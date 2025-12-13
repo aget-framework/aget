@@ -1,0 +1,376 @@
+# AGET Template Structure Guide
+
+**Version**: 1.0.0
+**Date**: 2025-12-01
+**Status**: CANONICAL
+**Location**: aget/docs/TEMPLATE_STRUCTURE_GUIDE.md
+
+---
+
+## Overview
+
+This guide defines the standard directory structure and file organization for AGET templates and agent instances.
+
+---
+
+## Standard Template Structure
+
+```
+template-{type}-aget/
+├── .aget/                          # AGET framework directory
+│   ├── version.json                # Agent identity and configuration
+│   ├── evolution/                  # Learning documents (L-series)
+│   │   ├── L001_example.md
+│   │   └── ...
+│   ├── specs/                      # Specifications (if applicable)
+│   │   └── {TEMPLATE}_SPEC_v1.0.yaml
+│   ├── docs/                       # Internal documentation
+│   │   └── ...
+│   ├── architecture/               # ADRs (optional)
+│   │   └── ADR-001-example.md
+│   └── tests/                      # Contract tests (optional)
+│       └── contract_tests.py
+├── AGENTS.md                       # Agent behavior specification
+├── CLAUDE.md -> AGENTS.md          # Symlink for Claude Code
+├── README.md                       # Public documentation
+├── CHANGELOG.md                    # Version history
+├── docs/                           # Extended documentation (optional)
+│   └── ...
+└── scripts/                        # Utility scripts (optional)
+    └── ...
+```
+
+---
+
+## Required Files
+
+### .aget/version.json
+
+Identity and configuration file.
+
+```json
+{
+  "aget_version": "2.9.0",
+  "created": "2025-12-01",
+  "updated": "2025-12-01",
+  "template": "worker",
+  "agent_name": "template-worker-aget",
+  "instance_type": "template",
+  "domain": "worker-template",
+  "portfolio": null,
+  "managed_by": "none",
+  "intelligence_enabled": true,
+  "collaboration_enabled": true,
+  "patterns": {
+    "session": "1.1.0",
+    "documentation": "1.0.0"
+  }
+}
+```
+
+**Required Fields**:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `aget_version` | string | Framework version (semver) |
+| `agent_name` | string | Full agent identifier |
+| `instance_type` | string | aget, AGET, template, or coordinator |
+| `domain` | string | Agent's area of operation |
+| `created` | string | Creation date (YYYY-MM-DD) |
+
+**Optional Fields**:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `updated` | string | Last update date |
+| `template` | string | Base template type |
+| `portfolio` | string | Portfolio assignment |
+| `managed_by` | string | Supervisor reference |
+| `intelligence_enabled` | boolean | Learning tracking active |
+| `collaboration_enabled` | boolean | Multi-agent coordination |
+| `patterns` | object | Pattern version tracking |
+| `migration_history` | array | Version migration log |
+
+### AGENTS.md
+
+Agent behavior specification. This is the primary configuration file that defines how the agent operates.
+
+**Required Sections**:
+
+```markdown
+# Agent Configuration
+
+@aget-version: 2.9.0
+
+## Substantial Change Protocol
+[Required for all agents]
+
+## Agent Identity
+[Name, Type, Domain, Portfolio, Manages, Managed By]
+
+## Purpose
+[Mission statement]
+
+## Session Protocol
+### Wake Up Protocol
+### Wind Down Protocol
+
+## [Domain-Specific Sections]
+[Vary by template type]
+
+---
+*Footer with agent identifier*
+```
+
+### CLAUDE.md
+
+MUST be a symlink to AGENTS.md:
+
+```bash
+ln -s AGENTS.md CLAUDE.md
+```
+
+This ensures Claude Code reads the correct configuration.
+
+---
+
+## Optional Directories
+
+### .aget/evolution/
+
+Learning documents captured during agent operation.
+
+**Naming Convention**: `L{NNN}_{snake_case_description}.md`
+
+```
+.aget/evolution/
+├── L001_initial_setup.md
+├── L002_workflow_discovery.md
+└── L187_wake_protocol_silent_execution.md
+```
+
+**L-doc Structure**:
+
+```markdown
+# L{NNN}: {Title}
+
+**Date**: YYYY-MM-DD
+**Context**: {session or source}
+**Status**: ACTIVE | SUPERSEDED
+
+---
+
+## Observation
+{What was observed}
+
+## Learning
+{What was learned}
+
+## Protocol
+{How to apply this learning}
+
+## Impact
+{Before/after comparison}
+
+---
+*{Pattern statement}*
+```
+
+### .aget/specs/
+
+Formal specifications for the template or agent.
+
+**Naming Convention**: `{NAME}_SPEC_v{X.Y}.yaml`
+
+```
+.aget/specs/
+├── WORKER_TEMPLATE_SPEC_v1.0.yaml
+└── CUSTOM_CAPABILITY_SPEC_v1.0.yaml
+```
+
+### .aget/architecture/
+
+Architectural Decision Records.
+
+**Naming Convention**: `ADR-{NNN}-{kebab-case-title}.md`
+
+```
+.aget/architecture/
+├── ADR-001-initial-architecture.md
+└── ADR-012-migration-strategy.md
+```
+
+### .aget/tests/
+
+Contract tests for specification compliance.
+
+```python
+# contract_tests.py
+def test_version_json_required_fields():
+    """Verify all required fields present."""
+    pass
+
+def test_claude_md_is_symlink():
+    """Verify CLAUDE.md is symlink to AGENTS.md."""
+    pass
+```
+
+---
+
+## Instance vs Template
+
+### Template Structure
+
+Templates are reference implementations. They have:
+
+- `instance_type: "template"`
+- `managed_by: "none"`
+- Complete documentation
+- Example configurations
+
+### Instance Structure
+
+Instances are deployed agents. They have:
+
+- `instance_type: "aget"` or `"AGET"`
+- `managed_by: "{supervisor-agent}"`
+- Portfolio assignment
+- Customized AGENTS.md
+
+**Instance Creation from Template**:
+
+```bash
+# Clone template
+cp -r template-worker-aget private-myagent-aget
+
+# Update version.json
+# - Change agent_name
+# - Set instance_type to aget or AGET
+# - Set portfolio
+# - Set managed_by
+
+# Update AGENTS.md
+# - Customize for specific use case
+
+# Recreate symlink
+rm CLAUDE.md
+ln -s AGENTS.md CLAUDE.md
+```
+
+---
+
+## File Size Guidelines
+
+### AGENTS.md Size Limit
+
+- **Hard limit**: 40,000 characters
+- **Warning threshold**: 35,000 characters (L146)
+
+**Strategies for large configurations**:
+
+1. Extract verbose content to .aget/docs/
+2. Use references instead of inline content
+3. Move historical context to evolution/
+4. Compress examples
+
+### version.json Size
+
+- Keep under 2,000 characters
+- Move complex nested objects to separate files
+
+---
+
+## Naming Conventions
+
+### Directory Names
+
+```
+{visibility}-{identifier}-{type}
+
+visibility: private | public | template
+identifier: kebab-case descriptive name
+type: aget | AGET
+
+Examples:
+- template-worker-aget
+- private-supervisor-AGET
+- private-impact-aget
+```
+
+### File Names
+
+| Type | Convention | Example |
+|------|------------|---------|
+| Specs | SCREAMING_SNAKE_CASE | WORKER_TEMPLATE_SPEC_v1.0.yaml |
+| ADRs | ADR-NNN-kebab-case | ADR-012-migration-strategy.md |
+| L-docs | L{NNN}_snake_case | L187_wake_protocol.md |
+| Plans | PROJECT_PLAN_{name} | PROJECT_PLAN_v2.9_core_specs.md |
+
+---
+
+## Validation Checklist
+
+Before committing a template or instance:
+
+- [ ] version.json has all required fields
+- [ ] aget_version matches framework version
+- [ ] CLAUDE.md is symlink to AGENTS.md
+- [ ] AGENTS.md under 40k characters
+- [ ] @aget-version header present in AGENTS.md
+- [ ] Substantial Change Protocol section exists
+- [ ] Session protocols defined
+- [ ] README.md exists and is current
+
+---
+
+## Common Patterns
+
+### Minimal Template
+
+```
+minimal-aget/
+├── .aget/
+│   └── version.json
+├── AGENTS.md
+├── CLAUDE.md -> AGENTS.md
+└── README.md
+```
+
+### Full-Featured Template
+
+```
+full-aget/
+├── .aget/
+│   ├── version.json
+│   ├── evolution/
+│   │   └── L001_initial.md
+│   ├── specs/
+│   │   └── TEMPLATE_SPEC_v1.0.yaml
+│   ├── architecture/
+│   │   └── ADR-001-design.md
+│   ├── docs/
+│   │   └── INTERNAL_GUIDE.md
+│   └── tests/
+│       └── contract_tests.py
+├── AGENTS.md
+├── CLAUDE.md -> AGENTS.md
+├── README.md
+├── CHANGELOG.md
+├── docs/
+│   └── USER_GUIDE.md
+└── scripts/
+    └── setup.sh
+```
+
+---
+
+## References
+
+- WORKER_TEMPLATE_SPEC_v1.0.yaml - Foundation capabilities
+- AGET_CONTROLLED_VOCABULARY.md - Standard terminology
+- AGET_VERSIONING_CONVENTIONS.md - Version rules
+- L171: Instance creation specification gap
+
+---
+
+*TEMPLATE_STRUCTURE_GUIDE.md — Standard structure for AGET templates*

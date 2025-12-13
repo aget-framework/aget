@@ -1,0 +1,511 @@
+spec:
+  id: SPEC-WORKER-TEMPLATE
+  version: "1.0.0"
+  maturity: standard
+  format_version: "1.1"
+  description: >
+    Foundation template specification for AGET framework. All other templates
+    inherit from this specification. Defines core session protocols, analysis
+    capabilities, evolution patterns, and configuration requirements.
+  system_name: template-worker-aget
+  inherits_from: null  # Foundation template - no parent
+  changelog:
+    - version: "1.0.0"
+      date: "2025-12-01"
+      changes: "Initial foundation specification with 35 capabilities"
+
+# =============================================================================
+# SESSION PROTOCOL CAPABILITIES
+# =============================================================================
+
+capabilities:
+
+  # ---------------------------------------------------------------------------
+  # Wake Protocol (CAP-001 to CAP-005)
+  # ---------------------------------------------------------------------------
+
+  CAP-001:
+    domain: session_protocol
+    statement: "WHEN Wake_Command is received, the SYSTEM shall execute Wake_Protocol"
+    pattern: event-driven
+    trigger: "User says 'wake up'"
+    inputs: ["Wake_Command"]
+    outputs: ["Session_Summary"]
+    enforcement: "Contract test test_wake_protocol_execution"
+    notes: "Foundation protocol - all templates must implement"
+
+  CAP-002:
+    domain: session_protocol
+    statement: "WHEN executing Wake_Protocol, the SYSTEM shall read Version_Json for agent identity"
+    pattern: event-driven
+    trigger: "Wake_Protocol execution"
+    inputs: [".aget/version.json"]
+    outputs: ["Agent identity fields"]
+    enforcement: "Contract test test_version_json_read"
+
+  CAP-003:
+    domain: session_protocol
+    statement: "WHEN executing Wake_Protocol, the SYSTEM shall display Session_Summary with agent identity"
+    pattern: event-driven
+    trigger: "Wake_Protocol execution"
+    inputs: ["Agent identity"]
+    outputs: ["Formatted session summary"]
+    enforcement: "Documentation"
+
+  CAP-004:
+    domain: session_protocol
+    statement: "WHERE Silent_Execution is specified, the SYSTEM shall suppress tool call output during Wake_Protocol"
+    pattern: optional
+    precondition: "AGENTS.md specifies silent execution"
+    inputs: ["Silent_Execution flag"]
+    outputs: ["Only final Session_Summary shown"]
+    enforcement: "Documentation in AGENTS.md"
+    notes: "L187 - Wake protocol should execute silently"
+
+  CAP-005:
+    domain: session_protocol
+    statement: "The SYSTEM shall complete Wake_Protocol WITHIN 30 seconds"
+    pattern: ubiquitous
+    constraint: "WITHIN 30 seconds"
+    enforcement: "Performance monitoring"
+
+  # ---------------------------------------------------------------------------
+  # Study Up Protocol (CAP-006 to CAP-008)
+  # ---------------------------------------------------------------------------
+
+  CAP-006:
+    domain: session_protocol
+    statement: "WHEN Study_Up_Command is received, the SYSTEM shall execute Study_Up_Protocol"
+    pattern: event-driven
+    trigger: "User says 'study up'"
+    inputs: ["Study_Up_Command"]
+    outputs: ["Deep context summary"]
+    enforcement: "Contract test test_study_up_protocol"
+
+  CAP-007:
+    domain: session_protocol
+    statement: "WHEN executing Study_Up_Protocol, the SYSTEM shall read Evolution_Directory contents"
+    pattern: event-driven
+    trigger: "Study_Up_Protocol execution"
+    inputs: [".aget/evolution/*"]
+    outputs: ["Learning document index"]
+    enforcement: "Documentation"
+
+  CAP-008:
+    domain: session_protocol
+    statement: "WHEN executing Study_Up_Protocol, the SYSTEM shall analyze managed resources"
+    pattern: event-driven
+    trigger: "Study_Up_Protocol execution"
+    inputs: ["Managed directory structure"]
+    outputs: ["Resource state summary"]
+    enforcement: "Documentation"
+
+  # ---------------------------------------------------------------------------
+  # Wind Down Protocol (CAP-009 to CAP-011)
+  # ---------------------------------------------------------------------------
+
+  CAP-009:
+    domain: session_protocol
+    statement: "WHEN Wind_Down_Command is received, the SYSTEM shall execute Wind_Down_Protocol"
+    pattern: event-driven
+    trigger: "User says 'wind down'"
+    inputs: ["Wind_Down_Command", "Session_State"]
+    outputs: ["Session closure summary"]
+    enforcement: "Contract test test_wind_down_protocol"
+
+  CAP-010:
+    domain: session_protocol
+    statement: "WHEN executing Wind_Down_Protocol, the SYSTEM shall document pending work"
+    pattern: event-driven
+    trigger: "Wind_Down_Protocol execution"
+    inputs: ["Session_State"]
+    outputs: ["Pending work documentation"]
+    enforcement: "Documentation"
+
+  CAP-011:
+    domain: session_protocol
+    statement: "WHEN executing Wind_Down_Protocol, the SYSTEM shall capture session learnings"
+    pattern: event-driven
+    trigger: "Wind_Down_Protocol execution"
+    inputs: ["Session insights"]
+    outputs: ["Learning_Document candidates"]
+    enforcement: "Documentation"
+
+  # ---------------------------------------------------------------------------
+  # Sign Off Protocol (CAP-012)
+  # ---------------------------------------------------------------------------
+
+  CAP-012:
+    domain: session_protocol
+    statement: "WHEN Sign_Off_Command is received, the SYSTEM shall execute Sign_Off_Protocol with complete closure"
+    pattern: event-driven
+    trigger: "User says 'sign off'"
+    inputs: ["Sign_Off_Command", "Session_State"]
+    outputs: ["Complete session record"]
+    enforcement: "Contract test test_sign_off_protocol"
+
+# =============================================================================
+# ANALYSIS CAPABILITIES
+# =============================================================================
+
+  # ---------------------------------------------------------------------------
+  # File Operations (CAP-013 to CAP-015)
+  # ---------------------------------------------------------------------------
+
+  CAP-013:
+    domain: analysis
+    statement: "The SYSTEM shall read File_Content from specified File_Path"
+    pattern: ubiquitous
+    inputs: ["File_Path"]
+    outputs: ["File_Content"]
+    enforcement: "Tool availability"
+    notes: "Core analysis capability - all templates"
+
+  CAP-014:
+    domain: analysis
+    statement: "The SYSTEM shall search for Pattern in codebase using Pattern_Search"
+    pattern: ubiquitous
+    inputs: ["Search pattern", "Scope"]
+    outputs: ["Matching locations"]
+    enforcement: "Tool availability"
+
+  CAP-015:
+    domain: analysis
+    statement: "The SYSTEM shall list Directory_Contents for navigation"
+    pattern: ubiquitous
+    inputs: ["Directory path"]
+    outputs: ["File and directory listing"]
+    enforcement: "Tool availability"
+
+  # ---------------------------------------------------------------------------
+  # Web Operations (CAP-016)
+  # ---------------------------------------------------------------------------
+
+  CAP-016:
+    domain: analysis
+    statement: "The SYSTEM shall fetch Web_Content from specified URL using Web_Fetch"
+    pattern: ubiquitous
+    inputs: ["URL", "Extraction prompt"]
+    outputs: ["Processed web content"]
+    enforcement: "Tool availability"
+
+# =============================================================================
+# ACTION CAPABILITIES (Instance Type Dependent)
+# =============================================================================
+
+  # ---------------------------------------------------------------------------
+  # Write Operations (CAP-017 to CAP-019)
+  # ---------------------------------------------------------------------------
+
+  CAP-017:
+    domain: action
+    statement: "WHERE Instance_Type is AGET, the SYSTEM shall permit File_Write operations"
+    pattern: optional
+    precondition: "instance_type == 'AGET'"
+    inputs: ["File_Path", "Content"]
+    outputs: ["File created or modified"]
+    enforcement: "Contract test test_action_capabilities"
+    notes: "Only action-taking instances (AGET) can write"
+
+  CAP-018:
+    domain: action
+    statement: "WHERE Instance_Type is AGET, the SYSTEM shall permit Command_Execute operations"
+    pattern: optional
+    precondition: "instance_type == 'AGET'"
+    inputs: ["Command"]
+    outputs: ["Command output"]
+    enforcement: "Contract test test_action_capabilities"
+
+  CAP-019:
+    domain: action
+    statement: "WHERE Instance_Type is aget, the SYSTEM shall operate in Read_Only_Mode WITHOUT Write_Operations"
+    pattern: optional
+    precondition: "instance_type == 'aget'"
+    inputs: []
+    outputs: ["Analysis and advisory only"]
+    enforcement: "Contract test test_read_only_mode"
+    notes: "Read-only instances (aget) cannot modify files"
+
+# =============================================================================
+# CONFIGURATION MANAGEMENT
+# =============================================================================
+
+  # ---------------------------------------------------------------------------
+  # Version Configuration (CAP-020 to CAP-022)
+  # ---------------------------------------------------------------------------
+
+  CAP-020:
+    domain: configuration
+    statement: "The SYSTEM shall maintain Version_Json with required identity fields"
+    pattern: ubiquitous
+    inputs: []
+    outputs: ["Valid version.json"]
+    enforcement: "Contract test test_version_json_required_fields"
+    required_fields:
+      - aget_version
+      - agent_name
+      - instance_type
+      - domain
+      - created
+
+  CAP-021:
+    domain: configuration
+    statement: "The SYSTEM shall validate aget_version follows semantic versioning"
+    pattern: ubiquitous
+    inputs: ["aget_version field"]
+    outputs: ["Validation result"]
+    enforcement: "Contract test test_version_is_valid_semver"
+
+  CAP-022:
+    domain: configuration
+    statement: "The SYSTEM shall maintain AGENTS.md as symlink target for Claude_Md"
+    pattern: ubiquitous
+    inputs: []
+    outputs: ["CLAUDE.md -> AGENTS.md symlink"]
+    enforcement: "Contract test test_claude_md_is_symlink"
+
+  # ---------------------------------------------------------------------------
+  # Size Management (CAP-023 to CAP-024)
+  # ---------------------------------------------------------------------------
+
+  CAP-023:
+    domain: configuration
+    statement: "The SYSTEM shall enforce Configuration_Size_Limit of 40000 characters"
+    pattern: ubiquitous
+    constraint: "Configuration_Size <= 40000"
+    inputs: ["AGENTS.md content"]
+    outputs: ["Size compliance status"]
+    enforcement: "Contract test test_configuration_size_limit"
+    notes: "L146 - Configuration size management"
+
+  CAP-024:
+    domain: configuration
+    statement: "IF Configuration_Size exceeds 35000 THEN the SYSTEM shall emit Size_Warning"
+    pattern: conditional
+    condition: "Configuration_Size > 35000"
+    inputs: ["AGENTS.md content"]
+    outputs: ["Warning message"]
+    enforcement: "Documentation"
+    notes: "Early warning at 87.5% of limit"
+
+# =============================================================================
+# EVOLUTION CAPABILITIES
+# =============================================================================
+
+  # ---------------------------------------------------------------------------
+  # Learning Tracking (CAP-025 to CAP-027)
+  # ---------------------------------------------------------------------------
+
+  CAP-025:
+    domain: evolution
+    statement: "WHERE Intelligence_Enabled is true, the SYSTEM shall track Learning_Documents in Evolution_Directory"
+    pattern: optional
+    precondition: "intelligence_enabled == true"
+    inputs: ["Learning insights"]
+    outputs: ["L-doc in .aget/evolution/"]
+    enforcement: "Documentation"
+
+  CAP-026:
+    domain: evolution
+    statement: "The SYSTEM shall format Learning_Document with L-number prefix"
+    pattern: ubiquitous
+    inputs: ["Learning content"]
+    outputs: ["L{NNN}_{description}.md"]
+    enforcement: "Naming convention"
+    notes: "Sequential L-numbers, snake_case description"
+
+  CAP-027:
+    domain: evolution
+    statement: "WHEN creating Learning_Document, the SYSTEM shall include date, context, and reusable pattern"
+    pattern: event-driven
+    trigger: "L-doc creation"
+    inputs: ["Learning insight"]
+    outputs: ["Structured L-doc"]
+    enforcement: "Documentation template"
+
+# =============================================================================
+# GOVERNANCE CAPABILITIES
+# =============================================================================
+
+  # ---------------------------------------------------------------------------
+  # Planning (CAP-028 to CAP-030)
+  # ---------------------------------------------------------------------------
+
+  CAP-028:
+    domain: governance
+    statement: "WHEN facing Substantial_Change, the SYSTEM shall create Project_Plan before execution"
+    pattern: event-driven
+    trigger: "Substantial change identified"
+    inputs: ["Change request"]
+    outputs: ["Project_Plan with gates"]
+    enforcement: "Documentation"
+    notes: "L186 - Substantial Change Protocol"
+
+  CAP-029:
+    domain: governance
+    statement: "The SYSTEM shall await Gate_Approval before proceeding past Gate checkpoint"
+    pattern: ubiquitous
+    inputs: ["Gate status"]
+    outputs: ["Execution proceeds or halts"]
+    enforcement: "Documentation"
+    notes: "GO/NOGO decision points"
+
+  CAP-030:
+    domain: governance
+    statement: "WHERE Gate_Override is granted, the SYSTEM shall document override rationale"
+    pattern: optional
+    precondition: "Principal grants override"
+    inputs: ["Override approval"]
+    outputs: ["Documented override"]
+    enforcement: "Documentation"
+
+# =============================================================================
+# COORDINATION CAPABILITIES
+# =============================================================================
+
+  # ---------------------------------------------------------------------------
+  # Portfolio (CAP-031 to CAP-032)
+  # ---------------------------------------------------------------------------
+
+  CAP-031:
+    domain: coordination
+    statement: "WHERE Portfolio_Assignment exists, the SYSTEM shall operate within Portfolio_Boundaries"
+    pattern: optional
+    precondition: "portfolio field is set"
+    inputs: ["Portfolio assignment"]
+    outputs: ["Scoped operations"]
+    enforcement: "Documentation"
+
+  CAP-032:
+    domain: coordination
+    statement: "The SYSTEM shall reference managed_by field for Supervisor coordination"
+    pattern: ubiquitous
+    inputs: ["managed_by field"]
+    outputs: ["Supervisor awareness"]
+    enforcement: "Contract test test_managed_by_reference"
+
+# =============================================================================
+# ENVIRONMENTAL GROUNDING
+# =============================================================================
+
+  # ---------------------------------------------------------------------------
+  # Verification (CAP-033 to CAP-035)
+  # ---------------------------------------------------------------------------
+
+  CAP-033:
+    domain: verification
+    statement: "BEFORE proposing changes, the SYSTEM shall verify current environment state"
+    pattern: event-driven
+    trigger: "Change proposal"
+    inputs: ["Target environment"]
+    outputs: ["Verified state"]
+    enforcement: "Documentation"
+    notes: "L185 - Environmental grounding"
+
+  CAP-034:
+    domain: verification
+    statement: "The SYSTEM shall use ls to verify directory existence BEFORE creating structure"
+    pattern: ubiquitous
+    inputs: ["Target path"]
+    outputs: ["Existence confirmation"]
+    enforcement: "Documentation"
+
+  CAP-035:
+    domain: verification
+    statement: "The SYSTEM shall check git status BEFORE proposing repository changes"
+    pattern: ubiquitous
+    inputs: ["Repository path"]
+    outputs: ["Repository state"]
+    enforcement: "Documentation"
+
+# =============================================================================
+# DEPENDENCIES
+# =============================================================================
+
+dependencies:
+  # Wake protocol chain
+  CAP-002: [CAP-001]
+  CAP-003: [CAP-002]
+  CAP-004: [CAP-001]
+
+  # Study up protocol chain
+  CAP-007: [CAP-006]
+  CAP-008: [CAP-006]
+
+  # Wind down protocol chain
+  CAP-010: [CAP-009]
+  CAP-011: [CAP-009]
+
+  # Action capabilities depend on instance type
+  CAP-017: [CAP-020]  # Needs version.json to check instance_type
+  CAP-018: [CAP-020]
+  CAP-019: [CAP-020]
+
+  # Learning depends on intelligence flag
+  CAP-025: [CAP-020]
+  CAP-026: [CAP-025]
+  CAP-027: [CAP-026]
+
+  # Governance chain
+  CAP-029: [CAP-028]
+  CAP-030: [CAP-029]
+
+# =============================================================================
+# CONTRACT TESTS
+# =============================================================================
+
+contract_tests:
+  required:
+    - test_wake_protocol_execution
+    - test_version_json_required_fields
+    - test_version_is_valid_semver
+    - test_claude_md_is_symlink
+    - test_configuration_size_limit
+    - test_instance_type_valid
+
+  recommended:
+    - test_study_up_protocol
+    - test_wind_down_protocol
+    - test_sign_off_protocol
+    - test_action_capabilities
+    - test_read_only_mode
+    - test_managed_by_reference
+
+# =============================================================================
+# INHERITANCE
+# =============================================================================
+
+inheritance:
+  description: >
+    This is the foundation template. All other templates (advisor, supervisor,
+    developer, spec-engineer, consultant) inherit these capabilities and may
+    add or override specific behaviors.
+
+  derived_templates:
+    - template-advisor-aget: "Adds advisory protocols, persona system"
+    - template-supervisor-aget: "Adds fleet coordination, portfolio governance"
+    - template-developer-aget: "Adds development workflows, code review"
+    - template-spec-engineer-aget: "Adds specification authoring"
+    - template-consultant-aget: "Adds consulting engagement patterns"
+
+  override_rules:
+    - "Derived templates MUST NOT remove foundation capabilities"
+    - "Derived templates MAY add new capabilities with CAP-1XX numbering"
+    - "Derived templates MAY specialize behavior via WHERE patterns"
+    - "Derived templates MUST maintain session protocol compatibility"
+
+# =============================================================================
+# METADATA
+# =============================================================================
+
+metadata:
+  created: "2025-12-01"
+  author: "private-aget-framework-AGET"
+  references:
+    - "L185: Environmental grounding"
+    - "L186: TodoWrite vs PROJECT_PLAN"
+    - "L187: Wake protocol silent execution"
+    - "L174: Template specification debt"
+    - "L171: Instance creation specification gap"
+  status: "CANONICAL"
+  location: "aget/specs/WORKER_TEMPLATE_SPEC_v1.0.yaml"
