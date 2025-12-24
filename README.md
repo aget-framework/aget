@@ -14,9 +14,13 @@ AGET is a configuration & lifecycle management system for CLI-based human-AI col
 
 Created 2025-11-21 via [ADR-001](https://github.com/aget-framework/private-supervisor-AGET/.aget/decisions/ADR-001-aget-framework-repository.md) in private-supervisor-AGET.
 
-## Current State (v2.10.0)
+## Current Version
 
-**v2.10.0**: Capability Composition Architecture - DAG-based composition enabling agents to declare multiple capabilities onto base templates. See L330-L332 for theoretical foundations.
+**v2.11.0** (2025-12-24): Memory Architecture + L352 Traceability + Version Migration
+
+Key features: 6-layer information model, five-tier requirement-to-test traceability, 80 contract tests passing, configurable wake-up output.
+
+**Version History**: See [docs/VERSION_HISTORY.md](docs/VERSION_HISTORY.md) for complete version timeline and known gaps.
 
 This repository contains:
 - `specs/` - Framework specifications
