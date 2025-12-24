@@ -1,6 +1,6 @@
 # R-PUB-001: Public Release Completeness
 
-**Version**: 1.0
+**Version**: 1.1
 **Date**: 2025-12-24
 **Status**: Active
 **Category**: Release Management
@@ -174,6 +174,83 @@ for link in links:
 
 ---
 
+### R-PUB-001-09: Latest Badge Correctness (Ubiquitous)
+
+**Statement**: The system SHALL mark the current version as "Latest" in GitHub Releases for all managed repositories.
+
+**Rationale**: GitHub displays "Latest" badge on most recent release chronologically. Retroactive releases or out-of-order tagging can mark wrong version as Latest, confusing users.
+
+**Verification**:
+```bash
+# For each repo, check Latest badge
+gh release list --repo aget-framework/REPO_NAME --limit 1 | grep "vX.Y.Z.*Latest"
+# If found = pass, else fail
+```
+
+**Implements**: User navigation requirement (L360)
+
+**Added**: v1.1 (2025-12-24) - Phase 2 validation enhancement
+
+---
+
+### R-PUB-001-10: Homepage Content Consistency (Ubiquitous)
+
+**Statement**: The organization homepage content SHALL be consistent with version badge (code examples, roadmap, migration history all reference current version).
+
+**Rationale**: Badge showing v2.11.0 but content showing v2.9.0 creates user confusion. Semantic consistency required, not just badge update.
+
+**Verification**:
+```bash
+# Extract homepage content
+content=$(curl -s https://raw.githubusercontent.com/aget-framework/.github/main/profile/README.md)
+
+# Check code examples
+echo "$content" | grep '"aget_version": "X.Y.Z"' || fail
+
+# Check roadmap current marker
+echo "$content" | grep 'vX.Y.Z (Current)' || fail
+
+# Check version progression
+echo "$content" | grep 'v2.5 → v2.6 → ... → vX.Y.Z' || fail
+```
+
+**Implements**: Content-badge alignment requirement (L361)
+
+**Added**: v1.1 (2025-12-24) - Phase 2 validation enhancement
+
+---
+
+### R-PUB-001-11: Historical Release Completeness (Conditional)
+
+**Statement**: IF templates have N releases, THEN core (aget/) SHALL have at least N-2 releases.
+
+**Rationale**: Significant gap (e.g., templates at v2.11, core at v2.2) suggests incomplete historical release backfill. Small gap acceptable (templates update more frequently).
+
+**Verification**:
+```bash
+# Count releases
+aget_count=$(gh release list --repo aget-framework/aget --limit 100 | wc -l)
+template_count=$(gh release list --repo aget-framework/template-worker-aget --limit 100 | wc -l)
+
+# Calculate gap
+gap=$((template_count - aget_count))
+
+# Acceptable gap: ≤ 2 versions
+if [ $gap -le 2 ]; then
+  echo "PASS: Gap = $gap (acceptable)"
+else
+  echo "FAIL: Gap = $gap (threshold: 2)"
+fi
+```
+
+**Implements**: Historical completeness requirement (L360)
+
+**Added**: v1.1 (2025-12-24) - Phase 2 validation enhancement
+
+**Note**: Does not require perfect parity (1:1). Allows 2-version acceptable gap for operational flexibility.
+
+---
+
 ## Requirement Summary Table
 
 | ID | Type | Statement Summary | Verification |
@@ -186,6 +263,9 @@ for link in links:
 | R-PUB-001-06 | Conditional | Major/minor have release notes | Body length or file exists |
 | R-PUB-001-07 | Ubiquitous | Users can access historical versions | Tag/release exists |
 | R-PUB-001-08 | Ubiquitous | No broken links in releases | HTTP status checks |
+| R-PUB-001-09 | Ubiquitous | Current version marked "Latest" | `gh release list` grep |
+| R-PUB-001-10 | Ubiquitous | Homepage content matches badge version | Content parsing |
+| R-PUB-001-11 | Conditional | Core releases within 2 of templates | Release count comparison |
 
 ---
 
@@ -203,19 +283,25 @@ for link in links:
 | R-PUB-001-06 | Context provision | Major changes need narrative |
 | R-PUB-001-07 | Reproducibility | Historical access required |
 | R-PUB-001-08 | Quality assurance | Link rot prevention |
+| R-PUB-001-09 | L360 (external validation) | Latest badge must reflect actual current version |
+| R-PUB-001-10 | L361 (badge-content consistency) | Content must align with badge version |
+| R-PUB-001-11 | L360 (completeness validation) | Historical release parity prevents gaps |
 
 ### Validated By
 
 | Requirement | Test | Location |
 |-------------|------|----------|
-| R-PUB-001-01 | test_github_releases_exist() | tests/test_public_release_completeness.py |
-| R-PUB-001-02 | test_release_artifact_completeness() | tests/test_public_release_completeness.py |
-| R-PUB-001-03 | test_org_homepage_currency() | tests/test_public_release_completeness.py |
-| R-PUB-001-04 | test_version_badge_accuracy() | tests/test_public_release_completeness.py |
-| R-PUB-001-05 | test_changelog_accessibility() | tests/test_public_release_completeness.py |
-| R-PUB-001-06 | test_release_notes_accessibility() | tests/test_public_release_completeness.py |
-| R-PUB-001-07 | test_historical_version_access() | tests/test_public_release_completeness.py |
-| R-PUB-001-08 | test_broken_link_prevention() | tests/test_public_release_completeness.py |
+| R-PUB-001-01 | check_github_releases_exist() | .aget/patterns/release/post_release_validation.py |
+| R-PUB-001-02 | Manual validation | sops/RELEASE_VERIFICATION_CHECKLIST.md |
+| R-PUB-001-03 | check_org_homepage_currency() | .aget/patterns/release/post_release_validation.py |
+| R-PUB-001-04 | check_version_badge_accuracy() | .aget/patterns/release/post_release_validation.py |
+| R-PUB-001-05 | check_changelog_accessibility() | .aget/patterns/release/post_release_validation.py |
+| R-PUB-001-06 | Manual validation | sops/RELEASE_VERIFICATION_CHECKLIST.md |
+| R-PUB-001-07 | check_historical_version_access() | .aget/patterns/release/post_release_validation.py |
+| R-PUB-001-08 | check_broken_links() | .aget/patterns/release/post_release_validation.py |
+| R-PUB-001-09 | check_latest_badge_correct() | .aget/patterns/release/post_release_validation.py |
+| R-PUB-001-10 | check_homepage_content_consistency() | .aget/patterns/release/post_release_validation.py |
+| R-PUB-001-11 | check_historical_release_completeness() | .aget/patterns/release/post_release_validation.py |
 
 ### Referenced In
 
@@ -231,16 +317,23 @@ for link in links:
 ## Success Criteria
 
 **Release is complete WHEN**:
-- All R-PUB-001-01 through R-PUB-001-08 requirements satisfied
-- Post-release validation script exits with code 0
-- Manual validation checklist 100% checked
+- All R-PUB-001-01 through R-PUB-001-11 requirements satisfied
+- Post-release validation script exits with code 0 (9/9 automated checks passing)
+- Manual validation checklist 100% checked (2 manual checks)
 
 **Release is incomplete WHEN**:
 - Any requirement fails validation
 - Broken links detected
 - Organization homepage shows outdated version
+- Latest badge shows wrong version
+- Homepage content inconsistent with badge version
+- Historical release gap exceeds threshold
 
 **Action on failure**: DO NOT announce release publicly until gaps closed.
+
+**Automation Coverage** (v1.1):
+- Automated: 9/11 requirements (82%)
+- Manual: 2/11 requirements (18%)
 
 ---
 
@@ -249,6 +342,7 @@ for link in links:
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0 | 2025-12-24 | Initial specification (8 requirements) |
+| 1.1 | 2025-12-24 | Added R-PUB-001-09 (Latest badge), R-PUB-001-10 (content consistency), R-PUB-001-11 (historical completeness) - Phase 2 validation enhancement |
 
 ---
 
