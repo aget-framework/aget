@@ -1,0 +1,275 @@
+# AGET Framework Version History
+
+This document provides a complete timeline of AGET Framework versions and their release status across all repositories.
+
+**Legend**:
+- ✅ GitHub Release exists
+- ❌ No GitHub Release (gap)
+- ⚠️ Partial (some repos only)
+- 🔄 Retroactive (created after work completed)
+
+---
+
+## Current Version
+
+**v2.11.0** (2025-12-24) - Memory Architecture + L352 Traceability + Version Migration
+
+All 7 repositories have GitHub Releases: ✅
+
+---
+
+## Version Timeline
+
+### v2.11.0 (2025-12-24) ✅
+
+**Theme**: Memory Architecture + L352 Traceability + Version Migration
+
+**Status**: Complete release (all repos)
+
+| Repository | Release | Notes |
+|------------|---------|-------|
+| aget | ✅ | Core framework |
+| template-supervisor | ✅ | Supervisor template |
+| template-worker | ✅ | Worker template |
+| template-advisor | ✅ | Advisor template |
+| template-consultant | ✅ | Consultant template |
+| template-developer | ✅ | Developer template |
+| template-spec-engineer | ✅ | Spec engineer template |
+
+**Key Features**:
+- Memory Architecture (L335): 6-layer information model
+- L352 Traceability Pattern: Five-tier requirement-to-test traceability
+- Version Migration (R-REL-006): Manager self-updates
+- 40 contract tests with full traceability
+- Configurable wake-up output
+
+**See**: [AGET_DELTA_v2.11.md](../specs/deltas/AGET_DELTA_v2.11.md)
+
+---
+
+### v2.10.0 (2025-12-13) 🔄
+
+**Theme**: Capability Composition Architecture
+
+**Status**: Complete release (retroactively created 2025-12-24)
+
+| Repository | Release | Notes |
+|------------|---------|-------|
+| aget | ✅ 🔄 | Created 2025-12-24 |
+| template-supervisor | ✅ 🔄 | Created 2025-12-24 |
+| template-worker | ✅ 🔄 | Created 2025-12-24 |
+| template-advisor | ✅ 🔄 | Created 2025-12-24 |
+| template-consultant | ✅ 🔄 | Created 2025-12-24 |
+| template-developer | ✅ 🔄 | Created 2025-12-24 |
+| template-spec-engineer | ✅ 🔄 | Created 2025-12-24 |
+
+**Key Features**:
+- 6 agent type specifications
+- Executive Advisor pattern (5W+H knowledge architecture)
+- Domain Specialist pattern (structured outputs)
+- L330-L332 learnings (knowledge inheritance, theoretical grounding)
+
+**Note**: Work completed 2025-12-13. GitHub Releases created retroactively on 2025-12-24 as part of public framework governance enhancement (Gap Analysis → L358).
+
+**See**: aget/specs/deltas/AGET_DELTA_v2.10.md (if exists)
+
+---
+
+### v2.9.0 (2025-12-01) ⚠️
+
+**Theme**: Information Storage Standardization
+
+**Status**: Partial release (4/7 repos)
+
+| Repository | Release | Notes |
+|------------|---------|-------|
+| aget | ❌ | No release |
+| template-supervisor | ❌ | No release |
+| template-worker | ❌ | No release |
+| template-advisor | ✅ | Released 2025-11-24 |
+| template-consultant | ✅ | Released 2025-11-24 |
+| template-developer | ✅ | Released 2025-11-24 |
+| template-spec-engineer | ✅ | Released 2025-11-24 |
+
+**Key Features**: Core specifications, vocabulary standards
+
+**Known Gap**: Only advisor-family templates received GitHub Releases
+
+---
+
+### v2.8.0 (2025-11-08) ✅
+
+**Theme**: Planning & Infrastructure
+
+**Status**: Complete release (all repos)
+
+| Repository | Release | Notes |
+|------------|---------|-------|
+| aget | ❌ | No release (core had no releases until v2.11.0) |
+| template-supervisor | ✅ | Released 2025-11-10 |
+| template-worker | ✅ | Released 2025-11-10 |
+| template-advisor | ✅ | Released 2025-11-10 |
+| template-consultant | ✅ | Released 2025-11-10 |
+| template-developer | ✅ | Released 2025-11-10 |
+| template-spec-engineer | ✅ | Released 2025-11-10 |
+
+**Key Features**: Friction reduction, enhancement filing protocol, planning framework
+
+---
+
+### v2.7.0 (2025-10-13) ✅
+
+**Theme**: Portfolio Governance
+
+**Status**: Partial release (most templates)
+
+| Repository | Release | Notes |
+|------------|---------|-------|
+| aget | ❌ | No release |
+| template-supervisor | ✅ | Released 2025-10-13 |
+| template-worker | ✅ | Released 2025-10-13 |
+| template-advisor | ✅ | Released 2025-10-13 |
+| template-consultant | ⚠️ | Uncertain |
+| template-developer | ✅ | Released 2025-10-20 |
+| template-spec-engineer | ⚠️ | Uncertain |
+
+**Key Features**: Portfolio field, naming conventions, advisor personas
+
+---
+
+### v2.6.0 (2025-10-12) ❌
+
+**Theme**: Size Management
+
+**Status**: No GitHub Releases (known gap)
+
+| Repository | Release | Notes |
+|------------|---------|-------|
+| aget | ❌ | Migration history exists, no tag/release |
+| All templates | ❌ | No releases created |
+
+**Known Gap**: Version documented in migration history but no releases published
+
+---
+
+### v2.5.0 (2025-10-06) ⚠️
+
+**Theme**: Validation Framework
+
+**Status**: Partial release (some templates)
+
+| Repository | Release | Notes |
+|------------|---------|-------|
+| aget | ❌ | No release |
+| template-worker | ✅ | Released 2025-10-04 |
+| Others | ⚠️ | Uncertain/incomplete |
+
+**Known Gap**: Incomplete release coverage
+
+---
+
+### v2.4.0 and Earlier
+
+See individual repository release pages for v2.0-v2.4 history.
+
+Most repositories have GitHub Releases for v2.1-v2.4 created during early framework development.
+
+---
+
+## Known Gaps Summary
+
+### Complete Gaps (No Releases Anywhere)
+
+- **v2.6.0**: Documented in migration history, no releases created
+
+### Partial Gaps (Some Repos Missing)
+
+- **v2.9.0**: Only advisor-family templates (4/7)
+- **v2.7.0**: Most templates, but some uncertain
+- **v2.5.0**: Incomplete coverage
+
+### Core Repository (aget/) Historical Gap
+
+The core framework repository (`aget/`) did NOT have GitHub Releases until v2.11.0, despite having version history documented in migration_history.
+
+**Affected Versions**: v2.5.0, v2.6.0, v2.7.0, v2.8.0, v2.9.0
+**Reason**: Private→public transition focused on making repos visible without establishing public release process
+**Addressed**: v2.10.0 created retroactively (2025-12-24), v2.11.0 includes complete release process
+
+---
+
+## Why Gaps Exist
+
+**Root Cause**: Private→public transition (2024-2025)
+
+During the transition from private experimentation to public framework:
+- **Internal versioning** (version.json, migration_history) was maintained ✅
+- **Public releases** (GitHub Releases, tags, announcements) were inconsistent ❌
+
+**Analysis**: See `.aget/evolution/L358_tags_vs_releases_github.md` in private-aget-framework-AGET
+
+**Resolution**: Public framework governance established (v2.11.0+) with:
+- Post-release validation (user-visible state)
+- Organization homepage currency
+- Complete release specifications (R-PUB-001)
+
+---
+
+## Going Forward (v2.11.0+)
+
+**Commitment**: Every version increment will include:
+
+1. ✅ Git tags (all 7 repos)
+2. ✅ GitHub Releases (all 7 repos)
+3. ✅ Organization homepage update
+4. ✅ CHANGELOG entries
+5. ✅ Delta specification
+6. ✅ Migration guide (if breaking)
+
+**Validation**: Post-release validation script ensures user-visible completeness
+
+**Transparency**: Version gaps acknowledged, not hidden
+
+---
+
+## How to Access Versions
+
+### Latest Stable
+
+Visit: https://github.com/aget-framework/aget/releases
+
+### Specific Version
+
+```bash
+# View all releases
+gh release list --repo aget-framework/aget
+
+# Clone specific version
+git clone --branch v2.11.0 https://github.com/aget-framework/aget.git
+
+# Checkout existing clone
+git checkout v2.11.0
+```
+
+### Version Compatibility
+
+All templates share the same major.minor version:
+- aget: v2.11.0
+- template-*: v2.11.0
+
+Templates at v2.11.x are compatible with aget v2.11.y (patch versions independent).
+
+---
+
+## Contributing
+
+Found a version gap or inconsistency? Please file an issue:
+https://github.com/aget-framework/aget/issues
+
+We acknowledge historical gaps transparently and focus on complete releases going forward.
+
+---
+
+*VERSION_HISTORY.md - Complete version timeline for AGET Framework*
+*Last Updated: 2025-12-24*
+*Maintained by: private-aget-framework-AGET*
