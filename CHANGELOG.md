@@ -15,6 +15,58 @@ No unreleased changes at this time.
 
 ---
 
+## [2.12.0] - 2025-12-25
+
+### Added
+
+- **Capability Architecture Completion**: Full implementation of capability composition system
+- **CAPABILITY_SPEC_v1.0_SCHEMA.yaml**: JSON Schema for capability specifications
+- **TEMPLATE_MANIFEST_v1.0_SCHEMA.yaml**: JSON Schema for agent composition declarations
+- **COMPOSITION_SPEC_v1.0.md**: DAG composition rules, conflict detection, resolution strategies
+- **5 Capability Specifications**:
+  - `memory-management` (upgraded from DRAFT to v1.0 APPROVED)
+  - `domain-knowledge` (P0 - 12+ agent demand)
+  - `structured-outputs` (P0 - 8+ agent demand)
+  - `collaboration` (P1 - multi-agent coordination)
+  - `org-kb` (P1 - 5W+H organizational knowledge base)
+- **3 Validators**:
+  - `validate_capability_spec.py`: Schema compliance for capability specs
+  - `validate_template_manifest.py`: Manifest structure validation
+  - `validate_composition.py`: DAG conflict detection, prerequisite checking
+- **80 Capability Architecture Tests**: Comprehensive test suite across 5 test files
+- **3 Practitioner Guides**:
+  - `CAPABILITY_AUTHOR_GUIDE.md`: How to create new capabilities (521 lines)
+  - `COMPOSITION_GUIDE.md`: How to compose agents from capabilities (556 lines)
+  - `FLEET_MIGRATION_GUIDE.md`: Step-by-step migration procedures (618 lines)
+
+### Changed
+
+- Architecture completeness: 65% → 100% (all 5 layers complete)
+- Fleet Migration Phase 2 prerequisites: All satisfied
+
+### Documentation
+
+- Pattern documents for structured-outputs and collaboration capabilities
+- Cross-referenced documentation ecosystem for practitioners
+- Pilot agent inventory with version gap analysis
+
+### Tests
+
+80 passing (capability architecture tests)
+- test_capability_spec_validation.py (18 tests)
+- test_template_manifest_validation.py (14 tests)
+- test_composition_validation.py (16 tests)
+- test_agent_type_instantiation.py (12 tests)
+- test_capability_contracts.py (20 tests)
+
+### Fleet Migration Enablement
+
+- 5 pilot agents documented with projected compositions
+- Migration complexity ranking established
+- Recommended migration order (3 waves)
+
+---
+
 ## [2.11.0] - 2025-12-24
 
 ### Added
@@ -274,9 +326,9 @@ This version exists in migration_history but was never published as a GitHub Rel
 
 ## Version Support
 
-**Latest Stable**: v2.11.0
+**Latest Stable**: v2.12.0
 **Support Window**: Latest release receives full support (bug fixes, enhancements)
-**Previous Minor** (v2.10.x): Security fixes only
+**Previous Minor** (v2.11.x): Security fixes only
 **Older Versions**: No active support (upgrade recommended)
 
 ---
