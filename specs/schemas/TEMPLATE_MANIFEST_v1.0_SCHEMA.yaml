@@ -1,0 +1,487 @@
+# TEMPLATE_MANIFEST_v1.0_SCHEMA.yaml
+# JSON Schema for AGET Template Manifest (Agent Composition Declaration)
+# Version: 1.0.0
+# Created: 2025-12-24
+# Author: private-aget-framework-AGET
+#
+# This schema defines the structure for template manifests, which declare
+# how agents are composed from base templates and capabilities.
+#
+# The manifest enables DAG-based composition per L330:
+#   Agent = Base_Template ⊕ Capability_1 ⊕ Capability_2 ⊕ ... ⊕ Capability_n
+#
+# Reference: L330 (Capability Composition Architecture)
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://aget-framework.github.io/schemas/template-manifest/v1.0"
+
+title: AGET Template Manifest Schema
+description: |
+  Declares agent composition: base template + capabilities.
+  Used to instantiate agent types from the capability composition model.
+
+type: object
+required:
+  - apiVersion
+  - kind
+  - metadata
+  - composition
+
+# =============================================================================
+# TOP-LEVEL STRUCTURE
+# =============================================================================
+
+properties:
+
+  # ---------------------------------------------------------------------------
+  # API Version & Kind (Required)
+  # ---------------------------------------------------------------------------
+
+  apiVersion:
+    type: string
+    const: "aget.framework/v1"
+    description: API version for template manifests
+
+  kind:
+    type: string
+    const: "TemplateManifest"
+    description: Resource kind identifier
+
+  # ---------------------------------------------------------------------------
+  # Metadata (Required)
+  # ---------------------------------------------------------------------------
+
+  metadata:
+    type: object
+    description: Manifest metadata including identity and classification
+    required:
+      - name
+      - version
+    properties:
+      name:
+        type: string
+        pattern: "^[a-z][a-z0-9-]*$"
+        description: |
+          Unique manifest/agent type identifier. Lowercase with hyphens.
+          Examples: data-science-aget, executive-advisor-aget
+        minLength: 3
+        maxLength: 60
+
+      version:
+        type: string
+        pattern: "^\\d+\\.\\d+\\.\\d+$"
+        description: Manifest version (semantic versioning)
+
+      agent_type:
+        type: string
+        description: |
+          Human-readable agent type name.
+          Examples: Data Science Aget, Executive Advisor Aget
+
+      description:
+        type: string
+        description: Brief description of what this agent type does
+
+      author:
+        type: string
+        description: Creating agent or person identifier
+
+      created:
+        type: string
+        format: date
+        description: Creation date
+
+      updated:
+        type: string
+        format: date
+        description: Last update date
+
+      status:
+        type: string
+        enum:
+          - draft
+          - active
+          - deprecated
+        default: active
+        description: Manifest lifecycle status
+
+      labels:
+        type: object
+        additionalProperties:
+          type: string
+        description: |
+          Key-value labels for organization and filtering.
+          Examples: portfolio: main, domain: data-science
+
+      annotations:
+        type: object
+        additionalProperties:
+          type: string
+        description: Non-identifying metadata (notes, references)
+
+  # ---------------------------------------------------------------------------
+  # Composition (Required) - Core DAG Declaration
+  # ---------------------------------------------------------------------------
+
+  composition:
+    type: object
+    description: |
+      Defines the agent composition: base template + capabilities.
+      This is the core DAG declaration per L330.
+    required:
+      - base_template
+      - capabilities
+    properties:
+
+      base_template:
+        type: string
+        enum:
+          - worker
+          - advisor
+          - supervisor
+          - consultant
+          - developer
+          - spec-engineer
+        description: |
+          Base template for this agent type.
+          All agents inherit from exactly one base template.
+
+      capabilities:
+        type: array
+        description: |
+          List of capabilities to compose with the base template.
+          Order matters only for conflict resolution (if using first-wins/last-wins).
+        items:
+          type: object
+          required:
+            - name
+            - version
+          properties:
+            name:
+              type: string
+              pattern: "^[a-z][a-z0-9-]*$"
+              description: Capability name (must match a defined capability)
+
+            version:
+              type: string
+              pattern: "^\\d+\\.\\d+\\.\\d+(-[a-z]+)?$"
+              description: Required capability version
+
+            required:
+              type: boolean
+              default: true
+              description: |
+                Whether this capability is required for the agent.
+                Optional capabilities can be omitted in instances.
+
+            configuration:
+              type: object
+              description: |
+                Capability-specific configuration.
+                Structure depends on the capability.
+              additionalProperties: true
+
+            enabled:
+              type: boolean
+              default: true
+              description: Whether this capability is enabled
+
+      composition_rules:
+        type: object
+        description: Rules for handling composition edge cases
+        properties:
+          conflict_resolution:
+            type: string
+            enum:
+              - error       # Fail on any conflict (safest, default)
+              - first-wins  # Earlier capability takes precedence
+              - last-wins   # Later capability takes precedence
+              - merge       # Attempt to merge conflicting behaviors
+            default: error
+            description: How to handle capability conflicts
+
+          optional_capabilities:
+            type: array
+            items:
+              type: string
+            description: |
+              Capabilities that can be omitted in instances.
+              Overrides the 'required' field in capability entries.
+
+          excluded_capabilities:
+            type: array
+            items:
+              type: string
+            description: |
+              Capabilities explicitly excluded from this composition.
+              Useful for inheritance scenarios.
+
+          behavior_overrides:
+            type: object
+            additionalProperties:
+              type: string
+            description: |
+              Override specific behaviors.
+              Key: behavior_name, Value: override_behavior_name
+
+  # ---------------------------------------------------------------------------
+  # Validation (Optional) - Composition Validation Status
+  # ---------------------------------------------------------------------------
+
+  validation:
+    type: object
+    description: Records of validation checks performed
+    properties:
+      dag_validated:
+        type: boolean
+        description: Whether DAG has been validated (no cycles)
+
+      conflicts_checked:
+        type: boolean
+        description: Whether conflict detection has been run
+
+      prerequisites_satisfied:
+        type: boolean
+        description: Whether all capability prerequisites are met
+
+      last_validated:
+        type: string
+        format: date-time
+        description: Timestamp of last validation
+
+      validation_errors:
+        type: array
+        items:
+          type: string
+        description: List of validation errors (if any)
+
+      validation_warnings:
+        type: array
+        items:
+          type: string
+        description: List of validation warnings (if any)
+
+  # ---------------------------------------------------------------------------
+  # Instance Defaults (Optional) - Defaults for Agent Instances
+  # ---------------------------------------------------------------------------
+
+  instance_defaults:
+    type: object
+    description: |
+      Default values for instances created from this manifest.
+      Can be overridden in individual agent version.json files.
+    properties:
+      portfolio:
+        type: string
+        description: Default portfolio for instances
+
+      instance_type:
+        type: string
+        enum:
+          - aget  # Advisory (read-only)
+          - AGET  # Action-taking (can modify)
+        description: Default instance type
+
+      governance_intensity:
+        type: string
+        enum:
+          - minimal
+          - standard
+          - rigorous
+        description: Default governance intensity level
+
+      wake_sections:
+        type: array
+        items:
+          type: string
+        description: Default wake-up protocol sections
+
+  # ---------------------------------------------------------------------------
+  # Theoretical Basis (Optional) - Per L332
+  # ---------------------------------------------------------------------------
+
+  theoretical_basis:
+    type: object
+    description: |
+      Theoretical grounding for this agent type composition.
+      Documents why this particular combination makes sense.
+    properties:
+      pattern:
+        type: string
+        description: |
+          Named pattern this composition follows.
+          Examples: Domain Specialist, Executive Advisor
+
+      primary_theory:
+        type: string
+        description: Primary theoretical foundation
+
+      rationale:
+        type: string
+        description: Why this composition is appropriate
+
+      references:
+        type: array
+        items:
+          type: string
+        description: L-docs or papers supporting this composition
+
+  # ---------------------------------------------------------------------------
+  # Use Cases (Optional) - When to Use This Agent Type
+  # ---------------------------------------------------------------------------
+
+  use_cases:
+    type: array
+    description: Scenarios where this agent type is appropriate
+    items:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Use case name
+
+        description:
+          type: string
+          description: When this use case applies
+
+        examples:
+          type: array
+          items:
+            type: string
+          description: Concrete examples
+
+  # ---------------------------------------------------------------------------
+  # Changelog (Optional)
+  # ---------------------------------------------------------------------------
+
+  changelog:
+    type: array
+    description: History of manifest changes
+    items:
+      type: object
+      required:
+        - version
+        - date
+        - changes
+      properties:
+        version:
+          type: string
+        date:
+          type: string
+          format: date
+        author:
+          type: string
+        changes:
+          type: array
+          items:
+            type: string
+
+# =============================================================================
+# ADDITIONAL PROPERTIES
+# =============================================================================
+
+additionalProperties: false
+
+# =============================================================================
+# EXAMPLES
+# =============================================================================
+
+examples:
+  # Example 1: Data Science Aget (Domain Specialist pattern)
+  - apiVersion: aget.framework/v1
+    kind: TemplateManifest
+    metadata:
+      name: data-science-aget
+      version: 1.0.0
+      agent_type: Data Science Aget
+      description: Domain specialist for data science advisory
+      labels:
+        pattern: domain-specialist
+        domain: data-science
+    composition:
+      base_template: advisor
+      capabilities:
+        - name: domain-knowledge
+          version: 1.0.0
+          configuration:
+            domain: data-science
+            expertise_areas:
+              - machine-learning
+              - statistical-analysis
+              - experiment-design
+        - name: structured-outputs
+          version: 1.0.0
+        - name: memory-management
+          version: 1.0.0
+      composition_rules:
+        conflict_resolution: error
+    validation:
+      dag_validated: true
+      conflicts_checked: true
+      prerequisites_satisfied: true
+      last_validated: "2025-12-24T00:00:00Z"
+    theoretical_basis:
+      pattern: Domain Specialist
+      primary_theory: Extended Mind
+      rationale: |
+        Domain knowledge capability extends agent cognition with
+        specialized data science expertise, enabling deep advisory.
+
+  # Example 2: Executive Advisor Aget (Executive Advisor pattern)
+  - apiVersion: aget.framework/v1
+    kind: TemplateManifest
+    metadata:
+      name: executive-advisor-aget
+      version: 1.0.0
+      agent_type: Executive Advisor Aget
+      description: Cross-functional coordinator with 5W+H KB architecture
+      labels:
+        pattern: executive-advisor
+        domain: cross-functional
+    composition:
+      base_template: advisor
+      capabilities:
+        - name: org-kb
+          version: 1.0.0
+          configuration:
+            kb_structure: 5w+h
+        - name: collaboration
+          version: 1.0.0
+        - name: memory-management
+          version: 1.0.0
+      composition_rules:
+        conflict_resolution: error
+    theoretical_basis:
+      pattern: Executive Advisor
+      primary_theory: Transactive Memory
+      rationale: |
+        Org-kb capability enables cross-functional coordination by
+        providing shared "who knows what" indexing across teams.
+
+# =============================================================================
+# SCHEMA METADATA
+# =============================================================================
+
+$comment: |
+  TEMPLATE_MANIFEST_v1.0_SCHEMA.yaml
+
+  This schema is part of the AGET Capability Composition Architecture (L330).
+
+  The Template Manifest declares agent composition following the DAG model:
+    Agent = Base_Template ⊕ Capability_1 ⊕ ... ⊕ Capability_n
+
+  Key concepts:
+  - base_template: One of 6 base templates (worker, advisor, etc.)
+  - capabilities: Array of capability declarations
+  - composition_rules: How to handle conflicts
+
+  Usage:
+    python3 -c "import yaml, jsonschema; ..."
+    # Or use validate_template_manifest.py
+
+  References:
+    - L330: Capability Composition Architecture
+    - COMPOSITION_SPEC_v1.0.md: Composition rules
+
+  Created: 2025-12-24
+  Author: private-aget-framework-AGET
