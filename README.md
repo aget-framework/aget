@@ -12,7 +12,7 @@ AGET is a configuration & lifecycle management system for CLI-based human-AI col
 
 ## Origin
 
-Created 2025-11-21 via [ADR-001](https://github.com/aget-framework/private-supervisor-AGET/.aget/decisions/ADR-001-aget-framework-repository.md) in private-supervisor-AGET.
+Created 2025-11-21 via ADR-001 (AGET Framework Repository decision).
 
 ## Current Version
 
