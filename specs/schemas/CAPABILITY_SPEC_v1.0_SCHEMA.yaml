@@ -1,0 +1,566 @@
+# CAPABILITY_SPEC_v1.0_SCHEMA.yaml
+# JSON Schema for AGET Capability Specifications
+# Version: 1.0.0
+# Created: 2025-12-24
+# Author: private-aget-framework-AGET
+#
+# This schema defines the structure for all capability specifications
+# in the AGET framework. Capabilities are composable behavioral units
+# that can be added to base templates to create specialized agent types.
+#
+# Reference: L330 (Capability Composition Architecture)
+# Theoretical Basis: L331 (Theoretical Foundations of Agency)
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://aget-framework.github.io/schemas/capability-spec/v1.0"
+
+title: AGET Capability Specification Schema
+description: |
+  Defines the structure for capability specifications in the AGET framework.
+  Capabilities are composable units of agent behavior that extend base templates.
+
+type: object
+required:
+  - apiVersion
+  - kind
+  - metadata
+  - spec
+  - behaviors
+
+# =============================================================================
+# TOP-LEVEL STRUCTURE
+# =============================================================================
+
+properties:
+
+  # ---------------------------------------------------------------------------
+  # API Version & Kind (Required)
+  # ---------------------------------------------------------------------------
+
+  apiVersion:
+    type: string
+    const: "aget.framework/v1"
+    description: API version for capability specifications
+
+  kind:
+    type: string
+    const: "CapabilitySpecification"
+    description: Resource kind identifier
+
+  # ---------------------------------------------------------------------------
+  # Metadata (Required)
+  # ---------------------------------------------------------------------------
+
+  metadata:
+    type: object
+    description: Capability metadata including identity and lifecycle
+    required:
+      - name
+      - version
+      - created
+      - author
+      - status
+    properties:
+      name:
+        type: string
+        pattern: "^[a-z][a-z0-9-]*$"
+        description: |
+          Unique capability identifier. Must be lowercase with hyphens.
+          Examples: memory-management, domain-knowledge, structured-outputs
+        minLength: 3
+        maxLength: 50
+
+      version:
+        type: string
+        pattern: "^\\d+\\.\\d+\\.\\d+(-[a-z]+)?$"
+        description: |
+          Semantic version with optional status suffix.
+          Examples: 1.0.0, 1.0.0-draft, 2.1.0-beta
+
+      created:
+        type: string
+        format: date
+        description: Creation date in ISO 8601 format (YYYY-MM-DD)
+
+      author:
+        type: string
+        description: Creating agent or person identifier
+        minLength: 1
+
+      status:
+        type: string
+        enum:
+          - draft      # Initial development
+          - review     # Under review
+          - approved   # Production ready
+          - deprecated # Being phased out
+        description: Lifecycle status of the capability
+
+      target_version:
+        type: string
+        pattern: "^v\\d+\\.\\d+(\\.\\d+)?$"
+        description: Target AGET framework version for this capability
+
+      supersedes:
+        type: string
+        description: Previous capability this replaces (if any)
+
+      deprecated_by:
+        type: string
+        description: Capability that replaces this one (if deprecated)
+
+  # ---------------------------------------------------------------------------
+  # Spec (Required) - Core Capability Definition
+  # ---------------------------------------------------------------------------
+
+  spec:
+    type: object
+    description: Core capability definition
+    required:
+      - name
+      - display_name
+      - category
+      - purpose
+    properties:
+      name:
+        type: string
+        description: Capability name (should match metadata.name)
+
+      display_name:
+        type: string
+        description: Human-readable capability name
+        minLength: 3
+        maxLength: 100
+
+      category:
+        type: string
+        description: |
+          Capability category for organization.
+          Examples: Core Infrastructure, Domain Knowledge, Collaboration
+        minLength: 3
+
+      purpose:
+        type: string
+        description: |
+          Clear statement of what this capability enables.
+          Should answer "Why does this capability exist?"
+        minLength: 20
+
+      insight:
+        type: string
+        description: |
+          Core insight or principle underlying this capability.
+          The "aha!" that motivates the design.
+
+      composable_with:
+        type: array
+        items:
+          type: string
+        description: |
+          List of templates and capabilities this can compose with.
+          Use "All base templates" for universal composability.
+
+      prerequisites:
+        type: array
+        items:
+          type: string
+        description: |
+          Requirements that must be met before adopting this capability.
+          Can include structural requirements, other capabilities, or conditions.
+
+  # ---------------------------------------------------------------------------
+  # Behaviors (Required) - Capability Actions
+  # ---------------------------------------------------------------------------
+
+  behaviors:
+    type: array
+    description: |
+      List of behaviors this capability provides. Each behavior is a
+      discrete action or protocol the agent can perform.
+    minItems: 1
+    items:
+      type: object
+      required:
+        - name
+        - display_name
+        - description
+        - trigger
+        - protocol
+        - output
+      properties:
+        name:
+          type: string
+          pattern: "^[a-z][a-z0-9_]*$"
+          description: Behavior identifier (snake_case)
+
+        display_name:
+          type: string
+          description: Human-readable behavior name
+
+        description:
+          type: string
+          description: What this behavior does
+          minLength: 10
+
+        trigger:
+          oneOf:
+            - type: object
+              description: Structured trigger with categories
+              properties:
+                explicit:
+                  type: array
+                  items:
+                    type: string
+                  description: Explicit trigger phrases or commands
+                implicit:
+                  type: array
+                  items:
+                    type: string
+                  description: Conditions that implicitly trigger behavior
+                temporal:
+                  type: array
+                  items:
+                    type: string
+                  description: Time-based or session-progress triggers
+            - type: array
+              items:
+                type: string
+              description: Simple list of trigger conditions
+
+        protocol:
+          type: array
+          items:
+            type: string
+          description: |
+            Ordered list of steps in the behavior protocol.
+            Each step should be actionable and clear.
+          minItems: 1
+
+        output:
+          type: string
+          description: Expected output or result of the behavior
+
+        reference:
+          type: string
+          description: Path to detailed documentation (pattern, SOP)
+
+        status:
+          type: string
+          enum:
+            - active    # Currently implemented
+            - planned   # Future implementation
+            - deprecated
+          default: active
+          description: Implementation status of this behavior
+
+        examples:
+          type: array
+          items:
+            type: string
+          description: Example invocations or use cases
+
+  # ---------------------------------------------------------------------------
+  # Theoretical Basis (Recommended) - Per L332
+  # ---------------------------------------------------------------------------
+
+  theoretical_basis:
+    type: object
+    description: |
+      Theoretical grounding for this capability per L332 protocol.
+      Maps capability design to established theories.
+    properties:
+      primary:
+        type: string
+        description: |
+          Primary theoretical foundation.
+          Examples: Extended Mind, BDI, Actor Model, Cybernetics
+
+      secondary:
+        type: array
+        items:
+          type: string
+        description: Supporting theoretical foundations
+
+      rationale:
+        type: string
+        description: |
+          Explanation of how theories apply to this capability.
+          Should connect theory to design decisions.
+
+      references:
+        type: array
+        items:
+          type: string
+        description: |
+          Paths to L-docs or external references for theoretical basis.
+          Examples: .aget/evolution/L331_theoretical_foundations_agency.md
+
+  # ---------------------------------------------------------------------------
+  # Contracts (Recommended) - Testable Assertions
+  # ---------------------------------------------------------------------------
+
+  contracts:
+    type: array
+    description: |
+      Testable contracts that verify capability adoption.
+      Each contract is an assertion that can be automatically checked.
+    items:
+      type: object
+      required:
+        - name
+        - assertion
+      properties:
+        name:
+          type: string
+          pattern: "^[a-z][a-z0-9_]*$"
+          description: Contract identifier (snake_case)
+
+        assertion:
+          type: string
+          enum:
+            - directory_exists   # Check directory exists
+            - file_exists        # Check file exists
+            - file_contains      # Check file contains pattern
+            - json_valid         # Check valid JSON
+            - yaml_valid         # Check valid YAML
+            - schema_valid       # Check validates against schema
+            - custom             # Custom assertion (requires description)
+          description: Type of assertion to perform
+
+        path:
+          type: string
+          description: Path to check (for directory_exists, file_exists, file_contains)
+
+        pattern:
+          type: string
+          description: Pattern to match (for file_contains)
+
+        schema:
+          type: string
+          description: Schema path (for schema_valid)
+
+        description:
+          type: string
+          description: |
+            Human-readable description of what this contract verifies.
+            Required for custom assertions.
+
+        severity:
+          type: string
+          enum:
+            - error    # Must pass
+            - warning  # Should pass
+          default: error
+          description: Severity level if contract fails
+
+  # ---------------------------------------------------------------------------
+  # Adoption (Recommended) - Rollout Plan
+  # ---------------------------------------------------------------------------
+
+  adoption:
+    type: object
+    description: Adoption roadmap for this capability
+    properties:
+      priority:
+        type: string
+        enum:
+          - P0  # Critical - immediate adoption
+          - P1  # High - next release
+          - P2  # Medium - planned
+          - P3  # Low - when convenient
+        description: Priority level for adoption
+
+      demand:
+        type: string
+        description: |
+          Description of demand for this capability.
+          Examples: "All agents (universal)", "12+ agents in main portfolio"
+
+      rollout_phases:
+        type: array
+        items:
+          type: object
+          required:
+            - phase
+            - name
+            - version
+          properties:
+            phase:
+              type: integer
+              minimum: 1
+              description: Phase number
+
+            name:
+              type: string
+              description: Phase name (e.g., Pilot, Framework Owners, Fleet-wide)
+
+            agents:
+              type: array
+              items:
+                type: string
+              description: Agents included in this phase
+
+            version:
+              type: string
+              description: Target framework version for this phase
+
+            duration:
+              type: string
+              description: Expected duration (optional)
+
+      success_metrics:
+        type: array
+        items:
+          type: object
+          required:
+            - metric
+            - target
+          properties:
+            metric:
+              type: string
+              description: What is being measured
+
+            target:
+              type: string
+              description: Target value or threshold
+
+            measurement:
+              type: string
+              description: How to measure (optional)
+
+  # ---------------------------------------------------------------------------
+  # Integration (Optional) - How Capability Integrates
+  # ---------------------------------------------------------------------------
+
+  integration:
+    type: object
+    description: |
+      How this capability integrates with existing protocols and systems.
+      Documents modifications and enhancements to standard agent behavior.
+    additionalProperties:
+      type: object
+      description: Integration point details
+
+  # ---------------------------------------------------------------------------
+  # References (Optional) - Related Documentation
+  # ---------------------------------------------------------------------------
+
+  references:
+    type: object
+    description: Links to related documentation organized by category
+    additionalProperties:
+      type: array
+      items:
+        type: string
+      description: List of paths to related documents
+
+  # ---------------------------------------------------------------------------
+  # Notes (Optional) - Additional Information
+  # ---------------------------------------------------------------------------
+
+  notes:
+    type: array
+    items:
+      type: string
+    description: Additional notes, caveats, or implementation details
+
+  # ---------------------------------------------------------------------------
+  # Changelog (Recommended) - Version History
+  # ---------------------------------------------------------------------------
+
+  changelog:
+    type: array
+    description: History of changes to this specification
+    items:
+      type: object
+      required:
+        - version
+        - date
+        - author
+        - changes
+      properties:
+        version:
+          type: string
+          description: Version number for this changelog entry
+
+        date:
+          type: string
+          format: date
+          description: Date of changes
+
+        author:
+          type: string
+          description: Who made the changes
+
+        changes:
+          type: array
+          items:
+            type: string
+          description: List of changes in this version
+
+# =============================================================================
+# ADDITIONAL PROPERTIES
+# =============================================================================
+
+# Allow additional properties for capability-specific extensions
+# (e.g., memory_layers for memory-management capability)
+additionalProperties: true
+
+# =============================================================================
+# EXAMPLES
+# =============================================================================
+
+examples:
+  - apiVersion: aget.framework/v1
+    kind: CapabilitySpecification
+    metadata:
+      name: example-capability
+      version: 1.0.0
+      created: "2025-12-24"
+      author: private-aget-framework-AGET
+      status: draft
+    spec:
+      name: example-capability
+      display_name: Example Capability
+      category: Examples
+      purpose: Demonstrates the capability specification structure
+    behaviors:
+      - name: example_behavior
+        display_name: Example Behavior
+        description: An example behavior for demonstration
+        trigger:
+          explicit:
+            - "run example"
+          implicit:
+            - "When demonstration needed"
+        protocol:
+          - Step 1: Do something
+          - Step 2: Do something else
+        output: Example output produced
+    contracts:
+      - name: example_contract
+        assertion: file_exists
+        path: docs/example.md
+        description: Example file must exist
+
+# =============================================================================
+# SCHEMA METADATA
+# =============================================================================
+
+$comment: |
+  CAPABILITY_SPEC_v1.0_SCHEMA.yaml
+
+  This schema is part of the AGET Capability Composition Architecture (L330).
+
+  Usage:
+    python3 -c "import yaml, jsonschema; ..."
+    # Or use validate_capability_spec.py
+
+  References:
+    - L330: Capability Composition Architecture
+    - L331: Theoretical Foundations of Agency
+    - L332: Theoretical Grounding Protocol
+
+  Created: 2025-12-24
+  Author: private-aget-framework-AGET
+  License: AGET Framework
