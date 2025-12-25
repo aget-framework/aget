@@ -168,20 +168,39 @@ mkdir -p outputs templates
 
 ### Step 5: Update Version Information
 
-Update `.aget/version.json`:
+**CRITICAL**: Update BOTH files (L366 - AGENTS.md is runtime source of truth):
+
+#### 5a. Update `.aget/version.json`:
 
 ```json
 {
   "name": "agent-name",
   "version": "1.0.0",
   "template": "advisor",
-  "framework_version": "2.12.0",
+  "aget_version": "2.12.0",
   "capabilities": [
     "memory-management",
     "domain-knowledge"
+  ],
+  "migration_history": [
+    "v2.x.0 -> v2.12.0: YYYY-MM-DD (Capability Composition Architecture)"
   ]
 }
 ```
+
+#### 5b. Update `AGENTS.md`:
+
+```markdown
+# Agent Configuration
+
+@aget-version: 2.12.0   # <-- Must match version.json!
+
+## Project Context
+agent-name - Description - v2.12.0   # <-- Also update here
+```
+
+**Why both?** Claude Code reads `@aget-version` from AGENTS.md at runtime.
+`version.json` is for validators and scripts. They must stay synchronized.
 
 ### Step 6: Add Pattern Documents
 
@@ -479,7 +498,9 @@ Agent version 2.9.0 < minimum required 2.11.0
 - [ ] Created manifest.yaml
 - [ ] Created required directories
 - [ ] Created required files
-- [ ] Updated .aget/version.json
+- [ ] Updated .aget/version.json (aget_version, capabilities[], migration_history)
+- [ ] Updated AGENTS.md (@aget-version tag + project context) **[L366]**
+- [ ] Verified CLAUDE.md symlink → AGENTS.md
 - [ ] Added pattern documents
 
 ### Validation
