@@ -282,6 +282,8 @@ ln -s AGENTS.md CLAUDE.md
 
 ## Naming Conventions
 
+> **Full Specification**: See [AGET_FILE_NAMING_CONVENTIONS.md](../specs/AGET_FILE_NAMING_CONVENTIONS.md) for complete patterns, decision tree, and anti-patterns.
+
 ### Directory Names
 
 ```
@@ -301,10 +303,12 @@ Examples:
 
 | Type | Convention | Example |
 |------|------------|---------|
-| Specs | SCREAMING_SNAKE_CASE | WORKER_TEMPLATE_SPEC_v1.0.yaml |
-| ADRs | ADR-NNN-kebab-case | ADR-012-migration-strategy.md |
-| L-docs | L{NNN}_snake_case | L187_wake_protocol.md |
-| Plans | PROJECT_PLAN_{name} | PROJECT_PLAN_v2.9_core_specs.md |
+| Specs | `{NAME}_SPEC_v{M}.{m}.yaml` | `WORKER_TEMPLATE_SPEC_v1.0.yaml` |
+| ADRs | `ADR-{NNN}-{kebab-case}.md` | `ADR-001-initial-architecture.md` |
+| L-docs | `L{NNN}_{snake_case}.md` | `L187_wake_protocol.md` |
+| Plans | `PROJECT_PLAN_{name}_v{M}.{m}.md` | `PROJECT_PLAN_file_naming_v1.0.md` |
+| Sessions | `SESSION_{YYYY-MM-DD}_{name}.md` | `SESSION_2025-12-20_research.md` |
+| SOPs | `SOP_{snake_case}.md` | `SOP_release_process.md` |
 
 ---
 

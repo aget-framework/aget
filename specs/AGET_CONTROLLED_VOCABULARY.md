@@ -1,15 +1,19 @@
 # AGET Controlled Vocabulary
 
-**Version**: 1.0.0
-**Date**: 2025-12-01
+**Version**: 1.1.0
+**Date**: 2025-12-21
 **Status**: CANONICAL
 **Location**: aget/specs/AGET_CONTROLLED_VOCABULARY.md
+**Conformance**: Level 2 (Standard) per [AGET_GLOSSARY_STANDARD_SPEC_v1.0.md](AGET_GLOSSARY_STANDARD_SPEC_v1.0.md)
+**Foundation**: W3C SKOS + AGET Extensions (per ADR-001)
 
 ---
 
 ## Purpose
 
 This document defines the canonical vocabulary for AGET framework specifications. All specifications MUST use these terms with the defined meanings.
+
+> **Standard Reference**: See [AGET_GLOSSARY_STANDARD_SPEC_v1.0.md](AGET_GLOSSARY_STANDARD_SPEC_v1.0.md) for vocabulary format patterns, conformance levels, and validation rules.
 
 ---
 
@@ -236,49 +240,29 @@ This document defines the canonical vocabulary for AGET framework specifications
 
 ## Naming Conventions
 
-### Agent Names
+> **Full Specification**: See [AGET_FILE_NAMING_CONVENTIONS.md](AGET_FILE_NAMING_CONVENTIONS.md) for complete patterns, decision tree, and anti-patterns.
 
-```
-{visibility}-{identifier}-{type}
+### Quick Reference
 
-visibility: private | public | template
-identifier: descriptive name (kebab-case)
-type: aget | AGET
+| Artifact Type | Pattern | Example |
+|---------------|---------|---------|
+| Agent directories | `{visibility}-{identifier}-{type}` | `private-supervisor-AGET` |
+| Specs | `{NAME}_SPEC_v{M}.{m}.yaml` | `WORKER_TEMPLATE_SPEC_v1.0.yaml` |
+| PROJECT_PLANs | `PROJECT_PLAN_{name}_v{M}.{m}.md` | `PROJECT_PLAN_file_naming_v1.0.md` |
+| ADRs | `ADR-{NNN}-{kebab-case}.md` | `ADR-001-initial-architecture.md` |
+| L-docs | `L{NNN}_{snake_case}.md` | `L338_gate_verification.md` |
+| Sessions | `SESSION_{YYYY-MM-DD}_{name}.md` | `SESSION_2025-12-20_research.md` |
+| SOPs | `SOP_{snake_case}.md` | `SOP_release_process.md` |
+| Python code | `{snake_case}.py` | `validate_file_naming.py` |
 
-Examples:
-- private-supervisor-AGET (action-taking supervisor)
-- template-worker-aget (read-only template)
-- private-impact-aget (read-only personal agent)
-```
+### Case Conventions
 
-### File Names
-
-```
-{TYPE}_{NAME}_v{VERSION}.{ext}
-
-TYPE: SPEC, ADR, PROJECT_PLAN, etc.
-NAME: Descriptive (SCREAMING_SNAKE_CASE)
-VERSION: X.Y or X.Y.Z
-ext: md, yaml, py
-
-Examples:
-- SPEC_WORKER_TEMPLATE_v1.0.yaml
-- ADR_012_migration_strategy.md
-- PROJECT_PLAN_v2.9_core_specs_v1.0.md
-```
-
-### Learning Documents
-
-```
-L{NNN}_{description}.md
-
-NNN: Sequential number (001-999)
-description: snake_case description
-
-Examples:
-- L187_wake_protocol_silent_execution.md
-- L174_template_specification_debt.md
-```
+| Element | Convention | Example |
+|---------|------------|---------|
+| TYPE prefix | SCREAMING_CASE | `PROJECT_PLAN`, `SPEC` |
+| Descriptive name (files) | snake_case | `file_naming_conventions` |
+| Descriptive name (dirs) | kebab-case | `private-supervisor-AGET` |
+| Version | `_v{M}.{m}` | `_v1.0`, `_v2.1-alpha` |
 
 ---
 
@@ -320,4 +304,14 @@ To add new terms:
 
 ---
 
+## Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.1.0 | 2025-12-21 | Added SKOS foundation reference, conformance level declaration |
+| 1.0.0 | 2025-12-01 | Initial release (v2.9 Core Specs Gate 2) |
+
+---
+
 *AGET_CONTROLLED_VOCABULARY.md — Canonical vocabulary for AGET framework*
+*Conformance: Level 2 (Standard) per AGET_GLOSSARY_STANDARD_SPEC_v1.0.md*
