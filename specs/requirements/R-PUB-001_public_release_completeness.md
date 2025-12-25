@@ -1,6 +1,6 @@
 # R-PUB-001: Public Release Completeness
 
-**Version**: 1.2
+**Version**: 1.3
 **Date**: 2025-12-24
 **Status**: Active
 **Category**: Release Management
@@ -289,6 +289,117 @@ echo "PASS: All homepage links return 200 OK"
 
 ---
 
+### R-PUB-001-13: Validation Completeness (Ubiquitous)
+
+**Statement**: The validation system SHALL verify that all identified user-facing content types have validation coverage.
+
+**Rationale**: Validating a subset of content ≠ validating all content. Without completeness validation, we declare victory prematurely while gaps exist. L364 (Requirements Completeness Paradox): Can't prove requirements complete without a completeness requirement.
+
+**Verification**:
+```python
+# Define canonical content types requiring validation
+REQUIRED_CONTENT_TYPES = {
+    'org_homepage': 'Organization homepage',
+    'repo_readmes': 'Repository READMEs (7 repos)',
+    'release_notes': 'GitHub Release Notes',
+    'changelogs': 'CHANGELOG.md files',
+    'documentation': 'Documentation files (docs/)',
+    'delta_specs': 'Delta specifications',
+    'version_history': 'Version history'
+}
+
+# Map requirements to content types they validate
+requirement_coverage = {
+    'R-PUB-001-01': ['release_notes'],
+    'R-PUB-001-02': ['release_notes'],
+    'R-PUB-001-03': ['org_homepage'],
+    # ... etc
+}
+
+# Verify each content type has at least one requirement validating it
+for content_type, description in REQUIRED_CONTENT_TYPES.items():
+    validators = [req for req, types in requirement_coverage.items()
+                  if content_type in types]
+
+    if not validators:
+        print(f"FAIL: {description} has no validation")
+        exit(1)
+
+print("PASS: All content types have validation coverage")
+```
+
+**Implements**: L364 (Requirements Completeness Paradox - meta-validation requirement)
+
+**Added**: v1.3 (2025-12-24) - Phase 4C remediation (systematic completeness validation)
+
+**Pattern**: Meta-requirement that validates other requirements provide complete coverage
+
+**Trigger**: Run before claiming "validation complete" - prevents premature victory declaration
+
+**Maintenance**: When new content type added, update REQUIRED_CONTENT_TYPES list and map to validating requirement
+
+---
+
+### R-PUB-001-14: Repository README Quality (Ubiquitous)
+
+**Statement**: All managed repository READMEs SHALL exist, contain current version references, and have no broken links.
+
+**Rationale**: Repository READMEs are entry points for each repository. Users navigate from organization homepage → template repository → README. Broken, missing, or stale READMEs damage first impression and suggest abandoned project.
+
+**Verification**:
+```bash
+# For each managed repository
+for repo in aget template-supervisor-aget template-worker-aget \
+            template-advisor-aget template-consultant-aget \
+            template-developer-aget template-spec-engineer-aget; do
+
+  # Check README exists
+  readme_url="https://raw.githubusercontent.com/aget-framework/$repo/main/README.md"
+  status=$(curl -s -o /dev/null -w "%{http_code}" "$readme_url")
+
+  if [ "$status" != "200" ]; then
+    echo "FAIL: $repo README not found (HTTP $status)"
+    exit 1
+  fi
+
+  # Fetch README content
+  content=$(curl -s "$readme_url")
+
+  # Check version reference current (should mention vX.Y.Z)
+  if ! echo "$content" | grep -q "vX.Y.Z"; then
+    echo "FAIL: $repo README doesn't reference current version"
+    exit 1
+  fi
+
+  # Check no broken links (extract and verify GitHub links)
+  links=$(echo "$content" | grep -o 'https://github\.com/[^)]*')
+  for link in $links; do
+    link_status=$(curl -s -o /dev/null -w "%{http_code}" "$link")
+    if [ "$link_status" != "200" ]; then
+      echo "FAIL: $repo README has broken link: $link"
+      exit 1
+    fi
+  done
+done
+
+echo "PASS: All repository READMEs valid"
+```
+
+**Implements**: L363 (Validation Scope Gaps - repository README validation)
+
+**Added**: v1.3 (2025-12-24) - Phase 4B remediation (7 high-visibility files, zero validation)
+
+**Scope**: All 7 managed repositories (aget/ + 6 templates)
+
+**User Journey Protected**: Organization homepage → Template link → Repository README
+
+**Checks**:
+1. README.md exists and accessible (HTTP 200)
+2. README references current version (not stale)
+3. README has no broken links to framework resources
+
+---
+
 ## Requirement Summary Table
 
 | ID | Type | Statement Summary | Verification |
@@ -305,6 +416,8 @@ echo "PASS: All homepage links return 200 OK"
 | R-PUB-001-10 | Ubiquitous | Homepage content matches badge version | Content parsing |
 | R-PUB-001-11 | Conditional | Core releases within 2 of templates | Release count comparison |
 | R-PUB-001-12 | Ubiquitous | Homepage links return 200 OK | HTTP status checks |
+| R-PUB-001-13 | Ubiquitous | All content types have validation coverage | Coverage mapping |
+| R-PUB-001-14 | Ubiquitous | Repository READMEs valid and current | HTTP + content checks |
 
 ---
 
@@ -326,6 +439,8 @@ echo "PASS: All homepage links return 200 OK"
 | R-PUB-001-10 | L361 (badge-content consistency) | Content must align with badge version |
 | R-PUB-001-11 | L360 (completeness validation) | Historical release parity prevents gaps |
 | R-PUB-001-12 | L363 (validation scope gaps) | Homepage link integrity prevents user journey blocks |
+| R-PUB-001-13 | L364 (requirements completeness paradox) | Meta-validation ensures completeness |
+| R-PUB-001-14 | L363 (validation scope gaps) | Repository README validation protects critical user journey |
 
 ### Validated By
 
@@ -343,6 +458,8 @@ echo "PASS: All homepage links return 200 OK"
 | R-PUB-001-10 | check_homepage_content_consistency() | .aget/patterns/release/post_release_validation.py |
 | R-PUB-001-11 | check_historical_release_completeness() | .aget/patterns/release/post_release_validation.py |
 | R-PUB-001-12 | check_homepage_links() | .aget/patterns/release/post_release_validation.py |
+| R-PUB-001-13 | check_validation_completeness() | .aget/patterns/release/post_release_validation.py |
+| R-PUB-001-14 | check_repository_readmes() | .aget/patterns/release/post_release_validation.py |
 
 ### Referenced In
 
@@ -358,24 +475,27 @@ echo "PASS: All homepage links return 200 OK"
 ## Success Criteria
 
 **Release is complete WHEN**:
-- All R-PUB-001-01 through R-PUB-001-12 requirements satisfied
-- Post-release validation script exits with code 0 (10/10 automated checks passing)
+- All R-PUB-001-01 through R-PUB-001-14 requirements satisfied
+- Post-release validation script exits with code 0 (12/12 automated checks passing)
 - Manual validation checklist 100% checked (2 manual checks)
+- Validation completeness check passes (R-PUB-001-13)
 
 **Release is incomplete WHEN**:
 - Any requirement fails validation
-- Broken links detected (release notes OR homepage)
+- Broken links detected (release notes OR homepage OR repository READMEs)
 - Organization homepage shows outdated version
 - Latest badge shows wrong version
 - Homepage content inconsistent with badge version
 - Historical release gap exceeds threshold
 - Homepage links broken (404)
+- Repository READMEs missing, stale, or have broken links
+- Validation coverage incomplete (content types without validation)
 
 **Action on failure**: DO NOT announce release publicly until gaps closed.
 
-**Automation Coverage** (v1.2):
-- Automated: 10/12 requirements (83%)
-- Manual: 2/12 requirements (17%)
+**Automation Coverage** (v1.3):
+- Automated: 12/14 requirements (86%)
+- Manual: 2/14 requirements (14%)
 
 ---
 
@@ -385,7 +505,8 @@ echo "PASS: All homepage links return 200 OK"
 |---------|------|---------|
 | 1.0 | 2025-12-24 | Initial specification (8 requirements) |
 | 1.1 | 2025-12-24 | Added R-PUB-001-09 (Latest badge), R-PUB-001-10 (content consistency), R-PUB-001-11 (historical completeness) - Phase 2 validation enhancement |
-| 1.2 | 2025-12-24 | Added R-PUB-001-12 (Homepage link integrity) - Phase 4 remediation (user discovered 7 broken homepage links) |
+| 1.2 | 2025-12-24 | Added R-PUB-001-12 (Homepage link integrity) - Phase 4A remediation (user discovered 7 broken homepage links) |
+| 1.3 | 2025-12-24 | Added R-PUB-001-13 (Validation completeness - meta-requirement), R-PUB-001-14 (Repository README quality) - Phase 4B/4C remediation (systematic completeness validation, learning release) |
 
 ---
 
