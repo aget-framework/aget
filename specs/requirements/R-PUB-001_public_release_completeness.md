@@ -1,6 +1,6 @@
 # R-PUB-001: Public Release Completeness
 
-**Version**: 1.1
+**Version**: 1.2
 **Date**: 2025-12-24
 **Status**: Active
 **Category**: Release Management
@@ -251,6 +251,44 @@ fi
 
 ---
 
+### R-PUB-001-12: Homepage Link Integrity (Ubiquitous)
+
+**Statement**: The organization homepage SHALL NOT contain broken links to framework resources.
+
+**Rationale**: Homepage is first impression for new users. Broken links damage credibility and suggest abandoned/unmaintained project. Users navigate from homepage to documentation - broken links block user journey.
+
+**Verification**:
+```bash
+# Fetch homepage content
+content=$(curl -s https://raw.githubusercontent.com/aget-framework/.github/main/profile/README.md)
+
+# Extract all GitHub links
+links=$(echo "$content" | grep -o 'https://github\.com/[^)]*')
+
+# Verify each returns 200 OK
+for link in $links; do
+  status=$(curl -s -o /dev/null -w "%{http_code}" "$link")
+  if [ "$status" != "200" ]; then
+    echo "FAIL: $link → $status"
+    exit 1
+  fi
+done
+
+echo "PASS: All homepage links return 200 OK"
+```
+
+**Implements**: L363 (Validation Scope Gaps - homepage link validation)
+
+**Added**: v1.2 (2025-12-24) - Phase 4 remediation (user discovered 7 broken links)
+
+**Scope**: Organization homepage (`.github/profile/README.md`) - persistent content, not version-specific
+
+**Difference from R-PUB-001-08**:
+- R-PUB-001-08: Release artifacts (version-specific release notes, changelog)
+- R-PUB-001-12: Organization homepage (persistent, applies to all versions)
+
+---
+
 ## Requirement Summary Table
 
 | ID | Type | Statement Summary | Verification |
@@ -266,6 +304,7 @@ fi
 | R-PUB-001-09 | Ubiquitous | Current version marked "Latest" | `gh release list` grep |
 | R-PUB-001-10 | Ubiquitous | Homepage content matches badge version | Content parsing |
 | R-PUB-001-11 | Conditional | Core releases within 2 of templates | Release count comparison |
+| R-PUB-001-12 | Ubiquitous | Homepage links return 200 OK | HTTP status checks |
 
 ---
 
@@ -286,6 +325,7 @@ fi
 | R-PUB-001-09 | L360 (external validation) | Latest badge must reflect actual current version |
 | R-PUB-001-10 | L361 (badge-content consistency) | Content must align with badge version |
 | R-PUB-001-11 | L360 (completeness validation) | Historical release parity prevents gaps |
+| R-PUB-001-12 | L363 (validation scope gaps) | Homepage link integrity prevents user journey blocks |
 
 ### Validated By
 
@@ -302,6 +342,7 @@ fi
 | R-PUB-001-09 | check_latest_badge_correct() | .aget/patterns/release/post_release_validation.py |
 | R-PUB-001-10 | check_homepage_content_consistency() | .aget/patterns/release/post_release_validation.py |
 | R-PUB-001-11 | check_historical_release_completeness() | .aget/patterns/release/post_release_validation.py |
+| R-PUB-001-12 | check_homepage_links() | .aget/patterns/release/post_release_validation.py |
 
 ### Referenced In
 
@@ -317,23 +358,24 @@ fi
 ## Success Criteria
 
 **Release is complete WHEN**:
-- All R-PUB-001-01 through R-PUB-001-11 requirements satisfied
-- Post-release validation script exits with code 0 (9/9 automated checks passing)
+- All R-PUB-001-01 through R-PUB-001-12 requirements satisfied
+- Post-release validation script exits with code 0 (10/10 automated checks passing)
 - Manual validation checklist 100% checked (2 manual checks)
 
 **Release is incomplete WHEN**:
 - Any requirement fails validation
-- Broken links detected
+- Broken links detected (release notes OR homepage)
 - Organization homepage shows outdated version
 - Latest badge shows wrong version
 - Homepage content inconsistent with badge version
 - Historical release gap exceeds threshold
+- Homepage links broken (404)
 
 **Action on failure**: DO NOT announce release publicly until gaps closed.
 
-**Automation Coverage** (v1.1):
-- Automated: 9/11 requirements (82%)
-- Manual: 2/11 requirements (18%)
+**Automation Coverage** (v1.2):
+- Automated: 10/12 requirements (83%)
+- Manual: 2/12 requirements (17%)
 
 ---
 
@@ -343,6 +385,7 @@ fi
 |---------|------|---------|
 | 1.0 | 2025-12-24 | Initial specification (8 requirements) |
 | 1.1 | 2025-12-24 | Added R-PUB-001-09 (Latest badge), R-PUB-001-10 (content consistency), R-PUB-001-11 (historical completeness) - Phase 2 validation enhancement |
+| 1.2 | 2025-12-24 | Added R-PUB-001-12 (Homepage link integrity) - Phase 4 remediation (user discovered 7 broken homepage links) |
 
 ---
 
