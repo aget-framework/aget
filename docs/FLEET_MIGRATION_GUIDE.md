@@ -213,19 +213,88 @@ touch sops/SESSION_HANDOFF_AGET.md
 touch sops/SOP_pre_proposal_kb_audit.md
 ```
 
-### Step 7: Validate Migration
+### Step 6.5: Download Validators (L027 Pattern)
+
+If validators not present locally, download from aget-framework:
 
 ```bash
-# Validate manifest schema
-python3 aget/validation/validate_template_manifest.py manifest.yaml
+# Download validators for self-validation
+mkdir -p .aget/validation
+cd .aget/validation
 
-# Validate composition
-python3 aget/validation/validate_composition.py manifest.yaml \
-  --specs aget/specs/capabilities/
+curl -sO https://raw.githubusercontent.com/aget-framework/aget/main/validation/validate_version_consistency.py
+curl -sO https://raw.githubusercontent.com/aget-framework/aget/main/validation/validate_naming_conventions.py
+curl -sO https://raw.githubusercontent.com/aget-framework/aget/main/validation/validate_template_manifest.py
+curl -sO https://raw.githubusercontent.com/aget-framework/aget/main/validation/validate_composition.py
 
-# Run contract tests
-python3 -m pytest aget/tests/capability_architecture/test_capability_contracts.py -v
+cd ../..
 ```
+
+**Why This Matters**:
+- Validators enable self-validation without full framework repo
+- Agents can verify compliance independently
+- Follows L027 precedent from vp-of-ai-aget migration
+
+### Step 7: Validate Migration (BLOCKING GATE)
+
+**CRITICAL**: All validators must pass before migration is complete.
+
+#### 7.1: Automated Compliance Validation
+
+Run all four validators:
+
+```bash
+cd /path/to/agent
+
+# 1. Version consistency
+python3 .aget/validation/validate_version_consistency.py .
+# Expected: Exit code 0, output "✅ 1/1 agents have consistent versions"
+
+# 2. Naming conventions
+python3 .aget/validation/validate_naming_conventions.py .
+# Expected: Exit code 0, output "✅ 1/1 agents follow naming conventions"
+
+# 3. Template manifest schema
+python3 .aget/validation/validate_template_manifest.py .
+# Expected: Exit code 0, output "✅ manifest.yaml - 1/1 manifests valid"
+
+# 4. Capability composition
+python3 .aget/validation/validate_composition.py .
+# Expected: Exit code 0, output "✅ manifest.yaml - 1/1 compositions valid"
+
+# 5. CLAUDE.md symlink (L366 compliance)
+readlink CLAUDE.md
+# Expected: "AGENTS.md" (must be symlink, not copy)
+```
+
+**If ANY check fails**: Stop, fix issues, re-run all checks. Do NOT proceed to behavioral validation until all pass.
+
+#### 7.2: Behavioral Validation
+
+Test agent operation:
+
+```bash
+# Wake up agent
+# Expected: Version shows v2.12.0 (or target version)
+
+# Test capabilities
+# - domain-knowledge: Access governance/ or domain docs
+# - collaboration: Access fleet registry (if applicable)
+# - memory-management: Access .aget/evolution/ learnings
+# - structured-outputs: Verify output formats work
+```
+
+#### 7.3: Completion Criteria
+
+Migration is **ONLY** complete when:
+- ✅ All 4 automated validators pass
+- ✅ Behavioral validation passes (capabilities work)
+- ✅ No regressions in existing functionality
+- ✅ Git working directory clean (ready to commit)
+
+**DO NOT** declare migration complete with any PENDING or FAIL status.
+
+See: `docs/patterns/MIGRATION_COMPLETION_CHECKLIST.md` for detailed checklist.
 
 ### Step 8: Test Agent Operation
 
