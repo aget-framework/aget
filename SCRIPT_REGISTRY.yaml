@@ -138,6 +138,15 @@ scripts:
     exit_codes: [0, 1, 2]
     validates: SCRIPT_REGISTRY.yaml
 
+  - path: validation/validate_memory_compliance.py
+    description: Validates agent memory structure against AGET_MEMORY_SPEC
+    category: validator
+    version: 1.0.0
+    created: 2025-12-26
+    flags: [--help, --quiet, --dir, --strict, --version]
+    exit_codes: [0, 1, 2]
+    validates: Agent memory structure (6-layer model)
+
   # ============================================================
   # TOOLS (validation/ - miscellaneous)
   # ============================================================
@@ -280,11 +289,11 @@ scripts:
 
 # Summary statistics
 summary:
-  total_scripts: 27
+  total_scripts: 28
   by_category:
-    validator: 13
+    validator: 14
     tool: 2
     pattern: 12
   by_status:
-    active: 24
+    active: 25
     skeleton: 3
