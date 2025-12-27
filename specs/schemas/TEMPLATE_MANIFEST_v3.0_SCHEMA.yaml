@@ -1,0 +1,399 @@
+# TEMPLATE_MANIFEST_v3.0_SCHEMA.yaml
+# JSON Schema for AGET Template Manifest v3.0 (5D Composition Architecture)
+# Version: 3.0.0
+# Created: 2025-12-27
+# Author: private-aget-framework-AGET
+#
+# This schema defines the structure for template manifests v3.0, which declare
+# how agents are composed using the 5D Composition Architecture:
+#   D1: PERSONA (WHO)
+#   D2: MEMORY (WHAT KNOWS)
+#   D3: REASONING (HOW THINKS)
+#   D4: SKILLS (WHAT DOES)
+#   D5: CONTEXT (WHERE/WHEN)
+#
+# Reference: AGET_TEMPLATE_SPEC.md, CP-017, CP-018
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://aget-framework.github.io/schemas/template-manifest/v3.0"
+
+title: AGET Template Manifest Schema v3.0
+description: |
+  Declares agent composition using 5D Architecture.
+  Templates define reusable agent patterns with explicit dimension configuration.
+
+type: object
+required:
+  - manifest_version
+  - template
+  - composition
+  - capabilities
+
+# =============================================================================
+# TOP-LEVEL STRUCTURE
+# =============================================================================
+
+properties:
+
+  # ---------------------------------------------------------------------------
+  # Manifest Version (Required)
+  # ---------------------------------------------------------------------------
+
+  manifest_version:
+    type: string
+    const: "3.0"
+    description: Manifest schema version
+
+  # ---------------------------------------------------------------------------
+  # Template Metadata (Required)
+  # ---------------------------------------------------------------------------
+
+  template:
+    type: object
+    description: Template identity and metadata
+    required:
+      - name
+      - archetype
+      - version
+    properties:
+      name:
+        type: string
+        pattern: "^template-[a-z][a-z0-9-]*-aget$"
+        description: |
+          Template identifier. Must follow pattern: template-{type}-aget
+          Examples: template-worker-aget, template-advisor-aget
+        minLength: 15
+        maxLength: 60
+
+      archetype:
+        type: string
+        enum:
+          - Worker
+          - Advisor
+          - Supervisor
+          - Developer
+          - Consultant
+          - Spec_Engineer
+          - Executive
+          - Analyst
+          - Reviewer
+          - Operator
+          - Architect
+          - Researcher
+        description: Agent archetype classification
+
+      description:
+        type: string
+        description: Brief description of template purpose
+        maxLength: 500
+
+      version:
+        type: string
+        pattern: "^\\d+\\.\\d+\\.\\d+(-[a-zA-Z0-9.]+)?$"
+        description: Template version (semantic versioning)
+
+      created:
+        type: string
+        format: date
+        description: Creation date (YYYY-MM-DD)
+
+      author:
+        type: string
+        description: Creating agent identifier
+
+      inherits_from:
+        type:
+          - string
+          - "null"
+        description: |
+          Parent template name for inheritance, or null for base templates.
+          Example: "template-worker-aget"
+
+  # ---------------------------------------------------------------------------
+  # 5D Composition (Required)
+  # ---------------------------------------------------------------------------
+
+  composition:
+    type: object
+    description: 5D Composition Architecture configuration
+    required:
+      - persona
+      - memory
+      - reasoning
+      - skills
+      - context
+    properties:
+
+      # D1: PERSONA - WHO
+      persona:
+        type: object
+        description: PERSONA dimension (D1) - Identity and voice
+        properties:
+          archetype:
+            oneOf:
+              - type: string
+                pattern: "^\\$ref:"
+                description: Component reference
+              - type: object
+                description: Inline archetype configuration
+                properties:
+                  type:
+                    type: string
+                  authority_level:
+                    type: string
+                    enum: [base, medium, high]
+          style:
+            oneOf:
+              - type: string
+                pattern: "^\\$ref:"
+              - type: object
+                properties:
+                  communication:
+                    type: string
+                    enum: [formal, conversational, adaptive]
+          governance:
+            type: string
+            enum:
+              - capability-governance-rigorous
+              - capability-governance-balanced
+              - capability-governance-exploratory
+            description: Governance intensity capability
+
+      # D2: MEMORY - WHAT KNOWS
+      memory:
+        type: object
+        description: MEMORY dimension (D2) - Knowledge structure
+        properties:
+          structure:
+            oneOf:
+              - type: string
+                pattern: "^\\$ref:"
+              - type: object
+          inheritance:
+            type: array
+            items:
+              type: string
+              enum: [domain, organizational, experiential]
+            description: Memory layers to inherit
+
+      # D3: REASONING - HOW THINKS
+      reasoning:
+        type: object
+        description: REASONING dimension (D3) - Decision patterns
+        properties:
+          decision_authority:
+            oneOf:
+              - type: string
+                pattern: "^\\$ref:"
+              - type: object
+          planning:
+            oneOf:
+              - type: string
+                pattern: "^\\$ref:"
+              - type: object
+
+      # D4: SKILLS - WHAT DOES
+      skills:
+        type: object
+        description: SKILLS dimension (D4) - Capabilities
+        properties:
+          capabilities:
+            oneOf:
+              - type: string
+                pattern: "^\\$ref:"
+              - type: array
+                items:
+                  type: string
+          phases:
+            oneOf:
+              - type: string
+                pattern: "^\\$ref:"
+              - type: object
+
+      # D5: CONTEXT - WHERE/WHEN
+      context:
+        type: object
+        description: CONTEXT dimension (D5) - Relationships and scope
+        properties:
+          relationships:
+            oneOf:
+              - type: string
+                pattern: "^\\$ref:"
+              - type: object
+          scope:
+            oneOf:
+              - type: string
+                pattern: "^\\$ref:"
+              - type: object
+
+  # ---------------------------------------------------------------------------
+  # Capabilities (Required)
+  # ---------------------------------------------------------------------------
+
+  capabilities:
+    type: array
+    description: Declared capability identifiers
+    items:
+      type: string
+      pattern: "^capability-[a-z][a-z0-9-]*$"
+    minItems: 1
+    uniqueItems: true
+    examples:
+      - capability-governance-balanced
+      - capability-session-protocols
+      - capability-evolution-tracking
+
+  # ---------------------------------------------------------------------------
+  # A-SDLC Phases (Optional)
+  # ---------------------------------------------------------------------------
+
+  asdlc_phases:
+    type: object
+    description: Agent Software Development Lifecycle phase mapping
+    properties:
+      primary:
+        type: array
+        description: Primary phases this template serves
+        items:
+          type: integer
+          minimum: 0
+          maximum: 6
+        uniqueItems: true
+      secondary:
+        type: array
+        description: Secondary phases this template can support
+        items:
+          type: integer
+          minimum: 0
+          maximum: 6
+        uniqueItems: true
+
+  # ---------------------------------------------------------------------------
+  # Inviolables (Optional)
+  # ---------------------------------------------------------------------------
+
+  inviolables:
+    type: object
+    description: Boundaries that cannot be overridden
+    properties:
+      inherited:
+        type: array
+        description: Inviolables inherited from parent/framework
+        items:
+          type: object
+          required:
+            - id
+            - source
+            - statement
+          properties:
+            id:
+              type: string
+              pattern: "^INV-[A-Z]+-\\d{3}$"
+            source:
+              type: string
+            statement:
+              type: string
+      agent_specific:
+        type: array
+        description: Inviolables added by this template
+        items:
+          type: object
+          required:
+            - id
+            - statement
+          properties:
+            id:
+              type: string
+              pattern: "^INV-[A-Z]+-\\d{3}$"
+            statement:
+              type: string
+            rationale:
+              type: string
+            enforcement:
+              type: string
+
+  # ---------------------------------------------------------------------------
+  # Contract Tests (Optional)
+  # ---------------------------------------------------------------------------
+
+  contract_tests:
+    type: object
+    description: Test requirements for template validation
+    properties:
+      required:
+        type: array
+        description: Tests that must pass for compliance
+        items:
+          type: string
+          pattern: "^test_[a-z][a-z0-9_]*$"
+      recommended:
+        type: array
+        description: Tests recommended for quality
+        items:
+          type: string
+          pattern: "^test_[a-z][a-z0-9_]*$"
+
+# =============================================================================
+# ADDITIONAL PROPERTIES
+# =============================================================================
+
+additionalProperties: false
+
+# =============================================================================
+# EXAMPLES
+# =============================================================================
+
+examples:
+  - manifest_version: "3.0"
+    template:
+      name: "template-worker-aget"
+      archetype: "Worker"
+      description: "Foundation template for task execution agents"
+      version: "3.0.0"
+      created: "2025-12-27"
+      author: "private-aget-framework-AGET"
+      inherits_from: null
+    composition:
+      persona:
+        archetype: "$ref: .aget/persona/archetype.yaml"
+        style: "$ref: .aget/persona/style.yaml"
+        governance: "capability-governance-balanced"
+      memory:
+        structure: "$ref: .aget/memory/"
+        inheritance: ["domain", "organizational"]
+      reasoning:
+        decision_authority: "$ref: .aget/reasoning/decision_authority.yaml"
+        planning: "$ref: .aget/reasoning/planning_patterns.yaml"
+      skills:
+        capabilities: "$ref: .aget/skills/capabilities.yaml"
+        phases: "$ref: .aget/skills/phase_mapping.yaml"
+      context:
+        relationships: "$ref: .aget/context/relationships.yaml"
+        scope: "$ref: .aget/context/scope.yaml"
+    capabilities:
+      - capability-governance-balanced
+      - capability-session-protocols
+      - capability-evolution-tracking
+    asdlc_phases:
+      primary: [3]
+      secondary: [6]
+    contract_tests:
+      required:
+        - test_version_json_required_fields
+        - test_claude_md_is_symlink
+        - test_manifest_v3_schema
+      recommended:
+        - test_5d_directories_exist
+
+# =============================================================================
+# METADATA
+# =============================================================================
+
+$defs:
+  component_reference:
+    type: string
+    pattern: "^\\$ref:\\s*(aget:)?[a-zA-Z0-9_./-]+$"
+    description: |
+      Reference to a component file.
+      - Relative path: $ref: .aget/persona/archetype.yaml
+      - Framework path: $ref: aget:components/persona/archetype_balanced.yaml
