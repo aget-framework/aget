@@ -1,9 +1,11 @@
 # AGET REASONING Specification
 
-**Version**: 1.0.0
+**Version**: 1.1.0
 **Status**: Active
 **Category**: Standards (5D Composition - REASONING Dimension)
+**Format Version**: 1.2
 **Created**: 2025-12-26
+**Updated**: 2025-12-27
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_REASONING_SPEC.md`
 **Change Proposal**: CP-011
@@ -12,7 +14,7 @@
 
 ## Abstract
 
-This specification defines the REASONING dimension of the 5D Composition Architecture. REASONING encompasses HOW an agent thinks: its planning patterns, decision frameworks, reflection protocols, and quality assurance mechanisms. REASONING provides the cognitive structure that guides agent behavior.
+This specification defines the REASONING dimension of the 5D Composition Architecture. REASONING encompasses HOW an agent thinks: its Planning_Patterns, Decision_Frameworks, Reflection_Protocols, and Quality_Assurance mechanisms. REASONING provides the cognitive structure that guides agent behavior.
 
 ## Motivation
 
@@ -29,11 +31,11 @@ Without explicit REASONING patterns, agents exhibit inconsistent decision-making
 **Applies to**: All AGET agents.
 
 **Defines**:
-- Planning patterns
-- Decision frameworks
-- Reflection protocols
-- Quality assurance mechanisms
-- Gate discipline
+- Planning_Patterns
+- Decision_Frameworks
+- Reflection_Protocols
+- Quality_Assurance mechanisms
+- Gate_Discipline
 
 ---
 
@@ -51,19 +53,82 @@ REASONING is one of five dimensions in the AGET Composition Architecture:
 
 ---
 
+## Vocabulary
+
+Domain terms for the REASONING dimension:
+
+```yaml
+vocabulary:
+  meta:
+    domain: "reasoning"
+    version: "1.0.0"
+    inherits: "aget_core"
+
+  reasoning:  # D3: HOW THINKS
+    Planning_Pattern:
+      skos:definition: "Approach to decomposing and organizing work"
+      skos:narrower: ["PROJECT_PLAN", "Gate_Structure", "TodoWrite"]
+    Decision_Framework:
+      skos:definition: "Structure for making and documenting decisions"
+      skos:narrower: ["Decision_Authority_Matrix", "Escalation_Pattern"]
+    Reflection_Protocol:
+      skos:definition: "Process for reviewing and learning from work"
+      skos:narrower: ["Step_Back_Review_KB", "Mid_Gate_Checkpoint"]
+    Quality_Assurance:
+      skos:definition: "Verification and validation mechanisms"
+      skos:narrower: ["Verification_Test", "Gate_Completion"]
+    Gate_Discipline:
+      skos:definition: "Protocol for stopping at decision boundaries"
+      aget:reference: "L42"
+    Scope_Expansion:
+      skos:definition: "Work beyond current gate or session mandate"
+      aget:anti_pattern: true
+
+  persona:  # D1: Related identity terms
+    Governance_Intensity:
+      skos:definition: "Level of process rigor applied"
+      skos:broader: "AGET_PERSONA_SPEC"
+
+  memory:  # D2: Stored artifacts
+    PROJECT_PLAN:
+      skos:definition: "Formal gated planning document"
+      aget:location: "planning/"
+      aget:naming: "PROJECT_PLAN_{scope}.md"
+    Verification_Test:
+      skos:definition: "Executable test confirming deliverable completion"
+      aget:reference: "L382"
+
+  skills:  # D4: Capabilities
+    Gate_Verification:
+      skos:definition: "Running tests before gate completion"
+    Precedent_Citation:
+      skos:definition: "Referencing 3+ prior decisions for governance choices"
+
+  context:  # D5: Where/when applied
+    Session_Scope:
+      skos:definition: "Work mandate for current session"
+      aget:reference: "L342"
+    Gate_Boundary:
+      skos:definition: "Decision point requiring approval before proceeding"
+```
+
+---
+
 ## Requirements
 
-### R-REASON-001: Planning Patterns
+### CAP-REASON-001: Planning Patterns
 
-Agents SHALL follow planning patterns appropriate to governance intensity.
+The SYSTEM shall follow Planning_Patterns appropriate to Governance_Intensity.
 
-| ID | Requirement |
-|----|-------------|
-| R-REASON-001-01 | Rigorous agents SHALL create PROJECT_PLAN for multi-step tasks |
-| R-REASON-001-02 | Plans SHALL include gates with GO/NOGO decision points |
-| R-REASON-001-03 | Plans SHALL include verification tests (L382) |
-| R-REASON-001-04 | Balanced agents SHOULD create plans for substantial changes |
-| R-REASON-001-05 | Exploratory agents MAY omit formal plans |
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-REASON-001-01 | state-driven | WHILE Governance_Rigorous is active, the SYSTEM shall create PROJECT_PLAN for Multi_Step_Tasks |
+| CAP-REASON-001-02 | ubiquitous | The SYSTEM shall include Gates with GO_NOGO decision points in PROJECT_PLAN |
+| CAP-REASON-001-03 | ubiquitous | The SYSTEM shall include Verification_Tests in PROJECT_PLAN (L382) |
+| CAP-REASON-001-04 | state-driven | WHILE Governance_Balanced is active, the SYSTEM should create PROJECT_PLAN for Substantial_Changes |
+| CAP-REASON-001-05 | state-driven | WHILE Governance_Exploratory is active, the SYSTEM may omit PROJECT_PLAN |
+
+**Enforcement**: `validate_project_plan.py`
 
 #### Planning Hierarchy
 
@@ -71,13 +136,13 @@ Agents SHALL follow planning patterns appropriate to governance intensity.
 PROJECT_PLAN (formal, gated)
     │
     ├── Gate 0: Preparation
-    │   └── Deliverables + Verification Tests
+    │   └── Deliverables + Verification_Tests
     │
     ├── Gate 1: Implementation
-    │   └── Deliverables + Verification Tests
+    │   └── Deliverables + Verification_Tests
     │
     └── Gate N: Completion
-        └── Deliverables + Verification Tests
+        └── Deliverables + Verification_Tests
 
 TodoWrite (informal, tracking)
     │
@@ -86,82 +151,92 @@ TodoWrite (informal, tracking)
     └── Task 3 [completed]
 ```
 
-### R-REASON-002: Decision Frameworks
+### CAP-REASON-002: Decision Frameworks
 
-Agents SHALL use structured decision frameworks.
+The SYSTEM shall use structured Decision_Frameworks.
 
-| ID | Requirement |
-|----|-------------|
-| R-REASON-002-01 | Agent SHALL have decision authority matrix |
-| R-REASON-002-02 | Agent SHALL escalate decisions beyond authority |
-| R-REASON-002-03 | Agent SHALL document novel decisions as L-docs |
-| R-REASON-002-04 | Agent SHALL cite precedents for governance decisions (3+) |
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-REASON-002-01 | ubiquitous | The SYSTEM shall maintain Decision_Authority_Matrix |
+| CAP-REASON-002-02 | conditional | IF Decision exceeds Authority_Level THEN the SYSTEM shall escalate to Supervisor |
+| CAP-REASON-002-03 | event-driven | WHEN Novel_Decision occurs, the SYSTEM shall create Learning_Document |
+| CAP-REASON-002-04 | conditional | IF Governance_Decision is proposed THEN the SYSTEM shall cite 3+ Precedents |
+| CAP-REASON-002-05 | conditional | IF no Precedent exists THEN the SYSTEM shall note Novel_Decision |
+
+**Enforcement**: Documentation review, escalation audit
 
 #### Decision Authority Model
 
-| Decision Type | Autonomous | Escalate |
+| Decision_Type | Autonomous | Escalate |
 |---------------|------------|----------|
-| L-doc creation | ✅ | |
-| Spec creation | ✅ | |
-| Documentation | ✅ | |
-| Minor version | ⚠️ Propose | Validate |
-| Major version | | ✅ |
-| Breaking changes | | ✅ |
-| Scope changes | | ✅ |
+| Learning_Document creation | ✅ | |
+| Specification creation | ✅ | |
+| Documentation updates | ✅ | |
+| Minor_Version release | ⚠️ Propose | Validate |
+| Major_Version release | | ✅ |
+| Breaking_Change | | ✅ |
+| Scope_Boundary change | | ✅ |
 
-### R-REASON-003: Gate Discipline
+### CAP-REASON-003: Gate Discipline
 
-Agents SHALL follow gate discipline (L42, L340).
+The SYSTEM shall follow Gate_Discipline (L42, L340).
 
-| ID | Requirement |
-|----|-------------|
-| R-REASON-003-01 | Agent SHALL STOP at gate boundaries |
-| R-REASON-003-02 | Agent SHALL wait for explicit GO before proceeding |
-| R-REASON-003-03 | Agent SHALL NOT expand scope mid-gate |
-| R-REASON-003-04 | Agent SHALL run verification tests at gate completion |
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-REASON-003-01 | event-driven | WHEN Gate_Boundary is reached, the SYSTEM shall STOP execution |
+| CAP-REASON-003-02 | ubiquitous | The SYSTEM shall wait for explicit GO before proceeding past Gate_Boundary |
+| CAP-REASON-003-03 | ubiquitous | The SYSTEM shall NOT expand Scope mid-gate |
+| CAP-REASON-003-04 | event-driven | WHEN Gate is complete, the SYSTEM shall run Verification_Tests |
+| CAP-REASON-003-05 | conditional | IF Verification_Test fails THEN the SYSTEM shall block Gate_Completion |
+
+**Enforcement**: Gate review, test execution
 
 #### Gate Red Flags
 
 | Phrase | Meaning | Response |
 |--------|---------|----------|
-| "While we're at it..." | Next gate work | STOP |
-| "I also..." | Scope expansion | STOP |
-| "Might as well..." | Bypassing decision point | STOP |
-| "Let me just..." | Execution without artifact | STOP (L340) |
+| "While we're at it..." | Next_Gate work | STOP |
+| "I also..." | Scope_Expansion | STOP |
+| "Might as well..." | Bypassing Decision_Point | STOP |
+| "Let me just..." | Execution without Governance_Artifact | STOP (L340) |
 
-### R-REASON-004: Reflection Protocols
+### CAP-REASON-004: Reflection Protocols
 
-Agents SHALL implement reflection mechanisms.
+The SYSTEM shall implement Reflection_Protocols.
 
-| ID | Requirement |
-|----|-------------|
-| R-REASON-004-01 | Agent SHALL recognize "step back" or "review kb" triggers |
-| R-REASON-004-02 | Agent SHALL review KB before substantial proposals |
-| R-REASON-004-03 | Agent SHALL capture learnings as L-docs |
-| R-REASON-004-04 | Agent SHOULD check 50% progress on 4+ deliverable gates (L002) |
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-REASON-004-01 | event-driven | WHEN Step_Back_Trigger is received, the SYSTEM shall execute KB_Review |
+| CAP-REASON-004-02 | ubiquitous | The SYSTEM shall review Knowledge_Base before Substantial_Proposals |
+| CAP-REASON-004-03 | event-driven | WHEN Significant_Insight occurs, the SYSTEM shall capture Learning_Document |
+| CAP-REASON-004-04 | conditional | IF Gate has 4+ deliverables THEN the SYSTEM should check Mid_Gate_Progress (L002) |
+
+**Enforcement**: KB review checklist, L-doc creation
 
 #### KB Review Checklist
 
 ```
 Before proposing substantial changes:
-- [ ] inherited/   — precedents, decision authority
+- [ ] inherited/   — precedents, Decision_Authority
 - [ ] planning/    — active work, related PROJECT_PLANs
 - [ ] evolution/   — learnings applicable to context
-- [ ] governance/  — boundaries, charter, mission
-- [ ] Cite 3+ precedents or note "novel"
+- [ ] governance/  — boundaries, Charter, Mission
+- [ ] Cite 3+ precedents OR note "novel"
 ```
 
-### R-REASON-005: Quality Assurance
+### CAP-REASON-005: Quality Assurance
 
-Agents SHALL implement quality verification.
+The SYSTEM shall implement Quality_Assurance verification.
 
-| ID | Requirement |
-|----|-------------|
-| R-REASON-005-01 | Plans SHALL include verification tests (L382) |
-| R-REASON-005-02 | Tests SHALL be executable (bash/python commands) |
-| R-REASON-005-03 | Tests SHALL include expected results |
-| R-REASON-005-04 | Agent SHALL run tests before declaring gate complete |
-| R-REASON-005-05 | Test failures SHALL block gate completion |
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-REASON-005-01 | ubiquitous | The SYSTEM shall include Verification_Tests in PROJECT_PLAN (L382) |
+| CAP-REASON-005-02 | ubiquitous | The SYSTEM shall make Verification_Tests executable (bash/python) |
+| CAP-REASON-005-03 | ubiquitous | The SYSTEM shall include Expected_Results in Verification_Tests |
+| CAP-REASON-005-04 | event-driven | WHEN declaring Gate_Complete, the SYSTEM shall run Verification_Tests |
+| CAP-REASON-005-05 | conditional | IF Verification_Test fails THEN the SYSTEM shall block Gate_Completion |
+
+**Enforcement**: `validate_project_plan.py --strict`
 
 #### Verification Test Format (L382)
 
@@ -178,6 +253,40 @@ python3 validation/validate_artifact.py path/to/artifact.md
 # Expected: ✅ Valid
 ```
 ```
+
+### CAP-REASON-006: Session Scope Validation
+
+The SYSTEM shall validate Session_Scope (L342).
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-REASON-006-01 | event-driven | WHEN Significant_Scope_Expansion is proposed, the SYSTEM shall re-read Session_Mandate |
+| CAP-REASON-006-02 | ubiquitous | The SYSTEM shall classify proposed work as Research, Preparation, or Execution |
+| CAP-REASON-006-03 | conditional | IF Execution beyond Session_Mandate THEN the SYSTEM shall create Session_Handoff |
+| CAP-REASON-006-04 | conditional | IF Scope evolved 3+ times THEN the SYSTEM shall STOP and create Session_Handoff |
+
+**Enforcement**: Session review
+
+#### Scope Red Flags
+
+| Red Flag | Response |
+|----------|----------|
+| Creating PROJECT_PLAN for work not in Session_Scope | STOP - wrong session |
+| "Let me execute..." when session is Research | STOP - Scope_Mismatch |
+| Scope evolved 3+ times from original Session_Mandate | STOP - create Session_Handoff |
+
+### CAP-REASON-007: Execution Governance
+
+The SYSTEM shall require Governance_Artifacts before execution (L340).
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-REASON-007-01 | ubiquitous | The SYSTEM shall have Governance_Artifact before modifying Managed_Repos |
+| CAP-REASON-007-02 | ubiquitous | The SYSTEM shall reference Tracking_Issue in Governance_Artifact |
+| CAP-REASON-007-03 | ubiquitous | The SYSTEM shall define Success_Criteria in Governance_Artifact |
+| CAP-REASON-007-04 | ubiquitous | The SYSTEM shall document Rollback_Plan in Governance_Artifact |
+
+**Enforcement**: Pre-execution checklist
 
 ---
 
@@ -198,10 +307,10 @@ Substantial Change Protocol (CLAUDE.md):
 
 ```
 Context-Proportional Protocol:
-1. Assess task complexity
+1. Assess Task_Complexity
 2. If substantial: Apply rigorous protocol
 3. If simple: Execute with light documentation
-4. On user direction: Shift mode temporarily
+4. On user direction: Shift Mode temporarily
 ```
 
 ### Exploratory Reasoning
@@ -216,34 +325,92 @@ Flow-First Protocol:
 
 ---
 
-## Session Scope Validation (L342)
+## Authority Model
 
-### Scope Check Protocol
+```yaml
+authority:
+  applies_to: "all_agents"
 
-Before significant scope expansion:
-1. Re-read session mandate (wake-up instructions)
-2. Classify proposed work: Research | Preparation | Execution
-3. If execution beyond mandate: Create handoff, defer to future session
+  governed_by:
+    spec: "AGET_REASONING_SPEC"
+    owner: "private-aget-framework-AGET"
 
-### Scope Red Flags
+  agent_authority:
+    can_autonomously:
+      - "create PROJECT_PLAN for work within scope"
+      - "execute Verification_Tests"
+      - "capture Learning_Documents"
+      - "apply KB_Review protocol"
 
-| Red Flag | Response |
-|----------|----------|
-| Creating PROJECT_PLAN for work not in session scope | STOP - wrong session |
-| "Let me execute..." when session is for research | STOP - scope mismatch |
-| Scope evolved 3+ times from original mandate | STOP - create handoff |
+    requires_approval:
+      - action: "Gate_Completion for gates with approval requirement"
+        approver: "supervisor or principal"
+      - action: "Scope_Expansion beyond Session_Mandate"
+        approver: "principal"
+
+  escalation_protocol:
+    - action: "Breaking_Change"
+      approver: "supervisor"
+    - action: "Major_Version release"
+      approver: "supervisor"
+```
 
 ---
 
-## Execution Governance Check (L340)
+## Inviolables
 
-Before executing work that modifies managed repos:
-1. Discrete governance artifact exists (PROJECT_PLAN or gate checklist)
-2. Tracking issue referenced
-3. Success criteria defined
-4. Rollback plan documented
+```yaml
+inviolables:
+  inherited:
+    - id: "INV-REASON-001"
+      source: "aget_framework"
+      statement: "The SYSTEM shall NOT proceed past Gate_Boundary WITHOUT explicit GO"
+      rationale: "Gate discipline is foundational (L42)"
 
-**Red Flag**: "Let me just..." or "I'll quickly..." without artifact = STOP
+    - id: "INV-REASON-002"
+      source: "aget_framework"
+      statement: "The SYSTEM shall NOT expand Scope mid-gate"
+      rationale: "Scope discipline prevents scope creep"
+
+    - id: "INV-REASON-003"
+      source: "aget_framework"
+      statement: "The SYSTEM shall NOT skip Verification_Tests for gates"
+      rationale: "Quality assurance is mandatory (L382)"
+
+    - id: "INV-REASON-004"
+      source: "aget_framework"
+      statement: "The SYSTEM shall NOT execute without Governance_Artifact (L340)"
+      rationale: "Execution governance prevents undocumented changes"
+```
+
+---
+
+## Structural Requirements
+
+```yaml
+structure:
+  required_directories:
+    - path: "planning/"
+      purpose: "PROJECT_PLANs and planning artifacts"
+      contents:
+        - "PROJECT_PLAN_*.md"
+        - "VERSION_SCOPE_*.md"
+
+  required_files:
+    - path: "CLAUDE.md"
+      purpose: "Agent operational instructions including reasoning protocols"
+      sections:
+        - "Substantial Change Protocol"
+        - "Gate Execution Discipline"
+
+  pattern_files:
+    - path: "docs/patterns/PATTERN_step_back_review_kb.md"
+      purpose: "KB review pattern documentation"
+
+  optional_directories:
+    - path: "decisions/"
+      purpose: "Documented decisions beyond L-docs"
+```
 
 ---
 
@@ -254,20 +421,20 @@ REASONING is grounded in established theory (L331):
 | Theory | Application |
 |--------|-------------|
 | **BDI (Intentions)** | Plans and gates represent committed intentions |
-| **Cybernetics (Feedback)** | Verification tests provide feedback loops |
+| **Cybernetics (Feedback)** | Verification_Tests provide feedback loops |
 | **Actor Model** | Decision escalation follows message patterns |
 
 ```yaml
 theoretical_basis:
-  primary: BDI (Belief-Desire-Intention)
+  primary: "BDI (Belief-Desire-Intention)"
   secondary:
-    - Cybernetics (feedback loops)
-    - Actor Model (message escalation)
+    - "Cybernetics (feedback loops)"
+    - "Actor Model (message escalation)"
   rationale: >
     REASONING implements BDI intentions through plans and gates,
     Cybernetic feedback through verification tests, and
     Actor escalation through decision authority patterns.
-  reference: L331_theoretical_foundations_agency.md
+  reference: "L331_theoretical_foundations_agency.md"
 ```
 
 ---
@@ -280,14 +447,14 @@ theoretical_basis:
 # Validate PROJECT_PLAN structure
 python3 validation/validate_project_plan.py planning/PROJECT_PLAN_*.md
 
-# Check for L382 compliance (verification tests)
+# Check for L382 compliance (Verification_Tests)
 python3 validation/validate_project_plan.py planning/PROJECT_PLAN_*.md --strict
 ```
 
 ### Gate Discipline Check
 
 ```bash
-# Verify verification tests exist in plan
+# Verify Verification_Tests exist in plan
 grep -A5 "Verification Tests" planning/PROJECT_PLAN_*.md
 ```
 
@@ -302,17 +469,23 @@ grep -A5 "Verification Tests" planning/PROJECT_PLAN_*.md
 - L382: Gate Verification Test Gap
 - L002: Mid-Gate Quality Checkpoints
 - AGET_5D_ARCHITECTURE_SPEC: Umbrella specification
+- AGET_SPEC_FORMAT_v1.2: Specification format
 
 ---
 
 ## Graduation History
 
-- **Source Learnings**: L42 (Gate Discipline), L186 (PROJECT_PLAN), L340 (Execution Governance), L382 (Verification Tests)
-- **Related Pattern**: Substantial Change Protocol in CLAUDE.md
-- **Rationale**: Formalizes reasoning patterns from multiple learnings
+```yaml
+graduation:
+  source_learnings: ["L42", "L186", "L340", "L382", "L002", "L342"]
+  pattern_origin: "Substantial Change Protocol"
+  governance_vision: "CLAUDE.md execution protocols"
+  rationale: "Formalizes reasoning patterns from multiple operational learnings"
+```
 
 ---
 
-*AGET REASONING Specification v1.0.0*
+*AGET REASONING Specification v1.1.0*
+*Format: AGET_SPEC_FORMAT v1.2 (EARS + SKOS)*
 *Part of v3.0.0 Composition Architecture - REASONING Dimension*
 *"HOW the agent thinks shapes what it produces."*

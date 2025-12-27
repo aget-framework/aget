@@ -1,9 +1,11 @@
 # AGET 5D Composition Architecture Specification
 
-**Version**: 1.0.0
+**Version**: 1.1.0
 **Status**: Active
 **Category**: Standards (Umbrella)
+**Format Version**: 1.2
 **Created**: 2025-12-26
+**Updated**: 2025-12-27
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_5D_ARCHITECTURE_SPEC.md`
 **Change Proposal**: CP-008
@@ -36,7 +38,7 @@ Without a unifying framework, these concerns become ad-hoc and inconsistent. The
 **Defines**:
 - Five dimensions and their relationships
 - Requirements for each dimension
-- Integration with capability composition
+- Integration with Capability_Composition
 - Validation requirements
 
 **Related Specifications**:
@@ -58,74 +60,146 @@ Without a unifying framework, these concerns become ad-hoc and inconsistent. The
 │                                                                         │
 │  D1: PERSONA ──────────────────────────────────── WHO (Identity)       │
 │      • Archetype (supervisor, advisor, worker, etc.)                   │
-│      • Governance intensity (rigorous, balanced, exploratory)          │
-│      • Communication style (formal, conversational, adaptive)          │
-│      • Goal orientation (North Star, mission, objectives)              │
+│      • Governance_Intensity (rigorous, balanced, exploratory)          │
+│      • Communication_Style (formal, conversational, adaptive)          │
+│      • Goal_Orientation (North_Star, Mission, Objectives)              │
 │                                                                         │
 │  D2: MEMORY ───────────────────────────────────── WHAT KNOWS           │
-│      • 6-layer memory model (working → fleet)                          │
-│      • Continual Learning (L-doc → Pattern → Spec)                     │
-│      • Session protocols (wake, wind-down)                             │
-│      • Knowledge persistence (KB as collaboration substrate)           │
+│      • Six_Layer_Memory_Model (working → fleet)                        │
+│      • Continual_Learning (L-doc → Pattern → Spec)                     │
+│      • Session_Protocol (wake, wind-down)                              │
+│      • Knowledge_Persistence (KB as Collaboration_Substrate)           │
 │                                                                         │
 │  D3: REASONING ────────────────────────────────── HOW THINKS           │
-│      • Planning patterns (PROJECT_PLAN, gates)                         │
-│      • Decision frameworks (escalation, authority matrix)              │
-│      • Reflection protocols (step back, review KB)                     │
-│      • Quality assurance (verification tests, validation)              │
+│      • Planning_Patterns (PROJECT_PLAN, gates)                         │
+│      • Decision_Frameworks (escalation, Authority_Matrix)              │
+│      • Reflection_Protocols (step back, review KB)                     │
+│      • Quality_Assurance (Verification_Tests, validation)              │
 │                                                                         │
 │  D4: SKILLS ───────────────────────────────────── WHAT DOES            │
 │      • Capabilities (composable behavioral units)                      │
-│      • Tools (validators, scripts, patterns)                           │
+│      • Tools (Validators, scripts, patterns)                           │
 │      • Outputs (structured formats, artifacts)                         │
-│      • A-SDLC phase alignment                                          │
+│      • A_SDLC Phase_Alignment                                          │
 │                                                                         │
 │  D5: CONTEXT ──────────────────────────────────── WHERE/WHEN           │
-│      • Environmental awareness (codebase, repository state)            │
-│      • Relationships (supervisor, peers, managed agents)               │
-│      • Temporal awareness (session state, phase in workflow)           │
-│      • Scope boundaries (what is/isn't in scope)                       │
+│      • Environmental_Awareness (codebase, repository state)            │
+│      • Relationships (Supervisor, Peers, Managed_Agents)               │
+│      • Temporal_Awareness (Session_State, Workflow_Phase)              │
+│      • Scope_Boundaries (what is/isn't in scope)                       │
 │                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
+## Vocabulary
+
+Core terms for the 5D Architecture:
+
+```yaml
+vocabulary:
+  meta:
+    domain: "5d_architecture"
+    version: "1.0.0"
+    inherits: "aget_core"
+
+  architecture:  # Cross-cutting terms
+    Five_D_Model:
+      skos:definition: "Framework organizing agent design into five orthogonal dimensions"
+      skos:narrower: ["PERSONA", "MEMORY", "REASONING", "SKILLS", "CONTEXT"]
+    Dimension:
+      skos:definition: "Orthogonal aspect of agent design"
+    Dimension_Completeness:
+      skos:definition: "Requirement that agents address all five dimensions"
+    Dimension_Orthogonality:
+      skos:definition: "Property that dimensions are independent and compose without interference"
+    Capability_Composition:
+      skos:definition: "Mechanism for combining capabilities into agent behavior"
+      aget:reference: "COMPOSITION_SPEC_v1.0"
+
+  persona:  # D1: WHO
+    PERSONA:
+      skos:definition: "D1 - Identity dimension defining WHO the agent is"
+      skos:narrower: ["Archetype", "Governance_Intensity", "Communication_Style", "Goal_Orientation"]
+
+  memory:  # D2: WHAT KNOWS
+    MEMORY:
+      skos:definition: "D2 - Knowledge dimension defining WHAT the agent knows"
+      skos:narrower: ["Six_Layer_Memory_Model", "Continual_Learning", "Session_Protocol"]
+
+  reasoning:  # D3: HOW THINKS
+    REASONING:
+      skos:definition: "D3 - Cognitive dimension defining HOW the agent thinks"
+      skos:narrower: ["Planning_Pattern", "Decision_Framework", "Reflection_Protocol", "Quality_Assurance"]
+
+  skills:  # D4: WHAT DOES
+    SKILLS:
+      skos:definition: "D4 - Capability dimension defining WHAT the agent does"
+      skos:narrower: ["Capability", "Tool", "Output_Format", "Phase_Alignment"]
+
+  context:  # D5: WHERE/WHEN
+    CONTEXT:
+      skos:definition: "D5 - Situational dimension defining WHERE/WHEN the agent operates"
+      skos:narrower: ["Environmental_Awareness", "Relationship_Structure", "Temporal_Awareness", "Scope_Boundary"]
+```
+
+---
+
 ## Requirements
 
-### R-5D-001: Dimension Completeness
+### CAP-5D-001: Dimension Completeness
 
-Agents SHALL address all five dimensions in their design.
+The SYSTEM shall address all five dimensions in agent design.
 
-| ID | Requirement |
-|----|-------------|
-| R-5D-001-01 | Agent SHALL have defined PERSONA (archetype + governance) |
-| R-5D-001-02 | Agent SHALL have MEMORY structure (.aget/evolution, governance, planning) |
-| R-5D-001-03 | Agent SHALL follow REASONING patterns appropriate to governance level |
-| R-5D-001-04 | Agent SHALL declare SKILLS via capabilities or manifest |
-| R-5D-001-05 | Agent SHALL have CONTEXT awareness (scope, relationships) |
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-5D-001-01 | ubiquitous | The SYSTEM shall have defined PERSONA (Archetype + Governance_Intensity) |
+| CAP-5D-001-02 | ubiquitous | The SYSTEM shall have MEMORY structure (.aget/evolution, governance, planning) |
+| CAP-5D-001-03 | ubiquitous | The SYSTEM shall follow REASONING patterns appropriate to Governance_Intensity |
+| CAP-5D-001-04 | ubiquitous | The SYSTEM shall declare SKILLS via Capabilities or Manifest_Yaml |
+| CAP-5D-001-05 | ubiquitous | The SYSTEM shall have CONTEXT awareness (Scope_Boundaries, Relationships) |
 
-### R-5D-002: Dimension Orthogonality
+**Enforcement**: `validate_5d_compliance.py`
+
+### CAP-5D-002: Dimension Orthogonality
 
 Dimensions SHALL be independent and compose without interference.
 
-| ID | Requirement |
-|----|-------------|
-| R-5D-002-01 | PERSONA choices SHALL NOT constrain MEMORY structure |
-| R-5D-002-02 | SKILLS SHALL compose independently of REASONING patterns |
-| R-5D-002-03 | CONTEXT awareness SHALL NOT override PERSONA identity |
-| R-5D-002-04 | Dimension configurations SHALL be separately testable |
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-5D-002-01 | ubiquitous | The SYSTEM shall ensure PERSONA choices do NOT constrain MEMORY structure |
+| CAP-5D-002-02 | ubiquitous | The SYSTEM shall ensure SKILLS compose independently of REASONING patterns |
+| CAP-5D-002-03 | ubiquitous | The SYSTEM shall ensure CONTEXT awareness does NOT override PERSONA identity |
+| CAP-5D-002-04 | ubiquitous | The SYSTEM shall make Dimension configurations separately testable |
 
-### R-5D-003: Dimension Documentation
+**Enforcement**: Architecture review, dimension validators
 
-Agents SHALL document their 5D configuration.
+### CAP-5D-003: Dimension Documentation
 
-| ID | Requirement |
-|----|-------------|
-| R-5D-003-01 | AGENTS.md SHALL include dimension summary section |
-| R-5D-003-02 | manifest.yaml SHALL declare capabilities (SKILLS dimension) |
-| R-5D-003-03 | .aget/identity.json SHALL declare PERSONA elements |
-| R-5D-003-04 | CLAUDE.md SHALL operationalize dimension requirements |
+The SYSTEM shall document its 5D configuration.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-5D-003-01 | ubiquitous | The SYSTEM shall include Dimension_Summary section in Agents_Md |
+| CAP-5D-003-02 | ubiquitous | The SYSTEM shall declare Capabilities (SKILLS dimension) in Manifest_Yaml |
+| CAP-5D-003-03 | ubiquitous | The SYSTEM shall declare PERSONA elements in Identity_Json |
+| CAP-5D-003-04 | ubiquitous | The SYSTEM shall operationalize Dimension requirements in Claude_Md |
+
+**Enforcement**: `validate_5d_compliance.py`, documentation review
+
+### CAP-5D-004: Dimension Interaction
+
+The SYSTEM shall support appropriate Dimension_Interactions.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-5D-004-01 | conditional | IF Governance_Rigorous is active THEN the SYSTEM shall apply full REASONING protocols |
+| CAP-5D-004-02 | ubiquitous | The SYSTEM shall use MEMORY to inform CONTEXT awareness |
+| CAP-5D-004-03 | ubiquitous | The SYSTEM shall use SKILLS availability to shape REASONING approach |
+| CAP-5D-004-04 | conditional | IF CONTEXT changes significantly THEN the SYSTEM may invoke PERSONA Governance_Shift |
+
+**Enforcement**: Operational review
 
 ---
 
@@ -133,22 +207,22 @@ Agents SHALL document their 5D configuration.
 
 Each dimension has a dedicated specification defining detailed requirements:
 
-| Dimension | Specification | Status |
-|-----------|---------------|--------|
-| D1: PERSONA | AGET_PERSONA_SPEC.md | In Progress |
-| D2: MEMORY | AGET_MEMORY_SPEC.md | Active |
-| D3: REASONING | AGET_REASONING_SPEC.md | In Progress |
-| D4: SKILLS | AGET_SKILLS_SPEC.md | In Progress |
-| D5: CONTEXT | AGET_CONTEXT_SPEC.md | In Progress |
+| Dimension | Specification | Version | Status |
+|-----------|---------------|---------|--------|
+| D1: PERSONA | AGET_PERSONA_SPEC.md | 1.1.0 | Active |
+| D2: MEMORY | AGET_MEMORY_SPEC.md | 1.1.0 | Active |
+| D3: REASONING | AGET_REASONING_SPEC.md | 1.1.0 | Active |
+| D4: SKILLS | AGET_SKILLS_SPEC.md | 1.1.0 | Active |
+| D5: CONTEXT | AGET_CONTEXT_SPEC.md | 1.1.0 | Active |
 
 ---
 
 ## Relationship to Capability Composition
 
-The 5D Architecture and Capability Composition (COMPOSITION_SPEC_v1.0) are **orthogonal but complementary**:
+The 5D Architecture and Capability_Composition (COMPOSITION_SPEC_v1.0) are **orthogonal but complementary**:
 
-| Concern | 5D Architecture | Capability Composition |
-|---------|-----------------|----------------------|
+| Concern | Five_D_Architecture | Capability_Composition |
+|---------|---------------------|------------------------|
 | **What** | Dimensions of agent design | How capabilities combine |
 | **Focus** | Conceptual organization | Technical mechanism |
 | **Question** | "What aspects define an agent?" | "How do behaviors compose?" |
@@ -162,83 +236,160 @@ Capabilities implement aspects of the 5D dimensions:
 # Example: How capabilities map to dimensions
 capabilities:
   # PERSONA dimension
-  - capability-governance-rigorous    # Governance intensity
+  - capability-governance-rigorous    # Governance_Intensity
 
   # MEMORY dimension
-  - capability-memory-management      # 6-layer model
+  - capability-memory-management      # Six_Layer_Model
 
   # REASONING dimension
-  - capability-gate-discipline        # Planning patterns
+  - capability-gate-discipline        # Planning_Patterns
 
   # SKILLS dimension
   - capability-domain-knowledge       # Domain expertise
-  - capability-structured-outputs     # Output formats
+  - capability-structured-outputs     # Output_Formats
 
   # CONTEXT dimension
-  - capability-collaboration          # Relationship awareness
+  - capability-collaboration          # Relationship_Awareness
 ```
 
 ---
 
 ## Dimension Interaction Patterns
 
-While dimensions are orthogonal, they interact at agent runtime:
+WHILE dimensions are orthogonal, they interact at agent runtime:
 
 ### Pattern 1: PERSONA → REASONING
 
-Governance intensity influences reasoning patterns:
-- Rigorous → Full PROJECT_PLAN for all non-trivial work
-- Balanced → Proportional governance
-- Exploratory → Flow-first, structure on request
+Governance_Intensity influences REASONING patterns:
+- Governance_Rigorous → Full PROJECT_PLAN for all non-trivial work
+- Governance_Balanced → Proportional governance
+- Governance_Exploratory → Flow-first, structure on request
 
 ### Pattern 2: MEMORY → CONTEXT
 
-Memory provides context for decisions:
-- KB review informs contextual awareness
-- Session history provides temporal context
-- L-docs inform current work
+MEMORY provides context for decisions:
+- KB_Review informs contextual awareness
+- Session_History provides Temporal_Context
+- Learning_Documents inform current work
 
 ### Pattern 3: SKILLS → REASONING
 
-Available skills influence planning:
-- Validator skills enable verification tests
-- Pattern scripts enable automation
-- Tool availability shapes execution approach
+Available SKILLS influence planning:
+- Validator skills enable Verification_Tests
+- Pattern_Scripts enable automation
+- Tool_Availability shapes execution approach
 
 ### Pattern 4: CONTEXT → PERSONA
 
-Environment may invoke governance shifts:
-- Public repo work → Higher governance (L340)
-- Breaking changes → Escalation required
-- Novel territory → Rigorous mode
+Environment may invoke Governance_Shifts:
+- Public_Repo work → Higher_Governance (L340)
+- Breaking_Changes → Escalation required
+- Novel_Territory → Rigorous_Mode
 
 ---
 
-## Theoretical Basis
-
-The 5D Architecture is grounded in established theory (L331):
-
-| Theory | 5D Application |
-|--------|----------------|
-| **BDI (Belief-Desire-Intention)** | PERSONA = Desires, MEMORY = Beliefs, REASONING = Intentions |
-| **Actor Model** | CONTEXT = Actor boundaries, SKILLS = Message handling |
-| **Cybernetics** | SKILLS = Requisite variety, MEMORY = Feedback loops |
-| **Extended Mind** | MEMORY = Cognitive extension, SKILLS = Cognitive scaffolding |
-| **Complex Adaptive Systems** | All dimensions interact for emergent fleet behavior |
+## Authority Model
 
 ```yaml
-theoretical_basis:
-  primary: BDI (Belief-Desire-Intention)
-  secondary:
-    - Actor Model
-    - Extended Mind
-    - Cybernetics
-    - Complex Adaptive Systems
-  rationale: >
-    The 5D model maps to BDI's mental states while incorporating
-    Actor Model boundaries, Extended Mind cognitive extension,
-    Cybernetics feedback and variety, and CAS emergence at fleet level.
-  reference: L331_theoretical_foundations_agency.md
+authority:
+  applies_to: "all_agents"
+
+  governed_by:
+    spec: "AGET_5D_ARCHITECTURE_SPEC"
+    owner: "private-aget-framework-AGET"
+
+  dimension_authority:
+    D1_PERSONA:
+      spec: "AGET_PERSONA_SPEC"
+      owner: "private-aget-framework-AGET"
+    D2_MEMORY:
+      spec: "AGET_MEMORY_SPEC"
+      owner: "private-aget-framework-AGET"
+    D3_REASONING:
+      spec: "AGET_REASONING_SPEC"
+      owner: "private-aget-framework-AGET"
+    D4_SKILLS:
+      spec: "AGET_SKILLS_SPEC"
+      owner: "private-aget-framework-AGET"
+    D5_CONTEXT:
+      spec: "AGET_CONTEXT_SPEC"
+      owner: "private-aget-framework-AGET"
+
+  agent_authority:
+    can_autonomously:
+      - "implement all five dimensions"
+      - "configure dimension settings within constraints"
+      - "document 5D configuration"
+
+    requires_template:
+      - "Base dimension configuration from template"
+      - "Inviolables inherited from template"
+```
+
+---
+
+## Inviolables
+
+```yaml
+inviolables:
+  inherited:
+    - id: "INV-5D-001"
+      source: "aget_framework"
+      statement: "The SYSTEM shall address all five dimensions"
+      rationale: "5D completeness is foundational to agent design"
+
+    - id: "INV-5D-002"
+      source: "aget_framework"
+      statement: "The SYSTEM shall NOT violate Dimension_Orthogonality"
+      rationale: "Orthogonality enables clean composition"
+
+    - id: "INV-5D-003"
+      source: "aget_framework"
+      statement: "The SYSTEM shall inherit dimension Inviolables from templates"
+      rationale: "Template inviolables cannot be weakened"
+```
+
+---
+
+## Structural Requirements
+
+```yaml
+structure:
+  required_directories:
+    - path: ".aget/"
+      purpose: "Agent identity and configuration (PERSONA, MEMORY)"
+
+    - path: ".aget/evolution/"
+      purpose: "Learning_Documents (MEMORY)"
+
+    - path: "governance/"
+      purpose: "Governance artifacts (PERSONA, CONTEXT)"
+
+    - path: "planning/"
+      purpose: "Planning artifacts (REASONING)"
+
+  required_files:
+    - path: ".aget/version.json"
+      purpose: "Agent identity (PERSONA)"
+
+    - path: ".aget/identity.json"
+      purpose: "North_Star (PERSONA)"
+
+    - path: "governance/CHARTER.md"
+      purpose: "Scope_Boundaries (CONTEXT)"
+
+    - path: "CLAUDE.md"
+      purpose: "Operational instructions (all dimensions)"
+
+    - path: "manifest.yaml"
+      purpose: "Capability declaration (SKILLS)"
+
+  dimension_mapping:
+    PERSONA: [".aget/identity.json", ".aget/version.json", "governance/"]
+    MEMORY: [".aget/evolution/", "planning/", "governance/"]
+    REASONING: ["planning/", "CLAUDE.md"]
+    SKILLS: ["manifest.yaml", ".aget/patterns/", "validation/"]
+    CONTEXT: ["governance/CHARTER.md", "CLAUDE.md", ".aget/version.json"]
 ```
 
 ---
@@ -249,20 +400,25 @@ theoretical_basis:
 
 | Dimension | Validator | Purpose |
 |-----------|-----------|---------|
-| MEMORY | validate_memory_compliance.py | 6-layer structure |
-| SKILLS | validate_composition.py | Capability composition |
-| All | validate_template_manifest.py | Manifest structure |
+| PERSONA | validate_persona_compliance.py | Identity and governance |
+| MEMORY | validate_memory_compliance.py | Six_Layer structure |
+| REASONING | validate_project_plan.py | Planning patterns |
+| SKILLS | validate_composition.py | Capability_Composition |
+| CONTEXT | validate_context_compliance.py | Scope and relationships |
+| All | validate_5d_compliance.py | Umbrella validator |
 
 ### 5D Compliance Check
 
 ```bash
-# Validate MEMORY dimension
+# Full 5D compliance validation
+python3 validation/validate_5d_compliance.py --dir /path/to/agent
+
+# Individual dimension checks
+python3 validation/validate_persona_compliance.py --dir /path/to/agent
 python3 validation/validate_memory_compliance.py --dir /path/to/agent
+python3 validation/validate_context_compliance.py --dir /path/to/agent
 
-# Validate SKILLS dimension (via manifest)
-python3 validation/validate_template_manifest.py /path/to/manifest.yaml
-
-# Validate SKILLS composition
+# Capability composition (SKILLS)
 python3 validation/validate_composition.py /path/to/manifest.yaml
 ```
 
@@ -270,45 +426,66 @@ python3 validation/validate_composition.py /path/to/manifest.yaml
 
 ## Agent Design Checklist
 
-When designing a new agent, address each dimension:
+WHEN designing a new agent, the SYSTEM shall address each dimension:
 
 ### D1: PERSONA
-- [ ] Base template selected (supervisor, advisor, worker, etc.)
-- [ ] Governance intensity declared (rigorous, balanced, exploratory)
-- [ ] North Star defined (identity.json)
-- [ ] Communication style established
+- [ ] Base_Template selected (supervisor, advisor, worker, etc.)
+- [ ] Governance_Intensity declared (rigorous, balanced, exploratory)
+- [ ] North_Star defined (identity.json)
+- [ ] Communication_Style established
 
 ### D2: MEMORY
 - [ ] .aget/evolution/ directory exists
 - [ ] governance/ and planning/ directories exist
-- [ ] Wake/wind-down protocols defined
+- [ ] Wake/Wind_Down protocols defined
 - [ ] L-doc conventions followed
 
 ### D3: REASONING
-- [ ] Planning patterns match governance intensity
-- [ ] Decision authority documented
-- [ ] Escalation paths defined
-- [ ] Verification tests included
+- [ ] Planning_Patterns match Governance_Intensity
+- [ ] Decision_Authority documented
+- [ ] Escalation_Paths defined
+- [ ] Verification_Tests included
 
 ### D4: SKILLS
-- [ ] Capabilities declared in manifest
-- [ ] Tools/validators available
-- [ ] Output formats defined
-- [ ] A-SDLC phase alignment clear
+- [ ] Capabilities declared in Manifest_Yaml
+- [ ] Tools/Validators available
+- [ ] Output_Formats defined
+- [ ] A_SDLC Phase_Alignment clear
 
 ### D5: CONTEXT
-- [ ] Scope boundaries documented
-- [ ] Relationships defined (supervisor, peers)
-- [ ] Environmental awareness protocols
-- [ ] Session state handling
+- [ ] Scope_Boundaries documented
+- [ ] Relationships defined (Supervisor, Peers)
+- [ ] Environmental_Awareness protocols
+- [ ] Session_State handling
 
 ---
 
-## Graduation History
+## Theoretical Basis
 
-- **Source Learnings**: L330 (Capability Composition), L331 (Theoretical Foundations), L335 (Memory Architecture), L341 (Governance Intensity)
-- **Related Pattern**: 5W+H Knowledge Architecture
-- **Rationale**: Unifies multiple learnings into coherent architectural framework
+The 5D Architecture is grounded in established theory (L331):
+
+| Theory | Five_D Application |
+|--------|-------------------|
+| **BDI (Belief-Desire-Intention)** | PERSONA = Desires, MEMORY = Beliefs, REASONING = Intentions |
+| **Actor Model** | CONTEXT = Actor boundaries, SKILLS = Message handling |
+| **Cybernetics** | SKILLS = Requisite variety, MEMORY = Feedback loops |
+| **Extended Mind** | MEMORY = Cognitive extension, SKILLS = Cognitive scaffolding |
+| **Complex Adaptive Systems** | All dimensions interact for emergent Fleet behavior |
+
+```yaml
+theoretical_basis:
+  primary: "BDI (Belief-Desire-Intention)"
+  secondary:
+    - "Actor Model"
+    - "Extended Mind"
+    - "Cybernetics"
+    - "Complex Adaptive Systems"
+  rationale: >
+    The 5D model maps to BDI's mental states while incorporating
+    Actor Model boundaries, Extended Mind cognitive extension,
+    Cybernetics feedback and variety, and CAS emergence at fleet level.
+  reference: "L331_theoretical_foundations_agency.md"
+```
 
 ---
 
@@ -319,10 +496,23 @@ When designing a new agent, address each dimension:
 - L335: Memory Architecture Principles
 - L341: Governance Intensity Classification
 - COMPOSITION_SPEC_v1.0: Capability composition mechanism
-- AGET_MEMORY_SPEC: D2 dimension detail
+- AGET_SPEC_FORMAT_v1.2: Specification format
+- AGET_PERSONA_SPEC, AGET_MEMORY_SPEC, AGET_REASONING_SPEC, AGET_SKILLS_SPEC, AGET_CONTEXT_SPEC
 
 ---
 
-*AGET 5D Composition Architecture Specification v1.0.0*
+## Graduation History
+
+```yaml
+graduation:
+  source_learnings: ["L330", "L331", "L335", "L341"]
+  pattern_origin: "5W+H Knowledge Architecture"
+  rationale: "Unifies multiple learnings into coherent architectural framework"
+```
+
+---
+
+*AGET 5D Composition Architecture Specification v1.1.0*
+*Format: AGET_SPEC_FORMAT v1.2 (EARS + SKOS)*
 *Part of v3.0.0 Composition Architecture*
 *"Five dimensions, one coherent agent."*

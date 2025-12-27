@@ -174,6 +174,15 @@ scripts:
     exit_codes: [0, 1, 2]
     validates: Agent 5D Architecture (all dimensions)
 
+  - path: validation/validate_spec_format.py
+    description: Validates specification format against AGET_SPEC_FORMAT v1.2 (EARS + SKOS)
+    category: validator
+    version: 1.0.0
+    created: 2025-12-27
+    flags: [--help, --quiet, --verbose, --all, --version]
+    exit_codes: [0, 1, 2]
+    validates: AGET_*_SPEC.md (EARS patterns, v1.2 sections, CAP IDs)
+
   # ============================================================
   # TOOLS (validation/ - miscellaneous)
   # ============================================================
@@ -316,11 +325,11 @@ scripts:
 
 # Summary statistics
 summary:
-  total_scripts: 31
+  total_scripts: 32
   by_category:
-    validator: 17
+    validator: 18
     tool: 2
     pattern: 12
   by_status:
-    active: 28
+    active: 29
     skeleton: 3

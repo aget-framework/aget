@@ -1,9 +1,11 @@
 # AGET Memory Specification
 
-**Version**: 1.0.0
+**Version**: 1.1.0
 **Status**: Active
 **Category**: Standards (5D Composition - MEMORY Dimension)
+**Format Version**: 1.2
 **Created**: 2025-12-26
+**Updated**: 2025-12-27
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_MEMORY_SPEC.md`
 
@@ -11,7 +13,7 @@
 
 ## Abstract
 
-This specification defines the MEMORY dimension of the 5D Composition Architecture. Memory enables persistent, structured, shareable knowledge across sessions, agents, and humans. The specification formalizes the 6-layer memory model, continual learning patterns, and memory compliance requirements.
+This specification defines the MEMORY dimension of the 5D Composition Architecture. Memory enables persistent, structured, shareable knowledge across sessions, agents, and humans. The specification formalizes the Six_Layer_Memory_Model, Continual_Learning patterns, and Memory_Compliance requirements.
 
 ## Motivation
 
@@ -20,17 +22,17 @@ Human-AI collaboration faces fundamental asymmetry:
 - Human has limited bandwidth to re-explain context
 - Project state exists but isn't systematically loaded
 
-L335 (Memory Architecture Principles) established that **KB is not storage—KB is the collaboration substrate**. This specification formalizes that insight into testable requirements.
+L335 (Memory Architecture Principles) established that **Knowledge_Base is not storage—Knowledge_Base is the Collaboration_Substrate**. This specification formalizes that insight into testable requirements.
 
 ## Scope
 
-**Applies to**: All AGET agents using `memory-management` capability.
+**Applies to**: All AGET agents using Memory_Management capability.
 
 **Defines**:
-- 6-layer memory model
-- Continual Learning framework
-- Memory artifact types
-- Session protocols
+- Six_Layer_Memory_Model
+- Continual_Learning framework
+- Memory_Artifact types
+- Session_Protocol
 - Compliance requirements
 
 ---
@@ -41,77 +43,131 @@ Memory is one of five dimensions in the AGET Composition Architecture:
 
 | Dimension | Focus | This Spec |
 |-----------|-------|-----------|
-| PERSONA | Identity, voice, behavior style | - |
+| PERSONA | Identity, voice, behavior style | AGET_PERSONA_SPEC |
 | **MEMORY** | Knowledge persistence, learning accumulation | **This document** |
-| REASONING | Decision patterns, problem-solving approach | - |
-| SKILLS | Specific capabilities, tools, integrations | - |
-| CONTEXT | Environmental awareness, situation adaptation | - |
+| REASONING | Decision patterns, problem-solving approach | AGET_REASONING_SPEC |
+| SKILLS | Specific capabilities, tools, integrations | AGET_SKILLS_SPEC |
+| CONTEXT | Environmental awareness, situation adaptation | AGET_CONTEXT_SPEC |
+
+---
+
+## Vocabulary
+
+Domain terms for the MEMORY dimension:
+
+```yaml
+vocabulary:
+  meta:
+    domain: "memory"
+    version: "1.0.0"
+    inherits: "aget_core"
+
+  memory:  # D2: WHAT KNOWS
+    Knowledge_Base:
+      skos:definition: "Structured persistent storage for agent knowledge"
+      skos:altLabel: "KB"
+    Learning_Document:
+      skos:definition: "Captured insight in L-doc format"
+      skos:altLabel: "L-doc"
+      aget:naming: "L{NNN}_{snake_case}.md"
+      aget:location: ".aget/evolution/"
+    Six_Layer_Memory_Model:
+      skos:definition: "Architecture defining memory from working to fleet level"
+      skos:narrower: ["Working_Memory", "Session_Memory", "Project_Memory", "Agent_Memory", "Fleet_Memory", "Context_Optimization"]
+    Continual_Learning:
+      skos:definition: "Framework for accumulating and graduating knowledge"
+    Graduation_Pathway:
+      skos:definition: "Process by which learnings become patterns become specs"
+
+  persona:  # D1: Terms defined
+    Evolution_Directory:
+      skos:definition: "Directory containing Learning_Documents"
+      aget:location: ".aget/evolution/"
+
+  skills:  # D4: Capabilities
+    Wake_Protocol:
+      skos:definition: "Session initialization loading context"
+      aget:location: ".aget/patterns/session/wake_up.py"
+    Wind_Down_Protocol:
+      skos:definition: "Session finalization capturing artifacts"
+      aget:location: ".aget/patterns/session/wind_down.py"
+    Step_Back_Review_KB:
+      skos:definition: "Mid-session context refresh pattern"
+
+  context:  # D5: Where applied
+    Session_Handoff:
+      skos:definition: "Document enabling session continuity"
+```
 
 ---
 
 ## Requirements
 
-### R-MEM-001: 6-Layer Memory Model
+### CAP-MEMORY-001: Six Layer Memory Model
 
-Agents SHALL implement the 6-layer memory architecture.
+The SYSTEM shall implement the Six_Layer_Memory_Model.
 
-| ID | Requirement | Layer |
-|----|-------------|-------|
-| R-MEM-001-01 | Agent SHALL maintain working memory (active context) | Layer 1 |
-| R-MEM-001-02 | Agent SHALL support session memory (handoff artifacts) | Layer 2 |
-| R-MEM-001-03 | Agent SHALL maintain project memory (governance, planning, decisions) | Layer 3 |
-| R-MEM-001-04 | Agent SHALL maintain agent memory (.aget/, evolution/, patterns/) | Layer 4 |
-| R-MEM-001-05 | Agent MAY participate in fleet memory (cross-agent knowledge) | Layer 5 |
-| R-MEM-001-06 | Agent SHALL implement context optimization (selective loading) | Layer 6 |
+| ID | Pattern | Statement | Layer |
+|----|---------|-----------|-------|
+| CAP-MEMORY-001-01 | ubiquitous | The SYSTEM shall maintain Working_Memory as active context | Layer 1 |
+| CAP-MEMORY-001-02 | ubiquitous | The SYSTEM shall support Session_Memory via handoff artifacts | Layer 2 |
+| CAP-MEMORY-001-03 | ubiquitous | The SYSTEM shall maintain Project_Memory in governance, planning, decisions | Layer 3 |
+| CAP-MEMORY-001-04 | ubiquitous | The SYSTEM shall maintain Agent_Memory in .aget/, evolution/, patterns/ | Layer 4 |
+| CAP-MEMORY-001-05 | optional | WHERE Fleet_Membership exists, the SYSTEM shall participate in Fleet_Memory | Layer 5 |
+| CAP-MEMORY-001-06 | ubiquitous | The SYSTEM shall implement Context_Optimization for selective loading | Layer 6 |
+
+**Enforcement**: `validate_memory_compliance.py`
 
 #### Layer Definitions
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│ Layer 6: Context Optimization                                   │
+│ Layer 6: Context_Optimization                                   │
 │ Selective loading of relevant context into active window        │
-│ Patterns: Step Back/Review KB, Wake Protocol, Context Budget    │
+│ Patterns: Step_Back_Review_KB, Wake_Protocol, Context_Budget    │
 ├─────────────────────────────────────────────────────────────────┤
-│ Layer 5: Fleet Memory                                           │
-│ Cross-agent knowledge sharing, pattern graduation               │
+│ Layer 5: Fleet_Memory                                           │
+│ Cross-agent knowledge sharing, Pattern_Graduation               │
 │ Artifacts: FLEET_STATE.yaml, upstream/downstream flow           │
 ├─────────────────────────────────────────────────────────────────┤
-│ Layer 4: Agent Memory                                           │
+│ Layer 4: Agent_Memory                                           │
 │ Identity persistence, capability evolution, pattern libraries   │
 │ Artifacts: .aget/, evolution/, patterns/                        │
 ├─────────────────────────────────────────────────────────────────┤
-│ Layer 3: Project Memory                                         │
+│ Layer 3: Project_Memory                                         │
 │ KB structure, planning artifacts, decision records              │
 │ Artifacts: governance/, planning/, decisions/, docs/            │
 ├─────────────────────────────────────────────────────────────────┤
-│ Layer 2: Session Memory                                         │
+│ Layer 2: Session_Memory                                         │
 │ Session artifacts, decisions made, learnings captured           │
-│ Artifacts: sessions/, handoff documents, workspace/             │
+│ Artifacts: sessions/, Session_Handoff, workspace/               │
 ├─────────────────────────────────────────────────────────────────┤
-│ Layer 1: Working Memory                                         │
+│ Layer 1: Working_Memory                                         │
 │ Active context window, current conversation state               │
 │ Artifacts: None (ephemeral—LLM context window)                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### R-MEM-002: Continual Learning
+### CAP-MEMORY-002: Continual Learning
 
-Agents SHALL accumulate knowledge through structured learning mechanisms.
+The SYSTEM shall accumulate knowledge through Continual_Learning.
 
-| ID | Requirement |
-|----|-------------|
-| R-MEM-002-01 | Agent SHALL capture learnings as L-docs (L{NNN}_{title}.md) |
-| R-MEM-002-02 | L-docs SHALL include: Context, Insight, Application sections |
-| R-MEM-002-03 | Learnings MAY graduate to patterns (L-doc → Pattern) |
-| R-MEM-002-04 | Patterns MAY graduate to specifications (Pattern → Spec) |
-| R-MEM-002-05 | Agent SHALL track graduation history in artifacts |
-| R-MEM-002-06 | Agent SHOULD improve techniques based on learnings |
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-MEMORY-002-01 | event-driven | WHEN Significant_Insight occurs, the SYSTEM shall capture Learning_Document |
+| CAP-MEMORY-002-02 | ubiquitous | The SYSTEM shall format Learning_Documents with Context, Insight, Application sections |
+| CAP-MEMORY-002-03 | conditional | IF Learning applies to 3+ situations THEN the SYSTEM shall consider Pattern_Graduation |
+| CAP-MEMORY-002-04 | conditional | IF Pattern is broadly applicable THEN the SYSTEM shall propose Specification_Graduation |
+| CAP-MEMORY-002-05 | ubiquitous | The SYSTEM shall track Graduation_History in artifacts |
+| CAP-MEMORY-002-06 | ubiquitous | The SYSTEM shall improve techniques based on learnings |
+
+**Enforcement**: `validate_learning_doc.py`, `validate_graduation_history.py`
 
 #### Continual Learning Cycle
 
 ```
     ┌────────────────────────────────────────────────────┐
-    │                CONTINUAL LEARNING                   │
+    │                CONTINUAL_LEARNING                   │
     │                                                     │
     │  Experience ──► L-doc ──► Pattern ──► Spec        │
     │       │           │          │          │          │
@@ -124,38 +180,34 @@ Agents SHALL accumulate knowledge through structured learning mechanisms.
     └────────────────────────────────────────────────────┘
 ```
 
-**Graduation Pathway** (R-PROC-004):
-1. **Experience** → Captured as L-doc in `.aget/evolution/`
-2. **L-doc** → If pattern emerges, create pattern document
-3. **Pattern** → If broadly applicable, propose specification
-4. **Spec** → Framework-level standard
+### CAP-MEMORY-003: Session Protocols
 
-### R-MEM-003: Session Protocols
+The SYSTEM shall implement Session_Protocol for memory continuity.
 
-Agents SHALL implement session memory protocols.
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-MEMORY-003-01 | event-driven | WHEN Session_Start occurs, the SYSTEM shall execute Wake_Protocol |
+| CAP-MEMORY-003-02 | event-driven | WHEN Session_End occurs, the SYSTEM shall execute Wind_Down_Protocol |
+| CAP-MEMORY-003-03 | conditional | IF Session is significant THEN the SYSTEM shall create Session_Handoff |
+| CAP-MEMORY-003-04 | ubiquitous | The SYSTEM shall complete Context_Recovery WITHIN 2 minutes |
+| CAP-MEMORY-003-05 | ubiquitous | The SYSTEM shall document decisions and Pending_Work in Wind_Down_Protocol |
 
-| ID | Requirement |
-|----|-------------|
-| R-MEM-003-01 | Agent SHALL implement wake protocol (context loading) |
-| R-MEM-003-02 | Agent SHALL implement wind-down protocol (artifact capture) |
-| R-MEM-003-03 | Agent SHOULD create session handoff for significant sessions |
-| R-MEM-003-04 | Wake protocol SHALL complete context recovery < 2 minutes |
-| R-MEM-003-05 | Wind-down protocol SHALL document decisions and pending work |
+**Enforcement**: Wake/wind-down script execution, session review
 
-#### Wake Protocol
+#### Wake_Protocol
 
 ```bash
 # Minimal wake protocol
-1. Load .aget/version.json (identity)
-2. Load .aget/identity.json (North Star)
-3. Check git status (current state)
-4. Display summary
+1. Load Version_Json (identity)
+2. Load Identity_Json (North_Star)
+3. Check Git_Status (current state)
+4. Display Summary
 ```
 
-#### Wind-Down Protocol
+#### Wind_Down_Protocol
 
 ```markdown
-# Session Handoff Template
+# Session_Handoff Template
 ## What we set out to do
 ## What we actually did
 ## Decisions that changed direction
@@ -165,62 +217,157 @@ Agents SHALL implement session memory protocols.
 ## KB artifacts created/modified
 ```
 
-### R-MEM-004: Step Back / Review KB
+### CAP-MEMORY-004: Step Back Review KB
 
-Agents SHALL support mid-session context refresh.
+The SYSTEM shall support Mid_Session_Context_Refresh.
 
-| ID | Requirement |
-|----|-------------|
-| R-MEM-004-01 | Agent SHALL recognize "step back" or "review kb" triggers |
-| R-MEM-004-02 | Review SHALL load relevant KB artifacts by context |
-| R-MEM-004-03 | Review SHALL check inherited/, planning/, evolution/, governance/ |
-| R-MEM-004-04 | Agent SHALL cite 3+ precedents for governance decisions |
-| R-MEM-004-05 | If no precedent exists, agent SHALL note "novel" |
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-MEMORY-004-01 | event-driven | WHEN Step_Back_Trigger is received, the SYSTEM shall execute KB_Review |
+| CAP-MEMORY-004-02 | ubiquitous | The SYSTEM shall load relevant KB_Artifacts by context |
+| CAP-MEMORY-004-03 | ubiquitous | The SYSTEM shall check inherited/, planning/, evolution/, governance/ |
+| CAP-MEMORY-004-04 | conditional | IF Governance_Decision is proposed THEN the SYSTEM shall cite 3+ precedents |
+| CAP-MEMORY-004-05 | conditional | IF no precedent exists THEN the SYSTEM shall note Novel_Decision |
+
+**Enforcement**: Documentation review, precedent citation check
 
 #### Review KB Checklist
 
 ```
-Before proposing substantial changes:
-- [ ] inherited/   — precedents, decision authority
-- [ ] planning/    — active work, related PROJECT_PLANs
+BEFORE proposing substantial changes:
+- [ ] inherited/   — precedents, Decision_Authority
+- [ ] planning/    — active work, related Project_Plans
 - [ ] evolution/   — learnings applicable to context
 - [ ] governance/  — boundaries, charter, mission
-- [ ] Cite 3+ precedents or note "novel"
+- [ ] Cite 3+ precedents OR note "novel"
 ```
 
-### R-MEM-005: Memory Artifacts
+### CAP-MEMORY-005: Memory Artifacts
 
-Agents SHALL maintain required memory artifact structure.
+The SYSTEM shall maintain required Memory_Artifact structure.
 
-| ID | Requirement | Path |
-|----|-------------|------|
-| R-MEM-005-01 | Agent SHALL have identity file | `.aget/version.json` |
-| R-MEM-005-02 | Agent SHALL have evolution directory | `.aget/evolution/` |
-| R-MEM-005-03 | Agent SHOULD have patterns directory | `.aget/patterns/` or `docs/patterns/` |
-| R-MEM-005-04 | Agent SHALL have governance directory | `governance/` |
-| R-MEM-005-05 | Agent SHALL have planning directory | `planning/` |
-| R-MEM-005-06 | Agent MAY have inherited knowledge | `inherited/` |
+| ID | Pattern | Statement | Path |
+|----|---------|-----------|------|
+| CAP-MEMORY-005-01 | ubiquitous | The SYSTEM shall maintain Version_Json | `.aget/version.json` |
+| CAP-MEMORY-005-02 | ubiquitous | The SYSTEM shall maintain Evolution_Directory | `.aget/evolution/` |
+| CAP-MEMORY-005-03 | ubiquitous | The SYSTEM shall maintain Patterns_Directory | `.aget/patterns/` or `docs/patterns/` |
+| CAP-MEMORY-005-04 | ubiquitous | The SYSTEM shall maintain Governance_Directory | `governance/` |
+| CAP-MEMORY-005-05 | ubiquitous | The SYSTEM shall maintain Planning_Directory | `planning/` |
+| CAP-MEMORY-005-06 | optional | WHERE Fleet_Membership exists, the SYSTEM shall maintain Inherited_Directory | `inherited/` |
 
-### R-MEM-006: Memory Hygiene
+**Enforcement**: `validate_memory_compliance.py`, `validate_agent_structure.py`
 
-Agents SHOULD maintain memory health.
+### CAP-MEMORY-006: Memory Hygiene
 
-| ID | Requirement |
-|----|-------------|
-| R-MEM-006-01 | Agent SHOULD archive stale artifacts (>6 months untouched) |
-| R-MEM-006-02 | Agent SHOULD prune orphaned documents |
-| R-MEM-006-03 | Agent SHOULD update cross-references when documents move |
-| R-MEM-006-04 | Session SHOULD leave KB better than found |
-| R-MEM-006-05 | 80%+ of significant sessions SHOULD add/update artifacts |
+The SYSTEM shall maintain Memory_Health.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-MEMORY-006-01 | conditional | IF Artifact is stale (>6 months) THEN the SYSTEM shall archive Artifact |
+| CAP-MEMORY-006-02 | ubiquitous | The SYSTEM shall prune Orphaned_Documents |
+| CAP-MEMORY-006-03 | event-driven | WHEN Document moves, the SYSTEM shall update Cross_References |
+| CAP-MEMORY-006-04 | ubiquitous | The SYSTEM shall leave Knowledge_Base better than found |
+| CAP-MEMORY-006-05 | ubiquitous | The SYSTEM shall add/update artifacts in 80%+ of Significant_Sessions |
+
+**Enforcement**: Memory hygiene review
+
+---
+
+## Authority Model
+
+```yaml
+authority:
+  applies_to: "agents_with_memory_management_capability"
+
+  governed_by:
+    spec: "AGET_MEMORY_SPEC"
+    owner: "private-aget-framework-AGET"
+
+  agent_authority:
+    can_autonomously:
+      - "create Learning_Documents"
+      - "execute Wake_Protocol"
+      - "execute Wind_Down_Protocol"
+      - "propose Pattern_Graduation"
+
+    requires_approval:
+      - action: "Specification_Graduation"
+        approver: "framework-aget"
+      - action: "Fleet_Memory modification"
+        approver: "supervisor"
+```
+
+---
+
+## Inviolables
+
+```yaml
+inviolables:
+  inherited:
+    - id: "INV-MEMORY-001"
+      source: "aget_framework"
+      statement: "The SYSTEM shall NOT delete Learning_Documents WITHOUT Archive"
+      rationale: "Institutional memory preservation"
+
+    - id: "INV-MEMORY-002"
+      source: "aget_framework"
+      statement: "The SYSTEM shall NOT skip Wind_Down_Protocol for Significant_Sessions"
+      rationale: "Session continuity requirement"
+
+    - id: "INV-MEMORY-003"
+      source: "aget_framework"
+      statement: "The SYSTEM shall NOT claim context it has not loaded"
+      rationale: "Memory integrity requirement"
+```
+
+---
+
+## Structural Requirements
+
+```yaml
+structure:
+  required_directories:
+    - path: ".aget/"
+      purpose: "Agent identity and configuration"
+
+    - path: ".aget/evolution/"
+      purpose: "Learning_Documents storage"
+      naming: "L{NNN}_{snake_case}.md"
+
+    - path: "governance/"
+      purpose: "Governance artifacts"
+
+    - path: "planning/"
+      purpose: "Planning artifacts"
+
+  optional_directories:
+    - path: ".aget/patterns/"
+      purpose: "Agent pattern scripts"
+
+    - path: "inherited/"
+      purpose: "Fleet-inherited knowledge"
+
+    - path: "sessions/"
+      purpose: "Session_Handoff storage"
+
+  required_files:
+    - path: ".aget/version.json"
+      purpose: "Agent identity"
+
+  domain_structure:
+    - path: ".aget/evolution/"
+      purpose: "Learning accumulation"
+      pattern: "L{NNN}_{snake_case}.md"
+      minimum_entries: 1
+```
 
 ---
 
 ## Memory Capability Contract
 
-Agents with `memory-management` capability MUST satisfy:
+Agents with Memory_Management capability MUST satisfy:
 
 ```yaml
-# Contract for memory-management capability
 contracts:
   - name: has_evolution_directory
     assertion: directory_exists
@@ -258,73 +405,28 @@ Memory architecture is grounded in established theories (L335):
 
 | Theory | Application |
 |--------|-------------|
-| **Extended Mind** (Clark/Chalmers, 1998) | KB extends cognitive capacity beyond individual minds |
+| **Extended Mind** (Clark/Chalmers, 1998) | Knowledge_Base extends cognitive capacity beyond individual minds |
 | **Transactive Memory** (Wegner, 1987) | Human-AI pairs develop shared "who knows what" |
 | **Distributed Cognition** (Hutchins, 1995) | Cognition happens across people, tools, artifacts |
 | **Stigmergy** (Grassé, 1959) | Coordination through environment modification |
-| **Cybernetics** (Ashby, 1956) | KB provides requisite variety for context recovery |
+| **Cybernetics** (Ashby, 1956) | Knowledge_Base provides requisite variety for Context_Recovery |
 
 ```yaml
 theoretical_basis:
-  primary: Extended Mind
+  primary: "Extended Mind"
   secondary:
-    - Transactive Memory
-    - Distributed Cognition
-    - Stigmergy
-    - Cybernetics (Requisite Variety)
+    - "Transactive Memory"
+    - "Distributed Cognition"
+    - "Stigmergy"
+    - "Cybernetics (Requisite Variety)"
   rationale: >
-    Memory architecture treats KB as cognitive infrastructure, not
-    documentation. The KB extends human-AI cognition (Extended Mind),
+    Memory architecture treats Knowledge_Base as cognitive infrastructure, not
+    documentation. The Knowledge_Base extends human-AI cognition (Extended Mind),
     serves as shared knowledge index (Transactive Memory), carries
     cognition across sessions (Distributed Cognition), enables
     coordination through environment modification (Stigmergy), and
     provides variety to handle situational complexity (Cybernetics).
-  reference: L335_memory_architecture_principles.md
-```
-
----
-
-## Continual Learning Framework
-
-### Definition
-
-**Continual Learning** is the framework by which agents accumulate knowledge and improve techniques over time through structured capture, graduation, and application of experiential insights.
-
-### Components
-
-1. **Learning Capture** (L-docs)
-   - Format: `L{NNN}_{snake_case_title}.md`
-   - Required sections: Context, Insight, Application
-   - Location: `.aget/evolution/`
-
-2. **Pattern Emergence**
-   - When learning applies to 3+ situations, consider pattern
-   - Format: `PATTERN_{name}.md`
-   - Location: `docs/patterns/` or `.aget/patterns/`
-
-3. **Specification Graduation**
-   - When pattern is broadly applicable, propose spec
-   - Requires Change Proposal (CP)
-   - Follows R-PROC-004 graduation pathway
-
-4. **Technique Improvement**
-   - Agent applies learnings to improve behavior
-   - Learnings inform pattern script updates
-   - Patterns inform capability definitions
-
-### Example Graduation
-
-```
-L376 (Premature Completion Declaration)
-    │
-    ▼ Pattern extracted (applies to multiple migrations)
-PATTERN_migration_validation_gate.md
-    │
-    ▼ Formalized in specification (R-PROC requirements)
-AGET_FRAMEWORK_SPEC (R-PROC-004)
-    │
-    ▼ Tooling created (enforcement)
-validate_graduation_history.py
+  reference: "L335_memory_architecture_principles.md"
 ```
 
 ---
@@ -332,7 +434,7 @@ validate_graduation_history.py
 ## Validation
 
 ```bash
-# Validate memory compliance
+# Validate Memory_Compliance
 python3 validation/validate_memory_compliance.py --dir /path/to/agent
 
 # Expected output:
@@ -352,19 +454,24 @@ python3 validation/validate_memory_compliance.py --dir /path/to/agent
 - L331: Theoretical Foundations of Agency
 - MEMORY_VISION.md (governance document)
 - PATTERN_step_back_review_kb.md
-- R-PROC-004: Artifact Graduation Pathway
+- CAP-PROC-004: Artifact Graduation Pathway
+- AGET_SPEC_FORMAT_v1.2: Specification format
 
 ---
 
 ## Graduation History
 
-- **Source Learning**: L335 (Memory Architecture Principles)
-- **Related Pattern**: PATTERN_step_back_review_kb.md
-- **Governance Vision**: MEMORY_VISION.md
-- **Rationale**: User-discovered "step back. review kb." pattern formalized
+```yaml
+graduation:
+  source_learnings: ["L335"]
+  pattern_origin: "PATTERN_step_back_review_kb.md"
+  governance_vision: "MEMORY_VISION.md"
+  rationale: "User-discovered 'step back. review kb.' pattern formalized into dimension spec"
+```
 
 ---
 
-*AGET Memory Specification v1.0.0*
+*AGET Memory Specification v1.1.0*
+*Format: AGET_SPEC_FORMAT v1.2 (EARS + SKOS)*
 *Part of v3.0.0 Composition Architecture - MEMORY Dimension*
-*"KB is not storage—KB is the collaboration substrate."*
+*"Knowledge_Base is not storage—Knowledge_Base is the Collaboration_Substrate."*
