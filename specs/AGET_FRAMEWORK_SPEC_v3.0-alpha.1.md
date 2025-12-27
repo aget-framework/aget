@@ -1,9 +1,9 @@
-# AGET Framework Specification v2.11
+# AGET Framework Specification v3.0-alpha.1
 
-**Version**: 2.11.0
-**Date**: 2025-12-23
-**Status**: Current
-**Previous**: v2.10.0
+**Version**: 3.0.0-alpha.1
+**Date**: 2025-12-26
+**Status**: Pre-release
+**Previous**: v2.11.0
 **Format**: AGET_SPEC_FORMAT_v1.1
 **Vocabulary**: AGET_CONTROLLED_VOCABULARY.md
 
@@ -636,6 +636,36 @@ The Agent tracks learnings in process specs.
 | R-PROC-003-04 | Each learning SHALL HAVE change description showing how applied |
 | R-PROC-003-05 | WHEN process fails, the Agent SHALL CHECK for applicable learnings |
 | R-PROC-003-06 | IF learning applicable, the Agent SHALL UPDATE learnings_applied |
+
+### R-PROC-004: Artifact Graduation
+
+The Agent follows a graduation pathway for knowledge artifacts.
+
+| ID | Requirement |
+|----|-------------|
+| R-PROC-004-01 | Specifications SHOULD originate from validated patterns |
+| R-PROC-004-02 | IF spec created without pattern precedent, the Agent SHALL DOCUMENT rationale in spec preamble |
+| R-PROC-004-03 | Patterns SHOULD originate from learnings (L-docs) |
+| R-PROC-004-04 | IF pattern created without L-doc precedent, the Agent SHALL DOCUMENT rationale in pattern header |
+| R-PROC-004-05 | The Agent SHALL TRACK graduation_history in artifact metadata |
+| R-PROC-004-06 | Graduation to Specification SHALL REQUIRE Change Proposal (CP) |
+| R-PROC-004-07 | The Agent SHALL INCLUDE source_learnings[] in pattern metadata |
+| R-PROC-004-08 | The Agent SHALL INCLUDE source_pattern in spec metadata |
+
+### R-PROC-005: Change Proposal Handling
+
+The Agent processes Change Proposals per defined workflow.
+
+| ID | Requirement |
+|----|-------------|
+| R-PROC-005-01 | The Agent SHALL VALIDATE CP format on submission |
+| R-PROC-005-02 | The Agent SHALL SET CP status to SUBMITTED after validation |
+| R-PROC-005-03 | The Agent SHALL REVIEW CPs during scoping phase |
+| R-PROC-005-04 | The Agent SHALL ASSIGN accepted CPs to VERSION_SCOPE |
+| R-PROC-005-05 | The Agent SHALL TRACK CP status transitions |
+| R-PROC-005-06 | The Agent SHALL PUBLISH closed CPs to docs/proposals/ |
+| R-PROC-005-07 | IF CP is rejected, the Agent SHALL DOCUMENT rejection_rationale |
+| R-PROC-005-08 | IF CP is deferred, the Agent SHALL DOCUMENT deferral_reason and target_version |
 
 ---
 

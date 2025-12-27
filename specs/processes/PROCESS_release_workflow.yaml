@@ -1,0 +1,276 @@
+# AGET Release Workflow Process Specification
+# Version: 1.0.0
+# Status: PILOT
+# Location: aget/specs/processes/PROCESS_release_workflow.yaml
+# Format: R-PROC-001 compliant
+# Change Proposal: CP-002
+
+process:
+  id: release-workflow
+  name: AGET Release Workflow
+  version: "1.0.0"
+  spec_format_version: "1.0"
+  status: pilot  # pilot | draft | canonical | deprecated
+  owner: framework-aget
+  created: 2025-12-26
+  updated: 2025-12-26
+
+trigger:
+  event: change_proposal_submitted
+  description: Workflow begins when a Change Proposal is submitted for review
+
+phases:
+  - id: P-1
+    name: Intake
+    description: Receive and validate Change Proposals
+    activities:
+      - Receive Change Proposal from author
+      - Validate CP format against AGET_CHANGE_PROPOSAL_SPEC
+      - Perform initial triage (category, rough impact)
+      - Set CP status to SUBMITTED
+      - Acknowledge receipt to author
+    artifacts_in:
+      - type: change_proposal
+        status: DRAFT
+    artifacts_out:
+      - type: change_proposal
+        status: SUBMITTED
+    decision_point: null  # Automatic acceptance if format valid
+
+  - id: P-2
+    name: Scoping
+    description: Review CPs and assign to version
+    activities:
+      - Review all SUBMITTED and ACCEPTED CPs
+      - Assess version impact (breaking, features, fixes)
+      - Determine target version for each CP
+      - Create or update VERSION_SCOPE document
+      - Set CP statuses to SCOPED
+      - Identify dependencies between CPs
+    artifacts_in:
+      - type: change_proposal
+        status: SUBMITTED
+      - type: change_proposal
+        status: ACCEPTED
+    artifacts_out:
+      - type: version_scope
+        status: DRAFT
+      - type: change_proposal
+        status: SCOPED
+    decision_point:
+      id: DP-SCOPE
+      name: Version Scope Approval
+      criteria:
+        - All CPs reviewed
+        - VERSION_SCOPE document complete
+        - Dependencies identified
+      next_on_go: P-3
+      next_on_nogo: P-2  # Revise scoping
+
+  - id: P-3
+    name: Planning
+    description: Create PROJECT_PLANs for scoped CPs
+    activities:
+      - Create PROJECT_PLAN(s) for scoped CPs
+      - Define gates and deliverables
+      - Identify cross-CP dependencies
+      - Estimate effort per gate
+      - Get plan approval from principal
+    artifacts_in:
+      - type: version_scope
+        status: APPROVED
+    artifacts_out:
+      - type: project_plan
+        status: APPROVED
+    decision_point:
+      id: DP-PLAN
+      name: Plan Approval
+      criteria:
+        - All CPs have implementing plan
+        - Gates defined with clear deliverables
+        - Dependencies documented
+      next_on_go: P-4
+      next_on_nogo: P-3  # Revise plan
+
+  - id: P-4
+    name: Implementation
+    description: Execute gates to create artifacts
+    activities:
+      - Execute gates sequentially per PROJECT_PLAN
+      - Create/update artifacts per deliverables
+      - Run mid-gate checkpoints (L002 pattern)
+      - Get per-gate GO/NOGO approvals
+      - Update CP statuses to IMPLEMENTING
+    artifacts_in:
+      - type: project_plan
+        status: APPROVED
+    artifacts_out:
+      - type: specification
+        status: DRAFT
+      - type: pattern
+        status: DRAFT
+      - type: validator
+        status: DRAFT
+      - type: template_update
+        status: DRAFT
+    decision_point:
+      id: DP-GATE
+      name: Per-Gate Approval
+      criteria:
+        - Gate deliverables complete
+        - No regressions
+        - Ready for next gate
+      next_on_go: P-5  # After final gate
+      next_on_nogo: P-4  # Fix and retry gate
+
+  - id: P-5
+    name: Validation
+    description: Validate all artifacts before release
+    activities:
+      - Run all validators
+      - Execute contract tests
+      - Perform cross-reference check
+      - Verify naming conventions
+      - Verify version consistency
+      - Final review
+    artifacts_in:
+      - type: implementation_artifacts
+        status: COMPLETE
+    artifacts_out:
+      - type: validation_report
+        status: PASS
+    decision_point:
+      id: DP-VALIDATE
+      name: Release Readiness
+      criteria:
+        - All validators pass
+        - All tests pass
+        - No blocking issues
+      next_on_go: P-6
+      next_on_nogo: P-4  # Return to fix issues
+
+  - id: P-6
+    name: Release
+    description: Publish version
+    activities:
+      - Update version numbers in all repos
+      - Update CHANGELOG.md in all repos
+      - Create git tags
+      - Create GitHub releases
+      - Write deep release notes
+      - Set CP statuses to RELEASED
+    artifacts_in:
+      - type: validation_report
+        status: PASS
+    artifacts_out:
+      - type: git_tag
+        status: PUBLISHED
+      - type: github_release
+        status: PUBLISHED
+      - type: release_notes
+        status: PUBLISHED
+    decision_point: null  # Automatic if validation passed
+
+  - id: P-7
+    name: Closure
+    description: Complete release activities
+    activities:
+      - Update CP statuses to CLOSED
+      - Publish accepted CPs to docs/proposals/
+      - Archive VERSION_SCOPE
+      - Capture learnings (new L-docs if applicable)
+      - Update backlog with deferred items
+    artifacts_in:
+      - type: released_version
+    artifacts_out:
+      - type: published_proposals
+        location: docs/proposals/accepted/
+      - type: archived_scope
+    decision_point: null  # Automatic
+
+roles:
+  - id: author
+    name: Author
+    responsibilities:
+      - Create Change Proposals
+      - Respond to review feedback
+      - Update CPs based on feedback
+
+  - id: framework_manager
+    name: Framework Manager
+    responsibilities:
+      - Intake and triage CPs
+      - Scope CPs to versions
+      - Create PROJECT_PLANs
+      - Execute gates
+      - Manage release process
+      - Publish CPs
+
+  - id: supervisor
+    name: Supervisor
+    responsibilities:
+      - Approve major decisions
+      - Review breaking changes
+      - Oversee release process
+
+  - id: principal
+    name: Principal
+    responsibilities:
+      - Ultimate approval authority
+      - Approve VERSION_SCOPE
+      - Approve PROJECT_PLANs
+      - Final release approval
+
+artifacts:
+  - type: change_proposal
+    description: Formal change request (CP-NNN)
+    format: Markdown with YAML front matter
+    location: Various (per lifecycle state)
+
+  - type: version_scope
+    description: Version contents definition
+    format: Markdown
+    location: planning/VERSION_SCOPE_vX.Y.md
+
+  - type: project_plan
+    description: Gated execution plan
+    format: Markdown
+    location: planning/PROJECT_PLAN_vX.Y_*.md
+
+  - type: specification
+    description: Formal requirements document
+    format: Markdown or YAML
+    location: specs/
+
+  - type: validation_report
+    description: Validator execution results
+    format: Console output
+    location: Ephemeral
+
+  - type: release_notes
+    description: Detailed version documentation
+    format: Markdown
+    location: release-notes/vX.Y.Z.md
+
+learnings_applied:
+  - id: L376
+    summary: Premature completion declaration
+    change: Added explicit validation phase (P-5) with blocking gate
+
+  - id: L381
+    summary: Enhancement-request-driven learning transfer
+    change: Formalized CP intake and publication mechanism
+
+  - id: L001
+    summary: Gate execution discipline
+    change: Per-gate GO/NOGO decision points in P-4
+
+  - id: L002
+    summary: Mid-gate quality checkpoints
+    change: Referenced in P-4 implementation activities
+
+validation:
+  - rule: All phases have id, name, activities
+  - rule: Decision points reference valid next phases
+  - rule: Artifact types match defined list
+  - rule: Roles have id, name, responsibilities

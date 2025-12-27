@@ -1,7 +1,7 @@
 # AGET Controlled Vocabulary
 
-**Version**: 1.1.0
-**Date**: 2025-12-21
+**Version**: 1.2.0
+**Date**: 2025-12-26
 **Status**: CANONICAL
 **Location**: aget/specs/AGET_CONTROLLED_VOCABULARY.md
 **Conformance**: Level 2 (Standard) per [AGET_GLOSSARY_STANDARD_SPEC_v1.0.md](AGET_GLOSSARY_STANDARD_SPEC_v1.0.md)
@@ -165,6 +165,28 @@ This document defines the canonical vocabulary for AGET framework specifications
 | `Gate_Override` | Explicit approval to skip gating |
 | `Plan_Approval` | Principal acceptance of plan |
 
+### Change Proposal Terms
+
+| Term | Definition |
+|------|------------|
+| `Change_Proposal` | Formal request for framework change (abbrev: CP) |
+| `CP_ID` | Unique identifier (pattern: CP-NNN) |
+| `Lifecycle_State` | Current status in CP lifecycle |
+| `VERSION_SCOPE` | Document defining what CPs are in a version |
+| `Graduation_History` | Tracking of artifact evolution (L-doc → Pattern → Spec) |
+| `Artifact_Graduation` | Process of promoting L-doc to Pattern to Spec |
+
+### Process Terms
+
+| Term | Definition |
+|------|------------|
+| `Process_Spec` | Formal workflow definition (YAML format) |
+| `Phase` | Stage in a process workflow |
+| `Decision_Point` | Explicit GO/NOGO moment in workflow |
+| `Intake` | Initial receipt and validation of submissions |
+| `Scoping` | Assignment of work to versions |
+| `Closure` | Final completion activities |
+
 ---
 
 ## Capability Terms
@@ -308,6 +330,7 @@ To add new terms:
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.2.0 | 2025-12-26 | Added Change Proposal, Process, Graduation terms (v3.0.0-alpha.1) |
 | 1.1.0 | 2025-12-21 | Added SKOS foundation reference, conformance level declaration |
 | 1.0.0 | 2025-12-01 | Initial release (v2.9 Core Specs Gate 2) |
 
