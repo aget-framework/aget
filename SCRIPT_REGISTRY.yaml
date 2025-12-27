@@ -183,6 +183,15 @@ scripts:
     exit_codes: [0, 1, 2]
     validates: AGET_*_SPEC.md (EARS patterns, v1.2 sections, CAP IDs)
 
+  - path: validation/validate_composition_refs.py
+    description: Validates $ref component references in template manifests
+    category: validator
+    version: 1.0.0
+    created: 2025-12-27
+    flags: [--help, --all, --framework-root, --verbose]
+    exit_codes: [0, 1, 2]
+    validates: manifest.yaml $ref references to components
+
   # ============================================================
   # TOOLS (validation/ - miscellaneous)
   # ============================================================
@@ -325,11 +334,11 @@ scripts:
 
 # Summary statistics
 summary:
-  total_scripts: 32
+  total_scripts: 33
   by_category:
-    validator: 18
+    validator: 19
     tool: 2
     pattern: 12
   by_status:
-    active: 29
+    active: 30
     skeleton: 3

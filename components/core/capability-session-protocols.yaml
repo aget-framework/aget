@@ -1,0 +1,60 @@
+# Core Capability: Session Protocols
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-session-protocols
+  name: Session Protocols
+  version: 3.0.0
+  category: core
+
+  description: |
+    Standard session lifecycle management including wake-up, wind-down,
+    context recovery, and handoff protocols. Required for all agents.
+
+  protocols:
+    wake_up:
+      trigger: "wake up"
+      steps:
+        - Load identity.json (North Star)
+        - Load version.json (context)
+        - Check pending work in planning/
+        - Verify inherited knowledge (L330)
+        - Output session banner
+      pattern_location: .aget/patterns/session/wake_up.py
+
+    wind_down:
+      trigger: "wind down"
+      steps:
+        - Document session decisions
+        - Update planning/ if work pending
+        - Capture learnings in evolution/
+        - Note handoff context
+      pattern_location: .aget/patterns/session/wind_down.py
+
+    context_recovery:
+      trigger: "step back. review kb."
+      steps:
+        - Review inherited/ directory
+        - Review planning/ for active work
+        - Review evolution/ for relevant learnings
+        - Review governance/ for boundaries
+        - Cite 3+ precedents or note "novel"
+      pattern_location: docs/patterns/PATTERN_step_back_review_kb.md
+
+    handoff:
+      trigger: session end with pending work
+      steps:
+        - Create HANDOFF_YYYY-MM-DD.md
+        - Document completed work
+        - Document pending work
+        - Document context for next session
+      pattern_location: sops/SOP_session_handoff.md
+
+  requirements:
+    - R-SESSION-001: Session initialization
+    - R-SESSION-002: Session termination
+    - R-SESSION-003: Context recovery
+
+  theoretical_basis:
+    - Extended Mind: Session state extends cognitive continuity
+    - Transactive Memory: Handoffs enable distributed cognition

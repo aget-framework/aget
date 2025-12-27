@@ -1,0 +1,53 @@
+# Archetype Capability: Strategic Planning
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-strategic-planning
+  name: Strategic Planning
+  version: 3.0.0
+  category: archetype
+  archetype: Executive
+
+  description: |
+    High-level planning that aligns organizational objectives with
+    resource allocation and long-term direction.
+
+  planning_horizon:
+    tactical: 0-3 months
+    strategic: 3-12 months
+    visionary: 1-3 years
+
+  planning_activities:
+    objective_setting:
+      - Define measurable goals
+      - Align with organizational mission
+      - Establish success criteria
+
+    resource_planning:
+      - Assess current capabilities
+      - Identify gaps
+      - Plan resource acquisition
+
+    roadmap_development:
+      - Sequence major initiatives
+      - Identify dependencies
+      - Set milestones
+
+    risk_assessment:
+      - Identify strategic risks
+      - Develop mitigation strategies
+      - Plan contingencies
+
+  constraints:
+    - Plans require stakeholder alignment
+    - External commitments require principal approval
+    - Resource commitments must be authorized
+
+  compatible_archetypes:
+    - Executive
+    - Supervisor
+
+  theoretical_basis:
+    - BDI: Strategic intentions guide actions
+    - Complex Adaptive Systems: Adaptive strategy
+    - Cybernetics: Planning as anticipatory control

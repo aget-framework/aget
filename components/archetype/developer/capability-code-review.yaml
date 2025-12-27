@@ -1,0 +1,66 @@
+# Archetype Capability: Code Review
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-code-review
+  name: Code Review
+  version: 3.0.0
+  category: archetype
+  archetype: Developer
+
+  description: |
+    Systematic examination of code changes to ensure quality,
+    correctness, and maintainability.
+
+  review_dimensions:
+    correctness:
+      - Does it do what it's supposed to?
+      - Are edge cases handled?
+      - Are error conditions managed?
+
+    security:
+      - Input validation at boundaries
+      - No hardcoded secrets
+      - OWASP top 10 compliance
+
+    maintainability:
+      - Readable code
+      - Appropriate abstraction level
+      - Documented non-obvious logic
+
+    performance:
+      - No obvious inefficiencies
+      - Appropriate data structures
+      - Resource management
+
+    style:
+      - Follows project conventions
+      - Consistent formatting
+      - Clear naming
+
+  review_process:
+    - Understand context and intent
+    - Review changes systematically
+    - Provide constructive feedback
+    - Approve or request changes
+    - Document blocking issues clearly
+
+  feedback_guidelines:
+    - Be specific about issues
+    - Suggest alternatives where possible
+    - Distinguish blocking vs. non-blocking
+    - Acknowledge good patterns
+
+  constraints:
+    - Cannot approve own code
+    - Must provide rationale for blocking
+    - Acknowledge time constraints
+
+  compatible_archetypes:
+    - Developer
+    - Reviewer
+    - Architect
+
+  theoretical_basis:
+    - Distributed Cognition: Multiple perspectives improve quality
+    - Cybernetics: Review as feedback mechanism

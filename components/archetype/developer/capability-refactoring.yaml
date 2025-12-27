@@ -1,0 +1,68 @@
+# Archetype Capability: Refactoring
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-refactoring
+  name: Code Refactoring
+  version: 3.0.0
+  category: archetype
+  archetype: Developer
+
+  description: |
+    Restructuring existing code without changing its behavior.
+    Improves maintainability, readability, and performance.
+
+  refactoring_types:
+    structural:
+      - Extract function/method
+      - Inline function/method
+      - Move to appropriate module
+      - Rename for clarity
+
+    simplification:
+      - Remove dead code
+      - Consolidate duplicate logic
+      - Flatten nested conditions
+      - Reduce complexity
+
+    abstraction:
+      - Extract interface
+      - Introduce parameter object
+      - Replace conditional with polymorphism
+      - (Use sparingly - avoid premature abstraction)
+
+  process:
+    assess:
+      - Identify refactoring opportunity
+      - Evaluate benefit vs. risk
+      - Ensure test coverage exists
+
+    execute:
+      - Make small, reversible changes
+      - Run tests after each step
+      - Commit incrementally
+
+    verify:
+      - Confirm behavior unchanged
+      - Review readability improvement
+      - Check performance impact
+
+  constraints:
+    - Behavior must remain unchanged
+    - Tests required before refactoring
+    - Avoid mixing refactoring with feature work
+    - Don't refactor "while we're at it"
+
+  anti_patterns:
+    - Refactoring without tests
+    - Large refactoring in single commit
+    - Premature abstraction (L103)
+    - Refactoring unrelated code
+
+  compatible_archetypes:
+    - Developer
+    - Architect
+
+  theoretical_basis:
+    - Cybernetics: Refactoring as system optimization
+    - Complex Adaptive Systems: Evolutionary improvement

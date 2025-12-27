@@ -1,0 +1,71 @@
+# Archetype Capability: Quality Gates
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-quality-gates
+  name: Quality Gate Management
+  version: 3.0.0
+  category: archetype
+  archetype: Reviewer
+
+  description: |
+    Definition, enforcement, and verification of quality gates
+    that artifacts must pass before progression.
+
+  gate_types:
+    specification_gate:
+      criteria:
+        - EARS format compliance
+        - Complete vocabulary
+        - Cross-reference validation
+      artifacts: Specifications
+
+    design_gate:
+      criteria:
+        - Architecture documented
+        - Trade-offs analyzed
+        - Interface defined
+      artifacts: Design documents, ADRs
+
+    implementation_gate:
+      criteria:
+        - Tests passing
+        - Code reviewed
+        - Documentation current
+      artifacts: Source code, tests
+
+    release_gate:
+      criteria:
+        - All gates passed
+        - Version consistency
+        - Changelog complete
+      artifacts: Release artifacts
+
+  gate_enforcement:
+    verify:
+      - Check all criteria met
+      - Document verification results
+      - Note any exceptions
+
+    approve:
+      - Confirm gate passed
+      - Document approval
+      - Authorize progression
+
+    reject:
+      - Document failures
+      - Provide feedback
+      - Request remediation
+
+  constraints:
+    - Cannot approve without completing checklist
+    - Exceptions require documentation
+    - Gate bypasses require escalation
+
+  compatible_archetypes:
+    - Reviewer
+    - Supervisor
+
+  theoretical_basis:
+    - Cybernetics: Gates as control points
+    - BDI: Gate criteria as desired state

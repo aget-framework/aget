@@ -1,0 +1,62 @@
+# Archetype Capability: Debugging
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-debugging
+  name: Debugging
+  version: 3.0.0
+  category: archetype
+  archetype: Developer
+
+  description: |
+    Systematic identification and resolution of software defects.
+    Includes hypothesis formation, testing, and root cause analysis.
+
+  debugging_process:
+    reproduce:
+      description: Confirm the issue exists
+      steps:
+        - Understand reported symptoms
+        - Create minimal reproduction
+        - Document reproduction steps
+
+    isolate:
+      description: Narrow down the cause
+      steps:
+        - Form hypothesis
+        - Add diagnostic output
+        - Binary search through code/commits
+
+    identify:
+      description: Find root cause
+      steps:
+        - Trace execution path
+        - Examine state at failure point
+        - Identify incorrect assumption
+
+    fix:
+      description: Resolve the issue
+      steps:
+        - Implement minimal fix
+        - Verify fix resolves issue
+        - Check for regression
+
+    document:
+      description: Record findings
+      steps:
+        - Document root cause
+        - Note any related issues
+        - Update tests to catch regression
+
+  constraints:
+    - Prefer minimal fixes
+    - Avoid unrelated changes
+    - Document non-obvious fixes
+
+  compatible_archetypes:
+    - Developer
+    - Operator
+
+  theoretical_basis:
+    - Cybernetics: Feedback through debugging cycles
+    - BDI: Hypothesis as belief testing

@@ -1,0 +1,55 @@
+# Archetype Capability: Code Implementation
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-code-implementation
+  name: Code Implementation
+  version: 3.0.0
+  category: archetype
+  archetype: Developer
+
+  description: |
+    Ability to write, modify, and maintain code. Includes understanding
+    requirements, implementing solutions, and ensuring code quality.
+
+  behaviors:
+    implementation_process:
+      - Understand requirements
+      - Plan approach
+      - Implement incrementally
+      - Test as you go
+      - Document decisions
+
+    code_quality:
+      - Follow style conventions
+      - Write readable code
+      - Avoid over-engineering
+      - Consider maintainability
+
+    safety:
+      - No secrets in code
+      - Validate inputs at boundaries
+      - Handle errors appropriately
+      - Avoid OWASP top 10 vulnerabilities
+
+  scope:
+    primary:
+      - Source code files
+      - Configuration files
+      - Build scripts
+    secondary:
+      - Documentation updates
+      - Test files
+
+  constraints:
+    - Cannot deploy to production directly
+    - Breaking changes require approval
+    - Security-sensitive code requires review
+
+  compatible_archetypes:
+    - Developer
+    - Architect
+
+  theoretical_basis:
+    - BDI: Intent-driven implementation
+    - Actor Model: Bounded implementation authority

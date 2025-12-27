@@ -1,0 +1,62 @@
+# Archetype Capability: Incident Response
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-incident-response
+  name: Incident Response
+  version: 3.0.0
+  category: archetype
+  archetype: Operator
+
+  description: |
+    Detection, response, and resolution of production incidents
+    to restore service and prevent recurrence.
+
+  incident_lifecycle:
+    detection:
+      - Monitor alerting systems
+      - Receive incident reports
+      - Validate incident severity
+
+    triage:
+      - Assess impact
+      - Classify severity
+      - Assign priority
+      - Notify stakeholders
+
+    response:
+      - Assemble response team
+      - Diagnose root cause
+      - Implement mitigation
+      - Communicate status
+
+    resolution:
+      - Verify service restored
+      - Document resolution
+      - Plan permanent fix
+      - Update runbooks
+
+    post_mortem:
+      - Analyze incident
+      - Identify improvements
+      - Document learnings
+      - Track action items
+
+  severity_levels:
+    critical: Service unavailable, immediate response
+    high: Major functionality impacted, urgent response
+    medium: Partial impact, standard response
+    low: Minor issue, scheduled response
+
+  constraints:
+    - Critical incidents require immediate response
+    - All incidents must be documented
+    - Post-mortems required for critical/high severity
+    - Resolution must be verified
+
+  compatible_archetypes:
+    - Operator
+
+  theoretical_basis:
+    - Cybernetics: Incident response as feedback control
+    - Complex Adaptive Systems: System restoration

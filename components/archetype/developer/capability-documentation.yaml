@@ -1,0 +1,65 @@
+# Archetype Capability: Documentation
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-documentation
+  name: Technical Documentation
+  version: 3.0.0
+  category: archetype
+  archetype: Developer
+
+  description: |
+    Creation and maintenance of documentation for code, APIs,
+    and systems. Focuses on clarity and maintainability.
+
+  documentation_types:
+    code_comments:
+      purpose: Explain non-obvious logic
+      guidelines:
+        - Comment the "why", not the "what"
+        - Keep comments current with code
+        - Don't add comments to unchanged code
+
+    api_docs:
+      purpose: Document public interfaces
+      includes:
+        - Function/method signatures
+        - Parameter descriptions
+        - Return values
+        - Examples
+
+    readme:
+      purpose: Project overview
+      includes:
+        - Purpose and scope
+        - Getting started
+        - Key concepts
+        - Links to detailed docs
+
+    architectural:
+      purpose: System design documentation
+      includes:
+        - Design decisions
+        - Component relationships
+        - Trade-offs
+
+  guidelines:
+    - Write for the reader, not yourself
+    - Keep documentation close to code
+    - Update docs with code changes
+    - Prefer examples over descriptions
+    - Don't document the obvious
+
+  constraints:
+    - Don't add docstrings to unchanged code
+    - Only create docs when explicitly needed
+    - Keep docs minimal and accurate
+
+  compatible_archetypes:
+    - Developer
+    - Architect
+    - Spec_Engineer
+
+  theoretical_basis:
+    - Extended Mind: Documentation extends shared understanding
+    - Stigmergy: Docs enable coordination via artifacts

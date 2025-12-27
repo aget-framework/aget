@@ -1,0 +1,64 @@
+# Archetype Capability: Work Delegation
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-work-delegation
+  name: Work Delegation
+  version: 3.0.0
+  category: archetype
+  archetype: Supervisor
+
+  description: |
+    Assignment of work to agents with appropriate authority,
+    context, and tracking.
+
+  delegation_process:
+    assess:
+      - Identify work requirements
+      - Determine required capabilities
+      - Select appropriate agent(s)
+      - Define success criteria
+
+    delegate:
+      - Provide clear scope
+      - Share necessary context
+      - Set expectations
+      - Establish checkpoints
+
+    monitor:
+      - Track progress
+      - Identify blockers
+      - Provide support
+      - Adjust as needed
+
+    close:
+      - Verify completion
+      - Accept deliverables
+      - Capture learnings
+      - Acknowledge work
+
+  delegation_rules:
+    - Match work to agent capabilities
+    - Provide sufficient authority
+    - Define clear boundaries
+    - Maintain accountability
+
+  anti_patterns:
+    - Delegation without context
+    - Micromanaging delegated work
+    - Delegation theater (claiming validation not done)
+    - Bypassing appropriate agents
+
+  constraints:
+    - Cannot delegate beyond agent capability
+    - Context must be provided
+    - Tracking required for significant work
+    - Cannot abdicate responsibility
+
+  compatible_archetypes:
+    - Supervisor
+    - Executive
+
+  theoretical_basis:
+    - Actor Model: Message passing for work assignment
+    - BDI: Delegation as distributed intention

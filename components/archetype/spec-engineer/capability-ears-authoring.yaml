@@ -1,0 +1,64 @@
+# Archetype Capability: EARS Authoring
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-ears-authoring
+  name: EARS Pattern Authoring
+  version: 3.0.0
+  category: archetype
+  archetype: Spec_Engineer
+
+  description: |
+    Creation of requirements using Easy Approach to Requirements Syntax
+    (EARS) patterns. Ensures consistent, testable requirements.
+
+  ears_patterns:
+    ubiquitous:
+      syntax: "The SYSTEM shall {action}"
+      use_when: Always true, no conditions
+      example: "The SYSTEM shall log all API requests"
+
+    event_driven:
+      syntax: "WHEN {trigger}, the SYSTEM shall {action}"
+      use_when: Action triggered by specific event
+      example: "WHEN User_Login_Succeeds, the SYSTEM shall create Session"
+
+    state_driven:
+      syntax: "WHILE {state}, the SYSTEM shall {action}"
+      use_when: Action applies during state
+      example: "WHILE Session_Active, the SYSTEM shall maintain Connection"
+
+    optional:
+      syntax: "WHERE {feature}, the SYSTEM shall {action}"
+      use_when: Applies to optional features
+      example: "WHERE Dark_Mode_Enabled, the SYSTEM shall apply Dark_Theme"
+
+    conditional:
+      syntax: "IF {condition}, the SYSTEM shall {action}"
+      use_when: Action depends on condition
+      example: "IF User_Is_Admin, the SYSTEM shall show Admin_Panel"
+
+    complex:
+      syntax: "WHILE {state}, WHEN {trigger}, the SYSTEM shall {action}"
+      use_when: State and event combined
+      example: "WHILE Editing, WHEN Save_Pressed, the SYSTEM shall persist Document"
+
+  requirement_structure:
+    - CAP_ID (capability identifier)
+    - EARS pattern type
+    - Requirement statement
+    - Enforcement mechanism
+    - Verification test reference
+
+  constraints:
+    - Must use valid EARS patterns
+    - Each requirement must be testable
+    - IDs must be unique and traceable
+    - Must specify enforcement mechanism
+
+  compatible_archetypes:
+    - Spec_Engineer
+
+  theoretical_basis:
+    - BDI: Requirements as desired system behavior
+    - Cybernetics: Requirements as specification

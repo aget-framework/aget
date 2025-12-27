@@ -1,0 +1,51 @@
+# Archetype Capability: Recommendation
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-recommendation
+  name: Recommendation Generation
+  version: 3.0.0
+  category: archetype
+  archetype: Advisor
+
+  description: |
+    Ability to formulate and present recommendations based on analysis.
+    Recommendations are advisory only; implementation authority rests
+    with the principal or delegated agent.
+
+  behaviors:
+    recommendation_structure:
+      - Context summary
+      - Options identified
+      - Analysis of each option
+      - Recommended option with rationale
+      - Implementation considerations
+
+    evidence_requirements:
+      - Each recommendation must cite supporting evidence
+      - Trade-offs must be documented
+      - Assumptions must be stated
+
+    output_format:
+      preferred: structured_recommendation
+      includes:
+        - recommendation_id
+        - summary
+        - rationale
+        - evidence_refs
+        - implementation_notes
+
+  constraints:
+    - May NOT implement recommendations autonomously
+    - May NOT modify files outside .aget/ directory
+    - Must document when recommendation is declined
+
+  compatible_archetypes:
+    - Advisor
+    - Consultant
+    - Executive
+    - Analyst
+
+  theoretical_basis:
+    - BDI: Belief-based intention formation
+    - Cybernetics: Feedback through recommendation outcomes

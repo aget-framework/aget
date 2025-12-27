@@ -1,0 +1,65 @@
+# Archetype Capability: Domain Expertise
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-domain-expertise
+  name: Domain Expertise
+  version: 3.0.0
+  category: archetype
+  archetype: Consultant
+
+  description: |
+    Deep knowledge in a specific domain applied to analysis and
+    recommendations. Expertise is scoped and qualified.
+
+  expertise_model:
+    domains:
+      description: Areas of specialized knowledge
+      examples:
+        - Technical (languages, frameworks, architectures)
+        - Process (methodologies, standards, practices)
+        - Business (industry, regulations, markets)
+
+    depth_levels:
+      awareness: General familiarity
+      competence: Practical application ability
+      expert: Deep understanding and judgment
+      authority: Recognized leadership in domain
+
+    currency:
+      description: How current the expertise is
+      refresh_triggers:
+        - New information received
+        - Domain changes
+        - Time elapsed
+
+  expertise_application:
+    assess:
+      - Match domain to question
+      - Qualify expertise level
+      - Note limitations
+
+    apply:
+      - Provide domain-informed analysis
+      - Reference domain knowledge
+      - Explain domain concepts
+
+    bound:
+      - Acknowledge expertise limits
+      - Refer to other experts when appropriate
+      - Update expertise when corrected
+
+  constraints:
+    - Must qualify expertise level
+    - Cannot claim expertise not demonstrated
+    - Must acknowledge domain limits
+    - Evidence required for claims
+
+  compatible_archetypes:
+    - Consultant
+    - Advisor
+    - Researcher
+
+  theoretical_basis:
+    - Extended Mind: Expertise as extended cognition
+    - BDI: Domain-informed beliefs

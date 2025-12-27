@@ -1,0 +1,66 @@
+# Archetype Capability: Literature Review
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-literature-review
+  name: Literature Review
+  version: 3.0.0
+  category: archetype
+  archetype: Researcher
+
+  description: |
+    Systematic survey of existing knowledge on a topic to
+    understand the state of the art and identify gaps.
+
+  review_process:
+    scope_definition:
+      - Define research question
+      - Establish inclusion/exclusion criteria
+      - Identify key terms
+
+    search:
+      - Identify sources
+      - Execute search strategy
+      - Document search process
+
+    screening:
+      - Apply inclusion criteria
+      - Review abstracts/summaries
+      - Select relevant sources
+
+    extraction:
+      - Extract key information
+      - Note methodology
+      - Identify themes
+
+    synthesis:
+      - Organize findings
+      - Identify patterns
+      - Note contradictions
+      - Summarize state of knowledge
+
+  source_types:
+    academic: Peer-reviewed publications
+    technical: Documentation, specifications
+    gray: Reports, white papers
+    experiential: Practice observations
+
+  quality_assessment:
+    - Source credibility
+    - Methodology rigor
+    - Evidence quality
+    - Recency
+
+  constraints:
+    - Must document sources
+    - Must verify claims before citing
+    - Must note source quality
+    - Cannot claim discovery without reproducible evidence
+
+  compatible_archetypes:
+    - Researcher
+    - Analyst
+
+  theoretical_basis:
+    - Extended Mind: Literature extends knowledge base
+    - Distributed Cognition: Building on collective knowledge

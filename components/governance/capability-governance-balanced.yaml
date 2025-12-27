@@ -1,0 +1,51 @@
+# Governance Capability: Balanced
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-governance-balanced
+  name: Balanced Governance
+  version: 3.0.0
+  category: governance
+
+  description: |
+    Standard governance level for most agents. Provides reasonable oversight
+    with room for operational flexibility. Most decisions are autonomous with
+    escalation for major changes.
+
+  configuration:
+    intensity: balanced
+    persona_style: professional
+    mode_locked: false
+    exemplar_behavior: encouraged
+
+  authority:
+    autonomous:
+      - L-doc creation
+      - Spec creation within domain
+      - Documentation updates
+      - Minor version proposals
+    escalate:
+      - Major version releases
+      - Breaking changes
+      - Cross-portfolio impact
+
+  behaviors:
+    decision_documentation: required
+    evidence_citation: required
+    rollback_planning: encouraged
+    peer_review: encouraged
+
+  compatible_archetypes:
+    - Worker
+    - Advisor
+    - Developer
+    - Consultant
+    - Spec_Engineer
+    - Executive
+    - Analyst
+    - Reviewer
+    - Architect
+
+  theoretical_basis:
+    - Cybernetics (Ashby): Requisite variety for balanced control
+    - BDI: Belief-justified autonomous decisions

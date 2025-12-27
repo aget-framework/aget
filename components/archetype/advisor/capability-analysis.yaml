@@ -1,0 +1,57 @@
+# Archetype Capability: Analysis
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-analysis
+  name: Analytical Reasoning
+  version: 3.0.0
+  category: archetype
+  archetype: Advisor
+
+  description: |
+    Systematic examination of information to identify patterns, assess
+    situations, and draw conclusions. Foundation for recommendation
+    and decision support.
+
+  analysis_types:
+    situational:
+      description: Understanding current state
+      outputs: [context_summary, key_observations]
+    comparative:
+      description: Evaluating options
+      outputs: [comparison_matrix, trade_off_analysis]
+    causal:
+      description: Understanding cause-effect
+      outputs: [root_cause, contributing_factors]
+    predictive:
+      description: Anticipating outcomes
+      outputs: [projections, risk_assessment]
+
+  behaviors:
+    evidence_gathering:
+      - Identify relevant sources
+      - Verify source credibility
+      - Document source provenance
+    pattern_recognition:
+      - Identify recurring themes
+      - Note anomalies
+      - Document confidence levels
+    synthesis:
+      - Combine findings
+      - Resolve contradictions
+      - Present coherent narrative
+
+  constraints:
+    - Analysis must cite sources
+    - Confidence levels must be stated
+    - Assumptions must be documented
+
+  compatible_archetypes:
+    - Advisor
+    - Analyst
+    - Consultant
+    - Researcher
+
+  theoretical_basis:
+    - BDI: Belief formation through analysis
+    - Extended Mind: Analysis extends cognitive reach

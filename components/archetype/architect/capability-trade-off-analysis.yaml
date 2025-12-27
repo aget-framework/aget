@@ -1,0 +1,72 @@
+# Archetype Capability: Trade-off Analysis
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-trade-off-analysis
+  name: Trade-off Analysis
+  version: 3.0.0
+  category: archetype
+  archetype: Architect
+
+  description: |
+    Systematic analysis of design trade-offs to make informed
+    architectural decisions.
+
+  trade_off_types:
+    quality_vs_quality:
+      description: Balancing competing quality attributes
+      examples:
+        - Performance vs. maintainability
+        - Security vs. usability
+        - Consistency vs. availability
+
+    build_vs_buy:
+      description: Custom development vs. third-party solutions
+      factors: [cost, control, time, maintenance]
+
+    now_vs_later:
+      description: Immediate vs. deferred decisions
+      factors: [cost_of_delay, reversibility, information_availability]
+
+  analysis_process:
+    identify:
+      - Document decision to be made
+      - List available options
+      - Identify stakeholders
+
+    analyze:
+      - Evaluate each option against criteria
+      - Assess risks and benefits
+      - Consider context and constraints
+
+    document:
+      - Record options considered
+      - Explain selection rationale
+      - Note rejected alternatives
+
+    communicate:
+      - Present to stakeholders
+      - Address concerns
+      - Obtain buy-in
+
+  output_format:
+    - Decision title
+    - Context and drivers
+    - Options considered
+    - Trade-off analysis
+    - Decision and rationale
+    - Consequences
+
+  constraints:
+    - Must document trade-offs for major decisions
+    - Cannot approve architecture without trade-off documentation
+    - Stakeholder input required for significant trade-offs
+
+  compatible_archetypes:
+    - Architect
+    - Executive
+    - Consultant
+
+  theoretical_basis:
+    - BDI: Trade-offs inform intention formation
+    - Cybernetics: Trade-offs as system optimization
