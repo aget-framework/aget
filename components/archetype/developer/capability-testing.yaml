@@ -1,0 +1,65 @@
+# Archetype Capability: Testing
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-testing
+  name: Software Testing
+  version: 3.0.0
+  category: archetype
+  archetype: Developer
+
+  description: |
+    Creation and execution of tests to verify software behavior.
+    Includes unit tests, integration tests, and contract tests.
+
+  test_types:
+    unit:
+      description: Test individual functions/methods
+      scope: Single function or method
+      isolation: High (mocked dependencies)
+
+    integration:
+      description: Test component interactions
+      scope: Multiple components working together
+      isolation: Medium (real dependencies where practical)
+
+    contract:
+      description: Test behavioral requirements
+      scope: Specification compliance
+      isolation: Varies
+
+    validation:
+      description: Test against specifications
+      scope: Requirement coverage
+      isolation: Low (realistic conditions)
+
+  behaviors:
+    test_creation:
+      - Identify test cases from requirements
+      - Write clear test descriptions
+      - Use AAA pattern (Arrange, Act, Assert)
+      - Include edge cases
+
+    test_maintenance:
+      - Keep tests fast
+      - Avoid test interdependence
+      - Update tests with code changes
+
+    coverage:
+      - Aim for meaningful coverage
+      - Avoid test theater (tests that pass but verify nothing)
+      - Focus on critical paths
+
+  constraints:
+    - Tests must be deterministic
+    - No tests that skip or ignore failures
+    - Real tests required (no placeholder tests)
+
+  compatible_archetypes:
+    - Developer
+    - Reviewer
+    - Spec_Engineer
+
+  theoretical_basis:
+    - Cybernetics: Tests as feedback mechanism
+    - BDI: Tests verify belief correctness

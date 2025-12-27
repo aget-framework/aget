@@ -1,0 +1,64 @@
+# Core Capability: Memory Management
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-memory-management
+  name: Memory Management
+  version: 3.0.0
+  category: core
+
+  description: |
+    Management of the 6-layer memory architecture including domain knowledge,
+    organizational context, and experiential learnings.
+
+  memory_layers:
+    layer_1_identity:
+      location: .aget/identity.json
+      description: North Star, purpose, and archetype
+      volatility: stable
+
+    layer_2_governance:
+      location: governance/
+      description: Charter, mission, scope boundaries
+      volatility: stable
+
+    layer_3_domain:
+      location: .aget/memory/domain/
+      description: Domain-specific knowledge
+      volatility: grows
+
+    layer_4_organizational:
+      location: .aget/memory/organizational/
+      description: Organizational context and relationships
+      volatility: moderate
+
+    layer_5_experiential:
+      location: .aget/memory/experiential/
+      description: Session history and learnings
+      volatility: grows
+
+    layer_6_session:
+      location: planning/
+      description: Current session context
+      volatility: ephemeral
+
+  operations:
+    store:
+      - Write to appropriate layer
+      - Validate against schema if applicable
+    retrieve:
+      - Load from layer
+      - Apply inheritance chain
+    synthesize:
+      - Combine layers for context
+      - Apply relevance filtering
+
+  requirements:
+    - R-MEM-001: Layer separation maintained
+    - R-MEM-002: Inheritance chain respected
+    - R-MEM-003: Session context recoverable
+
+  theoretical_basis:
+    - Extended Mind: KB as cognitive extension
+    - Distributed Cognition: Memory across artifacts
+    - Transactive Memory: Shared "who knows what"

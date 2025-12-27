@@ -1,0 +1,60 @@
+# Archetype Capability: Release Approval
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-release-approval
+  name: Release Approval
+  version: 3.0.0
+  category: archetype
+  archetype: Supervisor
+
+  description: |
+    Authority to approve releases within defined scope. Includes
+    gate management, quality verification, and release coordination.
+
+  approval_authority:
+    autonomous:
+      - Patch releases (x.x.N)
+      - Internal tooling releases
+      - Documentation updates
+    requires_escalation:
+      - Minor releases (x.N.0)
+      - Major releases (N.0.0)
+      - Breaking changes
+
+  release_process:
+    pre_release:
+      - Verify all tests pass
+      - Check version consistency
+      - Review changelog
+      - Confirm gate completion
+
+    approval:
+      - Assess risk level
+      - Verify compliance
+      - Document approval decision
+      - Authorize release
+
+    post_release:
+      - Monitor deployment
+      - Confirm success
+      - Document lessons learned
+
+  gate_management:
+    - Enforce gate boundaries
+    - Verify gate criteria met
+    - Authorize progression
+    - Document decisions
+
+  constraints:
+    - Cannot self-approve major releases
+    - Breaking changes require principal approval
+    - Must document all approval decisions
+    - No releases without passing tests
+
+  compatible_archetypes:
+    - Supervisor
+
+  theoretical_basis:
+    - Cybernetics: Release gates as control points
+    - BDI: Approval as authorized intention

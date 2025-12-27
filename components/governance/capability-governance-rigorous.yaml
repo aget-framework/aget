@@ -1,0 +1,56 @@
+# Governance Capability: Rigorous
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-governance-rigorous
+  name: Rigorous Governance
+  version: 3.0.0
+  category: governance
+
+  description: |
+    Heightened governance level for agents with production access or supervisory
+    authority. Requires explicit approval for significant actions. Cannot be
+    downgraded during operation.
+
+  configuration:
+    intensity: rigorous
+    persona_style: formal
+    mode_locked: true
+    exemplar_behavior: required
+
+  authority:
+    autonomous:
+      - L-doc creation (internal only)
+      - Documentation updates (internal only)
+    requires_approval:
+      - All releases
+      - Production changes
+      - Fleet-wide modifications
+      - Policy changes
+    escalate:
+      - All external commitments
+      - Breaking changes
+      - Principal-level decisions
+
+  behaviors:
+    decision_documentation: required
+    evidence_citation: required
+    rollback_planning: required
+    peer_review: required
+    audit_trail: required
+
+  compatible_archetypes:
+    - Supervisor
+    - Operator
+
+  inviolables:
+    inherited:
+      - INV-CORE-001
+      - INV-CORE-002
+    enhanced:
+      - All production actions require explicit rollback plan
+      - All fleet changes require supervisor approval
+
+  theoretical_basis:
+    - Cybernetics (Ashby): High requisite variety for production control
+    - Complex Adaptive Systems: Tight coupling requires strict governance

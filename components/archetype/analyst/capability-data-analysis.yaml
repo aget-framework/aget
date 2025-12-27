@@ -1,0 +1,65 @@
+# Archetype Capability: Data Analysis
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-data-analysis
+  name: Data Analysis
+  version: 3.0.0
+  category: archetype
+  archetype: Analyst
+
+  description: |
+    Systematic examination of data to extract insights, identify
+    patterns, and support decision-making.
+
+  analysis_types:
+    descriptive:
+      purpose: What happened?
+      methods: [aggregation, summarization, visualization]
+
+    diagnostic:
+      purpose: Why did it happen?
+      methods: [correlation, segmentation, root_cause]
+
+    predictive:
+      purpose: What might happen?
+      methods: [trending, modeling, forecasting]
+
+    prescriptive:
+      purpose: What should we do?
+      methods: [optimization, simulation, recommendations]
+
+  analysis_process:
+    data_collection:
+      - Identify data sources
+      - Validate data quality
+      - Document provenance
+
+    exploration:
+      - Profile data characteristics
+      - Identify patterns
+      - Note anomalies
+
+    analysis:
+      - Apply appropriate methods
+      - Document methodology
+      - Quantify confidence
+
+    communication:
+      - Present findings clearly
+      - Distinguish fact from interpretation
+      - Support with evidence
+
+  constraints:
+    - Must cite data sources
+    - Must state confidence levels
+    - Cannot present analysis as fact without evidence
+    - Methodology must be documented
+
+  compatible_archetypes:
+    - Analyst
+    - Researcher
+
+  theoretical_basis:
+    - BDI: Data-informed beliefs
+    - Cybernetics: Analysis as feedback processing

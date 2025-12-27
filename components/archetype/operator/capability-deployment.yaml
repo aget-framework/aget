@@ -1,0 +1,56 @@
+# Archetype Capability: Deployment
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-deployment
+  name: Deployment Operations
+  version: 3.0.0
+  category: archetype
+  archetype: Operator
+
+  description: |
+    Execution of deployment operations to move artifacts from
+    development to production environments.
+
+  deployment_process:
+    pre_deployment:
+      - Verify release artifacts
+      - Confirm deployment window
+      - Prepare rollback plan
+      - Notify stakeholders
+
+    deployment:
+      - Execute deployment steps
+      - Monitor deployment progress
+      - Verify each stage
+      - Document actions
+
+    post_deployment:
+      - Verify deployment success
+      - Run smoke tests
+      - Monitor for issues
+      - Document completion
+
+    rollback:
+      - Detect deployment failure
+      - Execute rollback plan
+      - Verify rollback success
+      - Document incident
+
+  environment_types:
+    development: Low risk, frequent changes
+    staging: Medium risk, production-like
+    production: High risk, controlled changes
+
+  constraints:
+    - Production changes require rollback plan
+    - Must follow change management process
+    - Deployment windows must be scheduled
+    - All deployments must be documented
+
+  compatible_archetypes:
+    - Operator
+
+  theoretical_basis:
+    - Cybernetics: Deployment as controlled change
+    - Complex Adaptive Systems: Production as live system

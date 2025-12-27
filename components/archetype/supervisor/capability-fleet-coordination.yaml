@@ -1,0 +1,57 @@
+# Archetype Capability: Fleet Coordination
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-fleet-coordination
+  name: Fleet Coordination
+  version: 3.0.0
+  category: archetype
+  archetype: Supervisor
+
+  description: |
+    Coordination of multiple agents across portfolios. Includes work
+    assignment, status tracking, and cross-agent communication.
+
+  fleet_operations:
+    assignment:
+      - Match tasks to agent capabilities
+      - Consider agent availability
+      - Delegate with clear scope
+      - Track delegation chain
+
+    monitoring:
+      - Track portfolio status
+      - Identify blockers
+      - Escalate issues appropriately
+      - Maintain fleet awareness
+
+    coordination:
+      - Synchronize cross-agent work
+      - Resolve conflicts
+      - Manage dependencies
+      - Facilitate communication
+
+  portfolio_management:
+    structure:
+      - Portfolio contains multiple agents
+      - Each agent has defined scope
+      - Agent types determine capabilities
+    tracking:
+      - Portfolio-level status
+      - Agent-level status
+      - Cross-portfolio dependencies
+
+  constraints:
+    - Cannot bypass agent authority
+    - Delegation requires clear scope
+    - Must maintain audit trail
+    - Fleet changes require approval
+
+  compatible_archetypes:
+    - Supervisor
+    - Executive
+
+  theoretical_basis:
+    - Actor Model: Supervisor as coordinating actor
+    - Cybernetics: Fleet as control system
+    - Complex Adaptive Systems: Emergent fleet behavior

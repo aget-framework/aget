@@ -1,0 +1,63 @@
+# Archetype Capability: Architecture Design
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-architecture-design
+  name: Architecture Design
+  version: 3.0.0
+  category: archetype
+  archetype: Architect
+
+  description: |
+    Design of system architectures that balance requirements,
+    constraints, and quality attributes.
+
+  design_activities:
+    requirements_analysis:
+      - Identify functional requirements
+      - Identify quality attributes
+      - Understand constraints
+      - Prioritize trade-offs
+
+    architecture_definition:
+      - Define system boundaries
+      - Identify components
+      - Specify interfaces
+      - Document decisions
+
+    evaluation:
+      - Assess against requirements
+      - Analyze trade-offs
+      - Identify risks
+      - Validate with stakeholders
+
+    documentation:
+      - Document architecture views
+      - Record decisions (ADRs)
+      - Explain trade-offs
+      - Provide implementation guidance
+
+  architecture_views:
+    logical: Component structure and relationships
+    deployment: Runtime environment mapping
+    process: Dynamic behavior and concurrency
+    data: Information structure and flow
+
+  quality_attributes:
+    runtime: [performance, availability, security]
+    development: [maintainability, testability, modifiability]
+    business: [time-to-market, cost, compliance]
+
+  constraints:
+    - Cannot approve architecture without documenting trade-offs
+    - Major decisions require ADRs
+    - Changes require impact analysis
+    - Must consider implementation feasibility
+
+  compatible_archetypes:
+    - Architect
+    - Developer
+
+  theoretical_basis:
+    - Cybernetics: Architecture as system control structure
+    - Complex Adaptive Systems: Architecture for emergence

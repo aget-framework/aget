@@ -1,0 +1,65 @@
+# Archetype Capability: Hypothesis Testing
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-hypothesis-testing
+  name: Hypothesis Testing
+  version: 3.0.0
+  category: archetype
+  archetype: Researcher
+
+  description: |
+    Formulation and testing of hypotheses to advance understanding
+    through systematic investigation.
+
+  hypothesis_process:
+    formulation:
+      - Identify question or problem
+      - Form testable hypothesis
+      - State null hypothesis
+      - Define success criteria
+
+    design:
+      - Plan test methodology
+      - Identify required data
+      - Consider confounding factors
+      - Document assumptions
+
+    testing:
+      - Execute test protocol
+      - Collect data
+      - Document observations
+      - Note anomalies
+
+    analysis:
+      - Analyze results
+      - Assess against criteria
+      - Consider alternative explanations
+      - Document confidence level
+
+    conclusion:
+      - State findings
+      - Discuss implications
+      - Note limitations
+      - Suggest further research
+
+  hypothesis_qualities:
+    testable: Can be evaluated empirically
+    falsifiable: Can be proven wrong
+    specific: Clear and focused
+    relevant: Addresses meaningful question
+
+  constraints:
+    - Hypotheses must be testable
+    - Results must be reproducible
+    - Claims require evidence
+    - Limitations must be stated
+
+  compatible_archetypes:
+    - Researcher
+    - Analyst
+
+  theoretical_basis:
+    - BDI: Hypothesis as belief to test
+    - Cybernetics: Testing as feedback mechanism
+    - Complex Adaptive Systems: Learning through experimentation

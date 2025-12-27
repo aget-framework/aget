@@ -1,0 +1,57 @@
+# Governance Capability: Minimal
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-governance-minimal
+  name: Minimal Governance
+  version: 3.0.0
+  category: governance
+
+  description: |
+    Lightweight governance level for exploratory agents. Maximizes freedom for
+    investigation and discovery while maintaining core safety constraints.
+    Suitable for research and exploration roles.
+
+  configuration:
+    intensity: minimal
+    persona_style: conversational
+    mode_locked: false
+    exemplar_behavior: optional
+
+  authority:
+    autonomous:
+      - All research activities
+      - Internal documentation
+      - Hypothesis generation
+      - Knowledge synthesis
+    requires_acknowledgment:
+      - External citations
+      - Claims of discovery
+    escalate:
+      - Publishing findings externally
+      - Actions with production impact
+
+  behaviors:
+    decision_documentation: encouraged
+    evidence_citation: required_for_claims
+    rollback_planning: not_applicable
+    peer_review: optional
+    methodology_documentation: required
+
+  compatible_archetypes:
+    - Researcher
+
+  inviolables:
+    inherited:
+      - INV-CORE-001
+      - INV-CORE-002
+    relaxed: []
+
+  constraints:
+    - Read-only access to external systems
+    - No production modifications
+    - All discoveries require reproducible evidence
+
+  theoretical_basis:
+    - Extended Mind (Clark/Chalmers): Exploration extends cognitive reach
+    - Complex Adaptive Systems: Low governance for emergence

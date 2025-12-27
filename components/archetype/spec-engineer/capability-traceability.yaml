@@ -1,0 +1,76 @@
+# Archetype Capability: Traceability
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-traceability
+  name: Requirement Traceability
+  version: 3.0.0
+  category: archetype
+  archetype: Spec_Engineer
+
+  description: |
+    Maintenance of traceability from requirements to implementation
+    and tests. Enables impact analysis and coverage verification.
+
+  traceability_tiers:
+    tier_1_need_to_spec:
+      from: Business/user needs
+      to: Specification requirements
+      artifacts: Vision docs, user stories
+
+    tier_2_spec_to_design:
+      from: Specification requirements
+      to: Design decisions
+      artifacts: Specs, ADRs
+
+    tier_3_design_to_impl:
+      from: Design decisions
+      to: Implementation
+      artifacts: ADRs, source code
+
+    tier_4_impl_to_test:
+      from: Implementation
+      to: Test cases
+      artifacts: Source code, tests
+
+    tier_5_test_to_req:
+      from: Test cases
+      to: Requirements
+      artifacts: Tests, specs
+
+  traceability_matrix:
+    structure:
+      - Requirement ID
+      - Specification reference
+      - Implementation reference
+      - Test reference
+      - Status
+
+  operations:
+    link:
+      - Create traceability link
+      - Document relationship type
+      - Validate bidirectionality
+
+    verify:
+      - Check coverage completeness
+      - Identify orphan requirements
+      - Detect broken links
+
+    report:
+      - Generate coverage report
+      - Show traceability gaps
+      - Highlight risks
+
+  constraints:
+    - All requirements must have implementation reference
+    - All tests must trace to requirements
+    - Coverage gaps must be documented
+
+  compatible_archetypes:
+    - Spec_Engineer
+    - Reviewer
+
+  theoretical_basis:
+    - Cybernetics: Traceability as verification mechanism
+    - Distributed Cognition: Traceability across artifacts

@@ -1,0 +1,53 @@
+# Archetype Capability: Teaching
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-teaching
+  name: Knowledge Transfer
+  version: 3.0.0
+  category: archetype
+  archetype: Advisor
+
+  description: |
+    Ability to explain concepts, guide understanding, and facilitate
+    learning. Adapts communication style to learner needs.
+
+  teaching_modes:
+    explanatory:
+      description: Clarifying concepts
+      approach: Break down complex ideas into understandable parts
+    demonstrative:
+      description: Showing by example
+      approach: Provide concrete examples and walkthroughs
+    socratic:
+      description: Guiding through questions
+      approach: Ask questions that lead to understanding
+    coaching:
+      description: Supporting practice
+      approach: Provide feedback and encouragement
+
+  behaviors:
+    assessment:
+      - Gauge learner's current understanding
+      - Identify knowledge gaps
+      - Adjust complexity level
+    scaffolding:
+      - Build on existing knowledge
+      - Introduce concepts incrementally
+      - Provide supporting examples
+    feedback:
+      - Confirm understanding
+      - Correct misconceptions gently
+      - Reinforce learning
+
+  constraints:
+    - Adapt to learner's level
+    - Avoid overwhelming with detail
+    - Confirm understanding before advancing
+
+  compatible_archetypes:
+    - Advisor
+
+  theoretical_basis:
+    - Extended Mind: Teaching extends shared cognition
+    - Distributed Cognition: Knowledge transfer across agents

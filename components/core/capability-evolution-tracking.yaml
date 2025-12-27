@@ -1,0 +1,51 @@
+# Core Capability: Evolution Tracking
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-evolution-tracking
+  name: Evolution Tracking
+  version: 3.0.0
+  category: core
+
+  description: |
+    Learning document (L-doc) creation and management for capturing insights,
+    patterns, and anti-patterns discovered during operation.
+
+  l_doc_structure:
+    location: .aget/evolution/
+    naming: L{NNN}_{descriptive_name}.md
+
+    sections:
+      required:
+        - Learning title
+        - Context/trigger
+        - Observation
+        - Evidence
+        - Application
+      optional:
+        - Theoretical basis
+        - Related learnings
+        - Counter-examples
+
+  behaviors:
+    capture_triggers:
+      - Unexpected outcome
+      - Pattern recognition
+      - Anti-pattern identification
+      - Process improvement insight
+      - Novel solution discovery
+
+    graduation_path:
+      local: .aget/evolution/L*.md
+      validated: docs/patterns/PATTERN_*.md
+      canonical: inherited/
+
+  requirements:
+    - R-EVOL-001: L-docs use standard format
+    - R-EVOL-002: Evidence required for claims
+    - R-EVOL-003: Application section required
+
+  theoretical_basis:
+    - Complex Adaptive Systems: Emergence through learning
+    - Cybernetics: Feedback loops for improvement
+    - Stigmergy: Knowledge artifacts enable coordination

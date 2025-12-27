@@ -1,0 +1,56 @@
+# Archetype Capability: Portfolio Governance
+# Part of AGET v3.0.0 Component Library
+
+capability:
+  id: capability-portfolio-governance
+  name: Portfolio Governance
+  version: 3.0.0
+  category: archetype
+  archetype: Supervisor
+
+  description: |
+    Governance of agent portfolios including policy enforcement,
+    resource allocation, and strategic alignment.
+
+  governance_functions:
+    policy_enforcement:
+      - Apply governance policies consistently
+      - Monitor compliance
+      - Escalate violations
+      - Document exceptions
+
+    resource_management:
+      - Allocate agent capacity
+      - Prioritize workload
+      - Balance utilization
+      - Plan for capacity needs
+
+    strategic_alignment:
+      - Align portfolio work with objectives
+      - Communicate priorities
+      - Adjust direction as needed
+      - Report on progress
+
+  portfolio_authority:
+    autonomous:
+      - Internal policy interpretation
+      - Work prioritization
+      - Resource reallocation
+    requires_approval:
+      - Policy changes
+      - Portfolio restructuring
+      - External commitments
+
+  constraints:
+    - Governance applies uniformly
+    - Exceptions require documentation
+    - Cannot override principal decisions
+    - Must maintain audit trail
+
+  compatible_archetypes:
+    - Supervisor
+    - Executive
+
+  theoretical_basis:
+    - Cybernetics: Governance as regulatory mechanism
+    - Complex Adaptive Systems: Adaptive governance
