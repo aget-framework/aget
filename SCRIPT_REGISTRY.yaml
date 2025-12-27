@@ -147,6 +147,33 @@ scripts:
     exit_codes: [0, 1, 2]
     validates: Agent memory structure (6-layer model)
 
+  - path: validation/validate_persona_compliance.py
+    description: Validates agent persona against AGET_PERSONA_SPEC (identity, governance, style)
+    category: validator
+    version: 1.0.0
+    created: 2025-12-26
+    flags: [--help, --quiet, --dir, --strict, --template, --version]
+    exit_codes: [0, 1, 2]
+    validates: Agent persona (5D D1 dimension)
+
+  - path: validation/validate_context_compliance.py
+    description: Validates agent context against AGET_CONTEXT_SPEC (relationships, scope)
+    category: validator
+    version: 1.0.0
+    created: 2025-12-26
+    flags: [--help, --quiet, --dir, --strict, --version]
+    exit_codes: [0, 1, 2]
+    validates: Agent context (5D D5 dimension)
+
+  - path: validation/validate_5d_compliance.py
+    description: Umbrella validator for complete 5D Architecture compliance
+    category: validator
+    version: 1.0.0
+    created: 2025-12-26
+    flags: [--help, --quiet, --dir, --strict, --dimensions, --skip-dimensions, --verbose, --version]
+    exit_codes: [0, 1, 2]
+    validates: Agent 5D Architecture (all dimensions)
+
   # ============================================================
   # TOOLS (validation/ - miscellaneous)
   # ============================================================
@@ -289,11 +316,11 @@ scripts:
 
 # Summary statistics
 summary:
-  total_scripts: 28
+  total_scripts: 31
   by_category:
-    validator: 14
+    validator: 17
     tool: 2
     pattern: 12
   by_status:
-    active: 25
+    active: 28
     skeleton: 3
