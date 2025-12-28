@@ -1,6 +1,6 @@
 # AGET Migration Specification
 
-**Version**: 1.0.0
+**Version**: 1.1.0
 **Status**: Active
 **Category**: Standards (Lifecycle Management)
 **Format Version**: 1.2
@@ -338,6 +338,21 @@ Migration Failed?
 
 The SYSTEM shall coordinate multi-agent migrations.
 
+### CAP-MIG-010: Version Synchronization
+
+The SYSTEM shall maintain version consistency across all version sources.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-MIG-010-01 | ubiquitous | The SYSTEM shall update `@aget-version:` tag in AGENTS.md |
+| CAP-MIG-010-02 | ubiquitous | The SYSTEM shall update `aget_version` in version.json |
+| CAP-MIG-010-03 | conditional | IF CLAUDE.md is not a symlink THEN the SYSTEM shall update CLAUDE.md |
+| CAP-MIG-010-04 | ubiquitous | The `@aget-version` and `aget_version` values SHALL match |
+
+**Rationale**: L401 revealed that updating version.json without AGENTS.md causes version display inconsistency (wake_up.py reads from AGENTS.md).
+
+**Enforcement**: `migrate_instance_to_v3.py` GATE 5.
+
 | ID | Pattern | Statement |
 |----|---------|-----------|
 | CAP-MIG-009-01 | ubiquitous | The SYSTEM shall use three-phase rollout (Pilot, Expand, Complete) |
@@ -447,10 +462,19 @@ structure:
 
   scripts:
     - path: "aget/scripts/analyze_template_compliance.py"
-      purpose: "Phase 1: Analyze"
+      purpose: "Phase 1: Analyze (templates)"
 
     - path: "aget/scripts/migrate_template_to_v3.py"
-      purpose: "Phase 3: Execute"
+      purpose: "Phase 3: Execute (templates)"
+
+    - path: "aget/scripts/migrate_instance_to_v3.py"
+      purpose: "Phase 3: Execute (instances)"
+      features:
+        - "12 archetypes supported"
+        - "5D directory creation"
+        - "identity.json generation"
+        - "AGENTS.md @aget-version sync (CAP-MIG-010)"
+      validated: "impact-aget, supervisor-AGET (24/24 each)"
 
     - path: "aget/scripts/cleanup_template_archive.py"
       purpose: "Phase 5: Cleanup"
@@ -550,8 +574,12 @@ python3 aget/scripts/cleanup_template_archive.py template-example-aget/ --execut
 
 - L392: Pilot-Driven Migration Automation
 - L394: Design by Fleet Exploration
+- L395: Instance v3.0 Migration Pattern
+- L400: Conceptual vs Structural Migration Understanding
+- L401: AGENTS.md Version Tag Synchronization (CAP-MIG-010)
 - PATTERN_migration_validation_gate.md
 - AGET_TEMPLATE_SPEC.md (target spec)
+- AGET_INSTANCE_SPEC.md (instance requirements)
 - AGET_PORTABILITY_SPEC.md (content preservation)
 - AGET_COMPATIBILITY_SPEC.md (version compatibility)
 
