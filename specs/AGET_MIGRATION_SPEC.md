@@ -1,11 +1,11 @@
 # AGET Migration Specification
 
-**Version**: 1.3.0
+**Version**: 1.4.0
 **Status**: Active
 **Category**: Standards (Lifecycle Management)
 **Format Version**: 1.2
 **Created**: 2025-12-27
-**Updated**: 2025-12-27
+**Updated**: 2025-12-28
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_MIGRATION_SPEC.md`
 
@@ -471,6 +471,77 @@ The SYSTEM shall ensure knowledge/ directories have population guidance.
 └────────────────────────────────────────────────────────────┘
 ```
 
+### CAP-MIG-014: Legacy File Handling (L376)
+
+The SYSTEM shall detect and handle legacy version-bearing files during migration.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-MIG-014-01 | conditional | IF migration creates new version-bearing file THEN the SYSTEM shall detect legacy equivalents |
+| CAP-MIG-014-02 | conditional | IF legacy version-bearing file exists THEN the SYSTEM shall archive it before removal |
+| CAP-MIG-014-03 | conditional | IF legacy file removed THEN the SYSTEM shall log the action |
+| CAP-MIG-014-04 | prohibited | Migration shall NOT leave stale version files that cause contract test failures |
+| CAP-MIG-014-05 | ubiquitous | Archive location shall be `.aget/archive/legacy_v3_migration/` |
+
+**Rationale**: L376 (supervisor) identified that `migrate_instance_to_v3.py` created `manifest.yaml` but left legacy `.aget/collaboration/agent_manifest.yaml` with stale version, causing contract test failures in 3/25 agents.
+
+**Known Legacy Files**:
+| New File | Legacy File | Action |
+|----------|-------------|--------|
+| `manifest.yaml` | `.aget/collaboration/agent_manifest.yaml` | Archive + Remove |
+
+**Enforcement**:
+- Migration: `migrate_instance_to_v3.py` Gate 5.5 handles legacy files
+- Validation: Contract tests detect version mismatches
+- Audit: `find .aget -name "*manifest*.yaml"` post-migration
+
+### CAP-MIG-015: Behavioral Validation Requirement (L376, L402)
+
+The SYSTEM shall require behavioral validation, not just structural checks.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-MIG-015-01 | ubiquitous | Post-migration validation shall include contract test execution |
+| CAP-MIG-015-02 | ubiquitous | Validation shall verify no stale version files exist |
+| CAP-MIG-015-03 | conditional | IF Fleet_Migration THEN minimum 3 agents shall have contract tests executed |
+| CAP-MIG-015-04 | prohibited | Structural validation alone is NOT sufficient for migration completion |
+| CAP-MIG-015-05 | ubiquitous | Migration scripts shall output next-step commands including validation paths |
+
+**Rationale**: L402 and L376 revealed a recurring pattern: structural checks pass (24/24) but behavioral issues remain undetected. Root cause: "Assumed structural = complete migration."
+
+**Validation Matrix**:
+| Check Type | Example | Required |
+|------------|---------|----------|
+| Structural | `[ -d .aget/persona ]` | YES |
+| Version | `jq .aget_version version.json` | YES |
+| Contract | `pytest tests/test_identity_contract.py` | **YES** |
+| Behavioral | `python3 wake_up.py` | YES |
+| Legacy Audit | `find .aget -name "*manifest*"` | YES |
+
+**Enforcement**:
+- Migration: Script outputs validation commands with correct paths
+- Gate 4.1: Must include contract test execution (not just structural)
+- PROJECT_PLAN: Template must include behavioral validation gate
+
+#### Validation Path Reference (CAP-MIG-016)
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│                    AGET TOOLING LOCATIONS                       │
+├────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ~/github/aget-framework/aget/                                  │
+│  ├── scripts/                    <- Migration tools             │
+│  │   └── migrate_instance_to_v3.py                             │
+│  │                                                              │
+│  └── validation/                 <- Validation tools            │
+│      └── validate_template_instance.py                          │
+│                                                                 │
+│  Note: Validation is in validation/, NOT scripts/               │
+│                                                                 │
+└────────────────────────────────────────────────────────────────┘
+```
+
 ---
 
 ## Authority Model
@@ -664,6 +735,8 @@ python3 aget/scripts/cleanup_template_archive.py template-example-aget/ --execut
 - L401: AGENTS.md Version Tag Synchronization (CAP-MIG-010)
 - L402: Behavioral Validation Gaps (CAP-MIG-006-03, CAP-MIG-011, CAP-MIG-012)
 - L403: knowledge/ Directory Population Guidance Gap (CAP-MIG-013)
+- L376: Legacy File Version Sync (CAP-MIG-014, supervisor)
+- L402: Behavioral Validation Gaps (CAP-MIG-015)
 - PATTERN_migration_validation_gate.md
 - AGET_TEMPLATE_SPEC.md (target spec)
 - AGET_INSTANCE_SPEC.md (instance requirements)
@@ -689,7 +762,8 @@ graduation:
 
 ---
 
-*AGET Migration Specification v1.2.0*
+*AGET Migration Specification v1.4.0*
 *Format: AGET_SPEC_FORMAT v1.2 (EARS + SKOS)*
 *Part of v3.0.0 Lifecycle Management - Gap C3*
+*Enhanced: CAP-MIG-014 (legacy handling), CAP-MIG-015 (behavioral validation)*
 *"Controlled transitions enable safe evolution."*
