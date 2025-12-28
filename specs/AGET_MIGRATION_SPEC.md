@@ -1,6 +1,6 @@
 # AGET Migration Specification
 
-**Version**: 1.1.0
+**Version**: 1.2.0
 **Status**: Active
 **Category**: Standards (Lifecycle Management)
 **Format Version**: 1.2
@@ -279,12 +279,20 @@ The SYSTEM shall complete all validation before cleanup.
 |----|---------|-----------|
 | CAP-MIG-006-01 | ubiquitous | The SYSTEM shall run ALL required validators |
 | CAP-MIG-006-02 | ubiquitous | The SYSTEM shall require Exit_Code 0 from all validators |
-| CAP-MIG-006-03 | ubiquitous | The SYSTEM shall perform Behavioral_Validation (wake-up, capabilities) |
+| CAP-MIG-006-03 | ubiquitous | The SYSTEM shall perform Behavioral_Validation per CAP-MIG-006-03a through CAP-MIG-006-03f |
+| CAP-MIG-006-03a | ubiquitous | Behavioral_Validation shall execute wake_up.py without error |
+| CAP-MIG-006-03b | ubiquitous | Behavioral_Validation shall verify version display matches version.json AND AGENTS.md |
+| CAP-MIG-006-03c | ubiquitous | Behavioral_Validation shall verify AGENTS.md size ≤ 40000 characters (CAP-TPL-008-01) |
+| CAP-MIG-006-03d | conditional | IF sanity_check script exists THEN Behavioral_Validation shall execute it |
+| CAP-MIG-006-03e | conditional | IF archetype=supervisor THEN Behavioral_Validation shall verify fleet inventory accuracy |
+| CAP-MIG-006-03f | conditional | IF archetype=supervisor THEN Behavioral_Validation shall verify portfolio tracking completeness |
 | CAP-MIG-006-04 | conditional | IF any validator fails THEN the SYSTEM shall STOP and report |
 | CAP-MIG-006-05 | prohibited | The SYSTEM shall NOT proceed to Cleanup_Phase with FAIL status |
 | CAP-MIG-006-06 | event-driven | WHEN all validations pass, the SYSTEM shall issue GO decision |
 
 **Enforcement**: `PATTERN_migration_validation_gate.md`
+
+**Rationale**: L402 analysis of supervisor session revealed missing behavioral checks — wake_up showed correct version but fleet state was stale, AGENTS.md exceeded size limit.
 
 #### Required Validators
 
@@ -294,6 +302,7 @@ The SYSTEM shall complete all validation before cleanup.
 | `validate_naming_conventions.py` | L-doc/ADR naming |
 | `validate_template_manifest.py` | Manifest schema |
 | `validate_composition.py` | Capability composition |
+| `validate_agents_md_size.py` | Configuration size (CAP-MIG-006-03c) |
 
 ### CAP-MIG-007: Cleanup Phase
 
@@ -360,8 +369,42 @@ The SYSTEM shall maintain version consistency across all version sources.
 | CAP-MIG-009-03 | conditional | IF Pilot_Phase fails THEN the SYSTEM shall NOT proceed to Expand_Phase |
 | CAP-MIG-009-04 | ubiquitous | The SYSTEM shall capture learnings between phases |
 | CAP-MIG-009-05 | optional | WHERE parallel execution is safe, the SYSTEM may batch migrations |
+| CAP-MIG-009-06 | event-driven | WHEN pilot migration completes, the SYSTEM shall update FLEET_MIGRATION_PLAN |
+| CAP-MIG-009-07 | ubiquitous | The SYSTEM shall update agent priority from P1-pending to P1-complete |
 
 **Enforcement**: Fleet migration PROJECT_PLAN structure.
+
+### CAP-MIG-011: Size Compliance Validation
+
+The SYSTEM shall validate configuration file sizes.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-MIG-011-01 | ubiquitous | The SYSTEM shall validate AGENTS.md size BEFORE migration |
+| CAP-MIG-011-02 | conditional | IF AGENTS.md > 40000 characters THEN the SYSTEM shall BLOCK migration |
+| CAP-MIG-011-03 | conditional | IF AGENTS.md > 35000 characters THEN the SYSTEM shall emit Size_Warning |
+| CAP-MIG-011-04 | ubiquitous | The SYSTEM shall validate AGENTS.md size AFTER migration |
+| CAP-MIG-011-05 | event-driven | WHEN size violation detected, the SYSTEM shall report remediation options |
+
+**Rationale**: L402 revealed AGENTS.md at 47.6k characters (exceeds 40k limit from CAP-TPL-008-01). Size validation prevents migrations that would result in non-compliant configurations.
+
+**Enforcement**: `validate_agents_md_size.py`, migration script pre-check.
+
+### CAP-MIG-012: Supervisor Fleet State Synchronization
+
+The SYSTEM shall maintain supervisor fleet state accuracy.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-MIG-012-01 | conditional | IF migrating Supervisor_Agent THEN the SYSTEM shall verify FLEET_STATE accuracy |
+| CAP-MIG-012-02 | ubiquitous | Supervisor FLEET_STATE shall reflect accurate agent count |
+| CAP-MIG-012-03 | ubiquitous | Supervisor FLEET_STATE shall reflect accurate portfolio tracking |
+| CAP-MIG-012-04 | conditional | IF fleet version mismatch THEN wake-up shall display both supervisor and fleet versions |
+| CAP-MIG-012-05 | event-driven | WHEN fleet migration completes, the SYSTEM shall update supervisor fleet inventory |
+
+**Rationale**: L402 revealed supervisor showed 28 agents while actual count was 29, and portfolio tracking (3 vs 5) was inconsistent. Fleet state must be synchronized during supervisor migration.
+
+**Enforcement**: `validate_supervisor_fleet_state.py` (to be created), behavioral validation.
 
 #### Fleet Migration Phases
 
@@ -577,6 +620,7 @@ python3 aget/scripts/cleanup_template_archive.py template-example-aget/ --execut
 - L395: Instance v3.0 Migration Pattern
 - L400: Conceptual vs Structural Migration Understanding
 - L401: AGENTS.md Version Tag Synchronization (CAP-MIG-010)
+- L402: Behavioral Validation Gaps (CAP-MIG-006-03, CAP-MIG-011, CAP-MIG-012)
 - PATTERN_migration_validation_gate.md
 - AGET_TEMPLATE_SPEC.md (target spec)
 - AGET_INSTANCE_SPEC.md (instance requirements)
@@ -602,7 +646,7 @@ graduation:
 
 ---
 
-*AGET Migration Specification v1.0.0*
+*AGET Migration Specification v1.2.0*
 *Format: AGET_SPEC_FORMAT v1.2 (EARS + SKOS)*
 *Part of v3.0.0 Lifecycle Management - Gap C3*
 *"Controlled transitions enable safe evolution."*
