@@ -1,6 +1,6 @@
 # AGET 5D Composition Architecture Specification
 
-**Version**: 1.1.0
+**Version**: 1.2.0
 **Status**: Active
 **Category**: Standards (Umbrella)
 **Format Version**: 1.2
@@ -9,6 +9,7 @@
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_5D_ARCHITECTURE_SPEC.md`
 **Change Proposal**: CP-008
+**Change Origin**: L394 (Design by Fleet Exploration)
 
 ---
 
@@ -200,6 +201,75 @@ The SYSTEM shall support appropriate Dimension_Interactions.
 | CAP-5D-004-04 | conditional | IF CONTEXT changes significantly THEN the SYSTEM may invoke PERSONA Governance_Shift |
 
 **Enforcement**: Operational review
+
+### CAP-5D-005: Dimension Extensions
+
+The SYSTEM shall support Dimension_Extensions beyond the core 5D.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-5D-005-01 | optional | WHERE agent complexity requires, the SYSTEM may add D6+ dimensions |
+| CAP-5D-005-02 | ubiquitous | The SYSTEM shall name extension dimensions as D6_{domain}, D7_{domain}, etc. |
+| CAP-5D-005-03 | ubiquitous | The SYSTEM shall place extension dimension config in .aget/D6_{domain}/ |
+| CAP-5D-005-04 | ubiquitous | The SYSTEM shall document extension dimensions in manifest.yaml |
+| CAP-5D-005-05 | ubiquitous | The SYSTEM shall ensure extension dimensions maintain Dimension_Orthogonality |
+
+**Enforcement**: Architecture review, manifest validation
+
+**Rationale**: Fleet exploration (L394) revealed that complex agents (e.g., supervisors with 35+ .aget/ subdirs) require organizational structures beyond the core 5D. Extensions enable scaling without violating core architecture.
+
+#### Extension Dimension Examples
+
+| Extension | Purpose | Used By |
+|-----------|---------|---------|
+| D6_fleet | Fleet management, portfolio tracking | Supervisors |
+| D6_coordination | Multi-agent coordination | Supervisors |
+| D6_compliance | Compliance state, audit trails | Rigorous agents |
+| D6_intelligence | Advanced reasoning, ML state | Intelligence-enabled agents |
+
+#### Extension Structure
+
+```
+.aget/
+├── persona/          # D1 (core)
+├── memory/           # D2 (core)
+├── reasoning/        # D3 (core)
+├── skills/           # D4 (core)
+├── context/          # D5 (core)
+│
+├── D6_fleet/         # D6 Extension: Fleet management
+│   ├── portfolios.yaml
+│   ├── agents.yaml
+│   └── coordination.yaml
+│
+├── D7_compliance/    # D7 Extension: Compliance
+│   ├── audit_trail.yaml
+│   └── checkpoints/
+│
+└── ...               # Additional extensions as needed
+```
+
+#### Extension Declaration
+
+```yaml
+# manifest.yaml
+composition:
+  # Core 5D
+  persona: ...
+  memory: ...
+  reasoning: ...
+  skills: ...
+  context: ...
+
+  # Extensions
+  extensions:
+    - dimension: D6_fleet
+      purpose: "Fleet management and portfolio tracking"
+      config: $ref: .aget/D6_fleet/
+    - dimension: D7_compliance
+      purpose: "Compliance state and audit trails"
+      config: $ref: .aget/D7_compliance/
+```
 
 ---
 
@@ -512,7 +582,8 @@ graduation:
 
 ---
 
-*AGET 5D Composition Architecture Specification v1.1.0*
+*AGET 5D Composition Architecture Specification v1.2.0*
 *Format: AGET_SPEC_FORMAT v1.2 (EARS + SKOS)*
 *Part of v3.0.0 Composition Architecture*
-*"Five dimensions, one coherent agent."*
+*"Five dimensions, extensible when needed, one coherent agent."*
+*Updated: 2025-12-27 (L394 dimension extensions)*

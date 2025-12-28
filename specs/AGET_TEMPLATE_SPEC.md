@@ -1,13 +1,15 @@
 # AGET TEMPLATE Specification
 
-**Version**: 3.0.0
+**Version**: 3.1.0
 **Status**: Active
 **Category**: Standards (Template Architecture)
 **Format Version**: 1.2
 **Created**: 2025-12-27
+**Updated**: 2025-12-27
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_TEMPLATE_SPEC.md`
 **Change Proposal**: CP-017, CP-018
+**Change Origin**: L394 (Design by Fleet Exploration)
 **Supersedes**: WORKER_TEMPLATE_SPEC_v1.0.yaml, TEMPLATE_STRUCTURE_GUIDE.md
 
 ---
@@ -124,50 +126,70 @@ The SYSTEM shall maintain v3.0 Template_Directory structure.
 
 **Enforcement**: `validate_template_manifest.py`, `validate_5d_compliance.py`
 
-#### v3.0 Directory Layout
+#### v3.1 Directory Layout
 
 ```
 template-{type}-aget/
-├── .aget/                          # AGET framework directory
+│
+├── .aget/                          # FRAMEWORK CONFIGURATION (Apache 2.0)
 │   ├── version.json                # Agent version + template reference
 │   ├── identity.json               # North Star (D1: PERSONA)
 │   │
-│   ├── persona/                    # D1: PERSONA dimension
+│   ├── persona/                    # D1: PERSONA dimension (config)
 │   │   ├── archetype.yaml          # Selected archetype configuration
 │   │   └── style.yaml              # Communication style settings
 │   │
-│   ├── memory/                     # D2: MEMORY dimension
-│   │   ├── domain/                 # Domain knowledge
-│   │   ├── organizational/         # Organizational knowledge
-│   │   └── experiential/           # Experience and learnings
+│   ├── memory/                     # D2: MEMORY dimension (CONFIG ONLY)
+│   │   ├── layer_config.yaml       # 6-layer configuration
+│   │   ├── inheritance.yaml        # Inheritance rules
+│   │   └── retrieval.yaml          # Context loading rules
+│   │   # NOTE: NO content subdirs (domain/, experiential/)
+│   │   #       Content goes to visible knowledge/ directory
 │   │
-│   ├── reasoning/                  # D3: REASONING dimension
+│   ├── reasoning/                  # D3: REASONING dimension (config)
 │   │   ├── decision_authority.yaml # Decision authority matrix
 │   │   └── planning_patterns.yaml  # Planning approach configuration
 │   │
-│   ├── skills/                     # D4: SKILLS dimension
+│   ├── skills/                     # D4: SKILLS dimension (config)
 │   │   ├── capabilities.yaml       # Declared capabilities
 │   │   └── phase_mapping.yaml      # A-SDLC phase assignments
 │   │
-│   ├── context/                    # D5: CONTEXT dimension
+│   ├── context/                    # D5: CONTEXT dimension (config)
 │   │   ├── relationships.yaml      # Agent relationships
 │   │   └── scope.yaml              # Operational scope
+│   │
+│   ├── D6_*/                       # D6+ extensions (optional)
+│   │   └── *.yaml                  # Complex agents extend here
 │   │
 │   ├── patterns/                   # Operational patterns (scripts)
 │   │   ├── session/
 │   │   ├── release/
 │   │   └── sync/
 │   │
-│   └── evolution/                  # Learning documents
-│       └── L*.md
+│   ├── evolution/                  # L-docs (PORTABLE EXCEPTION)
+│   │   ├── index.json              # L-doc index for scaling
+│   │   └── L*.md
+│   │
+│   └── state/                      # Operational state (optional)
+│       └── *.json                  # Compliance, checkpoints, etc.
 │
-├── governance/                     # Governance artifacts
+├── governance/                     # VISIBLE: Governance artifacts (core)
 │   ├── CHARTER.md                  # Agent charter
 │   ├── MISSION.md                  # Mission statement
 │   └── SCOPE_BOUNDARIES.md         # Operational boundaries
 │
+├── sessions/                       # VISIBLE: Session notes (core)
+│   └── SESSION_*.md
+│
+├── planning/                       # VISIBLE: Planning artifacts (core)
+│   └── PROJECT_PLAN_*.md
+│
+├── knowledge/                      # VISIBLE: Domain knowledge (core)
+│   ├── domain/                     # Domain-specific knowledge
+│   └── research/                   # Research findings
+│
 ├── tests/                          # Contract tests
-│   └── contract_tests.py
+│   └── test_contract.py
 │
 ├── manifest.yaml                   # Template manifest (v3 schema)
 ├── CLAUDE.md                       # CLI configuration (symlink)
@@ -437,6 +459,78 @@ The SYSTEM shall include Contract_Tests for Template validation.
 | test_5d_directories_exist | Verifies 5D directory structure |
 | test_governance_files_exist | Validates governance/ contents |
 
+### CAP-TPL-010: Visible Directory Standards
+
+The SYSTEM shall maintain visible directories for Portable_Content.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-TPL-010-01 | ubiquitous | The SYSTEM shall include governance/ as core visible directory |
+| CAP-TPL-010-02 | ubiquitous | The SYSTEM shall include sessions/ as core visible directory |
+| CAP-TPL-010-03 | ubiquitous | The SYSTEM shall include planning/ as core visible directory |
+| CAP-TPL-010-04 | ubiquitous | The SYSTEM shall include knowledge/ as core visible directory |
+| CAP-TPL-010-05 | conditional | IF archetype extends Developer THEN the SYSTEM shall include products/, workspace/, src/ |
+| CAP-TPL-010-06 | conditional | IF archetype extends Advisor THEN the SYSTEM shall include clients/, engagements/ |
+| CAP-TPL-010-07 | conditional | IF archetype extends Supervisor THEN the SYSTEM shall include sops/ |
+| CAP-TPL-010-08 | ubiquitous | The SYSTEM shall NOT place user content in hidden directories (except .aget/evolution/) |
+
+**Enforcement**: `validate_5d_compliance.py`, directory structure validation
+
+**Rationale**: Fleet exploration (L394) revealed 18+ visible directories in real instances. This formalizes a layered approach: core set + archetype extensions.
+
+#### Visible Directory Matrix
+
+| Directory | Purpose | Core/Extension | Inherits From |
+|-----------|---------|----------------|---------------|
+| governance/ | Charter, Mission, Scope | Core | - |
+| sessions/ | Session notes | Core | - |
+| planning/ | Project plans, decisions | Core | - |
+| knowledge/ | Domain knowledge, research | Core | - |
+| products/ | Deliverables | Extension | Developer |
+| workspace/ | Work in progress | Extension | Developer |
+| src/ | Source code | Extension | Developer |
+| docs/ | Documentation | Extension | Worker |
+| data/ | Persistent data | Extension | Worker |
+| decisions/ | ADRs | Extension | Architect |
+| reports/ | Research outputs | Extension | Analyst |
+| sops/ | Operating procedures | Extension | Supervisor |
+| clients/ | Client relationships | Extension | Advisor |
+| engagements/ | Engagement tracking | Extension | Advisor |
+
+### CAP-TPL-011: Directory Inheritance
+
+The SYSTEM shall support directory inheritance from parent templates.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-TPL-011-01 | optional | WHERE inherits_from is specified, the SYSTEM shall inherit parent visible directories |
+| CAP-TPL-011-02 | ubiquitous | The SYSTEM shall allow child to add new visible directories |
+| CAP-TPL-011-03 | conditional | IF child removes inherited directory THEN the SYSTEM shall emit warning |
+| CAP-TPL-011-04 | ubiquitous | The SYSTEM shall document directory inheritance in manifest.yaml |
+
+**Enforcement**: `validate_composition.py`
+
+#### Directory Inheritance Example
+
+```yaml
+# template-architect-aget/manifest.yaml
+template:
+  inherits_from: template-developer-aget
+
+visible_directories:
+  inherited:                    # From developer
+    - governance/
+    - sessions/
+    - planning/
+    - knowledge/
+    - products/
+    - workspace/
+    - src/
+  added:                        # Architect-specific
+    - decisions/               # ADRs
+  removed: []                   # None (removal emits warning)
+```
+
 ---
 
 ## 12 Templates Specification
@@ -512,25 +606,66 @@ inviolables:
 
 ```yaml
 structure:
-  required_directories:
+  # Framework Configuration (.aget/)
+  required_framework_directories:
     - path: ".aget/"
       purpose: "Agent identity and configuration"
     - path: ".aget/persona/"
-      purpose: "PERSONA dimension configuration"
+      purpose: "D1 PERSONA dimension configuration"
     - path: ".aget/memory/"
-      purpose: "MEMORY dimension structure"
+      purpose: "D2 MEMORY dimension configuration (NOT content)"
     - path: ".aget/reasoning/"
-      purpose: "REASONING dimension configuration"
+      purpose: "D3 REASONING dimension configuration"
     - path: ".aget/skills/"
-      purpose: "SKILLS dimension configuration"
+      purpose: "D4 SKILLS dimension configuration"
     - path: ".aget/context/"
-      purpose: "CONTEXT dimension configuration"
+      purpose: "D5 CONTEXT dimension configuration"
     - path: ".aget/evolution/"
-      purpose: "Learning documents"
+      purpose: "Learning documents (portable exception)"
+
+  optional_framework_directories:
+    - path: ".aget/D6_*/"
+      purpose: "D6+ dimension extensions"
+    - path: ".aget/state/"
+      purpose: "Operational state"
+    - path: ".aget/patterns/"
+      purpose: "Pattern scripts"
+
+  # Visible Content Directories (Portable_Content)
+  required_visible_directories:
     - path: "governance/"
-      purpose: "Governance artifacts"
+      purpose: "Charter, Mission, Scope (core)"
+    - path: "sessions/"
+      purpose: "Session notes (core)"
+    - path: "planning/"
+      purpose: "Project plans, decisions (core)"
+    - path: "knowledge/"
+      purpose: "Domain knowledge, research (core)"
     - path: "tests/"
       purpose: "Contract tests"
+
+  archetype_extension_directories:
+    developer:
+      - path: "products/"
+        purpose: "Deliverables"
+      - path: "workspace/"
+        purpose: "Work in progress"
+      - path: "src/"
+        purpose: "Source code"
+    advisor:
+      - path: "clients/"
+        purpose: "Client relationships (.gitignore)"
+      - path: "engagements/"
+        purpose: "Engagement tracking (.gitignore)"
+    supervisor:
+      - path: "sops/"
+        purpose: "Operating procedures"
+    architect:
+      - path: "decisions/"
+        purpose: "Architecture Decision Records"
+    analyst:
+      - path: "reports/"
+        purpose: "Research outputs"
 
   required_files:
     - path: ".aget/version.json"
@@ -642,5 +777,6 @@ cd /path/to/template && pytest tests/ -v
 
 ---
 
-*AGET TEMPLATE Specification v3.0.0*
+*AGET TEMPLATE Specification v3.1.0*
 *"Templates are composable agent patterns enabling consistent 5D composition"*
+*Updated: 2025-12-27 (L394 visible directory standards)*

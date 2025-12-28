@@ -193,6 +193,69 @@ scripts:
     validates: manifest.yaml $ref references to components
 
   # ============================================================
+  # MIGRATION SCRIPTS (scripts/)
+  # ============================================================
+
+  - path: scripts/analyze_template_compliance.py
+    description: Analyzes template compliance with AGET_TEMPLATE_SPEC v3.0
+    category: tool
+    version: 1.0.0
+    created: 2025-12-27
+    flags: [--help, --all, --output, --summary]
+    exit_codes: [0, 1, 2]
+    validates: Template structure and compliance
+
+  - path: scripts/migrate_template_to_v3.py
+    description: Migrates template to v3.0 by archiving legacy and removing cruft
+    category: tool
+    version: 1.0.0
+    created: 2025-12-27
+    flags: [--help, --dry-run, --execute, --analysis, --verbose]
+    exit_codes: [0, 1, 2]
+
+  - path: scripts/cleanup_template_archive.py
+    description: Cleans up archive directory after migration verification
+    category: tool
+    version: 1.0.0
+    created: 2025-12-27
+    flags: [--help, --verify, --execute, --force]
+    exit_codes: [0, 1, 2]
+
+  - path: scripts/export_agent_knowledge.py
+    description: Exports Portable_Content from agent for framework ejection
+    category: tool
+    version: 1.0.0
+    created: 2025-12-27
+    flags: [--help, --output, --dry-run, --remove-framework, --acknowledge-constraints-removed]
+    exit_codes: [0, 1, 2]
+    status: planned
+    spec: AGET_PORTABILITY_SPEC.md
+
+  # ============================================================
+  # VALIDATORS - Compliance
+  # ============================================================
+
+  - path: validation/validate_portability_compliance.py
+    description: Validates portability classification (Portable_Content vs Framework_Configuration)
+    category: validator
+    version: 1.0.0
+    created: 2025-12-27
+    flags: [--help, --quiet, --dir]
+    exit_codes: [0, 1, 2]
+    validates: Portability classification per AGET_PORTABILITY_SPEC
+    status: planned
+
+  - path: validation/validate_license_compliance.py
+    description: Validates LICENSE files and license separation
+    category: validator
+    version: 1.0.0
+    created: 2025-12-27
+    flags: [--help, --quiet, --dir]
+    exit_codes: [0, 1, 2]
+    validates: LICENSE files per AGET_LICENSE_SPEC
+    status: planned
+
+  # ============================================================
   # TOOLS (validation/ - miscellaneous)
   # ============================================================
 
@@ -334,11 +397,12 @@ scripts:
 
 # Summary statistics
 summary:
-  total_scripts: 33
+  total_scripts: 39
   by_category:
-    validator: 19
-    tool: 2
+    validator: 21
+    tool: 6
     pattern: 12
   by_status:
-    active: 30
+    active: 33
     skeleton: 3
+    planned: 3
