@@ -1,0 +1,580 @@
+# AGET Migration Specification
+
+**Version**: 1.0.0
+**Status**: Active
+**Category**: Standards (Lifecycle Management)
+**Format Version**: 1.2
+**Created**: 2025-12-27
+**Updated**: 2025-12-27
+**Author**: private-aget-framework-AGET
+**Location**: `aget/specs/AGET_MIGRATION_SPEC.md`
+
+---
+
+## Abstract
+
+This specification defines the formal migration process for AGET agents, templates, and fleets. It establishes standard phases, validation gates, rollback procedures, and artifact formats to ensure reliable version transitions.
+
+## Motivation
+
+Migration challenges observed in practice:
+
+1. **Ad-hoc processes**: Scripts created per-migration without standardization
+2. **Incomplete validation**: Behavioral validation without automated compliance checks
+3. **Missing rollback**: No formal recovery path when migrations fail
+4. **Fleet coordination**: No standard for multi-agent migration sequencing
+5. **Artifact preservation**: Inconsistent archival of pre-migration state
+
+L392 (Pilot-Driven Migration Automation) and L394 (Design by Fleet Exploration) revealed these gaps. This specification formalizes patterns validated in v3.0.0-beta.2.
+
+## Scope
+
+**Applies to**: All AGET framework version transitions.
+
+**Defines**:
+- Migration_Types (Template, Instance, Fleet)
+- Migration_Phases (5-phase model)
+- Validation_Gate requirements
+- Rollback_Protocol
+- Migration_Manifest format
+- Archive_Policy
+
+---
+
+## Vocabulary
+
+Domain terms for migration:
+
+```yaml
+vocabulary:
+  meta:
+    domain: "migration"
+    version: "1.0.0"
+    inherits: "aget_core"
+
+  migration:  # Core concepts
+    Migration:
+      skos:definition: "Controlled transition from one framework version to another"
+      skos:narrower: ["Template_Migration", "Instance_Migration", "Fleet_Migration"]
+    Migration_Phase:
+      skos:definition: "Discrete step in migration process"
+      skos:narrower: ["Analyze", "Plan", "Execute", "Validate", "Cleanup"]
+    Migration_Manifest:
+      skos:definition: "Record of migration actions and pre-migration state"
+      aget:location: ".aget/archive/_archive_manifest.json"
+    Rollback_Point:
+      skos:definition: "Saved state enabling migration reversal"
+    Validation_Gate:
+      skos:definition: "Blocking checkpoint requiring all validators to pass"
+      skos:related: "PATTERN_migration_validation_gate.md"
+
+  types:  # Migration types
+    Template_Migration:
+      skos:definition: "Migration of template repository to new spec version"
+      skos:note: "Templates are canonical; instances derive from them"
+    Instance_Migration:
+      skos:definition: "Migration of deployed agent instance"
+      skos:note: "May include user content preservation"
+    Fleet_Migration:
+      skos:definition: "Coordinated migration of multiple agents"
+      skos:narrower: ["Pilot_Phase", "Expand_Phase", "Complete_Phase"]
+
+  phases:  # Migration phases
+    Analyze_Phase:
+      skos:definition: "Examine current state and identify migration scope"
+      skos:output: "Compliance report, migration plan"
+    Plan_Phase:
+      skos:definition: "Create gated PROJECT_PLAN with rollback strategy"
+      skos:output: "PROJECT_PLAN, gate definitions"
+    Execute_Phase:
+      skos:definition: "Perform structural changes per plan"
+      skos:output: "Migrated artifacts, archive"
+    Validate_Phase:
+      skos:definition: "Run all validators and behavioral tests"
+      skos:output: "Validation report, GO/NOGO decision"
+    Cleanup_Phase:
+      skos:definition: "Remove archives after verification period"
+      skos:output: "Clean repository"
+
+  artifacts:  # Migration artifacts
+    Archive_Directory:
+      skos:definition: "Holding location for pre-migration artifacts"
+      aget:location: ".aget/archive/"
+    Compliance_Report:
+      skos:definition: "Analysis output showing compliant vs legacy items"
+    Migration_Script:
+      skos:definition: "Automated migration tool"
+      skos:example: "migrate_template_to_v3.py"
+```
+
+---
+
+## Requirements
+
+### CAP-MIG-001: Migration Types
+
+The SYSTEM shall support three Migration_Types.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-MIG-001-01 | ubiquitous | The SYSTEM shall support Template_Migration for template repositories |
+| CAP-MIG-001-02 | ubiquitous | The SYSTEM shall support Instance_Migration for deployed agents |
+| CAP-MIG-001-03 | ubiquitous | The SYSTEM shall support Fleet_Migration for multi-agent coordination |
+| CAP-MIG-001-04 | conditional | IF Fleet_Migration THEN the SYSTEM shall use Pilot_Phase before full rollout |
+
+**Enforcement**: Migration scripts must identify migration type.
+
+#### Migration Type Matrix
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                    MIGRATION TYPE MATRIX                          │
+├─────────────────┬────────────────┬───────────────────────────────┤
+│ Type            │ Scope          │ Rollback Complexity           │
+├─────────────────┼────────────────┼───────────────────────────────┤
+│ Template        │ 1 repository   │ Low (git revert)              │
+│ Instance        │ 1 agent        │ Medium (archive restore)      │
+│ Fleet           │ N agents       │ High (coordinated rollback)   │
+└─────────────────┴────────────────┴───────────────────────────────┘
+```
+
+### CAP-MIG-002: Five-Phase Model
+
+The SYSTEM shall execute migrations through five sequential phases.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-MIG-002-01 | ubiquitous | The SYSTEM shall complete Analyze_Phase before Plan_Phase |
+| CAP-MIG-002-02 | ubiquitous | The SYSTEM shall complete Plan_Phase before Execute_Phase |
+| CAP-MIG-002-03 | ubiquitous | The SYSTEM shall complete Execute_Phase before Validate_Phase |
+| CAP-MIG-002-04 | ubiquitous | The SYSTEM shall complete Validate_Phase before Cleanup_Phase |
+| CAP-MIG-002-05 | conditional | IF Validate_Phase fails THEN the SYSTEM shall NOT proceed to Cleanup_Phase |
+
+**Enforcement**: Phase gates in migration scripts.
+
+#### Phase Model
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     FIVE-PHASE MIGRATION MODEL                   │
+│                                                                  │
+│   ┌─────────┐    ┌──────┐    ┌─────────┐    ┌──────────┐    ┌──────────┐
+│   │ ANALYZE │ -> │ PLAN │ -> │ EXECUTE │ -> │ VALIDATE │ -> │ CLEANUP  │
+│   └─────────┘    └──────┘    └─────────┘    └──────────┘    └──────────┘
+│        │              │            │              │               │
+│        ▼              ▼            ▼              ▼               ▼
+│   Compliance    PROJECT_PLAN  Archive +      Validators     Remove
+│   Report        + Gates       Migrate        + Behavioral   Archive
+│                                                    │
+│                                              ┌─────┴─────┐
+│                                              │  NOGO?    │
+│                                              │  ROLLBACK │
+│                                              └───────────┘
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### CAP-MIG-003: Analyze Phase
+
+The SYSTEM shall analyze migration scope before planning.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-MIG-003-01 | event-driven | WHEN Migration is initiated, the SYSTEM shall run Compliance_Analysis |
+| CAP-MIG-003-02 | ubiquitous | The SYSTEM shall identify Compliant_Items versus Legacy_Items |
+| CAP-MIG-003-03 | ubiquitous | The SYSTEM shall identify Delete_Candidates (framework code in templates) |
+| CAP-MIG-003-04 | ubiquitous | The SYSTEM shall generate Compliance_Report in JSON format |
+| CAP-MIG-003-05 | conditional | IF Compliance_Report shows is_compliant=true THEN the SYSTEM shall skip migration |
+
+**Enforcement**: `analyze_template_compliance.py`
+
+#### Analysis Output Format
+
+```json
+{
+  "template": "template-example-aget",
+  "spec_version": "3.0",
+  "analysis_date": "2025-12-27T10:00:00Z",
+  "compliance": {
+    "compliant_items": [...],
+    "legacy_dirs": [...],
+    "legacy_files": [...],
+    "delete_candidates": [...]
+  },
+  "summary": {
+    "is_compliant": false,
+    "compliant_count": 19,
+    "legacy_items": 24,
+    "delete_candidates": 2
+  }
+}
+```
+
+### CAP-MIG-004: Plan Phase
+
+The SYSTEM shall create formal migration plan before execution.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-MIG-004-01 | ubiquitous | The SYSTEM shall create PROJECT_PLAN for non-trivial migrations |
+| CAP-MIG-004-02 | ubiquitous | The PROJECT_PLAN shall include Validation_Gate (BLOCKING) |
+| CAP-MIG-004-03 | ubiquitous | The PROJECT_PLAN shall document Rollback_Strategy |
+| CAP-MIG-004-04 | conditional | IF Fleet_Migration THEN the PROJECT_PLAN shall define Pilot_Agents |
+| CAP-MIG-004-05 | ubiquitous | The SYSTEM shall require User_Approval before Execute_Phase |
+
+**Enforcement**: PROJECT_PLAN template, gate checklist.
+
+### CAP-MIG-005: Execute Phase
+
+The SYSTEM shall perform migration with archive preservation.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-MIG-005-01 | ubiquitous | The SYSTEM shall create Archive_Directory before moving items |
+| CAP-MIG-005-02 | ubiquitous | The SYSTEM shall archive Legacy_Items to `.aget/archive/_legacy_dirs/` |
+| CAP-MIG-005-03 | ubiquitous | The SYSTEM shall archive Legacy_Files to `.aget/archive/_legacy_files/` |
+| CAP-MIG-005-04 | ubiquitous | The SYSTEM shall write Migration_Manifest to `.aget/archive/_archive_manifest.json` |
+| CAP-MIG-005-05 | ubiquitous | The SYSTEM shall delete Delete_Candidates after archiving |
+| CAP-MIG-005-06 | optional | WHERE --dry-run flag, the SYSTEM shall show actions without executing |
+
+**Enforcement**: `migrate_template_to_v3.py`
+
+#### Archive Structure
+
+```
+.aget/archive/
+├── _legacy_dirs/           # Archived directories
+│   ├── architecture/
+│   ├── backups/
+│   └── ...
+├── _legacy_files/          # Archived files
+│   ├── BRANCHING.md
+│   ├── dependencies.json
+│   └── ...
+└── _archive_manifest.json  # Migration record
+```
+
+#### Migration Manifest Format
+
+```json
+{
+  "migration_date": "2025-12-27T10:00:00Z",
+  "template": "template-example-aget",
+  "from_version": "2.x",
+  "to_version": "3.0",
+  "archived_items": [
+    {"source": ".aget/architecture/", "target": ".aget/archive/_legacy_dirs/architecture/", "type": "directory"}
+  ],
+  "deleted_items": [
+    {"path": "aget/", "type": "directory"}
+  ],
+  "rollback_command": "python3 rollback_migration.py --manifest .aget/archive/_archive_manifest.json"
+}
+```
+
+### CAP-MIG-006: Validate Phase (BLOCKING)
+
+The SYSTEM shall complete all validation before cleanup.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-MIG-006-01 | ubiquitous | The SYSTEM shall run ALL required validators |
+| CAP-MIG-006-02 | ubiquitous | The SYSTEM shall require Exit_Code 0 from all validators |
+| CAP-MIG-006-03 | ubiquitous | The SYSTEM shall perform Behavioral_Validation (wake-up, capabilities) |
+| CAP-MIG-006-04 | conditional | IF any validator fails THEN the SYSTEM shall STOP and report |
+| CAP-MIG-006-05 | prohibited | The SYSTEM shall NOT proceed to Cleanup_Phase with FAIL status |
+| CAP-MIG-006-06 | event-driven | WHEN all validations pass, the SYSTEM shall issue GO decision |
+
+**Enforcement**: `PATTERN_migration_validation_gate.md`
+
+#### Required Validators
+
+| Validator | Purpose |
+|-----------|---------|
+| `validate_version_consistency.py` | Version alignment |
+| `validate_naming_conventions.py` | L-doc/ADR naming |
+| `validate_template_manifest.py` | Manifest schema |
+| `validate_composition.py` | Capability composition |
+
+### CAP-MIG-007: Cleanup Phase
+
+The SYSTEM shall remove archives after verification period.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-MIG-007-01 | conditional | IF Verification_Period (7 days) elapsed THEN the SYSTEM may remove Archive_Directory |
+| CAP-MIG-007-02 | ubiquitous | The SYSTEM shall verify no references to archived items before removal |
+| CAP-MIG-007-03 | event-driven | WHEN cleanup is complete, the SYSTEM shall run final validation |
+| CAP-MIG-007-04 | optional | WHERE --preserve-archive flag, the SYSTEM shall retain Archive_Directory |
+
+**Enforcement**: `cleanup_template_archive.py`
+
+### CAP-MIG-008: Rollback Protocol
+
+The SYSTEM shall support migration reversal.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-MIG-008-01 | ubiquitous | The SYSTEM shall preserve Rollback_Point in Migration_Manifest |
+| CAP-MIG-008-02 | event-driven | WHEN rollback is requested, the SYSTEM shall restore from Archive_Directory |
+| CAP-MIG-008-03 | ubiquitous | The SYSTEM shall restore files to original locations from manifest |
+| CAP-MIG-008-04 | conditional | IF Archive_Directory is missing THEN the SYSTEM shall use git history |
+| CAP-MIG-008-05 | ubiquitous | The SYSTEM shall validate state after rollback |
+
+**Enforcement**: `rollback_migration.py` (to be created)
+
+#### Rollback Decision Tree
+
+```
+Migration Failed?
+     │
+     ├── YES: Archive exists?
+     │         ├── YES: Run rollback_migration.py
+     │         └── NO: Use git revert
+     │
+     └── NO: Proceed to Cleanup
+```
+
+### CAP-MIG-009: Fleet Migration
+
+The SYSTEM shall coordinate multi-agent migrations.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-MIG-009-01 | ubiquitous | The SYSTEM shall use three-phase rollout (Pilot, Expand, Complete) |
+| CAP-MIG-009-02 | ubiquitous | The SYSTEM shall select 1-3 Pilot_Agents for initial migration |
+| CAP-MIG-009-03 | conditional | IF Pilot_Phase fails THEN the SYSTEM shall NOT proceed to Expand_Phase |
+| CAP-MIG-009-04 | ubiquitous | The SYSTEM shall capture learnings between phases |
+| CAP-MIG-009-05 | optional | WHERE parallel execution is safe, the SYSTEM may batch migrations |
+
+**Enforcement**: Fleet migration PROJECT_PLAN structure.
+
+#### Fleet Migration Phases
+
+```
+PILOT (1-3 agents)
+├── Select diverse archetypes
+├── Migrate with full validation
+├── Capture learnings
+└── Improve scripts
+        │
+        ▼ [GO if all pilots pass]
+EXPAND (50% of fleet)
+├── Apply improved scripts
+├── Parallel execution if safe
+├── Capture additional learnings
+└── Prepare for completion
+        │
+        ▼ [GO if no regressions]
+COMPLETE (remaining agents)
+├── Batch execution
+├── Final validation
+└── Fleet-wide verification
+```
+
+---
+
+## Authority Model
+
+```yaml
+authority:
+  applies_to: "agents_performing_migrations"
+
+  governed_by:
+    spec: "AGET_MIGRATION_SPEC"
+    owner: "private-aget-framework-AGET"
+
+  agent_authority:
+    can_autonomously:
+      - "run Analyze_Phase"
+      - "create migration plan draft"
+      - "execute --dry-run"
+      - "run validators"
+
+    requires_approval:
+      - action: "execute migration"
+        approver: "user"
+      - action: "fleet migration"
+        approver: "supervisor"
+      - action: "cleanup archives"
+        approver: "user"
+```
+
+---
+
+## Inviolables
+
+```yaml
+inviolables:
+  inherited:
+    - id: "INV-MIG-001"
+      source: "aget_framework"
+      statement: "The SYSTEM shall NOT execute migration WITHOUT Archive preservation"
+      rationale: "Rollback capability is required"
+
+    - id: "INV-MIG-002"
+      source: "aget_framework"
+      statement: "The SYSTEM shall NOT proceed to Cleanup_Phase with validation failures"
+      rationale: "Blocking gate semantics"
+
+    - id: "INV-MIG-003"
+      source: "aget_framework"
+      statement: "The SYSTEM shall NOT delete User_Content during migration"
+      rationale: "Portability requirement (CAP-PORT-001)"
+```
+
+---
+
+## Structural Requirements
+
+```yaml
+structure:
+  required_directories:
+    - path: ".aget/archive/"
+      purpose: "Archive holding during verification period"
+      created_by: "Execute_Phase"
+      removed_by: "Cleanup_Phase"
+
+    - path: ".aget/archive/_legacy_dirs/"
+      purpose: "Archived directories"
+
+    - path: ".aget/archive/_legacy_files/"
+      purpose: "Archived files"
+
+  required_files:
+    - path: ".aget/archive/_archive_manifest.json"
+      purpose: "Migration record and rollback reference"
+      created_by: "Execute_Phase"
+
+  scripts:
+    - path: "aget/scripts/analyze_template_compliance.py"
+      purpose: "Phase 1: Analyze"
+
+    - path: "aget/scripts/migrate_template_to_v3.py"
+      purpose: "Phase 3: Execute"
+
+    - path: "aget/scripts/cleanup_template_archive.py"
+      purpose: "Phase 5: Cleanup"
+
+    - path: "aget/scripts/rollback_migration.py"
+      purpose: "Rollback support"
+      status: "to be created"
+```
+
+---
+
+## Migration Capability Contract
+
+Agents performing migrations MUST satisfy:
+
+```yaml
+contracts:
+  - name: analyze_before_execute
+    assertion: phase_order
+    rule: "Analyze_Phase completes before Execute_Phase"
+
+  - name: archive_before_delete
+    assertion: action_order
+    rule: "Archive action precedes Delete action"
+
+  - name: validate_before_cleanup
+    assertion: gate_blocking
+    rule: "Validate_Phase must GO before Cleanup_Phase"
+
+  - name: manifest_exists
+    assertion: file_exists
+    path: ".aget/archive/_archive_manifest.json"
+    when: "after Execute_Phase"
+
+  - name: rollback_documented
+    assertion: manifest_contains
+    field: "rollback_command"
+    when: "after Execute_Phase"
+```
+
+---
+
+## Theoretical Basis
+
+Migration architecture is grounded in established theories:
+
+| Theory | Application |
+|--------|-------------|
+| **Defense in Depth** | Multiple validation gates prevent incomplete migrations |
+| **Fail-Safe Design** | Archive preservation enables recovery |
+| **Staged Rollout** | Pilot → Expand → Complete reduces fleet risk |
+| **Automation Theory** | Scripts reduce human error in repetitive operations |
+
+```yaml
+theoretical_basis:
+  primary: "Defense in Depth"
+  secondary:
+    - "Fail-Safe Design"
+    - "Staged Rollout"
+    - "Automation Theory"
+  rationale: >
+    Migration specification treats version transitions as critical operations
+    requiring multiple safety layers. Archive preservation (Fail-Safe) enables
+    rollback. Validation gates (Defense in Depth) catch issues before propagation.
+    Pilot phases (Staged Rollout) limit blast radius. Automation reduces error.
+  references:
+    - "L392_pilot_driven_migration_automation.md"
+    - "L394_design_by_fleet_exploration.md"
+    - "PATTERN_migration_validation_gate.md"
+```
+
+---
+
+## Validation
+
+```bash
+# Analyze compliance
+python3 aget/scripts/analyze_template_compliance.py template-example-aget/
+
+# Dry run migration
+python3 aget/scripts/migrate_template_to_v3.py template-example-aget/ --dry-run
+
+# Execute migration
+python3 aget/scripts/migrate_template_to_v3.py template-example-aget/ --execute
+
+# Run validators
+python3 validation/validate_version_consistency.py template-example-aget/
+python3 validation/validate_template_manifest.py template-example-aget/manifest.yaml
+
+# Cleanup (after verification period)
+python3 aget/scripts/cleanup_template_archive.py template-example-aget/ --execute
+```
+
+---
+
+## References
+
+- L392: Pilot-Driven Migration Automation
+- L394: Design by Fleet Exploration
+- PATTERN_migration_validation_gate.md
+- AGET_TEMPLATE_SPEC.md (target spec)
+- AGET_PORTABILITY_SPEC.md (content preservation)
+- AGET_COMPATIBILITY_SPEC.md (version compatibility)
+
+---
+
+## Graduation History
+
+```yaml
+graduation:
+  source_patterns:
+    - "migrate_template_to_v3.py"
+    - "analyze_template_compliance.py"
+    - "cleanup_template_archive.py"
+  source_learnings:
+    - "L392"
+    - "L394"
+  trigger: "Gap C3 in GAP_ANALYSIS_v3.0_fleet_exploration.md"
+  rationale: "Ad-hoc migration scripts formalized into specification"
+```
+
+---
+
+*AGET Migration Specification v1.0.0*
+*Format: AGET_SPEC_FORMAT v1.2 (EARS + SKOS)*
+*Part of v3.0.0 Lifecycle Management - Gap C3*
+*"Controlled transitions enable safe evolution."*

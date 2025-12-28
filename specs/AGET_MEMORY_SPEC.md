@@ -1,6 +1,6 @@
 # AGET Memory Specification
 
-**Version**: 1.1.0
+**Version**: 1.2.0
 **Status**: Active
 **Category**: Standards (5D Composition - MEMORY Dimension)
 **Format Version**: 1.2
@@ -78,6 +78,18 @@ vocabulary:
       skos:definition: "Framework for accumulating and graduating knowledge"
     Graduation_Pathway:
       skos:definition: "Process by which learnings become patterns become specs"
+    Memory_Configuration:
+      skos:definition: "Framework configuration for memory behavior (not content)"
+      aget:location: ".aget/memory/"
+      skos:note: "Contains layer_config.yaml, inheritance.yaml, retrieval.yaml"
+    L_doc_Index:
+      skos:definition: "Index file for navigating large Learning_Document collections"
+      aget:location: ".aget/evolution/index.json"
+      skos:note: "Required when L-doc count exceeds 50"
+    Memory_Content:
+      skos:definition: "User work products stored in visible directories"
+      skos:note: "Portable content NOT stored in .aget/"
+      skos:example: "knowledge/, sessions/, decisions/"
 
   persona:  # D1: Terms defined
     Evolution_Directory:
@@ -271,6 +283,118 @@ The SYSTEM shall maintain Memory_Health.
 
 **Enforcement**: Memory hygiene review
 
+### CAP-MEMORY-007: Memory Configuration Structure
+
+The SYSTEM shall separate Memory_Configuration from Memory_Content.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-MEMORY-007-01 | ubiquitous | The SYSTEM shall store Memory_Configuration in `.aget/memory/` |
+| CAP-MEMORY-007-02 | ubiquitous | The SYSTEM shall store Memory_Content in visible directories |
+| CAP-MEMORY-007-03 | prohibited | The SYSTEM shall NOT store user work products in `.aget/memory/` |
+| CAP-MEMORY-007-04 | ubiquitous | The `.aget/memory/` directory shall contain only configuration files |
+| CAP-MEMORY-007-05 | ubiquitous | The SYSTEM shall use visible `knowledge/`, `sessions/`, `decisions/` for content |
+
+**Enforcement**: `validate_memory_compliance.py`
+
+#### Memory Configuration vs Content
+
+```
+CONFIGURATION (in .aget/memory/):        CONTENT (in visible directories):
+├── layer_config.yaml                    ├── knowledge/
+│   └── 6-layer model settings           │   └── domain expertise, research
+├── inheritance.yaml                     ├── sessions/
+│   └── what to inherit from fleet       │   └── session notes, handoffs
+└── retrieval.yaml                       ├── decisions/
+    └── context loading priorities       │   └── decision records
+                                         └── docs/
+                                             └── documentation artifacts
+
+EXCEPTION:
+.aget/evolution/*.md (L-docs)
+└── Framework-licensed learnings
+└── Portable via Apache 2.0
+└── Hidden but tracked in git
+```
+
+#### Rationale
+
+```yaml
+rationale:
+  principle: "Portability requires visibility"
+  source: "L394 (Design by Fleet Exploration)"
+  insight: >
+    Fleet exploration revealed that .aget/memory/ subdirectories (domain/,
+    experiential/, organizational/) implied content storage. User work
+    products must be visible for portability. Configuration (how memory
+    works) belongs in .aget/; content (what was learned) belongs in
+    visible directories.
+  reference: "AGET_PORTABILITY_SPEC CAP-PORT-001A"
+```
+
+### CAP-MEMORY-008: L-doc Index Requirement
+
+The SYSTEM shall support L-doc scaling through indexing.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-MEMORY-008-01 | conditional | IF L-doc count exceeds 50 THEN the SYSTEM shall maintain `index.json` |
+| CAP-MEMORY-008-02 | ubiquitous | The `index.json` shall list all L-docs with id, title, date, tags |
+| CAP-MEMORY-008-03 | ubiquitous | The SYSTEM shall support L-doc search by tag, date range, keyword |
+| CAP-MEMORY-008-04 | event-driven | WHEN L-doc is created, the SYSTEM shall update `index.json` |
+| CAP-MEMORY-008-05 | ubiquitous | The flat file structure shall be preserved (no subdirectories) |
+
+**Enforcement**: `validate_ldoc_index.py`
+
+#### Index Structure
+
+```json
+{
+  "meta": {
+    "version": "1.0.0",
+    "generated": "2025-12-27T10:00:00Z",
+    "count": 338
+  },
+  "entries": [
+    {
+      "id": "L001",
+      "file": "L001_gate_execution_discipline.md",
+      "title": "Gate Execution Discipline",
+      "date": "2025-01-15",
+      "tags": ["governance", "gates", "execution"],
+      "status": "active"
+    },
+    {
+      "id": "L394",
+      "file": "L394_design_by_fleet_exploration.md",
+      "title": "Design by Fleet Exploration",
+      "date": "2025-12-27",
+      "tags": ["design", "fleet", "specification"],
+      "status": "active"
+    }
+  ],
+  "categories": {
+    "governance": ["L001", "L042", "L099"],
+    "design": ["L289", "L394"],
+    "memory": ["L335", "L340"]
+  }
+}
+```
+
+#### Scaling Rationale
+
+```yaml
+rationale:
+  problem: "Real agents accumulate 300+ L-docs"
+  evidence: "private-supervisor-AGET: 338 L-docs"
+  solution: "Index + flat structure"
+  tradeoffs:
+    index_overhead: "Minimal (generated automatically)"
+    search_benefit: "O(1) lookup by id/tag vs O(n) file scan"
+    flat_preservation: "Maintains simplicity, no nested navigation"
+  source: "L394 Fleet Exploration, GAP_ANALYSIS A5"
+```
+
 ---
 
 ## Authority Model
@@ -326,6 +450,7 @@ inviolables:
 
 ```yaml
 structure:
+  # FRAMEWORK CONFIGURATION (.aget/ - hidden, Apache 2.0)
   required_directories:
     - path: ".aget/"
       purpose: "Agent identity and configuration"
@@ -333,32 +458,66 @@ structure:
     - path: ".aget/evolution/"
       purpose: "Learning_Documents storage"
       naming: "L{NNN}_{snake_case}.md"
+      scaling: "index.json when count > 50"
 
+    - path: ".aget/memory/"
+      purpose: "Memory configuration (NOT content)"
+      contents:
+        - "layer_config.yaml"      # 6-layer model settings
+        - "inheritance.yaml"       # Fleet inheritance rules
+        - "retrieval.yaml"         # Context loading priorities
+      prohibited: "User work products, domain content"
+
+  # VISIBLE CONTENT (portable, user-licensed)
+  required_visible_directories:
     - path: "governance/"
       purpose: "Governance artifacts"
 
     - path: "planning/"
       purpose: "Planning artifacts"
 
-  optional_directories:
-    - path: ".aget/patterns/"
-      purpose: "Agent pattern scripts"
-
-    - path: "inherited/"
-      purpose: "Fleet-inherited knowledge"
+  optional_visible_directories:
+    - path: "knowledge/"
+      purpose: "Domain expertise, research"
 
     - path: "sessions/"
       purpose: "Session_Handoff storage"
 
+    - path: "decisions/"
+      purpose: "Decision records"
+
+    - path: "inherited/"
+      purpose: "Fleet-inherited knowledge"
+
+  # OPTIONAL FRAMEWORK (.aget/ subdirs)
+  optional_framework_directories:
+    - path: ".aget/patterns/"
+      purpose: "Agent pattern scripts"
+
   required_files:
     - path: ".aget/version.json"
       purpose: "Agent identity"
+
+  optional_files:
+    - path: ".aget/evolution/index.json"
+      purpose: "L-doc index for scaling"
+      required_when: "L-doc count > 50"
 
   domain_structure:
     - path: ".aget/evolution/"
       purpose: "Learning accumulation"
       pattern: "L{NNN}_{snake_case}.md"
       minimum_entries: 1
+      index_required: "when count > 50"
+
+  # ANTI-PATTERN: These should NOT exist
+  prohibited_structures:
+    - path: ".aget/memory/domain/"
+      reason: "Content belongs in visible knowledge/"
+    - path: ".aget/memory/experiential/"
+      reason: "Content belongs in visible sessions/"
+    - path: ".aget/memory/organizational/"
+      reason: "Content belongs in visible governance/"
 ```
 
 ---
@@ -369,6 +528,7 @@ Agents with Memory_Management capability MUST satisfy:
 
 ```yaml
 contracts:
+  # Core structure
   - name: has_evolution_directory
     assertion: directory_exists
     path: .aget/evolution/
@@ -395,6 +555,34 @@ contracts:
     assertion: directory_not_empty
     path: .aget/evolution/
     warning_only: true
+
+  # v1.2.0 additions: Config vs Content
+  - name: memory_config_only
+    assertion: no_content_subdirs
+    path: .aget/memory/
+    prohibited_subdirs:
+      - domain/
+      - experiential/
+      - organizational/
+    rationale: "Content belongs in visible directories"
+
+  - name: has_ldoc_index_when_scaled
+    assertion: file_exists_if_threshold
+    path: .aget/evolution/index.json
+    threshold:
+      count_files: ".aget/evolution/L*.md"
+      minimum: 50
+    warning_only: true
+
+  - name: content_in_visible_directories
+    assertion: content_not_in_hidden
+    visible_paths:
+      - knowledge/
+      - sessions/
+      - decisions/
+    hidden_content_prohibited:
+      - .aget/memory/**/
+    rationale: "Portability requires visibility"
 ```
 
 ---
@@ -452,10 +640,13 @@ python3 validation/validate_memory_compliance.py --dir /path/to/agent
 
 - L335: Memory Architecture Principles
 - L331: Theoretical Foundations of Agency
+- L394: Design by Fleet Exploration (source of v1.2.0 insights)
 - MEMORY_VISION.md (governance document)
 - PATTERN_step_back_review_kb.md
 - CAP-PROC-004: Artifact Graduation Pathway
 - AGET_SPEC_FORMAT_v1.2: Specification format
+- AGET_PORTABILITY_SPEC: Content vs Configuration model
+- GAP_ANALYSIS_v3.0_fleet_exploration.md: Gap A5 (L-doc scaling)
 
 ---
 
@@ -471,7 +662,8 @@ graduation:
 
 ---
 
-*AGET Memory Specification v1.1.0*
+*AGET Memory Specification v1.2.0*
 *Format: AGET_SPEC_FORMAT v1.2 (EARS + SKOS)*
 *Part of v3.0.0 Composition Architecture - MEMORY Dimension*
 *"Knowledge_Base is not storage—Knowledge_Base is the Collaboration_Substrate."*
+*v1.2.0: Config vs Content separation, L-doc index scaling (L394)*
