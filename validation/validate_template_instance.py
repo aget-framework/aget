@@ -5,7 +5,12 @@ Validate Template or Instance
 Template-aware validator that applies appropriate checks based on instance_type.
 Templates have different requirements than deployed agent instances.
 
+Implements: CAP-VAL-003 (Test Categorization), CAP-INST-002 (Archetype Baseline)
+See: aget/specs/AGET_VALIDATION_SPEC.md, aget/specs/AGET_INSTANCE_SPEC.md
+Tests: tests/test_validation.py::TestTemplateInstanceValidator
+
 Part of AGET v3.0.0-beta.3 - Template UX improvements (L391).
+Updated: G-PRE.3.3 - Added archetype baseline compliance check (L398).
 
 Usage:
     python3 validate_template_instance.py <path>
@@ -28,15 +33,34 @@ from typing import Dict, List, Any, Optional, Tuple
 class TemplateInstanceValidator:
     """Validates templates and instances with appropriate checks."""
 
+    # CAP-INST-002: Archetype baseline visible directories
+    CORE_VISIBLE_DIRS = ["governance", "sessions", "planning", "knowledge"]
+
+    ARCHETYPE_VISIBLE_DIRS = {
+        "worker": [],
+        "advisor": ["clients"],
+        "supervisor": ["fleet"],
+        "developer": ["products"],
+        "consultant": ["clients"],
+        "operator": ["operations"],
+        "analyst": ["reports"],
+        "architect": ["decisions"],
+        "researcher": ["research"],
+        "executive": ["decisions"],
+        "reviewer": ["reviews"],
+        "spec-engineer": ["specs"],
+    }
+
     def __init__(self, path: Path):
         self.path = path
         self.aget_path = path / ".aget"
         self.version_file = self.aget_path / "version.json"
         self.instance_type: Optional[str] = None
+        self.archetype: Optional[str] = None
         self.results: List[Dict[str, Any]] = []
 
     def detect_type(self) -> Tuple[Optional[str], Optional[str]]:
-        """Detect if path is template or instance."""
+        """Detect if path is template or instance, and load archetype."""
         if not self.version_file.exists():
             return None, "No .aget/version.json found"
 
@@ -44,6 +68,7 @@ class TemplateInstanceValidator:
             with open(self.version_file) as f:
                 data = json.load(f)
             self.instance_type = data.get("instance_type")
+            self.archetype = data.get("archetype")
             return self.instance_type, None
         except json.JSONDecodeError as e:
             return None, f"Invalid version.json: {e}"
@@ -390,17 +415,48 @@ class TemplateInstanceValidator:
                 f"sessions/ exists ({len(session_files)} files)"
             )
 
-        # Check visible content directories (v3.1 requirement)
-        core_visible = ["governance", "planning"]
-        for dir_name in core_visible:
+        # CAP-INST-002: Archetype baseline visible directories
+        # Check core directories (all archetypes)
+        for dir_name in self.CORE_VISIBLE_DIRS:
             if (self.path / dir_name).exists():
-                pass  # Already checked
+                self._add_result(
+                    f"instance_core_{dir_name}",
+                    "pass",
+                    f"Core directory {dir_name}/ exists"
+                )
             else:
                 self._add_result(
-                    f"instance_visible_{dir_name}",
-                    "warn",
-                    f"Core visible directory {dir_name}/ missing"
+                    f"instance_core_{dir_name}",
+                    "fail",
+                    f"Core visible directory {dir_name}/ missing",
+                    f"Required by CAP-INST-002-01"
                 )
+
+        # Check archetype-specific directories
+        if self.archetype:
+            archetype_dirs = self.ARCHETYPE_VISIBLE_DIRS.get(self.archetype, [])
+            if archetype_dirs:
+                for dir_name in archetype_dirs:
+                    if (self.path / dir_name).exists():
+                        self._add_result(
+                            f"instance_archetype_{dir_name}",
+                            "pass",
+                            f"Archetype directory {dir_name}/ exists ({self.archetype})"
+                        )
+                    else:
+                        self._add_result(
+                            f"instance_archetype_{dir_name}",
+                            "fail",
+                            f"Archetype directory {dir_name}/ missing",
+                            f"Required by CAP-INST-002 for {self.archetype} archetype"
+                        )
+        else:
+            self._add_result(
+                "instance_archetype",
+                "warn",
+                "No archetype in version.json",
+                "Cannot validate archetype-specific directories"
+            )
 
 
 def main():
