@@ -1,6 +1,6 @@
 # AGET Migration Specification
 
-**Version**: 1.2.0
+**Version**: 1.3.0
 **Status**: Active
 **Category**: Standards (Lifecycle Management)
 **Format Version**: 1.2
@@ -429,6 +429,48 @@ COMPLETE (remaining agents)
 └── Fleet-wide verification
 ```
 
+### CAP-MIG-013: knowledge/ Directory Guidance (L403)
+
+The SYSTEM shall ensure knowledge/ directories have population guidance.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-MIG-013-01 | ubiquitous | Templates shall include `knowledge/README.md` with L296 Portability Test |
+| CAP-MIG-013-02 | conditional | IF Instance_Migration AND knowledge/README.md not exists THEN the SYSTEM shall create it |
+| CAP-MIG-013-03 | ubiquitous | knowledge/README.md shall reference L296 for content routing (portable vs domain-specific) |
+| CAP-MIG-013-04 | prohibited | Migration shall NOT overwrite existing knowledge/README.md content |
+| CAP-MIG-013-05 | conditional | IF existing knowledge/ content exists THEN L296 guidance is additive, not disruptive |
+
+**Rationale**: L403 revealed that github-aget successfully articulated knowledge/ guidelines because it had pre-existing documentation. Templates only had `.gitkeep`, leaving agents without guidance. The L296 Portability Test provides clear routing: "Clone to different domain. Still useful?" YES→.aget/evolution/, NO→knowledge/.
+
+**Enforcement**:
+- Templates: `knowledge/README.md` included in all 6 templates
+- Migration: `migrate_instance_to_v3.py` creates README if missing
+- Validation: Check `knowledge/README.md` exists and contains L296 reference
+
+#### L296 Portability Test Summary
+
+```
+┌────────────────────────────────────────────────────────────┐
+│                  L296 PORTABILITY TEST                      │
+│                                                             │
+│  "Clone this agent to a different domain/company.          │
+│   Would this content still be useful?"                      │
+│                                                             │
+│   ┌─────────┐                     ┌──────────────┐         │
+│   │   YES   │ ──────────────────> │ .aget/       │         │
+│   │         │                     │ evolution/   │         │
+│   │ Portable│                     │ (framework)  │         │
+│   └─────────┘                     └──────────────┘         │
+│                                                             │
+│   ┌─────────┐                     ┌──────────────┐         │
+│   │   NO    │ ──────────────────> │ knowledge/   │         │
+│   │         │                     │ (domain)     │         │
+│   │ Domain  │                     │              │         │
+│   └─────────┘                     └──────────────┘         │
+└────────────────────────────────────────────────────────────┘
+```
+
 ---
 
 ## Authority Model
@@ -621,6 +663,7 @@ python3 aget/scripts/cleanup_template_archive.py template-example-aget/ --execut
 - L400: Conceptual vs Structural Migration Understanding
 - L401: AGENTS.md Version Tag Synchronization (CAP-MIG-010)
 - L402: Behavioral Validation Gaps (CAP-MIG-006-03, CAP-MIG-011, CAP-MIG-012)
+- L403: knowledge/ Directory Population Guidance Gap (CAP-MIG-013)
 - PATTERN_migration_validation_gate.md
 - AGET_TEMPLATE_SPEC.md (target spec)
 - AGET_INSTANCE_SPEC.md (instance requirements)
