@@ -19,11 +19,15 @@ Reference:
     - L395: Instance v3.0 Migration Pattern
     - L400: Conceptual vs Structural Migration Understanding
     - L403: knowledge/ Directory Population Guidance Gap
+    - L376: Legacy File Version Sync (supervisor)
+    - CAP-MIG-014: Legacy File Handling
+    - CAP-MIG-015: Behavioral Validation Requirement
     - SOP_instance_migration_v3.md
     - AGET_INSTANCE_SPEC v1.0.0
 
 Author: private-aget-framework-AGET
 Date: 2025-12-27
+Updated: 2025-12-28 (L376/CAP-MIG-014 legacy file handling)
 """
 
 import argparse
@@ -58,6 +62,11 @@ ARCHETYPE_DIRS = {
 CORE_VISIBLE_DIRS = ["governance", "sessions", "planning", "knowledge"]
 
 FIVE_D_DIRS = ["persona", "memory", "reasoning", "skills", "context"]
+
+# Legacy files to detect and remove (CAP-MIG-014, L376)
+LEGACY_FILES = [
+    ".aget/collaboration/agent_manifest.yaml",  # Superseded by manifest.yaml
+]
 
 
 # =============================================================================
@@ -532,6 +541,57 @@ def get_scope_boundaries_md(name: str, portfolio: str) -> str:
 # Migration Functions
 # =============================================================================
 
+def handle_legacy_files(agent_path: Path, dry_run: bool) -> dict:
+    """
+    Detect and remove legacy version-bearing files (CAP-MIG-014, L376).
+
+    Archives files before removal for safety.
+
+    Returns dict with removed files and any errors.
+    """
+    results = {
+        "detected": [],
+        "archived": [],
+        "removed": [],
+        "errors": [],
+    }
+
+    for legacy_rel_path in LEGACY_FILES:
+        legacy_path = agent_path / legacy_rel_path
+
+        if legacy_path.exists():
+            results["detected"].append(legacy_rel_path)
+            print(f"  DETECT: {legacy_rel_path} (legacy file)")
+
+            if not dry_run:
+                try:
+                    # Archive first (safety)
+                    archive_dir = agent_path / ".aget" / "archive" / "legacy_v3_migration"
+                    archive_dir.mkdir(parents=True, exist_ok=True)
+                    archive_path = archive_dir / legacy_path.name
+
+                    shutil.copy2(legacy_path, archive_path)
+                    results["archived"].append(str(archive_path))
+                    print(f"  ARCHIVE: {legacy_rel_path} -> .aget/archive/legacy_v3_migration/")
+
+                    # Remove original
+                    legacy_path.unlink()
+                    results["removed"].append(legacy_rel_path)
+                    print(f"  REMOVE: {legacy_rel_path} (superseded by manifest.yaml)")
+
+                    # Clean up empty parent directory
+                    parent_dir = legacy_path.parent
+                    if parent_dir.exists() and not any(parent_dir.iterdir()):
+                        parent_dir.rmdir()
+                        print(f"  REMOVE: {parent_dir.relative_to(agent_path)}/ (empty directory)")
+
+                except Exception as e:
+                    results["errors"].append(f"Failed to handle {legacy_rel_path}: {e}")
+                    print(f"  ERROR: Failed to handle {legacy_rel_path}: {e}")
+
+    return results
+
+
 def count_ldocs(agent_path: Path) -> int:
     """Count L-docs in evolution directory."""
     evolution_dir = agent_path / ".aget" / "evolution"
@@ -576,6 +636,7 @@ def migrate_instance(
         "created_files": [],
         "moved_files": [],
         "updated_files": [],
+        "legacy_removed": [],
         "errors": [],
     }
 
@@ -790,7 +851,8 @@ def migrate_instance(
                 f"Moved {len(project_plans)} PROJECT_PLANs to planning/",
                 f"Created identity.json",
                 f"Created 5D YAML configurations",
-                f"Created governance files"
+                f"Created governance files",
+                f"Removed legacy files (CAP-MIG-014)"
             ]
         }
 
@@ -830,6 +892,22 @@ def migrate_instance(
     print("\nGATE 5: COMPLETE\n")
 
     # =========================================================================
+    # GATE 5.5: Legacy File Cleanup (CAP-MIG-014, L376)
+    # =========================================================================
+    print("=== GATE 5.5: Legacy File Cleanup (CAP-MIG-014) ===\n")
+
+    legacy_results = handle_legacy_files(agent_path, dry_run)
+
+    if legacy_results["detected"]:
+        results["legacy_removed"] = legacy_results["removed"]
+        if legacy_results["errors"]:
+            results["errors"].extend(legacy_results["errors"])
+    else:
+        print("  No legacy files detected")
+
+    print("\nGATE 5.5: COMPLETE\n")
+
+    # =========================================================================
     # Summary
     # =========================================================================
     print(f"{'='*60}")
@@ -839,6 +917,7 @@ def migrate_instance(
     print(f"Files created: {len(results['created_files'])}")
     print(f"Files moved: {len(results['moved_files'])}")
     print(f"Files updated: {len(results['updated_files'])}")
+    print(f"Legacy files removed: {len(results['legacy_removed'])}")
 
     if dry_run:
         print(f"\n{'='*60}")
@@ -853,8 +932,17 @@ def migrate_instance(
         print("  1. Review .aget/identity.json north_star")
         print("  2. Review governance/ content")
         print("  3. Customize 5D YAML files as needed")
-        print(f"  4. Run: python3 validate_template_instance.py {agent_path}")
-        print("  5. Commit changes")
+        print("")
+        print("  4. Validate structure (CAP-MIG-015):")
+        print(f"     python3 ~/github/aget-framework/aget/validation/validate_template_instance.py {agent_path}")
+        print("")
+        print("  5. Run contract tests (CAP-MIG-015):")
+        print(f"     cd {agent_path} && python3 -m pytest tests/test_identity_contract.py -v")
+        print("")
+        print("  6. Test session protocol:")
+        print(f"     python3 {agent_path}/.aget/patterns/session/wake_up.py")
+        print("")
+        print("  7. Commit changes")
 
     return results
 
