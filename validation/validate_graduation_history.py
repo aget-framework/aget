@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """
-Validate Artifact Graduation History (R-PROC-004)
+Validate Artifact Graduation History.
 
-Validates that specifications and patterns track their graduation history,
-enforcing the L-doc → Pattern → Specification pathway.
+Implements: R-PROC-004 (Graduation_History_Tracking), CAP-VAL-002 (validator structure)
+Traces to: AGET_PROCESS_SPEC.md, AGET_EVOLUTION_SPEC.md
+
+Validates that Specifications and Patterns track their Graduation_History,
+enforcing the Learning_Document → Pattern → Specification pathway.
 
 Usage:
     python3 validate_graduation_history.py <file_or_dir>
@@ -11,12 +14,12 @@ Usage:
     python3 validate_graduation_history.py --patterns docs/patterns/
 
 Exit codes:
-    0: All artifacts have proper graduation history
-    1: Missing graduation history
+    0: All artifacts have proper Graduation_History
+    1: Missing Graduation_History
     2: File/path errors
 
 R-PROC-004 Requirements:
-    - Specs SHOULD have source_pattern or graduation_history
+    - Specifications SHOULD have source_pattern or graduation_history
     - Patterns SHOULD have source_learnings or graduation_history
     - Exceptions require documented rationale
 """

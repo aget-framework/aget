@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """
-Validate file naming conventions per AGET_FILE_NAMING_CONVENTIONS.md
+Validate file naming conventions for AGET agents.
+
+Implements: CAP-SOP-003 (SOP naming), CAP-VAL-002 (validator structure)
+Traces to: AGET_FILE_NAMING_CONVENTIONS.md, AGET_SOP_SPEC.md
 
 Checks:
 - L-docs: L###_snake_case.md (unique numbers)
@@ -12,6 +15,10 @@ Checks:
 Usage:
     python3 validate_naming_conventions.py /path/to/agent
     python3 validate_naming_conventions.py /path/to/agent1 /path/to/agent2 ...
+
+Exit codes:
+    0: All validations passed
+    1: Naming convention violations found
 """
 
 import re

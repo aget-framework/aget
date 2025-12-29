@@ -1,21 +1,22 @@
 #!/usr/bin/env python3
 """
-Validate AGET Persona Compliance
+Validate AGET Persona Compliance (D1).
 
-Validates agent persona structure against AGET_PERSONA_SPEC requirements.
-Checks for identity artifacts, governance intensity, and archetype definition.
+Implements: CAP-COMP-001 (Persona_Dimension), R-PERSONA-001 through R-PERSONA-005, CAP-VAL-002
+Traces to: AGET_PERSONA_SPEC.md, AGET_5D_ARCHITECTURE_SPEC.md
+
+Validates agent Persona structure against AGET_PERSONA_SPEC requirements.
+Checks for Identity artifacts, Governance_Intensity, and Archetype definition.
 
 Usage:
     python3 validate_persona_compliance.py <agent_path>
     python3 validate_persona_compliance.py --dir /path/to/agent
-    python3 validate_persona_compliance.py --template  # For template validation
+    python3 validate_persona_compliance.py --template  # For Template_Validation
 
 Exit codes:
     0: All validations passed
     1: Validation errors found
     2: File/path errors
-
-See: specs/AGET_PERSONA_SPEC.md (R-PERSONA-001 through R-PERSONA-005)
 """
 
 import argparse

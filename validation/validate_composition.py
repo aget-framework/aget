@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """
-Validate AGET Capability Composition
+Validate AGET Capability Composition.
 
-Validates capability composition following COMPOSITION_SPEC rules.
+Implements: CAP-COMP-001 (Composition_Rules), CAP-VAL-002 (validator structure)
+Traces to: AGET_COMPOSITION_SPEC.md, AGET_CAPABILITY_SPEC.md
+
+Validates capability composition following Composition_Spec rules.
 Detects DAG conflicts, prerequisite violations, and behavior overlaps.
 
 Usage:

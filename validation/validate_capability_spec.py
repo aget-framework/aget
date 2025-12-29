@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """
-Validate AGET Capability Specifications
+Validate AGET Capability Specifications.
 
-Validates capability specification YAML files against the CAPABILITY_SPEC schema.
+Implements: CAP-CAP-001 (Capability_Spec_Format), CAP-VAL-002 (validator structure)
+Traces to: AGET_CAPABILITY_SPEC.md, AGET_SPEC_FORMAT_v1.2.md
+
+Validates capability specification YAML files against the Capability_Spec schema.
 
 Usage:
     python3 validate_capability_spec.py <spec_path>

@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """
-Validate AGET Context Compliance
+Validate AGET Context Compliance (D5).
 
-Validates agent context structure against AGET_CONTEXT_SPEC requirements.
-Checks for relationship documentation, scope boundaries, and environmental awareness.
+Implements: CAP-COMP-005 (Context_Dimension), R-CONTEXT-001 through R-CONTEXT-005, CAP-VAL-002
+Traces to: AGET_CONTEXT_SPEC.md, AGET_5D_ARCHITECTURE_SPEC.md
+
+Validates agent Context structure against AGET_CONTEXT_SPEC requirements.
+Checks for relationship documentation, Scope_Boundaries, and environmental awareness.
 
 Usage:
     python3 validate_context_compliance.py <agent_path>
@@ -14,8 +17,6 @@ Exit codes:
     0: All validations passed
     1: Validation errors found
     2: File/path errors
-
-See: specs/AGET_CONTEXT_SPEC.md (R-CONTEXT-001 through R-CONTEXT-005)
 """
 
 import argparse

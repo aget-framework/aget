@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """
-Validate Composition References
+Validate Composition References.
 
-Validates that $ref: references in template manifests point to existing
-components or files. Part of AGET v3.0.0 Component Library validation.
+Implements: CAP-COMP-001 (Composition_Integrity), CAP-VAL-002 (validator structure)
+Traces to: AGET_COMPOSITION_SPEC.md, AGET_TEMPLATE_SPEC.md
+
+Validates that $ref: references in Template_Manifests point to existing
+components or files. Part of AGET v3.0.0 Component Library Validation.
 
 Usage:
     python3 validate_composition_refs.py <template_path>
@@ -12,7 +15,7 @@ Usage:
 Exit codes:
     0: All references valid
     1: Invalid references found
-    2: Error during validation
+    2: Error during Validation
 """
 
 import argparse

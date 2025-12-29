@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """
-Validate AGET Learning Documents (L-docs)
+Validate AGET Learning Documents (L-docs).
 
-Validates L-doc format, naming, and required sections.
+Implements: CAP-EVOL-001 (Learning_Document_Format), CAP-VAL-002 (validator structure)
+Traces to: AGET_EVOLUTION_SPEC.md, AGET_FILE_NAMING_CONVENTIONS.md
+
+Validates Learning_Document format, naming, and required sections.
 L-docs capture experiential knowledge and form the foundation
 of the continual learning system.
 
@@ -16,7 +19,7 @@ Exit codes:
     1: Validation errors found
     2: File/path errors
 
-L-doc Format Requirements:
+Learning_Document Format Requirements:
     - Filename: L{NNN}_{snake_case_title}.md
     - Title: # L{NNN}: {Title}
     - Required sections: Context, Insight, Application

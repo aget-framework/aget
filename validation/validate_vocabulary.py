@@ -1,22 +1,26 @@
 #!/usr/bin/env python3
 """
-AGET Vocabulary SKOS Validator
+Validate AGET Vocabulary (SKOS).
 
-Validates vocabulary files against AGET Glossary Standard (SKOS-based).
+Implements: CAP-VOC-001 (Vocabulary_Compliance), ADR-001 (SKOS adoption), CAP-VAL-002
+Traces to: AGET_GLOSSARY_STANDARD_SPEC_v1.0.md, AGET_CONTROLLED_VOCABULARY.md
+
+Validates Vocabulary files against AGET Glossary Standard (SKOS-based).
 
 Conformance Levels:
     Level 1 (Basic): skos:prefLabel + skos:definition required
     Level 2 (Standard): + hierarchy + examples + lifecycle
-    Level 3 (Full SKOS): + all AGET extensions + validation
+    Level 3 (Full SKOS): + all AGET extensions + Validation
 
 Usage:
     python validate_vocabulary.py <vocabulary_file>
     python validate_vocabulary.py --level 2 <vocabulary_file>
     python validate_vocabulary.py --help
 
-Reference:
-    AGET_GLOSSARY_STANDARD_SPEC_v1.0.md
-    ADR-001: Controlled Vocabulary Standard Selection (SKOS adoption)
+Exit codes:
+    0: All validations passed
+    1: Validation errors found
+    2: File/path errors
 """
 
 import argparse

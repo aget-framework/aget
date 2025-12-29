@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """
-Validate AGET Script Registry
+Validate AGET Script Registry.
 
-Validates SCRIPT_REGISTRY.yaml for completeness and correctness.
+Implements: R-SCRIPT-006 (Script_Registration), CAP-VAL-002 (validator structure)
+Traces to: AGET_PYTHON_SCRIPT_SPEC.md, AGET_VALIDATION_SPEC.md
+
+Validates Script_Registry YAML for completeness and correctness.
 Checks that registered scripts exist and unregistered scripts are flagged.
 
 Usage:
@@ -14,8 +17,6 @@ Exit codes:
     0: All validations passed
     1: Validation errors found
     2: File/path errors
-
-See: specs/AGET_PYTHON_SCRIPT_SPEC.md (R-SCRIPT-006)
 """
 
 import argparse

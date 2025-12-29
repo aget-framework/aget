@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """
-Validate AGET 5D Architecture Compliance
+Validate AGET 5D Architecture Compliance.
+
+Implements: CAP-COMP-001 through CAP-COMP-005 (5D dimensions), CAP-VAL-002 (validator structure)
+Traces to: AGET_5D_ARCHITECTURE_SPEC.md, AGET_VALIDATION_SPEC.md
 
 Umbrella validator that runs all dimension validators and reports aggregate compliance.
 This is the primary entry point for validating complete 5D agent compliance.
@@ -16,8 +19,6 @@ Exit codes:
     0: All validations passed
     1: Validation errors found
     2: File/path errors
-
-See: specs/AGET_5D_ARCHITECTURE_SPEC.md
 """
 
 import argparse

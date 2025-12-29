@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """
-Validate version consistency between version.json and AGENTS.md
+Validate version consistency between version.json and AGENTS.md.
+
+Implements: CAP-MIG-010 (Version_Synchronization), CAP-VAL-002 (validator structure)
+Traces to: AGET_MIGRATION_SPEC.md, AGET_COMPATIBILITY_SPEC.md
 
 Per L366: AGENTS.md is the runtime source of truth for Claude Code.
 version.json and AGENTS.md must have matching versions.
@@ -8,6 +11,10 @@ version.json and AGENTS.md must have matching versions.
 Usage:
     python3 validate_version_consistency.py /path/to/agent
     python3 validate_version_consistency.py /path/to/agent1 /path/to/agent2 ...
+
+Exit codes:
+    0: All validations passed
+    1: Version consistency errors found
 """
 
 import json
