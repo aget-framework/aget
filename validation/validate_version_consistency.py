@@ -25,7 +25,8 @@ def extract_agents_md_version(agents_md_path: Path) -> Tuple[Optional[str], Opti
     content = agents_md_path.read_text()
 
     # Extract @aget-version tag (usually line 3)
-    tag_match = re.search(r'@aget-version:\s*(\d+\.\d+\.\d+)', content)
+    # Supports semver with optional pre-release: 3.0.0, 3.0.0-beta.3, 3.0.0-rc.1
+    tag_match = re.search(r'@aget-version:\s*([\d.]+(?:-[a-zA-Z0-9.]+)?)', content)
     tag_version = tag_match.group(1) if tag_match else None
 
     # Extract version from project context (e.g., "agent-name - Description - v2.12.0")
