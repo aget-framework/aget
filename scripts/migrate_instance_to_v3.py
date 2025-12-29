@@ -1082,12 +1082,28 @@ def migrate_instance(
     results["updated_files"].append(".aget/version.json")
 
     if not dry_run:
+        # Derive instance_type: preserve original, infer from name/archetype, or default
+        # Fix for issue #12: Don't overwrite existing instance_type
+        original_instance_type = current_version.get("instance_type")
+        if original_instance_type:
+            # Preserve existing instance_type (L013)
+            derived_instance_type = original_instance_type
+        elif agent_name.endswith("-AGET"):
+            # Naming convention: -AGET suffix indicates action-taking
+            derived_instance_type = "AGET"
+        elif archetype in ["supervisor", "operator", "developer"]:
+            # Action-taking archetypes (L099)
+            derived_instance_type = "AGET"
+        else:
+            # Default to advisory
+            derived_instance_type = "aget"
+
         new_version = current_version.copy()
         new_version.update({
             "aget_version": "3.0.0-beta.3",
             "manifest_version": "3.0",
             "updated": datetime.now().strftime("%Y-%m-%d"),
-            "instance_type": "aget",
+            "instance_type": derived_instance_type,
             "archetype": archetype,
             "specialization": specialization,
         })
