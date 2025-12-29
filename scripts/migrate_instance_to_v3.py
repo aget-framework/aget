@@ -20,6 +20,7 @@ Reference:
     - L400: Conceptual vs Structural Migration Understanding
     - L403: knowledge/ Directory Population Guidance Gap
     - L376: Legacy File Version Sync (supervisor)
+    - G-1.9: Directory Discoverability (governance/, planning/, sessions/ READMEs)
     - CAP-MIG-014: Legacy File Handling
     - CAP-MIG-015: Behavioral Validation Requirement
     - SOP_instance_migration_v3.md
@@ -27,7 +28,7 @@ Reference:
 
 Author: private-aget-framework-AGET
 Date: 2025-12-27
-Updated: 2025-12-28 (L376/CAP-MIG-014 legacy file handling)
+Updated: 2025-12-28 (G-1.9 directory discoverability)
 """
 
 import argparse
@@ -368,6 +369,226 @@ Content moves from `sessions/` → `knowledge/` when:
 """
 
 
+def get_governance_readme() -> str:
+    """Generate governance/README.md content (G-1.9 discoverability)."""
+    return """# Governance Directory
+
+This directory contains governance artifacts that define agent boundaries and authority.
+
+## Required Files (CAP-INST-002)
+
+| File | Purpose |
+|------|---------|
+| `CHARTER.md` | What this agent IS and IS NOT |
+| `MISSION.md` | Goals and key results |
+| `SCOPE_BOUNDARIES.md` | Authority limits and escalation paths |
+
+## Optional Files
+
+| File | Purpose |
+|------|---------|
+| `NAMING_CONVENTIONS.md` | Agent-specific naming rules |
+| `DECISION_MATRIX.md` | Authority delegation rules |
+| `MEMORY_VISION.md` | Memory architecture principles |
+
+## Guidance
+
+### What Goes Here
+
+- **Operational boundaries** — not technical specifications
+- **Authority definitions** — what decisions this agent can make autonomously
+- **Escalation rules** — when to defer to supervisor or principal
+
+### Maintenance
+
+- Update `CHARTER.md` when scope changes
+- Review `MISSION.md` quarterly for KR relevance
+- Update `SCOPE_BOUNDARIES.md` when authority model changes
+
+### Anti-Patterns
+
+| Anti-Pattern | Why Bad | Instead |
+|--------------|---------|---------|
+| Technical specs in CHARTER | Conflates governance with implementation | Put specs in `.aget/specs/` |
+| Vague MISSION goals | Not measurable | Use SMART criteria |
+| Missing escalation paths | Agent operates beyond authority | Define explicit boundaries |
+
+## Cross-References
+
+| Document | Relationship |
+|----------|--------------|
+| `.aget/identity.json` | North Star alignment |
+| `CLAUDE.md` | Operational instructions |
+| `AGENTS.md` | Public-facing identity |
+
+---
+
+*Template version: 1.0.0 (G-1.9 discoverability)*
+*Created by: private-aget-framework-AGET*
+"""
+
+
+def get_planning_readme() -> str:
+    """Generate planning/README.md content (G-1.9 discoverability)."""
+    return """# Planning Directory
+
+This directory contains PROJECT_PLANs and related planning artifacts.
+
+## Contents
+
+| Pattern | Purpose |
+|---------|---------|
+| `PROJECT_PLAN_*.md` | Active and historical project plans |
+| `DECISION_POINT_*.md` | Captured decision points |
+| `FLEET_MIGRATION_PLAN_*.md` | Fleet-wide migration plans |
+
+## Governance (L186)
+
+### When to Use PROJECT_PLAN
+
+Use PROJECT_PLAN pattern for **substantial work**:
+- Multi-step implementations
+- Cross-agent coordination
+- Work requiring go/no-go gates
+
+**Not TodoWrite** — TodoWrite is for session-level task tracking, not governance artifacts.
+
+### Gate Discipline (L42)
+
+- Include go/no-go gates with decision points
+- Stop at gate boundaries
+- Wait for explicit GO before proceeding
+- Document gate completion with evidence
+
+## Guidance
+
+### Naming Convention
+
+```
+PROJECT_PLAN_<topic>_v<version>.md
+DECISION_POINT_<topic>.md
+FLEET_MIGRATION_PLAN_v<version>.md
+```
+
+### Lifecycle
+
+| State | Meaning |
+|-------|---------|
+| PROPOSED | Awaiting approval |
+| ACTIVE | In execution |
+| BLOCKED | Waiting on dependency |
+| COMPLETE | All gates passed |
+| ARCHIVED | Historical reference |
+
+### Archival
+
+- Archive completed plans with completion date suffix
+- Reference learnings (L-docs) in post-completion notes
+- Move to `archive/` subdirectory if desired
+
+## Anti-Patterns
+
+| Anti-Pattern | Why Bad | Instead |
+|--------------|---------|---------|
+| No gates | No decision points | Add go/no-go gates |
+| Unbounded scope | Scope creep | Define explicit deliverables |
+| Missing success criteria | Can't validate completion | Add measurable criteria |
+
+## Cross-References
+
+| Document | Relationship |
+|----------|--------------|
+| `.aget/evolution/L186_*.md` | PROJECT_PLAN pattern learning |
+| `.aget/evolution/L42_*.md` | Gate discipline learning |
+| `governance/MISSION.md` | Alignment with goals |
+
+---
+
+*Template version: 1.0.0 (G-1.9 discoverability)*
+*Created by: private-aget-framework-AGET*
+"""
+
+
+def get_sessions_readme() -> str:
+    """Generate sessions/README.md content (G-1.9 discoverability)."""
+    return """# Sessions Directory
+
+This directory contains session notes and handoff documentation.
+
+## Contents
+
+| Pattern | Purpose |
+|---------|---------|
+| `session_YYYY-MM-DD_*.md` | Session notes |
+| `HANDOFF_*.md` | Inter-session continuity documents |
+
+## Session Protocol
+
+### Wake Up (Session Start)
+
+1. Execute `python3 .aget/patterns/session/wake_up.py`
+2. Review pending work from previous sessions
+3. Create session note with date stamp
+
+### Wind Down (Session End)
+
+1. Execute `python3 .aget/patterns/session/wind_down.py`
+2. Update session note with work completed
+3. Create HANDOFF if work continues to next session
+
+## Guidance
+
+### Session Note Content
+
+| Section | Content |
+|---------|---------|
+| Context | What session was about |
+| Work Completed | What was accomplished |
+| Decisions Made | Key decisions and rationale |
+| Blocked Items | What couldn't be completed and why |
+| Next Actions | What needs to happen next |
+
+### HANDOFF Content
+
+| Section | Content |
+|---------|---------|
+| Current State | Where work stands |
+| Critical Context | What next session needs to know |
+| Files Modified | Key files touched |
+| Pending Items | What remains to be done |
+| Learnings | L-docs captured during session |
+
+### Naming Convention
+
+```
+session_YYYY-MM-DD_<topic>.md
+session_YYYY-MM-DD_HHMM.md  (if multiple sessions per day)
+HANDOFF_<topic>_YYYY-MM-DD.md
+```
+
+## Anti-Patterns
+
+| Anti-Pattern | Why Bad | Instead |
+|--------------|---------|---------|
+| No session notes | Context lost between sessions | Always create session note |
+| Missing HANDOFF | Continuity broken | Create HANDOFF for ongoing work |
+| Too verbose | Hard to scan | Focus on decisions and actions |
+
+## Cross-References
+
+| Document | Relationship |
+|----------|--------------|
+| `.aget/patterns/session/wake_up.py` | Session initialization |
+| `.aget/patterns/session/wind_down.py` | Session finalization |
+| `planning/` | PROJECT_PLANs referenced in sessions |
+
+---
+
+*Template version: 1.0.0 (G-1.9 discoverability)*
+*Created by: private-aget-framework-AGET*
+"""
+
+
 def get_charter_md(name: str, archetype: str) -> str:
     """Generate governance/CHARTER.md content."""
     return f"""# Agent Charter: {name}
@@ -704,6 +925,39 @@ def migrate_instance(
     else:
         print(f"  SKIP: knowledge/README.md (already exists)")
 
+    # Create governance/README.md if not exists (G-1.9 discoverability)
+    governance_readme_path = agent_path / "governance" / "README.md"
+    if not governance_readme_path.exists():
+        print(f"  CREATE: governance/README.md (G-1.9 discoverability)")
+        results["created_files"].append("governance/README.md")
+        if not dry_run:
+            with open(governance_readme_path, 'w') as f:
+                f.write(get_governance_readme())
+    else:
+        print(f"  SKIP: governance/README.md (already exists)")
+
+    # Create planning/README.md if not exists (G-1.9 discoverability)
+    planning_readme_path = agent_path / "planning" / "README.md"
+    if not planning_readme_path.exists():
+        print(f"  CREATE: planning/README.md (G-1.9 discoverability)")
+        results["created_files"].append("planning/README.md")
+        if not dry_run:
+            with open(planning_readme_path, 'w') as f:
+                f.write(get_planning_readme())
+    else:
+        print(f"  SKIP: planning/README.md (already exists)")
+
+    # Create sessions/README.md if not exists (G-1.9 discoverability)
+    sessions_readme_path = agent_path / "sessions" / "README.md"
+    if not sessions_readme_path.exists():
+        print(f"  CREATE: sessions/README.md (G-1.9 discoverability)")
+        results["created_files"].append("sessions/README.md")
+        if not dry_run:
+            with open(sessions_readme_path, 'w') as f:
+                f.write(get_sessions_readme())
+    else:
+        print(f"  SKIP: sessions/README.md (already exists)")
+
     # Move PROJECT_PLANs
     if project_plans:
         planning_dir = agent_path / "planning"
@@ -846,8 +1100,8 @@ def migrate_instance(
             "method": "migrate_instance_to_v3.py",
             "changes": [
                 f"Created 5D directories",
-                f"Created governance/, planning/, knowledge/ visible directories",
-                f"Created knowledge/README.md (L403 population guidance)",
+                f"Created governance/, planning/, sessions/, knowledge/ visible directories",
+                f"Created directory READMEs (L403 + G-1.9 discoverability)",
                 f"Moved {len(project_plans)} PROJECT_PLANs to planning/",
                 f"Created identity.json",
                 f"Created 5D YAML configurations",
