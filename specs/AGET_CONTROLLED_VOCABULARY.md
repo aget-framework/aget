@@ -260,6 +260,50 @@ This document defines the canonical vocabulary for AGET framework specifications
 
 ---
 
+## CI/CD Terms
+
+### CI Objects
+
+| Term | Definition |
+|------|------------|
+| `CI_Workflow` | GitHub Actions workflow definition (.github/workflows/*.yml) |
+| `CI_Job` | Individual job within CI_Workflow (e.g., test, lint, security) |
+| `CI_Step` | Individual step within CI_Job |
+| `CI_Trigger` | Event that initiates CI_Workflow execution |
+| `Push_Trigger` | CI trigger on git push to branch |
+| `PR_Trigger` | CI trigger on pull request |
+
+### CI Configuration
+
+| Term | Definition |
+|------|------------|
+| `Test_Matrix` | Set of Python versions for CI testing |
+| `Python_Version_Matrix` | Supported Python versions (3.8-3.12) |
+| `Package_Configuration` | setup.py or pyproject.toml configuration |
+| `Package_Discovery` | Mechanism for finding Python packages (find_packages) |
+| `Init_File` | __init__.py file marking directory as Python package |
+
+### CI Validation
+
+| Term | Definition |
+|------|------------|
+| `Test_Isolation` | Requirement for tests to be self-contained without external imports |
+| `CI_Pass` | All CI_Jobs completed successfully |
+| `CI_Failure` | One or more CI_Jobs failed |
+| `Collection_Error` | pytest failed to import test modules |
+| `Import_Error` | Module not found during test collection |
+
+### CI Job Types
+
+| Term | Definition |
+|------|------------|
+| `Test_Job` | CI_Job that runs pytest test suite |
+| `Lint_Job` | CI_Job that runs code quality checks (ruff, black) |
+| `Security_Job` | CI_Job that runs security scans (bandit, secret detection) |
+| `Integration_Test_Job` | CI_Job that runs integration tests |
+
+---
+
 ## Naming Conventions
 
 > **Full Specification**: See [AGET_FILE_NAMING_CONVENTIONS.md](AGET_FILE_NAMING_CONVENTIONS.md) for complete patterns, decision tree, and anti-patterns.
@@ -330,6 +374,7 @@ To add new terms:
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.3.0 | 2025-12-28 | Added CI/CD Terms section (L404, AGET_CI_SPEC) |
 | 1.2.0 | 2025-12-26 | Added Change Proposal, Process, Graduation terms (v3.0.0-alpha.1) |
 | 1.1.0 | 2025-12-21 | Added SKOS foundation reference, conformance level declaration |
 | 1.0.0 | 2025-12-01 | Initial release (v2.9 Core Specs Gate 2) |
