@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 """
-Validate AGET PROJECT_PLANs
+Validate AGET PROJECT_PLANs.
 
-Validates PROJECT_PLAN documents for proper gate structure, deliverables,
-decision points, and verification tests (L382).
+Implements: CAP-PLAN-001 (Project_Plan_Format), L382 (Verification_Tests), CAP-VAL-002
+Traces to: AGET_PLANNING_SPEC.md, AGET_FILE_NAMING_CONVENTIONS.md
+
+Validates Project_Plan documents for proper Project_Gate structure, deliverables,
+Decision_Points, and Verification_Tests (L382).
 
 Usage:
     python3 validate_project_plan.py <plan_path>
     python3 validate_project_plan.py planning/*.md
     python3 validate_project_plan.py --dir /path/to/agent
-    python3 validate_project_plan.py --strict  # Require verification tests
+    python3 validate_project_plan.py --strict  # Require Verification_Tests
 
 Exit codes:
     0: All validations passed
@@ -17,7 +20,7 @@ Exit codes:
     2: File/path errors
 
 L382 Requirements:
-    - Each gate SHOULD have a Verification Tests section
+    - Each Project_Gate SHOULD have a Verification_Tests section
     - Tests SHOULD be executable (bash/python commands)
     - Tests SHOULD have expected output patterns
 """

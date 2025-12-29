@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """
-Validate AGET Process Specifications
+Validate AGET Process Specifications.
 
-Validates PROCESS specification YAML files against R-PROC requirements.
-Process specifications define formal workflows with phases, activities,
-and decision points.
+Implements: R-PROC-001 (Process_Spec_Format), CAP-VAL-002 (validator structure)
+Traces to: AGET_PROCESS_SPEC.md, AGET_SPEC_FORMAT_v1.2.md
+
+Validates Process_Specification YAML files against R-PROC requirements.
+Process_Specifications define formal workflows with phases, activities,
+and Decision_Points.
 
 Usage:
     python3 validate_process_spec.py <process_spec_path>
@@ -15,9 +18,6 @@ Exit codes:
     0: All validations passed
     1: Validation errors found
     2: File/path errors
-
-Requirements validated:
-    R-PROC-001: Process Spec Format
     R-PROC-002: Process Spec Validation
     R-PROC-003: Learnings Applied
 """

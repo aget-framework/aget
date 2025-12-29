@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """
-Validate Cross-References in AGET Documents
+Validate Cross-References in AGET Documents.
+
+Implements: CAP-DOC-001 (Reference_Integrity), CAP-VAL-002 (validator structure)
+Traces to: AGET_DOCUMENTATION_SPEC.md, AGET_VALIDATION_SPEC.md
 
 Checks that file references within documents point to existing files.
 Prevents documentation rot by catching broken links.

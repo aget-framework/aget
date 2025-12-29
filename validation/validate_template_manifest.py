@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """
-Validate AGET Template Manifests
+Validate AGET Template Manifests.
 
-Validates template manifest YAML files against the TEMPLATE_MANIFEST schema.
+Implements: CAP-TMPL-001 (Template_Manifest_Format), CAP-VAL-002 (validator structure)
+Traces to: AGET_TEMPLATE_SPEC.md, AGET_VALIDATION_SPEC.md
+
+Validates template manifest YAML files against the Template_Manifest schema.
 Template manifests declare agent composition (base template + capabilities).
 
 Usage:

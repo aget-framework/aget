@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """
-Validate AGET Change Proposals
+Validate AGET Change Proposals.
 
-Validates Change Proposal (CP) documents against AGET_CHANGE_PROPOSAL_SPEC.
+Implements: R-CP-001 (Change_Proposal_Format), R-CP-002 (Change_Proposal_Lifecycle), CAP-VAL-002
+Traces to: AGET_CHANGE_PROPOSAL_SPEC.md, AGET_VALIDATION_SPEC.md
+
+Validates Change_Proposal (CP) documents against AGET_CHANGE_PROPOSAL_SPEC.
 CPs are formal change requests with defined lifecycle and format.
 
 Usage:
@@ -14,10 +17,6 @@ Exit codes:
     0: All validations passed
     1: Validation errors found
     2: File/path errors
-
-Requirements validated:
-    R-CP-001: Change Proposal Format
-    R-CP-002: Change Proposal Lifecycle
 """
 
 import argparse

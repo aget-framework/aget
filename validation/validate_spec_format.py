@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """
-Validate AGET Specification Format v1.2
+Validate AGET Specification Format v1.2.
+
+Implements: CAP-SPEC-001 (Spec_Format_Compliance), CAP-VAL-002 (validator structure)
+Traces to: AGET_SPEC_FORMAT_v1.2.md, AGET_VALIDATION_SPEC.md
 
 Validates specification files against AGET_SPEC_FORMAT v1.2 requirements:
 - EARS temporal patterns
@@ -17,8 +20,6 @@ Exit codes:
     0: All validations passed
     1: Validation errors found
     2: File/path errors
-
-See: specs/AGET_SPEC_FORMAT_v1.2.md
 """
 
 import argparse

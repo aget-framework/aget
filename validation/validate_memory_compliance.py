@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """
-Validate AGET Memory Compliance
+Validate AGET Memory Compliance (D2).
 
-Validates agent memory structure against AGET_MEMORY_SPEC requirements.
-Checks for required directories, artifacts, and learning documents.
+Implements: CAP-COMP-002 (Memory_Dimension), R-MEM-001 through R-MEM-006, CAP-VAL-002
+Traces to: AGET_MEMORY_SPEC.md, AGET_5D_ARCHITECTURE_SPEC.md
+
+Validates agent Memory structure against AGET_MEMORY_SPEC requirements.
+Checks for required directories, artifacts, and Learning_Documents.
 
 Usage:
     python3 validate_memory_compliance.py <agent_path>
@@ -14,8 +17,6 @@ Exit codes:
     0: All validations passed
     1: Validation errors found
     2: File/path errors
-
-See: specs/AGET_MEMORY_SPEC.md (R-MEM-001 through R-MEM-006)
 """
 
 import argparse
