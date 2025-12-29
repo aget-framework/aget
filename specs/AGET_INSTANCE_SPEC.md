@@ -138,16 +138,16 @@ The SYSTEM shall maintain instance identity distinct from templates.
 ```json
 {
   "agent_name": "private-aget-framework-AGET",
-  "version": "3.0.0-beta.3",
+  "version": "3.0.0",
   "instance_type": "aget",
-  "manifest_version": "3.1",
+  "manifest_version": "3.0",
   "archetype": "operator",
   "specialization": "framework-manager",
-  "aget_version": "3.0.0-beta.3",
+  "aget_version": "3.0.0",
   "template_origin": "template-operator-aget",
   "created_date": "2024-12-01",
   "migration_history": [
-    {"from": "2.12.0", "to": "3.0.0-beta.3", "date": "2025-12-27"}
+    {"from": "2.12.0", "to": "3.0.0", "date": "2025-12-28"}
   ]
 }
 ```

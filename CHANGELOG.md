@@ -15,6 +15,40 @@ No unreleased changes at this time.
 
 ---
 
+## [3.0.0] - 2025-12-28
+
+### Added
+
+- **5D Composition Architecture**: Structured directories for agent composition
+  - `.aget/persona/` - Agent identity and behavioral characteristics
+  - `.aget/memory/` - Session handoffs and persistent state
+  - `.aget/reasoning/` - Decision frameworks and policies
+  - `.aget/skills/` - Patterns, SOPs, and automation scripts
+  - `.aget/context/` - Environmental and domain information
+- **Instance Type System**: Clear distinction between `aget` (advisory), `AGET` (action-taking), and `template`
+- **Template Field**: Replaces `roles` array with single `template` field in version.json
+- **Archetype Field**: High-level classification (supervisor, worker, advisor, consultant, developer, spec-engineer)
+- **v3.0 Contract Tests**: Updated test suite supporting 5D architecture and v3.0 schema
+
+### Changed
+
+- **BREAKING**: `roles` field removed from version.json (use `template` and `instance_type`)
+- **BREAKING**: `persona` field in version.json now optional (use `.aget/persona/` directory)
+- Manifest version: 2.0 → 3.0
+- All 6 templates migrated to 5D architecture
+
+### Migration Guide
+
+Agents upgrading from v2.x:
+1. Add `template` field (archetype name)
+2. Add `instance_type` field (`aget`, `AGET`, or `template`)
+3. Add `archetype` field (high-level classification)
+4. Create `.aget/persona/`, `.aget/memory/`, `.aget/reasoning/`, `.aget/skills/`, `.aget/context/` directories
+5. Remove `roles` field (deprecated)
+6. See `docs/FLEET_MIGRATION_GUIDE.md` for detailed steps
+
+---
+
 ## [2.12.0] - 2025-12-25
 
 ### Added
