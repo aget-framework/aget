@@ -7,6 +7,8 @@
 - Scope: All decisions
 - Contact: Via GitHub issues
 
+*Governance model subject to evolution as community develops.*
+
 ## Decision Process
 
 All significant decisions follow the PROJECT_PLAN pattern with gated approval.
