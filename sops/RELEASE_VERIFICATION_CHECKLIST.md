@@ -1,8 +1,8 @@
 # Release Verification Checklist
 
-**Version**: 1.1.0
+**Version**: 1.2.0
 **Status**: ACTIVE
-**Implements**: R-PUB-001, R-REL-001, R-REL-010, R-REL-011
+**Implements**: R-PUB-001, R-REL-001, R-REL-010, R-REL-011, R-LIC-001, R-SPEC-010
 **Updated**: 2026-01-04
 
 ---
@@ -67,6 +67,39 @@ Pre-release verification checklist ensuring quality, consistency, and governance
 - [ ] `.github/profile/README.md` roadmap section shows new version as "Current"
 - [ ] `.github` repo committed and pushed
 - [ ] Organization homepage displays correctly (visual verification)
+
+### Gate 8: License Compliance (R-LIC-001, L432)
+
+**⚠️ BLOCKING: Legal requirement**
+
+- [ ] aget/ has LICENSE file (Apache 2.0)
+- [ ] .github/ has LICENSE file (Apache 2.0)
+- [ ] All templates have LICENSE file (Apache 2.0)
+- [ ] Homepage license badge shows "Apache 2.0"
+- [ ] No MIT licenses in template fleet (CAP-LIC-001)
+
+```bash
+# Verification command
+for repo in aget .github template-*-aget; do
+  echo -n "$repo: "; head -1 "$repo/LICENSE" 2>/dev/null || echo "MISSING"
+done
+```
+
+### Gate 9: Validator Existence (R-SPEC-010, L433)
+
+**⚠️ Pre-release: Run before major releases**
+
+- [ ] All "Enforcement:" references in specs have existing validators OR "(planned)" marker
+- [ ] Validator theater ratio < 20% (missing/total)
+- [ ] New specs don't reference non-existent validators
+
+```bash
+# Verification command
+grep -rh "Enforcement.*validate_" aget/specs/ | grep -v "(planned)" | \
+  grep -oE "validate_[a-z_]+\.py" | sort -u | while read v; do
+    [ -f "aget/validation/$v" ] || echo "MISSING: $v"
+  done
+```
 
 ---
 
@@ -154,6 +187,10 @@ If issues discovered post-release:
 | R-PUB-001-06 | Gate 6 | Tag application |
 | R-REL-010 | Gate 7 | Organization homepage update |
 | R-REL-011 | Gate 7 | CHANGELOG entry verification |
+| R-LIC-001 | Gate 8 | License file verification |
+| CAP-LIC-001 | Gate 8 | Apache 2.0 compliance |
+| R-SPEC-010 | Gate 9 | Validator existence check |
+| L433 | Gate 9 | Enforcement theater audit |
 
 ---
 
