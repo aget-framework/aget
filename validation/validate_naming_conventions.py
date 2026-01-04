@@ -36,7 +36,13 @@ def validate_l_docs(agent_path: Path) -> Tuple[bool, List[str]]:
     if not evolution_dir.exists():
         return True, []  # No evolution dir is OK
 
-    l_docs = list(evolution_dir.glob('L*.md'))
+    # Fix #14: Exclude index files from L-doc validation
+    # Files like LEARNINGS_INDEX.md, index.json are not L-docs
+    ALLOWED_NON_LDOCS = {'README.md', 'index.json'}
+
+    l_docs = [f for f in evolution_dir.glob('L*.md')
+              if f.name not in ALLOWED_NON_LDOCS
+              and not f.name.endswith('_INDEX.md')]
     l_numbers = []
 
     for doc in l_docs:

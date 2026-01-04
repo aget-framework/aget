@@ -45,6 +45,9 @@ from pathlib import Path
 # Constants
 # =============================================================================
 
+# Target version for v3.0.1 migration
+TARGET_VERSION = "3.0.1"
+
 ARCHETYPES = [
     "worker", "advisor", "developer", "architect", "supervisor",
     "consultant", "spec-engineer", "executive", "analyst",
@@ -1100,18 +1103,20 @@ def migrate_instance(
 
         new_version = current_version.copy()
         new_version.update({
-            "aget_version": "3.0.0-beta.3",
+            "aget_version": TARGET_VERSION,
             "manifest_version": "3.0",
             "updated": datetime.now().strftime("%Y-%m-%d"),
             "instance_type": derived_instance_type,
             "archetype": archetype,
             "specialization": specialization,
+            # Fix #221: Set template field to reference base template
+            "template": f"template-{archetype}-aget",
         })
 
         # Add migration history
         migration_entry = {
             "from_version": current_version.get("aget_version", "2.x"),
-            "to_version": "3.0.0-beta.3",
+            "to_version": TARGET_VERSION,
             "date": datetime.now().strftime("%Y-%m-%d"),
             "method": "migrate_instance_to_v3.py",
             "changes": [
@@ -1146,7 +1151,7 @@ def migrate_instance(
         target_md = claude_md_path
 
     if target_md:
-        print(f"  UPDATE: {target_md.name} (@aget-version tag)")
+        print(f"  UPDATE: {target_md.name} (@aget-version tag + Project Context)")
         results["updated_files"].append(str(target_md.name))
 
         if not dry_run:
@@ -1154,8 +1159,15 @@ def migrate_instance(
             # Replace @aget-version: X.Y.Z with new version
             updated_content = re.sub(
                 r'@aget-version:\s*[\d.]+(-[a-zA-Z0-9.]+)?',
-                '@aget-version: 3.0.0-beta.3',
+                f'@aget-version: {TARGET_VERSION}',
                 content
+            )
+            # Fix #16: Also update ## Project Context version
+            # Format: "agent-name - Description - vX.Y.Z"
+            updated_content = re.sub(
+                r'(## Project Context\n.+) - v[\d.]+(-[a-zA-Z0-9.]+)?',
+                rf'\1 - v{TARGET_VERSION}',
+                updated_content
             )
             target_md.write_text(updated_content)
 
