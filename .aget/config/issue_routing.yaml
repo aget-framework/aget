@@ -1,0 +1,145 @@
+# Issue Routing Configuration
+#
+# Defines where issues should be filed based on category, scope, and context.
+# Used by learning_to_enhancement.py and other workflow automation scripts.
+#
+# Version: 1.0.0
+# Implements: #2 (Configurable Issue Routing)
+
+# Default repository for unrouted issues
+default_repo: "aget-framework/aget"
+
+# Category-based routing
+# Maps L-doc categories to target repositories
+category_routing:
+  pattern: "aget-framework/aget"
+  protocol: "aget-framework/aget"
+  architecture: "aget-framework/aget"
+  tooling: "aget-framework/aget"
+  governance: "aget-framework/aget"
+  migration: "aget-framework/aget"
+  process: "aget-framework/aget"
+  # Template-specific patterns route to templates
+  template_supervisor: "aget-framework/template-supervisor-aget"
+  template_worker: "aget-framework/template-worker-aget"
+  template_advisor: "aget-framework/template-advisor-aget"
+
+# Scope-based routing
+# Maps applicability scope to repositories
+scope_routing:
+  fleet: "aget-framework/aget"
+  universal: "aget-framework/aget"
+  archetype:
+    supervisor: "aget-framework/template-supervisor-aget"
+    worker: "aget-framework/template-worker-aget"
+    advisor: "aget-framework/template-advisor-aget"
+    consultant: "aget-framework/template-consultant-aget"
+    developer: "aget-framework/template-developer-aget"
+    spec-engineer: "aget-framework/template-spec-engineer-aget"
+
+# Privacy staging configuration
+# For sensitive contexts, issues go to private staging first
+privacy_staging:
+  enabled: false
+  private_repo: null  # e.g., "gmelli/aget-aget"
+  staging_labels:
+    - "needs-review"
+    - "private-staging"
+  # Conditions that trigger private staging
+  triggers:
+    - "contains_credentials"
+    - "internal_reference"
+    - "pre_announcement"
+
+# Label configuration
+# Default labels applied to routed issues
+default_labels:
+  from_ldoc:
+    - "enhancement"
+    - "from-ldoc"
+  from_cascade:
+    - "sop-update"
+    - "from-cascade"
+
+# Category-specific labels
+category_labels:
+  pattern:
+    - "pattern"
+    - "documentation"
+  protocol:
+    - "protocol"
+    - "process"
+  tooling:
+    - "tooling"
+    - "automation"
+  architecture:
+    - "architecture"
+    - "design"
+
+# Priority routing
+# High-priority categories bypass staging
+priority_categories:
+  - "security"
+  - "breaking-change"
+  - "critical-fix"
+
+# Routing rules (evaluated in order)
+# First matching rule determines routing
+routing_rules:
+  - name: "Security issues"
+    condition:
+      category: "security"
+    route_to: "aget-framework/aget"
+    labels:
+      - "security"
+      - "priority-high"
+    bypass_staging: true
+
+  - name: "Template-specific patterns"
+    condition:
+      scope: "archetype"
+    route_to: "scope_routing.archetype.{archetype}"
+    labels:
+      - "template-specific"
+
+  - name: "Fleet-wide enhancements"
+    condition:
+      scope: "fleet"
+    route_to: "aget-framework/aget"
+    labels:
+      - "fleet-wide"
+
+  - name: "Default routing"
+    condition: {}
+    route_to: "default_repo"
+
+# Notification configuration
+notifications:
+  enabled: false
+  # Notify these handles on new issues
+  mentions:
+    fleet_wide: []  # e.g., ["@aget-maintainers"]
+    security: []    # e.g., ["@security-team"]
+
+# Migration path for moving issues between repos
+migration:
+  # When moving from private to public
+  private_to_public:
+    remove_labels:
+      - "private-staging"
+      - "needs-review"
+    add_labels:
+      - "migrated-from-private"
+    # Fields to sanitize
+    sanitize:
+      - "internal_references"
+      - "credentials"
+
+# Validation rules
+validation:
+  # Require category before routing
+  require_category: true
+  # Require summary before routing
+  require_summary: true
+  # Minimum summary length
+  min_summary_length: 20
