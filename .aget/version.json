@@ -1,5 +1,5 @@
 {
-  "aget_version": "3.0.1",
+  "aget_version": "3.1.0",
   "created": "2025-09-21",
   "updated": "2026-01-04",
   "component": "core",
@@ -15,12 +15,14 @@
     "v2.11.0: 2025-12-24 (Memory Architecture + L352 Traceability + Version Migration)",
     "v2.12.0: 2025-12-25 (Capability Architecture Completion + Fleet Migration Enablement)",
     "v3.0.0: 2025-12-28 (5D Composition Architecture - Major Release)",
-    "v3.0.1: 2026-01-04 (Patch: Migration script fixes #14,#15,#16,#220,#221)"
+    "v3.0.1: 2026-01-04 (Patch: Migration script fixes #14,#15,#16,#220,#221)",
+    "v3.1.0: 2026-01-04 (Session Protocol Enhancements + Workflow Automation)"
   ],
   "contents": {
     "specs/": "Canonical specifications (AGET_VERSIONING_CONVENTIONS, etc.)",
     "templates/": "ADR and document templates",
     "validation/": "Vocabulary and compliance checkers",
-    "docs/": "Architecture and structure guides"
+    "docs/": "Architecture and structure guides",
+    "scripts/": "CLI-agnostic session and workflow automation scripts"
   }
 }
