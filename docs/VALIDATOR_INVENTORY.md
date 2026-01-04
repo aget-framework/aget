@@ -138,20 +138,40 @@ echo "Theater Ratio: ${ratio}%"
 
 ## Remediation Roadmap
 
-### v3.2.0 Target
+### v3.2.0 Target (Issue #36)
+**Theme**: Specification Architecture
+**Goal**: Theater ratio < 10%
+
 - [ ] validate_license_compliance.py (P0)
 - [ ] validate_agent_structure.py (P1)
+- [ ] validate_homepage_messaging.py (P1)
+- [ ] validate_sop_compliance.py (P1)
+- [ ] validate_spec_header.py (new, P1)
+- [ ] validate_release_gate.py (new, P1) — L440 remediation
 - [ ] Update all specs to mark "(planned)" accurately
+- [ ] Add 7 new specs (TESTING, RELEASE, DOCUMENTATION, ORGANIZATION, ERROR, SECURITY, PROJECT_PLAN)
+
+**V-Test (Gate 6.12)**:
+```bash
+# Theater ratio < 10%
+missing=$(grep -rh "validate_.*\.py" specs/ | grep -oE "validate_[a-z_]+\.py" | sort -u | \
+  while read v; do [ ! -f "validation/$v" ] && echo "$v"; done | wc -l)
+total=$(grep -rh "validate_.*\.py" specs/ | grep -oE "validate_[a-z_]+\.py" | sort -u | wc -l)
+ratio=$((missing * 100 / total))
+[ $ratio -lt 10 ] && echo "PASS: ${ratio}%" || echo "FAIL: ${ratio}%"
+```
 
 ### v3.3.0 Target
-- [ ] validate_homepage_messaging.py
-- [ ] validate_sop_compliance.py
-- [ ] validate_file_naming.py
-- [ ] Theater ratio < 20%
+**Theme**: Fleet Communication Patterns
+
+- [ ] validate_file_naming.py (P2)
+- [ ] validate_portability_compliance.py (P2)
+- [ ] validate_compatibility.py (P2)
+- [ ] Theater ratio maintained < 10%
 
 ### v3.4.0 Target
-- [ ] Remaining P2 validators
-- [ ] Theater ratio < 10%
+- [ ] Remaining P2/P3 validators
+- [ ] Full validator coverage for all specs
 
 ---
 
