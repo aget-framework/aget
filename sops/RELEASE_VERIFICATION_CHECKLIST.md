@@ -1,8 +1,8 @@
 # Release Verification Checklist
 
-**Version**: 1.0.0
+**Version**: 1.1.0
 **Status**: ACTIVE
-**Implements**: R-PUB-001, R-REL-001
+**Implements**: R-PUB-001, R-REL-001, R-REL-010, R-REL-011
 **Updated**: 2026-01-04
 
 ---
@@ -56,6 +56,17 @@ Pre-release verification checklist ensuring quality, consistency, and governance
 - [ ] Tag follows format: `vMAJOR.MINOR.PATCH`
 - [ ] Tag applied to aget/ core first
 - [ ] Tags applied to all templates
+
+### Gate 7: Organization Artifacts (R-REL-010, R-REL-011)
+
+**⚠️ BLOCKING: Must complete within release session**
+
+- [ ] aget/CHANGELOG.md has entry for this release (R-REL-011)
+- [ ] `.github/profile/README.md` version badge updated to new version
+- [ ] `.github/profile/README.md` release date badge updated
+- [ ] `.github/profile/README.md` roadmap section shows new version as "Current"
+- [ ] `.github` repo committed and pushed
+- [ ] Organization homepage displays correctly (visual verification)
 
 ---
 
@@ -131,7 +142,7 @@ If issues discovered post-release:
 
 ---
 
-## R-PUB-001 Requirements Mapping
+## Requirements Mapping
 
 | Requirement | Gate | Verification |
 |-------------|------|--------------|
@@ -141,6 +152,8 @@ If issues discovered post-release:
 | R-PUB-001-04 | Gate 4 | Structural validation |
 | R-PUB-001-05 | Gate 5 | Git status check |
 | R-PUB-001-06 | Gate 6 | Tag application |
+| R-REL-010 | Gate 7 | Organization homepage update |
+| R-REL-011 | Gate 7 | CHANGELOG entry verification |
 
 ---
 

@@ -1,11 +1,11 @@
 # AGET Framework Specification
 
-**Version**: 3.0.0-alpha.5
-**Status**: Pre-release
+**Version**: 3.1.0
+**Status**: Released
 **Category**: Standards (Framework)
 **Format Version**: 1.2
 **Created**: 2025-12-26
-**Updated**: 2025-12-27
+**Updated**: 2026-01-04
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_FRAMEWORK_SPEC.md`
 **Previous**: v2.11.0
@@ -15,7 +15,7 @@
 
 ## Abstract
 
-AGET (Agent) is a configuration and lifecycle management framework for CLI-based human-AI collaborative coding. This specification defines the behavioral requirements for AGET-compliant agents across 9 capability domains: Core, Session, Governance, Template, Memory, Vocabulary, CLI, Process, and Specification.
+AGET (Agent) is a configuration and lifecycle management framework for CLI-based human-AI collaborative coding. This specification defines the behavioral requirements for AGET-compliant agents across 10 capability domains: Core, Session, Governance, Template, Memory, Vocabulary, CLI, Process, Specification, and Organization.
 
 ## Motivation
 
@@ -919,6 +919,44 @@ The SYSTEM shall link gates to requirements.
 
 ---
 
+### CAP-ORG: Organization Artifact Requirements
+
+#### CAP-ORG-001: Organization Homepage Update
+
+WHEN a new version is released, the SYSTEM shall update organization homepage artifacts.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-ORG-001-01 | event-driven | WHEN release tagged, the SYSTEM shall UPDATE `.github/profile/README.md` |
+| CAP-ORG-001-02 | ubiquitous | The homepage shall DISPLAY version badge with format `version-X.Y.Z-blue` |
+| CAP-ORG-001-03 | ubiquitous | The homepage shall DISPLAY release date badge with format `released-YYYY--MM--DD-lightgrey` |
+| CAP-ORG-001-04 | ubiquitous | The version badge shall LINK to `/releases/tag/vX.Y.Z` |
+| CAP-ORG-001-05 | ubiquitous | The homepage shall INCLUDE Roadmap section showing current version |
+| CAP-ORG-001-06 | event-driven | WHEN new version released, the SYSTEM shall MOVE previous version to roadmap history |
+| CAP-ORG-001-07 | ubiquitous | The homepage update shall COMPLETE within the release session |
+| CAP-ORG-001-08 | ubiquitous | The SYSTEM shall VERIFY homepage displays correctly after update |
+
+**Enforcement**: RELEASE_VERIFICATION_CHECKLIST.md Gate 7
+
+**Source**: L431 (Release Artifact Inventory Requirement)
+
+#### CAP-ORG-002: Homepage Content Structure
+
+The organization homepage shall maintain required sections.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-ORG-002-01 | ubiquitous | The homepage shall INCLUDE organization identity badges |
+| CAP-ORG-002-02 | ubiquitous | The homepage shall INCLUDE framework description section |
+| CAP-ORG-002-03 | ubiquitous | The homepage shall INCLUDE "Getting Started" section |
+| CAP-ORG-002-04 | ubiquitous | The homepage shall INCLUDE repository listing |
+| CAP-ORG-002-05 | ubiquitous | The homepage shall INCLUDE Roadmap section |
+| CAP-ORG-002-06 | ubiquitous | The homepage shall INCLUDE migration history examples |
+
+**Enforcement**: Organization homepage validation
+
+---
+
 ## Conformance Levels
 
 ### Minimal_Conformance
@@ -945,7 +983,9 @@ Minimal plus:
 
 ### Full_Conformance
 
-All requirements: **~300**
+All requirements: **~314**
+
+Includes CAP-ORG (14 requirements) for organization artifact management.
 
 ---
 
