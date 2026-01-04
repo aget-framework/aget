@@ -1,0 +1,177 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://aget-framework.github.io/schemas/ldoc_v2.json",
+  "title": "AGET L-Doc Format v2",
+  "description": "Schema for AGET Learning Documents (L-docs) v2 format with cross-agent discovery support",
+  "version": "2.0.0",
+  "type": "object",
+  "required": ["id", "title", "format_version", "created", "summary"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^L[0-9]+$",
+      "description": "Unique L-doc identifier (e.g., L419)"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 100,
+      "description": "Concise title describing the learning"
+    },
+    "format_version": {
+      "type": "string",
+      "enum": ["1.0", "2.0"],
+      "description": "L-doc format version"
+    },
+    "created": {
+      "type": "string",
+      "format": "date",
+      "description": "Creation date (YYYY-MM-DD)"
+    },
+    "updated": {
+      "type": "string",
+      "format": "date",
+      "description": "Last update date (YYYY-MM-DD)"
+    },
+    "author": {
+      "type": "string",
+      "description": "Agent or human that authored the L-doc"
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 500,
+      "description": "One-paragraph summary of the learning"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "pattern",
+        "anti-pattern",
+        "protocol",
+        "governance",
+        "tooling",
+        "migration",
+        "architecture",
+        "process",
+        "observation",
+        "decision"
+      ],
+      "description": "Primary category of the learning"
+    },
+    "applicability": {
+      "type": "object",
+      "description": "Cross-agent discovery metadata",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "enum": ["agent", "archetype", "fleet", "universal"],
+          "description": "Scope of applicability"
+        },
+        "archetypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["supervisor", "worker", "advisor", "consultant", "developer", "spec-engineer", "all"]
+          },
+          "description": "Applicable archetypes (if scope is archetype)"
+        },
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Applicable domains (e.g., framework-management, data-science)"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Conditions under which this learning applies"
+        }
+      }
+    },
+    "related": {
+      "type": "object",
+      "description": "Related artifacts",
+      "properties": {
+        "ldocs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^L[0-9]+$"
+          },
+          "description": "Related L-doc IDs"
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Related issue references (e.g., #123, aget#45)"
+        },
+        "patterns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Related pattern document names"
+        },
+        "specs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Related specification documents"
+        }
+      }
+    },
+    "enforcement": {
+      "type": "object",
+      "description": "Enforcement metadata (L418 progression)",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["observation", "recommendation", "advisory", "enforced"],
+          "description": "Current enforcement level"
+        },
+        "mechanism": {
+          "type": "string",
+          "enum": ["none", "documentation", "validation", "gate", "automated"],
+          "description": "How enforcement is implemented"
+        },
+        "validator": {
+          "type": "string",
+          "description": "Path to validation script (if mechanism is validation/gate)"
+        }
+      }
+    },
+    "origin": {
+      "type": "object",
+      "description": "Origin context of the learning",
+      "properties": {
+        "session": {
+          "type": "string",
+          "description": "Session ID where learning was captured"
+        },
+        "trigger": {
+          "type": "string",
+          "description": "What triggered this learning (pain point, observation, etc.)"
+        },
+        "evidence": {
+          "type": "string",
+          "description": "Evidence supporting the learning"
+        }
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Free-form tags for additional categorization"
+    }
+  },
+  "additionalProperties": false
+}
