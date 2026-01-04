@@ -1,11 +1,11 @@
 # AGET SOP Specification
 
-**Version**: 1.0.0
+**Version**: 1.1.0
 **Status**: Active
 **Category**: Standards (Process)
 **Format Version**: 1.2
 **Created**: 2025-12-28
-**Updated**: 2025-12-28
+**Updated**: 2026-01-04
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_SOP_SPEC.md`
 **Change Origin**: Pre-migration conformance review
@@ -96,7 +96,40 @@ vocabulary:
     Informal_Term:
       skos:definition: "Non-controlled term that should be replaced"
       skos:example: "gate, validation, migration"
+
+  process_hierarchy:  # L436: PROJECT_PLAN to SOP graduation
+    Process_Artifact:
+      skos:definition: "Document defining how work is done"
+      skos:narrower: ["PROJECT_PLAN", "SOP", "Specification"]
+    PROJECT_PLAN:
+      skos:definition: "One-time gated plan for specific scope"
+      skos:broader: "Process_Artifact"
+      aget:graduation_target: "SOP"
+      aget:location: "planning/PROJECT_PLAN_*.md"
+    SOP:
+      skos:definition: "Repeatable formalized procedure (graduated PROJECT_PLAN)"
+      skos:broader: "Process_Artifact"
+      aget:graduation_source: "PROJECT_PLAN"
+      aget:graduation_target: "Specification"
+      aget:location: "sops/*.md"
+    Graduation:
+      skos:definition: "Process by which repeated PROJECT_PLANs become formalized SOPs"
+      skos:related: ["PROJECT_PLAN", "SOP"]
+      aget:trigger: "Pattern executed successfully 2+ times"
 ```
+
+**Process Artifact Hierarchy (L436):**
+
+```
+Ad-hoc Task → PROJECT_PLAN (one-time) → SOP (repeatable) → Specification (normative)
+```
+
+| Level | Nature | Execution | When to Use |
+|-------|--------|-----------|-------------|
+| **Ad-hoc** | Informal | Once | Simple, low-risk tasks |
+| **PROJECT_PLAN** | Formal, gated | Once | Complex, multi-step tasks |
+| **SOP** | Formal, procedural | Repeatable | Procedures executed 2+ times |
+| **Specification** | Formal, normative | N/A | Requirements that define behavior |
 
 ---
 
@@ -367,7 +400,9 @@ grep -E '\b(gate|validation|migration|rollback)\b' sops/*.md
 - AGET_FILE_NAMING_CONVENTIONS.md (naming rules)
 - AGET_CORE_VOCABULARY.md (controlled vocabulary)
 - AGET_VALIDATION_SPEC.md (validator structure pattern)
+- AGET_REASONING_SPEC.md (PROJECT_PLAN requirements)
 - L377: Validation Suite Orchestration Gap
+- L436: PROJECT_PLAN to SOP Graduation Pattern
 
 ---
 
@@ -381,12 +416,18 @@ graduation:
     - "SOP_instance_migration_v3.md"
   source_learnings:
     - "L377"
+    - "L436"
   trigger: "Pre-migration conformance review"
   rationale: "SOPs lacked governing specification; vocabulary inconsistent"
+
+  v1.1.0_additions:
+    - update: "process_hierarchy vocabulary"
+      source: "L436"
+      description: "PROJECT_PLAN to SOP graduation pattern"
 ```
 
 ---
 
-*AGET SOP Specification v1.0.0*
+*AGET SOP Specification v1.1.0*
 *Format: AGET_SPEC_FORMAT v1.2 (EARS + SKOS)*
 *"Standardized procedures enable standardized quality."*
