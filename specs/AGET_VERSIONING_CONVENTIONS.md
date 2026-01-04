@@ -129,6 +129,44 @@ Examples:
 
 ## Release Process
 
+### Multi-Repo Coordination Protocol (R-REL-001)
+
+The AGET framework spans multiple repositories that must be version-synchronized.
+
+**Repository Structure**:
+```
+aget-framework/
+├── aget/                    <- Core framework (primary version)
+├── template-supervisor-aget/
+├── template-worker-aget/
+├── template-advisor-aget/
+├── template-consultant-aget/
+├── template-developer-aget/
+└── template-spec-engineer-aget/
+```
+
+**R-REL-001-01: Core First**
+```
+The aget/ core repository is versioned and tagged first.
+All template repositories inherit this version.
+```
+
+**R-REL-001-02: Atomic Fleet Release**
+```
+When releasing:
+1. Update aget/ core version
+2. Update all template version.json files
+3. Tag aget/ first
+4. Tag all templates with same version
+5. Push all tags atomically
+```
+
+**R-REL-001-03: Version Sync Validation**
+```bash
+# All templates must match core version
+python3 scripts/version_sync.py --check
+```
+
 ### Pre-Release Checklist
 
 - [ ] All changes documented in CHANGELOG.md
@@ -136,6 +174,7 @@ Examples:
 - [ ] Migration guide written (if breaking)
 - [ ] Contract tests pass
 - [ ] Version bumped in all affected files
+- [ ] Version sync validated across all repos (R-REL-001)
 
 ### Version Bump Locations
 
