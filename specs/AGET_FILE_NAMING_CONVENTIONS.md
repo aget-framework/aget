@@ -1,7 +1,7 @@
 # AGET File Naming Conventions
 
-**Version**: 1.0.0
-**Date**: 2025-12-20
+**Version**: 2.0.0
+**Date**: 2026-01-04
 **Status**: CANONICAL
 **Location**: aget/specs/AGET_FILE_NAMING_CONVENTIONS.md
 
@@ -11,26 +11,30 @@
 
 This specification defines canonical file naming conventions for all AGET framework artifacts. It consolidates patterns previously scattered across AGET_CONTROLLED_VOCABULARY.md, TEMPLATE_STRUCTURE_GUIDE.md, and NAMING_CONVENTIONS.md.
 
-**Scope**: File and directory naming within AGET repositories. Does not cover:
+**Scope**: File, directory, git branch, and git tag naming within AGET repositories. Does not cover:
 - Python package naming (see PEP 8, PEP 423)
-- Git branch naming
 - External artifact naming
 
 ---
 
 ## Quick Reference
 
-| Artifact Type | Pattern | Example |
-|---------------|---------|---------|
-| Specs | `{NAME}_SPEC_v{M}.{m}.yaml` | `WORKER_TEMPLATE_SPEC_v1.0.yaml` |
-| PROJECT_PLANs | `PROJECT_PLAN_{name}_v{M}.{m}.md` | `PROJECT_PLAN_file_naming_v1.0.md` |
-| ADRs | `ADR-{NNN}-{kebab-case}.md` | `ADR-001-initial-architecture.md` |
-| L-docs | `L{NNN}_{snake_case}.md` | `L338_gate_verification.md` |
-| Sessions | `SESSION_{YYYY-MM-DD}_{snake_case}.md` | `SESSION_2025-12-20_research.md` |
-| SOPs | `SOP_{snake_case}.md` | `SOP_release_process.md` |
-| Patterns | `PATTERN_{snake_case}.md` | `PATTERN_step_back_review.md` |
-| Python code | `{snake_case}.py` | `validate_file_naming.py` |
-| Directories | `{visibility}-{identifier}-{type}` | `private-supervisor-AGET` |
+| Cat | Artifact Type | Pattern | Example |
+|-----|---------------|---------|---------|
+| A | Specs | `{NAME}_SPEC_v{M}.{m}.yaml` | `WORKER_TEMPLATE_SPEC_v1.0.yaml` |
+| A | PROJECT_PLANs | `PROJECT_PLAN_{name}_v{M}.{m}.md` | `PROJECT_PLAN_file_naming_v1.0.md` |
+| B | ADRs | `ADR-{NNN}-{kebab-case}.md` | `ADR-001-initial-architecture.md` |
+| B | L-docs | `L{NNN}_{snake_case}.md` | `L338_gate_verification.md` |
+| C | Sessions | `SESSION_{YYYY-MM-DD}_{snake_case}.md` | `SESSION_2025-12-20_research.md` |
+| D | SOPs | `SOP_{snake_case}.md` | `SOP_release_process.md` |
+| D | Patterns | `PATTERN_{snake_case}.md` | `PATTERN_step_back_review.md` |
+| E | Python code | `{snake_case}.py` | `validate_file_naming.py` |
+| F | Open-source | `{EXACT_NAME}` | `README.md`, `LICENSE` |
+| G | Requirements | `R-{DOMAIN}-{NNN}` | `R-REL-006` |
+| H | Change Proposals | `CP-{NNN}_{name}.md` | `CP-001_capability.md` |
+| I | Protocols | `{NAME}_PROTOCOL.md` | `WAKE_UP_PROTOCOL.md` |
+| J | Checklists | `{NAME}_CHECKLIST.md` | `RELEASE_CHECKLIST.md` |
+| — | Directories | `{visibility}-{identifier}-{type}` | `private-supervisor-AGET` |
 
 ---
 
@@ -261,6 +265,207 @@ This is acceptable as it describes the migration target, not file version.
 
 ---
 
+## Category F: Standard Open-Source Files
+
+Community-standard files that follow external conventions, NOT AGET patterns. Per L439.
+
+### Pattern
+
+```
+{EXACT_COMMUNITY_NAME}
+
+No AGET prefix. Use exact names expected by GitHub, package managers, and community tools.
+```
+
+### Standard Files
+
+| File | Convention Source | Required? | Notes |
+|------|------------------|-----------|-------|
+| `README.md` | GitHub | Yes | Repository root |
+| `LICENSE` | OSI/GitHub | Yes | No extension preferred |
+| `CHANGELOG.md` | Keep a Changelog | Yes | Semantic versioning |
+| `CONTRIBUTING.md` | GitHub | Recommended | Contribution guide |
+| `CODE_OF_CONDUCT.md` | Contributor Covenant | Recommended | Community standards |
+| `SECURITY.md` | GitHub Security Advisories | Recommended | Vulnerability reporting |
+| `UPGRADING.md` | Package managers | If applicable | Version migration |
+| `.gitignore` | Git | Yes | Standard patterns |
+| `requirements.txt` | pip | If Python | Dependencies |
+| `pyproject.toml` | PEP 517/518 | If Python | Modern packaging |
+
+### Examples
+
+```
+✅ README.md
+✅ LICENSE
+✅ CHANGELOG.md
+✅ CONTRIBUTING.md
+✅ CODE_OF_CONDUCT.md
+✅ SECURITY.md
+❌ AGET_README.md         # Don't prefix
+❌ LICENSE.md             # No extension
+❌ CHANGE_LOG.md          # Exact spelling
+```
+
+### Validation Exception
+
+Validators MUST whitelist Category F files and NOT flag them as naming violations.
+
+---
+
+## Category G: Requirement Documents
+
+Formal requirements using domain-prefixed identifiers.
+
+### Pattern
+
+```
+R-{DOMAIN}-{NNN}
+
+R:       Literal "R" prefix
+DOMAIN:  3-4 letter domain code (see Domain Codes Registry)
+NNN:     3-digit sequence within domain
+```
+
+### Examples
+
+```
+✅ R-REL-001    # Release requirement 001
+✅ R-REL-006    # Release requirement 006 (manager migration)
+✅ R-TPL-001    # Template requirement 001
+✅ R-WAKE-003   # Wake protocol requirement 003
+✅ R-SANITY-007 # Sanity check requirement 007
+```
+
+### Domain Codes Registry
+
+| Code | Domain | Scope |
+|------|--------|-------|
+| `REL` | Release | Release process, versioning |
+| `TPL` | Template | Template structure, compliance |
+| `WAKE` | Wake Protocol | Session initialization |
+| `WIND` | Wind-down Protocol | Session close |
+| `SANITY` | Sanity Checks | Housekeeping, validation |
+| `CLI` | CLI Settings | CLAUDE.md, AGENTS.md |
+| `SPEC` | Specifications | Spec format, compliance |
+| `DOC` | Documentation | README, guides |
+| `LIC` | License | License compliance |
+| `ORG` | Organization | GitHub org, homepage |
+| `TEST` | Testing | Contract tests, V-tests |
+| `SEC` | Security | Security requirements |
+| `PP` | Project Plans | PROJECT_PLAN format |
+| `VOC` | Vocabulary | SKOS, controlled terms |
+| `NAME` | Naming | File/entity naming |
+| `MEM` | Memory | L-docs, knowledge |
+| `HOM` | Homepage | Org homepage messaging |
+
+### Requirement Document Files
+
+Requirements are typically embedded in specs, not standalone files:
+```yaml
+# In AGET_RELEASE_SPEC.md
+requirements:
+  - id: R-REL-006
+    text: "Managing agent MUST update version BEFORE releasing managed repos"
+    rationale: "Prevents version drift (L440)"
+```
+
+---
+
+## Category H: Change Proposals
+
+Formal proposals for significant changes.
+
+### Pattern
+
+```
+CP-{NNN}_{snake_case}.md
+
+CP:   Literal "CP" prefix
+NNN:  3-digit sequence
+```
+
+### Examples
+
+```
+✅ CP-001_capability_composition.md
+✅ CP-002_fleet_communication.md
+✅ CP-003_memory_architecture.md
+```
+
+### Status Lifecycle
+
+```
+DRAFT → PROPOSED → ACCEPTED/REJECTED → IMPLEMENTED/WITHDRAWN
+```
+
+---
+
+## Category I: Protocol Documents
+
+Reusable protocols for repeated processes.
+
+### Pattern
+
+```
+{NAME}_PROTOCOL.md
+
+NAME:  SCREAMING_SNAKE_CASE
+```
+
+### Examples
+
+```
+✅ WAKE_UP_PROTOCOL.md
+✅ WIND_DOWN_PROTOCOL.md
+✅ SESSION_HANDOFF_PROTOCOL.md
+✅ KB_AUDIT_PROTOCOL.md
+```
+
+### Distinction from SOPs
+
+| Type | Purpose | Scope |
+|------|---------|-------|
+| `*_PROTOCOL.md` | Step-by-step execution sequence | Narrow, focused |
+| `SOP_*.md` | Comprehensive operating procedure | Broad, policy-inclusive |
+
+---
+
+## Category J: Checklists
+
+Verification and compliance checklists.
+
+### Pattern
+
+```
+{NAME}_CHECKLIST.md
+
+NAME:  SCREAMING_SNAKE_CASE
+```
+
+### Examples
+
+```
+✅ RELEASE_VERIFICATION_CHECKLIST.md
+✅ MIGRATION_CHECKLIST.md
+✅ TEMPLATE_COMPLIANCE_CHECKLIST.md
+✅ PRE_RELEASE_CHECKLIST.md
+```
+
+### Checklist Format
+
+```markdown
+## {Checklist Name}
+
+### Section 1
+- [ ] Item 1
+- [ ] Item 2
+
+### Section 2
+- [ ] Item 3
+```
+
+---
+
 ## Directory Naming
 
 ### Agent Directories
@@ -308,15 +513,91 @@ Standard internal directories use lowercase:
 
 ---
 
+## Git Branch Naming
+
+### Pattern
+
+```
+{type}/{scope}-{description}
+
+type:        feature, fix, docs, refactor, release, hotfix
+scope:       Optional: gate number, issue number, or component
+description: kebab-case summary
+```
+
+### Examples
+
+```
+✅ feature/gate-1-naming-conventions
+✅ feature/issue-33-naming-expansion
+✅ fix/validator-whitelist
+✅ docs/release-notes-v3.2
+✅ release/v3.2.0
+✅ hotfix/l440-manager-version
+```
+
+### Branch Type Rules
+
+| Type | Purpose | Merge Target |
+|------|---------|--------------|
+| `feature/` | New functionality | main |
+| `fix/` | Bug fixes | main |
+| `docs/` | Documentation only | main |
+| `refactor/` | Code restructuring | main |
+| `release/` | Release preparation | main |
+| `hotfix/` | Urgent production fix | main + release |
+
+---
+
+## Git Tag Naming
+
+### Pattern
+
+```
+v{M}.{m}.{p}[-{prerelease}]
+
+v:          Literal lowercase "v"
+M:          Major version
+m:          Minor version
+p:          Patch version
+prerelease: Optional: alpha, beta, rc1, etc.
+```
+
+### Examples
+
+```
+✅ v3.0.0
+✅ v3.1.0
+✅ v3.2.0-alpha
+✅ v3.2.0-beta.1
+✅ v3.2.0-rc1
+✅ v3.2.0
+```
+
+### Tag Rules
+
+1. Tags are **immutable** — never delete or move
+2. Tags must match version in `version.json`
+3. Pre-release tags precede stable: `v3.2.0-alpha` → `v3.2.0-beta` → `v3.2.0`
+4. Annotated tags preferred: `git tag -a v3.2.0 -m "Release v3.2.0"`
+
+---
+
 ## Decision Tree: Which Category?
 
 ```
+Is this a community-standard file (README, LICENSE, CHANGELOG)?
+├── YES → Category F (Open-Source): {EXACT_NAME}
+└── NO
+    ↓
 Is this a formal specification or plan?
 ├── YES → Category A (Versioned): {TYPE}_{NAME}_v{M}.{m}.md
 └── NO
     ↓
-Does it have a sequence number (L###, ADR-###)?
-├── YES → Category B (Sequenced): {PREFIX}{NNN}_{name}.md
+Does it have a sequence number (L###, ADR-###, R-XXX-###, CP-###)?
+├── L### or ADR-### → Category B (Sequenced): {PREFIX}{NNN}_{name}.md
+├── R-XXX-### → Category G (Requirements): R-{DOMAIN}-{NNN}
+├── CP-### → Category H (Change Proposals): CP-{NNN}_{name}.md
 └── NO
     ↓
 Is it tied to a specific date/session?
@@ -325,6 +606,14 @@ Is it tied to a specific date/session?
     ↓
 Is it code?
 ├── YES → Category E (Code): {snake_case}.py
+└── NO
+    ↓
+Is it a protocol (step-by-step execution)?
+├── YES → Category I (Protocol): {NAME}_PROTOCOL.md
+└── NO
+    ↓
+Is it a checklist?
+├── YES → Category J (Checklist): {NAME}_CHECKLIST.md
 └── NO → Category D (Stable): {TYPE}_{name}.md
 ```
 
@@ -431,6 +720,20 @@ New files MUST follow this specification.
 ---
 
 ## Changelog
+
+### v2.0.0 (2026-01-04)
+
+- **Breaking**: Expanded from 5 to 10 categories (A-J)
+- Added Category F: Standard Open-Source Files (L439)
+- Added Category G: Requirement Documents (R-XXX-NNN)
+- Added Category H: Change Proposals (CP-NNN)
+- Added Category I: Protocol Documents (*_PROTOCOL.md)
+- Added Category J: Checklists (*_CHECKLIST.md)
+- Added Domain Codes Registry (17 domains)
+- Added Git Branch Naming section
+- Added Git Tag Naming section
+- Updated Decision Tree for new categories
+- Updated Quick Reference with category column
 
 ### v1.0.0 (2025-12-20)
 
