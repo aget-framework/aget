@@ -1,11 +1,11 @@
 # AGET REASONING Specification
 
-**Version**: 1.1.0
+**Version**: 1.2.0
 **Status**: Active
 **Category**: Standards (5D Composition - REASONING Dimension)
 **Format Version**: 1.2
 **Created**: 2025-12-26
-**Updated**: 2025-12-27
+**Updated**: 2026-01-04
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_REASONING_SPEC.md`
 **Change Proposal**: CP-011
@@ -91,9 +91,11 @@ vocabulary:
 
   memory:  # D2: Stored artifacts
     PROJECT_PLAN:
-      skos:definition: "Formal gated planning document"
+      skos:definition: "Formal gated planning document (one-time execution)"
       aget:location: "planning/"
       aget:naming: "PROJECT_PLAN_{scope}.md"
+      aget:graduation_target: "SOP"
+      aget:note: "Repeated PROJECT_PLANs should graduate to SOP (L436)"
     Verification_Test:
       skos:definition: "Executable test confirming deliverable completion"
       aget:reference: "L382"
@@ -288,6 +290,48 @@ The SYSTEM shall require Governance_Artifacts before execution (L340).
 
 **Enforcement**: Pre-execution checklist
 
+### CAP-REASON-008: Release Retrospective (L435)
+
+The SYSTEM shall include Retrospective_Section in release PROJECT_PLANs.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-REASON-008-01 | ubiquitous | Release PROJECT_PLAN shall include Retrospective section |
+| CAP-REASON-008-02 | ubiquitous | Retrospective shall include What_Went_Well (min 3 items) |
+| CAP-REASON-008-03 | ubiquitous | Retrospective shall include What_Could_Be_Improved (min 3 items) |
+| CAP-REASON-008-04 | ubiquitous | Retrospective shall include Key_Decisions_Made (min 3 items) |
+| CAP-REASON-008-05 | ubiquitous | Retrospective shall include Recommendations (prioritized) |
+| CAP-REASON-008-06 | ubiquitous | Retrospective shall include Release_Health_Score (X/10) |
+
+**Enforcement**: `validate_project_plan.py --release`
+
+#### Retrospective Section Template
+
+```markdown
+## Retrospective
+
+### What Went Well
+| Area | Observation | Evidence |
+|------|-------------|----------|
+
+### What Could Be Improved
+| Area | Issue | Recommendation |
+|------|-------|----------------|
+
+### Key Decisions Made
+| Decision | Context | Outcome |
+|----------|---------|---------|
+
+### Recommendations for Future Releases
+| Category | Recommendation | Priority |
+|----------|----------------|----------|
+
+### Release Health Score
+| Dimension | Score | Notes |
+|-----------|-------|-------|
+| **Overall** | **X/10** | |
+```
+
 ---
 
 ## Reasoning Patterns by Governance
@@ -468,7 +512,10 @@ grep -A5 "Verification Tests" planning/PROJECT_PLAN_*.md
 - L342: Session Scope Validation
 - L382: Gate Verification Test Gap
 - L002: Mid-Gate Quality Checkpoints
+- L435: PROJECT_PLAN Retrospective Requirement
+- L436: PROJECT_PLAN to SOP Graduation Pattern
 - AGET_5D_ARCHITECTURE_SPEC: Umbrella specification
+- AGET_SOP_SPEC: SOP requirements and process hierarchy
 - AGET_SPEC_FORMAT_v1.2: Specification format
 
 ---
@@ -477,15 +524,23 @@ grep -A5 "Verification Tests" planning/PROJECT_PLAN_*.md
 
 ```yaml
 graduation:
-  source_learnings: ["L42", "L186", "L340", "L382", "L002", "L342"]
+  source_learnings: ["L42", "L186", "L340", "L382", "L002", "L342", "L435", "L436"]
   pattern_origin: "Substantial Change Protocol"
   governance_vision: "CLAUDE.md execution protocols"
   rationale: "Formalizes reasoning patterns from multiple operational learnings"
+
+  v1.2.0_additions:
+    - requirement: "CAP-REASON-008"
+      source: "L435"
+      description: "Release Retrospective requirement"
+    - vocabulary: "PROJECT_PLAN graduation_target"
+      source: "L436"
+      description: "PROJECT_PLAN to SOP graduation pattern"
 ```
 
 ---
 
-*AGET REASONING Specification v1.1.0*
+*AGET REASONING Specification v1.2.0*
 *Format: AGET_SPEC_FORMAT v1.2 (EARS + SKOS)*
 *Part of v3.0.0 Composition Architecture - REASONING Dimension*
 *"HOW the agent thinks shapes what it produces."*
