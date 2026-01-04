@@ -1,7 +1,7 @@
 {
-  "aget_version": "3.0.0",
+  "aget_version": "3.0.1",
   "created": "2025-09-21",
-  "updated": "2025-12-28",
+  "updated": "2026-01-04",
   "component": "core",
   "description": "AGET Framework Core - Specifications, templates, and validation",
   "repository": "aget-framework/aget",
@@ -14,7 +14,8 @@
     "v2.10.0: 2025-12-13 (Capability Composition Architecture)",
     "v2.11.0: 2025-12-24 (Memory Architecture + L352 Traceability + Version Migration)",
     "v2.12.0: 2025-12-25 (Capability Architecture Completion + Fleet Migration Enablement)",
-    "v3.0.0: 2025-12-28 (5D Composition Architecture - Major Release)"
+    "v3.0.0: 2025-12-28 (5D Composition Architecture - Major Release)",
+    "v3.0.1: 2026-01-04 (Patch: Migration script fixes #14,#15,#16,#220,#221)"
   ],
   "contents": {
     "specs/": "Canonical specifications (AGET_VERSIONING_CONVENTIONS, etc.)",

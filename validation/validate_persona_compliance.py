@@ -90,23 +90,48 @@ class PersonaComplianceValidator:
 
     def _validate_archetype(self, agent_path: str, result: ValidationResult) -> None:
         """Validate archetype is defined (R-PERSONA-001)."""
-        # Check version.json first
+        # Check sources in priority order:
+        # 1. .aget/persona/archetype.yaml (5D v3.0 standard - Fix #220)
+        # 2. version.json archetype field
+        # 3. version.json template field (extract archetype)
+        # 4. manifest.yaml archetype field
+        archetype_yaml_path = os.path.join(agent_path, '.aget/persona/archetype.yaml')
         version_path = os.path.join(agent_path, '.aget/version.json')
         manifest_path = os.path.join(agent_path, 'manifest.yaml')
 
         archetype = None
 
-        if os.path.isfile(version_path):
+        # Fix #220: Check .aget/persona/archetype.yaml first (5D v3.0)
+        if os.path.isfile(archetype_yaml_path):
+            try:
+                import yaml
+                with open(archetype_yaml_path) as f:
+                    data = yaml.safe_load(f)
+                archetype = data.get('archetype')
+                if archetype:
+                    result.stats['archetype_source'] = '.aget/persona/archetype.yaml'
+            except Exception:
+                pass
+
+        # Check version.json
+        if not archetype and os.path.isfile(version_path):
             try:
                 with open(version_path) as f:
                     data = json.load(f)
-                archetype = data.get('template')
+                # Check direct archetype field first
+                archetype = data.get('archetype')
                 if archetype:
-                    # Extract archetype from template name
-                    # e.g., "template-advisor-aget" -> "advisor"
-                    match = re.match(r'template-(\w+)-aget', archetype)
-                    if match:
-                        archetype = match.group(1)
+                    result.stats['archetype_source'] = '.aget/version.json'
+                else:
+                    # Fallback to template field extraction
+                    template = data.get('template')
+                    if template:
+                        # Extract archetype from template name
+                        # e.g., "template-advisor-aget" -> "advisor"
+                        match = re.match(r'template-(\w+)-aget', template)
+                        if match:
+                            archetype = match.group(1)
+                            result.stats['archetype_source'] = '.aget/version.json (template)'
             except (json.JSONDecodeError, IOError):
                 pass
 
@@ -116,6 +141,8 @@ class PersonaComplianceValidator:
                 with open(manifest_path) as f:
                     data = yaml.safe_load(f)
                 archetype = data.get('archetype') or data.get('template', {}).get('archetype')
+                if archetype:
+                    result.stats['archetype_source'] = 'manifest.yaml'
             except Exception:
                 pass
 
