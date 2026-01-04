@@ -15,6 +15,45 @@ No unreleased changes at this time.
 
 ---
 
+## [3.1.0] - 2026-01-04
+
+### Added
+
+- **Complete Session Lifecycle**: Full session protocol suite in all templates
+  - `wake_up.py`: Session initialization (R-WAKE-001 to R-WAKE-007)
+  - `aget_housekeeping_protocol.py`: Mid-session sanity checks (R-SANITY-001 to R-SANITY-007)
+  - `wind_down.py`: Session close with sanity gate (R-WIND-001 to R-WIND-006)
+- **L-Doc Format v2**: Structured metadata for cross-agent pattern discovery
+  - `format_version: "2.0"` header
+  - `migrate_ldoc_to_v2.py` migration tool
+  - JSON Schema validation (`schemas/ldoc_v2.json`)
+- **Fleet Governance Patterns**:
+  - Role Boundary Awareness (PATTERN_role_boundary_awareness.md)
+  - Version Sync (`version_sync.py`) for fleet-wide consistency
+  - Issue Routing via `.aget/config/issue_routing.yaml`
+- **Workflow Automation Scripts**:
+  - `learning_to_enhancement.py`: L-doc → GitHub Issue workflow
+  - `cascade_ldoc_to_sop.py`: L-doc → SOP cascade automation
+  - `validate_cli_settings.py`: CLI settings hygiene validation
+  - `validate_fleet.py`: Fleet-wide validation
+- **CLI Settings Standard**: R-CLI-001 to R-CLI-005 for Claude Code, Codex, Cursor
+- **Organization Artifact Specification**: CAP-ORG-001 (homepage update requirements)
+
+### Changed
+
+- All scripts support `--json` output for cross-CLI automation
+- All scripts implement L038 (Agent-Agnostic) and L021 (Verify-Before-Modify)
+- AGET_FRAMEWORK_SPEC updated to 10 capability domains (added CAP-ORG)
+- RELEASE_VERIFICATION_CHECKLIST updated with Gate 7 (Organization Artifacts)
+
+### Fixed
+
+- #14: Naming validator index file exception
+- #15: Migration guide documentation enhancements
+- #16: AGENTS.md Project Context version in migration script
+
+---
+
 ## [3.0.0] - 2025-12-28
 
 ### Added
