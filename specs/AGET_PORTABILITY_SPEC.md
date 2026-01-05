@@ -500,6 +500,8 @@ python3 validation/validate_portability_compliance.py --dir /path/to/agent
 - AGET_MEMORY_SPEC.md (6-layer model)
 - AGET_5D_ARCHITECTURE_SPEC.md (dimension structure)
 - L393: Framework vs Agent Content Distinction (if captured)
+- L452: Shell Orchestration Pattern (CLI portability)
+- docs/SHELL_INTEGRATION.md (multi-CLI invocation guide)
 
 ---
 

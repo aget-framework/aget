@@ -524,6 +524,29 @@ theoretical_basis:
 
 ---
 
+## Shell Integration Pattern (L452)
+
+Users can streamline session initialization using shell aliases. This pattern provides CLI-agnostic agent launching via `.zshrc` configuration.
+
+```zsh
+# Core function
+aget() {
+  local dir="$1"; shift
+  cd "$dir" || return 1
+  claude "Wake up. Focus on: $*"
+}
+
+# Agent aliases
+alias supervisor='aget ~/github/private-supervisor-AGET'
+```
+
+See `docs/SHELL_INTEGRATION.md` for full setup guide including:
+- Multi-CLI support (Claude Code, Codex, Gemini, Aider)
+- Credential isolation patterns (L189)
+- Alias generator script
+
+---
+
 ## References
 
 - AGET_MEMORY_SPEC.md (Session_Memory layer, context patterns)
@@ -531,6 +554,8 @@ theoretical_basis:
 - L335: Memory Architecture Principles
 - L342: Session Scope Validation
 - L375: Session Scope Evolution Pattern
+- L452: Shell Orchestration Pattern
+- docs/SHELL_INTEGRATION.md (shell setup guide)
 
 ---
 
