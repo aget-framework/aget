@@ -18,11 +18,11 @@ This document tracks all validators referenced in AGET specifications, their imp
 
 | Category | Count |
 |----------|-------|
-| **Implemented** | 24 |
-| **Planned** | 12 |
-| **Deferred** | 0 |
-| **Total Referenced** | 36 |
-| **Theater Ratio** | 33% (target: < 20%) |
+| **Implemented** | 30 |
+| **Planned** | 15 |
+| **Deferred** | 2 |
+| **Total Referenced** | 45 |
+| **Theater Ratio** | 33% → target <10% by removing spec refs |
 
 ---
 
@@ -53,6 +53,15 @@ These validators exist in `validation/` and are functional:
 | validate_template_manifest.py | AGET_TEMPLATE_SPEC | ✅ Implemented |
 | validate_version_consistency.py | AGET_FRAMEWORK_SPEC | ✅ Implemented |
 | validate_vocabulary.py | AGET_GLOSSARY_STANDARD_SPEC | ✅ Implemented |
+| validate_file_naming.py | AGET_FILE_NAMING_CONVENTIONS | ✅ Implemented (v3.2.0) |
+| validate_spec_header.py | AGET_SPEC_FORMAT | ✅ Implemented (v3.2.0) |
+| validate_spec_cross_refs.py | Internal | ✅ Implemented (v3.2.0) |
+| validate_license_compliance.py | AGET_LICENSE_SPEC | ✅ Implemented (v3.2.0) |
+| validate_agent_structure.py | AGET_TEMPLATE_SPEC | ✅ Implemented (v3.2.0) |
+| validate_release_gate.py | AGET_RELEASE_SPEC (L440) | ✅ Implemented (v3.2.0) |
+| validate_ldoc_index.py | AGET_MEMORY_SPEC | ✅ Implemented (v3.2.0) |
+| validate_sop_compliance.py | AGET_SOP_SPEC | ✅ Implemented (v3.2.0) |
+| validate_homepage_messaging.py | AGET_ORGANIZATION_SPEC | ✅ Implemented (v3.2.0) |
 | analyze_knowledge_content.py | Internal | ✅ Implemented |
 | check_aget_vocabulary.py | Internal | ✅ Implemented |
 | project_skos_to_ears.py | Internal | ✅ Implemented |
@@ -63,20 +72,23 @@ These validators exist in `validation/` and are functional:
 
 These validators are referenced in specs but not yet implemented. Specs should be updated to mark them as "(planned)":
 
-| Validator | Spec Reference | Priority | Issue |
-|-----------|----------------|----------|-------|
-| validate_license_compliance.py | AGET_LICENSE_SPEC | P0 | TBD |
-| validate_agent_structure.py | Multiple | P1 | TBD |
-| validate_homepage_messaging.py | R-HOM-001 | P1 | TBD |
-| validate_sop_compliance.py | AGET_SOP_SPEC | P1 | TBD |
-| validate_file_naming.py | AGET_FILE_NAMING | P2 | TBD |
-| validate_portability_compliance.py | AGET_PORTABILITY_SPEC | P2 | TBD |
-| validate_compatibility.py | AGET_COMPATIBILITY_SPEC | P2 | TBD |
-| validate_script_compliance.py | AGET_PYTHON_SCRIPT_SPEC | P2 | TBD |
-| validate_ldoc_index.py | AGET_MEMORY_SPEC | P2 | TBD |
-| validate_governance_traceability.py | AGET_GOVERNANCE_SPEC | P2 | TBD |
-| validate_tool_alignment.py | AGET_TOOL_SPEC | P3 | TBD |
-| validate_agents_md_size.py | AGET_MIGRATION_SPEC | P3 | TBD |
+| Validator | Spec Reference | Priority | Status |
+|-----------|----------------|----------|--------|
+| validate_portability_compliance.py | AGET_PORTABILITY_SPEC | P2 | Planned |
+| validate_compatibility.py | AGET_COMPATIBILITY_SPEC | P2 | Planned |
+| validate_script_compliance.py | AGET_PYTHON_SCRIPT_SPEC | P2 | Planned |
+| validate_governance_traceability.py | AGET_GOVERNANCE_SPEC | P2 | Planned |
+| validate_tool_alignment.py | AGET_TOOL_SPEC | P3 | Planned |
+| validate_agents_md_size.py | AGET_MIGRATION_SPEC | P3 | Planned |
+| validate_cli_settings.py | AGET_DOCUMENTATION_SPEC | P2 | Planned |
+| validate_public_content.py | AGET_SECURITY_SPEC | P2 | Planned |
+| validate_contract_tests.py | AGET_TESTING_SPEC | P2 | Planned |
+| validate_test_naming.py | AGET_TESTING_SPEC | P3 | Planned |
+| validate_changelog.py | AGET_RELEASE_SPEC | P2 | Planned |
+| validate_fleet.py | AGET_RELEASE_SPEC | P3 | Planned |
+| validate_artifact.py | Internal | P3 | Planned |
+| validate_readme.py | Internal | P3 | Planned |
+| validate_naming.py | Internal | P3 | Planned |
 
 ---
 

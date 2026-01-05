@@ -1,11 +1,11 @@
 # AGET 5D Composition Architecture Specification
 
-**Version**: 1.2.0
+**Version**: 1.3.0
 **Status**: Active
 **Category**: Standards (Umbrella)
 **Format Version**: 1.2
 **Created**: 2025-12-26
-**Updated**: 2025-12-27
+**Updated**: 2026-01-04
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_5D_ARCHITECTURE_SPEC.md`
 **Change Proposal**: CP-008
@@ -43,12 +43,16 @@ Without a unifying framework, these concerns become ad-hoc and inconsistent. The
 - Validation requirements
 
 **Related Specifications**:
-- AGET_PERSONA_SPEC.md (D1 detail)
-- AGET_MEMORY_SPEC.md (D2 detail)
-- AGET_REASONING_SPEC.md (D3 detail)
-- AGET_SKILLS_SPEC.md (D4 detail)
-- AGET_CONTEXT_SPEC.md (D5 detail)
+- AGET_5D_COMPONENTS_SPEC.md (consolidated D1-D5 requirements)
 - COMPOSITION_SPEC_v1.0.md (capability composition mechanism)
+- AGET_VOCABULARY_SPEC.md (vocabulary standards)
+
+**Archived** (consolidated into AGET_5D_COMPONENTS_SPEC.md):
+- archive/AGET_PERSONA_SPEC.md (D1)
+- archive/AGET_MEMORY_SPEC.md (D2)
+- archive/AGET_REASONING_SPEC.md (D3)
+- archive/AGET_SKILLS_SPEC.md (D4)
+- archive/AGET_CONTEXT_SPEC.md (D5)
 
 ---
 

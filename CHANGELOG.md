@@ -15,6 +15,72 @@ No unreleased changes at this time.
 
 ---
 
+## [3.2.0] - 2026-01-04
+
+**Theme**: Specification Architecture
+
+### Added
+
+- **7 New Specifications**: Comprehensive governance coverage
+  - `AGET_TESTING_SPEC.md`: Contract testing requirements (CAP-TEST-001 to CAP-TEST-009)
+  - `AGET_RELEASE_SPEC.md`: Release process requirements (CAP-REL-001 to CAP-REL-006)
+  - `AGET_DOCUMENTATION_SPEC.md`: Documentation standards (CAP-DOC-001 to CAP-DOC-007)
+  - `AGET_ORGANIZATION_SPEC.md`: Organization artifacts (CAP-ORG-001 to CAP-ORG-003)
+  - `AGET_ERROR_SPEC.md`: Error handling patterns (CAP-ERR-001 to CAP-ERR-005)
+  - `AGET_SECURITY_SPEC.md`: Security requirements (CAP-SEC-001 to CAP-SEC-004)
+  - `AGET_PROJECT_PLAN_SPEC.md`: Planning standards (CAP-PP-001 to CAP-PP-011)
+- **Naming Convention Expansion**: 4 → 10 categories (L439)
+  - Category F: Standard Open-Source Files (README, LICENSE, CHANGELOG, CONTRIBUTING)
+  - Category G: Requirement Documents (R-XXX-NNN pattern)
+  - Category H: Change Proposals (CP-NNN_name.md)
+  - Category I: Protocol Documents (*_PROTOCOL.md)
+  - Category J: Checklists (*_CHECKLIST.md)
+  - Domain Codes Registry (17 registered: REL, TPL, WAKE, etc.)
+  - Git Branch Naming (feature/, fix/, docs/, etc.)
+  - Git Tag Naming (vM.m.p[-prerelease])
+- **Specification Index System**:
+  - `INDEX.md`: Master list of 30 specifications
+  - `REQUIREMENTS_MATRIX.md`: 78 CAP requirements cross-referenced
+- **Standardized Spec Headers**:
+  - YAML frontmatter with version, status, domain, dependencies
+  - `migrate_spec_headers.py` migration script
+  - JSON Schema for header validation
+- **6 New Validators** (L433 remediation):
+  - `validate_license_compliance.py`: Apache 2.0 verification (CAP-LIC-001 to CAP-LIC-004)
+  - `validate_agent_structure.py`: 5D directory validation (CAP-STRUCT-001 to CAP-STRUCT-005)
+  - `validate_release_gate.py`: Release gate enforcement (R-REL-006, L440)
+  - `validate_ldoc_index.py`: L-doc index consistency (CAP-MEMORY-008)
+  - `validate_sop_compliance.py`: SOP format validation (CAP-SOP-001 to CAP-SOP-004)
+  - `validate_homepage_messaging.py`: Homepage validation (CAP-ORG-001, CAP-ORG-002)
+
+### Changed
+
+- Validator inventory: 24 → 30 implemented
+- Spec count: 23 → 30 (7 new specifications)
+- Naming categories: 4 → 10 (6 new categories)
+- All specs now have standardized headers with version, status, dependencies
+- VALIDATOR_INVENTORY.md now tracks theater ratio (33% → target <10%)
+
+### Documentation
+
+- INDEX.md: Central specification registry
+- REQUIREMENTS_MATRIX.md: Complete CAP requirement inventory
+- PROJECT_PLAN_TEMPLATE.md: Standard planning format with V-tests (CAP-PP-011)
+
+### Learnings Captured
+
+- L439: Standard Open-Source Files as Category F
+- L440: "A checkbox is not a verification. A passing test is."
+- L441: Theater Ratio as Specification Quality Metric
+- L442: Declarative vs Executable Verification
+- L443: Theater Ratio Paradox (new specs increase denominator)
+
+### Tests
+
+30 validators implemented (theater ratio 33%, target <10% for v3.3.0)
+
+---
+
 ## [3.1.0] - 2026-01-04
 
 ### Added
@@ -399,9 +465,9 @@ This version exists in migration_history but was never published as a GitHub Rel
 
 ## Version Support
 
-**Latest Stable**: v2.12.0
+**Latest Stable**: v3.2.0
 **Support Window**: Latest release receives full support (bug fixes, enhancements)
-**Previous Minor** (v2.11.x): Security fixes only
+**Previous Minor** (v3.1.x): Security fixes only
 **Older Versions**: No active support (upgrade recommended)
 
 ---
