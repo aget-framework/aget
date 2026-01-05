@@ -1,8 +1,8 @@
 # Fleet Instance_Migration Guide v3.0
 
-**Version**: 1.1.0
+**Version**: 1.2.0
 **Date**: 2026-01-04
-**Updated**: Fix #15 enhancements (pre-flight, archaeology, customization, naming)
+**Updated**: L455 AGENTS.md invocation verification (Fix #15 enhancements)
 **Owner**: aget-framework
 **Implements**: CAP-MIG-001 (Instance_Migration), CAP-MIG-015 (Behavioral_Validation)
 **Location**: `aget/docs/FLEET_MIGRATION_GUIDE_v3.md`
@@ -187,6 +187,55 @@ See: L016 (Content Archaeology During Migration)
 
 ---
 
+## AGENTS.md Invocation Verification (L455)
+
+⚠️ **After script migration, AGENTS.md training instructions must match new CLI interfaces.**
+
+### Problem (L455)
+
+Migration often copies new scripts (wake_up.py, wind_down.py, housekeeping) but leaves stale CLI invocations in AGENTS.md. The agent's first session then fails:
+
+```
+User: "sanity check"
+Agent: python3 scripts/aget_housekeeping_protocol.py sanity-check
+Script: error: unrecognized arguments: sanity-check
+```
+
+### V-Tests
+
+```bash
+AGENT_PATH="/path/to/agent"
+
+# V-MIG-AGENTS.1: No stale CLI patterns
+! grep -q "sanity-check" $AGENT_PATH/AGENTS.md && echo "PASS" || echo "FAIL: stale sanity-check"
+
+# V-MIG-AGENTS.2: v3.1+ invocations documented
+grep -q "\-\-json\|\-\-dir" $AGENT_PATH/AGENTS.md && echo "PASS" || echo "FAIL: v3.1 flags missing"
+
+# V-MIG-AGENTS.3: Documented commands actually work
+cd $AGENT_PATH && python3 scripts/aget_housekeeping_protocol.py --json > /dev/null && echo "PASS" || echo "FAIL"
+```
+
+### Checklist Addition
+
+Add to per-agent migration:
+
+- [ ] AGENTS.md invocations updated to match v3.1+ script interfaces
+- [ ] No stale subcommand references (sanity-check, etc.)
+- [ ] Documented commands tested and working
+
+### Correct v3.1 Invocations
+
+| Script | Invocation |
+|--------|------------|
+| wake_up.py | `python3 scripts/wake_up.py --json` |
+| wind_down.py | `python3 scripts/wind_down.py --json --notes "session notes"` |
+| housekeeping | `python3 scripts/aget_housekeeping_protocol.py --json` |
+
+See: L455 (Migration AGENTS.md Invocation Gap), R-MIG-AGENTS-001
+
+---
+
 ## Troubleshooting
 
 ### "identity.json not found"
@@ -235,6 +284,7 @@ mv $AGENT_PATH/.aget/agent_manifest.yaml $AGENT_PATH/.aget/archive/
 - [ ] Each agent passes Structural_Validation (24/24)
 - [ ] Each agent passes Version_Consistency
 - [ ] No legacy `agent_manifest.yaml` files remain
+- [ ] **AGENTS.md invocations match v3.1+ script interfaces (L455)**
 - [ ] Commit migrations per agent
 
 ---
@@ -270,8 +320,10 @@ Pattern `PROJECT_PLAN_[\w]+_v\d+\.\d+\.md` doesn't allow dots in name portion:
 - L377: Validation Suite Orchestration Gap
 - L395: Instance v3.0 Migration Pattern
 - L400: Conceptual vs Structural Migration
+- **L455: Migration AGENTS.md Invocation Gap**
 - CAP-MIG-014: Legacy File Handling
 - CAP-MIG-015: Behavioral_Validation Requirement
+- **R-MIG-AGENTS-001: AGENTS.md Training Coherence**
 
 ---
 
