@@ -1,8 +1,8 @@
 # Fleet Instance_Migration Guide v3.0
 
-**Version**: 1.2.0
-**Date**: 2026-01-04
-**Updated**: L455 AGENTS.md invocation verification (Fix #15 enhancements)
+**Version**: 1.3.0
+**Date**: 2026-01-05
+**Updated**: L457 Cross-Machine Pre-Flight enhancement (git pull + re-study)
 **Owner**: aget-framework
 **Implements**: CAP-MIG-001 (Instance_Migration), CAP-MIG-015 (Behavioral_Validation)
 **Location**: `aget/docs/FLEET_MIGRATION_GUIDE_v3.md`
@@ -28,13 +28,13 @@ git log --oneline -1
 
 ---
 
-## Cross-Machine Pre-Flight (Fix #15)
+## Cross-Machine Pre-Flight (Fix #15, L457)
 
 Before starting migration on a different machine from where framework was developed:
 
 ```bash
 # 1. Verify framework repo has remote configured
-cd ~/github/aget-framework/aget
+cd ~/github/aget-framework/aget  # or ~/code/gmelli/aget
 git remote -v
 # Expected: origin  git@github.com:aget-framework/aget.git (fetch/push)
 
@@ -44,9 +44,41 @@ git remote set-url origin https://github.com/aget-framework/aget.git
 # 3. Verify can fetch
 git fetch origin
 
-# 4. Verify required commit available
+# 4. Verify remote has newer commits
 git log origin/main --oneline -5
+
+# 5. SYNC: Pull latest framework (CRITICAL - was missing pre-L456)
+git pull origin main
+
+# 6. Verify framework version after sync
+cat .aget/version.json | grep aget_version
+# Expected: "aget_version": "3.2.x" (or current release)
 ```
+
+### Post-Sync Agent Instructions
+
+After syncing framework, agents MUST re-study before migration:
+
+```
+⚠️ If agent previously studied with stale framework:
+   - Agent may incorrectly report "version X.X doesn't exist"
+   - Solution: Re-run study/research phase after git pull
+   - Pattern: "study up" or "focus on: v3.2 upgrade"
+```
+
+### V-Tests
+
+```bash
+# V-PRE.1: Framework synced
+LOCAL=$(cat .aget/version.json | grep -o '"[0-9.]*"' | head -1)
+EXPECTED="3.2"  # adjust to current release
+echo $LOCAL | grep -q "$EXPECTED" && echo "PASS" || echo "FAIL: framework stale"
+
+# V-PRE.2: No uncommitted changes blocking pull
+git status --short | grep -v '^??' | wc -l | grep -q '^0$' && echo "PASS" || echo "FAIL: uncommitted changes"
+```
+
+See: L457 (Remote Supervisor Upgrade Pattern)
 
 ---
 
@@ -321,6 +353,7 @@ Pattern `PROJECT_PLAN_[\w]+_v\d+\.\d+\.md` doesn't allow dots in name portion:
 - L395: Instance v3.0 Migration Pattern
 - L400: Conceptual vs Structural Migration
 - **L455: Migration AGENTS.md Invocation Gap**
+- **L457: Remote Supervisor Upgrade Pattern**
 - CAP-MIG-014: Legacy File Handling
 - CAP-MIG-015: Behavioral_Validation Requirement
 - **R-MIG-AGENTS-001: AGENTS.md Training Coherence**
