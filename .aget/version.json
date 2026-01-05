@@ -1,5 +1,5 @@
 {
-  "aget_version": "3.2.0",
+  "aget_version": "3.2.1",
   "created": "2025-09-21",
   "updated": "2026-01-04",
   "component": "core",
@@ -17,7 +17,8 @@
     "v3.0.0: 2025-12-28 (5D Composition Architecture - Major Release)",
     "v3.0.1: 2026-01-04 (Patch: Migration script fixes #14,#15,#16,#220,#221)",
     "v3.1.0: 2026-01-04 (Session Protocol Enhancements + Workflow Automation)",
-    "v3.2.0: 2026-01-04 (Specification Architecture - 7 new specs, naming expansion, validators)"
+    "v3.2.0: 2026-01-04 (Specification Architecture - 7 new specs, naming expansion, validators)",
+    "v3.2.1: 2026-01-04 (Patch: Version inventory coherence - L444 remediation)"
   ],
   "contents": {
     "specs/": "Canonical specifications (AGET_VERSIONING_CONVENTIONS, etc.)",

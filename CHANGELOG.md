@@ -15,6 +15,36 @@ No unreleased changes at this time.
 
 ---
 
+## [3.2.1] - 2026-01-04
+
+**Theme**: Version Inventory Coherence (L444 Remediation)
+
+### Fixed
+
+- **Version Consistency**: All version-bearing files now consistent across 7 repos
+  - AGENTS.md headers updated (were stuck at v3.1.0)
+  - manifest.yaml version fields updated (were stuck at 3.1.0)
+  - version.json files updated to 3.2.1
+- **Coherence Testing**: Added V7.1.4, V7.1.5, V7.1.6 tests to Gate 7
+  - V7.1.4: AGENTS.md header version check
+  - V7.1.5: manifest.yaml version field check
+  - V7.1.6: No stale version references check
+- **SOP Update**: `SOP_release_process.md` v1.7 with L444 coherence testing section
+
+### Added
+
+- **L444**: Version Inventory Coherence Requirement learning document
+- **R-REL-VER-001**: New requirement for version inventory coherence
+
+### Notes
+
+This patch release addresses version inconsistencies discovered during v3.2.0 retrospective.
+Root cause: Gate 7 checklist verified version.json but not AGENTS.md or manifest.yaml.
+
+See L444 for full 5-why analysis and process improvements.
+
+---
+
 ## [3.2.0] - 2026-01-04
 
 **Theme**: Specification Architecture
