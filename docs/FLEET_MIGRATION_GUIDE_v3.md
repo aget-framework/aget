@@ -309,6 +309,55 @@ mv $AGENT_PATH/.aget/agent_manifest.yaml $AGENT_PATH/.aget/archive/
 
 ---
 
+## Multi-Supervisor Coordination (L458)
+
+When multiple supervisors manage different fleet segments:
+
+### Sequential Validation Pattern
+
+```
+Supervisor 1 (smaller fleet) executes first
+    ↓
+[VALIDATION GATE] - All V-tests pass?
+    ↓
+[HANDOFF SIGNAL] → Supervisor 2
+    ↓
+Supervisor 2 pilot (cross-portfolio)
+    ↓
+[VALIDATION GATE] - Pilot successful?
+    ↓
+Supervisor 2 main fleet rollout
+```
+
+### Handoff Signals
+
+| Signal | Meaning |
+|--------|---------|
+| "Remote complete - GO for local" | Pattern validated, proceed |
+| "Remote complete with findings: [X]" | Issues to address first |
+| "HOLD" | Stop all migration |
+
+### Pilot Selection
+
+Select 3-5 agents across different portfolios for pilot:
+- Validates pattern works across portfolio boundaries
+- Catches portfolio-specific issues early
+- Example: 1 Main + 1 CCB + 1 RKB
+
+### Script Source Chain
+
+```
+✅ CORRECT: Framework → Fleet (direct)
+   ~/github/aget-framework/aget/scripts/ → agent/scripts/
+
+❌ WRONG: Framework → Supervisor → Fleet (chain)
+   May propagate supervisor-specific modifications
+```
+
+See: L458 (Fleet Migration Coordination Pattern)
+
+---
+
 ## Completion Checklist
 
 - [ ] Framework synced to latest (`git pull origin main`)
