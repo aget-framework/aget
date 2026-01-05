@@ -1,7 +1,8 @@
 # Capability Author Guide
 
-**Version**: 1.0.0
+**Version**: 1.0.1
 **Created**: 2025-12-25
+**Updated**: 2026-01-04
 **Purpose**: Enable practitioners to create new AGET capabilities
 
 ---
@@ -510,10 +511,15 @@ theoretical_basis:
 
 ## References
 
-- Schema: `specs/schemas/CAPABILITY_SPEC_v1.0_SCHEMA.yaml`
-- Validator: `validation/validate_capability_spec.py`
-- Theoretical Foundations: `.aget/evolution/L331_theoretical_foundations_agency.md`
-- Theoretical Grounding Protocol: `.aget/evolution/L332_theoretical_grounding_protocol.md`
+| ID | Title | Location |
+|----|-------|----------|
+| [CAPABILITY_SCHEMA] | Capability Spec Schema | [`specs/schemas/`][cap-schema] |
+| [validate_capability_spec] | Capability Validator | [`validation/`][cap-validator] |
+| [L331] | Theoretical Foundations of Agency | Internal L-doc |
+| [L332] | Theoretical Grounding Protocol | Internal L-doc |
+
+[cap-schema]: ../specs/schemas/CAPABILITY_SPEC_v1.0_SCHEMA.yaml
+[cap-validator]: ../validation/validate_capability_spec.py
 
 ---
 

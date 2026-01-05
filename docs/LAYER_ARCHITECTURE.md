@@ -1,7 +1,7 @@
 # AGET Layer Architecture
 
-**Version**: 1.0.0
-**Date**: 2025-12-01
+**Version**: 1.0.1
+**Date**: 2026-01-04
 **Status**: CANONICAL
 **Location**: aget/docs/LAYER_ARCHITECTURE.md
 
@@ -47,7 +47,7 @@ AGET templates form an inheritance hierarchy where specialized templates build u
 ### Layer 0: Foundation (Worker)
 
 **Template**: `template-worker-aget`
-**Specification**: `WORKER_TEMPLATE_SPEC_v1.0.yaml`
+**Specification**: [WORKER_TEMPLATE_SPEC]
 
 The foundation layer provides capabilities that ALL templates inherit:
 
@@ -75,8 +75,8 @@ Templates at this layer add behavioral patterns on top of foundation capabilitie
 #### Advisor Template
 
 **Template**: `template-advisor-aget`
-**Specification**: `ADVISOR_TEMPLATE_SPEC_v1.0.yaml`
-**Inherits From**: Worker Template
+**Specification**: [ADVISOR_TEMPLATE_SPEC] (planned)
+**Inherits From**: [WORKER_TEMPLATE_SPEC]
 
 **Added Capabilities**:
 - Persona system (teacher, mentor, consultant, guru, coach)
@@ -291,10 +291,14 @@ The architecture supports extension via:
 
 ## References
 
-- WORKER_TEMPLATE_SPEC_v1.0.yaml - Foundation specification
-- ADVISOR_TEMPLATE_SPEC_v1.0.yaml - Advisory specialization
-- L174: Template specification debt
-- L175: Template taxonomy bifurcation
+| ID | Title | Location |
+|----|-------|----------|
+| [WORKER_TEMPLATE_SPEC] | Foundation specification | [`specs/`][worker-spec] |
+| [ADVISOR_TEMPLATE_SPEC] | Advisory specialization | (planned) |
+| [L174] | Template specification debt | Internal L-doc |
+| [L175] | Template taxonomy bifurcation | Internal L-doc |
+
+[worker-spec]: ../specs/WORKER_TEMPLATE_SPEC_v1.0.yaml
 
 ---
 

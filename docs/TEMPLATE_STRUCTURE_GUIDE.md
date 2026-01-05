@@ -1,7 +1,7 @@
 # AGET Template Structure Guide
 
-**Version**: 1.0.0
-**Date**: 2025-12-01
+**Version**: 1.0.1
+**Date**: 2026-01-04
 **Status**: CANONICAL
 **Location**: aget/docs/TEMPLATE_STRUCTURE_GUIDE.md
 
@@ -370,10 +370,16 @@ full-aget/
 
 ## References
 
-- WORKER_TEMPLATE_SPEC_v1.0.yaml - Foundation capabilities
-- AGET_CONTROLLED_VOCABULARY.md - Standard terminology
-- AGET_VERSIONING_CONVENTIONS.md - Version rules
-- L171: Instance creation specification gap
+| ID | Title | Location |
+|----|-------|----------|
+| [WORKER_TEMPLATE_SPEC] | Foundation capabilities | [`specs/`][worker-spec] |
+| [VOCABULARY_SPEC] | Standard terminology | [`specs/`][vocab-spec] |
+| [VERSIONING_CONVENTIONS] | Version rules | [`specs/`][version-spec] |
+| [L171] | Instance creation specification gap | Internal L-doc |
+
+[worker-spec]: ../specs/WORKER_TEMPLATE_SPEC_v1.0.yaml
+[vocab-spec]: ../specs/AGET_VOCABULARY_SPEC.md
+[version-spec]: ../specs/AGET_VERSIONING_CONVENTIONS.md
 
 ---
 
