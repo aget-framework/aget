@@ -1,8 +1,8 @@
 # Shell Integration Guide
 
-**Version**: 1.0.0
+**Version**: 1.1.0
 **Status**: Active
-**Related**: L452 (Shell Orchestration Pattern), L189 (Credential Isolation)
+**Related**: L452 (Shell Orchestration Pattern), L189 (Credential Isolation), L050 (Directive Prompt Language)
 
 ---
 
@@ -141,15 +141,15 @@ alias ccb='aget ~/github/GM-CCB/private-ccb-AGET'
 Add custom CLI profiles or override existing ones:
 
 ```zsh
-# Example: Custom Claude path
+# Example: Custom Claude path with directive prompts
 _aget_claude() {
   local focus="$1"
   local prompt
 
   if [[ -n "$focus" ]]; then
-    prompt="Wake up. Focus: $focus"
+    prompt="Read AGENTS.md and execute the Wake Up Protocol. Then focus on: $focus"
   else
-    prompt="Wake up."
+    prompt="Read AGENTS.md and execute the Wake Up Protocol."
   fi
 
   /usr/local/bin/claude "$prompt"
@@ -198,46 +198,121 @@ Or manually maintain `~/.aget/agents.zsh` for smaller setups.
 
 ---
 
+## Prompt Language Guidelines
+
+When writing shell prompts that reference AGET protocols, use **directive language** rather than **suggestive language**.
+
+### Why This Matters
+
+LLMs interpret prompt phrasing literally. Suggestive phrases like "e.g." or "you might" are treated as optional examples, not instructions. This causes inconsistent protocol execution.
+
+### Language Comparison
+
+| Type | Example | LLM Interpretation |
+|------|---------|-------------------|
+| ❌ Suggestive | `(e.g. read AGENTS.md)` | Optional example, may skip |
+| ❌ Suggestive | `you might want to...` | Weak suggestion, often ignored |
+| ❌ Suggestive | `consider reading...` | Advisory, not required |
+| ✅ Directive | `Read AGENTS.md` | Clear imperative, will execute |
+| ✅ Directive | `Execute the Wake Up Protocol` | Named procedure, recognized |
+| ✅ Directive | `Run: python3 scripts/X.py` | Specific action required |
+
+### Correct Patterns
+
+```zsh
+# With focus topic
+"Read AGENTS.md and execute the Wake Up Protocol. Then study up and focus on: $1"
+
+# Without focus topic
+"Read AGENTS.md and execute the Wake Up Protocol."
+
+# Script-based (fastest)
+"Run: python3 scripts/wake_up.py"
+```
+
+### Anti-Patterns
+
+```zsh
+# ❌ BAD: Suggestive/example language
+"Wake up (e.g. read AGENTS.md)"
+"Start by maybe reading AGENTS.md"
+"You could read AGENTS.md first"
+
+# ❌ BAD: Vague references
+"Do the startup thing"
+"Initialize yourself"
+```
+
+**Reference**: L050 (Directive Prompt Language Pattern)
+
+---
+
 ## CLI Profiles
 
 ### Claude Code
 
 ```zsh
 _aget_claude() {
-  local prompt="Wake up (e.g. read AGENTS.md plus ...). Afterwards, study up. And focus on: $1"
+  local focus="$1"
+  local prompt
+
+  if [[ -n "$focus" ]]; then
+    prompt="Read AGENTS.md and execute the Wake Up Protocol. Then study up and focus on: $focus"
+  else
+    prompt="Read AGENTS.md and execute the Wake Up Protocol."
+  fi
+
   env -u ANTHROPIC_API_KEY /opt/homebrew/bin/claude "$prompt"
 }
 ```
 
 **Features**:
 - Subscription auth preference
-- Full wake-up prompt with focus topic
-- Reads AGENTS.md on mention
+- Directive prompt language (L050)
+- Conditional focus topic handling
 
 ### Codex CLI
 
 ```zsh
 _aget_codex() {
-  codex "wake up. focus on: $1"
+  local focus="$1"
+  local prompt
+
+  if [[ -n "$focus" ]]; then
+    prompt="Read AGENTS.md and execute the Wake Up Protocol. Then focus on: $focus"
+  else
+    prompt="Read AGENTS.md and execute the Wake Up Protocol."
+  fi
+
+  codex "$prompt"
 }
 ```
 
 **Features**:
 - Uses OPENAI_API_KEY from environment
-- Simpler prompt format
+- Directive prompt language (L050)
 
 ### Gemini CLI
 
 ```zsh
 _aget_gemini() {
-  gemini -i "@AGENTS.md wake up. focus on: $1"
+  local focus="$1"
+  local prompt
+
+  if [[ -n "$focus" ]]; then
+    prompt="@AGENTS.md Read this file and execute the Wake Up Protocol. Then focus on: $focus"
+  else
+    prompt="@AGENTS.md Read this file and execute the Wake Up Protocol."
+  fi
+
+  gemini -i "$prompt"
 }
 ```
 
 **Features**:
 - Requires `-i` flag for initial prompt
 - Uses `@filename` syntax for file references
-- Explicitly loads AGENTS.md
+- Directive prompt language (L050)
 
 ### Aider
 
@@ -261,12 +336,16 @@ _aget_aider() {
 ```zsh
 _aget_myawesomecli() {
   local focus="$1"
+  local prompt
 
+  # Use directive language (L050)
   if [[ -n "$focus" ]]; then
-    myawesomecli --prompt "Wake up. Focus: $focus"
+    prompt="Read AGENTS.md and execute the Wake Up Protocol. Then focus on: $focus"
   else
-    myawesomecli --prompt "Wake up."
+    prompt="Read AGENTS.md and execute the Wake Up Protocol."
   fi
+
+  myawesomecli --prompt "$prompt"
 }
 ```
 
@@ -338,12 +417,14 @@ plugins=(git aget)
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.1.0 | 2026-01-07 | Added Prompt Language Guidelines (L050), updated all CLI profiles to use directive language |
 | 1.0.0 | 2026-01-04 | Initial release |
 
 ---
 
 ## References
 
+- [L050: Directive Prompt Language Pattern](https://github.com/aget-framework/aget/issues/53) - Use directive vs suggestive language
 - [L452: Shell Orchestration Pattern](../evolution/L452_shell_orchestration_pattern.md)
 - [L189: Credential Isolation Pattern](../evolution/L189_env_u_credential_isolation_pattern.md)
 - [AGET_SESSION_SPEC](../specs/AGET_SESSION_SPEC.md) - Wake/wind-down protocols
