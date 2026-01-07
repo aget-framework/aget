@@ -1,6 +1,6 @@
 # SOP: Fleet Migration
 
-**Version**: 1.0.0
+**Version**: 1.1.0
 **Created**: 2026-01-05
 **Owner**: private-supervisor-AGET
 **Related**: L455 (AGENTS.md Invocation Verification), L457 (Cross-Machine Pre-Flight), AGET_RELEASE_SPEC, PROJECT_PLAN_fleet_v3.2_migration.md
@@ -65,6 +65,20 @@ ls ~/github/aget-framework/aget/scripts/{wake_up,wind_down,aget_housekeeping_pro
 python3 -c "import yaml; f=yaml.safe_load(open('~/.../FLEET_STATE.yaml')); print(f'Active: {f[\"metadata\"][\"active_agents\"]}')"
 ```
 **Expected**: Known agent count
+
+#### V0.4: Check for Late-Created Agents
+```bash
+# Identify agents created after last migration (may have missed version wave)
+LAST_MIGRATION="YYYY-MM-DD"  # Date of previous fleet migration
+for agent in ~/github/private-*-aget ~/github/GM-*/private-*-aget; do
+  created=$(jq -r '.created // .discovered // "unknown"' $agent/.aget/version.json 2>/dev/null)
+  if [[ "$created" > "$LAST_MIGRATION" ]]; then
+    echo "LATE: $(basename $agent) created $created"
+  fi
+done
+```
+**Expected**: List of agents needing catch-up migration (may be empty)
+**Action**: Include late-created agents in Phase 2 batches
 
 **Decision_Point**: Framework ready? [GO/NOGO]
 
@@ -212,6 +226,21 @@ done | grep -v "X.Y.Z" && echo "DRIFT DETECTED" || echo "ALL CONSISTENT"
 ```
 **Expected**: All at target version
 
+#### Gate 4.2.1: Migration History Check (V-MIG-HISTORY)
+
+```bash
+# Verify migration_history was updated per-agent
+TARGET_VERSION="X.Y.Z"
+for agent in ~/github/private-*-aget ~/github/GM-*/private-*-aget; do
+  last_to=$(jq -r '.migration_history[-1].to_version // "none"' $agent/.aget/version.json 2>/dev/null)
+  if [[ "$last_to" != "$TARGET_VERSION" ]]; then
+    echo "MISSING: $(basename $agent) - last recorded: $last_to"
+  fi
+done
+```
+**Expected**: All agents show target version in migration_history
+**Action**: If gaps found, update version.json migration_history arrays
+
 #### Gate 4.3: FLEET_STATE Update
 
 ```bash
@@ -313,6 +342,13 @@ mkdir -p $AGENT_PATH/scripts  # Create real directory
 ---
 
 ## Changelog
+
+### v1.1.0 (2026-01-07)
+
+- Added V0.4: Late-created agent detection (Phase 0)
+- Added Gate 4.2.1: V-MIG-HISTORY migration_history per-agent check
+- Created L455, L457 learning documents in `docs/learnings/`
+- Cross-supervisor feedback integration (multi-fleet validation)
 
 ### v1.0.0 (2026-01-05)
 
