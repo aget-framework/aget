@@ -1,8 +1,8 @@
 # AGET Requirements Traceability Matrix
 
-**Version**: 1.0.0
+**Version**: 1.2.0
 **Status**: Active
-**Updated**: 2026-01-04
+**Updated**: 2026-01-07
 **Author**: private-aget-framework-AGET
 
 This document provides traceability from L-docs and issues to CAP requirements and specifications.
@@ -127,6 +127,28 @@ Issue/L-doc → CAP Requirement → Specification → Validator → Test
 | CAP-PP-010 | References | - | validate_project_plan.py |
 | CAP-PP-011 | V-Tests | L440 | validate_project_plan.py --strict |
 
+### CAP-EVOL (AGET_EVOLUTION_SPEC)
+
+| CAP ID | Requirement | Source | Validator |
+|--------|-------------|--------|-----------|
+| CAP-EVOL-001 | Learning Entries (L-prefix) | L461 | validate_ldoc.py |
+| CAP-EVOL-002 | Decision Entries (D-prefix) | L461 | validate_evolution_entry.py |
+| CAP-EVOL-003 | Discovery Entries (DISC-prefix) | L461 | validate_evolution_entry.py |
+| CAP-EVOL-004 | Flat Directory Structure | L460 | validate_content_placement.py |
+| CAP-EVOL-005 | Content Placement | L460 | validate_content_placement.py |
+| CAP-EVOL-006 | Evolution Index | L394 | validate_evolution_index.py |
+
+### CAP-EKO (AGET_EXECUTABLE_KNOWLEDGE_SPEC)
+
+| CAP ID | Requirement | Source | Validator |
+|--------|-------------|--------|-----------|
+| CAP-EKO-001 | Three-Axis Taxonomy | L451 | Documentation review |
+| CAP-EKO-002 | Abstraction Level Classification | L451 | validate_artifact_type.py |
+| CAP-EKO-003 | Determinism Level Classification | L451 | validate_artifact_type.py |
+| CAP-EKO-004 | Reusability Level Classification | L451 | validate_artifact_type.py |
+| CAP-EKO-005 | Autonomy Delegation | L451 | Manual review |
+| CAP-EKO-006 | AGET Ontology Independence | L453 | Documentation review |
+
 ### CAP-DOC (AGET_DOCUMENTATION_SPEC)
 
 | CAP ID | Requirement | Source | Validator |
@@ -191,6 +213,10 @@ Issue/L-doc → CAP Requirement → Specification → Validator → Test
 | L433 | Validator Theater | CAP-TEST-006 |
 | L435 | Retrospective Requirement | CAP-REASON-008, CAP-PP-001 |
 | L440 | Verification Gap | CAP-VOC-003, CAP-TEST-003, CAP-PP-011, CAP-REL-006 |
+| L451 | Executable Knowledge Ontology | CAP-EKO-001 to CAP-EKO-005 |
+| L453 | AGET Ontology Independence | CAP-EKO-006 |
+| L460 | Directory Semantics | CAP-EVOL-004, CAP-EVOL-005 |
+| L461 | Evolution Entry Types | CAP-EVOL-001 to CAP-EVOL-003 |
 
 ---
 

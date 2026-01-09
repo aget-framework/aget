@@ -1,11 +1,11 @@
 # AGET TEMPLATE Specification
 
-**Version**: 3.1.0
+**Version**: 3.2.0
 **Status**: Active
 **Category**: Standards (Template Architecture)
 **Format Version**: 1.2
 **Created**: 2025-12-27
-**Updated**: 2025-12-27
+**Updated**: 2026-01-06
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_TEMPLATE_SPEC.md`
 **Change Proposal**: CP-017, CP-018
@@ -283,6 +283,17 @@ inviolables:
   inherited: []
   agent_specific: []
 
+# Optional: Entity inheritance (L459)
+entities:
+  inherits:                          # Core entities to inherit
+    - Person
+    - Organization
+    - Document
+  extends:                           # Domain-specific extensions
+    Person:
+      attributes:
+        - custom_field: {type: string}
+
 # Optional: Contract tests
 contract_tests:
   required:
@@ -530,6 +541,101 @@ visible_directories:
     - decisions/               # ADRs
   removed: []                   # None (removal emits warning)
 ```
+
+### CAP-TPL-012: Entity Inheritance (L459)
+
+The SYSTEM shall support Core_Entity inheritance from AGET_VOCABULARY_SPEC Part 6.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-TPL-012-01 | optional | WHERE entities.inherits is specified, the SYSTEM shall inherit Core_Entity definitions |
+| CAP-TPL-012-02 | ubiquitous | The SYSTEM shall include all base attributes from inherited Core_Entity |
+| CAP-TPL-012-03 | optional | WHERE entities.extends is specified, the SYSTEM shall add domain-specific attributes |
+| CAP-TPL-012-04 | ubiquitous | The SYSTEM shall NOT remove inherited Core_Entity attributes |
+| CAP-TPL-012-05 | conditional | IF extended attribute narrows type THEN the SYSTEM shall allow (string → enum) |
+| CAP-TPL-012-06 | conditional | IF extended attribute widens type THEN the SYSTEM shall report error |
+
+**Enforcement**: `validate_entity_inheritance.py`
+
+#### Entity Inheritance Rules (R-ENT-*)
+
+| Rule ID | Rule | Description |
+|---------|------|-------------|
+| R-ENT-001 | Inherited entities include all base attributes | Cannot remove base attributes |
+| R-ENT-002 | Extensions add attributes, cannot remove | Additive only |
+| R-ENT-003 | Extensions can add relationships | New connections allowed |
+| R-ENT-004 | Extensions can narrow types | string → enum allowed, not vice versa |
+| R-ENT-005 | Extended entities remain compatible | Consumers of base can consume extended |
+
+#### Entity Inheritance Example
+
+```yaml
+# In manifest.yaml
+entities:
+  inherits:
+    - Person                     # From AGET_VOCABULARY_SPEC Part 6
+    - Organization
+    - Document
+
+  extends:
+    Person:
+      attributes:
+        - bar_number:            # Domain-specific attribute
+            type: string
+            description: "State bar license number"
+        - jurisdiction:
+            type: string
+            description: "Licensing jurisdiction"
+    Document:
+      attributes:
+        - confidentiality:
+            type: enum
+            values: [public, confidential, privileged]
+      relationships:
+        - subject_of:
+            target: Legal_Matter
+            cardinality: "0:many"
+```
+
+**Reference**: L459 (Core Entity Vocabulary Vision), AGET_VOCABULARY_SPEC Part 6
+
+### CAP-TPL-013: Evolution Entry Types (L461)
+
+The SYSTEM shall use standardized entry types in `.aget/evolution/` directory.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-TPL-013-01 | ubiquitous | The SYSTEM shall use L-prefix for Learning entries (L{NNN}_{title}.md) |
+| CAP-TPL-013-02 | ubiquitous | The SYSTEM shall use D-prefix for Decision entries (D{NNN}_{title}.md) |
+| CAP-TPL-013-03 | ubiquitous | The SYSTEM shall use DISC-prefix for Discovery entries (DISC{NNN}_{title}.md) |
+| CAP-TPL-013-04 | ubiquitous | The SYSTEM shall use flat file structure (not subdirectories) for evolution entries |
+| CAP-TPL-013-05 | ubiquitous | The SYSTEM shall place PROJECT_PLAN files in planning/, NOT in .aget/evolution/ |
+| CAP-TPL-013-06 | optional | WHERE index.json exists, the SYSTEM shall maintain evolution entry metadata |
+
+**Enforcement**: `validate_content_placement.py`
+
+**Rationale**: L460 (Directory Semantics Reconciliation Gap) and L461 (Evolution Entry Type Standardization) established that evolution entries use flat files with prefixes (L/D/DISC), and PROJECT_PLANs belong in planning/ (prospective) not evolution/ (retrospective).
+
+#### Evolution Entry Types
+
+| Prefix | Type | Purpose | Temporal Orientation |
+|--------|------|---------|---------------------|
+| L | Learning | Lessons learned, patterns discovered | Retrospective |
+| D | Decision | Architectural/strategic decisions | Retrospective |
+| DISC | Discovery | Unexpected findings, emergent behaviors | Retrospective |
+
+#### Content Placement Rules
+
+| Content Type | Correct Location | Incorrect Location |
+|--------------|------------------|-------------------|
+| L-docs | `.aget/evolution/` | - |
+| D-docs | `.aget/evolution/` | - |
+| DISC-docs | `.aget/evolution/` | - |
+| PROJECT_PLANs | `planning/` | `.aget/evolution/` |
+| SOPs | `sops/` | `.aget/evolution/` |
+| Session notes | `sessions/` | `.aget/evolution/` |
+
+**Reference**: L460, L461, AGET_EVOLUTION_SPEC.md
 
 ---
 

@@ -1,0 +1,280 @@
+# SESSION_SKILLS_INDEX.yaml
+# AGET Framework Session Skills Index
+# Version: 1.0.0
+# Spec Reference: AGET_SESSION_SPEC.md
+# Created: 2026-01-08
+# Related Learnings: L187, L335, L477, L491
+
+# Purpose:
+# This index provides authoritative disambiguation for session skills.
+# Per L491 (Script-Level Semantic Slippage), agents can execute wrong
+# scripts despite correct intent. This index maps trigger phrases to
+# canonical script paths to prevent such errors.
+
+meta:
+  version: "1.0.0"
+  framework_version: "3.4.0"
+  spec_reference: "AGET_SESSION_SPEC.md"
+  purpose: "Authoritative index for session skill disambiguation"
+  related_learnings:
+    - L187  # Silent execution
+    - L335  # Memory architecture
+    - L477  # Semantic slippage (language level)
+    - L491  # Script-level semantic slippage
+
+# Validation rules for canonical paths
+validation:
+  canonical_path_pattern: ".aget/patterns/session/*.py"
+  non_canonical_paths:
+    - "scripts/*.py"          # Non-standard location
+    - "*.py"                  # Root level
+    - "patterns/*.py"         # Missing .aget prefix
+  disambiguation_rule: >
+    When protocol name appears in user instruction, reference this index
+    to determine correct script. Do NOT infer script from protocol name alone.
+
+# Session file naming standard
+session_naming:
+  pattern: "session_YYYY-MM-DD_HHMM.md"
+  components:
+    - prefix: "session_"      # Lowercase, underscore
+    - date: "YYYY-MM-DD"      # ISO 8601 date
+    - separator: "_"          # Separates date from time
+    - time: "HHMM"            # 24-hour, no colon (filesystem safe)
+    - extension: ".md"        # Markdown
+  collision_prevention: "Time component prevents multiple sessions per day"
+  optional_suffix: "session_2026-01-08_1430_topic.md"
+  location: "sessions/"
+
+# Session Skills Catalog
+skills:
+
+  # ============================================================
+  # LIFECYCLE SKILLS (Start / End)
+  # ============================================================
+
+  wake_up:
+    id: CAP-SESSION-001
+    category: lifecycle
+    trigger_phrase: "wake up"
+    aliases:
+      - "wakeup"
+      - "start session"
+      - "initialize"
+    script: ".aget/patterns/session/wake_up.py"
+    fallback: "Manual: Read version.json, identity.json, display summary"
+    tests: "tests/test_session_protocol.py::TestWakeUpProtocol"
+    requirements:
+      - R-SESSION-001-01  # Execute script if exists
+      - R-SESSION-001-02  # Fallback to manual
+      - R-SESSION-001-03  # Output format
+      - R-SESSION-001-04  # Silent execution (L187)
+      - R-SESSION-001-05  # Check pending work
+      - R-SESSION-001-06  # Display handoff summary
+    learnings:
+      - L187  # Silent execution
+    verify_flag: true
+    disambiguation: >
+      wake_up initializes session context. Execute at session start.
+      Do NOT confuse with sanity_check (health verification) or
+      step_back (KB review). This is the FIRST thing to run.
+
+  wind_down:
+    id: CAP-SESSION-004
+    category: lifecycle
+    trigger_phrase: "wind down"
+    aliases:
+      - "winddown"
+      - "end session"
+      - "finalize"
+    script: ".aget/patterns/session/wind_down.py"
+    NOT_script: ".aget/patterns/session/aget_housekeeping_protocol.py"  # L491
+    fallback: "Manual: Check pending work, create session file"
+    tests: "tests/test_session_protocol.py::TestWindDownProtocol"
+    requirements:
+      - R-SESSION-004-01  # Execute script
+      - R-SESSION-004-02  # Check pending work
+      - R-SESSION-004-03  # Check uncommitted changes
+      - R-SESSION-004-04  # Display summary
+      - R-SESSION-004-05  # Conditional handoff
+    related:
+      - CAP-SESSION-005  # Mandatory handoff triggers
+      - CAP-SESSION-006  # Handoff format
+      - INV-SESSION-002  # No wind-down without handoff
+    learnings:
+      - L477  # Semantic slippage
+      - L491  # Script-level slippage
+    verify_flag: true
+    disambiguation: >
+      wind_down ends session and creates handoff if required.
+      Do NOT confuse with sanity_check (health verification).
+      The aget_housekeeping_protocol.py is for sanity_check, NOT wind_down.
+      This is a common mistake documented in L491.
+
+  # ============================================================
+  # MID-SESSION SKILLS (Context Recovery / Research)
+  # ============================================================
+
+  step_back:
+    id: CAP-SESSION-002  # Part of Context Recovery capability
+    category: mid_session
+    trigger_phrase: "step back. review kb."
+    aliases:
+      - "step back"
+      - "review kb"
+      - "kb audit"
+      - "check precedents"
+    script: ".aget/patterns/session/step_back.py"
+    fallback: "Manual: Review inherited/, planning/, evolution/, governance/"
+    pattern_doc: "docs/patterns/PATTERN_step_back_review_kb.md"
+    tests: "tests/test_session_protocol.py::TestStepBackProtocol"
+    requirements:
+      - R-SESSION-002-01  # Support trigger phrase
+      - R-SESSION-002-02  # Load retrieval.yaml
+      - R-SESSION-002-03  # Use index.json if L-docs > 50
+      - R-SESSION-002-04  # Cite 3+ precedents
+      - R-SESSION-002-05  # Read handoff notes
+    learnings:
+      - L335  # Memory architecture
+    verify_flag: true
+    disambiguation: >
+      step_back reviews KB BEFORE proposing changes. Use for governance
+      decisions or substantial changes. Differs from study_up (focused
+      topic research) and wake_up (session initialization).
+
+  study_up:
+    id: CAP-SESSION-007  # NEW capability
+    category: mid_session
+    trigger_phrase: "study up [topic]"
+    aliases:
+      - "study up"
+      - "research"
+      - "deep dive"
+      - "investigate"
+    script: ".aget/patterns/session/study_up.py"
+    tests: "tests/test_session_protocol.py::TestStudyUpProtocol"
+    requirements:
+      - R-SESSION-007-01  # Accept topic argument
+      - R-SESSION-007-02  # Search KB for topic
+      - R-SESSION-007-03  # Report related artifacts
+      - R-SESSION-007-04  # JSON output mode
+      - R-SESSION-007-05  # Verify mode
+    learnings:
+      - L187  # Silent execution
+    verify_flag: true
+    disambiguation: >
+      study_up does focused research on a SPECIFIC topic. Use when you
+      need deep knowledge on one subject. Differs from step_back (broad
+      KB review) and wake_up (session initialization).
+
+  # ============================================================
+  # VERIFICATION SKILLS (Health / Diagnostics)
+  # ============================================================
+
+  sanity_check:
+    id: CAP-SESSION-008  # NEW capability (was informally CAP-SESSION-002)
+    category: verification
+    trigger_phrase: "sanity check"
+    aliases:
+      - "health check"
+      - "housekeeping"
+      - "diagnostics"
+    script: ".aget/patterns/session/aget_housekeeping_protocol.py"
+    NOT_trigger:
+      - "wind down"
+      - "wind_down"
+      - "end session"
+    tests: "tests/test_session_protocol.py::TestSanityCheckProtocol"
+    requirements:
+      - R-SESSION-008-01  # Execute housekeeping script
+      - R-SESSION-008-02  # Report health status
+      - R-SESSION-008-03  # JSON output mode
+      - R-SESSION-008-04  # 8 diagnostic checks
+      - R-SESSION-008-05  # Verify mode
+    learnings:
+      - L021  # Verify-before-modify
+      - L038  # Agent-agnostic diagnostics
+      - L039  # Diagnostic efficiency
+      - L491  # Script-level slippage (disambiguation)
+    verify_flag: true
+    disambiguation: >
+      sanity_check verifies agent health and configuration.
+      The script is aget_housekeeping_protocol.py.
+      Do NOT run this for "wind down" - wind_down has its own script.
+      This is the "housekeeping" script but it is NOT for session end.
+
+  protocol_verification:
+    id: CAP-SESSION-009  # NEW capability
+    category: verification
+    trigger_phrase: "verify protocols"
+    aliases:
+      - "verify session protocols"
+      - "check protocols"
+      - "protocol check"
+    script: ".aget/patterns/session/verify_session_protocols.py"
+    tests: "tests/test_session_protocol.py::TestProtocolVerification"
+    requirements:
+      - R-SESSION-009-01  # Verify all 5 session scripts exist
+      - R-SESSION-009-02  # Verify all scripts executable
+      - R-SESSION-009-03  # Verify identity via --verify flag
+      - R-SESSION-009-04  # Cross-reference with this index
+      - R-SESSION-009-05  # JSON output mode
+      - R-SESSION-009-06  # Exit code semantics (0=pass, 1=fail)
+    learnings:
+      - L491  # Script-level slippage prevention
+    verify_flag: true
+    disambiguation: >
+      protocol_verification checks that all session skills are correctly
+      configured after migration or upgrade. Run post-upgrade to catch
+      script confusion issues before they cause silent failures.
+
+# ============================================================
+# SKILL RELATIONSHIPS
+# ============================================================
+
+relationships:
+  session_lifecycle:
+    description: "Ordered sequence of session phases"
+    flow:
+      - wake_up           # Session start
+      - step_back         # Optional: Context recovery
+      - study_up          # Optional: Topic research
+      - sanity_check      # Optional: Health verification
+      - wind_down         # Session end
+
+  disambiguation_pairs:
+    description: "Skills commonly confused with each other (L491)"
+    pairs:
+      - skill_a: wind_down
+        skill_b: sanity_check
+        confusion: "Both involve 'housekeeping' concept"
+        resolution: "wind_down.py for end, aget_housekeeping_protocol.py for health"
+
+      - skill_a: step_back
+        skill_b: study_up
+        confusion: "Both involve KB research"
+        resolution: "step_back is broad review, study_up is topic-focused"
+
+      - skill_a: wake_up
+        skill_b: sanity_check
+        confusion: "Both check agent state"
+        resolution: "wake_up is session start, sanity_check is health verification"
+
+# ============================================================
+# MIGRATION VERIFICATION
+# ============================================================
+
+migration:
+  description: "Post-upgrade verification procedure"
+  script: ".aget/patterns/session/verify_session_protocols.py"
+  trigger: "After AGET version upgrade"
+  checklist:
+    - "All 5 session scripts exist at canonical paths"
+    - "All scripts support --verify flag"
+    - "All scripts confirm correct identity"
+    - "This index is present and parseable"
+    - "No script at non-canonical paths"
+  sop_integration:
+    phase: "Phase 0.5"
+    requirement: "R-REL-014"
+    reference: "sops/SOP_release_process.md"

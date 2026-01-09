@@ -1,6 +1,6 @@
 # AGET File Naming Conventions
 
-**Version**: 2.0.0
+**Version**: 2.1.0
 **Date**: 2026-01-04
 **Status**: CANONICAL
 **Location**: aget/specs/AGET_FILE_NAMING_CONVENTIONS.md
@@ -27,6 +27,8 @@ This specification defines canonical file naming conventions for all AGET framew
 | B | L-docs | `L{NNN}_{snake_case}.md` | `L338_gate_verification.md` |
 | C | Sessions | `SESSION_{YYYY-MM-DD}_{snake_case}.md` | `SESSION_2025-12-20_research.md` |
 | D | SOPs | `SOP_{snake_case}.md` | `SOP_release_process.md` |
+| D | Runbooks | `RUNBOOK_{snake_case}.md` | `RUNBOOK_deployment.md` |
+| D | Playbooks | `PLAYBOOK_{snake_case}.md` | `PLAYBOOK_incident_response.md` |
 | D | Patterns | `PATTERN_{snake_case}.md` | `PATTERN_step_back_review.md` |
 | E | Python code | `{snake_case}.py` | `validate_file_naming.py` |
 | F | Open-source | `{EXACT_NAME}` | `README.md`, `LICENSE` |
@@ -202,7 +204,7 @@ Artifacts that rarely change and don't need version tracking.
 ```
 {TYPE}_{snake_case}.md
 
-TYPE:  SOP, PATTERN, TEMPLATE, GUIDE (when not versioned)
+TYPE:  SOP, RUNBOOK, PLAYBOOK, PATTERN, TEMPLATE, GUIDE (when not versioned)
 ```
 
 ### Examples
@@ -210,6 +212,10 @@ TYPE:  SOP, PATTERN, TEMPLATE, GUIDE (when not versioned)
 ```
 ✅ SOP_release_process.md
 ✅ SOP_pre_proposal_kb_audit.md
+✅ RUNBOOK_deployment.md
+✅ RUNBOOK_database_migration.md
+✅ PLAYBOOK_incident_response.md
+✅ PLAYBOOK_security_breach.md
 ✅ PATTERN_step_back_review_kb.md
 ✅ KB_AUDIT_TEMPLATE.md
 ✅ SESSION_HANDOFF_GUIDE.md
@@ -219,9 +225,21 @@ TYPE:  SOP, PATTERN, TEMPLATE, GUIDE (when not versioned)
 
 | Type | Purpose | When to Version |
 |------|---------|-----------------|
-| `SOP_` | Standard operating procedures | If breaking changes |
+| `SOP_` | Standard operating procedures (universal) | If breaking changes |
+| `RUNBOOK_` | Operational procedures with decision points (parameterized) | If breaking changes |
+| `PLAYBOOK_` | Strategic guidelines for scenarios (adaptive) | If breaking changes |
 | `PATTERN_` | Reusable patterns | If breaking changes |
 | `*_TEMPLATE` | Document templates | If structure changes |
+
+### EKO Artifact Distinctions (L451)
+
+Per the Executable Knowledge Ontology:
+
+| Artifact | Determinism | Reusability | Example |
+|----------|-------------|-------------|---------|
+| `SOP_` | Deterministic | Universal | `SOP_release_process.md` |
+| `RUNBOOK_` | Deterministic | Parameterized | `RUNBOOK_deployment.md` |
+| `PLAYBOOK_` | Syllogistic | Parameterized | `PLAYBOOK_incident_response.md` |
 
 ### Promotion to Versioned
 
@@ -720,6 +738,13 @@ New files MUST follow this specification.
 ---
 
 ## Changelog
+
+### v2.1.0 (2026-01-04)
+
+- Added RUNBOOK and PLAYBOOK to Category D (Stable Artifacts)
+- Added EKO Artifact Distinctions table (L451)
+- Updated Quick Reference with new artifact types
+- Aligns with VOCABULARY_SPEC v1.1.1 (EKO terms)
 
 ### v2.0.0 (2026-01-04)
 

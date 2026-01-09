@@ -1,8 +1,8 @@
 # AGET Specification Index
 
-**Version**: 1.0.0
+**Version**: 1.3.0
 **Status**: Active
-**Updated**: 2026-01-04
+**Updated**: 2026-01-09
 **Author**: private-aget-framework-AGET
 
 This document provides an index of all AGET framework specifications with their Spec IDs, status, and descriptions.
@@ -17,6 +17,7 @@ This document provides an index of all AGET framework specifications with their 
 | AGET-5D-001 | AGET_5D_ARCHITECTURE_SPEC | Active | 5D Composition Architecture umbrella |
 | AGET-5D-002 | AGET_5D_COMPONENTS_SPEC | Active | Consolidated 5D component specs (PERSONA, MEMORY, REASONING, SKILLS, CONTEXT) |
 | AGET-VOC-001 | AGET_VOCABULARY_SPEC | Active | Consolidated vocabulary standards |
+| AGET-EKO-001 | AGET_EXECUTABLE_KNOWLEDGE_SPEC | Active | Executable Knowledge Ontology (three-axis taxonomy) |
 | AGET-GOV-001 | AGET_GOVERNANCE_HIERARCHY_SPEC | Active | Governance hierarchy and authority |
 | AGET-LIC-001 | AGET_LICENSE_SPEC | Active | License requirements (Apache 2.0) |
 | AGET-ORG-001 | AGET_ORGANIZATION_SPEC | Active | Organization homepage requirements |
@@ -36,6 +37,7 @@ This document provides an index of all AGET framework specifications with their 
 | AGET-SOP-001 | AGET_SOP_SPEC | Active | SOP requirements |
 | AGET-REL-001 | AGET_RELEASE_SPEC | Active | Release requirements |
 | AGET-LDOC-001 | AGET_LDOC_SPEC | Active | L-doc requirements |
+| AGET-EVOL-001 | AGET_EVOLUTION_SPEC | Active | Evolution directory requirements (L/D/DISC entry types) |
 | AGET-PP-001 | AGET_PROJECT_PLAN_SPEC | Active | PROJECT_PLAN requirements (CAP-PP-011) |
 | AGET-FMT-001 | AGET_SPEC_FORMAT | CANONICAL | Specification format v1.2 |
 | AGET-NAME-001 | AGET_FILE_NAMING_CONVENTIONS | CANONICAL | File naming conventions |
@@ -44,7 +46,7 @@ This document provides an index of all AGET framework specifications with their 
 | AGET-TOOL-001 | AGET_TOOL_SPEC | Active | Tool specifications |
 | AGET-COMP-001 | COMPOSITION_SPEC_v1.0 | Approved | Capability composition mechanism |
 
-**Total: 30 specifications**
+**Total: 32 specifications**
 
 ---
 
@@ -67,6 +69,7 @@ AGET-{DOMAIN}-{NNN}
 | CORE | Core framework | 1 |
 | 5D | 5D Architecture | 2 |
 | VOC | Vocabulary | 1 |
+| EKO | Executable Knowledge | 1 |
 | GOV | Governance | 1 |
 | LIC | License | 1 |
 | ORG | Organization | 1 |
@@ -106,6 +109,7 @@ AGET-{DOMAIN}-{NNN}
 | AGET-5D-001 | AGET_5D_ARCHITECTURE_SPEC | 5D Composition Architecture overview |
 | AGET-5D-002 | AGET_5D_COMPONENTS_SPEC | Consolidated dimension specs |
 | AGET-VOC-001 | AGET_VOCABULARY_SPEC | SKOS-based vocabulary |
+| AGET-EKO-001 | AGET_EXECUTABLE_KNOWLEDGE_SPEC | Executable Knowledge Ontology |
 | AGET-COMP-001 | COMPOSITION_SPEC_v1.0 | Capability composition algebra |
 
 ### Governance
@@ -198,6 +202,26 @@ The following specs have been superseded and moved to `specs/archive/`:
 ---
 
 ## Changelog
+
+### v1.3.0 (2026-01-09)
+
+- AGET_VOCABULARY_SPEC updated to v1.3.0 (L493, L494)
+- All vocabulary prefLabels now compound per L493
+- Added Meta-Ontology Terms (Aget_Entity, Aget_Concept, Aget_Property, Aget_Specification)
+- Added validate_vocabulary_prose.py validator
+- Added CAPABILITY_SPEC_action_item_management.yaml exemplar
+- Added Vocabulary Prose Migration Guide
+
+### v1.2.0 (2026-01-06)
+
+- AGET_VOCABULARY_SPEC updated with Core Domain Entities (L459)
+- Added AGET-EVOL-001: AGET_EVOLUTION_SPEC
+
+### v1.1.0 (2026-01-04)
+
+- Added AGET-EKO-001: AGET_EXECUTABLE_KNOWLEDGE_SPEC (L451, L453)
+- Added EKO domain code
+- Total specifications: 30 → 31
 
 ### v1.0.0 (2026-01-04)
 

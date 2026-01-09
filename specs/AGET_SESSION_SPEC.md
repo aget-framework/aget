@@ -1,11 +1,11 @@
 # AGET Session Specification
 
-**Version**: 1.0.0
+**Version**: 1.1.0
 **Status**: Active
 **Category**: Standards (Session Lifecycle)
 **Format Version**: 1.2
 **Created**: 2025-12-27
-**Updated**: 2025-12-27
+**Updated**: 2026-01-08
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_SESSION_SPEC.md`
 **Change Origin**: 5-why analysis on session continuity gaps (G-PRE.3.1)
@@ -114,6 +114,43 @@ vocabulary:
       skos:note: "Detected via planning/*.md with IN PROGRESS status"
     Mandatory_Handoff_Trigger:
       skos:definition: "Condition requiring handoff note creation"
+
+  study_up:  # Study up phase (CAP-SESSION-007)
+    Study_Up_Protocol:
+      skos:definition: "Focused topic research procedure"
+      aget:location: ".aget/patterns/session/study_up.py"
+      skos:related: ["R-SESSION-007"]
+    Topic_Research:
+      skos:definition: "Deep dive into specific knowledge domain"
+      skos:example: "study up on session protocols"
+
+  sanity_check:  # Sanity check phase (CAP-SESSION-008)
+    Sanity_Check_Protocol:
+      skos:definition: "Agent health verification procedure"
+      aget:location: ".aget/patterns/session/aget_housekeeping_protocol.py"
+      skos:related: ["R-SESSION-008"]
+    Health_Verification:
+      skos:definition: "Diagnostic checks for agent configuration"
+      skos:note: "8 checks including version, identity, structure"
+
+  protocol_verification:  # Protocol verification (CAP-SESSION-009)
+    Protocol_Verification:
+      skos:definition: "Post-migration validation of session protocols"
+      aget:location: ".aget/patterns/session/verify_session_protocols.py"
+      skos:related: ["R-SESSION-009", "L491"]
+    Script_Level_Semantic_Slippage:
+      skos:definition: "Anti-pattern: executing wrong script despite correct intent"
+      skos:related: ["L491"]
+      skos:example: "Running housekeeping script for wind-down trigger"
+
+  disambiguation:  # Disambiguation index (L491)
+    Session_Skills_Index:
+      skos:definition: "Authoritative index mapping trigger phrases to scripts"
+      aget:location: "aget/specs/SESSION_SKILLS_INDEX.yaml"
+      skos:related: ["L477", "L491"]
+    Canonical_Script_Path:
+      skos:definition: "Standard location for session scripts"
+      skos:example: ".aget/patterns/session/*.py"
 ```
 
 ---
@@ -294,6 +331,55 @@ The SYSTEM shall use standard handoff note format.
 
 **Enforcement**: wind_down.py, handoff template
 
+### CAP-SESSION-007: Study Up Protocol
+
+The SYSTEM shall support focused topic research via study_up protocol.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-SESSION-007-01 | ubiquitous | The SYSTEM shall execute study_up.py with --topic argument |
+| CAP-SESSION-007-02 | ubiquitous | The SYSTEM shall search KB for topic-related artifacts |
+| CAP-SESSION-007-03 | ubiquitous | The SYSTEM shall report related L-docs and patterns |
+| CAP-SESSION-007-04 | ubiquitous | The SYSTEM shall support --json output mode |
+| CAP-SESSION-007-05 | ubiquitous | The SYSTEM shall support --verify flag for migration validation |
+
+**Enforcement**: study_up.py, contract tests
+
+**Disambiguation**: study_up is for focused topic research. Differs from step_back (broad KB review).
+
+### CAP-SESSION-008: Sanity Check Protocol
+
+The SYSTEM shall support agent health verification via sanity check.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-SESSION-008-01 | ubiquitous | The SYSTEM shall execute aget_housekeeping_protocol.py for health checks |
+| CAP-SESSION-008-02 | ubiquitous | The SYSTEM shall report health status with 8 diagnostic checks |
+| CAP-SESSION-008-03 | ubiquitous | The SYSTEM shall support --json output mode |
+| CAP-SESSION-008-04 | prohibited | The SYSTEM shall NOT execute sanity_check script for "wind down" trigger |
+| CAP-SESSION-008-05 | ubiquitous | The SYSTEM shall support --verify flag for migration validation |
+
+**Enforcement**: aget_housekeeping_protocol.py, contract tests
+
+**Disambiguation (L491)**: The aget_housekeeping_protocol.py script is for sanity_check, NOT wind_down. This is a common mistake documented in L491 (Script-Level Semantic Slippage).
+
+### CAP-SESSION-009: Protocol Verification
+
+The SYSTEM shall support post-migration verification of session protocols.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-SESSION-009-01 | ubiquitous | The SYSTEM shall execute verify_session_protocols.py for migration validation |
+| CAP-SESSION-009-02 | ubiquitous | The SYSTEM shall verify all 5 session scripts exist at canonical paths |
+| CAP-SESSION-009-03 | ubiquitous | The SYSTEM shall verify all scripts support --verify flag |
+| CAP-SESSION-009-04 | ubiquitous | The SYSTEM shall cross-reference scripts with SESSION_SKILLS_INDEX.yaml |
+| CAP-SESSION-009-05 | ubiquitous | The SYSTEM shall return exit code 0 for pass, 1 for fail |
+| CAP-SESSION-009-06 | ubiquitous | The SYSTEM shall support --json output mode |
+
+**Enforcement**: verify_session_protocols.py, SOP_release_process.md Phase 0.5
+
+**Related**: L491 (Script-Level Semantic Slippage), R-REL-014 (Protocol Verification Before Release)
+
 #### Handoff Note Template
 
 ```markdown
@@ -405,9 +491,42 @@ structure:
       purpose: "Wind-down protocol implementation"
       requirements: ["CAP-SESSION-004", "CAP-SESSION-005"]
 
+    - path: ".aget/patterns/session/step_back.py"
+      purpose: "KB review protocol implementation"
+      requirements: ["CAP-SESSION-002"]
+
+    - path: ".aget/patterns/session/study_up.py"
+      purpose: "Topic research protocol implementation"
+      requirements: ["CAP-SESSION-007"]
+
+    - path: ".aget/patterns/session/aget_housekeeping_protocol.py"
+      purpose: "Sanity check protocol implementation"
+      requirements: ["CAP-SESSION-008"]
+
+    - path: ".aget/patterns/session/verify_session_protocols.py"
+      purpose: "Migration verification script"
+      requirements: ["CAP-SESSION-009"]
+
   configuration_files:
     - path: ".aget/memory/retrieval.yaml"
       purpose: "Context loading rules for recovery"
+
+  specification_files:
+    - path: "aget/specs/SESSION_SKILLS_INDEX.yaml"
+      purpose: "Authoritative session skill disambiguation index"
+      requirements: ["CAP-SESSION-009"]
+
+session_naming_standard:
+  pattern: "session_YYYY-MM-DD_HHMM.md"
+  location: "sessions/"
+  components:
+    prefix: "session_"
+    date: "YYYY-MM-DD"
+    separator: "_"
+    time: "HHMM"
+    extension: ".md"
+  collision_prevention: "Time component prevents multiple sessions per day"
+  optional_suffix: "session_2026-01-08_1430_topic.md"
 ```
 
 ---
@@ -480,10 +599,22 @@ structure:
 
 ```bash
 # Test wake-up protocol
-python3 .aget/patterns/session/wake_up.py -v
+python3 .aget/patterns/session/wake_up.py --verify
 
-# Test wind-down with mandatory handoff
-python3 .aget/patterns/session/wind_down.py --create-note
+# Test wind-down protocol
+python3 .aget/patterns/session/wind_down.py --verify
+
+# Test step-back protocol
+python3 .aget/patterns/session/step_back.py --verify
+
+# Test study-up protocol
+python3 .aget/patterns/session/study_up.py --verify
+
+# Test sanity check protocol
+python3 .aget/patterns/session/aget_housekeeping_protocol.py --verify
+
+# Verify all protocols (migration check)
+python3 .aget/patterns/session/verify_session_protocols.py
 
 # Contract tests
 python3 -m pytest tests/test_session_protocol.py -v
@@ -551,11 +682,16 @@ See `docs/SHELL_INTEGRATION.md` for full setup guide including:
 
 - AGET_MEMORY_SPEC.md (Session_Memory layer, context patterns)
 - AGET_INSTANCE_SPEC.md (instance lifecycle states)
+- SESSION_SKILLS_INDEX.yaml (session skill disambiguation)
+- L187: Wake Protocol Silent Execution
 - L335: Memory Architecture Principles
 - L342: Session Scope Validation
 - L375: Session Scope Evolution Pattern
 - L452: Shell Orchestration Pattern
+- L477: Semantic Slippage in Protocol Execution
+- L491: Script-Level Semantic Slippage
 - docs/SHELL_INTEGRATION.md (shell setup guide)
+- sops/SOP_release_process.md (Phase 0.5 Protocol Verification)
 
 ---
 
@@ -577,7 +713,8 @@ graduation:
 
 ---
 
-*AGET Session Specification v1.0.0*
+*AGET Session Specification v1.1.0*
 *Format: AGET_SPEC_FORMAT v1.2 (EARS + SKOS)*
-*Part of v3.0.0 Lifecycle Management - G-PRE.3.1*
+*Part of v3.4.0 Session Skills Maturity*
 *"Sessions are transactions; handoffs are commits."*
+*"Disambiguation prevents script-level semantic slippage (L491)."*
