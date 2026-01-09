@@ -20,10 +20,13 @@ _aget_claude() {
   local prompt
   local claude_bin="${AGET_CLAUDE_BIN:-/opt/homebrew/bin/claude}"
 
+  # L050: Use directive language for reliable protocol execution
+  # Avoid: "e.g.", "you might", "consider" (suggestive)
+  # Use: "Read", "Execute", "Run" (directive)
   if [[ -n "$focus" ]]; then
-    prompt="Wake up (e.g. read AGENTS.md plus ...). Afterwards, study up. And focus on: $focus"
+    prompt="Read AGENTS.md and execute the Wake Up Protocol. Then study up and focus on: $focus"
   else
-    prompt="Wake up."
+    prompt="Read AGENTS.md and execute the Wake Up Protocol."
   fi
 
   # env -u removes ANTHROPIC_API_KEY for this invocation only
@@ -40,10 +43,11 @@ _aget_claude_plan() {
   local prompt
   local claude_bin="${AGET_CLAUDE_BIN:-/opt/homebrew/bin/claude}"
 
+  # L050: Use directive language for reliable protocol execution
   if [[ -n "$focus" ]]; then
-    prompt="Wake up. Today you are in advisory mode (no edits). Focus on: $focus"
+    prompt="Read AGENTS.md and execute the Wake Up Protocol. Today you are in advisory mode (no edits). Focus on: $focus"
   else
-    prompt="Wake up. Today you are in advisory mode (no edits)."
+    prompt="Read AGENTS.md and execute the Wake Up Protocol. Today you are in advisory mode (no edits)."
   fi
 
   env -u ANTHROPIC_API_KEY "$claude_bin" --permission-mode plan "$prompt"

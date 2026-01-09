@@ -85,6 +85,22 @@ Use EARS patterns for capability statements:
 statement: "WHEN Wake_Command is received, the SYSTEM shall execute Wake_Protocol"
 ```
 
+Inherit core domain entities (v3.4.0+):
+```yaml
+# manifest.yaml
+entities:
+  inherits:
+    - Person
+    - Document
+    - Task
+  extends:
+    Person:
+      attributes:
+        - custom_field: {type: string}
+```
+
+See: [docs/ENTITY_EXTENSION_GUIDE.md](docs/ENTITY_EXTENSION_GUIDE.md)
+
 ## For Agent Creators
 
 See templates in [aget-framework organization](https://github.com/aget-framework):

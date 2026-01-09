@@ -366,6 +366,8 @@ structure:
     - path: ".aget/identity.json"
       purpose: "North Star and purpose"
       required_fields: ["north_star"]
+      schema_ref: "AGET_IDENTITY_JSON_SCHEMA.md"
+      notes: "north_star MUST be object with 'statement' field (not string) - see L488"
 
   required_directories:
     core:

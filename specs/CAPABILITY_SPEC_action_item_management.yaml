@@ -1,0 +1,266 @@
+# CAPABILITY_SPEC: Action_Item Management
+#
+# L493-Compliant Exemplar
+# All AGET Vocabulary terms use exact skos:prefLabel compound forms
+#
+# Version: 1.0.0
+# Status: Draft
+# Created: 2026-01-09
+# Author: private-aget-framework-AGET
+
+capability_id: capability-action-item-management
+version: "1.0.0"
+status: draft
+
+# =============================================================================
+# METADATA
+# =============================================================================
+
+metadata:
+  name: "Action_Item Management"
+  description: |
+    Enable Aget_Instances to track, prioritize, and manage Action_Items that
+    emerge from Aget_Sessions, Decision_Entities, and Project_Entities—persisting
+    beyond Aget_Session boundaries and enabling cross-session continuity for
+    work commitments.
+
+  # L493-compliant: All vocabulary terms are compound
+  vocabulary_compliance: "L493"
+
+  category: "session-enhancement"
+  priority: "P1"
+
+  author: "private-aget-framework-AGET"
+  created: "2026-01-09"
+
+  # EKO classification (L451)
+  eko:
+    abstraction: "medium"
+    determinism: "Syllogistic_Property"  # Requires judgment
+    reusability: "Parameterized_Property"  # Template with inputs
+
+# =============================================================================
+# PURPOSE
+# =============================================================================
+
+purpose: |
+  ## Problem Statement
+
+  Aget_Instances frequently identify Action_Items during Aget_Sessions that require
+  future attention. Without formal tracking, these Action_Items are lost when the
+  Aget_Session ends or when Aget_Principal context shifts.
+
+  ## Solution
+
+  Provide structured Action_Item capture, storage, and retrieval that persists
+  across Aget_Session boundaries and integrates with the Aget_Evolution system.
+
+  ## Value Proposition
+
+  - **For Aget_Principals**: Visibility into pending work commitments
+  - **For Aget_Instances**: Structured handoff of Action_Items between Aget_Sessions
+  - **For Aget_Fleet**: Coordination of Action_Items across Aget_Instances
+
+# =============================================================================
+# REQUIREMENTS
+# =============================================================================
+
+requirements:
+  functional:
+    - id: "CAP-AIM-001"
+      description: |
+        Aget_Instance SHALL capture Action_Items with: description, status,
+        priority, source_session, assignee
+      priority: "P0"
+
+    - id: "CAP-AIM-002"
+      description: |
+        Action_Items SHALL persist in Aget_Evolution directory under
+        `.aget/action_items/`
+      priority: "P0"
+
+    - id: "CAP-AIM-003"
+      description: |
+        Aget_Instance SHALL surface pending Action_Items during Wake_Protocol
+      priority: "P1"
+
+    - id: "CAP-AIM-004"
+      description: |
+        Action_Items SHALL support linking to Decision_Entity and
+        Requirement_Entity for traceability
+      priority: "P2"
+
+  non_functional:
+    - id: "CAP-AIM-NF-001"
+      description: |
+        Action_Item retrieval SHALL complete within 2 seconds for up to
+        1000 Action_Items
+      priority: "P1"
+
+# =============================================================================
+# ENTITIES
+# =============================================================================
+
+entities:
+  inherits:
+    - Task_Entity  # Base for Action_Item
+    - Person_Entity  # For assignee
+    - Document_Entity  # For source document
+
+  extends:
+    Task_Entity:
+      # Action_Item is a specialized Task_Entity
+      as: Action_Item
+      attributes:
+        - source_session:
+            type: string
+            description: "Aget_Session ID where Action_Item was captured"
+        - source_line:
+            type: integer
+            description: "Line number in session transcript"
+        - urgency:
+            type: enum
+            values: [immediate, soon, someday]
+            description: "Time sensitivity"
+        - context:
+            type: string
+            description: "Surrounding context from Aget_Session"
+      relationships:
+        - emerges_from:
+            target: Aget_Session
+            cardinality: "1:1"
+        - assigned_to:
+            target: Aget_Instance
+            cardinality: "0:1"
+        - implements:
+            target: Decision_Entity
+            cardinality: "0:many"
+
+# =============================================================================
+# OPERATIONS
+# =============================================================================
+
+operations:
+  - name: capture_action_item
+    description: |
+      Capture a new Action_Item from the current Aget_Session context
+    inputs:
+      - description: string (required)
+      - priority: enum [low, medium, high, critical]
+      - assignee: Aget_Instance ID (optional)
+    outputs:
+      - action_item_id: string
+    determinism: "Deterministic_Property"
+
+  - name: list_action_items
+    description: |
+      List Action_Items with optional filtering by status, priority, assignee
+    inputs:
+      - status: enum [pending, in_progress, completed, blocked] (optional)
+      - priority: enum [low, medium, high, critical] (optional)
+      - assignee: Aget_Instance ID (optional)
+    outputs:
+      - action_items: array of Action_Item
+    determinism: "Deterministic_Property"
+
+  - name: update_action_item
+    description: |
+      Update status or attributes of an existing Action_Item
+    inputs:
+      - action_item_id: string (required)
+      - status: enum (optional)
+      - priority: enum (optional)
+      - notes: string (optional)
+    outputs:
+      - success: boolean
+    determinism: "Deterministic_Property"
+
+  - name: surface_pending
+    description: |
+      Retrieve pending Action_Items for display during Wake_Protocol
+    inputs: []
+    outputs:
+      - pending_count: integer
+      - high_priority: array of Action_Item
+      - due_soon: array of Action_Item
+    determinism: "Deterministic_Property"
+
+# =============================================================================
+# INTEGRATION
+# =============================================================================
+
+integration:
+  wake_protocol:
+    hook: "post-identity-load"
+    action: "surface_pending"
+    display: |
+      **Pending Action_Items**: {pending_count}
+      {high_priority | format}
+
+  wind_down_protocol:
+    hook: "pre-session-end"
+    action: "prompt_capture"
+    prompt: |
+      Any Action_Items to capture from this Aget_Session?
+
+  evolution:
+    storage: ".aget/action_items/"
+    format: "yaml"
+    index: ".aget/action_items/index.json"
+
+# =============================================================================
+# VALIDATION
+# =============================================================================
+
+validation:
+  v_tests:
+    - id: "V-AIM-001"
+      description: "Action_Item can be captured"
+      command: "python -m aget.capabilities.action_item capture 'Test item'"
+      expected: "Action_Item created: AI-*"
+
+    - id: "V-AIM-002"
+      description: "Action_Items can be listed"
+      command: "python -m aget.capabilities.action_item list"
+      expected: "0 or more Action_Items displayed"
+
+    - id: "V-AIM-003"
+      description: "Wake_Protocol surfaces pending"
+      command: "python -m aget.session wake --dry-run"
+      expected: "Pending Action_Items: N"
+
+# =============================================================================
+# REFERENCES
+# =============================================================================
+
+references:
+  patterns:
+    - L493: "Vocabulary_Prose_Marking_Pattern"
+    - L494: "Vocabulary_Meta_Ontology_Pattern"
+    - L459: "Core_Entity_Vocabulary_Vision"
+
+  entities:
+    - Task_Entity: "AGET_VOCABULARY_SPEC Part 6"
+    - Person_Entity: "AGET_VOCABULARY_SPEC Part 6"
+    - Aget_Session: "AGET_VOCABULARY_SPEC Part 2"
+    - Aget_Instance: "AGET_VOCABULARY_SPEC Part 2"
+
+  specifications:
+    - AGET_VOCABULARY_SPEC: "v1.3.0"
+    - AGET_INSTANCE_SPEC: "Aget_Session definition"
+
+# =============================================================================
+# CHANGELOG
+# =============================================================================
+
+changelog:
+  - version: "1.0.0"
+    date: "2026-01-09"
+    changes:
+      - "Initial L493-compliant exemplar"
+      - "All vocabulary terms use compound forms"
+      - "Integrated with Core_Entity_Vocabulary (L459)"
+
+---
+# CAPABILITY_SPEC_action_item_management.yaml
+# L493-Compliant Exemplar for Vocabulary Prose Marking
