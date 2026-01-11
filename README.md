@@ -16,9 +16,9 @@ Created 2025-11-21 via ADR-001 (AGET Framework Repository decision).
 
 ## Current Version
 
-**v2.11.0** (2025-12-24): Memory Architecture + L352 Traceability + Version Migration
+**v3.3.0** (2026-01-10): Shell Integration + Executable Knowledge Ontology
 
-Key features: 6-layer information model, five-tier requirement-to-test traceability, 80 contract tests passing, configurable wake-up output.
+Key features: Shell orchestration (aget.zsh, profiles.zsh), SKOS-compliant template vocabularies (12 templates), ontology-driven agent creation (L481), executable knowledge spec, evolution spec, 18 new L-docs.
 
 **Version History**: See [docs/VERSION_HISTORY.md](docs/VERSION_HISTORY.md) for complete version timeline and known gaps.
 

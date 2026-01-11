@@ -15,6 +15,55 @@ No unreleased changes at this time.
 
 ---
 
+## [3.3.0] - 2026-01-10
+
+**Theme**: Shell Integration + Executable Knowledge Ontology
+
+### Added
+
+- **Shell Integration** (L452):
+  - `shell/aget.zsh`: Main shell orchestration file
+  - `shell/profiles.zsh`: CLI backend profiles (Claude Code, Cursor, Aider, Gemini, Windsurf)
+  - `scripts/generate_agents_zsh.py`: Alias generator for agent directories
+  - `docs/SHELL_INTEGRATION.md`: User documentation
+
+- **Executable Knowledge Ontology** (L451, L453):
+  - `AGET_EXECUTABLE_KNOWLEDGE_SPEC.md`: EKO axis definitions (Determinism, Reusability, Abstraction)
+  - `AGET_EVOLUTION_SPEC.md`: Evolution entry type standardization (L-doc, D-doc, DISC-doc)
+  - VOCABULARY_SPEC Part 5: EKO terms
+
+- **Ontology-Driven Agent Creation** (L481, L482):
+  - `SOP_agent_instance_creation.md`: SKOS+EARS-grounded creation process
+  - `scripts/generate_template_ontology.py`: Template vocabulary generator
+  - `validation/validate_ontology_compliance.py`: SKOS compliance validator
+  - 12 template vocabularies: All templates now have specs/*_VOCABULARY.md
+  - R-REL-015: "We do not leave published templates behind"
+
+- **Session Governance**:
+  - `SOP_point_upgrade.md`: Formal point upgrade procedure (L444 conformance)
+  - CAP-PP-012: Artifact comprehensibility (merged #67)
+
+- **18 New L-docs**: L451-L453, L460-L468, L478-L482, L500-L503
+
+### Changed
+
+- **Template Conformance**: All 12 templates now have SKOS-compliant vocabularies
+- **SOP_release_process.md**: v1.10 with R-REL-015 (template conformance)
+- **AGET_PORTABILITY_SPEC.md**: Shell integration references
+- **AGET_COMPATIBILITY_SPEC.md**: Zsh/bash support section
+
+### Fixed
+
+- **Version Documentation Gap**: README.md and VERSION_HISTORY.md updated (were stale at v2.11.0)
+
+### Notes
+
+This release establishes the foundation for ontology-driven agent creation, where template
+vocabularies DRIVE instance behavior (L481). All published templates now conform to
+SKOS vocabulary standards, enabling fleet supervisors to validate instance compliance.
+
+---
+
 ## [3.2.1] - 2026-01-04
 
 **Theme**: Version Inventory Coherence (L444 Remediation)
