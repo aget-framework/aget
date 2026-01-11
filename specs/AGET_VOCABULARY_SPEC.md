@@ -1,6 +1,6 @@
 # AGET Vocabulary Specification
 
-**Version**: 1.4.0
+**Version**: 1.5.0
 **Status**: Active
 **Category**: Core (Standards)
 **Format Version**: 1.2
@@ -301,6 +301,13 @@ V_Test:
 | `GitHub_Release` | GitHub release object with tag and notes |
 | `Deep_Release_Notes` | Narrative documentation beyond CHANGELOG |
 | `Version_Drift` | ANTI-PATTERN: Manager behind managed repos |
+| `Declarative_Release` | ANTI-PATTERN: Declaring version in commit message without updating version.json (L517) |
+| `Version_Overrun` | ANTI-PATTERN: Instance version exceeds framework version (L517) |
+| `Template_Abandonment` | ANTI-PATTERN: Published templates left behind during upgrades (R-REL-015 violation, L517) |
+| `SOP_Theater` | ANTI-PATTERN: SOP steps without verification (L517) |
+| `Release_Verification` | Automated validation that all release artifacts complete before push (CAP-REL-009) |
+| `Pre_Push_Gate` | BLOCKING validation checkpoint before git push (CAP-REL-009) |
+| `Version_Ceiling` | Constraint that instance version ≤ framework version (CAP-REL-010) |
 
 ## Documentation Terms (CAP-DOC-*)
 

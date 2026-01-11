@@ -23,7 +23,11 @@ Exit Codes:
     1 - Validation failures detected
 
 Author: private-aget-framework-AGET
-Version: 1.0.0
+Version: 1.1.0
+
+Changelog:
+    1.1.0 (2026-01-11): Expanded to 12 templates (L517), added CAP-REL-009/010
+    1.0.0 (2026-01-04): Initial version
 """
 
 import argparse
@@ -34,14 +38,22 @@ from pathlib import Path
 from typing import List, Dict, Tuple, Optional
 
 
-# Template repositories to check
+# Template repositories to check (all 12 - L517 expansion)
 TEMPLATE_REPOS = [
+    # Published templates (6)
     "template-supervisor-aget",
     "template-worker-aget",
     "template-advisor-aget",
     "template-consultant-aget",
     "template-developer-aget",
     "template-spec-engineer-aget",
+    # Additional templates (6) - discovered in L517
+    "template-analyst-aget",
+    "template-architect-aget",
+    "template-qa-aget",
+    "template-devops-aget",
+    "template-documenter-aget",
+    "template-researcher-aget",
 ]
 
 
