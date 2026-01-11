@@ -12,13 +12,61 @@ This document provides a complete timeline of AGET Framework versions and their 
 
 ## Current Version
 
-**v2.11.0** (2025-12-24) - Memory Architecture + L352 Traceability + Version Migration
+**v3.3.0** (2026-01-10) - Shell Integration + Executable Knowledge Ontology
 
-All 7 repositories have GitHub Releases: ✅
+All 12 template repositories have SKOS-compliant vocabularies: ✅
 
 ---
 
 ## Version Timeline
+
+### v3.3.0 (2026-01-10) ✅
+
+**Theme**: Shell Integration + Executable Knowledge Ontology
+
+**Status**: Complete release (all repos)
+
+| Repository | Release | Notes |
+|------------|---------|-------|
+| aget | ✅ | Core framework + shell integration |
+| template-advisor-aget | ✅ | SKOS vocabulary added |
+| template-analyst-aget | ✅ | SKOS vocabulary added |
+| template-architect-aget | ✅ | SKOS vocabulary added |
+| template-consultant-aget | ✅ | SKOS vocabulary added |
+| template-developer-aget | ✅ | SKOS vocabulary added |
+| template-executive-aget | ✅ | SKOS vocabulary added |
+| template-operator-aget | ✅ | SKOS vocabulary added |
+| template-researcher-aget | ✅ | SKOS vocabulary added |
+| template-reviewer-aget | ✅ | SKOS vocabulary added |
+| template-spec-engineer-aget | ✅ | SKOS vocabulary added |
+| template-supervisor-aget | ✅ | SKOS vocabulary added |
+| template-worker-aget | ✅ | SKOS vocabulary added |
+
+**Key Features**:
+- Shell orchestration: aget.zsh, profiles.zsh (5 CLI backends)
+- SKOS-compliant template vocabularies (12 templates)
+- Ontology-driven agent creation (L481, L482)
+- AGET_EXECUTABLE_KNOWLEDGE_SPEC.md
+- AGET_EVOLUTION_SPEC.md
+- 18 new L-docs (L451-L503)
+- validate_ontology_compliance.py
+- generate_template_ontology.py
+- SOP_point_upgrade.md (L444 conformance)
+- R-REL-015: "We do not leave published templates behind"
+
+**See**: CHANGELOG.md for detailed changes
+
+---
+
+### v3.0.0 - v3.2.1 (2025-12-28 to 2026-01-04)
+
+**Versions**: v3.0.0, v3.1.0, v3.2.0, v3.2.1
+
+**Status**: Released (see CHANGELOG.md for details)
+
+**Note**: VERSION_HISTORY.md was not updated during v3.x releases. See CHANGELOG.md for complete v3.0.0-v3.2.1 history.
+
+---
 
 ### v2.11.0 (2025-12-24) ✅
 
@@ -271,5 +319,5 @@ We acknowledge historical gaps transparently and focus on complete releases goin
 ---
 
 *VERSION_HISTORY.md - Complete version timeline for AGET Framework*
-*Last Updated: 2025-12-24*
+*Last Updated: 2026-01-10*
 *Maintained by: private-aget-framework-AGET*
