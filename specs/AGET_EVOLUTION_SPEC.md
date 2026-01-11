@@ -222,6 +222,44 @@ The SYSTEM shall maintain an index for evolution entry discovery.
 
 **Enforcement**: `validate_evolution_index.py`
 
+### CAP-EVOL-007: Public Learning Publication (CP-008)
+
+The SYSTEM shall support publication of Learning entries to `docs/learnings/` for external consumption.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-EVOL-007-01 | ubiquitous | The SYSTEM shall place Published_Learnings in `docs/learnings/` |
+| CAP-EVOL-007-02 | conditional | IF L-doc published THEN the SYSTEM shall verify fleet-wide applicability |
+| CAP-EVOL-007-03 | ubiquitous | The SYSTEM shall sanitize internal references before publication |
+| CAP-EVOL-007-04 | ubiquitous | The SYSTEM shall preserve L-number from source L-doc |
+| CAP-EVOL-007-05 | conditional | IF L-doc references private agents THEN the SYSTEM shall generalize references |
+| CAP-EVOL-007-06 | ubiquitous | The SYSTEM shall include publication metadata in Published_Learning |
+| CAP-EVOL-007-07 | conditional | IF source L-doc updated THEN the SYSTEM should review Published_Learning |
+
+**Enforcement**: `validate_public_learnings.py`, `SOP_learning_publication.md`
+
+**Selection Criteria** (recommended):
+- L-doc has fleet-wide or universal applicability
+- Pattern executed 3+ times successfully
+- No internal references that cannot be generalized
+- Provides value to external users
+
+**Sanitization Checklist**:
+- [ ] No `.aget/` paths (replace with `path/to/your/`)
+- [ ] No `private-*-AGET` agent names (generalize or remove)
+- [ ] No internal tracking issues (remove or generalize)
+- [ ] No machine-specific paths (use placeholders)
+- [ ] References validated for external accessibility
+
+**Publication Metadata**:
+```yaml
+publication:
+  date: YYYY-MM-DD
+  source: ".aget/evolution/L###_*.md"
+  sanitized: true
+  applicability: fleet | universal
+```
+
 ---
 
 ## Entry Type Templates
