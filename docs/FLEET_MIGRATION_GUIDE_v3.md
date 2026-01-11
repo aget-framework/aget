@@ -1,10 +1,10 @@
 # Fleet Instance_Migration Guide v3.0
 
-**Version**: 1.3.0
-**Date**: 2026-01-05
-**Updated**: L457 Cross-Machine Pre-Flight enhancement (git pull + re-study)
+**Version**: 1.4.0
+**Date**: 2026-01-11
+**Updated**: CAP-MIG-017 Cross-Machine Pre-Flight generalization (industry patterns, Quick Reference Card)
 **Owner**: aget-framework
-**Implements**: CAP-MIG-001 (Instance_Migration), CAP-MIG-015 (Behavioral_Validation)
+**Implements**: CAP-MIG-001 (Instance_Migration), CAP-MIG-015 (Behavioral_Validation), CAP-MIG-017 (Remote Supervisor Upgrade)
 **Location**: `aget/docs/FLEET_MIGRATION_GUIDE_v3.md`
 
 ---
@@ -19,66 +19,131 @@ Supervisor guide for migrating agent fleets from v2.x to v3.0 5D Composition Arc
 
 ```bash
 # Sync framework (required before migration)
-cd ~/github/aget-framework/aget
+# See "Common Framework Locations" in Cross-Machine Pre-Flight section
+cd /path/to/your/aget-framework/aget
 git pull origin main
 
-# Verify version (9903984 or later)
-git log --oneline -1
+# Verify version
+cat .aget/version.json | grep aget_version
+# Expected: Current release version (e.g., "3.3.0")
 ```
 
 ---
 
-## Cross-Machine Pre-Flight (Fix #15, L457)
+## Cross-Machine Pre-Flight (L457, CAP-MIG-017)
 
-Before starting migration on a different machine from where framework was developed:
+**When This Applies**: Migration executed on different machine from framework development.
+
+**Key Issue**: Your local framework clone may be stale, causing agents to incorrectly report "version X.X doesn't exist."
+
+### Common Framework Locations
+
+| Environment | Typical Path |
+|-------------|--------------|
+| Personal laptop | `~/github/aget-framework/aget/` |
+| Work laptop | `~/code/aget-framework/aget/` |
+| Server deployment | `/opt/aget/` or `/srv/aget/` |
+| CI/CD | `$WORKSPACE/aget-framework/aget/` |
+
+### Quick Reference Card
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  CROSS-MACHINE PRE-FLIGHT - QUICK REFERENCE                 │
+├─────────────────────────────────────────────────────────────┤
+│  1. HEALTH CHECK                                            │
+│     cd /path/to/your/aget-framework/aget                    │
+│     git ls-remote origin HEAD                               │
+│                                                             │
+│  2. SYNC FRAMEWORK                                          │
+│     git fetch origin && git pull origin main                │
+│                                                             │
+│  3. VERIFY VERSION                                          │
+│     cat .aget/version.json | grep aget_version              │
+│                                                             │
+│  4. RE-STUDY (if agent previously studied stale framework)  │
+│     User: "study up, focus on: vX.Y upgrade"                │
+│                                                             │
+│  5. PROCEED WITH MIGRATION                                  │
+│     Follow standard migration procedure below               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Pre-Flight Steps
 
 ```bash
-# 1. Verify framework repo has remote configured
-cd ~/github/aget-framework/aget  # or ~/code/gmelli/aget
+# 0. Find your framework clone (see Common Framework Locations above)
+cd /path/to/your/aget-framework/aget
+
+# 1. HEALTH CHECK: Verify remote is reachable
+git ls-remote origin HEAD > /dev/null 2>&1 && echo "PASS: Remote reachable" || echo "FAIL: Check network/SSH"
+
+# 2. Verify framework repo has remote configured
 git remote -v
 # Expected: origin  git@github.com:aget-framework/aget.git (fetch/push)
 
-# 2. If SSH fails, use HTTPS
+# 3. If SSH fails, use HTTPS
 git remote set-url origin https://github.com/aget-framework/aget.git
 
-# 3. Verify can fetch
+# 4. Verify can fetch
 git fetch origin
 
-# 4. Verify remote has newer commits
+# 5. Verify remote has newer commits
 git log origin/main --oneline -5
 
-# 5. SYNC: Pull latest framework (CRITICAL - was missing pre-L456)
+# 6. SYNC: Pull latest framework (CRITICAL - was missing pre-L457)
 git pull origin main
 
-# 6. Verify framework version after sync
+# 7. Verify framework version after sync
 cat .aget/version.json | grep aget_version
-# Expected: "aget_version": "3.2.x" (or current release)
+# Expected: Current release version (e.g., "3.3.0")
 ```
 
-### Post-Sync Agent Instructions
+### Post-Sync: State Verification
 
 After syncing framework, agents MUST re-study before migration:
 
 ```
-⚠️ If agent previously studied with stale framework:
+⚠️ STATE VERIFICATION (Industry Pattern: Check last action before continuing)
+
+If agent previously studied with stale framework:
+   - Agent context is now INVALID
    - Agent may incorrectly report "version X.X doesn't exist"
    - Solution: Re-run study/research phase after git pull
-   - Pattern: "study up" or "focus on: v3.2 upgrade"
+   - Pattern: "study up, focus on: vX.Y upgrade"
+
+This ensures agent has current framework knowledge before proceeding.
 ```
 
 ### V-Tests
 
 ```bash
-# V-PRE.1: Framework synced
+# V-PRE.0: Health check (remote reachable)
+git ls-remote origin HEAD > /dev/null 2>&1 && echo "PASS: V-PRE.0" || echo "FAIL: V-PRE.0 - Remote unreachable"
+
+# V-PRE.1: Framework synced to expected version
 LOCAL=$(cat .aget/version.json | grep -o '"[0-9.]*"' | head -1)
-EXPECTED="3.2"  # adjust to current release
-echo $LOCAL | grep -q "$EXPECTED" && echo "PASS" || echo "FAIL: framework stale"
+EXPECTED="3.3"  # adjust to current release
+echo $LOCAL | grep -q "$EXPECTED" && echo "PASS: V-PRE.1" || echo "FAIL: V-PRE.1 - Framework stale ($LOCAL vs $EXPECTED)"
 
 # V-PRE.2: No uncommitted changes blocking pull
-git status --short | grep -v '^??' | wc -l | grep -q '^0$' && echo "PASS" || echo "FAIL: uncommitted changes"
+git status --short | grep -v '^??' | wc -l | grep -q '^0$' && echo "PASS: V-PRE.2" || echo "FAIL: V-PRE.2 - Uncommitted changes"
+
+# V-PRE.3: On main branch
+BRANCH=$(git branch --show-current)
+[ "$BRANCH" = "main" ] && echo "PASS: V-PRE.3" || echo "FAIL: V-PRE.3 - Not on main ($BRANCH)"
 ```
 
-See: L457 (Remote Supervisor Upgrade Pattern)
+### Troubleshooting
+
+| Problem | Cause | Solution |
+|---------|-------|----------|
+| "Remote unreachable" | Network/SSH issue | Use HTTPS: `git remote set-url origin https://github.com/aget-framework/aget.git` |
+| "Framework stale" | Pull failed | Check for merge conflicts, stash changes |
+| Agent says "version doesn't exist" | Studied with stale framework | Re-study after pull: `"study up, focus on: vX.Y upgrade"` |
+| "Uncommitted changes" | Local modifications | `git stash` or commit first |
+
+See: L457 (Remote Supervisor Upgrade Pattern), CAP-MIG-017 (Remote Supervisor Upgrade)
 
 ---
 
@@ -96,10 +161,17 @@ See: L457 (Remote Supervisor Upgrade Pattern)
 
 ## Migration Script
 
+### Setup
+
+```bash
+# Set framework path (adjust to your environment - see Common Framework Locations)
+FRAMEWORK="/path/to/your/aget-framework/aget"
+```
+
 ### Single Agent
 
 ```bash
-python3 ~/github/aget-framework/aget/scripts/migrate_instance_to_v3.py /path/to/agent \
+python3 $FRAMEWORK/scripts/migrate_instance_to_v3.py /path/to/agent \
   --archetype <archetype> \
   --specialization <specialization> \
   --north-star "Agent purpose statement" \
@@ -127,7 +199,7 @@ python3 ~/github/aget-framework/aget/scripts/migrate_instance_to_v3.py /path/to/
 
 ```bash
 # Preview changes (no --execute)
-python3 ~/github/aget-framework/aget/scripts/migrate_instance_to_v3.py /path/to/agent \
+python3 $FRAMEWORK/scripts/migrate_instance_to_v3.py /path/to/agent \
   --archetype advisor \
   --specialization domain-advisor \
   --north-star "Purpose"
@@ -142,18 +214,20 @@ python3 ~/github/aget-framework/aget/scripts/migrate_instance_to_v3.py /path/to/
 Run **all 5 validators** per CAP-MIG-015:
 
 ```bash
+# Set paths (adjust to your environment)
+FRAMEWORK="/path/to/your/aget-framework/aget"
 AGENT_PATH="/path/to/agent"
 
 # 1. Structural Validation (24 checks)
-python3 ~/github/aget-framework/aget/validation/validate_template_instance.py $AGENT_PATH
+python3 $FRAMEWORK/validation/validate_template_instance.py $AGENT_PATH
 # Expected: 24/24 PASS
 
 # 2. Naming Conventions
-python3 ~/github/aget-framework/aget/validation/validate_naming_conventions.py $AGENT_PATH
+python3 $FRAMEWORK/validation/validate_naming_conventions.py $AGENT_PATH
 # Expected: ✅ PASS (pre-existing violations acceptable)
 
 # 3. Version Consistency
-python3 ~/github/aget-framework/aget/validation/validate_version_consistency.py $AGENT_PATH
+python3 $FRAMEWORK/validation/validate_version_consistency.py $AGENT_PATH
 # Expected: ✅ PASS
 
 # 4. Legacy File Audit (L376)
@@ -170,18 +244,24 @@ find $AGENT_PATH/.aget -name "agent_manifest.yaml" 2>/dev/null
 ## Batch Validation (Fleet)
 
 ```bash
-# Main portfolio
-for agent in ~/github/private-*-aget ~/github/private-*-AGET; do
+# Set framework path (adjust to your environment)
+FRAMEWORK="/path/to/your/aget-framework/aget"
+
+# Example: Validate all agents in a directory
+# Adjust AGENT_DIR to your agent location pattern
+AGENT_DIR="/path/to/your/agents"
+
+for agent in $AGENT_DIR/private-*-aget $AGENT_DIR/private-*-AGET; do
+  [ -d "$agent" ] || continue
   echo "=== $(basename $agent) ==="
-  python3 ~/github/aget-framework/aget/validation/validate_template_instance.py "$agent" 2>/dev/null | tail -3
-  python3 ~/github/aget-framework/aget/validation/validate_version_consistency.py "$agent" 2>/dev/null | tail -1
+  python3 $FRAMEWORK/validation/validate_template_instance.py "$agent" 2>/dev/null | tail -3
+  python3 $FRAMEWORK/validation/validate_version_consistency.py "$agent" 2>/dev/null | tail -1
 done
 
-# Other portfolios (adjust paths)
-for agent in ~/github/GM-CCB/private-* ~/github/GM-RKB/private-*; do
-  echo "=== $(basename $agent) ==="
-  python3 ~/github/aget-framework/aget/validation/validate_template_instance.py "$agent" 2>/dev/null | tail -3
-done
+# For multiple portfolios, repeat with different AGENT_DIR values
+# Example:
+#   AGENT_DIR="/path/to/portfolio-1" && for agent in ...
+#   AGENT_DIR="/path/to/portfolio-2" && for agent in ...
 ```
 
 ---
@@ -348,7 +428,7 @@ Select 3-5 agents across different portfolios for pilot:
 
 ```
 ✅ CORRECT: Framework → Fleet (direct)
-   ~/github/aget-framework/aget/scripts/ → agent/scripts/
+   $FRAMEWORK/scripts/ → agent/scripts/
 
 ❌ WRONG: Framework → Supervisor → Fleet (chain)
    May propagate supervisor-specific modifications

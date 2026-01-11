@@ -1,10 +1,10 @@
 # SOP: Release Process
 
-**Version**: 1.0.0
+**Version**: 1.1.0
 **Created**: 2026-01-04
-**Updated**: 2026-01-04
+**Updated**: 2026-01-11
 **Owner**: aget-framework
-**Implements**: AGET_RELEASE_SPEC, CAP-REL-001 through CAP-REL-008, R-REL-006
+**Implements**: AGET_RELEASE_SPEC, CAP-REL-001 through CAP-REL-008, R-REL-006, CAP-MIG-017
 
 ---
 
@@ -206,6 +206,30 @@ curl -s https://raw.githubusercontent.com/aget-framework/.github/main/profile/RE
 
 ---
 
+## Phase 6.5: Remote Upgrade Documentation (CAP-MIG-017)
+
+**Objective**: Ensure remote upgrade documentation is current for this release.
+
+### 6.5.1 Verify Cross-Machine Section
+
+```bash
+# Check version references in cross-machine section
+grep -A5 "Expected:" aget/docs/FLEET_MIGRATION_GUIDE_v3.md | grep -q "X.Y.Z" && echo "PASS" || echo "UPDATE NEEDED"
+```
+
+### 6.5.2 Checklist
+
+- [ ] FLEET_MIGRATION_GUIDE cross-machine section references correct version
+- [ ] Example version numbers updated (e.g., `# Expected: X.Y.Z`)
+- [ ] Quick Reference Card version updated
+- [ ] L457 learning document still accurate
+- [ ] SOP_fleet_migration Phase 0.5 V-tests reference correct version
+- [ ] UPGRADING.md Remote/Cross-Machine section current
+
+**Decision_Point**: Remote documentation current? [GO/NOGO]
+
+---
+
 ## Gate 8: Retrospective (L435)
 
 **Required**: Every release PROJECT_PLAN SHALL include a retrospective gate.
@@ -276,6 +300,12 @@ gh release view v{PREVIOUS} --repo aget-framework/aget
 ---
 
 ## Changelog
+
+### v1.1.0 (2026-01-11)
+
+- Added Phase 6.5: Remote Upgrade Documentation (CAP-MIG-017)
+- Checklist for cross-machine documentation verification
+- Cross-reference to FLEET_MIGRATION_GUIDE_v3.md and UPGRADING.md
 
 ### v1.0.0 (2026-01-04)
 

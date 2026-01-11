@@ -1,8 +1,10 @@
 # SOP: Fleet Migration
 
-**Version**: 1.1.0
+**Version**: 1.2.0
 **Created**: 2026-01-05
+**Updated**: 2026-01-11
 **Owner**: private-supervisor-AGET
+**Implements**: CAP-MIG-017 (Remote Supervisor Upgrade)
 **Related**: L455 (AGENTS.md Invocation Verification), L457 (Cross-Machine Pre-Flight), AGET_RELEASE_SPEC, PROJECT_PLAN_fleet_v3.2_migration.md
 
 ---
@@ -81,6 +83,59 @@ done
 **Action**: Include late-created agents in Phase 2 batches
 
 **Decision_Point**: Framework ready? [GO/NOGO]
+
+---
+
+### Phase 0.5: Remote Supervisor Pre-Flight (CAP-MIG-017)
+
+**When This Applies**: Migration executed on different machine from framework development.
+
+**Objective**: Ensure local framework clone is synchronized before migration.
+
+**Key Issue**: Your local framework clone may be stale, causing agents to incorrectly report "version X.X doesn't exist."
+
+See: FLEET_MIGRATION_GUIDE_v3.md (Cross-Machine Pre-Flight section), L457
+
+#### V0.5.1: Health Check (Remote Reachable)
+
+```bash
+# Find your framework clone (common locations below)
+# Personal laptop: ~/github/aget-framework/aget/
+# Work laptop: ~/code/aget-framework/aget/
+# Server: /opt/aget/ or /srv/aget/
+cd /path/to/your/aget-framework/aget
+
+git ls-remote origin HEAD > /dev/null 2>&1 && echo "PASS: V0.5.1" || echo "FAIL: V0.5.1 - Remote unreachable"
+```
+**Expected**: PASS
+**Fix (if FAIL)**: Use HTTPS: `git remote set-url origin https://github.com/aget-framework/aget.git`
+
+#### V0.5.2: Framework Sync
+
+```bash
+cd /path/to/your/aget-framework/aget
+git fetch origin && git pull origin main
+```
+**Expected**: Up-to-date or successful pull
+
+#### V0.5.3: Version Verification
+
+```bash
+cat /path/to/your/aget-framework/aget/.aget/version.json | grep aget_version
+```
+**Expected**: Target version (e.g., "3.3.0")
+
+#### V0.5.4: State Verification (Re-Study)
+
+```
+⚠️ If agent previously studied with stale framework:
+   - Agent context is now INVALID
+   - Agent may incorrectly report "version X.X doesn't exist"
+   - Solution: Re-run study/research phase after git pull
+   - Pattern: "study up, focus on: vX.Y upgrade"
+```
+
+**Decision_Point**: Remote environment ready? [GO/NOGO]
 
 ---
 
@@ -318,6 +373,18 @@ mkdir -p $AGENT_PATH/scripts  # Create real directory
 /bin/rm -f $AGENT_PATH/scripts
 ```
 
+### Remote Supervisor Pre-Flight Issues (CAP-MIG-017)
+
+| Problem | Cause | Solution |
+|---------|-------|----------|
+| V0.5.1 FAIL: Remote unreachable | Network/SSH issue | Use HTTPS: `git remote set-url origin https://github.com/aget-framework/aget.git` |
+| V0.5.2 FAIL: Pull failed | Merge conflicts, uncommitted changes | `git stash` or commit first, resolve conflicts |
+| V0.5.3 FAIL: Framework stale | Pull failed silently | Check git status, try `git reset --hard origin/main` |
+| Agent says "version doesn't exist" | Studied with stale framework | Re-study after pull: `"study up, focus on: vX.Y upgrade"` |
+| V0.5.4: Context invalid | Proceeded without re-study | Session restart with fresh study phase |
+
+See: FLEET_MIGRATION_GUIDE_v3.md (Cross-Machine Pre-Flight), L457
+
 ---
 
 ## Success Metrics
@@ -342,6 +409,14 @@ mkdir -p $AGENT_PATH/scripts  # Create real directory
 ---
 
 ## Changelog
+
+### v1.2.0 (2026-01-11)
+
+- Added Phase 0.5: Remote Supervisor Pre-Flight (CAP-MIG-017)
+- Added V0.5.1-V0.5.4: Health check, framework sync, version verification, state verification
+- Added troubleshooting section for remote supervisor issues
+- Cross-reference to FLEET_MIGRATION_GUIDE_v3.md Cross-Machine Pre-Flight section
+- Implements CAP-MIG-017 (7 requirements)
 
 ### v1.1.0 (2026-01-07)
 
