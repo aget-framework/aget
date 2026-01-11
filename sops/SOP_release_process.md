@@ -1,10 +1,10 @@
 # SOP: Release Process
 
-**Version**: 1.1.0
+**Version**: 1.2.0
 **Created**: 2026-01-04
 **Updated**: 2026-01-11
 **Owner**: aget-framework
-**Implements**: AGET_RELEASE_SPEC, CAP-REL-001 through CAP-REL-008, R-REL-006, CAP-MIG-017
+**Implements**: AGET_RELEASE_SPEC, CAP-REL-001 through CAP-REL-010, CAP-SOP-001, R-REL-006, CAP-MIG-017
 
 ---
 
@@ -230,6 +230,87 @@ grep -A5 "Expected:" aget/docs/FLEET_MIGRATION_GUIDE_v3.md | grep -q "X.Y.Z" && 
 
 ---
 
+## Phase 7: Pre-Push Gate (L517, CAP-REL-009, CAP-SOP-001)
+
+**BLOCKING**: This phase MUST pass BEFORE executing Phase 3.3 (Push).
+
+**Purpose**: Prevent Declarative_Release anti-pattern by verifying all version metadata is updated before push.
+
+### 7.1 Run Release Validator
+
+```bash
+python3 validation/validate_release_gate.py X.Y.Z
+```
+
+**Expected**: PASS (exit code 0)
+**BLOCKING**: Do NOT proceed with push if FAIL
+
+### 7.2 V-REL Tests
+
+| ID | Test | Phase | Command | BLOCKING |
+|----|------|-------|---------|----------|
+| V-REL-001 | Release validator passes | Pre-Push | `python3 validation/validate_release_gate.py $VERSION` | **YES** |
+| V-REL-002 | Framework version.json correct | 1.2 | `jq -r '.aget_version' aget/.aget/version.json` | **YES** |
+| V-REL-003 | ALL 12 templates correct | 1.3 | Loop check all template version.json | **YES** |
+| V-REL-004 | CHANGELOG entry exists | 1.2 | `grep "$VERSION" CHANGELOG.md` | No |
+| V-REL-005 | Git tag exists | 3.2 | `git tag -l "v$VERSION"` | No |
+| V-REL-006 | migration_history updated | 1.2 | `jq '.migration_history[-1]' aget/.aget/version.json` | No |
+| V-REL-007 | No instance exceeds framework | Pre-Push | `python3 validation/validate_version_ceiling.py` | **YES** |
+
+### 7.3 V-Test Execution
+
+```bash
+# V-REL-002: Framework version
+jq -r '.aget_version' /path/to/aget-framework/aget/.aget/version.json
+# Expected: X.Y.Z
+
+# V-REL-003: All templates (12 total)
+TEMPLATES=(
+  template-supervisor-aget
+  template-worker-aget
+  template-advisor-aget
+  template-consultant-aget
+  template-developer-aget
+  template-spec-engineer-aget
+  template-analyst-aget
+  template-architect-aget
+  template-qa-aget
+  template-devops-aget
+  template-documenter-aget
+  template-researcher-aget
+)
+for t in "${TEMPLATES[@]}"; do
+  VERSION=$(jq -r '.aget_version' /path/to/aget-framework/$t/.aget/version.json 2>/dev/null || echo "NOT_FOUND")
+  echo "$t: $VERSION"
+done
+# Expected: ALL show X.Y.Z (or NOT_FOUND for unpublished templates)
+
+# V-REL-006: migration_history
+jq -r '.migration_history[-1]' /path/to/aget-framework/aget/.aget/version.json
+# Expected: Contains "vX.Y.Z" or "X.Y.Z"
+
+# V-REL-007: Version ceiling (when validator exists)
+python3 validation/validate_version_ceiling.py /path/to/instances
+# Expected: PASS (no instance exceeds framework version)
+```
+
+### 7.4 Decision Point
+
+**Mandatory Check Before Push**:
+- [ ] V-REL-001 PASS (release validator)
+- [ ] V-REL-002 PASS (framework version.json)
+- [ ] V-REL-003 PASS (all templates, or documented exceptions)
+- [ ] V-REL-007 PASS (version ceiling)
+
+**Anti-Patterns to Prevent** (L517):
+- **Declarative_Release**: Version in commit message but not version.json
+- **Version_Overrun**: Instance version exceeds framework version
+- **Template_Abandonment**: Templates left behind during upgrade
+
+**Decision_Point**: All BLOCKING V-tests pass? [GO/NOGO]
+
+---
+
 ## Gate 8: Retrospective (L435)
 
 **Required**: Every release PROJECT_PLAN SHALL include a retrospective gate.
@@ -300,6 +381,16 @@ gh release view v{PREVIOUS} --repo aget-framework/aget
 ---
 
 ## Changelog
+
+### v1.2.0 (2026-01-11)
+
+- **Added Phase 7: Pre-Push Gate** (L517, CAP-REL-009, CAP-SOP-001)
+  - BLOCKING verification before git push
+  - V-REL-001 through V-REL-007 tests
+  - Prevents Declarative_Release anti-pattern
+  - All 12 templates validation
+  - Version ceiling constraint enforcement
+- Updated Implements header (CAP-REL-009, CAP-REL-010, CAP-SOP-001)
 
 ### v1.1.0 (2026-01-11)
 

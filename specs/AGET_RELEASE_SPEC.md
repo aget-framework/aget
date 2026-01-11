@@ -1,11 +1,11 @@
 # AGET Release Specification
 
-**Version**: 1.0.0
+**Version**: 1.1.0
 **Status**: Active
 **Category**: Process (Release Management)
 **Format Version**: 1.2
 **Created**: 2026-01-04
-**Updated**: 2026-01-04
+**Updated**: 2026-01-11
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_RELEASE_SPEC.md`
 **Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.2
@@ -252,6 +252,43 @@ private-aget-framework-AGET/release-notes/v{VERSION}.md
 | R-REL-010-01 | Homepage SHALL show current version | User information |
 | R-REL-010-02 | Roadmap SHALL reflect release status | Planning visibility |
 | R-REL-010-03 | Next version SHALL be documented | Roadmap clarity |
+
+### CAP-REL-009: Release Verification (L517)
+
+**SHALL** requirements for release verification before push:
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| CAP-REL-009-01 | ubiquitous | The SYSTEM shall run validate_release_gate.py before push | Automated verification |
+| CAP-REL-009-02 | ubiquitous | The SYSTEM shall BLOCK release if validation fails | Gate enforcement |
+| CAP-REL-009-03 | ubiquitous | The SYSTEM shall verify framework version.json matches release | Source of truth |
+| CAP-REL-009-04 | ubiquitous | The SYSTEM shall verify ALL templates match release version | R-REL-015 compliance |
+
+**Prevents**: Declarative_Release anti-pattern (declaring version without updating metadata).
+
+### CAP-REL-010: Version Ceiling Constraint (L517)
+
+**SHALL** requirements for instance-framework version relationship:
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| CAP-REL-010-01 | ubiquitous | Instance aget_version SHALL NOT exceed framework aget_version | Version ceiling |
+| CAP-REL-010-02 | conditional | IF instance > framework THEN the SYSTEM shall flag Version_Overrun | Detection |
+| CAP-REL-010-03 | conditional | IF Version_Overrun detected THEN the SYSTEM shall block upgrade | Prevention |
+
+**Prevents**: Version_Overrun anti-pattern (instance version exceeds framework version).
+
+### CAP-SOP-001: SOP Verification Requirements (L517)
+
+**SHALL** requirements for SOP verification:
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| CAP-SOP-001-01 | ubiquitous | SOPs for releases SHALL include V-tests | Verified process |
+| CAP-SOP-001-02 | ubiquitous | Each SOP phase SHALL have ≥1 BLOCKING V-test | Gate discipline |
+| CAP-SOP-001-03 | conditional | IF step can be skipped silently THEN V-test SHALL verify | No silent failures |
+
+**Prevents**: SOP_Theater anti-pattern (procedural steps without verification).
 
 ---
 
