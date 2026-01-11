@@ -233,6 +233,7 @@ Compound AGET Vocabulary terms match this regex:
 | `Learning_Document` | L-series knowledge capture (e.g., L440) | — |
 | `L_Doc` | Abbreviation for Learning_Document | — |
 | `Evolution_Directory` | Storage for learning (.aget/evolution/) | — |
+| `Published_Learning` | Learning_Document graduated from private evolution to public docs/learnings/ | — |
 | `Pattern_Extraction` | Identifying reusable Aget_Pattern | — |
 | `Knowledge_Migration` | Moving learning between Aget_Instances | — |
 
