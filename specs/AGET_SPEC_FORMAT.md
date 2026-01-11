@@ -1,7 +1,7 @@
-# AGET Specification Format v1.2
+# AGET Specification Format v1.3
 
-**Version**: 1.2.0
-**Date**: 2025-12-26
+**Version**: 1.3.0
+**Date**: 2026-01-10
 **Status**: CANONICAL
 **Location**: `aget/specs/AGET_SPEC_FORMAT_v1.2.md`
 **Supersedes**: AGET_SPEC_FORMAT_v1.1.md
@@ -392,6 +392,44 @@ python3 validate_agent_structure.py --dir /path/to/agent --spec AGET_ACCOUNTING_
 
 ---
 
+## Artifact Size Guidance (L502)
+
+Large artifacts exceed tool limits and cognitive capacity. Size constraints ensure readability and processability.
+
+### Size Limits by Artifact Type
+
+| Artifact Type | Optimal | Warning | Oversized | Remediation |
+|---------------|---------|---------|-----------|-------------|
+| PROJECT_PLAN | ≤500 lines | 501-1000 | >1000 | Decompose into phases |
+| Specification | ≤600 lines | 601-800 | >800 | Split by domain |
+| SOP | ≤400 lines | 401-600 | >600 | Modularize procedures |
+| L-doc | ≤150 lines | 151-250 | >250 | Focus scope |
+| CLAUDE.md | ≤600 lines | 601-800 | >800 | Use imports/references |
+
+### Tool Constraints
+
+| Constraint | Limit | Implication |
+|------------|-------|-------------|
+| Read tool tokens | 25,000 | ~1,500 lines max single-pass |
+| Context window | Varies | Large artifacts fragment context |
+| Human working memory | 7±2 chunks | ~500 lines optimal working set |
+
+### Decomposition Patterns
+
+1. **Phased Plans**: `PROJECT_PLAN_{scope}_phase{N}.md`
+2. **Domain Split**: Separate specs by bounded context
+3. **Registry Extraction**: Move V-tests to `tests/vtest_{id}.md`
+4. **Summary + Appendix**: Core content inline, details in appendix
+
+### Validation
+
+```bash
+# Check artifact sizes
+python3 validate_artifact_size.py /path/to/repo
+```
+
+---
+
 ## Dual Format Support
 
 ### Markdown Format (.md)
@@ -624,10 +662,11 @@ Capability IDs match: `CAP-[A-Z]+-[0-9]{3}(-[0-9]{2})?`
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.3.0 | 2026-01-10 | Artifact Size Guidance section (L502): size limits by type, tool constraints, decomposition patterns |
 | 1.2.0 | 2025-12-26 | Dimension-organized vocabulary, authority model, inviolables, structural requirements, dual format, namespaced IDs, theoretical basis, graduation history |
 | 1.1.0 | 2025-12-01 | Initial EARS-based format |
 
 ---
 
-*AGET_SPEC_FORMAT_v1.2.md — Canonical specification format for AGET framework*
+*AGET_SPEC_FORMAT_v1.3.md — Canonical specification format for AGET framework*
 *"Specs in proper language enable proper validation"*

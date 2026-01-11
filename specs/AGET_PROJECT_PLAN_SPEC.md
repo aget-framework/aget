@@ -1,11 +1,11 @@
 # AGET PROJECT_PLAN Specification
 
-**Version**: 1.0.0
+**Version**: 1.1.0
 **Status**: Active
 **Category**: Process (Planning)
 **Format Version**: 1.2
 **Created**: 2026-01-04
-**Updated**: 2026-01-04
+**Updated**: 2026-01-10
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_PROJECT_PLAN_SPEC.md`
 **Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.7, Issue #30
@@ -444,6 +444,45 @@ python3 -c "import json; v=json.load(open('.aget/version.json')); print('PASS' i
 
 ---
 
+### CAP-PP-012: Plan Comprehensibility (L502)
+
+**SHOULD** requirements for plan size and readability:
+
+| ID | Requirement | Rationale |
+|----|-------------|-----------|
+| CAP-PP-012-01 | PROJECT_PLAN SHOULD be ≤1000 lines | Cognitive load, tool limits |
+| CAP-PP-012-02 | Plans >1000 lines SHOULD use decomposition or summary pattern | Maintainability |
+| CAP-PP-012-03 | V-tests MAY be extracted to separate registry for large plans | Modularity |
+
+**Size Classification:**
+
+| Size | Classification | Action |
+|------|----------------|--------|
+| ≤500 lines | Optimal | None required |
+| 501-1000 lines | Acceptable | Monitor growth |
+| 1001-1500 lines | Warning | Consider decomposition |
+| >1500 lines | Oversized | Decompose or extract |
+
+**Decomposition Patterns:**
+
+1. **Child Plans**: Split into `PROJECT_PLAN_{scope}_phase{N}.md`
+2. **V-Test Registry**: Extract to `tests/vtest_{plan_id}.md`
+3. **Summary + Detail**: Executive summary standalone, details in appendix
+
+**Rationale (L502):**
+
+PROJECT_PLAN_v3.2.0 (25,088 tokens, 1,641 lines) exceeded the Read tool's 25,000 token limit. Root cause analysis revealed CAP-PP-011 (V-tests) optimized for verification without constraining comprehensibility—a single-axis optimization anti-pattern.
+
+**Tool Constraints:**
+
+| Constraint | Limit | Implication |
+|------------|-------|-------------|
+| Read tool tokens | 25,000 | ~1,500 lines max |
+| Context window | Varies | Large plans fragment context |
+| Human working memory | 7±2 chunks | ~500 lines optimal |
+
+---
+
 ## PROJECT_PLAN Template
 
 See: `templates/PROJECT_PLAN_TEMPLATE.md` (G2.9 deliverable)
@@ -470,6 +509,7 @@ See: `templates/PROJECT_PLAN_TEMPLATE.md` (G2.9 deliverable)
 | CAP-PP-002-* | validate_project_plan.py | Planned |
 | CAP-PP-003-* | Manual review | Manual |
 | CAP-PP-011-* | V-test execution | Manual |
+| CAP-PP-012-* | validate_artifact_size.py | Planned |
 
 ---
 
@@ -552,12 +592,21 @@ See G2.8 (already in plan) or defer to v3.3.0.
 - L342: Session Scope Validation
 - L426: Effort Estimation Patterns
 - L440: Manager Migration Verification Gap
+- L502: Artifact Comprehensibility Gap
 - CAP-REASON-008: Retrospective Requirement (AGET_REASONING_SPEC)
 - SOP_release_process.md
 
 ---
 
 ## Changelog
+
+### v1.1.0 (2026-01-10)
+
+- Added CAP-PP-012: Plan Comprehensibility (L502)
+- Size classification table (optimal/acceptable/warning/oversized)
+- Decomposition patterns (child plans, V-test registry, summary+detail)
+- Tool constraints documentation
+- Added validate_artifact_size.py to enforcement table
 
 ### v1.0.0 (2026-01-04)
 

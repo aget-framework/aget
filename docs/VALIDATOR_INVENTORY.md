@@ -18,7 +18,7 @@ This document tracks all validators referenced in AGET specifications, their imp
 
 | Category | Count |
 |----------|-------|
-| **Implemented** | 30 |
+| **Implemented** | 31 |
 | **Planned** | 15 |
 | **Deferred** | 2 |
 | **Total Referenced** | 45 |
@@ -65,6 +65,7 @@ These validators exist in `validation/` and are functional:
 | analyze_knowledge_content.py | Internal | ✅ Implemented |
 | check_aget_vocabulary.py | Internal | ✅ Implemented |
 | project_skos_to_ears.py | Internal | ✅ Implemented |
+| validate_artifact_size.py | AGET_SPEC_FORMAT, CAP-PP-012 (L502) | ✅ Implemented (v3.3.0) |
 
 ---
 
