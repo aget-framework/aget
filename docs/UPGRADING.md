@@ -450,6 +450,66 @@ If managing multiple agents (5+):
 
 ---
 
+## Remote/Cross-Machine Upgrades (CAP-MIG-017)
+
+**When This Applies**: Upgrading an agent on a different machine from where the framework is developed/released.
+
+**Key Issue**: Your local framework clone may be stale, causing "version X.X doesn't exist" errors.
+
+**Scenarios**:
+- Work laptop different from personal laptop
+- Server deployment
+- CI/CD environment
+- Any machine that doesn't automatically sync framework
+
+### Quick Pre-Flight
+
+Before upgrading on a remote machine:
+
+```bash
+# 1. Find your framework clone (common locations below)
+#    Personal: ~/github/aget-framework/aget/
+#    Work:     ~/code/aget-framework/aget/
+#    Server:   /opt/aget/ or /srv/aget/
+cd /path/to/your/aget-framework/aget
+
+# 2. Health check: Verify remote is reachable
+git ls-remote origin HEAD > /dev/null && echo "Remote OK" || echo "FAIL: Check network/SSH"
+
+# 3. Sync framework
+git fetch origin && git pull origin main
+
+# 4. Verify version
+cat .aget/version.json | grep aget_version
+# Should show current release version
+```
+
+### After Sync: State Verification
+
+If your agent previously studied the upgrade with stale framework:
+
+```
+⚠️ Agent context may be INVALID
+   - Agent may incorrectly report "version X.X doesn't exist"
+   - Solution: Re-study after sync
+   - Pattern: "study up, focus on: vX.Y upgrade"
+```
+
+### Detailed Guide
+
+For comprehensive cross-machine migration procedures, see:
+- **[FLEET_MIGRATION_GUIDE_v3.md - Cross-Machine Pre-Flight](FLEET_MIGRATION_GUIDE_v3.md#cross-machine-pre-flight-l457-cap-mig-017)**
+
+### Common Issues
+
+| Problem | Cause | Solution |
+|---------|-------|----------|
+| "Version doesn't exist" | Stale framework | Run git pull, re-study |
+| Remote unreachable | Network/SSH issue | Use HTTPS: `git remote set-url origin https://github.com/aget-framework/aget.git` |
+| Pull failed | Uncommitted changes | `git stash` or commit first |
+
+---
+
 ## Staying Up-to-Date
 
 **Recommended**: Upgrade within 1-2 releases of latest
@@ -496,4 +556,4 @@ If managing multiple agents (5+):
 ---
 
 *UPGRADING.md - Safe version upgrade procedures*
-*Created: 2025-12-24 | Version: 1.0*
+*Created: 2025-12-24 | Updated: 2026-01-11 | Version: 1.1*

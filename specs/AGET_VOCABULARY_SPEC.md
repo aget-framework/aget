@@ -1,11 +1,11 @@
 # AGET Vocabulary Specification
 
-**Version**: 1.3.0
+**Version**: 1.4.0
 **Status**: Active
 **Category**: Core (Standards)
 **Format Version**: 1.2
 **Created**: 2026-01-04
-**Updated**: 2026-01-09
+**Updated**: 2026-01-11
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_VOCABULARY_SPEC.md`
 **Change Origin**: PROJECT_PLAN_v3.2.0 Gate 3.1
@@ -338,6 +338,18 @@ V_Test:
 | `Pre_Publication_Review` | Review before public push |
 | `Public_Private_Boundary` | Separation of public/private content |
 | `Sanitization` | Removing sensitive content from L-docs |
+
+## Migration Terms (CAP-MIG-*)
+
+| Term | Definition |
+|------|------------|
+| `Pre_Flight` | Verification procedure executed before primary operation to ensure environment readiness |
+| `Health_Check` | Network/service reachability verification using lightweight probes (e.g., `git ls-remote`) |
+| `Framework_Sync` | Synchronization of local framework clone with remote origin |
+| `Remote_Supervisor` | Aget_Supervisor executing migration on a machine different from framework development |
+| `Cross_Machine_Migration` | Fleet_Migration where execution environment differs from framework development environment |
+| `Stale_Framework` | Framework clone that has not been synchronized with remote, causing version mismatch errors |
+| `State_Verification` | Re-study/re-research procedure after Framework_Sync to ensure agent context is valid |
 
 ## Executable Knowledge Ontology Terms (L451)
 
@@ -1138,6 +1150,13 @@ entities:
 ---
 
 ## Changelog
+
+### v1.4.0 (2026-01-11)
+
+- Added Migration Terms section (CAP-MIG-*)
+- Added 7 migration vocabulary terms: Pre_Flight, Health_Check, Framework_Sync, Remote_Supervisor, Cross_Machine_Migration, Stale_Framework, State_Verification
+- Supports CAP-MIG-017 (Remote Supervisor Upgrade)
+- See: L457 (Remote Supervisor Upgrade Pattern), FLEET_MIGRATION_GUIDE_v3.md
 
 ### v1.3.0 (2026-01-09)
 

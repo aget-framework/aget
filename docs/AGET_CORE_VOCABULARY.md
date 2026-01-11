@@ -1,8 +1,8 @@
 # AGET Core Vocabulary
 
-**Version**: 1.0.0
-**Date**: 2025-12-26
-**Source**: AGET_CONTROLLED_VOCABULARY.md (subset)
+**Version**: 1.1.0
+**Date**: 2026-01-11
+**Source**: AGET_VOCABULARY_SPEC.md (subset)
 **Purpose**: Clone-ready vocabulary for AGET templates
 
 ---
@@ -118,6 +118,20 @@ This document provides the essential vocabulary terms that every AGET agent shou
 
 ---
 
+## Migration Terms (CAP-MIG-017)
+
+| Term | Definition |
+|------|------------|
+| Pre_Flight | Verification procedure before primary operation to ensure environment readiness |
+| Health_Check | Network/service reachability verification using lightweight probes |
+| Framework_Sync | Synchronization of local framework clone with remote origin |
+| Remote_Supervisor | Supervisor agent on machine different from framework development |
+| Cross_Machine_Migration | Migration where execution environment differs from development |
+| Stale_Framework | Framework clone not synchronized with remote, causing version mismatch |
+| State_Verification | Re-study/re-research procedure after Framework_Sync to ensure valid context |
+
+---
+
 ## Usage
 
 ### In Specifications
@@ -149,9 +163,10 @@ This allows agent-specific vocabulary while preserving core terminology.
 
 ## Reference
 
-Full vocabulary: `aget/specs/AGET_CONTROLLED_VOCABULARY.md`
+Full vocabulary: `aget/specs/AGET_VOCABULARY_SPEC.md`
 
 ---
 
 *AGET_CORE_VOCABULARY.md — Essential vocabulary for AGET agents*
-*Clone-ready subset of AGET_CONTROLLED_VOCABULARY.md*
+*Clone-ready subset of AGET_VOCABULARY_SPEC.md*
+*Updated: 2026-01-11 (v1.1.0 - Migration Terms CAP-MIG-017)*

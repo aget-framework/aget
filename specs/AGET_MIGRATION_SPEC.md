@@ -1,11 +1,11 @@
 # AGET Migration Specification
 
-**Version**: 1.4.0
+**Version**: 1.5.0
 **Status**: Active
 **Category**: Standards (Lifecycle Management)
 **Format Version**: 1.2
 **Created**: 2025-12-27
-**Updated**: 2025-12-28
+**Updated**: 2026-01-11
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_MIGRATION_SPEC.md`
 
@@ -542,6 +542,83 @@ The SYSTEM shall require behavioral validation, not just structural checks.
 └────────────────────────────────────────────────────────────────┘
 ```
 
+### CAP-MIG-017: Remote Supervisor Upgrade (L457)
+
+The SYSTEM shall support Cross_Machine_Migration where migration is executed from a different machine than framework development.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-MIG-017-01 | conditional | IF Remote_Supervisor executing migration THEN the SYSTEM shall perform Pre_Flight verification |
+| CAP-MIG-017-02 | ubiquitous | Pre_Flight shall include Health_Check using `git ls-remote origin HEAD` |
+| CAP-MIG-017-03 | ubiquitous | Pre_Flight shall include Framework_Sync using `git fetch origin && git pull origin main` |
+| CAP-MIG-017-04 | ubiquitous | Pre_Flight shall include Version_Verification after sync |
+| CAP-MIG-017-05 | conditional | IF agent previously studied Stale_Framework THEN the SYSTEM shall require State_Verification (re-study) |
+| CAP-MIG-017-06 | ubiquitous | Migration documentation shall use placeholder paths (e.g., `/path/to/your/aget-framework/aget`) |
+| CAP-MIG-017-07 | ubiquitous | Migration documentation shall include common framework location examples |
+
+**Rationale**: L457 (supervisor) identified that migrations executed on a different machine from framework development fail when local framework clone is stale. Agent incorrectly reports "version X.X doesn't exist" because it studied outdated framework.
+
+**Key Issue**: Your local framework clone may be stale, causing agents to incorrectly report "version X.X doesn't exist."
+
+**Common Framework Locations**:
+
+| Environment | Typical Path |
+|-------------|--------------|
+| Personal laptop | `~/github/aget-framework/aget/` |
+| Work laptop | `~/code/aget-framework/aget/` |
+| Server deployment | `/opt/aget/` or `/srv/aget/` |
+| CI/CD | `$WORKSPACE/aget-framework/aget/` |
+
+**Pre-Flight Quick Reference**:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  CROSS-MACHINE PRE-FLIGHT - QUICK REFERENCE                 │
+├─────────────────────────────────────────────────────────────┤
+│  1. HEALTH CHECK                                            │
+│     cd /path/to/your/aget-framework/aget                    │
+│     git ls-remote origin HEAD                               │
+│                                                             │
+│  2. SYNC FRAMEWORK                                          │
+│     git fetch origin && git pull origin main                │
+│                                                             │
+│  3. VERIFY VERSION                                          │
+│     cat .aget/version.json | grep aget_version              │
+│                                                             │
+│  4. RE-STUDY (if agent previously studied stale framework)  │
+│     User: "study up, focus on: vX.Y upgrade"                │
+│                                                             │
+│  5. PROCEED WITH MIGRATION                                  │
+│     Follow standard migration procedure                     │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Enforcement**:
+- SOP: `sops/SOP_fleet_migration.md` Phase 0.5
+- Guide: `docs/FLEET_MIGRATION_GUIDE_v3.md` Cross-Machine Pre-Flight section
+- Validation: V-PRE.0 through V-PRE.3 tests
+
+**V-Tests**:
+
+```bash
+# V-PRE.0: Health check (remote reachable)
+git ls-remote origin HEAD > /dev/null 2>&1 && echo "PASS: V-PRE.0" || echo "FAIL: V-PRE.0 - Remote unreachable"
+
+# V-PRE.1: Framework synced to expected version
+LOCAL=$(cat .aget/version.json | grep -o '"[0-9.]*"' | head -1)
+EXPECTED="3.3"  # adjust to current release
+echo $LOCAL | grep -q "$EXPECTED" && echo "PASS: V-PRE.1" || echo "FAIL: V-PRE.1 - Framework stale ($LOCAL vs $EXPECTED)"
+
+# V-PRE.2: No uncommitted changes blocking pull
+git status --short | grep -v '^??' | wc -l | grep -q '^0$' && echo "PASS: V-PRE.2" || echo "FAIL: V-PRE.2 - Uncommitted changes"
+
+# V-PRE.3: On main branch
+BRANCH=$(git branch --show-current)
+[ "$BRANCH" = "main" ] && echo "PASS: V-PRE.3" || echo "FAIL: V-PRE.3 - Not on main ($BRANCH)"
+```
+
+**References**: L457 (Remote Supervisor Upgrade Pattern), FLEET_MIGRATION_GUIDE_v3.md, SOP_fleet_migration.md
+
 ---
 
 ## Authority Model
@@ -737,6 +814,7 @@ python3 aget/scripts/cleanup_template_archive.py template-example-aget/ --execut
 - L403: knowledge/ Directory Population Guidance Gap (CAP-MIG-013)
 - L376: Legacy File Version Sync (CAP-MIG-014, supervisor)
 - L402: Behavioral Validation Gaps (CAP-MIG-015)
+- L457: Remote Supervisor Upgrade Pattern (CAP-MIG-017)
 - PATTERN_migration_validation_gate.md
 - AGET_TEMPLATE_SPEC.md (target spec)
 - AGET_INSTANCE_SPEC.md (instance requirements)
@@ -762,8 +840,8 @@ graduation:
 
 ---
 
-*AGET Migration Specification v1.4.0*
+*AGET Migration Specification v1.5.0*
 *Format: AGET_SPEC_FORMAT v1.2 (EARS + SKOS)*
 *Part of v3.0.0 Lifecycle Management - Gap C3*
-*Enhanced: CAP-MIG-014 (legacy handling), CAP-MIG-015 (behavioral validation)*
+*Enhanced: CAP-MIG-014 (legacy handling), CAP-MIG-015 (behavioral validation), CAP-MIG-017 (remote supervisor)*
 *"Controlled transitions enable safe evolution."*
