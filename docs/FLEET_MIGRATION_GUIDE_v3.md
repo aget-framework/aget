@@ -36,6 +36,19 @@ cat .aget/version.json | grep aget_version
 
 **Key Issue**: Your local framework clone may be stale, causing agents to incorrectly report "version X.X doesn't exist."
 
+### When to Run Pre-Flight
+
+**Run when ANY apply:**
+- Switching between machines (work ↔ personal)
+- Framework not synced in >7 days
+- Agent reports "version doesn't exist" after framework update
+- First migration on new machine
+
+**Skip if:**
+- Same machine, continuous work session
+- Framework synced this session
+- Agent already studied current framework version
+
 ### Common Framework Locations
 
 | Environment | Typical Path |
@@ -114,6 +127,18 @@ If agent previously studied with stale framework:
 
 This ensures agent has current framework knowledge before proceeding.
 ```
+
+### Stale Context Symptoms
+
+Agent may exhibit:
+- "I don't see version X.Y in the framework" (version exists after sync)
+- "File Z doesn't exist" (file present after sync)
+- References outdated protocol names or deprecated features
+- Proposes changes already in current framework
+
+**Cause**: Agent studied pre-sync, framework updated, agent context now stale
+
+**Solution**: User says `"study up, focus on: vX.Y upgrade"`
 
 ### V-Tests
 
