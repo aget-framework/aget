@@ -1,19 +1,20 @@
 # AGET Template Structure Guide
 
-**Version**: 1.0.1
-**Date**: 2026-01-04
+**Version**: 2.0.0
+**Date**: 2026-01-11
 **Status**: CANONICAL
 **Location**: aget/docs/TEMPLATE_STRUCTURE_GUIDE.md
+**Framework Version**: 3.3.0
 
 ---
 
 ## Overview
 
-This guide defines the standard directory structure and file organization for AGET templates and agent instances.
+This guide defines the standard directory structure and file organization for AGET templates and agent instances. Updated for v3.3 to include shell integration, specification structure, and vocabulary requirements.
 
 ---
 
-## Standard Template Structure
+## Standard Template Structure (v3.3)
 
 ```
 template-{type}-aget/
@@ -30,10 +31,17 @@ template-{type}-aget/
 │   │   └── ADR-001-example.md
 │   └── tests/                      # Contract tests (optional)
 │       └── contract_tests.py
+├── specs/                          # Template specifications (v3.3)
+│   ├── {Type}_SPEC.md              # Capability specification
+│   └── {Type}_VOCABULARY.md        # Domain vocabulary
+├── shell/                          # Shell integration (v3.3, CAP-TPL-014)
+│   ├── {type}_profile.zsh          # Shell profile with helpers
+│   └── README.md                   # Shell integration documentation
 ├── AGENTS.md                       # Agent behavior specification
 ├── CLAUDE.md -> AGENTS.md          # Symlink for Claude Code
 ├── README.md                       # Public documentation
 ├── CHANGELOG.md                    # Version history
+├── manifest.yaml                   # 5D composition manifest
 ├── docs/                           # Extended documentation (optional)
 │   └── ...
 └── scripts/                        # Utility scripts (optional)
@@ -316,6 +324,8 @@ Examples:
 
 Before committing a template or instance:
 
+### Core Requirements (all versions)
+
 - [ ] version.json has all required fields
 - [ ] aget_version matches framework version
 - [ ] CLAUDE.md is symlink to AGENTS.md
@@ -324,6 +334,27 @@ Before committing a template or instance:
 - [ ] Substantial Change Protocol section exists
 - [ ] Session protocols defined
 - [ ] README.md exists and is current
+
+### v3.3 Exemplar Requirements (CAP-TPL-014)
+
+- [ ] specs/{Type}_SPEC.md exists with required sections
+  - [ ] Abstract
+  - [ ] Archetype Definition
+  - [ ] Capabilities (≥3)
+  - [ ] Inviolables
+  - [ ] EKO Classification
+  - [ ] Archetype Constraints
+  - [ ] A-SDLC Phase Coverage
+- [ ] specs/{Type}_VOCABULARY.md exists with required sections
+  - [ ] Concept Scheme (SKOS)
+  - [ ] Core Concepts (≥5)
+  - [ ] Concept Relationships
+  - [ ] EKO Cross-References
+- [ ] shell/ directory exists
+  - [ ] {type}_profile.zsh with aget_info(), aget_docs()
+  - [ ] README.md with usage instructions
+- [ ] .aget/evolution/ directory exists with seed L-doc
+- [ ] manifest.yaml exists (5D composition)
 
 ---
 
