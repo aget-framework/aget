@@ -1,9 +1,9 @@
 # Release Verification Checklist
 
-**Version**: 1.2.0
+**Version**: 1.3.0
 **Status**: ACTIVE
-**Implements**: R-PUB-001, R-REL-001, R-REL-010, R-REL-011, R-LIC-001, R-SPEC-010
-**Updated**: 2026-01-04
+**Implements**: R-PUB-001, R-REL-001, R-REL-010, R-REL-011, R-LIC-001, R-SPEC-010, L515
+**Updated**: 2026-01-11
 
 ---
 
@@ -101,6 +101,39 @@ grep -rh "Enforcement.*validate_" aget/specs/ | grep -v "(planned)" | \
   done
 ```
 
+### Gate 10: Template Coherence (L515)
+
+**⚠️ BLOCKING: Templates must align with validators**
+
+- [ ] Single canonical location per template (no duplicates in docs/templates/)
+- [ ] Each template passes its own validator
+- [ ] Template versions bumped if format changed
+- [ ] SOP_template_lifecycle.md followed for any template changes
+
+```bash
+# Verification command: template coherence check
+echo "=== Template Coherence Check ==="
+
+# Check for duplicates
+echo "Checking for duplicate templates..."
+for tmpl in PROJECT_PLAN ADR SPEC VOCABULARY; do
+  count=$(find aget/ -name "${tmpl}_TEMPLATE.md" 2>/dev/null | wc -l | tr -d ' ')
+  if [ "$count" -gt 1 ]; then
+    echo "FAIL: Multiple ${tmpl}_TEMPLATE.md found"
+    find aget/ -name "${tmpl}_TEMPLATE.md"
+  elif [ "$count" -eq 0 ]; then
+    echo "WARN: No ${tmpl}_TEMPLATE.md found"
+  else
+    echo "PASS: Single ${tmpl}_TEMPLATE.md"
+  fi
+done
+
+# Validate PROJECT_PLAN template
+echo ""
+echo "Validating PROJECT_PLAN template..."
+python3 aget/validation/validate_project_plan.py aget/templates/PROJECT_PLAN_TEMPLATE.md
+```
+
 ---
 
 ## Checklist Execution
@@ -191,6 +224,7 @@ If issues discovered post-release:
 | CAP-LIC-001 | Gate 8 | Apache 2.0 compliance |
 | R-SPEC-010 | Gate 9 | Validator existence check |
 | L433 | Gate 9 | Enforcement theater audit |
+| L515 | Gate 10 | Template coherence check |
 
 ---
 
