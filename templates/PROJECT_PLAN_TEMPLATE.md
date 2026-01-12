@@ -7,7 +7,36 @@
 **Author**: {agent-name}
 **Theme**: {Short theme description}
 **Tracking**: {GitHub milestone or issue reference}
-**CAP-PP-011 Compliant**: Yes (all gates have V-tests)
+**Template Version**: 2.0.0 (v3.4)
+
+---
+
+## Plan_Status Vocabulary (#232)
+
+| Status | Meaning | Transition Rule |
+|--------|---------|-----------------|
+| `Draft` | Plan under development | Initial state |
+| `Ready` | Awaiting approval | Draft → Ready when complete |
+| `In_Progress` | Execution started | Ready → In_Progress on GO |
+| `Blocked` | Waiting on dependency | Any → Blocked |
+| `Complete` | All gates passed | **REQUIRES Closure Checklist** |
+| `Abandoned` | Work stopped | Any → Abandoned (document reason) |
+
+**Current Status**: Draft
+
+---
+
+## Gate Naming Convention (#233)
+
+Choose ONE pattern per plan. Selection guidance:
+
+| Pattern | Format | When to Use |
+|---------|--------|-------------|
+| **Sequential** | `## G-0:`, `## G-1:` | Simple linear execution, <10 gates |
+| **Hierarchical** | `## Gate 0:`, `## Gate 1.1:` | Multi-phase projects, 10+ gates |
+| **Track-prefixed** | `## S-1:`, `## W-1:` | Parallel tracks, independent streams |
+
+**This plan uses**: {Sequential | Hierarchical | Track-prefixed}
 
 ---
 
@@ -216,6 +245,8 @@ gh release view v{VERSION} --repo aget-framework/aget && echo "PASS" || echo "FA
 **Objective:** Document learnings and close project
 **Status:** Pending
 
+**IMPORTANT**: This gate is REQUIRED for project closure. Do not mark plan as Complete without completing this gate.
+
 ### Deliverables
 
 | ID | Deliverable | Owner | Status |
@@ -223,7 +254,32 @@ gh release view v{VERSION} --repo aget-framework/aget && echo "PASS" || echo "FA
 | G{M}.1 | Document learnings (L-docs) | Manager | Pending |
 | G{M}.2 | Update SOPs if needed | Manager | Pending |
 | G{M}.3 | Velocity analysis | Manager | Pending |
-| G{M}.4 | Archive PROJECT_PLAN | Manager | Pending |
+| G{M}.4 | Complete Closure Checklist | Manager | Pending |
+
+### What Went Well
+
+| Item | Evidence |
+|------|----------|
+| {Success 1} | {Quantified outcome} |
+| {Success 2} | {Quantified outcome} |
+
+### What Didn't Go Well
+
+| Item | Impact | Root Cause |
+|------|--------|------------|
+| {Issue 1} | {Quantified impact} | {Cause} |
+| {Issue 2} | {Quantified impact} | {Cause} |
+
+### What To Improve
+
+| Improvement | Action | Owner |
+|-------------|--------|-------|
+| {Gap identified} | {Specific action} | {Owner} |
+
+### Action Items
+
+- [ ] **AI-1**: {Actionable follow-up task}
+- [ ] **AI-2**: {Actionable follow-up task}
 
 ### Verification Tests
 
@@ -233,18 +289,42 @@ gh release view v{VERSION} --repo aget-framework/aget && echo "PASS" || echo "FA
 ```
 **Expected:** PASS (at least one L-doc)
 
-#### V{M}.2: PROJECT_PLAN marked Complete
+#### V{M}.2: Closure Checklist complete
 ```bash
-grep -q "Status.*Complete" PROJECT_PLAN_*.md && echo "PASS" || echo "FAIL"
+grep -c "\[x\]" PROJECT_PLAN_{name}.md | awk '{if ($1 >= 5) print "PASS"; else print "FAIL"}'
 ```
-**Expected:** PASS
+**Expected:** PASS (all checklist items checked)
 
 ### Checklist
 
 - [ ] V{M}.1 PASS: Learnings documented
-- [ ] V{M}.2 PASS: PROJECT_PLAN marked Complete
+- [ ] V{M}.2 PASS: Closure Checklist complete
 
-**Project Complete**
+---
+
+## Project Closure Checklist (#247)
+
+**MANDATORY before setting Status to Complete**
+
+Per L515 (Template Coherence Gap) and Issue #247, this checklist MUST be completed before marking the project as Complete. Fleet audit showed 44% of plans marked Complete without retrospectives.
+
+### Pre-Completion Verification
+
+- [ ] All gates passed (check V-Test Summary above)
+- [ ] All verification tests pass
+- [ ] Retrospective sections filled (no TBD/placeholders)
+- [ ] What Went Well has ≥1 entry with evidence
+- [ ] What Didn't Go Well has ≥1 entry (or explicit "None")
+- [ ] Action Items documented (or explicit "None")
+- [ ] L-doc(s) created for significant learnings
+- [ ] Changes committed to repository
+- [ ] Related issues updated/closed
+
+### Sign-off
+
+- [ ] **Plan Author**: {name} verified checklist complete on {date}
+
+**Status Transition**: Only after ALL items above are checked may Status change to `Complete`.
 
 ---
 
@@ -299,3 +379,4 @@ grep -q "Status.*Complete" PROJECT_PLAN_*.md && echo "PASS" || echo "FAIL"
 ---
 
 *PROJECT_PLAN_{name}.md — Per CAP-PP-001 through CAP-PP-011*
+*Template Version: 2.0.0 (v3.4) — Includes #231, #232, #233, #247 enhancements*

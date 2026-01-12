@@ -11,7 +11,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-No unreleased changes at this time.
+### Changed
+
+- **PROJECT_PLAN Template v2.0** (L515, #233, #247):
+  - Consolidated to single canonical template at `templates/PROJECT_PLAN_TEMPLATE.md`
+  - Removed duplicate from `docs/templates/`
+  - Added Plan_Status controlled vocabulary (#232)
+  - Added Gate Naming Convention guidance (#233)
+  - Added mandatory Project Closure Checklist (#247)
+  - Added status transition rules
+
+- **validate_project_plan.py** (L515, #233):
+  - Now supports multiple gate naming conventions: G-N:, Gate N:, Gate N.M:, {Track}-N:
+  - Extended --strict mode to check closure checklist (L515/#247)
+  - Improved error messages with gate name truncation
 
 ---
 

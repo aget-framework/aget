@@ -4,15 +4,21 @@ Validate AGET PROJECT_PLANs.
 
 Implements: CAP-PLAN-001 (Project_Plan_Format), L382 (Verification_Tests), CAP-VAL-002
 Traces to: AGET_PLANNING_SPEC.md, AGET_FILE_NAMING_CONVENTIONS.md
+Updated: L515 (Template Coherence Gap), #233 (Gate Naming Convention)
 
 Validates Project_Plan documents for proper Project_Gate structure, deliverables,
 Decision_Points, and Verification_Tests (L382).
+
+Gate Naming Conventions Supported (#233):
+    - Sequential: ## G-0:, ## G-1:, ## G-2: (simple linear, <10 gates)
+    - Hierarchical: ## Gate 0:, ## Gate 1:, ## Gate 1.1: (multi-phase, 10+ gates)
+    - Track-prefixed: ## S-1:, ## W-1: (parallel tracks)
 
 Usage:
     python3 validate_project_plan.py <plan_path>
     python3 validate_project_plan.py planning/*.md
     python3 validate_project_plan.py --dir /path/to/agent
-    python3 validate_project_plan.py --strict  # Require Verification_Tests
+    python3 validate_project_plan.py --strict  # Require Verification_Tests + Closure Checklist
 
 Exit codes:
     0: All validations passed
@@ -23,6 +29,10 @@ L382 Requirements:
     - Each Project_Gate SHOULD have a Verification_Tests section
     - Tests SHOULD be executable (bash/python commands)
     - Tests SHOULD have expected output patterns
+
+L515/247 Requirements (--strict mode):
+    - Plans marked COMPLETE SHOULD have Closure Checklist
+    - Plans marked COMPLETE SHOULD have Retrospective section
 """
 
 import argparse
@@ -66,7 +76,23 @@ class ProjectPlanValidator:
         'Rollback',
     ]
 
-    # Gate patterns
+    # Gate patterns - supports multiple naming conventions (#233, L515)
+    # Sequential: ## G-0:, ## G-1:
+    # Hierarchical: ## Gate 0:, ## Gate 1:, ## Gate 1.1:
+    # Track-prefixed: ## S-1:, ## W-1:
+    GATE_PATTERNS = [
+        re.compile(r'^##\s+G-(\d+):', re.MULTILINE),  # G-0:, G-1:
+        re.compile(r'^##\s+Gate\s+(\d+):', re.MULTILINE),  # Gate 0:, Gate 1:
+        re.compile(r'^##\s+Gate\s+(\d+)\.(\d+):', re.MULTILINE),  # Gate 1.1:
+        re.compile(r'^##\s+([A-Z])-(\d+):', re.MULTILINE),  # S-1:, W-1:
+    ]
+    GATE_FULL_PATTERNS = [
+        re.compile(r'^##\s+G-\d+:.*$', re.MULTILINE),
+        re.compile(r'^##\s+Gate\s+\d+:.*$', re.MULTILINE),
+        re.compile(r'^##\s+Gate\s+\d+\.\d+:.*$', re.MULTILINE),
+        re.compile(r'^##\s+[A-Z]-\d+:.*$', re.MULTILINE),
+    ]
+    # Legacy pattern for backward compatibility
     GATE_HEADER_PATTERN = re.compile(r'^##\s+G-(\d+):', re.MULTILINE)
     GATE_FULL_PATTERN = re.compile(r'^##\s+G-\d+:.*$', re.MULTILINE)
 
@@ -117,6 +143,7 @@ class ProjectPlanValidator:
         self._validate_decision_points(content, result)
         self._validate_deliverables(content, result)
         self._validate_verification_tests(content, result)
+        self._validate_closure(content, result)  # L515/#247
 
         return result
 
@@ -137,6 +164,15 @@ class ProjectPlanValidator:
     def _validate_required_sections(self, content: str, result: ValidationResult) -> None:
         """Validate required sections exist."""
         for section in self.REQUIRED_SECTIONS:
+            # Special case: "Gate Structure" is satisfied by having actual gates
+            if section == 'Gate Structure':
+                gate_numbers, _, _ = self._find_gates(content)
+                if gate_numbers:
+                    continue  # Gates found, requirement satisfied
+                # Also accept literal "Gate Structure" section
+                if 'gate structure' in content.lower():
+                    continue
+
             pattern = rf'^##\s+.*{re.escape(section)}.*$'
             if not re.search(pattern, content, re.MULTILINE | re.IGNORECASE):
                 # Try without exact match
@@ -149,52 +185,76 @@ class ProjectPlanValidator:
             if section.lower() not in content.lower():
                 result.add_warning(f"Missing recommended section: {section}")
 
+    def _find_gates(self, content: str) -> tuple:
+        """Find gates using any supported naming convention (#233).
+
+        Returns:
+            Tuple of (gate_numbers, gate_matches, convention_name)
+        """
+        # Try each pattern, use first one that matches
+        conventions = [
+            ('G-N', self.GATE_PATTERNS[0], self.GATE_FULL_PATTERNS[0]),
+            ('Gate N', self.GATE_PATTERNS[1], self.GATE_FULL_PATTERNS[1]),
+            ('Gate N.M', self.GATE_PATTERNS[2], self.GATE_FULL_PATTERNS[2]),
+            ('Track-N', self.GATE_PATTERNS[3], self.GATE_FULL_PATTERNS[3]),
+        ]
+
+        for name, header_pattern, full_pattern in conventions:
+            matches = header_pattern.findall(content)
+            if matches:
+                full_matches = list(full_pattern.finditer(content))
+                # Extract gate numbers (handle tuples from multi-group patterns)
+                if matches and isinstance(matches[0], tuple):
+                    gate_numbers = [int(m[0]) for m in matches]
+                else:
+                    gate_numbers = [int(m) for m in matches]
+                return gate_numbers, full_matches, name
+
+        return [], [], None
+
     def _validate_gates(self, content: str, result: ValidationResult) -> None:
-        """Validate gate structure."""
-        gates = self.GATE_HEADER_PATTERN.findall(content)
+        """Validate gate structure (supports multiple naming conventions per #233)."""
+        gate_numbers, gate_matches, convention = self._find_gates(content)
 
-        if not gates:
-            result.add_error("No gates found (expected ## G-N: format)")
+        if not gate_numbers:
+            result.add_error("No gates found (expected ## G-N:, ## Gate N:, or ## {Track}-N: format)")
             return
-
-        # Check gate numbering
-        gate_numbers = [int(g) for g in gates]
 
         # Should start with 0 or 1
         if gate_numbers[0] not in [0, 1]:
-            result.add_warning(f"Gates typically start at G-0 or G-1, found G-{gate_numbers[0]}")
+            result.add_warning(f"Gates typically start at 0 or 1, found {gate_numbers[0]}")
 
-        # Check for gaps
-        for i in range(1, len(gate_numbers)):
-            expected = gate_numbers[i-1] + 1
-            # Allow for sub-gates like G-5.5
-            if gate_numbers[i] != expected and gate_numbers[i] != gate_numbers[i-1]:
-                result.add_warning(f"Gate numbering gap: G-{gate_numbers[i-1]} to G-{gate_numbers[i]}")
+        # Check for gaps (only for sequential patterns)
+        if convention in ('G-N', 'Gate N'):
+            for i in range(1, len(gate_numbers)):
+                expected = gate_numbers[i-1] + 1
+                if gate_numbers[i] != expected and gate_numbers[i] != gate_numbers[i-1]:
+                    result.add_warning(f"Gate numbering gap: {gate_numbers[i-1]} to {gate_numbers[i]}")
 
         # Check each gate has content
-        gate_matches = list(self.GATE_FULL_PATTERN.finditer(content))
         for i, match in enumerate(gate_matches):
             gate_start = match.end()
             gate_end = gate_matches[i+1].start() if i+1 < len(gate_matches) else len(content)
             gate_content = content[gate_start:gate_end]
+            gate_name = match.group().strip()[:30]  # Truncate for display
 
             # Check for Objective
             if 'objective' not in gate_content.lower():
-                result.add_warning(f"Gate {gates[i]}: Missing **Objective**")
+                result.add_warning(f"{gate_name}...: Missing **Objective**")
 
             # Check for Deliverables
             if 'deliverable' not in gate_content.lower():
-                result.add_warning(f"Gate {gates[i]}: Missing Deliverables section")
+                result.add_warning(f"{gate_name}...: Missing Deliverables section")
 
     def _validate_decision_points(self, content: str, result: ValidationResult) -> None:
         """Validate decision points in gates."""
-        gates = list(self.GATE_FULL_PATTERN.finditer(content))
+        _, gate_matches, _ = self._find_gates(content)
 
-        for i, match in enumerate(gates):
+        for i, match in enumerate(gate_matches):
             gate_start = match.end()
-            gate_end = gates[i+1].start() if i+1 < len(gates) else len(content)
+            gate_end = gate_matches[i+1].start() if i+1 < len(gate_matches) else len(content)
             gate_content = content[gate_start:gate_end]
-            gate_name = match.group().strip()
+            gate_name = match.group().strip()[:30]
 
             # Check for GO/NOGO decision point
             has_decision = (
@@ -205,7 +265,7 @@ class ProjectPlanValidator:
             )
 
             if not has_decision:
-                result.add_warning(f"{gate_name}: Missing GO/NOGO decision point")
+                result.add_warning(f"{gate_name}...: Missing GO/NOGO decision point")
 
     def _validate_deliverables(self, content: str, result: ValidationResult) -> None:
         """Validate deliverables tables or lists."""
@@ -223,19 +283,19 @@ class ProjectPlanValidator:
 
     def _validate_verification_tests(self, content: str, result: ValidationResult) -> None:
         """Validate verification tests in gates (L382)."""
-        gates = list(self.GATE_FULL_PATTERN.finditer(content))
+        _, gate_matches, _ = self._find_gates(content)
 
-        if not gates:
+        if not gate_matches:
             return  # Already reported in _validate_gates
 
         gates_without_tests = []
         gates_without_expected = []
 
-        for i, match in enumerate(gates):
+        for i, match in enumerate(gate_matches):
             gate_start = match.end()
-            gate_end = gates[i+1].start() if i+1 < len(gates) else len(content)
+            gate_end = gate_matches[i+1].start() if i+1 < len(gate_matches) else len(content)
             gate_content = content[gate_start:gate_end]
-            gate_name = match.group().strip()
+            gate_name = match.group().strip()[:20]
 
             # Check for Verification Tests section
             has_tests = self.VERIFICATION_TESTS_PATTERN.search(gate_content)
@@ -266,11 +326,38 @@ class ProjectPlanValidator:
             result.add_warning(msg)
 
         # Summary
-        total_gates = len(gates)
+        total_gates = len(gate_matches)
         gates_with_tests = total_gates - len(gates_without_tests)
         if gates_with_tests < total_gates:
             coverage = f"{gates_with_tests}/{total_gates}"
             result.add_warning(f"L382: Verification test coverage: {coverage} gates")
+
+    def _validate_closure(self, content: str, result: ValidationResult) -> None:
+        """Validate closure checklist for COMPLETE plans (L515, #247).
+
+        Only enforced in --strict mode.
+        """
+        if not self.strict:
+            return
+
+        # Check if plan is marked COMPLETE
+        status_match = re.search(r'\*\*Status\*\*:\s*(\w+)', content, re.IGNORECASE)
+        if not status_match:
+            return  # Can't determine status
+
+        status = status_match.group(1).upper()
+        if 'COMPLETE' not in status:
+            return  # Not complete, no closure check needed
+
+        # Plan is COMPLETE - check for closure checklist
+        has_closure = bool(re.search(r'(Project\s+)?Closure\s+Checklist', content, re.IGNORECASE))
+        has_retrospective = bool(re.search(r'Retrospective|What\s+Went\s+Well', content, re.IGNORECASE))
+
+        if not has_closure:
+            result.add_warning("L515/#247: Plan marked COMPLETE but missing Closure Checklist")
+
+        if not has_retrospective:
+            result.add_warning("L515/#247: Plan marked COMPLETE but missing Retrospective section")
 
 
 def format_result(result: ValidationResult) -> str:
@@ -314,7 +401,7 @@ def main():
     parser.add_argument('--dir', help='Agent directory to search for plans')
     parser.add_argument('--quiet', '-q', action='store_true', help='Only show errors')
     parser.add_argument('--strict', action='store_true',
-                        help='Require verification tests (L382) - missing tests are errors')
+                        help='Strict mode: require V-tests (L382), check closure checklist (L515/#247)')
 
     args = parser.parse_args()
 
