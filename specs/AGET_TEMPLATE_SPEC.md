@@ -1,6 +1,6 @@
 # AGET TEMPLATE Specification
 
-**Version**: 3.3.0
+**Version**: 3.3.1
 **Status**: Active
 **Category**: Standards (Template Architecture)
 **Format Version**: 1.2
@@ -680,6 +680,41 @@ aget_docs()   # Open documentation
 
 **Reference**: L452 (Shell Orchestration Pattern), aget/shell/README.md
 
+### CAP-TPL-015: Repository Issue Settings (L520)
+
+The SYSTEM shall configure repository issue settings to prevent Issue_Fragmentation.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-TPL-015-01 | ubiquitous | Template repositories SHALL have GitHub issues DISABLED |
+| CAP-TPL-015-02 | ubiquitous | Issues for template improvements SHALL be filed to central aget-framework/aget tracker |
+| CAP-TPL-015-03 | event-driven | WHEN publishing a template, the SYSTEM SHALL verify hasIssuesEnabled is false |
+
+**Enforcement**: `repo_settings_validator.py --check-issues`
+
+**Rationale**: Issue_Fragmentation occurs when issues are scattered across individual template repos instead of the central tracker. This complicates issue discovery, cross-template coordination, and release planning. Per AGET_ISSUE_GOVERNANCE_SPEC, issues should flow to:
+- Private agents → `gmelli/aget-aget`
+- Public/remote agents → `aget-framework/aget`
+
+#### Repository Issue Matrix
+
+| Repository Pattern | Issues | Rationale |
+|-------------------|--------|-----------|
+| `aget-framework/aget` | enabled | Central public issue tracker |
+| `aget-framework/.github` | disabled | Org config, not issue target |
+| `aget-framework/template-*` | **disabled** | Code templates only |
+
+#### Verification
+
+```bash
+# Verify template repos have issues disabled
+gh repo list aget-framework --json name,hasIssuesEnabled --jq \
+  '.[] | select(.name | startswith("template-")) | "\(.name): \(.hasIssuesEnabled)"'
+# Expected: all show "false"
+```
+
+**Reference**: L520 (Issue Governance Gap), AGET_ISSUE_GOVERNANCE_SPEC (R-ISSUE-007)
+
 ---
 
 ## 12 Templates Specification
@@ -926,6 +961,6 @@ cd /path/to/template && pytest tests/ -v
 
 ---
 
-*AGET TEMPLATE Specification v3.1.0*
+*AGET TEMPLATE Specification v3.3.1*
 *"Templates are composable agent patterns enabling consistent 5D composition"*
-*Updated: 2025-12-27 (L394 visible directory standards)*
+*Updated: 2026-01-11 (L520 issue governance)*

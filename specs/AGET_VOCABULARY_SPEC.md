@@ -1,6 +1,6 @@
 # AGET Vocabulary Specification
 
-**Version**: 1.5.0
+**Version**: 1.6.0
 **Status**: Active
 **Category**: Core (Standards)
 **Format Version**: 1.2
@@ -346,6 +346,78 @@ V_Test:
 | `Pre_Publication_Review` | Review before public push |
 | `Public_Private_Boundary` | Separation of public/private content |
 | `Sanitization` | Removing sensitive content from L-docs |
+
+## Issue Governance Terms (CAP-ISSUE-*)
+
+```yaml
+Issue_Destination:
+  skos:prefLabel: "Issue_Destination"
+  skos:definition: "Target repository for issue filing based on agent type."
+  skos:narrower:
+    - Private_Issue_Destination
+    - Public_Issue_Destination
+  aget:governed_by: "AGET_ISSUE_GOVERNANCE_SPEC"
+  skos:related: ["R-ISSUE-001", "R-ISSUE-002"]
+
+Private_Issue_Destination:
+  skos:prefLabel: "Private_Issue_Destination"
+  skos:definition: "Issue destination for Private_Fleet_Agent (gmelli/aget-aget)."
+  skos:broader: "Issue_Destination"
+  aget:value: "gmelli/aget-aget"
+
+Public_Issue_Destination:
+  skos:prefLabel: "Public_Issue_Destination"
+  skos:definition: "Issue destination for Public_Remote_Agent (aget-framework/aget)."
+  skos:broader: "Issue_Destination"
+  aget:value: "aget-framework/aget"
+
+Private_Fleet_Agent:
+  skos:prefLabel: "Private_Fleet_Agent"
+  skos:definition: "Agent in gmelli's private fleet, may reference private details in issues."
+  skos:related: ["R-ISSUE-001", "Issue_Sanitization"]
+
+Public_Remote_Agent:
+  skos:prefLabel: "Public_Remote_Agent"
+  skos:definition: "Agent not in private fleet, issue content must be sanitized for public."
+  skos:related: ["R-ISSUE-002", "Issue_Sanitization"]
+
+Issue_Sanitization:
+  skos:prefLabel: "Issue_Sanitization"
+  skos:definition: "Process of removing private information from issue content before public filing."
+  skos:related: ["R-ISSUE-003", "R-ISSUE-004", "Private_Pattern"]
+  aget:enforcement: "sanitize_issue_content.py"
+
+Private_Pattern:
+  skos:prefLabel: "Private_Pattern"
+  skos:definition: "Content pattern indicating private/internal information that should not appear in public issues."
+  skos:example: ["private-*-aget", "gmelli/*", "fleet size disclosure"]
+  aget:detection_script: "sanitize_issue_content.py"
+
+Cross_Boundary_Filing:
+  skos:prefLabel: "Cross_Boundary_Filing"
+  skos:definition: "ANTI-PATTERN: Private agent filing to public repo without sanitization."
+  aget:anti_pattern: true
+  aget:severity: "high"
+  skos:related: ["R-ISSUE-001", "R-ISSUE-005"]
+
+Issue_Fragmentation:
+  skos:prefLabel: "Issue_Fragmentation"
+  skos:definition: "ANTI-PATTERN: Issues scattered across template repos instead of central tracker."
+  aget:anti_pattern: true
+  skos:related: ["R-ISSUE-007", "R-ISSUE-009"]
+```
+
+| Term | Definition |
+|------|------------|
+| `Issue_Destination` | Target repository for issue filing based on agent type |
+| `Private_Issue_Destination` | Private fleet issue destination (gmelli/aget-aget) |
+| `Public_Issue_Destination` | Public/remote issue destination (aget-framework/aget) |
+| `Private_Fleet_Agent` | Agent in private fleet, may include private details |
+| `Public_Remote_Agent` | Agent outside private fleet, content must be sanitized |
+| `Issue_Sanitization` | Removing private info before public issue filing |
+| `Private_Pattern` | Content pattern indicating private information |
+| `Cross_Boundary_Filing` | ANTI-PATTERN: Private agent filing to public repo |
+| `Issue_Fragmentation` | ANTI-PATTERN: Issues scattered across template repos |
 
 ## Migration Terms (CAP-MIG-*)
 
@@ -1158,6 +1230,18 @@ entities:
 ---
 
 ## Changelog
+
+### v1.6.0 (2026-01-11)
+
+- Added Issue Governance Terms section (CAP-ISSUE-*)
+- Added 9 issue governance vocabulary terms: Issue_Destination, Private_Issue_Destination, Public_Issue_Destination, Private_Fleet_Agent, Public_Remote_Agent, Issue_Sanitization, Private_Pattern, Cross_Boundary_Filing, Issue_Fragmentation
+- Added SKOS relationships linking terms to AGET_ISSUE_GOVERNANCE_SPEC requirements
+- Supports CAP-ISSUE-001 through CAP-ISSUE-004
+- See: L520 (Issue Governance Gap), PROJECT_PLAN_issue_governance_v1.0
+
+### v1.5.0 (2026-01-11)
+
+- Version bump for consistency
 
 ### v1.4.0 (2026-01-11)
 
