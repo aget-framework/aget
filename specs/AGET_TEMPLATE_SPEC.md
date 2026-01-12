@@ -1,11 +1,11 @@
 # AGET TEMPLATE Specification
 
-**Version**: 3.2.0
+**Version**: 3.3.0
 **Status**: Active
 **Category**: Standards (Template Architecture)
 **Format Version**: 1.2
 **Created**: 2025-12-27
-**Updated**: 2026-01-06
+**Updated**: 2026-01-11
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_TEMPLATE_SPEC.md`
 **Change Proposal**: CP-017, CP-018
@@ -636,6 +636,49 @@ The SYSTEM shall use standardized entry types in `.aget/evolution/` directory.
 | Session notes | `sessions/` | `.aget/evolution/` |
 
 **Reference**: L460, L461, AGET_EVOLUTION_SPEC.md
+
+### CAP-TPL-014: Shell Integration (v3.3.0)
+
+The SYSTEM shall include shell integration for template portability.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-TPL-014-01 | ubiquitous | The SYSTEM shall include shell/ directory in each template |
+| CAP-TPL-014-02 | ubiquitous | The SYSTEM shall include {type}_profile.zsh in shell/ |
+| CAP-TPL-014-03 | ubiquitous | The SYSTEM shall include README.md in shell/ |
+| CAP-TPL-014-04 | ubiquitous | The SYSTEM shall document paths to Spec, Vocabulary, Config in profile header |
+| CAP-TPL-014-05 | ubiquitous | The SYSTEM shall include aget_info() function in profile |
+| CAP-TPL-014-06 | ubiquitous | The SYSTEM shall include aget_docs() function in profile |
+| CAP-TPL-014-07 | ubiquitous | The SYSTEM shall use AGET_AGENT_DIR for path portability |
+
+**Enforcement**: `validate_template_exemplar.py`
+
+**Rationale**: Shell profiles enable consistent agent activation across installations. Well-documented profiles reduce onboarding friction and ensure users can locate related specifications and documentation.
+
+#### Profile Structure Requirements
+
+Each template profile SHALL include:
+
+```zsh
+# Header: Documentation paths
+# DOCUMENTATION
+# -------------
+# Shell README:    ./shell/README.md
+# Template Spec:   ./specs/{Type}_SPEC.md
+# Template Vocab:  ./specs/{Type}_VOCABULARY.md
+# Agent Config:    ./AGENTS.md
+
+# Configuration: Portable paths
+export AGET_AGENT_DIR="${AGET_AGENT_DIR:-...}"
+export AGET_SPEC="${AGET_AGENT_DIR}/specs/{Type}_SPEC.md"
+export AGET_VOCAB="${AGET_AGENT_DIR}/specs/{Type}_VOCABULARY.md"
+
+# Functions: Discovery helpers
+aget_info()   # Display all paths
+aget_docs()   # Open documentation
+```
+
+**Reference**: L452 (Shell Orchestration Pattern), aget/shell/README.md
 
 ---
 
