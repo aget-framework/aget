@@ -7,10 +7,11 @@ Implements L444 (Version Inventory Coherence Requirement) and R-REL-VER-001.
 This validator performs COHERENCE testing (not just existence testing per L421).
 All version-bearing files must have consistent versions, with version.json as PRIMARY.
 
-Version-Bearing Files Inventory:
+Version-Bearing Files Inventory (R-REL-VER-001):
 - .aget/version.json: aget_version field (PRIMARY source of truth)
 - AGENTS.md: @aget-version tag
 - manifest.yaml: template.version field
+- README.md: **Current Version**: vX.Y.Z pattern (L521 gap fix)
 - CHANGELOG.md: [X.Y.Z] entry must exist
 
 Requirements Implemented:
@@ -29,9 +30,10 @@ Exit Codes:
     1 - Validation failures detected (version mismatch)
 
 Author: private-aget-framework-AGET
-Version: 1.0.0
+Version: 1.1.0
 Created: 2026-01-04
-Related: L444, L421, L429, R-REL-VER-001
+Updated: 2026-01-12
+Related: L444, L421, L429, L521, R-REL-VER-001
 """
 
 import argparse
@@ -133,6 +135,43 @@ def extract_manifest_version(repo_path: Path) -> Tuple[Optional[str], List[str]]
         return None, errors
     except Exception as e:
         errors.append(f"V7.1.5: Could not read manifest.yaml: {e}")
+        return None, errors
+
+
+def extract_readme_version(repo_path: Path) -> Tuple[Optional[str], List[str]]:
+    """Extract version from README.md **Current Version**: vX.Y.Z pattern.
+
+    L521 gap fix: README.md was not previously checked, allowing version drift.
+
+    Returns:
+        Tuple of (version_string, errors)
+    """
+    errors = []
+    readme_path = repo_path / "README.md"
+
+    if not readme_path.exists():
+        # README.md should exist but version line is optional for some repos
+        return None, []
+
+    try:
+        content = readme_path.read_text(encoding="utf-8")
+        # Match **Current Version**: vX.Y.Z or variations
+        # Patterns: "**Current Version**: vX.Y.Z", "Current Version: vX.Y.Z", "Version: vX.Y.Z"
+        patterns = [
+            r'\*\*Current Version\*\*:\s*v?([\d.]+(?:-[a-zA-Z0-9.]+)?)',  # **Current Version**: vX.Y.Z
+            r'Current Version:\s*v?([\d.]+(?:-[a-zA-Z0-9.]+)?)',  # Current Version: vX.Y.Z
+            r'- Current Version:\s*v?([\d.]+(?:-[a-zA-Z0-9.]+)?)',  # - Current Version: vX.Y.Z
+        ]
+
+        for pattern in patterns:
+            match = re.search(pattern, content, re.IGNORECASE)
+            if match:
+                return match.group(1), errors
+
+        # No version pattern found - this is OK for some repos
+        return None, []
+    except Exception as e:
+        errors.append(f"L521: Could not read README.md: {e}")
         return None, errors
 
 
@@ -281,7 +320,33 @@ def validate_coherence(repo_path: Path, check_stale: Optional[str] = None, verbo
         if verbose:
             print(f"  [PASS] manifest.yaml: version: {manifest_version}")
 
-    # Step 4: Check CHANGELOG.md has entry
+    # Step 4: Check README.md version (L521 gap fix)
+    readme_version, errors = extract_readme_version(repo_path)
+    if errors:
+        failed += 1
+        issues["readme_md"] = errors
+        if verbose:
+            print("  [FAIL] README.md")
+            for e in errors:
+                print(f"    - {e}")
+    elif readme_version is None:
+        # README.md doesn't have version pattern - OK for some repos
+        passed += 1
+        if verbose:
+            print("  [PASS] README.md: no version pattern (not applicable)")
+    elif readme_version != primary_version:
+        failed += 1
+        issues["readme_md"] = [
+            f"L521: README.md has Current Version: v{readme_version} but version.json has {primary_version}"
+        ]
+        if verbose:
+            print(f"  [FAIL] README.md: v{readme_version} != {primary_version}")
+    else:
+        passed += 1
+        if verbose:
+            print(f"  [PASS] README.md: Current Version: v{readme_version}")
+
+    # Step 5: Check CHANGELOG.md has entry (was Step 4 before L521)
     has_entry, errors = check_changelog_entry(repo_path, primary_version)
     if not has_entry:
         failed += 1
@@ -295,7 +360,7 @@ def validate_coherence(repo_path: Path, check_stale: Optional[str] = None, verbo
         if verbose:
             print(f"  [PASS] CHANGELOG.md: [{primary_version}] entry exists")
 
-    # Step 5: Check for stale references (V7.1.6) - optional
+    # Step 6: Check for stale references (V7.1.6) - optional
     if check_stale:
         stale_count, stale_files = check_stale_references(repo_path, check_stale)
         if stale_count > 0:
