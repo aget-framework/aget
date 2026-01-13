@@ -1,14 +1,14 @@
 # AGET Vocabulary Specification
 
-**Version**: 1.6.0
+**Version**: 1.8.0
 **Status**: Active
 **Category**: Core (Standards)
 **Format Version**: 1.2
 **Created**: 2026-01-04
-**Updated**: 2026-01-11
+**Updated**: 2026-01-12
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_VOCABULARY_SPEC.md`
-**Change Origin**: PROJECT_PLAN_v3.2.0 Gate 3.1
+**Change Origin**: PROJECT_PLAN_standards_ontology_elevation_v1.0
 **Related Specs**: AGET_FRAMEWORK_SPEC
 **Consolidates**: AGET_GLOSSARY_STANDARD_SPEC.md, AGET_CONTROLLED_VOCABULARY.md
 
@@ -39,6 +39,7 @@ This spec combines AGET_GLOSSARY_STANDARD_SPEC.md (format) with AGET_CONTROLLED_
 - Format and validation terms (Part 4)
 - Contribution guidelines (Part 5)
 - Core domain entities (Part 6) — L459
+- Standards Document Ontology (Part 7) — L502
 
 ---
 
@@ -291,6 +292,36 @@ V_Test:
 
 ## Release Terms (CAP-REL-*)
 
+```yaml
+Version_Bearing_File:
+  skos:prefLabel: "Version_Bearing_File"
+  skos:definition: "A file that contains version information and must be updated during releases to maintain version coherence."
+  skos:narrower:
+    - Version_Json
+    - Agents_Md
+    - Manifest_Yaml
+    - README
+    - CHANGELOG
+  aget:primary_source: "Version_Json"
+  aget:derived_sources: ["Agents_Md", "Manifest_Yaml", "README", "CHANGELOG"]
+  aget:enforcement: "validate_version_inventory.py"
+  skos:related: ["R-REL-VER-001", "L429", "L444", "L521"]
+  skos:example: [".aget/version.json (primary)", "AGENTS.md (@aget-version)", "manifest.yaml", "README.md"]
+
+Version_Coherence:
+  skos:prefLabel: "Version_Coherence"
+  skos:definition: "The state where all Version_Bearing_Files display the same version string."
+  skos:related: ["Version_Bearing_File", "R-REL-VER-001", "L444"]
+  aget:validation: "All derived sources must match primary source"
+
+Version_Drift_File:
+  skos:prefLabel: "Version_Drift_File"
+  skos:definition: "ANTI-PATTERN: A Version_Bearing_File showing a stale version that doesn't match the primary source."
+  aget:anti_pattern: true
+  skos:related: ["Version_Bearing_File", "Version_Coherence", "L521"]
+  skos:example: "README.md showing v3.1.0 when version.json shows v3.3.0"
+```
+
 | Term | Definition |
 |------|------------|
 | `Release_Version` | Semantic version identifying a release |
@@ -300,7 +331,10 @@ V_Test:
 | `CHANGELOG` | Document tracking notable changes per version |
 | `GitHub_Release` | GitHub release object with tag and notes |
 | `Deep_Release_Notes` | Narrative documentation beyond CHANGELOG |
+| `Version_Bearing_File` | File containing version info requiring update during releases (R-REL-VER-001) |
+| `Version_Coherence` | State where all Version_Bearing_Files show same version |
 | `Version_Drift` | ANTI-PATTERN: Manager behind managed repos |
+| `Version_Drift_File` | ANTI-PATTERN: Version_Bearing_File with stale version (L521) |
 | `Declarative_Release` | ANTI-PATTERN: Declaring version in commit message without updating version.json (L517) |
 | `Version_Overrun` | ANTI-PATTERN: Instance version exceeds framework version (L517) |
 | `Template_Abandonment` | ANTI-PATTERN: Published templates left behind during upgrades (R-REL-015 violation, L517) |
@@ -1176,6 +1210,336 @@ entities:
 
 ---
 
+# Part 7: Standards Document Ontology
+
+This part elevates AGET standards documents (specifications, SOPs, templates, learnings) as first-class ontology entities. Per **PROJECT_PLAN_standards_ontology_elevation_v1.0**, this enables queryable relationships between documents and the concepts they define.
+
+## Document Type Hierarchy
+
+```
+Document_Entity (Part 6)
+├── Normative_Document
+│   ├── Specification_Document (CANONICAL > Active > Draft > Deprecated)
+│   ├── SOP_Document
+│   └── Template_Document
+├── Informative_Document
+│   ├── Guide_Document
+│   ├── Pattern_Document
+│   └── Learning_Document (observation > recommendation > advisory > enforced)
+└── Process_Document
+    ├── Project_Plan_Document
+    ├── Session_Document
+    └── Handoff_Document
+```
+
+## Authority Model
+
+| Level | Meaning | Mutation Allowed | Examples |
+|-------|---------|------------------|----------|
+| **CANONICAL** | Immutable reference standard | Major version only | AGET_SPEC_FORMAT, AGET_FILE_NAMING_CONVENTIONS |
+| **Active** | Current normative | Minor/patch allowed | AGET_TEMPLATE_SPEC, AGET_VOCABULARY_SPEC |
+| **Draft** | Under development | Any change | New specs before approval |
+| **Deprecated** | Superseded, read-only | None | AGET_GLOSSARY_STANDARD_SPEC (archived) |
+
+## Traceability Properties
+
+| Property | Definition | Example |
+|----------|------------|---------|
+| `aget:defines` | Specification → Terms it defines | AGET_VOCABULARY_SPEC defines V_Test |
+| `aget:implements` | SOP → Spec requirements it implements | SOP_release_process implements CAP-REL-* |
+| `aget:supersedes` | Document → Document it replaces | AGET_VOCABULARY_SPEC supersedes AGET_GLOSSARY_STANDARD_SPEC |
+| `aget:governed_by` | Any document → Spec that governs it | PROJECT_PLAN governed_by AGET_PROJECT_PLAN_SPEC |
+
+## Document Type Definitions
+
+### Normative_Document
+
+```yaml
+Normative_Document:
+  skos:prefLabel: "Normative_Document"
+  skos:definition: "Document that establishes requirements, standards, or authoritative guidance that MUST or SHOULD be followed."
+  skos:broader: "Document_Entity"
+  skos:narrower: ["Specification_Document", "SOP_Document", "Template_Document"]
+  skos:example: "AGET_FRAMEWORK_SPEC.md, SOP_release_process.md"
+```
+
+### Specification_Document
+
+```yaml
+Specification_Document:
+  skos:prefLabel: "Specification_Document"
+  skos:definition: "Formal document defining requirements, formats, or standards using EARS patterns and CAP-{DOMAIN}-{NNN} requirement IDs."
+  skos:broader: "Normative_Document"
+  aget:authority_levels: ["CANONICAL", "Active", "Draft", "Deprecated"]
+  aget:naming_pattern: "{NAME}_SPEC.md or {NAME}_SPEC_v{M}.{m}.md"
+  aget:location: "aget/specs/"
+  skos:narrower: []  # Populated with spec instances in Part 7.4
+  skos:example: "AGET_VOCABULARY_SPEC.md, AGET_TEMPLATE_SPEC.md"
+```
+
+### SOP_Document
+
+```yaml
+SOP_Document:
+  skos:prefLabel: "SOP_Document"
+  skos:definition: "Standard Operating Procedure document defining repeatable processes with Purpose, Scope, and Procedure sections."
+  skos:broader: "Normative_Document"
+  aget:determinism: "deterministic"
+  aget:reusability: "universal"
+  aget:naming_pattern: "SOP_{snake_case}.md"
+  aget:location: "aget/sops/ or sops/"
+  aget:required_sections: ["Purpose", "Scope"]
+  skos:example: "SOP_release_process.md, SOP_fleet_migration.md"
+```
+
+### Template_Document
+
+```yaml
+Template_Document:
+  skos:prefLabel: "Template_Document"
+  skos:definition: "Reusable document pattern providing structure for creating conformant artifacts."
+  skos:broader: "Normative_Document"
+  aget:naming_pattern: "{NAME}_TEMPLATE.md or TEMPLATE_{name}.md"
+  aget:location: "aget/templates/ or docs/templates/"
+  skos:example: "PROJECT_PLAN_TEMPLATE.md, ADR_TEMPLATE.md, SPEC_TEMPLATE_v3.3.md"
+```
+
+### Informative_Document
+
+```yaml
+Informative_Document:
+  skos:prefLabel: "Informative_Document"
+  skos:definition: "Document that provides guidance, patterns, or knowledge without establishing requirements."
+  skos:broader: "Document_Entity"
+  skos:narrower: ["Guide_Document", "Pattern_Document", "Learning_Document"]
+  skos:example: "GETTING_STARTED.md, PATTERN_gate_verification_tests.md, L459_core_entity_vocabulary.md"
+```
+
+### Guide_Document
+
+```yaml
+Guide_Document:
+  skos:prefLabel: "Guide_Document"
+  skos:definition: "Instructional document explaining how to accomplish tasks or use features."
+  skos:broader: "Informative_Document"
+  aget:naming_pattern: "{NAME}_GUIDE.md or GUIDE_{name}.md"
+  skos:example: "GETTING_STARTED.md, FLEET_MIGRATION_GUIDE.md, ENTITY_EXTENSION_GUIDE.md"
+```
+
+### Pattern_Document
+
+```yaml
+Pattern_Document:
+  skos:prefLabel: "Pattern_Document"
+  skos:definition: "Document describing a reusable solution to a recurring problem in a specific context."
+  skos:broader: "Informative_Document"
+  aget:naming_pattern: "PATTERN_{snake_case}.md"
+  aget:location: "docs/patterns/"
+  skos:example: "PATTERN_gate_verification_tests.md, PATTERN_step_back_review_kb.md"
+```
+
+### Learning_Document
+
+```yaml
+Learning_Document:
+  skos:prefLabel: "Learning_Document"
+  skos:altLabel: ["L_Doc", "L-doc"]
+  skos:definition: "Experiential knowledge capture with structured YAML frontmatter documenting discoveries, decisions, or patterns."
+  skos:broader: "Informative_Document"
+  aget:naming_pattern: "L{NNN}_{snake_case}.md"
+  aget:location: ".aget/evolution/"
+  aget:enforcement_progression: ["observation", "recommendation", "advisory", "enforced"]
+  aget:numbering_scope: "per-agent"
+  skos:example: "L459_core_entity_vocabulary.md, L493_vocabulary_prose_marking.md"
+```
+
+### Process_Document
+
+```yaml
+Process_Document:
+  skos:prefLabel: "Process_Document"
+  skos:definition: "Document supporting workflow execution with temporal scope (sessions, projects, handoffs)."
+  skos:broader: "Document_Entity"
+  skos:narrower: ["Project_Plan_Document", "Session_Document", "Handoff_Document"]
+  skos:example: "PROJECT_PLAN_v3.2.0.md, session_2026-01-12_0930.md"
+```
+
+### Project_Plan_Document
+
+```yaml
+Project_Plan_Document:
+  skos:prefLabel: "Project_Plan_Document"
+  skos:altLabel: ["PROJECT_PLAN"]
+  skos:definition: "Formal gated execution plan with objectives, deliverables, V-tests, and decision points."
+  skos:broader: "Process_Document"
+  aget:determinism: "syllogistic"
+  aget:reusability: "one_time"
+  aget:naming_pattern: "PROJECT_PLAN_{scope}_v{M}.{m}.md"
+  aget:location: "planning/"
+  aget:governed_by: "AGET_PROJECT_PLAN_SPEC"
+  skos:example: "PROJECT_PLAN_v3.2.0_specification_architecture.md"
+```
+
+### Session_Document
+
+```yaml
+Session_Document:
+  skos:prefLabel: "Session_Document"
+  skos:definition: "Document capturing session state, pending work, and handoff context for continuity."
+  skos:broader: "Process_Document"
+  aget:naming_pattern: "session_{YYYY-MM-DD}_{HHMM}.md"
+  aget:location: "sessions/"
+  aget:governed_by: "AGET_SESSION_SPEC"
+  skos:example: "session_2026-01-12_0930.md"
+```
+
+### Handoff_Document
+
+```yaml
+Handoff_Document:
+  skos:prefLabel: "Handoff_Document"
+  skos:definition: "Document facilitating transfer of context between sessions, agents, or releases."
+  skos:broader: "Process_Document"
+  aget:naming_pattern: "RELEASE_HANDOFF_v{M}.{m}.{p}.md or HANDOFF_{context}.md"
+  aget:location: "handoffs/"
+  skos:example: "RELEASE_HANDOFF_v3.3.0.md"
+```
+
+## Document Type Summary Table
+
+| Document Type | Category | Authority/Enforcement | Location | Naming Pattern |
+|---------------|----------|----------------------|----------|----------------|
+| **Specification_Document** | Normative | CANONICAL/Active/Draft/Deprecated | aget/specs/ | {NAME}_SPEC.md |
+| **SOP_Document** | Normative | Active | aget/sops/ | SOP_{name}.md |
+| **Template_Document** | Normative | Active | aget/templates/ | {NAME}_TEMPLATE.md |
+| **Guide_Document** | Informative | N/A | aget/docs/ | {NAME}_GUIDE.md |
+| **Pattern_Document** | Informative | N/A | docs/patterns/ | PATTERN_{name}.md |
+| **Learning_Document** | Informative | observation→enforced | .aget/evolution/ | L{NNN}_{name}.md |
+| **Project_Plan_Document** | Process | One-time | planning/ | PROJECT_PLAN_{scope}_v{M}.{m}.md |
+| **Session_Document** | Process | One-time | sessions/ | session_{date}_{time}.md |
+| **Handoff_Document** | Process | One-time | handoffs/ | HANDOFF_{context}.md |
+
+## Specification Instances (Exemplars)
+
+The following entries demonstrate specification documents as first-class ontology entities with `aget:defines` traceability.
+
+### AGET_VOCABULARY_SPEC
+
+```yaml
+AGET_VOCABULARY_SPEC:
+  skos:prefLabel: "AGET_VOCABULARY_SPEC"
+  skos:definition: "Consolidated vocabulary standards and controlled terminology for the AGET framework, including SKOS foundation, core terms, domain terms, and standards document ontology."
+  skos:broader: "Specification_Document"
+  aget:spec_id: "AGET-VOC-001"
+  aget:authority: "Active"
+  aget:version: "1.8.0"
+  aget:location: "aget/specs/AGET_VOCABULARY_SPEC.md"
+  aget:defines:
+    - "V_Test"
+    - "Declarative_Completion"
+    - "Verified_Completion"
+    - "Aget_Entity"
+    - "Aget_Concept"
+    - "Aget_Property"
+    - "Aget_Specification"
+    - "Specification_Document"
+    - "SOP_Document"
+    - "Learning_Document"
+  aget:supersedes: "AGET_GLOSSARY_STANDARD_SPEC"
+```
+
+### AGET_TEMPLATE_SPEC
+
+```yaml
+AGET_TEMPLATE_SPEC:
+  skos:prefLabel: "AGET_TEMPLATE_SPEC"
+  skos:definition: "Template architecture specification defining 5D composition, manifest schemas, and archetype requirements for AGET templates."
+  skos:broader: "Specification_Document"
+  aget:spec_id: "AGET-TPL-001"
+  aget:authority: "Active"
+  aget:version: "3.3.1"
+  aget:location: "aget/specs/AGET_TEMPLATE_SPEC.md"
+  aget:defines:
+    - "Aget_Template"
+    - "Aget_Instance"
+    - "Core_Template"
+    - "Specialized_Template"
+```
+
+### AGET_SPEC_FORMAT
+
+```yaml
+AGET_SPEC_FORMAT:
+  skos:prefLabel: "AGET_SPEC_FORMAT"
+  skos:definition: "CANONICAL specification format defining EARS-based requirement patterns, header structure, and conformance levels for all AGET specifications."
+  skos:broader: "Specification_Document"
+  aget:spec_id: "AGET-FMT-001"
+  aget:authority: "CANONICAL"
+  aget:version: "1.2"
+  aget:location: "aget/specs/AGET_SPEC_FORMAT.md"
+  aget:defines:
+    - "CAP requirement pattern"
+    - "EARS patterns (ubiquitous, event-driven, state-driven, optional, conditional)"
+```
+
+### AGET_FILE_NAMING_CONVENTIONS
+
+```yaml
+AGET_FILE_NAMING_CONVENTIONS:
+  skos:prefLabel: "AGET_FILE_NAMING_CONVENTIONS"
+  skos:definition: "CANONICAL file naming conventions defining naming patterns for all AGET artifact categories (A-J)."
+  skos:broader: "Specification_Document"
+  aget:spec_id: "AGET-NAME-001"
+  aget:authority: "CANONICAL"
+  aget:version: "2.1.0"
+  aget:location: "aget/specs/AGET_FILE_NAMING_CONVENTIONS.md"
+  aget:defines:
+    - "Naming_Category"
+    - "Category A-J patterns"
+    - "L-doc numbering"
+    - "ADR numbering"
+```
+
+### AGET_PROJECT_PLAN_SPEC
+
+```yaml
+AGET_PROJECT_PLAN_SPEC:
+  skos:prefLabel: "AGET_PROJECT_PLAN_SPEC"
+  skos:definition: "Specification defining PROJECT_PLAN requirements including gate structure, V-tests, decision points, and closure checklist."
+  skos:broader: "Specification_Document"
+  aget:spec_id: "AGET-PP-001"
+  aget:authority: "Active"
+  aget:version: "1.1.0"
+  aget:location: "aget/specs/AGET_PROJECT_PLAN_SPEC.md"
+  aget:defines:
+    - "PROJECT_PLAN"
+    - "Gate"
+    - "V_Test"
+    - "Decision_Point"
+    - "Project Closure Checklist"
+  aget:governed_by: "AGET_SPEC_FORMAT"
+```
+
+### AGET_SOP_SPEC
+
+```yaml
+AGET_SOP_SPEC:
+  skos:prefLabel: "AGET_SOP_SPEC"
+  skos:definition: "Specification defining Standard Operating Procedure requirements including required sections and vocabulary compliance."
+  skos:broader: "Specification_Document"
+  aget:spec_id: "AGET-SOP-001"
+  aget:authority: "Active"
+  aget:version: "1.1.0"
+  aget:location: "aget/specs/AGET_SOP_SPEC.md"
+  aget:defines:
+    - "SOP_Document"
+    - "Purpose section"
+    - "Scope section"
+  aget:governed_by: "AGET_SPEC_FORMAT"
+```
+
+---
+
 ## Requirements
 
 ### CAP-VOC-001: SKOS Foundation
@@ -1230,6 +1594,15 @@ entities:
 ---
 
 ## Changelog
+
+### v1.7.0 (2026-01-12)
+
+- Added Version_Bearing_File vocabulary term with SKOS structure
+- Added Version_Coherence vocabulary term
+- Added Version_Drift_File anti-pattern term
+- Added terms to Release Terms table
+- Supports R-REL-VER-001 (Version-Bearing File Coherence)
+- See: L521 (Version-Bearing File Specification-to-Tool Gap), PROJECT_PLAN_version_bearing_file_remediation_v1.0
 
 ### v1.6.0 (2026-01-11)
 

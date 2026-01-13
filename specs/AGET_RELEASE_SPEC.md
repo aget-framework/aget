@@ -1,11 +1,11 @@
 # AGET Release Specification
 
-**Version**: 1.1.0
+**Version**: 1.2.0
 **Status**: Active
 **Category**: Process (Release Management)
 **Format Version**: 1.2
 **Created**: 2026-01-04
-**Updated**: 2026-01-11
+**Updated**: 2026-01-12
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_RELEASE_SPEC.md`
 **Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.2
@@ -243,6 +243,37 @@ python3 -c "import json; v=json.load(open('.aget/version.json')); print('PASS' i
 private-aget-framework-AGET/release-notes/v{VERSION}.md
 ```
 
+### R-REL-VER-001: Version-Bearing File Coherence (L521)
+
+**SHALL** requirements for version-bearing file coherence:
+
+| ID | Requirement | Rationale |
+|----|-------------|-----------|
+| R-REL-VER-001-01 | All Version_Bearing_Files SHALL display same version | Coherence |
+| R-REL-VER-001-02 | Version_Json SHALL be PRIMARY source of truth | Single source |
+| R-REL-VER-001-03 | Derived files (AGENTS.md, manifest.yaml, README.md) SHALL match primary | Consistency |
+| R-REL-VER-001-04 | validate_version_inventory.py SHALL check ALL Version_Bearing_Files | Enforcement |
+| R-REL-VER-001-05 | Version updates SHALL update ALL Version_Bearing_Files atomically | Completeness |
+
+**Version-Bearing File Enumeration:**
+
+| File | Pattern | Source |
+|------|---------|--------|
+| `.aget/version.json` | `"aget_version": "X.Y.Z"` | PRIMARY |
+| `AGENTS.md` | `@aget-version: X.Y.Z` | Derived |
+| `manifest.yaml` | `version: X.Y.Z` | Derived |
+| `README.md` | `**Current Version**: vX.Y.Z` | Derived |
+| `CHANGELOG.md` | `## [X.Y.Z]` entry | Derived |
+
+**V-Test for Version Coherence:**
+
+```bash
+# Check all version-bearing files match
+python3 aget/validation/validate_version_inventory.py --all-files
+```
+
+**Prevents**: Version_Drift_File anti-pattern (derived file showing stale version).
+
 ### CAP-REL-008: Organization Homepage Update
 
 **SHALL** requirements for homepage updates (R-REL-010):
@@ -368,6 +399,8 @@ release not found  ← Release missing!
 - L358: Release Artifact Gaps
 - L429: Version Inventory Requirement
 - L440: Manager Migration Verification Gap
+- L444: Version Inventory Coherence Requirement
+- L521: Version-Bearing File Specification-to-Tool Gap
 - SOP_release_process.md
 - AGET_VERSIONING_CONVENTIONS.md
 - Keep a Changelog (https://keepachangelog.com)
@@ -376,6 +409,18 @@ release not found  ← Release missing!
 ---
 
 ## Changelog
+
+### v1.2.0 (2026-01-12)
+
+- Added R-REL-VER-001: Version-Bearing File Coherence requirements (L521)
+- Added Version-Bearing File Enumeration table
+- Added R-REL-VER-001-01 through R-REL-VER-001-05 requirements
+- Added references to L444, L521
+- See: PROJECT_PLAN_version_bearing_file_remediation_v1.0
+
+### v1.1.0 (2026-01-11)
+
+- Version bump for consistency
 
 ### v1.0.0 (2026-01-04)
 
