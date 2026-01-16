@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0.0",
+  "description": "CLI version tracking for AGET independence validation",
+  "last_updated": "2026-01-16",
+  "tested_versions": {
+    "claude_code": {
+      "versions": ["2.1.9"],
+      "last_tested": "2026-01-16",
+      "status": "validated",
+      "notes": "Baseline CLI - primary development target. 24/24 tests pass."
+    },
+    "codex_cli": {
+      "versions": ["0.77.0"],
+      "last_tested": "2026-01-16",
+      "status": "compatible",
+      "notes": "OpenAI CLI agent - 26/26 infrastructure tests pass. Live session validation pending."
+    },
+    "gemini_cli": {
+      "versions": ["0.23.0"],
+      "last_tested": "2026-01-16",
+      "status": "compatible",
+      "notes": "Google CLI agent - 26/26 infrastructure tests pass. Live session validation pending."
+    }
+  },
+  "minimum_supported": {
+    "claude_code": "2.0.0",
+    "codex_cli": "0.70.0",
+    "gemini_cli": "0.20.0"
+  },
+  "current_installed": {
+    "claude_code": "2.1.9",
+    "codex_cli": "0.77.0",
+    "gemini_cli": "0.23.0"
+  },
+  "support_levels": {
+    "claude_code": "baseline",
+    "codex_cli": "compatible",
+    "gemini_cli": "compatible"
+  }
+}
