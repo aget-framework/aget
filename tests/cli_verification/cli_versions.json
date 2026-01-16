@@ -12,8 +12,8 @@
     "codex_cli": {
       "versions": ["0.77.0"],
       "last_tested": "2026-01-16",
-      "status": "compatible",
-      "notes": "OpenAI CLI agent - 26/26 infrastructure tests pass. Live session validation pending."
+      "status": "validated",
+      "notes": "OpenAI CLI agent - 26/26 infrastructure tests + live session validation pass."
     },
     "gemini_cli": {
       "versions": ["0.23.0"],
@@ -34,7 +34,7 @@
   },
   "support_levels": {
     "claude_code": "baseline",
-    "codex_cli": "compatible",
+    "codex_cli": "validated",
     "gemini_cli": "compatible"
   }
 }
