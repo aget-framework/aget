@@ -42,6 +42,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Extended --strict mode to check closure checklist (L515/#247)
   - Improved error messages with gate name truncation
 
+- **AGET Lifecycle SOPs renamed to active verb pattern** (AI-1, SOP_SOP_CREATION.md):
+  - `SOP_agent_instance_creation.md` → `SOP_aget_create.md`
+  - `SOP_instance_migration_v3.md` → `SOP_aget_migrate.md`
+  - Pattern: `SOP_aget_{active_verb}.md` per naming convention
+  - 50 files updated across 7 repositories
+
 ---
 
 ## [3.3.0] - 2026-01-10
