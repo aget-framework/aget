@@ -325,7 +325,7 @@ else:
 ## Related Documents
 
 - AGET_INSTANCE_SPEC.md - Parent specification
-- SOP_agent_instance_creation.md - References this schema
+- SOP_aget_create.md - References this schema
 - L488: SOP Template vs Operational Reality Gap
 - L489: Validation-Operation Gap
 - L490: Schema Shape V-Tests

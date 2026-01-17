@@ -1,182 +1,103 @@
 # AGET Framework
 
-**Canonical specification and reference implementation for AGET (Agent) framework**
+> Configuration & lifecycle management for governed agentic work
 
 ## What is AGET?
 
-AGET is a configuration & lifecycle management system for CLI-based human-AI collaborative coding. It provides:
-- Universal CLI compatibility (Claude Code, Cursor, Aider, Windsurf)
-- Contract testing and version compliance
-- Shared learning repository and evolutionary patterns
-- Human-centric governance with evidence-based planning
+AGET is a platform-agnostic governance framework for CLI-based human-AI
+agentic work. It provides session continuity, shared memory architecture,
+fleet coordination, and human-supervised autonomy patterns that work
+across AI coding assistants including Claude Code, Cursor, Aider, and
+Windsurf.
 
-## Origin
+## Philosophy
 
-Created 2025-11-21 via ADR-001 (AGET Framework Repository decision).
+**Human-AI collaboration quality over autonomous agent speed**
 
-## Current Version
+- **Governed Autonomy**: Agents act autonomously within explicit boundaries
+- **Portable Memory**: Knowledge persists across sessions and platforms
+- **Platform Agnostic**: Patterns work across CLI agent platforms
+- **Human Oversight**: Humans remain decision authorities at key points
+- **Evidence-First**: Design to reality, not theory
 
-**v3.3.0** (2026-01-10): Shell Integration + Executable Knowledge Ontology
+## What AGET is NOT
 
-Key features: Shell orchestration (aget.zsh, profiles.zsh), SKOS-compliant template vocabularies (12 templates), ontology-driven agent creation (L481), executable knowledge spec, evolution spec, 18 new L-docs.
+- **A specific AI model or runtime** — AGET is a governance layer that works with any LLM backend
+- **A replacement for Claude Code, Cursor, or Aider** — AGET sits above these platforms as a governance substrate
+- **An autonomous AI system** — AGET explicitly requires human supervision and gate discipline
+- **A coding-only framework** — AGET supports advisory, consulting, supervision, and general knowledge work
+- **A vendor lock-in solution** — Three-tier degradation ensures portability (gh → git → filesystem)
 
-**Version History**: See [docs/VERSION_HISTORY.md](docs/VERSION_HISTORY.md) for complete version timeline and known gaps.
+## Supported Platforms
 
-This repository contains:
-- `specs/` - Framework specifications
-- `templates/` - Standard templates (ADR format)
-- `validation/` - Compliance checking tools
-- `docs/` - Architecture and structure guides
+AGET works across CLI agent platforms:
 
-## Repository Structure
+| Platform | Type | Integration |
+|----------|------|-------------|
+| Claude Code | CLI | `CLAUDE.md, .claude/` |
+| Cursor | IDE | `.cursor/rules, .cursorrules` |
+| Aider | CLI | `.aider.conf.yml, CONVENTIONS.md` |
+| Windsurf | IDE | `TBD` |
+| Codex CLI | CLI | `AGENTS.md, .codex/` |
+| Gemini CLI | CLI | `Hooks (experimental)` |
 
-```
-aget/
-├── specs/                          # Framework specifications
-│   ├── AGET_SPEC_FORMAT_v1.1.md       # EARS-based spec format
-│   ├── AGET_CONTROLLED_VOCABULARY.md  # Canonical vocabulary
-│   ├── AGET_VERSIONING_CONVENTIONS.md # SemVer rules
-│   └── WORKER_TEMPLATE_SPEC_v1.0.yaml # Foundation template spec
-├── templates/                      # Standard templates
-│   └── ADR_TEMPLATE.md               # Architectural Decision Record format
-├── validation/                     # Compliance tools
-│   └── check_aget_vocabulary.py      # Vocabulary compliance checker
-└── docs/                           # Architecture guides
-    ├── LAYER_ARCHITECTURE.md         # Template inheritance hierarchy
-    └── TEMPLATE_STRUCTURE_GUIDE.md   # Standard directory structure
-```
+## Key Features
 
-## Specifications
+- **Platform Portability**: Three-tier degradation ensures functionality across environments
+- **Memory Architecture**: KB as shared collaboration substrate
+- **Gate Discipline**: Explicit decision points with human approval
+- **Fleet Patterns**: Multi-agent coordination with clear authority
+- **Evidence-First Design**: Audit before architecture, validate before shipping
+- **Theoretical Grounding**: Concepts mapped to established theory
 
-### Core Specifications
+## Strategic Context
 
-| Specification | Purpose | Status |
-|--------------|---------|--------|
-| AGET_SPEC_FORMAT_v1.1.md | EARS-based requirement format | Canonical |
-| AGET_CONTROLLED_VOCABULARY.md | Standard terminology | Canonical |
-| AGET_VERSIONING_CONVENTIONS.md | Version numbering rules | Canonical |
-| WORKER_TEMPLATE_SPEC_v1.0.yaml | Foundation template (35 capabilities) | Canonical |
+| Era | Term | Scope |
+|-----|------|-------|
+| 2024 | **Coding Agent** | Domain-specific (code tasks) |
+| 2025 | **CLI Agent** | Interface-specific (terminal-based) |
+| 2026 | **Governed Agent** | Governance-centric (human-supervised autonomy) |
 
-### Template Specifications
+> The progression abstracts away from domain (coding) and interface (CLI)
+to relationship (governed) and capability (autonomous work within bounds).
 
-| Template | Specification | Status |
-|----------|--------------|--------|
-| template-worker-aget | WORKER_TEMPLATE_SPEC_v1.0.yaml | v1.0.0 |
-| template-advisor-aget | ADVISOR_TEMPLATE_SPEC_v1.0.yaml | v2.0.0 |
-| template-supervisor-aget | (pending) | Planned |
+## Quick Start
 
-## For Template Developers
+1. Choose a template from [aget-framework](https://github.com/aget-framework)
+2. Copy template to your project
+3. Configure `AGENTS.md` or `CLAUDE.md` for your CLI agent
+4. Start with `wake up` protocol
 
-Import framework specifications:
+## Templates
 
-```yaml
-spec:
-  inherits_from: SPEC-WORKER-TEMPLATE
-  parent_version: "1.0.0"
-```
+| Template | Purpose |
+|----------|---------|
+| [template-worker-aget](https://github.com/aget-framework/template-worker-aget) | Foundation template |
+| [template-advisor-aget](https://github.com/aget-framework/template-advisor-aget) | Advisory with personas |
+| [template-supervisor-aget](https://github.com/aget-framework/template-supervisor-aget) | Fleet coordination |
+| [template-consultant-aget](https://github.com/aget-framework/template-consultant-aget) | Consulting engagements |
+| [template-developer-aget](https://github.com/aget-framework/template-developer-aget) | Development workflows |
+| [template-spec-engineer-aget](https://github.com/aget-framework/template-spec-engineer-aget) | Specification authoring |
 
-Reference controlled vocabulary:
-```
-See: aget/specs/AGET_CONTROLLED_VOCABULARY.md
-```
-
-Use EARS patterns for capability statements:
-```yaml
-statement: "WHEN Wake_Command is received, the SYSTEM shall execute Wake_Protocol"
-```
-
-Inherit core domain entities (v3.4.0+):
-```yaml
-# manifest.yaml
-entities:
-  inherits:
-    - Person
-    - Document
-    - Task
-  extends:
-    Person:
-      attributes:
-        - custom_field: {type: string}
-```
-
-See: [docs/ENTITY_EXTENSION_GUIDE.md](docs/ENTITY_EXTENSION_GUIDE.md)
-
-## For Agent Creators
-
-See templates in [aget-framework organization](https://github.com/aget-framework):
-- template-worker-aget - Foundation template
-- template-advisor-aget - Advisory with personas
-- template-supervisor-aget - Fleet coordination
-- template-consultant-aget - Consulting engagements
-- template-developer-aget - Development workflows
-- template-spec-engineer-aget - Specification authoring
-
-## Roadmap
-
-### v2.9.x (Current)
-- [x] Core Template Specification (WORKER_TEMPLATE_SPEC)
-- [x] Layer Architecture documentation
-- [x] Template Structure Guide
-- [ ] INSTANCE_CREATION_SPEC (Tier 3)
-- [ ] Additional contract tests
-
-### v3.0 (Future)
-- Full Framework Conformance (comprehensive AGET_FRAMEWORK_SPEC)
-- Complete capabilities (EARS-formatted)
-- External interoperability and validation
-- SUPERVISOR_TEMPLATE_SPEC
-
-## Validation
-
-Check vocabulary compliance:
-
-```bash
-cd aget/validation
-python check_aget_vocabulary.py ../specs/
-```
-
-## Quick Reference
-
-### Instance Types
-
-| Type | Capabilities | Example |
-|------|-------------|---------|
-| `aget` | Read-only, analysis, advisory | private-impact-aget |
-| `AGET` | Action-taking, file writes | private-supervisor-AGET |
-| `template` | Reference implementation | template-worker-aget |
-| `coordinator` | Fleet management | private-supervisor-AGET |
-
-### Session Protocols
+## Session Protocols
 
 | Command | Protocol | Purpose |
 |---------|----------|---------|
-| `wake up` | Wake_Protocol | Initialize session |
-| `study up` | Study_Up_Protocol | Load deep context |
-| `wind down` | Wind_Down_Protocol | Finalize session |
-| `sign off` | Sign_Off_Protocol | Complete closure |
+| `wake up` | Wake_Protocol | Initialize session, load context |
+| `study up [topic]` | Study_Up_Protocol | Deep dive on specific topic |
+| `step back` | Step_Back_Protocol | Review KB before proposing |
+| `sanity check` | Sanity_Check_Protocol | Verify agent health |
+| `wind down` | Wind_Down_Protocol | End session, create handoff |
 
-### Key L-docs
+## Contributing
 
-| L-doc | Topic |
-|-------|-------|
-| L185 | Environmental grounding |
-| L186 | TodoWrite vs PROJECT_PLAN |
-| L187 | Wake protocol silent execution |
-| L174 | Template specification debt |
-| L171 | Instance creation gap |
+Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 
-Apache License 2.0 - See LICENSE file
-
-## Maintenance
-
-Maintained by private-aget-framework-AGET (framework management role)
-Governed by private-supervisor-AGET (fleet coordinator)
+Apache License 2.0 - See [LICENSE](LICENSE)
 
 ---
 
-**Version**: 2.10.0
-**Created**: 2025-11-21
-**Updated**: 2025-12-13
-**Status**: Capability Composition Architecture
+*Generated from specifications on 2026-01-16*
+*See: [AGET_IDENTITY_SPEC.yaml](specs/AGET_IDENTITY_SPEC.yaml), [AGET_POSITIONING_SPEC.yaml](specs/AGET_POSITIONING_SPEC.yaml)*

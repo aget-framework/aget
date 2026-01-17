@@ -1,11 +1,11 @@
 # AGET Vocabulary Specification
 
-**Version**: 1.8.0
+**Version**: 1.10.0
 **Status**: Active
 **Category**: Core (Standards)
 **Format Version**: 1.2
 **Created**: 2026-01-04
-**Updated**: 2026-01-12
+**Updated**: 2026-01-17
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_VOCABULARY_SPEC.md`
 **Change Origin**: PROJECT_PLAN_standards_ontology_elevation_v1.0
@@ -342,6 +342,81 @@ Version_Drift_File:
 | `Release_Verification` | Automated validation that all release artifacts complete before push (CAP-REL-009) |
 | `Pre_Push_Gate` | BLOCKING validation checkpoint before git push (CAP-REL-009) |
 | `Version_Ceiling` | Constraint that instance version ≤ framework version (CAP-REL-010) |
+
+### VERSION_SCOPE Terms (R-REL-020)
+
+```yaml
+Version_Scope:
+  skos:prefLabel: "Version_Scope"
+  skos:altLabel: ["VERSION_SCOPE", "Release_Scope"]
+  skos:definition: "Planning artifact that defines the boundaries, objectives, work items, timeline, and success criteria for a specific version release; serves as the authoritative scope document for release coordination"
+  skos:broader: ["Planning_Artifact", "Release_Governance"]
+  skos:narrower: ["MVP_Scope", "Full_Scope", "Out_of_Scope"]
+  skos:related: ["PROJECT_PLAN", "CHANGELOG", "Release_Notes", "Release_Checklist"]
+  aget:location: "planning/VERSION_SCOPE_vX.Y.Z.md"
+  aget:template: "planning/TEMPLATE_VERSION_SCOPE.md"
+  skos:example: "VERSION_SCOPE_v3.4.0.md"
+
+Release_Phase:
+  skos:prefLabel: "Release_Phase"
+  skos:definition: "Discrete stage in the release lifecycle with specific objectives, deliverables, and completion criteria"
+  skos:broader: "Release_Governance"
+  skos:narrower: ["Pre_Release_Phase", "Release_Execution_Phase", "Post_Release_Phase"]
+  skos:related: ["Version_Scope", "Release_Checklist"]
+
+Pre_Release_Phase:
+  skos:prefLabel: "Pre_Release_Phase"
+  skos:altLabel: ["Phase_0", "Pre_Release_Validation"]
+  skos:definition: "Release phase focused on validation and preparation before deployment; includes scope finalization, testing completion, documentation readiness, and blocker resolution"
+  skos:broader: "Release_Phase"
+  skos:related: ["Feature_Freeze", "Code_Freeze", "Release_Blocker"]
+
+Release_Execution_Phase:
+  skos:prefLabel: "Release_Execution_Phase"
+  skos:altLabel: ["Phase_1_2", "Release_Day"]
+  skos:definition: "Release phase covering version bump, tagging, deployment, and announcement; the actual release execution"
+  skos:broader: "Release_Phase"
+  skos:related: ["Version_Bump", "Git_Tag", "Release_Handoff"]
+
+Post_Release_Phase:
+  skos:prefLabel: "Post_Release_Phase"
+  skos:altLabel: ["Phase_3", "Post_Release_Validation"]
+  skos:definition: "Release phase focused on validation, monitoring, and learning after deployment; includes smoke testing, issue monitoring, and retrospective"
+  skos:broader: "Release_Phase"
+  skos:related: ["Release_Retrospective", "Hotfix", "Rollback"]
+
+MVP_Scope:
+  skos:prefLabel: "MVP_Scope"
+  skos:altLabel: ["Must_Ship", "Blocking_Scope"]
+  skos:definition: "Subset of Version_Scope containing items that MUST be complete for the release to proceed; incomplete MVP items block release"
+  skos:broader: "Version_Scope"
+  skos:related: ["Release_Blocker", "Full_Scope"]
+  aget:constraint: "All MVP items must be complete before Release_Execution_Phase"
+
+Rollback_Plan:
+  skos:prefLabel: "Rollback_Plan"
+  skos:definition: "Contingency procedure for reverting a release if critical issues are discovered post-deployment; includes triggers, steps, and owner"
+  skos:broader: "Release_Governance"
+  skos:related: ["Post_Release_Phase", "Hotfix", "Risk_Mitigation"]
+
+Release_Retrospective:
+  skos:prefLabel: "Release_Retrospective"
+  skos:altLabel: ["Post_Release_Retrospective", "Release_Review"]
+  skos:definition: "Structured review conducted after release completion to capture lessons learned, identify improvements, and update processes"
+  skos:broader: "Release_Governance"
+  skos:related: ["Post_Release_Phase", "Lesson_Learned", "L_Doc"]
+```
+
+| Term | Definition |
+|------|------------|
+| `Version_Scope` | Planning artifact defining boundaries, objectives, and success criteria for a release (R-REL-020) |
+| `Release_Phase` | Discrete stage in release lifecycle (Pre-Release, Execution, Post-Release) |
+| `Pre_Release_Phase` | Phase 0: validation before deployment (scope, testing, blockers) |
+| `Release_Execution_Phase` | Phase 1-2: version bump, tagging, deployment |
+| `Post_Release_Phase` | Phase 3: validation after deployment (monitoring, retrospective) |
+| `MVP_Scope` | Must-Ship items that BLOCK release if incomplete |
+| `Rollback_Plan` | Contingency procedure for reverting release on critical issues |
+| `Release_Retrospective` | Structured review after release to capture lessons learned |
 
 ## Documentation Terms (CAP-DOC-*)
 
@@ -764,7 +839,7 @@ New_Artifact:
 
 ---
 
-# Part 6: Core Domain Entities (L459)
+# Part 6: Core Domain Entities (L459, L530)
 
 Core domain entities are standardized foundational entities that AGET agents inherit by default and extend only when domain-specific requirements demand. Per **L459 (Core Entity Vocabulary Vision)**, this addresses the "reinvention anti-pattern" where agents independently define common entities.
 
@@ -774,44 +849,621 @@ Core domain entities are standardized foundational entities that AGET agents inh
 
 **Relationship to EKO (L451)**:
 - EKO defines **executable knowledge** (what Aget_Instances DO) — SOPs, Runbooks, Playbooks
-- Core Entity Vocabulary defines **domain objects** (what Aget_Instances WORK WITH) — Person_Entity, Organization_Entity, Document_Entity
+- Core Entity Vocabulary defines **domain objects** (what Aget_Instances WORK WITH) — Aget_Person, Aget_Organization, Aget_Document
+
+**Relationship to Ontology Foundation (L530)**:
+- L530 establishes the theoretical grounding for entity categories
+- DAG structure allows multi-parent inheritance (e.g., Aget_Person is both Aget_Agent and Aget_Living_Organism)
+- Naming convention: All ontology classes use `Aget_*` prefix for self-disambiguation
 
 ## Upper-Level Entity Categories
 
+The AGET ontology follows a DAG (Directed Acyclic Graph) structure rooted in `Aget_Thing`. Per L530 Finding 5, DAG allows entities to have multiple parents (e.g., Aget_Person inherits from both Aget_Agent and Aget_Living_Organism).
+
 ```yaml
+Aget_Thing:
+  skos:prefLabel: "Aget_Thing"
+  skos:definition: "The universal root class for all AGET ontology entities. Everything in the AGET domain model is an Aget_Thing."
+  aget:theoretical_basis: "BFO:Entity (root of Basic Formal Ontology)"
+  skos:narrower: ["Aget_Continuant", "Aget_Occurrent", "Aget_Intangible"]
+  skos:example: "Every Aget_Person, Aget_Task, and Aget_Rule is an Aget_Thing."
+
+Aget_Continuant:
+  skos:prefLabel: "Aget_Continuant"
+  skos:altLabel: ["Continuant", "Continuant_Category"]
+  skos:definition: "Aget_Thing that persists through time while maintaining identity. Continuants exist wholly at any moment they exist."
+  skos:broader: "Aget_Thing"
+  aget:theoretical_basis: "BFO:Continuant, DOLCE:Endurant"
+  aget:user_facing: false
+  skos:narrower: ["Aget_Agent", "Aget_System", "Aget_Artifact", "Aget_CreatedWork"]
+  skos:example: "Alice is an Aget_Person (Continuant) — she exists continuously, not as an event."
+
+Aget_Occurrent:
+  skos:prefLabel: "Aget_Occurrent"
+  skos:altLabel: ["Occurrent", "Occurrent_Category"]
+  skos:definition: "Aget_Thing that happens in time, with a beginning and end. Occurrents unfold over time."
+  skos:broader: "Aget_Thing"
+  aget:theoretical_basis: "BFO:Occurrent, DOLCE:Perdurant"
+  aget:user_facing: false
+  skos:narrower: ["Aget_Action", "Aget_Event", "Aget_Decision"]
+  skos:example: "A meeting is an Aget_Event (Occurrent) — it happens at a specific time."
+
+Aget_Intangible:
+  skos:prefLabel: "Aget_Intangible"
+  skos:altLabel: ["Intangible", "Abstract", "Abstract_Category"]
+  skos:definition: "Aget_Thing that is non-physical and exists as a conceptual construct. Intangibles are neither continuants nor occurrents."
+  skos:broader: "Aget_Thing"
+  aget:theoretical_basis: "Schema.org:Intangible, BFO:GenericallyDependentContinuant"
+  aget:user_facing: false
+  skos:narrower: ["Aget_Belief", "Aget_Rule", "Aget_Capability", "Aget_Promise", "Aget_Pattern", "Aget_Goal"]
+  skos:example: "A rule is an Aget_Intangible — it exists as a concept, not a physical thing."
+  skos:note: "Renamed from 'Abstract' per L530 Finding 4 (readability): 'A rule is an Aget_Intangible' scores 4/5 vs 'A rule is an Aget_Abstract' at 2/5."
+
+# Legacy compatibility mapping
 Aget_Entity:
   skos:prefLabel: "Aget_Entity"
   skos:altLabel: "Entity"
-  skos:definition: "A distinct, identifiable thing in the domain that can have attributes and relationships."
+  skos:definition: "A distinct, identifiable thing in the domain that can have attributes and relationships. Equivalent to Aget_Thing in the ontology hierarchy."
   aget:meta_entity: true
-  skos:narrower: ["Continuant_Category", "Occurrent_Category", "Abstract_Category"]
-
-Continuant_Category:
-  skos:prefLabel: "Continuant_Category"
-  skos:altLabel: ["Continuant"]
-  skos:definition: "Aget_Entity that persists through time while maintaining identity."
-  skos:broader: "Aget_Entity"
-  skos:narrower: ["Person_Entity", "Organization_Entity", "Document_Entity", "Project_Entity"]
-  skos:example: "A person exists continuously; they don't happen and end."
-
-Occurrent_Category:
-  skos:prefLabel: "Occurrent_Category"
-  skos:altLabel: ["Occurrent"]
-  skos:definition: "Aget_Entity that happens in time, with a beginning and end."
-  skos:broader: "Aget_Entity"
-  skos:narrower: ["Event_Entity", "Task_Entity"]
-  skos:example: "A meeting happens at a specific time; it has a start and end."
-
-Abstract_Category:
-  skos:prefLabel: "Abstract_Category"
-  skos:altLabel: ["Abstract"]
-  skos:definition: "Aget_Entity that is non-physical and exists as a conceptual construct."
-  skos:broader: "Aget_Entity"
-  skos:narrower: ["Decision_Entity", "Requirement_Entity"]
-  skos:example: "A decision exists as a concept, not as a physical thing."
+  skos:related: "Aget_Thing"
+  skos:narrower: ["Aget_Continuant", "Aget_Occurrent", "Aget_Intangible"]
+  skos:note: "For backward compatibility with L459/L494. New code should use Aget_Thing as root."
 ```
 
-## Core Entity Definitions
+## Continuant Branch (L530 - Agent-Centric)
+
+The Continuant branch emphasizes **Aget_Agent** as the central AGET concept. Per L530 Lesson 8, the framework starts from Agent and expands outward, rather than assuming generic ontology structure.
+
+### Agent Hierarchy
+
+```yaml
+Aget_Agent:
+  skos:prefLabel: "Aget_Agent"
+  skos:altLabel: ["Agent"]
+  skos:definition: "Aget_Continuant capable of autonomous action, possessing beliefs, desires, and intentions (BDI)."
+  skos:broader: "Aget_Continuant"
+  aget:theoretical_basis: "BDI Architecture (Bratman, Rao & Georgeff), L331"
+  aget:core_entity: true
+  skos:narrower: ["Aget_Person", "Aget_AI_System", "Aget_Organization"]
+  skos:example: "Alice is an Aget_Agent — she can form intentions and take autonomous actions."
+
+Aget_Person:
+  skos:prefLabel: "Aget_Person"
+  skos:altLabel: ["Person", "Person_Entity"]
+  skos:definition: "Aget_Agent that is a human individual. DAG: also an Aget_Living_Organism."
+  skos:broader: ["Aget_Agent", "Aget_Living_Organism"]
+  aget:theoretical_basis: "BFO:Object, Schema.org:Person"
+  aget:core_entity: true
+  aget:dag_parents: ["Aget_Agent (primary)", "Aget_Living_Organism (secondary)"]
+  skos:example: "Alice is an Aget_Person — both an agent with intentions and a living organism."
+
+Aget_AI_System:
+  skos:prefLabel: "Aget_AI_System"
+  skos:altLabel: ["AI_System"]
+  skos:definition: "Aget_Agent that is an artificial intelligence system. DAG: also an Aget_Technical_System."
+  skos:broader: ["Aget_Agent", "Aget_Technical_System"]
+  aget:theoretical_basis: "BDI Architecture for artificial agents"
+  aget:core_entity: true
+  aget:dag_parents: ["Aget_Agent (primary)", "Aget_Technical_System (secondary)"]
+  skos:narrower: ["Aget_Instance"]
+  skos:example: "Claude is an Aget_AI_System — an agent implemented as a technical system."
+
+Aget_Instance:
+  skos:prefLabel: "Aget_Instance"
+  skos:altLabel: ["Instance"]
+  skos:definition: "Aget_AI_System that is configured using the AGET framework (version.json + AGENTS.md)."
+  skos:broader: "Aget_AI_System"
+  aget:core_entity: true
+  skos:example: "private-aget-framework-AGET is an Aget_Instance — an AI system configured via AGET."
+
+Aget_Organization:
+  skos:prefLabel: "Aget_Organization"
+  skos:altLabel: ["Organization", "Organization_Entity"]
+  skos:definition: "Aget_Agent that is a structured group of agents with a shared purpose."
+  skos:broader: "Aget_Agent"
+  aget:theoretical_basis: "Schema.org:Organization"
+  aget:core_entity: true
+  skos:narrower: ["Aget_Team", "Aget_Fleet"]
+  skos:example: "Anthropic is an Aget_Organization — a collective agent."
+
+Aget_Team:
+  skos:prefLabel: "Aget_Team"
+  skos:altLabel: ["Team"]
+  skos:definition: "Aget_Organization of persons working together on shared goals."
+  skos:broader: "Aget_Organization"
+  aget:core_entity: true
+  skos:example: "The AGET development team is an Aget_Team."
+
+Aget_Fleet:
+  skos:prefLabel: "Aget_Fleet"
+  skos:altLabel: ["Fleet"]
+  skos:definition: "Aget_Organization of Aget_Instances under coordinator supervision."
+  skos:broader: "Aget_Organization"
+  aget:core_entity: true
+  skos:example: "The 28-agent main portfolio is an Aget_Fleet."
+```
+
+### System Hierarchy
+
+```yaml
+Aget_System:
+  skos:prefLabel: "Aget_System"
+  skos:altLabel: ["System"]
+  skos:definition: "Aget_Continuant composed of organized, interacting components."
+  skos:broader: "Aget_Continuant"
+  aget:theoretical_basis: "Systems Theory"
+  skos:narrower: ["Aget_Technical_System", "Aget_Biological_System"]
+  skos:example: "A computer is an Aget_System — organized components working together."
+
+Aget_Technical_System:
+  skos:prefLabel: "Aget_Technical_System"
+  skos:altLabel: ["Technical_System"]
+  skos:definition: "Aget_System designed and built by agents for a specific purpose."
+  skos:broader: "Aget_System"
+  skos:narrower: ["Aget_Software_System"]
+  skos:example: "A server cluster is an Aget_Technical_System."
+
+Aget_Software_System:
+  skos:prefLabel: "Aget_Software_System"
+  skos:altLabel: ["Software_System"]
+  skos:definition: "Aget_Technical_System implemented in software."
+  skos:broader: "Aget_Technical_System"
+  skos:example: "The AGET framework is an Aget_Software_System."
+
+Aget_Biological_System:
+  skos:prefLabel: "Aget_Biological_System"
+  skos:altLabel: ["Biological_System"]
+  skos:definition: "Aget_System that is alive or composed of living components."
+  skos:broader: "Aget_System"
+  skos:narrower: ["Aget_Living_Organism"]
+  skos:example: "An ecosystem is an Aget_Biological_System."
+
+Aget_Living_Organism:
+  skos:prefLabel: "Aget_Living_Organism"
+  skos:altLabel: ["Living_Organism"]
+  skos:definition: "Aget_Biological_System that is an individual living entity."
+  skos:broader: "Aget_Biological_System"
+  skos:narrower: ["Aget_Animal"]
+  skos:example: "A tree is an Aget_Living_Organism."
+
+Aget_Animal:
+  skos:prefLabel: "Aget_Animal"
+  skos:altLabel: ["Animal"]
+  skos:definition: "Aget_Living_Organism that is a member of the animal kingdom."
+  skos:broader: "Aget_Living_Organism"
+  skos:example: "A dog is an Aget_Animal (and potentially an Aget_Agent if we model it that way)."
+```
+
+### Artifact Hierarchy
+
+```yaml
+Aget_Artifact:
+  skos:prefLabel: "Aget_Artifact"
+  skos:altLabel: ["Artifact"]
+  skos:definition: "Aget_Continuant that is a physical object created by agents."
+  skos:broader: "Aget_Continuant"
+  aget:theoretical_basis: "BFO:Object, Schema.org:Product"
+  skos:narrower: ["Aget_Device", "Aget_Tool"]
+  skos:example: "A laptop is an Aget_Artifact."
+
+Aget_Device:
+  skos:prefLabel: "Aget_Device"
+  skos:altLabel: ["Device"]
+  skos:definition: "Aget_Artifact designed to perform specific functions."
+  skos:broader: "Aget_Artifact"
+  skos:example: "A smartphone is an Aget_Device."
+
+Aget_Tool:
+  skos:prefLabel: "Aget_Tool"
+  skos:altLabel: ["Tool"]
+  skos:definition: "Aget_Artifact used to extend agent capabilities."
+  skos:broader: "Aget_Artifact"
+  skos:example: "A hammer is an Aget_Tool."
+```
+
+### CreatedWork Hierarchy
+
+```yaml
+Aget_CreatedWork:
+  skos:prefLabel: "Aget_CreatedWork"
+  skos:altLabel: ["CreatedWork"]
+  skos:definition: "Aget_Continuant that is an informational object created by agents."
+  skos:broader: "Aget_Continuant"
+  aget:theoretical_basis: "FRBR:Work, Schema.org:CreativeWork"
+  aget:display_alias: "Work"
+  skos:narrower: ["Aget_Document", "Aget_Specification", "Aget_Code"]
+  skos:example: "A research paper is an Aget_CreatedWork."
+
+Aget_Document:
+  skos:prefLabel: "Aget_Document"
+  skos:altLabel: ["Document", "Document_Entity"]
+  skos:definition: "Aget_CreatedWork that is a persistent information artifact."
+  skos:broader: "Aget_CreatedWork"
+  aget:core_entity: true
+  skos:example: "This specification is an Aget_Document."
+
+Aget_Specification:
+  skos:prefLabel: "Aget_Specification"
+  skos:altLabel: ["Specification"]
+  skos:definition: "Aget_Document that defines requirements, formats, or standards."
+  skos:broader: "Aget_Document"
+  skos:example: "AGET_VOCABULARY_SPEC is an Aget_Specification."
+
+Aget_Code:
+  skos:prefLabel: "Aget_Code"
+  skos:altLabel: ["Code"]
+  skos:definition: "Aget_CreatedWork that is executable or interpretable by machines."
+  skos:broader: "Aget_CreatedWork"
+  skos:example: "wake_up.py is an Aget_Code artifact."
+```
+
+## Occurrent Branch (L530)
+
+The Occurrent branch captures things that happen over time.
+
+```yaml
+Aget_Action:
+  skos:prefLabel: "Aget_Action"
+  skos:altLabel: ["Action"]
+  skos:definition: "Aget_Occurrent that is an intentional doing by an agent."
+  skos:broader: "Aget_Occurrent"
+  aget:theoretical_basis: "BDI:Intention → Action"
+  skos:narrower: ["Aget_Task"]
+  skos:example: "Committing code is an Aget_Action."
+
+Aget_Task:
+  skos:prefLabel: "Aget_Task"
+  skos:altLabel: ["Task", "Task_Entity"]
+  skos:definition: "Aget_Action that is a unit of work with assignee and status."
+  skos:broader: "Aget_Action"
+  aget:core_entity: true
+  skos:example: "Implement feature X is an Aget_Task."
+
+Aget_Event:
+  skos:prefLabel: "Aget_Event"
+  skos:altLabel: ["Event", "Event_Entity"]
+  skos:definition: "Aget_Occurrent that happens at a specific time, typically involving multiple participants."
+  skos:broader: "Aget_Occurrent"
+  aget:theoretical_basis: "BFO:Process, Schema.org:Event"
+  aget:core_entity: true
+  skos:narrower: ["Aget_Meeting", "Aget_Block"]
+  skos:example: "A team standup is an Aget_Event."
+
+Aget_Meeting:
+  skos:prefLabel: "Aget_Meeting"
+  skos:altLabel: ["Meeting"]
+  skos:definition: "Aget_Event where agents gather for discussion or coordination."
+  skos:broader: "Aget_Event"
+  aget:core_entity: true
+  skos:example: "The weekly sync is an Aget_Meeting."
+
+Aget_Block:
+  skos:prefLabel: "Aget_Block"
+  skos:altLabel: ["Block", "TimeBlock", "FocusBlock"]
+  skos:definition: "Aget_Event representing a reserved time period for focused work."
+  skos:broader: "Aget_Event"
+  aget:display_alias: "Focus Block"
+  skos:example: "A 2-hour deep work block is an Aget_Block."
+
+Aget_Decision:
+  skos:prefLabel: "Aget_Decision"
+  skos:altLabel: ["Decision", "Decision_Entity"]
+  skos:definition: "Aget_Occurrent where an agent commits to a choice, creating obligations or beliefs."
+  skos:broader: "Aget_Occurrent"
+  aget:theoretical_basis: "BDI: Belief + Desire → Intention (Decision)"
+  aget:core_entity: true
+  skos:example: "Choosing REST over GraphQL is an Aget_Decision."
+```
+
+## Intangible Branch (L530 - Extended Research)
+
+The Intangible branch captures conceptual constructs including beliefs, rules, promises, and their consequences. Per L530 Findings 7-10, this branch integrates deontic logic, contract theory, and epistemology.
+
+### Belief and Epistemology Hierarchy (L530 Finding 10)
+
+Per Justified True Belief (JTB) and AGM Belief Revision theory:
+
+```yaml
+Aget_Belief:
+  skos:prefLabel: "Aget_Belief"
+  skos:altLabel: ["Belief"]
+  skos:definition: "Aget_Intangible representing an agent's acceptance that a proposition is true."
+  skos:broader: "Aget_Intangible"
+  aget:theoretical_basis: "BDI Architecture (B component), AGM Belief Revision"
+  aget:core_entity: true
+  skos:narrower: ["Aget_Assumption", "Aget_Hypothesis", "Aget_Conviction"]
+  aget:attributes:
+    - confidence: {type: float, range: "[0,1]", description: "Bayesian credence level"}
+    - truth_status: {type: enum, values: [unknown, verified_true, verified_false]}
+  skos:example: "Alice believes the meeting starts at 3pm."
+
+Aget_Assumption:
+  skos:prefLabel: "Aget_Assumption"
+  skos:altLabel: ["Assumption"]
+  skos:definition: "Aget_Belief that is accepted without verification."
+  skos:broader: "Aget_Belief"
+  skos:example: "Assuming the API will respond within 100ms."
+
+Aget_Hypothesis:
+  skos:prefLabel: "Aget_Hypothesis"
+  skos:altLabel: ["Hypothesis"]
+  skos:definition: "Aget_Belief that is testable and falsifiable."
+  skos:broader: "Aget_Belief"
+  aget:theoretical_basis: "Scientific Method, Popperian Falsificationism"
+  skos:example: "The hypothesis that caching will improve latency by 50%."
+
+Aget_Conviction:
+  skos:prefLabel: "Aget_Conviction"
+  skos:altLabel: ["Conviction"]
+  skos:definition: "Aget_Belief held with high confidence, resistant to revision."
+  skos:broader: "Aget_Belief"
+  skos:example: "A core conviction that code should be tested before deployment."
+
+Aget_Knowledge:
+  skos:prefLabel: "Aget_Knowledge"
+  skos:altLabel: ["Knowledge"]
+  skos:definition: "Aget_Intangible that is a justified true belief — Belief + Verified True + Justified."
+  skos:broader: "Aget_Intangible"
+  skos:related: ["Aget_Belief", "Aget_Justification"]
+  aget:theoretical_basis: "Justified True Belief (JTB), Gettier Problem awareness"
+  aget:core_entity: true
+  skos:example: "Knowledge that the build passed (verified by CI)."
+
+Aget_Justification:
+  skos:prefLabel: "Aget_Justification"
+  skos:altLabel: ["Justification"]
+  skos:definition: "Aget_Intangible providing epistemic support for a belief."
+  skos:broader: "Aget_Intangible"
+  aget:theoretical_basis: "Epistemology, Evidence Theory"
+  skos:narrower: ["Aget_Evidence", "Aget_Testimony", "Aget_Inference"]
+  skos:example: "The justification for believing the test passed is the green CI badge."
+
+Aget_Evidence:
+  skos:prefLabel: "Aget_Evidence"
+  skos:altLabel: ["Evidence"]
+  skos:definition: "Aget_Justification based on direct observation or data."
+  skos:broader: "Aget_Justification"
+  skos:example: "Log output showing successful completion."
+
+Aget_Testimony:
+  skos:prefLabel: "Aget_Testimony"
+  skos:altLabel: ["Testimony"]
+  skos:definition: "Aget_Justification based on another agent's assertion."
+  skos:broader: "Aget_Justification"
+  skos:example: "Alice said the feature was deployed."
+
+Aget_Inference:
+  skos:prefLabel: "Aget_Inference"
+  skos:altLabel: ["Inference"]
+  skos:definition: "Aget_Justification derived from reasoning over other beliefs."
+  skos:broader: "Aget_Justification"
+  skos:example: "Inferring the system is down because the health check failed."
+```
+
+### Rule and Deontic Hierarchy (L530 Finding 7)
+
+Per Standard Deontic Logic (von Wright):
+
+```yaml
+Aget_Rule:
+  skos:prefLabel: "Aget_Rule"
+  skos:altLabel: ["Rule"]
+  skos:definition: "Aget_Intangible that prescribes, permits, or prohibits behavior."
+  skos:broader: "Aget_Intangible"
+  aget:theoretical_basis: "Deontic Logic"
+  skos:narrower: ["Aget_Constraint", "Aget_Norm"]
+  skos:example: "A rule that all commits must have tests."
+
+Aget_Constraint:
+  skos:prefLabel: "Aget_Constraint"
+  skos:altLabel: ["Constraint"]
+  skos:definition: "Aget_Rule that limits possible states or actions."
+  skos:broader: "Aget_Rule"
+  skos:example: "A constraint that file names must be lowercase."
+
+Aget_Norm:
+  skos:prefLabel: "Aget_Norm"
+  skos:altLabel: ["Norm"]
+  skos:definition: "Aget_Rule with deontic force (obligation, prohibition, or permission)."
+  skos:broader: "Aget_Rule"
+  aget:theoretical_basis: "Standard Deontic Logic (von Wright)"
+  aget:core_entity: true
+  skos:narrower: ["Aget_Obligation", "Aget_Prohibition", "Aget_Permission"]
+  skos:example: "A norm that agents SHALL document decisions."
+
+Aget_Obligation:
+  skos:prefLabel: "Aget_Obligation"
+  skos:altLabel: ["Obligation", "SHALL"]
+  skos:definition: "Aget_Norm requiring an action or state (deontic SHALL)."
+  skos:broader: "Aget_Norm"
+  aget:theoretical_basis: "Deontic Logic: O(p) — it ought to be that p"
+  aget:deontic_operator: "SHALL"
+  aget:hohfeldian_correlative: "Aget_Right"
+  skos:example: "Agents SHALL run V-tests before marking gates complete."
+
+Aget_Prohibition:
+  skos:prefLabel: "Aget_Prohibition"
+  skos:altLabel: ["Prohibition", "SHALL_NOT"]
+  skos:definition: "Aget_Norm forbidding an action or state (deontic SHALL NOT)."
+  skos:broader: "Aget_Norm"
+  aget:theoretical_basis: "Deontic Logic: F(p) — it is forbidden that p"
+  aget:deontic_operator: "SHALL NOT"
+  skos:example: "Agents SHALL NOT commit secrets to public repositories."
+
+Aget_Permission:
+  skos:prefLabel: "Aget_Permission"
+  skos:altLabel: ["Permission", "MAY"]
+  skos:definition: "Aget_Norm allowing an action or state (deontic MAY)."
+  skos:broader: "Aget_Norm"
+  aget:theoretical_basis: "Deontic Logic: P(p) — it is permitted that p"
+  aget:deontic_operator: "MAY"
+  aget:hohfeldian_equivalent: "Aget_Privilege"
+  skos:example: "Agents MAY use abbreviated commit messages for trivial fixes."
+
+Aget_Capability:
+  skos:prefLabel: "Aget_Capability"
+  skos:altLabel: ["Capability"]
+  skos:definition: "Aget_Intangible representing an agent's ability to perform actions. NOT deontic — about CAN, not MAY."
+  skos:broader: "Aget_Intangible"
+  aget:theoretical_basis: "Ability vs Permission distinction (L530 Finding 7)"
+  aget:core_entity: true
+  skos:note: "Capability is about Ability (CAN), not Permission (MAY). Initial intuition to place under Rule was incorrect."
+  skos:example: "The capability to execute bash commands."
+```
+
+### Promise and Commitment Hierarchy (L530 Finding 8)
+
+Per Speech Act Theory (Austin, Searle):
+
+```yaml
+Aget_Promise:
+  skos:prefLabel: "Aget_Promise"
+  skos:altLabel: ["Promise"]
+  skos:definition: "Aget_Intangible representing a commitment to future action made by an agent."
+  skos:broader: "Aget_Intangible"
+  aget:theoretical_basis: "Speech Act Theory (Searle: Commissives)"
+  skos:narrower: ["Aget_Commitment"]
+  skos:example: "A promise to deliver the feature by Friday."
+
+Aget_Commitment:
+  skos:prefLabel: "Aget_Commitment"
+  skos:altLabel: ["Commitment"]
+  skos:definition: "Aget_Promise that has been formalized, creating obligations."
+  skos:broader: "Aget_Promise"
+  aget:theoretical_basis: "BDI Architecture (Intention as Commitment)"
+  aget:core_entity: true
+  skos:example: "A commitment tracked in the project plan."
+```
+
+### Agreement and Contract Hierarchy (L530 Finding 8)
+
+Per Hohfeldian Positions and UFO-L:
+
+```yaml
+Aget_Agreement:
+  skos:prefLabel: "Aget_Agreement"
+  skos:altLabel: ["Agreement"]
+  skos:definition: "Aget_Intangible representing mutual commitments between agents."
+  skos:broader: "Aget_Intangible"
+  aget:theoretical_basis: "Contract Theory, UFO-L"
+  skos:narrower: ["Aget_Contract"]
+  skos:example: "An agreement to share code review responsibilities."
+
+Aget_Contract:
+  skos:prefLabel: "Aget_Contract"
+  skos:altLabel: ["Contract"]
+  skos:definition: "Aget_Agreement with formal obligations, rights, and consequences."
+  skos:broader: "Aget_Agreement"
+  aget:theoretical_basis: "Legal Ontology, FIBO"
+  skos:example: "A service level agreement (SLA)."
+
+Aget_Right:
+  skos:prefLabel: "Aget_Right"
+  skos:altLabel: ["Right"]
+  skos:definition: "Aget_Intangible representing an entitlement correlative to another's obligation."
+  skos:broader: "Aget_Intangible"
+  aget:theoretical_basis: "Hohfeldian Positions: Right-Duty correlation"
+  aget:hohfeldian_correlative: "Aget_Obligation"
+  skos:example: "The right to receive code review within 24 hours."
+
+Aget_Power:
+  skos:prefLabel: "Aget_Power"
+  skos:altLabel: ["Power"]
+  skos:definition: "Aget_Intangible representing the ability to create, modify, or extinguish rights."
+  skos:broader: "Aget_Intangible"
+  aget:theoretical_basis: "Hohfeldian Positions: Power-Liability"
+  skos:example: "The power to approve or reject a pull request."
+```
+
+### Consequence Hierarchy (L530 Finding 9)
+
+Per Speech Act Theory (consequences of commitments):
+
+```yaml
+Aget_Consequence:
+  skos:prefLabel: "Aget_Consequence"
+  skos:altLabel: ["Consequence"]
+  skos:definition: "Aget_Intangible representing outcomes resulting from actions or commitments."
+  skos:broader: "Aget_Intangible"
+  aget:theoretical_basis: "Speech Act Theory, Contract Theory"
+  skos:narrower: ["Aget_Sanction", "Aget_Reward", "Aget_Breach", "Aget_Fulfillment"]
+  aget:impact_dimensions: ["self_impact", "relational_impact", "organizational_impact", "financial_impact", "emotional_impact", "reputational_impact"]
+  skos:example: "The consequence of missing a deadline."
+
+Aget_Sanction:
+  skos:prefLabel: "Aget_Sanction"
+  skos:altLabel: ["Sanction"]
+  skos:definition: "Aget_Consequence that is a negative outcome for breach of obligation."
+  skos:broader: "Aget_Consequence"
+  skos:related: "Aget_Breach"
+  skos:example: "Loss of commit privileges after repeated policy violations."
+
+Aget_Reward:
+  skos:prefLabel: "Aget_Reward"
+  skos:altLabel: ["Reward"]
+  skos:definition: "Aget_Consequence that is a positive outcome for fulfillment of commitment."
+  skos:broader: "Aget_Consequence"
+  skos:related: "Aget_Fulfillment"
+  skos:example: "Recognition for completing a difficult migration."
+
+Aget_Breach:
+  skos:prefLabel: "Aget_Breach"
+  skos:altLabel: ["Breach"]
+  skos:definition: "Aget_Consequence representing violation of an agreement or obligation."
+  skos:broader: "Aget_Consequence"
+  skos:related: ["Aget_Agreement", "Aget_Obligation", "Aget_Sanction"]
+  skos:example: "Breach of SLA by exceeding response time limits."
+
+Aget_Fulfillment:
+  skos:prefLabel: "Aget_Fulfillment"
+  skos:altLabel: ["Fulfillment"]
+  skos:definition: "Aget_Consequence representing satisfaction of an agreement or commitment."
+  skos:broader: "Aget_Consequence"
+  skos:related: ["Aget_Agreement", "Aget_Commitment", "Aget_Reward"]
+  skos:example: "Fulfillment of the release commitment by shipping on schedule."
+```
+
+### Additional Intangible Classes
+
+```yaml
+Aget_Pattern:
+  skos:prefLabel: "Aget_Pattern"
+  skos:altLabel: ["Pattern"]
+  skos:definition: "Aget_Intangible representing a reusable solution to a recurring problem."
+  skos:broader: "Aget_Intangible"
+  aget:core_entity: true
+  skos:example: "The gate verification test pattern."
+
+Aget_Project:
+  skos:prefLabel: "Aget_Project"
+  skos:altLabel: ["Project", "Project_Entity"]
+  skos:definition: "Aget_Intangible representing a planned initiative with goals and timeline."
+  skos:broader: "Aget_Intangible"
+  aget:core_entity: true
+  skos:example: "The AGET Ontology Foundation project."
+
+Aget_Goal:
+  skos:prefLabel: "Aget_Goal"
+  skos:altLabel: ["Goal"]
+  skos:definition: "Aget_Intangible representing a desired future state an agent intends to achieve."
+  skos:broader: "Aget_Intangible"
+  aget:theoretical_basis: "BDI Architecture (D component - Desire/Goal)"
+  aget:core_entity: true
+  skos:example: "The goal to release v3.5.0 by end of quarter."
+```
+
+## DAG Relationship Summary
+
+Per L530 Finding 5, the following entities have multiple parents:
+
+| Entity | Primary Parent | Secondary Parent |
+|--------|----------------|------------------|
+| Aget_Person | Aget_Agent | Aget_Living_Organism |
+| Aget_AI_System | Aget_Agent | Aget_Technical_System |
+
+## Legacy Core Entity Definitions
+
+The following definitions maintain backward compatibility with L459. New implementations should use the Aget_* prefixed versions above.
 
 ### Person_Entity
 
@@ -1594,6 +2246,49 @@ AGET_SOP_SPEC:
 ---
 
 ## Changelog
+
+### v1.10.0 (2026-01-17)
+
+- Added VERSION_SCOPE Terms subsection to Release Terms (R-REL-020)
+- Added 8 vocabulary terms for release scope planning:
+  - Version_Scope: Planning artifact for release boundaries and success criteria
+  - Release_Phase: Discrete stage in release lifecycle
+  - Pre_Release_Phase, Release_Execution_Phase, Post_Release_Phase: Three-phase model
+  - MVP_Scope: Must-Ship items that block release
+  - Rollback_Plan: Contingency procedure for release reversion
+  - Release_Retrospective: Post-release lesson capture
+- See: PROJECT_PLAN_version_scope_standardization_v1.0
+
+### v1.9.0 (2026-01-16)
+
+- **MAJOR**: Added AGET Ontology Foundation (L530) to Part 6
+- Added Aget_Thing as universal root class with BFO:Entity grounding
+- Renamed top-level categories to use Aget_* prefix (Aget_Continuant, Aget_Occurrent, Aget_Intangible)
+- Renamed Abstract_Category to Aget_Intangible per L530 Finding 4 (readability)
+- Added Agent-centric Continuant hierarchy (16 classes):
+  - Aget_Agent, Aget_Person, Aget_AI_System, Aget_Instance, Aget_Organization, Aget_Team, Aget_Fleet
+  - Aget_System, Aget_Technical_System, Aget_Software_System, Aget_Biological_System, Aget_Living_Organism, Aget_Animal
+  - Aget_Artifact, Aget_Device, Aget_Tool
+  - Aget_CreatedWork, Aget_Document, Aget_Specification, Aget_Code
+- Added Occurrent hierarchy (6 classes):
+  - Aget_Action, Aget_Task, Aget_Event, Aget_Meeting, Aget_Block, Aget_Decision
+- Added Intangible branch (24 classes - L530 Findings 7-10):
+  - Epistemology: Aget_Belief, Aget_Assumption, Aget_Hypothesis, Aget_Conviction, Aget_Knowledge, Aget_Justification, Aget_Evidence, Aget_Testimony, Aget_Inference
+  - Deontic: Aget_Rule, Aget_Constraint, Aget_Norm, Aget_Obligation, Aget_Prohibition, Aget_Permission, Aget_Capability
+  - Commitments: Aget_Promise, Aget_Commitment, Aget_Agreement, Aget_Contract, Aget_Right, Aget_Power
+  - Consequences: Aget_Consequence, Aget_Sanction, Aget_Reward, Aget_Breach, Aget_Fulfillment
+  - Other: Aget_Pattern, Aget_Project, Aget_Goal
+- Added DAG relationship support (multi-parent inheritance)
+- Added new AGET extensions: aget:theoretical_basis, aget:dag_parents, aget:user_facing, aget:display_alias, aget:deontic_operator, aget:hohfeldian_correlative, aget:impact_dimensions
+- Maintained backward compatibility with Person_Entity, Organization_Entity, etc.
+- See: L530 (AGET Ontology Foundation Research), PROJECT_PLAN_aget_ontology_foundation_v1.0
+
+### v1.8.0 (2026-01-12)
+
+- Added Part 7: Standards Document Ontology (L502)
+- Added document type hierarchy (Normative, Informative, Process)
+- Added specification instances as first-class entities
+- See: PROJECT_PLAN_standards_ontology_elevation_v1.0
 
 ### v1.7.0 (2026-01-12)
 

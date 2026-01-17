@@ -23,7 +23,7 @@ Reference:
     - G-1.9: Directory Discoverability (governance/, planning/, sessions/ READMEs)
     - CAP-MIG-014: Legacy File Handling
     - CAP-MIG-015: Behavioral Validation Requirement
-    - SOP_instance_migration_v3.md
+    - SOP_aget_migrate.md
     - AGET_INSTANCE_SPEC v1.0.0
 
 Author: private-aget-framework-AGET

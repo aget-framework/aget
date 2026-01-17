@@ -1,52 +1,63 @@
 # AGET Specification Index
 
-**Version**: 1.3.0
+**Version**: 1.4.0
 **Status**: Active
-**Updated**: 2026-01-09
+**Updated**: 2026-01-12
 **Author**: private-aget-framework-AGET
 
-This document provides an index of all AGET framework specifications with their Spec IDs, status, and descriptions.
+This document provides an index of all AGET framework specifications with their Spec IDs, status, authority level, and descriptions.
 
 ---
 
 ## Spec ID Registry
 
-| Spec ID | Spec Name | Status | Description |
-|---------|-----------|--------|-------------|
-| AGET-CORE-001 | AGET_FRAMEWORK_SPEC | Released | Master framework specification |
-| AGET-5D-001 | AGET_5D_ARCHITECTURE_SPEC | Active | 5D Composition Architecture umbrella |
-| AGET-5D-002 | AGET_5D_COMPONENTS_SPEC | Active | Consolidated 5D component specs (PERSONA, MEMORY, REASONING, SKILLS, CONTEXT) |
-| AGET-VOC-001 | AGET_VOCABULARY_SPEC | Active | Consolidated vocabulary standards |
-| AGET-EKO-001 | AGET_EXECUTABLE_KNOWLEDGE_SPEC | Active | Executable Knowledge Ontology (three-axis taxonomy) |
-| AGET-GOV-001 | AGET_GOVERNANCE_HIERARCHY_SPEC | Active | Governance hierarchy and authority |
-| AGET-LIC-001 | AGET_LICENSE_SPEC | Active | License requirements (Apache 2.0) |
-| AGET-ORG-001 | AGET_ORGANIZATION_SPEC | Active | Organization homepage requirements |
-| AGET-SEC-001 | AGET_SECURITY_SPEC | Active | Content security and sanitization |
-| AGET-TPL-001 | AGET_TEMPLATE_SPEC | Active | Template requirements |
-| AGET-INST-001 | AGET_INSTANCE_SPEC | Active | Instance requirements |
-| AGET-MIG-001 | AGET_MIGRATION_SPEC | Active | Version migration procedures |
-| AGET-COMPAT-001 | AGET_COMPATIBILITY_SPEC | Active | Compatibility requirements |
-| AGET-SES-001 | AGET_SESSION_SPEC | Active | Session protocols (wake/wind-down) |
-| AGET-SCRIPT-001 | AGET_PYTHON_SCRIPT_SPEC | Active | Python script standards |
-| AGET-VAL-001 | AGET_VALIDATION_SPEC | Active | Validator requirements |
-| AGET-TEST-001 | AGET_TESTING_SPEC | Active | Testing requirements |
-| AGET-CI-001 | AGET_CI_SPEC | Active | CI/CD requirements |
-| AGET-PORT-001 | AGET_PORTABILITY_SPEC | Active | Portability requirements |
-| AGET-ERR-001 | AGET_ERROR_SPEC | Active | Error handling and exit codes |
-| AGET-CP-001 | AGET_CHANGE_PROPOSAL_SPEC | Active | Change proposal process |
-| AGET-SOP-001 | AGET_SOP_SPEC | Active | SOP requirements |
-| AGET-REL-001 | AGET_RELEASE_SPEC | Active | Release requirements |
-| AGET-LDOC-001 | AGET_LDOC_SPEC | Active | L-doc requirements |
-| AGET-EVOL-001 | AGET_EVOLUTION_SPEC | Active | Evolution directory requirements (L/D/DISC entry types) |
-| AGET-PP-001 | AGET_PROJECT_PLAN_SPEC | Active | PROJECT_PLAN requirements (CAP-PP-011) |
-| AGET-FMT-001 | AGET_SPEC_FORMAT | CANONICAL | Specification format v1.2 |
-| AGET-NAME-001 | AGET_FILE_NAMING_CONVENTIONS | CANONICAL | File naming conventions |
-| AGET-VER-001 | AGET_VERSIONING_CONVENTIONS | CANONICAL | Versioning conventions |
-| AGET-DOC-001 | AGET_DOCUMENTATION_SPEC | Active | Documentation requirements |
-| AGET-TOOL-001 | AGET_TOOL_SPEC | Active | Tool specifications |
-| AGET-COMP-001 | COMPOSITION_SPEC_v1.0 | Approved | Capability composition mechanism |
+| Spec ID | Spec Name | Status | Authority | Description |
+|---------|-----------|--------|-----------|-------------|
+| AGET-CORE-001 | AGET_FRAMEWORK_SPEC | Released | Active | Master framework specification |
+| AGET-5D-001 | AGET_5D_ARCHITECTURE_SPEC | Active | Active | 5D Composition Architecture umbrella |
+| AGET-5D-002 | AGET_5D_COMPONENTS_SPEC | Active | Active | Consolidated 5D component specs (PERSONA, MEMORY, REASONING, SKILLS, CONTEXT) |
+| AGET-VOC-001 | AGET_VOCABULARY_SPEC | Active | Active | Consolidated vocabulary standards |
+| AGET-EKO-001 | AGET_EXECUTABLE_KNOWLEDGE_SPEC | Active | Active | Executable Knowledge Ontology (three-axis taxonomy) |
+| AGET-GOV-001 | AGET_GOVERNANCE_HIERARCHY_SPEC | Active | Active | Governance hierarchy and authority |
+| AGET-LIC-001 | AGET_LICENSE_SPEC | Active | Active | License requirements (Apache 2.0) |
+| AGET-ORG-001 | AGET_ORGANIZATION_SPEC | Active | Active | Organization homepage requirements |
+| AGET-SEC-001 | AGET_SECURITY_SPEC | Active | Active | Content security and sanitization |
+| AGET-TPL-001 | AGET_TEMPLATE_SPEC | Active | Active | Template requirements |
+| AGET-INST-001 | AGET_INSTANCE_SPEC | Active | Active | Instance requirements |
+| AGET-MIG-001 | AGET_MIGRATION_SPEC | Active | Active | Version migration procedures |
+| AGET-COMPAT-001 | AGET_COMPATIBILITY_SPEC | Active | Active | Compatibility requirements |
+| AGET-SES-001 | AGET_SESSION_SPEC | Active | Active | Session protocols (wake/wind-down) |
+| AGET-SCRIPT-001 | AGET_PYTHON_SCRIPT_SPEC | Active | Active | Python script standards |
+| AGET-VAL-001 | AGET_VALIDATION_SPEC | Active | Active | Validator requirements |
+| AGET-TEST-001 | AGET_TESTING_SPEC | Active | Active | Testing requirements |
+| AGET-CI-001 | AGET_CI_SPEC | Active | Active | CI/CD requirements |
+| AGET-PORT-001 | AGET_PORTABILITY_SPEC | Active | Active | Portability requirements |
+| AGET-ERR-001 | AGET_ERROR_SPEC | Active | Active | Error handling and exit codes |
+| AGET-CP-001 | AGET_CHANGE_PROPOSAL_SPEC | Active | Active | Change proposal process |
+| AGET-SOP-001 | AGET_SOP_SPEC | Active | Active | SOP requirements |
+| AGET-REL-001 | AGET_RELEASE_SPEC | Active | Active | Release requirements |
+| AGET-LDOC-001 | AGET_LDOC_SPEC | Active | Active | L-doc requirements |
+| AGET-EVOL-001 | AGET_EVOLUTION_SPEC | Active | Active | Evolution directory requirements (L/D/DISC entry types) |
+| AGET-PP-001 | AGET_PROJECT_PLAN_SPEC | Active | Active | PROJECT_PLAN requirements (CAP-PP-011) |
+| AGET-FMT-001 | AGET_SPEC_FORMAT | Active | **CANONICAL** | Specification format v1.2 |
+| AGET-NAME-001 | AGET_FILE_NAMING_CONVENTIONS | Active | **CANONICAL** | File naming conventions |
+| AGET-VER-001 | AGET_VERSIONING_CONVENTIONS | Active | **CANONICAL** | Versioning conventions |
+| AGET-DOC-001 | AGET_DOCUMENTATION_SPEC | Active | Active | Documentation requirements |
+| AGET-TOOL-001 | AGET_TOOL_SPEC | Active | Active | Tool specifications |
+| AGET-COMP-001 | COMPOSITION_SPEC_v1.0 | Approved | Active | Capability composition mechanism |
 
 **Total: 32 specifications**
+
+### Authority Levels
+
+Per AGET_VOCABULARY_SPEC Part 7 (Standards Document Ontology):
+
+| Authority | Meaning | Mutation Allowed |
+|-----------|---------|------------------|
+| **CANONICAL** | Immutable reference standard | Major version only |
+| **Active** | Current normative | Minor/patch allowed |
+| **Draft** | Under development | Any change |
+| **Deprecated** | Superseded, read-only | None |
 
 ---
 
