@@ -1,11 +1,11 @@
 # AGET Release Specification
 
-**Version**: 1.2.0
+**Version**: 1.4.0
 **Status**: Active
 **Category**: Process (Release Management)
 **Format Version**: 1.2
 **Created**: 2026-01-04
-**Updated**: 2026-01-12
+**Updated**: 2026-01-17
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_RELEASE_SPEC.md`
 **Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.2
@@ -86,6 +86,14 @@ vocabulary:
       skos:definition: "Narrative release documentation beyond CHANGELOG bullets"
       aget:location: "release-notes/v{VERSION}.md"
 
+  timing:
+    Release_Window:
+      skos:definition: "Designated time periods for public release activities"
+      skos:scopeNote: "Preferred windows minimize disruption during peak work days"
+      aget:preferred_windows: ["Thursday AM", "Friday PM"]
+      aget:avoid_windows: ["Monday", "Tuesday", "Wednesday", "Thursday PM", "Friday AM"]
+      skos:related: ["CAP-REL-011"]
+
   anti_patterns:
     Version_Drift:
       skos:definition: "Managing agent version behind managed repos"
@@ -96,6 +104,35 @@ vocabulary:
       skos:definition: "Marking release complete without V-test verification"
       aget:anti_pattern: true
       skos:related: ["L440"]
+
+    Off_Window_Release:
+      skos:definition: "Releasing outside designated release windows"
+      aget:anti_pattern: true
+      skos:related: ["CAP-REL-011"]
+
+  scope:
+    Version_Scope:
+      skos:definition: "Planning artifact defining boundaries, objectives, work items, timeline, and success criteria for a release"
+      aget:location: "planning/VERSION_SCOPE_vX.Y.Z.md"
+      aget:template: "planning/TEMPLATE_VERSION_SCOPE.md"
+      skos:related: ["R-REL-020", "CAP-REL-012"]
+
+    MVP_Scope:
+      skos:definition: "Must-Ship items that BLOCK release if incomplete"
+      skos:broader: "Version_Scope"
+      skos:related: ["Release_Blocker"]
+
+    Release_Phase:
+      skos:definition: "Discrete stage in release lifecycle"
+      skos:narrower: ["Pre_Release_Phase", "Release_Execution_Phase", "Post_Release_Phase"]
+
+    Release_Retrospective:
+      skos:definition: "Structured review after release to capture lessons learned"
+      skos:related: ["Post_Release_Phase", "L_Doc"]
+
+    Rollback_Plan:
+      skos:definition: "Contingency procedure for reverting release on critical issues"
+      skos:related: ["CAP-REL-015"]
 ```
 
 ---
@@ -321,6 +358,139 @@ python3 aget/validation/validate_version_inventory.py --all-files
 
 **Prevents**: SOP_Theater anti-pattern (procedural steps without verification).
 
+### CAP-REL-011: Release Window Timing
+
+**SHOULD** requirements for release timing:
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| CAP-REL-011-01 | conditional | IF releasing to public repos THEN the SYSTEM should verify Release_Window | Disruption minimization |
+| CAP-REL-011-02 | conditional | IF Off_Window_Release THEN the SYSTEM should warn and require acknowledgment | Intentional override |
+| CAP-REL-011-03 | ubiquitous | The SYSTEM should log release timing for retrospective analysis | Pattern tracking |
+
+**Preferred Release Windows:**
+
+| Window | Days | Times | Rationale |
+|--------|------|-------|-----------|
+| **Preferred** | Thursday | AM (before 12:00) | Mid-week buffer, weekend discovery |
+| **Preferred** | Friday | PM (after 12:00) | Week completion, weekend discovery |
+| **Avoid** | Mon-Wed | All day | Peak collaboration days |
+| **Avoid** | Thursday | PM | Insufficient response time |
+| **Avoid** | Friday | AM | Rushed fixes before weekend |
+
+**V-Test for Release Window:**
+
+```bash
+# Check current day/time is in preferred window
+day=$(date +%A)
+hour=$(date +%H)
+if [[ "$day" == "Thursday" && $hour -lt 12 ]] || [[ "$day" == "Friday" && $hour -ge 12 ]]; then
+  echo "PASS: In preferred release window ($day $(date +%H:%M))"
+else
+  echo "WARN: Outside preferred release window ($day $(date +%H:%M)) - acknowledge to proceed"
+fi
+```
+
+**Prevents**: Off_Window_Release anti-pattern (releasing during peak disruption periods).
+
+**Note**: This is a SHOULD requirement (advisory). Emergency releases may override with acknowledgment.
+
+### CAP-REL-012: VERSION_SCOPE Requirement (R-REL-020)
+
+**SHALL** requirements for VERSION_SCOPE documentation:
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| R-REL-020-01 | conditional | BEFORE releasing minor/major version, THE release manager SHALL create VERSION_SCOPE document | Explicit scope definition |
+| R-REL-020-02 | ubiquitous | VERSION_SCOPE SHALL define MVP (Must Ship) items | Release readiness criteria |
+| R-REL-020-03 | ubiquitous | VERSION_SCOPE SHALL define Full Scope (Nice to Have) items | Scope completeness |
+| R-REL-020-04 | ubiquitous | VERSION_SCOPE SHALL define Out of Scope items with rationale | Boundary clarity |
+| R-REL-020-05 | ubiquitous | VERSION_SCOPE SHALL include measurable success criteria | Release quality measurement |
+
+**When Required:**
+
+| Release Type | VERSION_SCOPE | Rationale |
+|--------------|:-------------:|-----------|
+| Major (vX.0.0) | **REQUIRED** | Breaking changes need explicit scope |
+| Minor (vX.Y.0) | **REQUIRED** | New features need explicit scope |
+| Patch (vX.Y.Z) | OPTIONAL | Bug fixes can reference parent version |
+
+**Template**: `planning/TEMPLATE_VERSION_SCOPE.md`
+
+**Location**: `planning/VERSION_SCOPE_vX.Y.Z.md`
+
+### CAP-REL-013: VERSION_SCOPE Content Requirements
+
+**SHALL** requirements for VERSION_SCOPE content:
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| R-REL-021-01 | ubiquitous | VERSION_SCOPE SHALL include Release Objectives with success metrics | Goal clarity |
+| R-REL-021-02 | ubiquitous | VERSION_SCOPE SHALL include three-phase release checklist | Process completeness |
+| R-REL-021-03 | ubiquitous | VERSION_SCOPE SHALL include Timeline with phase dates | Planning visibility |
+| R-REL-021-04 | ubiquitous | VERSION_SCOPE SHALL include Decision Log | Decision traceability |
+
+### CAP-REL-014: VERSION_SCOPE Status Lifecycle
+
+**SHALL** requirements for VERSION_SCOPE status:
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| R-REL-022-01 | ubiquitous | VERSION_SCOPE status SHALL be one of: PLANNING, READY FOR RELEASE, RELEASED, CANCELLED | Status clarity |
+| R-REL-022-02 | conditional | IF status is PLANNING THEN release SHALL NOT proceed | Gate enforcement |
+| R-REL-022-03 | conditional | IF release cancelled THEN VERSION_SCOPE SHALL include cancellation rationale | Decision audit |
+
+**Status Transitions:**
+
+```
+PLANNING → READY FOR RELEASE → RELEASED
+    ↓
+CANCELLED (with rationale)
+```
+
+### CAP-REL-015: Rollback Plan for Major Releases
+
+**SHOULD** requirements for rollback planning:
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| R-REL-023-01 | conditional | FOR major releases, VERSION_SCOPE SHOULD include Rollback Plan | Risk mitigation |
+| R-REL-023-02 | conditional | IF Rollback Plan included THEN it SHALL specify triggers, procedure, and owner | Completeness |
+
+### CAP-REL-016: Post-Release Retrospective
+
+**SHOULD** requirements for retrospectives:
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| R-REL-024-01 | conditional | AFTER release completion, release manager SHOULD complete Retrospective section | Learning capture |
+| R-REL-024-02 | conditional | IF retrospective completed THEN it SHOULD be within 7 days of release | Context freshness |
+
+### CAP-REL-017: VERSION_SCOPE Template Compliance
+
+**SHALL** requirements for template usage:
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| R-REL-025-01 | ubiquitous | VERSION_SCOPE documents SHALL use TEMPLATE_VERSION_SCOPE.md as starting point | Consistency |
+| R-REL-025-02 | ubiquitous | VERSION_SCOPE structure SHALL match template sections | Standardization |
+
+### CAP-REL-018: Historical VERSION_SCOPE Reconstruction
+
+**MAY** requirements for historical documentation:
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| R-REL-026-01 | optional | FOR releases without VERSION_SCOPE, release manager MAY create reconstructed documents | Historical completeness |
+| R-REL-026-02 | conditional | IF reconstructed THEN document SHALL include [RECONSTRUCTED] marker in header | Provenance clarity |
+
+**V-Test for VERSION_SCOPE Existence:**
+
+```bash
+VERSION="X.Y.Z"
+[ -f "planning/VERSION_SCOPE_v${VERSION}.md" ] && echo "PASS" || echo "FAIL"
+```
+
 ---
 
 ## Release Gate Structure
@@ -409,6 +579,18 @@ release not found  ← Release missing!
 ---
 
 ## Changelog
+
+### v1.4.0 (2026-01-17)
+
+- Added CAP-REL-012: VERSION_SCOPE Requirement (R-REL-020)
+- Added CAP-REL-013: VERSION_SCOPE Content Requirements
+- Added CAP-REL-014: VERSION_SCOPE Status Lifecycle
+- Added CAP-REL-015: Rollback Plan for Major Releases
+- Added CAP-REL-016: Post-Release Retrospective
+- Added CAP-REL-017: VERSION_SCOPE Template Compliance
+- Added CAP-REL-018: Historical VERSION_SCOPE Reconstruction
+- Added vocabulary terms: Version_Scope, MVP_Scope, Release_Phase, Release_Retrospective, Rollback_Plan
+- See: PROJECT_PLAN_version_scope_standardization_v1.0
 
 ### v1.2.0 (2026-01-12)
 

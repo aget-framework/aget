@@ -1,10 +1,10 @@
 # SOP: Release Process
 
-**Version**: 1.2.0
+**Version**: 1.3.0
 **Created**: 2026-01-04
-**Updated**: 2026-01-11
+**Updated**: 2026-01-13
 **Owner**: aget-framework
-**Implements**: AGET_RELEASE_SPEC, CAP-REL-001 through CAP-REL-010, CAP-SOP-001, R-REL-006, CAP-MIG-017
+**Implements**: AGET_RELEASE_SPEC, CAP-REL-001 through CAP-REL-011, CAP-SOP-001, R-REL-006, CAP-MIG-017
 
 ---
 
@@ -25,7 +25,22 @@ This SOP covers releases for:
 
 ## Phase 0: Pre-Release Verification (L440)
 
-**Critical**: Verify manager and version state before starting release.
+**Critical**: Verify manager, version state, and release timing before starting release.
+
+### V0.0: Check release window timing (CAP-REL-011)
+```bash
+day=$(date +%A)
+hour=$(date +%H)
+if [[ "$day" == "Thursday" && $hour -lt 12 ]] || [[ "$day" == "Friday" && $hour -ge 12 ]]; then
+  echo "PASS: In preferred release window ($day $(date +%H:%M))"
+else
+  echo "WARN: Outside preferred release window ($day $(date +%H:%M))"
+  echo "Preferred: Thursday AM or Friday PM"
+  echo "To proceed: Acknowledge off-window release with reason"
+fi
+```
+**Expected**: PASS (in preferred window) or acknowledged WARN
+**Advisory**: Off-window releases require acknowledgment, not blocked
 
 ### V0.1: Check manager version
 ```bash

@@ -249,7 +249,7 @@ The SYSTEM shall enforce SOP naming conventions.
 
 ```
 SOP_release_process.md         ✅ Standard SOP
-SOP_instance_migration_v3.md   ✅ Versioned SOP
+SOP_aget_migrate.md   ✅ Versioned SOP
 CONTRIBUTION_GUIDE.md          ✅ Guide document
 RELEASE_VERIFICATION_CHECKLIST.md  ✅ Checklist
 sops/README.md                 ✅ Index file
@@ -413,7 +413,7 @@ graduation:
   source_patterns:
     - "SOP_release_process.md"
     - "SOP_session_handoff.md"
-    - "SOP_instance_migration_v3.md"
+    - "SOP_aget_migrate.md"
   source_learnings:
     - "L377"
     - "L436"

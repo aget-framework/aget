@@ -11,6 +11,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Standards Document Ontology** (L502, PROJECT_PLAN_standards_ontology_elevation_v1.0):
+  - AGET_VOCABULARY_SPEC Part 7: Document type hierarchy, authority model, traceability properties
+  - 6 exemplar specification entries with `aget:defines` traceability
+  - `check_ontology_coherence.sh`: Lightweight vocabulary coherence checker
+  - `SOP_specification_consolidation.md`: Consolidation process
+  - `SOP_artifact_deprecation.md`: Deprecation process with authority lifecycle
+  - INDEX.md Authority column (CANONICAL, Active, Draft, Deprecated)
+
+- **Release Window Timing** (CAP-REL-011):
+  - AGET_RELEASE_SPEC v1.3.0: Release_Window vocabulary, CAP-REL-011 requirements
+  - SOP_release_process.md v1.3.0: V0.0 timing check in Phase 0
+  - Preferred windows: Thursday AM, Friday PM
+  - Advisory (SHOULD) requirement with acknowledgment for off-window releases
+
 ### Changed
 
 - **PROJECT_PLAN Template v2.0** (L515, #233, #247):
@@ -46,7 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - VOCABULARY_SPEC Part 5: EKO terms
 
 - **Ontology-Driven Agent Creation** (L481, L482):
-  - `SOP_agent_instance_creation.md`: SKOS+EARS-grounded creation process
+  - `SOP_aget_create.md`: SKOS+EARS-grounded creation process
   - `scripts/generate_template_ontology.py`: Template vocabulary generator
   - `validation/validate_ontology_compliance.py`: SKOS compliance validator
   - 12 template vocabularies: All templates now have specs/*_VOCABULARY.md
