@@ -253,6 +253,37 @@ for use_case in homepage_use_cases:
 
 ---
 
+## Gate Integration (L557)
+
+**Enforcement Level**: BLOCKING
+
+**V-Test Requirements** (L555 substance-aware):
+
+| V-Test ID | Requirement | BLOCKING | Substance Check |
+|-----------|-------------|:--------:|-----------------|
+| V-R-HOM-001-01 | Evidence-based claims | YES | All proof links return HTTP 200 |
+| V-R-HOM-001-02 | Audience targeting | YES | No "enterprise" in primary messaging |
+| V-R-HOM-001-03 | Aspirational marking | YES | Validated claims in "Coming Soon" section |
+| V-R-HOM-001-04 | Pain-point framing | YES | Use cases lead with pain, not industry |
+| V-R-HOM-001-05 | Proof links | YES | All links resolve to AGET artifacts |
+| V-R-HOM-001-07 | Credibility indicators | YES | Labels present for each use case |
+
+**Release Gate**: Gate 0 (pre-execution)
+
+**Integration** (add to SOP_release_process.md):
+```markdown
+### Homepage Messaging Check (R-HOM-001)
+- [ ] Run: `python3 .aget/patterns/validation/validate_homepage_messaging.py`
+- [ ] All claims verified: BLOCKING
+- [ ] All proof links valid: BLOCKING
+```
+
+**Validator Location**: `.aget/patterns/validation/validate_homepage_messaging.py`
+
+**Traceability**: L555 (Scaffold vs Substance), L557 (Spec-to-Enforcement)
+
+---
+
 ## Evolution History
 
 | Version | Date | Changes |

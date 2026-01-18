@@ -1,10 +1,10 @@
 # SOP: Release Process
 
-**Version**: 1.3.0
+**Version**: 1.4.0
 **Created**: 2026-01-04
-**Updated**: 2026-01-13
+**Updated**: 2026-01-18
 **Owner**: aget-framework
-**Implements**: AGET_RELEASE_SPEC, CAP-REL-001 through CAP-REL-011, CAP-SOP-001, R-REL-006, CAP-MIG-017
+**Implements**: AGET_RELEASE_SPEC, CAP-REL-001 through CAP-REL-011, CAP-SOP-001, R-REL-006, CAP-MIG-017, L555-L559, R-SYNC-001
 
 ---
 
@@ -59,6 +59,32 @@ git status -sb
 python3 validation/validate_version_consistency.py /path/to/repo
 ```
 **Expected**: PASS (all versions match)
+
+### V0.4: Spec Coverage Check (L557, L559)
+
+**Critical**: Verify specs exist and have V-tests before release.
+
+```bash
+# Check that release-critical areas have specs
+python3 .aget/patterns/validation/validate_spec_coverage.py
+```
+
+**Three-Part Check** (per L557):
+- [ ] Specs EXIST for all release-critical areas (L559)
+- [ ] Each spec has a V-test that checks substance, not scaffold (L555)
+- [ ] V-tests run as BLOCKING gates
+
+**Expected**: PASS (all specs covered with V-tests)
+**Blocking**: If any release-critical area lacks spec or V-test, STOP and create before proceeding.
+
+### V0.5: Template Sync Check (R-SYNC-001)
+
+```bash
+# Check private templates are synced to public
+python3 .aget/patterns/validation/validate_template_sync.py
+```
+**Expected**: PASS (all templates synced)
+**Blocking**: Missing templates block release
 
 ---
 

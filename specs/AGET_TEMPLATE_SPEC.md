@@ -723,12 +723,23 @@ The SYSTEM shall support operating procedure documentation in all templates.
 
 | ID | Pattern | Statement |
 |----|---------|-----------|
-| R-TEMPLATE-001-01 | ubiquitous | The SYSTEM SHOULD include sops/ directory in all templates |
-| R-TEMPLATE-001-02 | ubiquitous | The sops/ directory SHALL contain agent-specific operating procedures |
-| R-TEMPLATE-001-03 | optional | WHERE sops/ is included, the SYSTEM SHOULD include at least one SOP file |
+| R-TEMPLATE-001-01 | ubiquitous | The SYSTEM SHALL include sops/ directory in all templates |
+| R-TEMPLATE-001-02 | ubiquitous | The sops/ directory SHALL contain at least one SOP_*.md file (L555: substance check) |
+| R-TEMPLATE-001-03 | ubiquitous | WHERE sops/ is included, the SYSTEM SHALL include at least one SOP file |
 | R-TEMPLATE-001-04 | ubiquitous | SOPs SHALL follow naming convention SOP_{name}.md |
 
 **Enforcement**: `validate_template_structure.py`
+
+**V-Test** (L555 substance-aware):
+```bash
+# R-TEMPLATE-001-02: Substance check (not just scaffold)
+sop_count=$(find sops/ -name "SOP_*.md" 2>/dev/null | wc -l)
+if [ "$sop_count" -lt 1 ]; then
+  echo "FAIL: sops/ exists but contains no SOP_*.md files"
+  exit 1
+fi
+echo "PASS: sops/ contains $sop_count SOP file(s)"
+```
 
 **Rationale**: Issue #59 identified that templates lack sops/ scaffold, requiring agents to create it manually. All agent archetypes benefit from capturing operational procedures, not just Supervisors. Adding sops/ to the core directory set ensures consistent SOP governance across the fleet.
 

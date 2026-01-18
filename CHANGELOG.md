@@ -51,7 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `CITATION.cff`: Citation file format for academic reference
 
 - **Template Infrastructure**:
-  - `sops/` directory scaffold in all 12 templates (R-TEMPLATE-001)
+  - `sops/` directory with SOP_escalation.md in all 12 templates (R-TEMPLATE-001)
 
 - **Standards Document Ontology** (L502, PROJECT_PLAN_standards_ontology_elevation_v1.0):
   - AGET_VOCABULARY_SPEC Part 7: Document type hierarchy, authority model, traceability properties
@@ -111,14 +111,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 | Specs updated | 4 |
 | New SOPs | 4 |
 | New templates | 3 |
-| Templates with sops/ scaffold | 12/12 |
+| Templates with sops/ + SOP files | 12/12 |
 | Session tests passing | 38 |
 
 ### Migration Guide
 
 **For Existing Agents**:
 1. Update version files: Bump `.aget/version.json` to 3.4.0
-2. Create sops/ directory: If not present, create `sops/README.md`
+2. Create sops/ directory: If not present, create `sops/` and add at least one SOP file (e.g., `SOP_escalation.md`)
 3. Review session scripts: Verify wake_up.py and wind_down.py compatibility
 
 **Breaking Changes**: None. v3.4.0 is backward compatible with v3.3.x agents.
