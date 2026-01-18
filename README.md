@@ -74,7 +74,7 @@ to relationship (governed) and capability (autonomous work within bounds).
 |----------|---------|
 | [template-worker-aget](https://github.com/aget-framework/template-worker-aget) | Foundation template |
 | [template-advisor-aget](https://github.com/aget-framework/template-advisor-aget) | Advisory with personas |
-| [template-supervisor-aget](https://github.com/aget-framework/template-supervisor-aget) | Fleet coordination |
+| template-supervisor-aget *(private)* | Fleet coordination |
 | [template-consultant-aget](https://github.com/aget-framework/template-consultant-aget) | Consulting engagements |
 | [template-developer-aget](https://github.com/aget-framework/template-developer-aget) | Development workflows |
 | [template-spec-engineer-aget](https://github.com/aget-framework/template-spec-engineer-aget) | Specification authoring |
