@@ -1,0 +1,66 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "@type": "SoftwareSourceCode",
+  "name": "AGET Framework",
+  "description": "Configuration & lifecycle management for governed agentic work",
+  "identifier": "aget-framework",
+  "license": "https://spdx.org/licenses/Apache-2.0",
+  "codeRepository": "https://github.com/aget-framework/aget",
+  "issueTracker": "https://github.com/aget-framework/aget/issues",
+  "version": "3.4.0",
+  "dateCreated": "2025-11-21",
+  "dateModified": "2026-01-16",
+  "programmingLanguage": [
+    "Python",
+    "YAML",
+    "Markdown"
+  ],
+  "operatingSystem": [
+    "macOS",
+    "Linux",
+    "Windows"
+  ],
+  "keywords": [
+    "agentic-ai",
+    "cli-agents",
+    "human-ai-collaboration",
+    "agent-governance",
+    "session-management",
+    "knowledge-management",
+    "multi-agent-systems",
+    "claude-code",
+    "cursor",
+    "aider"
+  ],
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "Gabor",
+      "familyName": "Melli",
+      "email": "gabor@melli.com"
+    }
+  ],
+  "maintainer": [
+    {
+      "@type": "Person",
+      "givenName": "Gabor",
+      "familyName": "Melli"
+    }
+  ],
+  "developmentStatus": "active",
+  "readme": "https://github.com/aget-framework/aget/blob/main/README.md",
+  "softwareRequirements": [
+    "Python 3.9+",
+    "PyYAML"
+  ],
+  "applicationCategory": "Developer Tools",
+  "applicationSubCategory": "AI Agent Governance",
+  "isAccessibleForFree": true,
+  "releaseNotes": "https://github.com/aget-framework/aget/releases",
+  "contIntegration": "https://github.com/aget-framework/aget/actions",
+  "relatedLink": [
+    "https://github.com/aget-framework/template-worker-aget",
+    "https://github.com/aget-framework/template-supervisor-aget",
+    "https://github.com/aget-framework/template-advisor-aget"
+  ]
+}

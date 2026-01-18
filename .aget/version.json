@@ -1,7 +1,7 @@
 {
-  "aget_version": "3.3.0",
+  "aget_version": "3.4.0",
   "created": "2025-09-21",
-  "updated": "2026-01-11",
+  "updated": "2026-01-18",
   "component": "core",
   "description": "AGET Framework Core - Specifications, templates, and validation",
   "repository": "aget-framework/aget",
@@ -19,7 +19,8 @@
     "v3.1.0: 2026-01-04 (Session Protocol Enhancements + Workflow Automation)",
     "v3.2.0: 2026-01-04 (Specification Architecture - 7 new specs, naming expansion, validators)",
     "v3.2.1: 2026-01-04 (Patch: Version inventory coherence - L444 remediation)",
-    "v3.3.0: 2026-01-10 (Shell Integration + Executable Knowledge Ontology)"
+    "v3.3.0: 2026-01-10 (Shell Integration + Executable Knowledge Ontology)",
+    "v3.3.0 -> v3.4.0: 2026-01-18"
   ],
   "contents": {
     "specs/": "Canonical specifications (AGET_VERSIONING_CONVENTIONS, etc.)",

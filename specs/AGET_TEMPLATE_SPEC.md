@@ -1,11 +1,11 @@
 # AGET TEMPLATE Specification
 
-**Version**: 3.3.1
+**Version**: 3.3.2
 **Status**: Active
 **Category**: Standards (Template Architecture)
 **Format Version**: 1.2
 **Created**: 2025-12-27
-**Updated**: 2026-01-11
+**Updated**: 2026-01-18
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_TEMPLATE_SPEC.md`
 **Change Proposal**: CP-017, CP-018
@@ -714,6 +714,46 @@ gh repo list aget-framework --json name,hasIssuesEnabled --jq \
 ```
 
 **Reference**: L520 (Issue Governance Gap), AGET_ISSUE_GOVERNANCE_SPEC (R-ISSUE-007)
+
+---
+
+### R-TEMPLATE-001: SOP Directory Scaffold (Issue #59)
+
+The SYSTEM shall support operating procedure documentation in all templates.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| R-TEMPLATE-001-01 | ubiquitous | The SYSTEM SHOULD include sops/ directory in all templates |
+| R-TEMPLATE-001-02 | ubiquitous | The sops/ directory SHALL contain agent-specific operating procedures |
+| R-TEMPLATE-001-03 | optional | WHERE sops/ is included, the SYSTEM SHOULD include at least one SOP file |
+| R-TEMPLATE-001-04 | ubiquitous | SOPs SHALL follow naming convention SOP_{name}.md |
+
+**Enforcement**: `validate_template_structure.py`
+
+**Rationale**: Issue #59 identified that templates lack sops/ scaffold, requiring agents to create it manually. All agent archetypes benefit from capturing operational procedures, not just Supervisors. Adding sops/ to the core directory set ensures consistent SOP governance across the fleet.
+
+**Minimum SOP Set:**
+
+| SOP | Purpose | All Templates? |
+|-----|---------|----------------|
+| SOP_wind_down.md | Session finalization procedures | Optional |
+| SOP_escalation.md | When and how to escalate | Recommended |
+| SOP_release_process.md | Release procedures | Framework-owning |
+
+**Directory Layout Update:**
+
+```
+template-{type}-aget/
+├── ...
+├── sops/                       # VISIBLE: Operating procedures (NEW - Issue #59)
+│   ├── SOP_*.md               # Agent-specific SOPs
+│   └── templates/             # SOP templates (optional)
+├── sessions/
+├── planning/
+└── ...
+```
+
+**Origin**: Issue #59 (Missing sops/ scaffold in templates)
 
 ---
 

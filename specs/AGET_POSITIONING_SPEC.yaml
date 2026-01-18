@@ -1,0 +1,368 @@
+# AGET_POSITIONING_SPEC.yaml
+# Strategic positioning specification for AGET Framework
+# Version: 1.0.0
+# Status: Canonical
+# Created: 2026-01-16
+# Related: L545 (Strategic Positioning Evolution), AGET_IDENTITY_SPEC
+
+spec:
+  name: AGET_POSITIONING_SPEC
+  version: "1.0.0"
+  status: canonical
+  created: "2026-01-16"
+  updated: "2026-01-16"
+  author: private-aget-framework-AGET
+  related_specs:
+    - AGET_IDENTITY_SPEC
+    - AGET_VOCABULARY_SPEC
+  related_learnings:
+    - L545  # Strategic Positioning Evolution
+    - L143  # Framework Landscape Positioning
+    - L530  # Ontology Foundation Research
+
+# =============================================================================
+# POSITIONING
+# =============================================================================
+
+positioning:
+  # What layer AGET occupies in the stack
+  layer: "Governance substrate"
+  layer_description: |
+    AGET sits above CLI agent platforms (Claude Code, Cursor, Aider) as a
+    governance layer. CLI agents are the runtime; AGET is the governance
+    substrate that enables consistent behavior across platforms.
+
+  # -----------------------------------------------------------------------------
+  # Relationship to Platforms
+  # -----------------------------------------------------------------------------
+  relationship_to_platforms:
+    description: "AGET sits above CLI agent platforms, not beside them"
+
+    # Diagram representation
+    architecture_diagram: |
+      ┌─────────────────────────────────────────────────────────┐
+      │                    AGET Framework                        │
+      │   Governance · Memory · Session · Fleet · Ontology      │
+      ├─────────────────────────────────────────────────────────┤
+      │  Claude Code  │  Cursor  │  Aider  │  Windsurf  │  ???  │
+      │    (CLI)      │  (IDE)   │  (CLI)  │   (IDE)    │       │
+      └─────────────────────────────────────────────────────────┘
+
+    platforms:
+      - name: "Claude Code"
+        type: "CLI"
+        vendor: "Anthropic"
+        relationship: "runtime"
+        integration_mechanism: "CLAUDE.md, .claude/"
+        integration_status: "primary"
+        notes: "Primary development platform, most mature integration"
+
+      - name: "Cursor"
+        type: "IDE"
+        vendor: "Cursor Inc"
+        relationship: "runtime"
+        integration_mechanism: ".cursor/rules, .cursorrules"
+        integration_status: "supported"
+        notes: "IDE-based, rules file integration"
+
+      - name: "Aider"
+        type: "CLI"
+        vendor: "Open Source"
+        relationship: "runtime"
+        integration_mechanism: ".aider.conf.yml, CONVENTIONS.md"
+        integration_status: "supported"
+        notes: "Git-focused, convention file integration"
+
+      - name: "Windsurf"
+        type: "IDE"
+        vendor: "Codeium"
+        relationship: "runtime"
+        integration_mechanism: "TBD"
+        integration_status: "planned"
+        notes: "Emerging platform, integration in development"
+
+      - name: "Codex CLI"
+        type: "CLI"
+        vendor: "OpenAI"
+        relationship: "runtime"
+        integration_mechanism: "AGENTS.md, .codex/"
+        integration_status: "experimental"
+        notes: "Wrapper script pattern for session protocols"
+
+      - name: "Gemini CLI"
+        type: "CLI"
+        vendor: "Google"
+        relationship: "runtime"
+        integration_mechanism: "Hooks (experimental)"
+        integration_status: "experimental"
+        notes: "Preview support, hooks system emerging"
+
+  # -----------------------------------------------------------------------------
+  # Strategic Thesis
+  # -----------------------------------------------------------------------------
+  strategic_thesis:
+    statement: |
+      CLI agent platforms will evolve governance capabilities independently.
+      AGET invests in platform-agnostic patterns that will become universal
+      before the platforms converge on them.
+
+    investment_rationale:
+      - principle: "Too important not to invest"
+        explanation: "Agent governance is critical infrastructure for AI-assisted work"
+
+      - principle: "Wrong to bet on single platform"
+        explanation: "Platform landscape is fragmented and evolving rapidly"
+
+      - principle: "Right to invest in governance patterns"
+        explanation: "Patterns are portable; platform-specific features are not"
+
+    # What platforms will eventually build (and AGET has now)
+    platform_convergence_predictions:
+      - capability: "Session protocols"
+        aget_implementation: "wake up, wind down, study up, step back"
+        platform_equivalent: "Hooks, startup scripts, shutdown handlers"
+
+      - capability: "Memory/context management"
+        aget_implementation: "KB as collaboration substrate"
+        platform_equivalent: ".claude/, .cursor/rules, memory.md"
+
+      - capability: "Permission governance"
+        aget_implementation: "Decision authority matrix, escalation"
+        platform_equivalent: "MCP servers, permission prompts"
+
+      - capability: "Multi-agent coordination"
+        aget_implementation: "Fleet patterns, supervisor hierarchy"
+        platform_equivalent: "Crews (CrewAI), agents (AutoGen)"
+
+    # Correct and incorrect analogies for strategic positioning
+    analogies:
+      correct:
+        - pattern: "TCP/IP over specific networks"
+          explanation: "Protocol layer that works across implementations"
+
+        - pattern: "Kubernetes over cloud vendors"
+          explanation: "Orchestration layer that abstracts provider differences"
+
+        - pattern: "Web standards over browsers"
+          explanation: "Specifications that enable interoperability"
+
+        - pattern: "SQL over database vendors"
+          explanation: "Query language that works across implementations"
+
+      incorrect:
+        - pattern: "Windows vs Mac platform bet"
+          explanation: "AGET is not betting on one runtime to win"
+
+        - pattern: "AWS vs Azure vendor lock-in"
+          explanation: "AGET explicitly avoids platform-specific dependencies"
+
+        - pattern: "Facebook vs Twitter social bet"
+          explanation: "AGET is infrastructure, not application"
+
+  # -----------------------------------------------------------------------------
+  # Evolution Trajectory
+  # -----------------------------------------------------------------------------
+  evolution_trajectory:
+    description: "How agent terminology and scope has evolved"
+
+    stages:
+      - era: "2024"
+        term: "Coding Agent"
+        scope: "Domain-specific (code tasks)"
+        limitation: "Excludes non-code work"
+        examples:
+          - "GitHub Copilot"
+          - "Tabnine"
+          - "Early Cursor"
+
+      - era: "2025"
+        term: "CLI Agent"
+        scope: "Interface-specific (terminal-based)"
+        limitation: "Still implies developer focus"
+        examples:
+          - "Claude Code"
+          - "Aider"
+          - "Codex CLI"
+
+      - era: "2026"
+        term: "Governed Agent"
+        scope: "Governance-centric (human-supervised autonomy)"
+        limitation: "None identified yet"
+        examples:
+          - "AGET-managed agents"
+          - "Enterprise agentic automation"
+          - "Digital coworkers"
+
+    key_insight: |
+      The progression abstracts away from domain (coding) and interface (CLI)
+      to relationship (governed) and capability (autonomous work within bounds).
+
+  # -----------------------------------------------------------------------------
+  # Differentiators
+  # -----------------------------------------------------------------------------
+  differentiators:
+    - id: D1
+      name: "Platform Portability"
+      description: "Three-tier degradation ensures functionality across environments"
+      mechanism: "gh → git → filesystem fallback chain"
+      benefit: "No vendor lock-in, works in restricted environments"
+
+    - id: D2
+      name: "Memory Architecture"
+      description: "KB as shared collaboration substrate"
+      mechanism: "Structured directories, session handoffs, transactive memory"
+      benefit: "Context survives sessions; human and AI share understanding"
+
+    - id: D3
+      name: "Gate Discipline"
+      description: "Explicit decision points with human approval"
+      mechanism: "PROJECT_PLANs with gates, stop-and-wait protocol"
+      benefit: "Prevents runaway autonomy, ensures human oversight"
+
+    - id: D4
+      name: "Fleet Patterns"
+      description: "Multi-agent coordination with clear authority"
+      mechanism: "Supervisor hierarchy, portfolio governance, escalation paths"
+      benefit: "Scales from single agent to enterprise fleet"
+
+    - id: D5
+      name: "Evidence-First Design"
+      description: "Audit before architecture, validate before shipping"
+      mechanism: "L289 protocol, fleet audits, POC validation"
+      benefit: "Designs match reality, not theory"
+
+    - id: D6
+      name: "Theoretical Grounding"
+      description: "Concepts mapped to established theory"
+      mechanism: "BDI, Extended Mind, Transactive Memory foundations"
+      benefit: "Framework has intellectual coherence, not ad-hoc patterns"
+
+  # -----------------------------------------------------------------------------
+  # Value Proposition
+  # -----------------------------------------------------------------------------
+  value_proposition:
+    for_individual_developers:
+      - "Session continuity across coding sessions"
+      - "Portable patterns that work with any CLI agent"
+      - "Structured memory that survives context window limits"
+
+    for_teams:
+      - "Consistent agent behavior across team members"
+      - "Shared knowledge base for collective intelligence"
+      - "Governance patterns for responsible AI use"
+
+    for_enterprises:
+      - "Fleet management for multiple agents"
+      - "Audit trails and decision documentation"
+      - "Platform-agnostic investment protection"
+
+  # -----------------------------------------------------------------------------
+  # Competitive Landscape (2026)
+  # -----------------------------------------------------------------------------
+  competitive_landscape:
+    description: "How AGET relates to other frameworks in the 2026 landscape"
+
+    categories:
+      - category: "Agent Frameworks"
+        examples:
+          - "LangChain / LangGraph"
+          - "CrewAI"
+          - "AutoGen"
+        aget_distinction: |
+          These frameworks focus on agent orchestration and tool use.
+          AGET focuses on governance, session management, and human oversight.
+          They are complementary, not competitive.
+
+      - category: "CLI Agent Platforms"
+        examples:
+          - "Claude Code"
+          - "Cursor"
+          - "Aider"
+        aget_distinction: |
+          These are runtime platforms. AGET is a governance layer that
+          works across all of them, providing consistent patterns.
+
+      - category: "Enterprise AI Platforms"
+        examples:
+          - "Microsoft Agent Framework"
+          - "Salesforce Einstein"
+          - "ServiceNow AI"
+        aget_distinction: |
+          These are vendor-specific solutions. AGET is open-source and
+          platform-agnostic, designed for portability.
+
+# =============================================================================
+# MARKET CONTEXT (2026)
+# =============================================================================
+
+market_context:
+  year: 2026
+
+  industry_trends:
+    - trend: "Agentic AI Adoption"
+      source: "Deloitte Tech Trends 2026"
+      statistic: "80% of enterprise apps expected to embed agents by 2026"
+
+    - trend: "Human-in-the-Loop"
+      source: "Industry consensus"
+      insight: |
+        The narrative is shifting from viewing human oversight as
+        acknowledging AI limitations to designing 'Enterprise Agentic
+        Automation' that combines dynamic AI execution with deterministic
+        guardrails and human judgment at key decision points.
+
+    - trend: "Governance as Enabler"
+      source: "Enterprise adoption patterns"
+      insight: |
+        Mature governance frameworks increase organizational confidence
+        to deploy agents in higher-value scenarios, creating a virtuous
+        cycle of trust and capability expansion.
+
+  aget_alignment:
+    - trend: "Human-in-the-Loop"
+      alignment: "Core to AGET philosophy (P4: Human Oversight)"
+
+    - trend: "Governance as Enabler"
+      alignment: "AGET provides governance patterns that enable confident deployment"
+
+    - trend: "Platform Fragmentation"
+      alignment: "AGET's platform-agnostic approach addresses fragmentation risk"
+
+# =============================================================================
+# VALIDATION
+# =============================================================================
+
+validation:
+  required_fields:
+    - positioning.layer
+    - positioning.relationship_to_platforms.platforms
+    - positioning.strategic_thesis.statement
+    - positioning.evolution_trajectory.stages
+    - positioning.differentiators
+
+  constraints:
+    - field: positioning.relationship_to_platforms.platforms
+      min_count: 3
+      description: "Must document at least 3 platforms"
+
+    - field: positioning.differentiators
+      min_count: 4
+      description: "Must have at least 4 differentiators"
+
+# =============================================================================
+# CHANGELOG
+# =============================================================================
+
+changelog:
+  - version: "1.0.0"
+    date: "2026-01-16"
+    changes:
+      - "Initial specification"
+      - "Captured platform-agnostic strategic thesis"
+      - "Documented evolution trajectory (Coding → CLI → Governed)"
+      - "Defined 6 differentiators"
+      - "Added 2026 market context"
+
+# =============================================================================
+# End of AGET_POSITIONING_SPEC.yaml
+# =============================================================================
