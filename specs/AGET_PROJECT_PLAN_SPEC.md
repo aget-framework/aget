@@ -1,11 +1,11 @@
 # AGET PROJECT_PLAN Specification
 
-**Version**: 1.1.0
+**Version**: 1.2.0
 **Status**: Active
 **Category**: Process (Planning)
 **Format Version**: 1.2
 **Created**: 2026-01-04
-**Updated**: 2026-01-10
+**Updated**: 2026-01-18
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_PROJECT_PLAN_SPEC.md`
 **Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.7, Issue #30
@@ -483,6 +483,164 @@ PROJECT_PLAN_v3.2.0 (25,088 tokens, 1,641 lines) exceeded the Read tool's 25,000
 
 ---
 
+### CAP-PP-013: Plan Closure Checklist
+
+**SHALL** requirements for plan completion:
+
+| ID | Requirement | Rationale |
+|----|-------------|-----------|
+| CAP-PP-013-01 | PROJECT_PLAN SHALL have Closure Checklist section | Completeness |
+| CAP-PP-013-02 | Closure SHALL verify all V-tests passed | Verification |
+| CAP-PP-013-03 | Closure SHALL record actual vs estimated effort | Learning |
+| CAP-PP-013-04 | Closure SHALL update status to Complete or Abandoned | State management |
+
+---
+
+### CAP-PP-014: Operational Template Structure (Issue #260)
+
+**SHALL** requirements for operational PROJECT_PLAN templates:
+
+| ID | Requirement | Rationale |
+|----|-------------|-----------|
+| CAP-PP-014-01 | Template SHALL support operational (non-release) PROJECT_PLANs | Versatility |
+| CAP-PP-014-02 | Template SHALL include optional "Operational Context" section | Distinguish from release plans |
+| CAP-PP-014-03 | Template SHALL support recurring task tracking | Maintenance tasks |
+| CAP-PP-014-04 | Template SHALL mark release-specific sections as conditional | Clarity |
+
+**Operational vs Release:**
+
+| Attribute | Release PROJECT_PLAN | Operational PROJECT_PLAN |
+|-----------|---------------------|-------------------------|
+| Version tracking | Required | Optional |
+| CHANGELOG entry | Required | N/A |
+| Release checklist | Required | N/A |
+| Recurring tasks | N/A | Supported |
+| Example | PROJECT_PLAN_v3.4.0_*.md | PROJECT_PLAN_kb_audit_q1.md |
+
+**Origin**: Issue #260 (PROJECT_PLAN operational template)
+
+---
+
+### CAP-PP-015: Template and SOP Improvement Actions (Issue #254)
+
+**SHALL** requirements from L521 action items:
+
+| ID | Requirement | Rationale |
+|----|-------------|-----------|
+| CAP-PP-015-01 | PROJECT_PLAN template SHALL include version-bearing file section | L521 gap |
+| CAP-PP-015-02 | SOPs SHALL cross-reference related PROJECT_PLAN templates | Traceability |
+| CAP-PP-015-03 | Version source SHALL be explicit (spec, SOP, or inline) | Clarity |
+| CAP-PP-015-04 | Template SHALL include "Related SOPs" section | Governance |
+
+**Origin**: Issue #254 (PROJECT_PLAN and SOP Template Improvements), L521 (Version-Bearing File Gap)
+
+---
+
+### CAP-PP-016: Finalization Automation Pattern (Issue #253)
+
+**SHOULD** requirements for plan finalization automation:
+
+| ID | Requirement | Rationale |
+|----|-------------|-----------|
+| CAP-PP-016-01 | PROJECT_PLAN SHOULD include finalization checklist in template | Consistency |
+| CAP-PP-016-02 | Finalization checklist SHOULD verify all gates complete | Completeness |
+| CAP-PP-016-03 | Finalization checklist SHOULD trigger retrospective | Learning |
+| CAP-PP-016-04 | Template MAY support finalize_project_plan.py automation | Efficiency |
+
+**Finalization Checklist Format:**
+
+```markdown
+## Finalization Checklist
+
+- [ ] All gates marked Complete or Skipped (with justification)
+- [ ] All V-tests executed with results recorded
+- [ ] Velocity analysis completed
+- [ ] Retrospective captured (per CAP-REASON-008)
+- [ ] Status updated to Complete
+- [ ] Related issues closed
+```
+
+**Origin**: Issue #253 (Project Finalization Automation Pattern)
+
+---
+
+### CAP-PP-017: Gate -1 Evidence Verification (Issue #68)
+
+**SHALL** requirements for pre-execution evidence:
+
+| ID | Requirement | Rationale |
+|----|-------------|-----------|
+| CAP-PP-017-01 | PROJECT_PLAN SHALL include Gate -1 for pre-execution evidence | Readiness |
+| CAP-PP-017-02 | Gate -1 SHALL verify prerequisites are met | Dependencies |
+| CAP-PP-017-03 | Gate -1 SHALL document prior art and related work | Context |
+| CAP-PP-017-04 | Gate -1 evidence SHALL be verifiable | Accountability |
+
+**Gate -1 Structure:**
+
+```markdown
+## Gate -1: Evidence Verification (Pre-Execution)
+
+**Objective:** Verify prerequisites and context before execution begins
+
+### Deliverables
+
+| ID | Deliverable | Status |
+|----|-------------|--------|
+| G-1.1 | Prerequisites documented | |
+| G-1.2 | Prior art reviewed | |
+| G-1.3 | Dependencies verified | |
+
+### Verification Tests
+
+#### V-1.1: Prerequisites exist
+```bash
+# Verify required files/conditions exist
+```
+**Expected:** All prerequisites present
+
+**Decision Point:** Proceed to Gate 0? [GO/NO-GO]
+```
+
+**Origin**: Issue #68 (Gate -1 Evidence Verification for PROJECT_PLAN)
+
+---
+
+### CAP-PP-018: Retrospective Requirements (Issue #52, L462)
+
+**SHALL** requirements for plan retrospectives:
+
+| ID | Requirement | Rationale |
+|----|-------------|-----------|
+| CAP-PP-018-01 | PROJECT_PLAN SHALL include Retrospective section | Learning |
+| CAP-PP-018-02 | Retrospective SHALL capture what worked | Positive patterns |
+| CAP-PP-018-03 | Retrospective SHALL capture what didn't work | Improvement areas |
+| CAP-PP-018-04 | Retrospective SHALL generate action items | Actionability |
+| CAP-PP-018-05 | Action items SHALL trace to future work or L-docs | Closure |
+
+**Retrospective Format:**
+
+```markdown
+## Retrospective
+
+### What Worked
+1. {Positive pattern to repeat}
+2. {Effective approach}
+
+### What Didn't Work
+1. {Issue encountered}
+2. {Approach to avoid}
+
+### Action Items
+| Item | Owner | Target | Status |
+|------|-------|--------|--------|
+| Document {learning} as L-doc | {owner} | {date} | Pending |
+| Update {SOP/template} | {owner} | {date} | Pending |
+```
+
+**Origin**: Issue #52 (PROJECT_PLAN Template Improvements), L462 (Retrospective Capture Gap)
+
+---
+
 ## PROJECT_PLAN Template
 
 See: `templates/PROJECT_PLAN_TEMPLATE.md` (G2.9 deliverable)
@@ -599,6 +757,16 @@ See G2.8 (already in plan) or defer to v3.3.0.
 ---
 
 ## Changelog
+
+### v1.2.0 (2026-01-18)
+
+- Added CAP-PP-013: Plan Closure Checklist
+- Added CAP-PP-014: Operational Template Structure (Issue #260)
+- Added CAP-PP-015: Template and SOP Improvement Actions (Issue #254, L521)
+- Added CAP-PP-016: Finalization Automation Pattern (Issue #253)
+- Added CAP-PP-017: Gate -1 Evidence Verification (Issue #68)
+- Added CAP-PP-018: Retrospective Requirements (Issue #52, L462)
+- Part of v3.4.0 Governance Formalization
 
 ### v1.1.0 (2026-01-10)
 

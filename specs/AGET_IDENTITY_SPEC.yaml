@@ -1,0 +1,261 @@
+# AGET_IDENTITY_SPEC.yaml
+# Canonical identity specification for AGET Framework
+# Version: 1.0.0
+# Status: Canonical
+# Created: 2026-01-16
+# Related: L545 (Strategic Positioning Evolution), L143 (Framework Positioning)
+
+spec:
+  name: AGET_IDENTITY_SPEC
+  version: "1.0.0"
+  status: canonical
+  created: "2026-01-16"
+  updated: "2026-01-16"
+  author: private-aget-framework-AGET
+  related_specs:
+    - AGET_POSITIONING_SPEC
+    - AGET_VOCABULARY_SPEC
+  related_learnings:
+    - L545  # Strategic Positioning Evolution
+    - L143  # Framework Landscape Positioning
+    - L530  # Ontology Foundation Research
+
+# =============================================================================
+# IDENTITY
+# =============================================================================
+
+identity:
+  # Canonical name
+  full_name: "AGET Framework"
+  short_name: "AGET"
+
+  # Note: AGET is not an acronym - it's simply "Agent" without the 'n'
+  # This follows the pattern of framework names that are memorable words
+  name_origin: "Agent → Aget (memorable, distinct)"
+
+  # -----------------------------------------------------------------------------
+  # Definition
+  # -----------------------------------------------------------------------------
+  definition:
+    # Short definition (max 120 characters) - for badges, metadata, one-liners
+    short: "Configuration & lifecycle management for governed agentic work"
+
+    # Full definition - for README, documentation
+    full: |
+      AGET is a platform-agnostic governance framework for CLI-based human-AI
+      agentic work. It provides session continuity, shared memory architecture,
+      fleet coordination, and human-supervised autonomy patterns that work
+      across AI coding assistants including Claude Code, Cursor, Aider, and
+      Windsurf.
+
+    # Technical definition - for specifications, formal documents
+    technical: |
+      AGET (Agent Framework) is a configuration and lifecycle management
+      specification for CLI-based AI agents operating under human supervision.
+      It defines protocols for session management, knowledge persistence,
+      multi-agent coordination, and governance boundaries that are portable
+      across heterogeneous AI coding assistant platforms.
+
+  # -----------------------------------------------------------------------------
+  # What AGET is NOT (clarifications)
+  # -----------------------------------------------------------------------------
+  not_definition:
+    - id: NOT-1
+      statement: "A specific AI model or runtime"
+      clarification: "AGET is a governance layer that works with any LLM backend"
+
+    - id: NOT-2
+      statement: "A replacement for Claude Code, Cursor, or Aider"
+      clarification: "AGET sits above these platforms as a governance substrate"
+
+    - id: NOT-3
+      statement: "An autonomous AI system"
+      clarification: "AGET explicitly requires human supervision and gate discipline"
+
+    - id: NOT-4
+      statement: "A coding-only framework"
+      clarification: "AGET supports advisory, consulting, supervision, and general knowledge work"
+
+    - id: NOT-5
+      statement: "A vendor lock-in solution"
+      clarification: "Three-tier degradation ensures portability (gh → git → filesystem)"
+
+  # -----------------------------------------------------------------------------
+  # Core Philosophy
+  # -----------------------------------------------------------------------------
+  core_philosophy:
+    # Primary statement - the North Star
+    primary: "Human-AI collaboration quality over autonomous agent speed"
+
+    # Supporting principles
+    principles:
+      - id: P1
+        name: "Governed Autonomy"
+        statement: "Agents act autonomously within explicit boundaries"
+        mechanism: "Gate discipline, escalation paths, decision authority matrix"
+
+      - id: P2
+        name: "Portable Memory"
+        statement: "Knowledge persists across sessions and platforms"
+        mechanism: "Knowledge base as collaboration substrate, session handoffs"
+
+      - id: P3
+        name: "Platform Agnostic"
+        statement: "Patterns work across CLI agent platforms"
+        mechanism: "Three-tier degradation, universal session protocols"
+
+      - id: P4
+        name: "Human Oversight"
+        statement: "Humans remain decision authorities at key points"
+        mechanism: "Gate approval, human override principle (L178)"
+
+      - id: P5
+        name: "Evidence-First"
+        statement: "Design to reality, not theory"
+        mechanism: "Audit before architecture (L289), validated patterns"
+
+  # -----------------------------------------------------------------------------
+  # Scope
+  # -----------------------------------------------------------------------------
+  scope:
+    # What AGET manages
+    manages:
+      - "Session protocols (wake up, wind down, study up, step back)"
+      - "Knowledge base structure and memory architecture"
+      - "Agent identity and versioning"
+      - "Fleet coordination patterns"
+      - "Governance boundaries and escalation"
+      - "Template specifications and inheritance"
+
+    # What AGET does not manage
+    does_not_manage:
+      - "Domain-specific application logic"
+      - "LLM model selection or configuration"
+      - "IDE or editor integration details"
+      - "Project-level implementation patterns"
+
+  # -----------------------------------------------------------------------------
+  # Theoretical Foundations
+  # -----------------------------------------------------------------------------
+  theoretical_basis:
+    # Per L331 (Theoretical Foundations of Agency)
+    foundations:
+      - name: "BDI Architecture"
+        reference: "Bratman, Rao & Georgeff"
+        application: "Belief-Desire-Intention model for agent behavior"
+
+      - name: "Extended Mind"
+        reference: "Clark & Chalmers"
+        application: "KB extends cognitive capacity beyond individual minds"
+
+      - name: "Transactive Memory"
+        reference: "Wegner"
+        application: "Human-AI pairs share 'who knows what'"
+
+      - name: "Distributed Cognition"
+        reference: "Hutchins"
+        application: "Cognition across people, tools, and artifacts"
+
+      - name: "Stigmergy"
+        reference: "Grassé"
+        application: "Coordination through environment (KB) modification"
+
+      - name: "Cybernetics"
+        reference: "Ashby"
+        application: "Requisite variety for context recovery"
+
+# =============================================================================
+# VERSIONING
+# =============================================================================
+
+versioning:
+  current_version: "3.4.0"
+  version_scheme: "SemVer"
+  version_policy:
+    major: "Breaking changes to specifications or protocols"
+    minor: "New capabilities, templates, or specifications"
+    patch: "Bug fixes, documentation, non-breaking improvements"
+
+# =============================================================================
+# METADATA (for derived artifacts)
+# =============================================================================
+
+metadata:
+  # For codemeta.json
+  codemeta:
+    type: "SoftwareSourceCode"
+    license: "Apache-2.0"
+    programming_languages:
+      - "Python"
+      - "YAML"
+      - "Markdown"
+    keywords:
+      - "agentic-ai"
+      - "cli-agents"
+      - "human-ai-collaboration"
+      - "agent-governance"
+      - "session-management"
+      - "knowledge-management"
+      - "multi-agent-systems"
+
+  # For CITATION.cff
+  citation:
+    cff_version: "1.2.0"
+    message: "If you use this software, please cite it as below."
+    type: "software"
+
+  # For Standard Readme
+  readme:
+    sections_order:
+      - title
+      - badges
+      - short_description
+      - long_description
+      - table_of_contents
+      - background
+      - install
+      - usage
+      - api
+      - contributing
+      - license
+
+# =============================================================================
+# VALIDATION
+# =============================================================================
+
+validation:
+  # Required fields for this spec to be valid
+  required_fields:
+    - identity.full_name
+    - identity.definition.short
+    - identity.definition.full
+    - identity.core_philosophy.primary
+    - identity.core_philosophy.principles
+
+  # Constraints
+  constraints:
+    - field: identity.definition.short
+      max_length: 120
+      description: "Short definition must fit in metadata fields"
+
+    - field: identity.core_philosophy.principles
+      min_count: 4
+      description: "Must have at least 4 core principles"
+
+# =============================================================================
+# CHANGELOG
+# =============================================================================
+
+changelog:
+  - version: "1.0.0"
+    date: "2026-01-16"
+    changes:
+      - "Initial specification"
+      - "Established canonical identity definitions"
+      - "Captured core philosophy and principles"
+      - "Added theoretical foundations per L331"
+      - "Defined metadata for derived artifacts"
+
+# =============================================================================
+# End of AGET_IDENTITY_SPEC.yaml
+# =============================================================================

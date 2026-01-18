@@ -1,12 +1,12 @@
 # AGET Evolution Specification
 
 **Spec ID**: SPEC-EVOL-001
-**Version**: 1.0.0
+**Version**: 1.1.0
 **Status**: ACTIVE
 **Category**: Standards (Knowledge Management)
 **Format Version**: 1.2
 **Created**: 2026-01-06
-**Updated**: 2026-01-06
+**Updated**: 2026-01-18
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_EVOLUTION_SPEC.md`
 **Change Origin**: L460 (Directory Semantics Reconciliation Gap), L461 (Evolution Entry Type Standardization)
@@ -34,7 +34,7 @@ L460 and L461 established the canonical pattern. This spec formalizes those deci
 **Applies to**: All AGET agents with `.aget/evolution/` directories.
 
 **Defines**:
-- Three evolution entry types (Learning, Decision, Discovery)
+- Four evolution entry types (Learning, Decision, Discovery, PROJECT_PLAN)
 - File naming conventions for each type
 - Directory structure (flat files, not subdirectories)
 - Content placement rules
@@ -60,7 +60,7 @@ vocabulary:
   entry_types:
     Evolution_Entry:
       skos:definition: "Retrospective knowledge artifact in .aget/evolution/"
-      skos:narrower: ["Learning_Entry", "Decision_Entry", "Discovery_Entry"]
+      skos:narrower: ["Learning_Entry", "Decision_Entry", "Discovery_Entry", "PROJECT_PLAN_Entry"]
       aget:temporal_orientation: "retrospective"
 
     Learning_Entry:
@@ -83,6 +83,15 @@ vocabulary:
       aget:naming: "DISC{NNN}_{snake_case_title}.md"
       skos:example: "DISC001_concurrent_evolution_log_collision.md"
       skos:related: ["CAP-EVOL-003"]
+
+    PROJECT_PLAN_Entry:
+      skos:definition: "Completed project plan archived as evolution knowledge"
+      aget:prefix: "PP"
+      aget:naming: "PP{NNN}_{snake_case_title}.md"
+      skos:example: "PP001_v3.4.0_governance_formalization.md"
+      skos:related: ["CAP-EVOL-008"]
+      skos:note: "Only COMPLETED plans are evolution entries; active plans remain in planning/"
+      aget:temporal_orientation: "retrospective (post-completion)"
 
   structure:
     Evolution_Directory:
@@ -191,7 +200,7 @@ The SYSTEM shall place content in semantically correct directories.
 | ID | Pattern | Statement |
 |----|---------|-----------|
 | CAP-EVOL-005-01 | ubiquitous | The SYSTEM shall place L/D/DISC entries in .aget/evolution/ |
-| CAP-EVOL-005-02 | ubiquitous | The SYSTEM shall place PROJECT_PLANs in planning/ |
+| CAP-EVOL-005-02 | ubiquitous | The SYSTEM shall place active PROJECT_PLANs in planning/ (completed may archive to evolution as PP-prefix per CAP-EVOL-008) |
 | CAP-EVOL-005-03 | ubiquitous | The SYSTEM shall place SOPs in sops/ |
 | CAP-EVOL-005-04 | ubiquitous | The SYSTEM shall place session notes in sessions/ |
 | CAP-EVOL-005-05 | ubiquitous | The SYSTEM shall NOT place prospective documents in .aget/evolution/ |
@@ -259,6 +268,47 @@ publication:
   sanitized: true
   applicability: fleet | universal
 ```
+
+### CAP-EVOL-008: PROJECT_PLAN Entries (PP-prefix) — Issue #240
+
+The SYSTEM shall support PROJECT_PLAN entries for archiving completed project plans as evolution knowledge.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-EVOL-008-01 | ubiquitous | The SYSTEM shall use PP-prefix for archived PROJECT_PLAN entries |
+| CAP-EVOL-008-02 | ubiquitous | The SYSTEM shall name PROJECT_PLAN entries as `PP{NNN}_{title}.md` |
+| CAP-EVOL-008-03 | conditional | IF PROJECT_PLAN status is COMPLETE or ABANDONED THEN the SYSTEM may archive to evolution |
+| CAP-EVOL-008-04 | prohibited | The SYSTEM shall NOT archive IN_PROGRESS PROJECT_PLANs to evolution |
+| CAP-EVOL-008-05 | ubiquitous | The archived entry shall include velocity analysis and retrospective |
+| CAP-EVOL-008-06 | optional | WHERE original remains in planning/, the archive shall note the relationship |
+
+**Enforcement**: `validate_evolution_entry.py`
+
+**When to Create PP-docs**:
+- After PROJECT_PLAN reaches COMPLETE status
+- When PROJECT_PLAN is ABANDONED with documented learnings
+- When consolidating multiple completed plans
+- During periodic knowledge base cleanup
+
+**Temporal Distinction**:
+
+| Artifact | Location | Temporal | When |
+|----------|----------|----------|------|
+| Active PROJECT_PLAN | `planning/` | Prospective | During execution |
+| Archived PROJECT_PLAN | `.aget/evolution/` | Retrospective | After completion |
+
+**Archive Metadata**:
+```yaml
+archive:
+  original_location: "planning/PROJECT_PLAN_*.md"
+  completion_date: YYYY-MM-DD
+  final_status: COMPLETE | ABANDONED
+  velocity_ratio: {actual/estimated}
+  key_learnings:
+    - "{L-doc reference if extracted}"
+```
+
+**Origin**: Issue #240 (PROJECT_PLAN as fourth evolution entry type)
 
 ---
 

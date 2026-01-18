@@ -1,0 +1,57 @@
+# CITATION.cff
+# Citation File Format for AGET Framework
+# See: https://citation-file-format.github.io/
+
+cff-version: 1.2.0
+title: "AGET Framework"
+message: "If you use this software, please cite it as below."
+type: software
+
+authors:
+  - family-names: "Melli"
+    given-names: "Gabor"
+    email: "gabor@melli.com"
+    orcid: ""  # Add ORCID if available
+
+repository-code: "https://github.com/aget-framework/aget"
+url: "https://github.com/aget-framework"
+license: Apache-2.0
+version: "3.4.0"
+date-released: "2026-01-16"
+
+abstract: |
+  AGET is a platform-agnostic governance framework for CLI-based human-AI
+  agentic work. It provides session continuity, shared memory architecture,
+  fleet coordination, and human-supervised autonomy patterns that work
+  across AI coding assistants including Claude Code, Cursor, Aider, and
+  Windsurf.
+
+keywords:
+  - agentic-ai
+  - cli-agents
+  - human-ai-collaboration
+  - agent-governance
+  - session-management
+  - knowledge-management
+  - multi-agent-systems
+
+# Related references (optional)
+references:
+  - type: software
+    title: "Claude Code"
+    authors:
+      - name: "Anthropic"
+    url: "https://claude.ai/code"
+
+  - type: software
+    title: "Cursor"
+    authors:
+      - name: "Cursor Inc"
+    url: "https://cursor.sh"
+
+  - type: software
+    title: "Aider"
+    authors:
+      - family-names: "Gauthier"
+        given-names: "Paul"
+    url: "https://aider.chat"

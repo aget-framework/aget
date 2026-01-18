@@ -1,11 +1,11 @@
 # AGET Session Specification
 
-**Version**: 1.1.0
+**Version**: 1.2.0
 **Status**: Active
 **Category**: Standards (Session Lifecycle)
 **Format Version**: 1.2
 **Created**: 2025-12-27
-**Updated**: 2026-01-08
+**Updated**: 2026-01-18
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_SESSION_SPEC.md`
 **Change Origin**: 5-why analysis on session continuity gaps (G-PRE.3.1)
@@ -380,6 +380,51 @@ The SYSTEM shall support post-migration verification of session protocols.
 
 **Related**: L491 (Script-Level Semantic Slippage), R-REL-014 (Protocol Verification Before Release)
 
+### CAP-SESSION-010: Wind-Down Re-entrancy Guard
+
+The SYSTEM shall prevent re-entrancy issues during wind-down execution.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-SESSION-010-01 | prohibited | The SYSTEM shall NOT allow concurrent wind-down executions |
+| CAP-SESSION-010-02 | event-driven | WHEN wind-down starts, the SYSTEM shall acquire execution lock |
+| CAP-SESSION-010-03 | event-driven | WHEN wind-down completes, the SYSTEM shall release execution lock |
+| CAP-SESSION-010-04 | conditional | IF lock acquisition fails THEN the SYSTEM shall report "wind-down already in progress" |
+| CAP-SESSION-010-05 | ubiquitous | The lock mechanism shall use filesystem-based locking (`.wind_down.lock`) |
+
+**Enforcement**: wind_down.py lock mechanism
+**Origin**: Issue #252, L468 (Wind-Down Re-entrancy Anti-Pattern)
+
+### CAP-SESSION-011: Calendar-Aware Wake-Up
+
+The SYSTEM shall provide calendar context during wake-up initialization.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-SESSION-011-01 | ubiquitous | The SYSTEM shall display current date in wake-up output |
+| CAP-SESSION-011-02 | optional | WHERE calendar integration is available, the SYSTEM may display upcoming deadlines |
+| CAP-SESSION-011-03 | conditional | IF release window is approaching (Thu AM/Fri PM) THEN the SYSTEM shall note "release window" |
+| CAP-SESSION-011-04 | ubiquitous | The SYSTEM shall support --calendar flag to show extended calendar context |
+| CAP-SESSION-011-05 | ubiquitous | Calendar context shall include day-of-week for planning purposes |
+
+**Enforcement**: wake_up.py calendar module
+**Origin**: Issue #241 (Calendar context to wake up protocol)
+
+### CAP-SESSION-012: Wind-Down Sanity Gate
+
+The SYSTEM shall perform sanity validation before completing wind-down.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-SESSION-012-01 | ubiquitous | The SYSTEM shall run abbreviated sanity check before wind-down completion |
+| CAP-SESSION-012-02 | conditional | IF sanity check fails THEN the SYSTEM shall warn but not block wind-down |
+| CAP-SESSION-012-03 | ubiquitous | The sanity gate shall verify: version consistency, pending work detection, uncommitted changes |
+| CAP-SESSION-012-04 | ubiquitous | The SYSTEM shall include sanity gate status in wind-down output |
+| CAP-SESSION-012-05 | optional | WHERE --strict flag is set, the SYSTEM may block wind-down on sanity failure |
+
+**Enforcement**: wind_down.py sanity gate integration
+**Origin**: Issue #225 (Wind Down Sanity Gate Protocol)
+
 #### Handoff Note Template
 
 ```markdown
@@ -713,8 +758,9 @@ graduation:
 
 ---
 
-*AGET Session Specification v1.1.0*
+*AGET Session Specification v1.2.0*
 *Format: AGET_SPEC_FORMAT v1.2 (EARS + SKOS)*
 *Part of v3.4.0 Session Skills Maturity*
 *"Sessions are transactions; handoffs are commits."*
 *"Disambiguation prevents script-level semantic slippage (L491)."*
+*v1.2.0: Added CAP-SESSION-010 (re-entrancy guard), CAP-SESSION-011 (calendar awareness), CAP-SESSION-012 (sanity gate)*

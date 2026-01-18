@@ -11,7 +11,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+*No unreleased changes*
+
+---
+
+## [3.4.0] - 2026-01-18
+
+**Theme**: Session Skills Maturity + Governance Formalization
+
 ### Added
+
+- **Session Protocol Enhancements** (CAP-SESSION-010, 011, 012):
+  - `wind_down.py`: Re-entrancy guard prevents concurrent executions (CAP-SESSION-010)
+  - `wind_down.py`: Sanity gate runs abbreviated health check before session end (CAP-SESSION-012)
+  - `wake_up.py`: Calendar awareness displays date and release window notifications (CAP-SESSION-011)
+  - Cross-CLI validation on Claude Code, Codex CLI, and Gemini CLI
+
+- **Governance Artifact SOPs and Templates**:
+  - `SOP_L-DOC_CREATION.md`: Standard procedure for creating L-docs
+  - `TEMPLATE_L-DOC.md`: Reusable L-doc template
+  - `SOP_ENHANCEMENT_REQUEST.md`: Standard procedure for Enhancement Requests
+  - `TEMPLATE_ENHANCEMENT_REQUEST.md`: Reusable Enhancement Request template
+  - `SOP_project_plan_archival.md`: PROJECT_PLAN → evolution workflow (CAP-EVOL-008)
+
+- **Release Governance** (VERSION_SCOPE formalization):
+  - AGET_VOCABULARY_SPEC: 8 VERSION_SCOPE terms formalized
+  - CAP-REL-012 through CAP-REL-018: VERSION_SCOPE requirements in EARS format
+  - SOP Phase 2.5: Vocabulary/spec reconciliation protocol
+  - SOP Phase 2.6: SOP/Template reconciliation protocol
+
+- **Behavioral Governance**:
+  - L552: Imperative Escalation Bypass pattern documented
+  - R-BEHAV-EAC-*: Behavioral requirements for escalation acknowledgment
+
+- **Spec-First Documentation**:
+  - `AGET_IDENTITY_SPEC.yaml`: Agent identity specification (machine-readable)
+  - `AGET_POSITIONING_SPEC.yaml`: Market positioning specification (machine-readable)
+  - `codemeta.json`: Software metadata standard
+  - `CITATION.cff`: Citation file format for academic reference
+
+- **Template Infrastructure**:
+  - `sops/` directory scaffold in all 12 templates (R-TEMPLATE-001)
 
 - **Standards Document Ontology** (L502, PROJECT_PLAN_standards_ontology_elevation_v1.0):
   - AGET_VOCABULARY_SPEC Part 7: Document type hierarchy, authority model, traceability properties
@@ -29,6 +69,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **AGET_SESSION_SPEC.md**: 1.1.0 → 1.2.0 (CAP-SESSION-010, 011, 012)
+- **AGET_PROJECT_PLAN_SPEC.md**: 1.1.0 → 1.2.0 (CAP-PP-013 through 018)
+- **AGET_TEMPLATE_SPEC.md**: 3.3.1 → 3.3.2 (R-TEMPLATE-001)
+- **AGET_EVOLUTION_SPEC.md**: 1.0.0 → 1.1.0 (PROJECT_PLAN_Entry type, CAP-EVOL-008)
+
 - **PROJECT_PLAN Template v2.0** (L515, #233, #247):
   - Consolidated to single canonical template at `templates/PROJECT_PLAN_TEMPLATE.md`
   - Removed duplicate from `docs/templates/`
@@ -36,6 +81,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added Gate Naming Convention guidance (#233)
   - Added mandatory Project Closure Checklist (#247)
   - Added status transition rules
+  - Added Gate -1 (Pre-Execution) gate
+  - Added Operational Context section (CAP-PP-014)
+  - Added Retrospective section (L435)
 
 - **validate_project_plan.py** (L515, #233):
   - Now supports multiple gate naming conventions: G-N:, Gate N:, Gate N.M:, {Track}-N:
@@ -47,6 +95,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `SOP_instance_migration_v3.md` → `SOP_aget_migrate.md`
   - Pattern: `SOP_aget_{active_verb}.md` per naming convention
   - 50 files updated across 7 repositories
+
+### Learnings Captured
+
+- L554: Hierarchical PROJECT_PLAN gap — SOP needs top-level vs contributing guidance
+- L555-candidate: KB review should precede governance artifact creation
+- L556-candidate: V-tests validate presence, not correctness
+
+### Metrics
+
+| Metric | Value |
+|--------|-------|
+| GO issues resolved | 10 |
+| Implementations completed | 12 |
+| Specs updated | 4 |
+| New SOPs | 4 |
+| New templates | 3 |
+| Templates with sops/ scaffold | 12/12 |
+| Session tests passing | 38 |
+
+### Migration Guide
+
+**For Existing Agents**:
+1. Update version files: Bump `.aget/version.json` to 3.4.0
+2. Create sops/ directory: If not present, create `sops/README.md`
+3. Review session scripts: Verify wake_up.py and wind_down.py compatibility
+
+**Breaking Changes**: None. v3.4.0 is backward compatible with v3.3.x agents.
+
+### Contributing Projects
+
+This release aggregates work from six completed PROJECT_PLANs:
+1. PROJECT_PLAN_session_skills_maturity_v1.0.md
+2. PROJECT_PLAN_conformance_rubric_v3.4_v1.0.md
+3. PROJECT_PLAN_spec_first_documentation_v1.0.md
+4. PROJECT_PLAN_version_scope_standardization_v1.0.md
+5. PROJECT_PLAN_project_plan_creation_sop_v1.0.md
+6. PROJECT_PLAN_sop_creation_sop_v1.0.md
 
 ---
 
@@ -579,9 +664,9 @@ This version exists in migration_history but was never published as a GitHub Rel
 
 ## Version Support
 
-**Latest Stable**: v3.2.0
+**Latest Stable**: v3.4.0
 **Support Window**: Latest release receives full support (bug fixes, enhancements)
-**Previous Minor** (v3.1.x): Security fixes only
+**Previous Minor** (v3.3.x): Security fixes only
 **Older Versions**: No active support (upgrade recommended)
 
 ---
@@ -603,5 +688,5 @@ See [UPGRADING.md](docs/UPGRADING.md) for version-specific migration guides and 
 
 ---
 
-*CHANGELOG.md - Generated 2025-12-24*
+*CHANGELOG.md - Updated 2026-01-18*
 *Maintained by: private-aget-framework-AGET*
