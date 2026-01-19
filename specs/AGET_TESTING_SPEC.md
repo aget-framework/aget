@@ -1,11 +1,11 @@
 # AGET Testing Specification
 
-**Version**: 1.0.0
+**Version**: 1.1.0
 **Status**: Active
 **Category**: Technical (Quality Assurance)
 **Format Version**: 1.2
 **Created**: 2026-01-04
-**Updated**: 2026-01-04
+**Updated**: 2026-01-18
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_TESTING_SPEC.md`
 **Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.1
@@ -144,6 +144,9 @@ class TestWakeContract:
 | CAP-TEST-002-02 | Unit tests SHALL be independent | No test order dependencies |
 | CAP-TEST-002-03 | Unit tests SHALL be fast (<1s each) | Developer feedback loop |
 | CAP-TEST-002-04 | Unit tests SHALL use pytest | Framework standardization |
+| CAP-TEST-002-05 | Unit tests SHOULD use TEMPLATE_unit_test.py | Consistency (v1.1.0) |
+
+**Template**: `templates/TEMPLATE_unit_test.py` - Copy and customize for new test files.
 
 ### CAP-TEST-003: Test Naming Conventions
 
@@ -373,6 +376,12 @@ def test_version_format():
 ---
 
 ## Changelog
+
+### v1.1.0 (2026-01-18)
+
+- Added CAP-TEST-002-05: Unit tests SHOULD use TEMPLATE_unit_test.py
+- Added template reference for unit test creation
+- Created templates/TEMPLATE_unit_test.py
 
 ### v1.0.0 (2026-01-04)
 

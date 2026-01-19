@@ -11,7 +11,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-*No unreleased changes*
+### Added
+
+- **TEMPLATE_unit_test.py**: Formal template for unit test files (CAP-TEST-002-05)
+- **L529 Migration Integrity Checks**: P6 check in aget_verify_conformance.py
+  - V-SIZE: AGENTS.md < 1000 bytes = corruption
+  - V-SYNTAX: @aget-version marker required
+
+### Changed
+
+- **AGET_TESTING_SPEC.md**: 1.0.0 → 1.1.0 (added CAP-TEST-002-05, template reference)
+- **aget_verify_conformance.py**: 1.0.0 → 1.1.0 (added L529 integrity checks)
+
+### Breaking Changes
+
+- **validation/ → verification/**: Directory renamed (44 files moved)
+  - **Migration**: Update import paths: `from validation.X` → `from verification.X`
+  - **Migration**: Update script references: `validation/` → `verification/`
+  - **Rationale**: Naming consistency (verification scripts verify conformance)
+  - **Affects**: Any code importing from `aget/validation/`
 
 ---
 
