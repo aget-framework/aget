@@ -12,8 +12,8 @@ from pathlib import Path
 
 import pytest
 
-# Add validation directory to path
-sys.path.insert(0, str(Path(__file__).parent.parent / 'validation'))
+# Add verification directory to path
+sys.path.insert(0, str(Path(__file__).parent.parent / 'verification'))
 
 from validate_artifact_size import (
     LIMITS,
