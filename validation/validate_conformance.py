@@ -2,7 +2,7 @@
 """
 AGET v3.x Conformance Assessment Validator.
 
-Implements: L518 (Conformance Assessment Rubric Pattern)
+Implements: L518 (Conformance Assessment Rubric Pattern), L529 (Migration Integrity Verification)
 Traces to: AGET_5D_ARCHITECTURE_SPEC.md, AGET_TEMPLATE_SPEC.md, AGET_INSTANCE_SPEC.md
 
 Unified validator that assesses agent conformance against v3.x requirements,
@@ -30,7 +30,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 # Version
-__version__ = "1.0.0"
+__version__ = "1.1.0"  # Added L529 Migration Integrity checks (P6)
 
 
 # =============================================================================
@@ -206,13 +206,31 @@ class ConformanceValidator:
             if not full_path.exists():
                 self.result.critical_failures.append(message)
 
-        # Check AGENTS.md size limit
+        # Check AGENTS.md size limits (L529: Migration Integrity)
         agents_md = self.agent_path / "AGENTS.md"
         if agents_md.exists():
             size = agents_md.stat().st_size
-            if size > 40000:
+            # V-SIZE: Minimum size check (catches zeroed/corrupted files)
+            if size < 1000:
+                self.result.critical_failures.append(
+                    f"AGENTS.md below minimum size ({size} bytes < 1000) - possible corruption (L529)"
+                )
+            # Upper limit check
+            elif size > 40000:
                 self.result.critical_failures.append(
                     f"AGENTS.md exceeds 40KB limit ({size} bytes)"
+                )
+            # V-SYNTAX: Check @aget-version marker present
+            try:
+                with open(agents_md) as f:
+                    content = f.read()
+                if "@aget-version:" not in content.lower():
+                    self.result.critical_failures.append(
+                        "AGENTS.md missing @aget-version marker (L529)"
+                    )
+            except IOError:
+                self.result.critical_failures.append(
+                    "AGENTS.md unreadable"
                 )
 
         # Check manifest.yaml for templates
@@ -269,6 +287,9 @@ class ConformanceValidator:
 
         # P5: Version Coherence (L444)
         result.checks.append(self._check_p5_version_coherence())
+
+        # P6: AGENTS.md Integrity (L529)
+        result.checks.append(self._check_p6_agents_md_integrity())
 
         return result
 
@@ -507,6 +528,87 @@ class ConformanceValidator:
             score=score,
             message=message,
             critical=False
+        )
+
+    def _check_p6_agents_md_integrity(self) -> Check:
+        """P6: AGENTS.md Integrity (L529 - Migration Integrity Verification).
+
+        Checks:
+        - V-SIZE: File size > 1000 bytes (catches zeroed/truncated files)
+        - V-SYNTAX: Contains @aget-version marker
+        - Structure: Has expected sections (Agent Compatibility, etc.)
+
+        Root cause: G-1 AGENTS.md was zeroed during v3.4.0 upgrade, breaking wake up.
+        """
+        agents_md = self.agent_path / "AGENTS.md"
+
+        score = 0.0
+        message = ""
+        issues = []
+
+        if not agents_md.exists():
+            return Check(
+                id="P6",
+                name="AGENTS.md Integrity",
+                passed=False,
+                score=0.0,
+                message="AGENTS.md missing",
+                critical=True
+            )
+
+        try:
+            size = agents_md.stat().st_size
+            with open(agents_md) as f:
+                content = f.read()
+
+            # V-SIZE: Minimum size check
+            if size < 1000:
+                issues.append(f"size {size} < 1000 bytes")
+                score = 0.0
+            elif size < 5000:
+                issues.append(f"size {size} bytes (minimal)")
+                score = 2.0
+            else:
+                score = 3.0
+
+            # V-SYNTAX: @aget-version marker
+            if "@aget-version:" not in content.lower():
+                issues.append("missing @aget-version marker")
+                score = min(score, 1.0)
+            else:
+                score = max(score, 3.0)
+
+            # Structure check: expected sections
+            expected_sections = [
+                "agent configuration",
+                "agent compatibility",
+            ]
+            sections_found = sum(1 for s in expected_sections if s in content.lower())
+
+            if sections_found >= 2:
+                score = min(5.0, score + 1.0)
+                message = f"Integrity OK ({size} bytes, {sections_found} sections)"
+            elif sections_found >= 1:
+                message = f"Partial structure ({size} bytes, {sections_found}/2 sections)"
+            else:
+                issues.append("missing expected sections")
+                message = f"Minimal structure ({size} bytes)"
+
+            if issues:
+                message = f"Issues: {', '.join(issues)}"
+
+        except IOError as e:
+            score = 0.0
+            message = f"Unreadable: {e}"
+            issues.append("unreadable")
+
+        return Check(
+            id="P6",
+            name="AGENTS.md Integrity",
+            passed=score >= 3.0 and not issues,
+            score=score,
+            message=message,
+            critical=True  # Critical because zeroed AGENTS.md breaks agent
         )
 
     # -------------------------------------------------------------------------
