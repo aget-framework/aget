@@ -1,11 +1,11 @@
 # AGET Vocabulary Specification
 
-**Version**: 1.10.0
+**Version**: 1.11.0
 **Status**: Active
 **Category**: Core (Standards)
 **Format Version**: 1.2
 **Created**: 2026-01-04
-**Updated**: 2026-01-17
+**Updated**: 2026-02-11
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_VOCABULARY_SPEC.md`
 **Change Origin**: PROJECT_PLAN_standards_ontology_elevation_v1.0
@@ -237,6 +237,33 @@ Compound AGET Vocabulary terms match this regex:
 | `Published_Learning` | Learning_Document graduated from private evolution to public docs/learnings/ | — |
 | `Pattern_Extraction` | Identifying reusable Aget_Pattern | — |
 | `Knowledge_Migration` | Moving learning between Aget_Instances | — |
+
+## Ontology Terms (v3.5.0)
+
+| Term | Definition | altLabel |
+|------|------------|----------|
+| `Ontology_Directory` | Agent directory containing formal vocabulary definitions using SKOS+EARS format | — |
+| `Ontology_File` | YAML file containing SKOS-aligned concept definitions and optional EARS requirements | — |
+
+```yaml
+Ontology_Directory:
+  skos:prefLabel: "Ontology_Directory"
+  skos:definition: "Agent directory containing formal vocabulary definitions using SKOS+EARS format."
+  skos:broader: "Agent_Directory"
+  aget:location: "{agent}/ontology/"
+  aget:required: true
+  skos:related: ["Knowledge_Directory", "Specs_Directory", "Evolution_Directory"]
+
+Ontology_File:
+  skos:prefLabel: "Ontology_File"
+  skos:definition: "YAML file containing SKOS-aligned concept definitions and optional EARS requirements."
+  aget:format: "YAML+SKOS+EARS"
+  aget:naming_pattern: "ONTOLOGY_<domain>_vX.Y.yaml"
+  skos:broader: "Agent_Artifact"
+  skos:related: ["Learning_Document", "Specification"]
+```
+
+**L-doc Reference**: L482 (Executable Ontology - SKOS+EARS Grounding)
 
 ---
 
@@ -2192,6 +2219,139 @@ AGET_SOP_SPEC:
 
 ---
 
+# Part 8: Agent Capabilities Vocabulary (L536, L533)
+
+This section defines vocabulary for agent capabilities — the behavioral patterns that extend base model capabilities. Based on cli-aget optimization experiments (L533, L536, L557, L570).
+
+## Key Insight (L536)
+
+> **Agent_Skill, Agent_Hook, and Session_Protocol are PEERS under Agent_Capability, not in a parent-child hierarchy.**
+
+This ontological correction was established through empirical research showing that skills are stateless (per Agent Skills Standard) while protocols may require state.
+
+## Agent Capability Terms
+
+### Agent_Capability
+
+```yaml
+Agent_Capability:
+  skos:prefLabel: "Agent_Capability"
+  skos:definition: "Abstract parent for all agent behavioral patterns that extend base model capabilities through configuration or instruction."
+  skos:altLabel: ["Agent_Extension", "Behavioral_Module"]
+  skos:narrower: ["Agent_Skill", "Agent_Hook", "Session_Protocol"]
+  skos:related: ["Capability", "Specialization_Mechanism"]
+  aget:theoretical_basis: "Object-Capability Model (Dennis & Van Horn 1966)"
+  aget:source: "L536 Ontological Correction"
+```
+
+### Agent_Skill
+
+```yaml
+Agent_Skill:
+  skos:prefLabel: "Agent_Skill"
+  skos:definition: "Stateless, portable, on-demand capability that AI agents discover and load via SKILL.md manifest. Designed for cross-CLI portability."
+  skos:altLabel: ["CLI_Skill", "SKILL.md"]
+  skos:broader: "Agent_Capability"
+  skos:related: ["Session_Protocol", "Agent_Hook"]
+  aget:theoretical_basis: "Agent Skills Standard (agentskills.io)"
+  aget:source: "L557 Agent Skills Standard Ontology"
+  aget:note: "Skills are stateless by design; protocols may require state."
+```
+
+### Agent_Hook
+
+```yaml
+Agent_Hook:
+  skos:prefLabel: "Agent_Hook"
+  skos:definition: "Platform-specific lifecycle event handler that executes at defined points in agent/session lifecycle."
+  skos:altLabel: ["Lifecycle_Hook", "Session_Hook"]
+  skos:broader: "Agent_Capability"
+  skos:related: ["Agent_Skill", "Session_Protocol"]
+  aget:theoretical_basis: "Event-Driven Architecture (Michelson 2006)"
+  aget:source: "L570 Session Protocol Ontological Clarification"
+  aget:enum_values: ["SessionStart", "SessionEnd", "PreToolCall", "PostToolCall"]
+```
+
+### Session_Protocol
+
+```yaml
+Session_Protocol:
+  skos:prefLabel: "Session_Protocol"
+  skos:definition: "AGET-specific behavioral pattern that combines lifecycle awareness with on-demand capabilities. Hybrid of hooks and skills."
+  skos:altLabel: ["AGET_Protocol"]
+  skos:broader: "Agent_Capability"
+  skos:narrower: ["Lifecycle_Protocol", "On_Demand_Protocol"]
+  skos:related: ["Agent_Skill", "Agent_Hook"]
+  aget:theoretical_basis: "L536 Ontological Correction"
+  aget:note: "Session_Protocol is a PEER of Agent_Skill, not a subtype."
+```
+
+### Lifecycle_Protocol
+
+```yaml
+Lifecycle_Protocol:
+  skos:prefLabel: "Lifecycle_Protocol"
+  skos:definition: "Session protocol that executes at lifecycle boundaries (session start, session end). Implemented via hooks where available, scripts as fallback."
+  skos:altLabel: ["Session_Lifecycle_Protocol"]
+  skos:broader: "Session_Protocol"
+  skos:related: ["Agent_Hook"]
+  skos:example: ["wake_up", "wind_down"]
+  aget:source: "L536, L570"
+  aget:test_coverage: ["TestWakeUpProtocol (3)", "TestWindDownProtocol (8)"]
+```
+
+### On_Demand_Protocol
+
+```yaml
+On_Demand_Protocol:
+  skos:prefLabel: "On_Demand_Protocol"
+  skos:definition: "Session protocol that executes on user request, not at lifecycle boundaries. Fully portable via SKILL.md format."
+  skos:altLabel: ["Invocable_Protocol"]
+  skos:broader: "Session_Protocol"
+  skos:related: ["Agent_Skill"]
+  skos:example: ["study_up", "sanity_check", "step_back"]
+  aget:source: "L536, L557"
+  aget:test_coverage: ["TestStudyUpProtocol (6)", "TestSanityCheckProtocol (7)", "TestStepBackProtocol (6)"]
+```
+
+## CLI Support Terms
+
+### CLI_Support_Level
+
+```yaml
+CLI_Support_Level:
+  skos:prefLabel: "CLI_Support_Level"
+  skos:definition: "Classification of AGET support level for a specific CLI agent, based on empirical validation evidence."
+  skos:altLabel: ["CLI_Compatibility_Level"]
+  aget:theoretical_basis: "L533 Support Level Framework"
+  aget:source: "76/76 infrastructure tests passing"
+  aget:enum_values:
+    - Baseline: "CI + live session validation (primary target)"
+    - Validated: "VALIDATION_REPORT + live session confirmation"
+    - Compatible: "Infrastructure tests pass (should work, verify)"
+    - Experimental: "Architecture analysis only (may work, untested)"
+    - Unsupported: "Known blockers exist (does not work)"
+```
+
+## Agent Capability Terms Summary
+
+| Term | Type | Parent | Source |
+|------|------|--------|--------|
+| Agent_Capability | Concept | (root) | L536 |
+| Agent_Skill | Concept | Agent_Capability | L557 |
+| Agent_Hook | Concept | Agent_Capability | L570 |
+| Session_Protocol | Concept | Agent_Capability | L536 |
+| Lifecycle_Protocol | Concept | Session_Protocol | L536 |
+| On_Demand_Protocol | Concept | Session_Protocol | L536 |
+| CLI_Support_Level | Enum | (root) | L533 |
+
+## Ontology Reference
+
+Full concept definitions with theoretical grounding are in:
+`ontology/ONTOLOGY_personal_ai_systems_v1.0.yaml` (Cluster 10, Concepts C041-C047)
+
+---
+
 ## Requirements
 
 ### CAP-VOC-001: SKOS Foundation
@@ -2246,6 +2406,22 @@ AGET_SOP_SPEC:
 ---
 
 ## Changelog
+
+### v1.11.0 (2026-02-11)
+
+- **NEW**: Added Part 8: Agent Capabilities Vocabulary (L536, L533)
+- Added 7 vocabulary terms from cli-aget optimization experiments:
+  - Agent_Capability: Abstract parent for agent behavioral patterns
+  - Agent_Skill: Stateless, portable, on-demand (per Agent Skills Standard)
+  - Agent_Hook: Platform-specific lifecycle event handler
+  - Session_Protocol: AGET-specific hybrid of hooks and skills
+  - Lifecycle_Protocol: Session start/end protocols (wake_up, wind_down)
+  - On_Demand_Protocol: User-invoked protocols (study_up, sanity_check)
+  - CLI_Support_Level: Support classification (Baseline, Validated, Compatible, Experimental, Unsupported)
+- Documented L536 ontological correction: peers not hierarchy
+- Added test coverage mapping for all protocol terms
+- Cross-referenced to ontology/ONTOLOGY_personal_ai_systems_v1.0.yaml (Cluster 10, C041-C047)
+- See: PROJECT_PLAN_skills_ontology_integration_v1.0, L533, L536, L557, L570
 
 ### v1.10.0 (2026-01-17)
 
