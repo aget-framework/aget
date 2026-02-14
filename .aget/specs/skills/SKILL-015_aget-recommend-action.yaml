@@ -1,0 +1,121 @@
+# SKILL-015: aget-recommend-action
+# Purpose: Provide recommendations with rationale, alternatives, and risk assessment
+# Archetype: advisor
+# Created: 2026-02-14
+# Project: ARC-001 (Archetype Customization v3.5)
+
+spec:
+  id: SKILL-015
+  name: aget-recommend-action
+  version: 1.0.0
+  status: draft
+  created: 2026-02-14
+  format: "EARS with controlled vocabulary"
+  category: Archetype
+  archetype: advisor
+  scope: "Provide structured recommendations with rationale and alternatives"
+
+  traceability:
+    skill_md: ".claude/skills/aget-recommend-action/SKILL.md"
+    archetype_spec: "Advisor_SPEC.md"
+    ontology: "ONTOLOGY_advisor.yaml"
+    index_ref: "SKILL-A-ADV-002"
+    l_docs:
+      - "L463: Entity-Archetype Alignment"
+      - "L486: Ontology-Driven Creation"
+    vocabulary_terms:
+      - "Recommendation"
+      - "Strategy"
+      - "Option"
+
+capabilities:
+  RA-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-recommend-action`, the SKILL shall generate structured recommendation."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "Situation or question requiring recommendation"
+    outputs:
+      - "Primary recommendation"
+      - "Rationale"
+      - "Alternatives considered"
+      - "Risk assessment"
+    verification: "Output includes all four components"
+
+  RA-002:
+    domain: analysis
+    statement: "The SKILL shall identify at least two alternatives to the primary recommendation."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Alternative options with pros/cons"
+    verification: "At least two alternatives documented"
+
+  RA-003:
+    domain: analysis
+    statement: "The SKILL shall provide explicit rationale for the primary recommendation."
+    pattern: ubiquitous
+    priority: critical
+    outputs:
+      - "Clear rationale statement"
+    verification: "Rationale explains 'why' not just 'what'"
+
+  RA-004:
+    domain: output
+    statement: "The SKILL shall include confidence level (High, Medium, Low) for the recommendation."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "Confidence indicator"
+    verification: "Confidence level stated"
+
+  RA-005:
+    domain: output
+    statement: "WHEN uncertainty exists, the SKILL shall clearly state assumptions and limitations."
+    pattern: conditional
+    trigger: "Incomplete information or novel situation"
+    priority: high
+    outputs:
+      - "Assumptions list"
+      - "Limitations statement"
+    verification: "Uncertainty acknowledged when present"
+
+test_cases:
+  T-RA-001:
+    capability: "RA-001"
+    scenario: "User requests recommendation"
+    given: "User describes decision situation"
+    when: "User runs `/aget-recommend-action`"
+    then: "Structured recommendation generated"
+    verification_method: "manual"
+
+  T-RA-002:
+    capability: "RA-002"
+    scenario: "Alternatives provided"
+    given: "Recommendation requested"
+    when: "Recommendation generated"
+    then: "At least two alternatives included"
+    verification_method: "manual"
+
+  T-RA-003:
+    capability: "RA-005"
+    scenario: "Uncertainty handling"
+    given: "Incomplete information available"
+    when: "Recommendation generated"
+    then: "Assumptions and limitations stated"
+    verification_method: "spot-check"
+
+constraints:
+  C-RA-001:
+    statement: "The SKILL shall NOT present recommendations as commands."
+    rationale: "Advisor role is advisory, not directive"
+
+  C-RA-002:
+    statement: "The SKILL shall NOT hide alternatives that conflict with primary recommendation."
+    rationale: "User deserves complete picture for decision-making"
+
+  C-RA-003:
+    statement: "The SKILL shall NOT claim certainty when assumptions exist."
+    rationale: "Intellectual honesty essential for advisory role"

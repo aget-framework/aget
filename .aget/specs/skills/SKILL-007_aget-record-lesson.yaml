@@ -1,0 +1,120 @@
+# SKILL-007: aget-record-lesson
+# Purpose: Record lessons learned as persistent L-docs
+# Created: 2026-02-10
+# Based on: L532, SKILL_SPEC_TEMPLATE.yaml
+
+spec:
+  id: SKILL-007
+  name: aget-record-lesson
+  version: 1.0.0
+  status: production
+  created: 2026-02-10
+  format: "EARS with controlled vocabulary"
+  category: Learning
+  scope: "Capture lessons as structured L-docs with Framework/Domain classification"
+
+  traceability:
+    skill_md: ".claude/skills/aget-record-lesson/SKILL.md"
+    l_docs:
+      - "L532: Skills vs Learnings Distinction"
+      - "L51: Learning Document Structure"
+    vocabulary_terms:
+      - "AGET_Skill"
+      - "Learning_Document"
+      - "Framework_Belief"
+      - "Domain_Belief"
+
+capabilities:
+  RL-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-record-lesson`, the SKILL shall gather context and create a structured lesson document."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    outputs:
+      - "L-doc file or domain knowledge file"
+      - "Classification confirmation"
+    verification: "Lesson document created"
+
+  RL-002:
+    domain: classification
+    statement: "The SKILL shall ask user to classify lesson as Framework or Domain before writing."
+    pattern: ubiquitous
+    priority: critical
+    outputs:
+      - "Classification: Framework | Domain"
+    verification: "User confirms classification"
+
+  RL-003:
+    domain: framework
+    statement: "WHEN lesson is classified as Framework, the SKILL shall create L-doc in .aget/evolution/L###_*.md."
+    pattern: event-driven
+    trigger: framework_classification
+    priority: high
+    outputs:
+      - ".aget/evolution/L###_{name}.md"
+      - "Updated index.json"
+    verification: "L-doc created with next ID"
+
+  RL-004:
+    domain: domain
+    statement: "WHEN lesson is classified as Domain, the SKILL shall create file in knowledge/patterns/."
+    pattern: event-driven
+    trigger: domain_classification
+    priority: high
+    outputs:
+      - "knowledge/patterns/{category}/{name}.md"
+    verification: "Domain knowledge file created"
+
+  RL-005:
+    domain: id_management
+    statement: "WHEN creating Framework L-doc, the SKILL shall read next_id from index.json and increment after use."
+    pattern: event-driven
+    trigger: framework_creation
+    priority: high
+    verification: "ID assigned and incremented"
+
+  RL-006:
+    domain: structure
+    statement: "The SKILL shall use L-doc template with Summary, Context, Key Finding, Implications, Traceability sections."
+    pattern: ubiquitous
+    priority: medium
+    verification: "L-doc follows standard structure"
+
+test_cases:
+  T-RL-001:
+    capability: "RL-002"
+    scenario: "Classification prompt displayed"
+    given: "User provides lesson description"
+    when: "User runs `/aget-record-lesson`"
+    then: "Classification question asked before proceeding"
+    verification_method: "manual"
+
+  T-RL-002:
+    capability: "RL-003"
+    scenario: "Framework lesson creation"
+    given: "User classifies lesson as Framework"
+    when: "Classification confirmed"
+    then: "L-doc created in .aget/evolution/ with L-number"
+    verification_method: "manual"
+
+  T-RL-003:
+    capability: "RL-004"
+    scenario: "Domain lesson creation"
+    given: "User classifies lesson as Domain"
+    when: "Classification confirmed"
+    then: "File created in knowledge/patterns/ without L-number"
+    verification_method: "manual"
+
+constraints:
+  C-RL-001:
+    statement: "The SKILL shall NOT auto-classify lessons. User MUST confirm classification."
+    rationale: "Framework vs Domain is semantic decision requiring human judgment"
+
+  C-RL-002:
+    statement: "The SKILL shall NOT create L-docs without updating index.json."
+    rationale: "Index must stay synchronized with L-doc count"
+
+  C-RL-003:
+    statement: "The SKILL shall NOT assign L-numbers to Domain lessons."
+    rationale: "L-numbers reserved for Framework learnings"

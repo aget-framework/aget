@@ -1,0 +1,130 @@
+# SKILL-021: aget-propose-engagement
+# Purpose: Create proposals outlining scope, approach, and deliverables
+# Archetype: consultant
+# Created: 2026-02-14
+# Project: ARC-001 (Archetype Customization v3.5)
+
+spec:
+  id: SKILL-021
+  name: aget-propose-engagement
+  version: 1.0.0
+  status: draft
+  created: 2026-02-14
+  format: "EARS with controlled vocabulary"
+  category: Archetype
+  archetype: consultant
+  scope: "Create engagement proposals with scope, approach, and deliverables"
+
+  traceability:
+    skill_md: ".claude/skills/aget-propose-engagement/SKILL.md"
+    archetype_spec: "Consultant_SPEC.md"
+    ontology: "ONTOLOGY_consultant.yaml"
+    index_ref: "SKILL-A-CON-002"
+    l_docs:
+      - "L463: Entity-Archetype Alignment"
+      - "L486: Ontology-Driven Creation"
+    vocabulary_terms:
+      - "Engagement"
+      - "Proposal"
+      - "Deliverable"
+      - "Scope"
+
+capabilities:
+  PE-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-propose-engagement`, the SKILL shall generate proposal document."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "Engagement type"
+      - "Client needs (from assessment)"
+    outputs:
+      - "Proposal document"
+    verification: "Proposal generated with standard sections"
+
+  PE-002:
+    domain: structure
+    statement: "The SKILL shall include scope definition with in-scope and out-of-scope items."
+    pattern: ubiquitous
+    priority: critical
+    outputs:
+      - "Scope section"
+    verification: "Both in-scope and out-of-scope documented"
+
+  PE-003:
+    domain: structure
+    statement: "The SKILL shall include approach with methodology and phases."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Approach section"
+      - "Phase breakdown"
+    verification: "Methodology and phases described"
+
+  PE-004:
+    domain: structure
+    statement: "The SKILL shall include deliverables with acceptance criteria."
+    pattern: ubiquitous
+    priority: critical
+    outputs:
+      - "Deliverables list"
+      - "Acceptance criteria"
+    verification: "Each deliverable has criteria"
+
+  PE-005:
+    domain: structure
+    statement: "The SKILL shall include assumptions and dependencies."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Assumptions list"
+      - "Dependencies"
+    verification: "Assumptions and dependencies stated"
+
+  PE-006:
+    domain: structure
+    statement: "The SKILL shall include success criteria for engagement."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Success criteria"
+    verification: "Measurable success criteria defined"
+
+test_cases:
+  T-PE-001:
+    capability: "PE-001"
+    scenario: "User requests proposal"
+    given: "Client needs assessed"
+    when: "User runs `/aget-propose-engagement`"
+    then: "Proposal document generated"
+    verification_method: "manual"
+
+  T-PE-002:
+    capability: "PE-002, PE-003, PE-004"
+    scenario: "Complete proposal structure"
+    given: "Proposal generated"
+    when: "Structure reviewed"
+    then: "Scope, approach, and deliverables present"
+    verification_method: "manual"
+
+  T-PE-003:
+    capability: "PE-006"
+    scenario: "Success criteria"
+    given: "Proposal complete"
+    when: "Criteria reviewed"
+    then: "Measurable success criteria defined"
+    verification_method: "spot-check"
+
+constraints:
+  C-PE-001:
+    statement: "The SKILL shall NOT propose without prior needs assessment."
+    rationale: "Proposals must be grounded in client needs"
+
+  C-PE-002:
+    statement: "The SKILL shall NOT leave scope ambiguous."
+    rationale: "Clear scope prevents scope creep"
+
+  C-PE-003:
+    statement: "The SKILL shall NOT define deliverables without acceptance criteria."
+    rationale: "Criteria enable completion verification"

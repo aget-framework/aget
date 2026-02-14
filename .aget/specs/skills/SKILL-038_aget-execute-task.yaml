@@ -1,0 +1,128 @@
+# SKILL-038: aget-execute-task
+# Purpose: Execute defined tasks with progress tracking and deliverable production
+# Archetype: worker
+# Created: 2026-02-14
+# Project: ARC-001 (Archetype Customization v3.5)
+
+spec:
+  id: SKILL-038
+  name: aget-execute-task
+  version: 1.0.0
+  status: draft
+  created: 2026-02-14
+  format: "EARS with controlled vocabulary"
+  category: Archetype
+  archetype: worker
+  scope: "Execute tasks with progress tracking and deliverable production"
+
+  traceability:
+    skill_md: ".claude/skills/aget-execute-task/SKILL.md"
+    archetype_spec: "Worker_SPEC.md"
+    ontology: "ONTOLOGY_worker.yaml"
+    index_ref: "SKILL-A-WRK-001"
+    l_docs:
+      - "L463: Entity-Archetype Alignment"
+      - "L486: Ontology-Driven Creation"
+    vocabulary_terms:
+      - "Task"
+      - "Deliverable"
+      - "Task_Status"
+
+capabilities:
+  ET-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-execute-task`, the SKILL shall begin task execution."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "Task definition or reference"
+    outputs:
+      - "Task execution"
+      - "Deliverables"
+    verification: "Task executed"
+
+  ET-002:
+    domain: validation
+    statement: "The SKILL shall validate task definition before execution."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Validation result"
+    verification: "Incomplete tasks flagged"
+
+  ET-003:
+    domain: execution
+    statement: "The SKILL shall execute task steps sequentially."
+    pattern: ubiquitous
+    priority: critical
+    outputs:
+      - "Step completion status"
+    verification: "Steps execute in order"
+
+  ET-004:
+    domain: tracking
+    statement: "The SKILL shall track and report progress."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Progress percentage"
+      - "Current step"
+    verification: "Progress visible"
+
+  ET-005:
+    domain: deliverables
+    statement: "The SKILL shall produce specified deliverables."
+    pattern: ubiquitous
+    priority: critical
+    outputs:
+      - "Deliverable artifacts"
+    verification: "Deliverables match specification"
+
+  ET-006:
+    domain: blocking
+    statement: "WHEN blocker encountered, the SKILL shall report and pause."
+    pattern: conditional
+    trigger: "Blocker encountered"
+    priority: high
+    outputs:
+      - "Blocker description"
+    verification: "Blockers not silently ignored"
+
+test_cases:
+  T-ET-001:
+    capability: "ET-001"
+    scenario: "User executes task"
+    given: "Valid task definition"
+    when: "User runs `/aget-execute-task`"
+    then: "Task execution begins"
+    verification_method: "manual"
+
+  T-ET-002:
+    capability: "ET-003, ET-004"
+    scenario: "Task with multiple steps"
+    given: "Task with 5 steps"
+    when: "Execution proceeds"
+    then: "Progress reported at each step"
+    verification_method: "manual"
+
+  T-ET-003:
+    capability: "ET-006"
+    scenario: "Blocker handling"
+    given: "Step encounters blocker"
+    when: "Blocker detected"
+    then: "Execution pauses, blocker reported"
+    verification_method: "manual"
+
+constraints:
+  C-ET-001:
+    statement: "The SKILL shall NOT skip steps without explicit approval."
+    rationale: "Task integrity requires step completion"
+
+  C-ET-002:
+    statement: "The SKILL shall NOT claim completion without deliverables."
+    rationale: "Deliverables are proof of completion"
+
+  C-ET-003:
+    statement: "The SKILL shall NOT continue past blockers silently."
+    rationale: "Blockers require human decision"

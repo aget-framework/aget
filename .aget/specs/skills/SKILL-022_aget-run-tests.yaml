@@ -1,0 +1,133 @@
+# SKILL-022: aget-run-tests
+# Purpose: Execute test suite and report results
+# Archetype: developer
+# Created: 2026-02-14
+# Project: ARC-001 (Archetype Customization v3.5)
+
+spec:
+  id: SKILL-022
+  name: aget-run-tests
+  version: 1.0.0
+  status: draft
+  created: 2026-02-14
+  format: "EARS with controlled vocabulary"
+  category: Archetype
+  archetype: developer
+  scope: "Execute test suites and report results for unit, integration, and conformance tests"
+
+  traceability:
+    skill_md: ".claude/skills/aget-run-tests/SKILL.md"
+    archetype_spec: "Developer_SPEC.md"
+    ontology: "ONTOLOGY_developer.yaml"
+    index_ref: "SKILL-A-DEV-001"
+    l_docs:
+      - "L463: Entity-Archetype Alignment"
+      - "L486: Ontology-Driven Creation"
+    vocabulary_terms:
+      - "Test"
+      - "Unit_Test"
+      - "Integration_Test"
+      - "Test_Result"
+
+capabilities:
+  RT-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-run-tests`, the SKILL shall execute appropriate test suite."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "Test scope (all, unit, integration, specific file/pattern)"
+    outputs:
+      - "Test execution results"
+      - "Pass/fail summary"
+    verification: "Tests execute and results displayed"
+
+  RT-002:
+    domain: detection
+    statement: "The SKILL shall auto-detect test framework (pytest, jest, go test, etc.)."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Detected framework"
+    verification: "Framework correctly identified"
+
+  RT-003:
+    domain: execution
+    statement: "The SKILL shall run tests with appropriate verbosity and timing."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Test output with timing"
+    verification: "Output includes execution time"
+
+  RT-004:
+    domain: reporting
+    statement: "The SKILL shall report pass/fail count and failure details."
+    pattern: ubiquitous
+    priority: critical
+    outputs:
+      - "Pass count"
+      - "Fail count"
+      - "Failure messages"
+    verification: "All failures detailed"
+
+  RT-005:
+    domain: reporting
+    statement: "WHEN tests fail, the SKILL shall provide actionable failure context."
+    pattern: conditional
+    trigger: "Test failure occurs"
+    priority: high
+    outputs:
+      - "File and line of failure"
+      - "Expected vs actual"
+      - "Relevant stack trace"
+    verification: "Failure context enables debugging"
+
+  RT-006:
+    domain: coverage
+    statement: "WHEN coverage tool available, the SKILL shall report coverage percentage."
+    pattern: conditional
+    trigger: "Coverage tool configured"
+    priority: medium
+    outputs:
+      - "Coverage percentage"
+    verification: "Coverage reported when available"
+
+test_cases:
+  T-RT-001:
+    capability: "RT-001"
+    scenario: "User runs tests"
+    given: "Test suite exists"
+    when: "User runs `/aget-run-tests`"
+    then: "Tests execute and results shown"
+    verification_method: "automated"
+
+  T-RT-002:
+    capability: "RT-002"
+    scenario: "Framework detection"
+    given: "pytest.ini or package.json with jest exists"
+    when: "Tests invoked"
+    then: "Correct framework used"
+    verification_method: "automated"
+
+  T-RT-003:
+    capability: "RT-005"
+    scenario: "Failure reporting"
+    given: "Test that fails"
+    when: "Test run completes"
+    then: "Failure details actionable"
+    verification_method: "manual"
+
+constraints:
+  C-RT-001:
+    statement: "The SKILL shall NOT modify test files during execution."
+    rationale: "Test execution is read-only"
+
+  C-RT-002:
+    statement: "The SKILL shall NOT suppress test failures."
+    rationale: "All failures must be visible"
+
+  C-RT-003:
+    statement: "The SKILL shall NOT run tests without user consent if they have side effects."
+    rationale: "Integration tests may modify state"

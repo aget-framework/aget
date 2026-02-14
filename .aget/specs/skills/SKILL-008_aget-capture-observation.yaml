@@ -1,0 +1,116 @@
+# SKILL-008: aget-capture-observation
+# Purpose: Capture research observations without committing specs
+# Created: 2026-02-10
+# Based on: L570, L574, SKILL_SPEC_TEMPLATE.yaml
+
+spec:
+  id: SKILL-008
+  name: aget-capture-observation
+  version: 1.0.0
+  status: production
+  created: 2026-02-10
+  format: "EARS with controlled vocabulary"
+  category: Learning
+  scope: "Capture observations mid-session for later review at wind-down"
+
+  traceability:
+    skill_md: ".claude/skills/aget-capture-observation/SKILL.md"
+    l_docs:
+      - "L570: Observation Capture Protocol"
+      - "L574: Session Continuity"
+      - "L575: Autonomous-Explicit Continuum"
+    vocabulary_terms:
+      - "AGET_Skill"
+      - "Observation"
+      - "Session_Artifact"
+
+capabilities:
+  CO-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-capture-observation`, the SKILL shall capture observation to session file."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    outputs:
+      - "Observation appended to session file"
+    verification: "Observation captured"
+
+  CO-002:
+    domain: mode_detection
+    statement: "WHEN invoked with no arguments, the SKILL shall scan session for valuable signals (Autonomous mode)."
+    pattern: event-driven
+    trigger: no_args
+    priority: high
+    outputs:
+      - "Top 3-5 signals captured"
+    verification: "Autonomous scan identifies signals"
+
+  CO-003:
+    domain: mode_detection
+    statement: "WHEN invoked with time pattern (e.g., '10min'), the SKILL shall scale depth to time budget."
+    pattern: event-driven
+    trigger: time_arg
+    priority: medium
+    verification: "Depth scales with time budget"
+
+  CO-004:
+    domain: mode_detection
+    statement: "WHEN invoked with signal text, the SKILL shall classify and route to appropriate section (Explicit mode)."
+    pattern: event-driven
+    trigger: text_arg
+    priority: high
+    outputs:
+      - "Signal classified and captured"
+    verification: "Signal routed to correct section"
+
+  CO-005:
+    domain: classification
+    statement: "The SKILL shall classify signals as: vocabulary candidate, research question, web finding, L-doc draft, pattern, process gap, or general observation."
+    pattern: ubiquitous
+    priority: medium
+    verification: "Signals classified correctly"
+
+  CO-006:
+    domain: output
+    statement: "The SKILL shall append observations to current session file in sessions/ if one exists."
+    pattern: ubiquitous
+    priority: high
+    verification: "Observations written to session file"
+
+test_cases:
+  T-CO-001:
+    capability: "CO-002"
+    scenario: "Autonomous signal detection"
+    given: "Session with vocabulary candidates discussed"
+    when: "User runs `/aget-capture-observation`"
+    then: "Vocabulary candidates captured to session file"
+    verification_method: "manual"
+
+  T-CO-002:
+    capability: "CO-004"
+    scenario: "Explicit observation capture"
+    given: "User provides 'pattern: Gate discipline'"
+    when: "User runs `/aget-capture-observation 'pattern: Gate discipline'`"
+    then: "Captured under Patterns section"
+    verification_method: "manual"
+
+  T-CO-003:
+    capability: "CO-003"
+    scenario: "Time-budget depth scaling"
+    given: "User specifies 20min time budget"
+    when: "User runs `/aget-capture-observation 20min`"
+    then: "Deep analysis with RQ proposals and L-doc candidates"
+    verification_method: "manual"
+
+constraints:
+  C-CO-001:
+    statement: "The SKILL shall NOT modify specs/CLI_VOCABULARY.md directly."
+    rationale: "Vocabulary requires deliberate enhancement session"
+
+  C-CO-002:
+    statement: "The SKILL shall NOT modify specs/CLI_SUBSYSTEM_SPEC.md directly."
+    rationale: "Specs require deliberate enhancement session"
+
+  C-CO-003:
+    statement: "The SKILL shall NOT create L-docs directly. Capture findings, formalize at wind-down."
+    rationale: "Capture early, commit deliberately"

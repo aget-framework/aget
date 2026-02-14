@@ -1,0 +1,127 @@
+# SKILL-011: aget-create-project
+# Purpose: Generate PROJECT_PLAN with research-informed scaffolding
+# Created: 2026-02-10
+# Based on: L274, L275, SKILL_SPEC_TEMPLATE.yaml
+
+spec:
+  id: SKILL-011
+  name: aget-create-project
+  version: 1.0.0
+  status: production
+  created: 2026-02-10
+  format: "EARS with controlled vocabulary"
+  category: Creation
+  scope: "Create project plans with research phase, L-doc integration, and traceability"
+
+  traceability:
+    skill_md: ".claude/skills/aget-create-project/SKILL.md"
+    l_docs:
+      - "L274: OKR-Driven Project Initiation"
+      - "L275: Multi-Gate Execution Protocol"
+      - "L289: Evidence-First Design"
+    vocabulary_terms:
+      - "AGET_Skill"
+      - "Project_Plan"
+      - "Research_Phase"
+
+capabilities:
+  CP-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-create-project`, the SKILL shall create a research-informed project plan."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    outputs:
+      - "planning/PROJECT_PLAN_{name}.md"
+    verification: "Project plan created"
+
+  CP-002:
+    domain: mode_detection
+    statement: "WHEN invoked with type and name, the SKILL shall create project of specified type (Explicit mode)."
+    pattern: event-driven
+    trigger: explicit_args
+    priority: high
+    verification: "Explicit mode creates correct type"
+
+  CP-003:
+    domain: mode_detection
+    statement: "WHEN invoked with topic only, the SKILL shall infer type from topic and AGET domain."
+    pattern: event-driven
+    trigger: inference_needed
+    priority: medium
+    verification: "Type inferred correctly"
+
+  CP-004:
+    domain: research
+    statement: "The SKILL shall read .aget/identity.json before scaffolding."
+    pattern: ubiquitous
+    priority: high
+    inputs:
+      - ".aget/identity.json"
+    verification: "Identity informs project context"
+
+  CP-005:
+    domain: research
+    statement: "The SKILL shall search relevant L-docs and include in Phase -1 table."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "L-doc Review table populated"
+    verification: "Related L-docs included"
+
+  CP-006:
+    domain: conflict_check
+    statement: "WHEN project with similar name exists, the SKILL shall WARN and ask for confirmation."
+    pattern: conditional
+    trigger: name_conflict
+    priority: medium
+    verification: "Duplicate warning displayed"
+
+  CP-007:
+    domain: template
+    statement: "The SKILL shall verify template exists before generating project."
+    pattern: ubiquitous
+    priority: critical
+    verification: "Template validation before generation"
+
+test_cases:
+  T-CP-001:
+    capability: "CP-001"
+    scenario: "Project creation with research"
+    given: "Valid project topic"
+    when: "User runs `/aget-create-project research skill-specs`"
+    then: "PROJECT_PLAN created with L-doc Review populated"
+    verification_method: "manual"
+
+  T-CP-002:
+    capability: "CP-006"
+    scenario: "Duplicate project warning"
+    given: "PROJECT_PLAN_skills_v1.md exists"
+    when: "User proposes project named 'skills'"
+    then: "Warning about similar project displayed"
+    verification_method: "manual"
+
+  T-CP-003:
+    capability: "CP-007"
+    scenario: "Missing template blocks creation"
+    given: "Template file does not exist"
+    when: "User runs `/aget-create-project`"
+    then: "Error: Template not found"
+    verification_method: "automated"
+
+constraints:
+  C-CP-001:
+    statement: "The SKILL shall NOT create project without valid template."
+    rationale: "Template ensures consistent structure"
+
+  C-CP-002:
+    statement: "The SKILL shall NOT overwrite existing project without explicit confirmation."
+    rationale: "Protect existing work"
+
+  C-CP-003:
+    statement: "The SKILL shall NOT skip the Research Phase."
+    rationale: "Evidence-first design principle"
+
+  C-CP-004:
+    statement: "The SKILL shall NOT modify specs/, governance/, or .aget/ directly."
+    rationale: "Creation skill scoped to planning/"

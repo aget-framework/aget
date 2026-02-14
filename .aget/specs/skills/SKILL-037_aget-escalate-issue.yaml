@@ -1,0 +1,128 @@
+# SKILL-037: aget-escalate-issue
+# Purpose: Escalate issues to higher authority when they exceed current scope
+# Archetype: supervisor
+# Created: 2026-02-14
+# Project: ARC-001 (Archetype Customization v3.5)
+
+spec:
+  id: SKILL-037
+  name: aget-escalate-issue
+  version: 1.0.0
+  status: draft
+  created: 2026-02-14
+  format: "EARS with controlled vocabulary"
+  category: Archetype
+  archetype: supervisor
+  scope: "Escalate issues exceeding current scope to higher authority"
+
+  traceability:
+    skill_md: ".claude/skills/aget-escalate-issue/SKILL.md"
+    archetype_spec: "Supervisor_SPEC.md"
+    ontology: "ONTOLOGY_supervisor.yaml"
+    index_ref: "SKILL-A-SUP-003"
+    l_docs:
+      - "L463: Entity-Archetype Alignment"
+      - "L486: Ontology-Driven Creation"
+    vocabulary_terms:
+      - "Escalation"
+      - "Intervention"
+      - "Authority"
+
+capabilities:
+  EI-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-escalate-issue`, the SKILL shall prepare escalation."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "Issue description"
+      - "Reason for escalation"
+    outputs:
+      - "Escalation document"
+    verification: "Escalation prepared"
+
+  EI-002:
+    domain: assessment
+    statement: "The SKILL shall verify issue exceeds current authority scope."
+    pattern: ubiquitous
+    priority: critical
+    outputs:
+      - "Scope assessment"
+    verification: "Scope boundary verified"
+
+  EI-003:
+    domain: documentation
+    statement: "The SKILL shall document context, attempts made, and impact."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Context summary"
+      - "Prior attempts"
+      - "Impact assessment"
+    verification: "Documentation complete"
+
+  EI-004:
+    domain: routing
+    statement: "The SKILL shall identify appropriate escalation target."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Escalation target"
+    verification: "Target appropriate for issue type"
+
+  EI-005:
+    domain: urgency
+    statement: "The SKILL shall assign urgency level."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Urgency classification"
+    verification: "Urgency assigned"
+
+  EI-006:
+    domain: tracking
+    statement: "The SKILL shall create tracking artifact for escalation."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "Tracking artifact"
+    verification: "Escalation trackable"
+
+test_cases:
+  T-EI-001:
+    capability: "EI-001"
+    scenario: "User escalates issue"
+    given: "Issue exceeds supervisor scope"
+    when: "User runs `/aget-escalate-issue`"
+    then: "Escalation prepared"
+    verification_method: "manual"
+
+  T-EI-002:
+    capability: "EI-002"
+    scenario: "Scope verification"
+    given: "Issue within scope"
+    when: "Escalation attempted"
+    then: "User advised to handle locally"
+    verification_method: "manual"
+
+  T-EI-003:
+    capability: "EI-003, EI-004"
+    scenario: "Complete escalation"
+    given: "Escalation needed"
+    when: "Escalation executed"
+    then: "Context documented, target identified"
+    verification_method: "spot-check"
+
+constraints:
+  C-EI-001:
+    statement: "The SKILL shall NOT escalate issues within current authority."
+    rationale: "Unnecessary escalation wastes resources"
+
+  C-EI-002:
+    statement: "The SKILL shall NOT escalate without documenting prior attempts."
+    rationale: "Escalation requires proof of local effort"
+
+  C-EI-003:
+    statement: "The SKILL shall NOT set urgency inappropriately high."
+    rationale: "Urgency inflation reduces effectiveness"

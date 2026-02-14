@@ -1,0 +1,630 @@
+# ARCHETYPE_SKILLS_INDEX.yaml
+# AGET Framework Archetype Skills Index
+# Version: 1.0.0
+# Spec Reference: AGET_TEMPLATE_SPEC.md
+# Created: 2026-02-14
+# Project: ARC-001 (Archetype Customization v3.5)
+
+# Purpose:
+# This index provides the authoritative registry of archetype-specific skills.
+# Each archetype has 2-3 specialized skills derived from its capability spec.
+# Skills are deployed to templates in addition to the universal 13 skills.
+
+meta:
+  version: "1.0.0"
+  framework_version: "3.5.0"
+  spec_reference: "AGET_TEMPLATE_SPEC.md"
+  purpose: "Authoritative index for archetype-specific skills"
+  project: "PROJECT_PLAN_archetype_customization_v3.5_v1.0.md"
+  related_learnings:
+    - L463  # Entity-archetype alignment
+    - L486  # Ontology-driven creation
+    - L574  # v3.5.0 vocabulary/skills architecture
+    - L575  # SOP & Template archetype audit
+
+# Skill naming convention
+naming:
+  pattern: "aget-{verb}-{object}"
+  convention: "S-V-O (Subject-Verb-Object)"
+  examples:
+    - "aget-run-tests"
+    - "aget-broadcast-fleet"
+    - "aget-assess-risk"
+  constraints:
+    - "MUST start with 'aget-' prefix"
+    - "MUST use lowercase with hyphens"
+    - "MUST NOT conflict with universal 13 skills"
+
+# Universal skills (for reference - not defined here)
+universal_skills:
+  count: 13
+  list:
+    - aget-wake-up
+    - aget-wind-down
+    - aget-save-state
+    - aget-check-health
+    - aget-check-evolution
+    - aget-check-sessions
+    - aget-check-kb
+    - aget-record-lesson
+    - aget-capture-observation
+    - aget-create-project
+    - aget-review-project
+    - aget-propose-skill
+    - aget-studyup
+  reference: "SESSION_SKILLS_INDEX.yaml"
+
+# ============================================================================
+# ARCHETYPE SKILLS CATALOG
+# ============================================================================
+
+archetypes:
+
+  # --------------------------------------------------------------------------
+  # WORKER ARCHETYPE
+  # --------------------------------------------------------------------------
+  worker:
+    archetype_id: worker
+    spec_reference: "Worker_SPEC.md"
+    ontology_reference: "ONTOLOGY_worker.yaml"
+    skill_count: 2
+
+    skills:
+      - id: SKILL-A-WRK-001
+        name: aget-execute-task
+        capability: CAP-WRK-001
+        description: >
+          Execute a defined task with progress tracking and deliverable production.
+        trigger_phrase: "execute task"
+        aliases:
+          - "do task"
+          - "work on task"
+        ontology_concepts:
+          - Task
+          - Deliverable
+          - Task_Status
+        location: ".claude/skills/aget-execute-task/"
+
+      - id: SKILL-A-WRK-002
+        name: aget-report-progress
+        capability: CAP-WRK-002
+        description: >
+          Report progress on current work, including completion percentage,
+          blockers, and remaining items.
+        trigger_phrase: "report progress"
+        aliases:
+          - "status update"
+          - "progress report"
+        ontology_concepts:
+          - Progress
+          - Task_Status
+          - Handoff
+        location: ".claude/skills/aget-report-progress/"
+
+  # --------------------------------------------------------------------------
+  # SUPERVISOR ARCHETYPE
+  # --------------------------------------------------------------------------
+  supervisor:
+    archetype_id: supervisor
+    spec_reference: "Supervisor_SPEC.md"
+    ontology_reference: "ONTOLOGY_supervisor.yaml"
+    skill_count: 3
+
+    skills:
+      - id: SKILL-A-SUP-001
+        name: aget-broadcast-fleet
+        capability: CAP-SUP-001
+        description: >
+          Send a communication to multiple fleet members simultaneously.
+          Supports announcements, directives, and release handoffs.
+        trigger_phrase: "broadcast fleet"
+        aliases:
+          - "notify fleet"
+          - "fleet announcement"
+        ontology_concepts:
+          - Fleet
+          - Broadcast
+          - Release_Handoff
+        location: ".claude/skills/aget-broadcast-fleet/"
+
+      - id: SKILL-A-SUP-002
+        name: aget-review-agent
+        capability: CAP-SUP-002
+        description: >
+          Review a specific agent's health, conformance, and recent activity.
+        trigger_phrase: "review agent"
+        aliases:
+          - "check agent"
+          - "agent status"
+        ontology_concepts:
+          - Agent_Registry
+          - Agent_Status
+          - Fleet_Audit
+        location: ".claude/skills/aget-review-agent/"
+
+      - id: SKILL-A-SUP-003
+        name: aget-escalate-issue
+        capability: CAP-SUP-003
+        description: >
+          Escalate an issue to higher authority when it exceeds current scope.
+        trigger_phrase: "escalate issue"
+        aliases:
+          - "escalate"
+          - "raise issue"
+        ontology_concepts:
+          - Escalation
+          - Intervention
+        location: ".claude/skills/aget-escalate-issue/"
+
+  # --------------------------------------------------------------------------
+  # DEVELOPER ARCHETYPE
+  # --------------------------------------------------------------------------
+  developer:
+    archetype_id: developer
+    spec_reference: "Developer_SPEC.md"
+    ontology_reference: "ONTOLOGY_developer.yaml"
+    skill_count: 3
+
+    skills:
+      - id: SKILL-A-DEV-001
+        name: aget-run-tests
+        capability: CAP-DEV-001
+        description: >
+          Execute test suite and report results. Supports unit tests,
+          integration tests, and conformance tests.
+        trigger_phrase: "run tests"
+        aliases:
+          - "test"
+          - "execute tests"
+        ontology_concepts:
+          - Test
+          - Unit_Test
+          - Integration_Test
+          - Test_Result
+        location: ".claude/skills/aget-run-tests/"
+
+      - id: SKILL-A-DEV-002
+        name: aget-lint-code
+        capability: CAP-DEV-002
+        description: >
+          Run code linting and formatting checks on specified files or directories.
+        trigger_phrase: "lint code"
+        aliases:
+          - "lint"
+          - "check code style"
+        ontology_concepts:
+          - Code
+          - Code_Change
+        location: ".claude/skills/aget-lint-code/"
+
+      - id: SKILL-A-DEV-003
+        name: aget-review-pr
+        capability: CAP-DEV-003
+        description: >
+          Review a pull request for code quality, test coverage, and standards compliance.
+        trigger_phrase: "review pr"
+        aliases:
+          - "review pull request"
+          - "pr review"
+        ontology_concepts:
+          - Pull_Request
+          - Code_Review
+          - Code_Change
+        location: ".claude/skills/aget-review-pr/"
+
+  # --------------------------------------------------------------------------
+  # CONSULTANT ARCHETYPE
+  # --------------------------------------------------------------------------
+  consultant:
+    archetype_id: consultant
+    spec_reference: "Consultant_SPEC.md"
+    ontology_reference: "ONTOLOGY_consultant.yaml"
+    skill_count: 2
+
+    skills:
+      - id: SKILL-A-CON-001
+        name: aget-assess-client
+        capability: CAP-CON-001
+        description: >
+          Assess client needs, constraints, and objectives to inform engagement scope.
+        trigger_phrase: "assess client"
+        aliases:
+          - "client assessment"
+          - "needs assessment"
+        ontology_concepts:
+          - Client
+          - Client_Need
+        location: ".claude/skills/aget-assess-client/"
+
+      - id: SKILL-A-CON-002
+        name: aget-propose-engagement
+        capability: CAP-CON-002
+        description: >
+          Create a proposal document outlining scope, approach, and deliverables.
+        trigger_phrase: "propose engagement"
+        aliases:
+          - "create proposal"
+          - "engagement proposal"
+        ontology_concepts:
+          - Engagement
+          - Proposal
+          - Deliverable
+        location: ".claude/skills/aget-propose-engagement/"
+
+  # --------------------------------------------------------------------------
+  # ADVISOR ARCHETYPE
+  # --------------------------------------------------------------------------
+  advisor:
+    archetype_id: advisor
+    spec_reference: "Advisor_SPEC.md"
+    ontology_reference: "ONTOLOGY_advisor.yaml"
+    skill_count: 2
+
+    skills:
+      - id: SKILL-A-ADV-001
+        name: aget-assess-risk
+        capability: CAP-ADV-001
+        description: >
+          Assess risks associated with a decision, action, or situation.
+          Includes likelihood, impact, and mitigation options.
+        trigger_phrase: "assess risk"
+        aliases:
+          - "risk assessment"
+          - "evaluate risk"
+        ontology_concepts:
+          - Risk
+          - Mitigation
+        location: ".claude/skills/aget-assess-risk/"
+
+      - id: SKILL-A-ADV-002
+        name: aget-recommend-action
+        capability: CAP-ADV-002
+        description: >
+          Provide a recommendation with rationale, alternatives considered,
+          and risk assessment.
+        trigger_phrase: "recommend action"
+        aliases:
+          - "recommendation"
+          - "advise"
+        ontology_concepts:
+          - Recommendation
+          - Strategy
+          - Option
+        location: ".claude/skills/aget-recommend-action/"
+
+  # --------------------------------------------------------------------------
+  # ANALYST ARCHETYPE
+  # --------------------------------------------------------------------------
+  analyst:
+    archetype_id: analyst
+    spec_reference: "Analyst_SPEC.md"
+    ontology_reference: "ONTOLOGY_analyst.yaml"
+    skill_count: 2
+
+    skills:
+      - id: SKILL-A-ANL-001
+        name: aget-analyze-data
+        capability: CAP-ANL-001
+        description: >
+          Perform analysis on a dataset to discover patterns and generate insights.
+        trigger_phrase: "analyze data"
+        aliases:
+          - "data analysis"
+          - "analyze"
+        ontology_concepts:
+          - Dataset
+          - Analysis
+          - Insight
+        location: ".claude/skills/aget-analyze-data/"
+
+      - id: SKILL-A-ANL-002
+        name: aget-generate-report
+        capability: CAP-ANL-002
+        description: >
+          Generate a report presenting analysis results, metrics, and insights.
+        trigger_phrase: "generate report"
+        aliases:
+          - "create report"
+          - "report"
+        ontology_concepts:
+          - Report
+          - Metric
+          - Visualization
+        location: ".claude/skills/aget-generate-report/"
+
+  # --------------------------------------------------------------------------
+  # ARCHITECT ARCHETYPE
+  # --------------------------------------------------------------------------
+  architect:
+    archetype_id: architect
+    spec_reference: "Architect_SPEC.md"
+    ontology_reference: "ONTOLOGY_architect.yaml"
+    skill_count: 2
+
+    skills:
+      - id: SKILL-A-ARC-001
+        name: aget-design-architecture
+        capability: CAP-ARC-001
+        description: >
+          Design system architecture including components, relationships, and patterns.
+        trigger_phrase: "design architecture"
+        aliases:
+          - "architecture design"
+          - "system design"
+        ontology_concepts:
+          - Architecture
+          - Component
+          - Pattern
+        location: ".claude/skills/aget-design-architecture/"
+
+      - id: SKILL-A-ARC-002
+        name: aget-assess-tradeoffs
+        capability: CAP-ARC-002
+        description: >
+          Analyze trade-offs between competing concerns and quality attributes.
+        trigger_phrase: "assess tradeoffs"
+        aliases:
+          - "tradeoff analysis"
+          - "evaluate tradeoffs"
+        ontology_concepts:
+          - Trade_off
+          - Quality_Attribute
+          - Decision
+        location: ".claude/skills/aget-assess-tradeoffs/"
+
+  # --------------------------------------------------------------------------
+  # RESEARCHER ARCHETYPE
+  # --------------------------------------------------------------------------
+  researcher:
+    archetype_id: researcher
+    spec_reference: "Researcher_SPEC.md"
+    ontology_reference: "ONTOLOGY_researcher.yaml"
+    skill_count: 2
+
+    skills:
+      - id: SKILL-A-RES-001
+        name: aget-search-literature
+        capability: CAP-RES-001
+        description: >
+          Search and review relevant literature, papers, and prior work.
+        trigger_phrase: "search literature"
+        aliases:
+          - "literature review"
+          - "research search"
+        ontology_concepts:
+          - Literature
+          - Citation
+          - Knowledge_Gap
+        location: ".claude/skills/aget-search-literature/"
+
+      - id: SKILL-A-RES-002
+        name: aget-document-finding
+        capability: CAP-RES-002
+        description: >
+          Document a research finding with evidence, methodology, and implications.
+        trigger_phrase: "document finding"
+        aliases:
+          - "record finding"
+          - "finding documentation"
+        ontology_concepts:
+          - Finding
+          - Evidence
+          - Hypothesis
+        location: ".claude/skills/aget-document-finding/"
+
+  # --------------------------------------------------------------------------
+  # OPERATOR ARCHETYPE
+  # --------------------------------------------------------------------------
+  operator:
+    archetype_id: operator
+    spec_reference: "Operator_SPEC.md"
+    ontology_reference: "ONTOLOGY_operator.yaml"
+    skill_count: 2
+
+    skills:
+      - id: SKILL-A-OPS-001
+        name: aget-handle-incident
+        capability: CAP-OPS-001
+        description: >
+          Handle an incident including diagnosis, mitigation, and resolution.
+        trigger_phrase: "handle incident"
+        aliases:
+          - "incident response"
+          - "respond to incident"
+        ontology_concepts:
+          - Incident
+          - Response
+          - Root_Cause
+        location: ".claude/skills/aget-handle-incident/"
+
+      - id: SKILL-A-OPS-002
+        name: aget-run-playbook
+        capability: CAP-OPS-002
+        description: >
+          Execute a runbook for a specific operational scenario.
+        trigger_phrase: "run playbook"
+        aliases:
+          - "execute runbook"
+          - "follow playbook"
+        ontology_concepts:
+          - Runbook
+          - Deployment
+          - Rollback
+        location: ".claude/skills/aget-run-playbook/"
+
+  # --------------------------------------------------------------------------
+  # EXECUTIVE ARCHETYPE
+  # --------------------------------------------------------------------------
+  executive:
+    archetype_id: executive
+    spec_reference: "Executive_SPEC.md"
+    ontology_reference: "ONTOLOGY_executive.yaml"
+    skill_count: 2
+
+    skills:
+      - id: SKILL-A-EXE-001
+        name: aget-make-decision
+        capability: CAP-EXE-001
+        description: >
+          Make a decision with documented rationale, authority, and communication plan.
+        trigger_phrase: "make decision"
+        aliases:
+          - "decide"
+          - "executive decision"
+        ontology_concepts:
+          - Decision
+          - Authority
+          - Communication
+        location: ".claude/skills/aget-make-decision/"
+
+      - id: SKILL-A-EXE-002
+        name: aget-review-budget
+        capability: CAP-EXE-002
+        description: >
+          Review budget allocation, ROI, and resource distribution.
+        trigger_phrase: "review budget"
+        aliases:
+          - "budget review"
+          - "financial review"
+        ontology_concepts:
+          - Budget
+          - ROI
+          - Delegation
+        location: ".claude/skills/aget-review-budget/"
+
+  # --------------------------------------------------------------------------
+  # REVIEWER ARCHETYPE
+  # --------------------------------------------------------------------------
+  reviewer:
+    archetype_id: reviewer
+    spec_reference: "Reviewer_SPEC.md"
+    ontology_reference: "ONTOLOGY_reviewer.yaml"
+    skill_count: 2
+
+    skills:
+      - id: SKILL-A-REV-001
+        name: aget-review-artifact
+        capability: CAP-REV-001
+        description: >
+          Review an artifact against defined criteria and produce feedback.
+        trigger_phrase: "review artifact"
+        aliases:
+          - "artifact review"
+          - "review document"
+        ontology_concepts:
+          - Review
+          - Artifact
+          - Criteria
+        location: ".claude/skills/aget-review-artifact/"
+
+      - id: SKILL-A-REV-002
+        name: aget-provide-feedback
+        capability: CAP-REV-002
+        description: >
+          Provide structured feedback on reviewed work with severity classification.
+        trigger_phrase: "provide feedback"
+        aliases:
+          - "give feedback"
+          - "feedback"
+        ontology_concepts:
+          - Feedback
+          - Issue
+          - Approval
+        location: ".claude/skills/aget-provide-feedback/"
+
+  # --------------------------------------------------------------------------
+  # SPEC-ENGINEER ARCHETYPE
+  # --------------------------------------------------------------------------
+  spec-engineer:
+    archetype_id: spec-engineer
+    spec_reference: "Spec-Engineer_SPEC.md"
+    ontology_reference: "ONTOLOGY_spec-engineer.yaml"
+    skill_count: 2
+
+    skills:
+      - id: SKILL-A-SPE-001
+        name: aget-validate-spec
+        capability: CAP-SPE-001
+        description: >
+          Validate a specification for completeness, consistency, and testability.
+        trigger_phrase: "validate spec"
+        aliases:
+          - "spec validation"
+          - "check specification"
+        ontology_concepts:
+          - Specification
+          - Validation
+          - Traceability
+        location: ".claude/skills/aget-validate-spec/"
+
+      - id: SKILL-A-SPE-002
+        name: aget-generate-requirement
+        capability: CAP-SPE-002
+        description: >
+          Generate EARS-compliant requirements from stakeholder input or analysis.
+        trigger_phrase: "generate requirement"
+        aliases:
+          - "create requirement"
+          - "write requirement"
+        ontology_concepts:
+          - Requirement
+          - Functional_Requirement
+          - Non_Functional_Requirement
+        location: ".claude/skills/aget-generate-requirement/"
+
+# ============================================================================
+# SUMMARY
+# ============================================================================
+
+summary:
+  total_archetypes: 12
+  total_archetype_skills: 26
+  universal_skills: 13
+  total_framework_skills: 39
+
+  distribution:
+    - archetype: worker
+      skills: 2
+    - archetype: supervisor
+      skills: 3
+    - archetype: developer
+      skills: 3
+    - archetype: consultant
+      skills: 2
+    - archetype: advisor
+      skills: 2
+    - archetype: analyst
+      skills: 2
+    - archetype: architect
+      skills: 2
+    - archetype: researcher
+      skills: 2
+    - archetype: operator
+      skills: 2
+    - archetype: executive
+      skills: 2
+    - archetype: reviewer
+      skills: 2
+    - archetype: spec-engineer
+      skills: 2
+
+  skill_naming_validation:
+    pattern_compliant: true
+    no_conflicts_with_universal: true
+    all_prefixed_with_aget: true
+    all_use_hyphens: true
+
+# ============================================================================
+# CHANGELOG
+# ============================================================================
+
+changelog:
+  - version: "1.0.0"
+    date: "2026-02-14"
+    changes:
+      - "Initial archetype skills registry"
+      - "27 archetype-specific skills defined across 12 archetypes"
+      - "Mapped to ontology concepts and capabilities"
+      - "S-V-O naming convention validated"
+
+# End of ARCHETYPE_SKILLS_INDEX.yaml

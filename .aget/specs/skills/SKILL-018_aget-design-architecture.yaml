@@ -1,0 +1,130 @@
+# SKILL-018: aget-design-architecture
+# Purpose: Design system architecture including components, relationships, and patterns
+# Archetype: architect
+# Created: 2026-02-14
+# Project: ARC-001 (Archetype Customization v3.5)
+
+spec:
+  id: SKILL-018
+  name: aget-design-architecture
+  version: 1.0.0
+  status: draft
+  created: 2026-02-14
+  format: "EARS with controlled vocabulary"
+  category: Archetype
+  archetype: architect
+  scope: "Design system architecture with components, patterns, and relationships"
+
+  traceability:
+    skill_md: ".claude/skills/aget-design-architecture/SKILL.md"
+    archetype_spec: "Architect_SPEC.md"
+    ontology: "ONTOLOGY_architect.yaml"
+    index_ref: "SKILL-A-ARC-001"
+    l_docs:
+      - "L463: Entity-Archetype Alignment"
+      - "L486: Ontology-Driven Creation"
+    vocabulary_terms:
+      - "Architecture"
+      - "Component"
+      - "Pattern"
+      - "Relationship"
+
+capabilities:
+  DA-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-design-architecture`, the SKILL shall initiate architecture design workflow."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "Requirements or problem description"
+      - "Constraints"
+    outputs:
+      - "Architecture overview"
+      - "Component diagram"
+      - "Relationship descriptions"
+    verification: "Output includes architectural artifacts"
+
+  DA-002:
+    domain: decomposition
+    statement: "The SKILL shall decompose the system into logical components."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Component list with responsibilities"
+    verification: "Components have clear, single responsibilities"
+
+  DA-003:
+    domain: patterns
+    statement: "The SKILL shall identify applicable architectural patterns."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Pattern recommendations (e.g., microservices, layered, event-driven)"
+    verification: "Patterns match problem characteristics"
+
+  DA-004:
+    domain: relationships
+    statement: "The SKILL shall define relationships and interfaces between components."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Interface definitions"
+      - "Dependency diagram"
+    verification: "All component interactions documented"
+
+  DA-005:
+    domain: quality
+    statement: "The SKILL shall address key quality attributes (scalability, reliability, security)."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Quality attribute decisions"
+    verification: "At least 3 quality attributes addressed"
+
+  DA-006:
+    domain: visualization
+    statement: "The SKILL shall produce architecture diagrams in standard notation."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "ASCII or Mermaid diagrams"
+    verification: "Diagrams follow consistent notation"
+
+test_cases:
+  T-DA-001:
+    capability: "DA-001"
+    scenario: "User requests architecture design"
+    given: "User describes system requirements"
+    when: "User runs `/aget-design-architecture`"
+    then: "Architecture design workflow initiates"
+    verification_method: "manual"
+
+  T-DA-002:
+    capability: "DA-002, DA-003"
+    scenario: "Component and pattern design"
+    given: "Requirements analyzed"
+    when: "Design produced"
+    then: "Components and patterns documented"
+    verification_method: "manual"
+
+  T-DA-003:
+    capability: "DA-005"
+    scenario: "Quality attributes"
+    given: "Architecture designed"
+    when: "Design reviewed"
+    then: "Quality attributes explicitly addressed"
+    verification_method: "spot-check"
+
+constraints:
+  C-DA-001:
+    statement: "The SKILL shall NOT propose architecture without understanding requirements."
+    rationale: "Architecture must serve requirements, not precede them"
+
+  C-DA-002:
+    statement: "The SKILL shall NOT introduce unnecessary complexity."
+    rationale: "Simplest architecture meeting requirements is preferred"
+
+  C-DA-003:
+    statement: "The SKILL shall NOT ignore non-functional requirements."
+    rationale: "Quality attributes are architectural drivers"

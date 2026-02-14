@@ -1,0 +1,128 @@
+# SKILL-028: aget-run-playbook
+# Purpose: Execute runbooks for operational scenarios
+# Archetype: operator
+# Created: 2026-02-14
+# Project: ARC-001 (Archetype Customization v3.5)
+
+spec:
+  id: SKILL-028
+  name: aget-run-playbook
+  version: 1.0.0
+  status: draft
+  created: 2026-02-14
+  format: "EARS with controlled vocabulary"
+  category: Archetype
+  archetype: operator
+  scope: "Execute runbooks for deployment, rollback, and operational scenarios"
+
+  traceability:
+    skill_md: ".claude/skills/aget-run-playbook/SKILL.md"
+    archetype_spec: "Operator_SPEC.md"
+    ontology: "ONTOLOGY_operator.yaml"
+    index_ref: "SKILL-A-OPS-002"
+    l_docs:
+      - "L463: Entity-Archetype Alignment"
+      - "L486: Ontology-Driven Creation"
+    vocabulary_terms:
+      - "Runbook"
+      - "Deployment"
+      - "Rollback"
+
+capabilities:
+  RP-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-run-playbook`, the SKILL shall execute specified runbook."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "Playbook name or path"
+      - "Parameters"
+    outputs:
+      - "Execution log"
+      - "Step results"
+    verification: "Playbook executes"
+
+  RP-002:
+    domain: validation
+    statement: "The SKILL shall validate playbook exists and is readable."
+    pattern: ubiquitous
+    priority: critical
+    outputs:
+      - "Validation result"
+    verification: "Missing playbook caught"
+
+  RP-003:
+    domain: execution
+    statement: "The SKILL shall execute playbook steps sequentially with checkpoint confirmation."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Step-by-step progress"
+    verification: "Steps execute in order"
+
+  RP-004:
+    domain: verification
+    statement: "The SKILL shall verify each step completion before proceeding."
+    pattern: ubiquitous
+    priority: critical
+    outputs:
+      - "Step verification"
+    verification: "Failed steps halt execution"
+
+  RP-005:
+    domain: rollback
+    statement: "WHEN step fails, the SKILL shall offer rollback options."
+    pattern: conditional
+    trigger: "Step failure"
+    priority: high
+    outputs:
+      - "Rollback options"
+    verification: "Rollback available on failure"
+
+  RP-006:
+    domain: logging
+    statement: "The SKILL shall log all actions with timestamps."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Audit log"
+    verification: "Log complete and timestamped"
+
+test_cases:
+  T-RP-001:
+    capability: "RP-001"
+    scenario: "User runs playbook"
+    given: "Playbook exists"
+    when: "User runs `/aget-run-playbook deploy`"
+    then: "Playbook execution begins"
+    verification_method: "manual"
+
+  T-RP-002:
+    capability: "RP-002"
+    scenario: "Missing playbook"
+    given: "Playbook does not exist"
+    when: "User runs playbook"
+    then: "Error with helpful message"
+    verification_method: "automated"
+
+  T-RP-003:
+    capability: "RP-005"
+    scenario: "Step failure rollback"
+    given: "Step 3 of 5 fails"
+    when: "Failure detected"
+    then: "Rollback options presented"
+    verification_method: "manual"
+
+constraints:
+  C-RP-001:
+    statement: "The SKILL shall NOT execute playbooks without user confirmation."
+    rationale: "Operational actions require authorization"
+
+  C-RP-002:
+    statement: "The SKILL shall NOT skip verification steps."
+    rationale: "Verification ensures state correctness"
+
+  C-RP-003:
+    statement: "The SKILL shall NOT proceed after failure without explicit override."
+    rationale: "Failures may indicate unsafe state"

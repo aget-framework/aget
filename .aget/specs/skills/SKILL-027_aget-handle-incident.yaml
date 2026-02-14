@@ -1,0 +1,132 @@
+# SKILL-027: aget-handle-incident
+# Purpose: Handle incidents including diagnosis, mitigation, and resolution
+# Archetype: operator
+# Created: 2026-02-14
+# Project: ARC-001 (Archetype Customization v3.5)
+
+spec:
+  id: SKILL-027
+  name: aget-handle-incident
+  version: 1.0.0
+  status: draft
+  created: 2026-02-14
+  format: "EARS with controlled vocabulary"
+  category: Archetype
+  archetype: operator
+  scope: "Handle incidents with diagnosis, mitigation, and resolution tracking"
+
+  traceability:
+    skill_md: ".claude/skills/aget-handle-incident/SKILL.md"
+    archetype_spec: "Operator_SPEC.md"
+    ontology: "ONTOLOGY_operator.yaml"
+    index_ref: "SKILL-A-OPS-001"
+    l_docs:
+      - "L463: Entity-Archetype Alignment"
+      - "L486: Ontology-Driven Creation"
+    vocabulary_terms:
+      - "Incident"
+      - "Response"
+      - "Root_Cause"
+
+capabilities:
+  HI-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-handle-incident`, the SKILL shall initiate incident response."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "Incident description"
+      - "Severity (if known)"
+    outputs:
+      - "Incident timeline"
+      - "Diagnosis"
+      - "Mitigation steps"
+    verification: "Response initiated"
+
+  HI-002:
+    domain: triage
+    statement: "The SKILL shall assess incident severity (P1-P4)."
+    pattern: ubiquitous
+    priority: critical
+    outputs:
+      - "Severity classification"
+    verification: "Severity assigned with rationale"
+
+  HI-003:
+    domain: diagnosis
+    statement: "The SKILL shall gather diagnostic information systematically."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Diagnostic findings"
+      - "Probable causes"
+    verification: "Diagnostics comprehensive"
+
+  HI-004:
+    domain: mitigation
+    statement: "The SKILL shall propose mitigation steps prioritized by impact."
+    pattern: ubiquitous
+    priority: critical
+    outputs:
+      - "Mitigation steps"
+      - "Expected outcome"
+    verification: "Mitigations actionable"
+
+  HI-005:
+    domain: tracking
+    statement: "The SKILL shall maintain incident timeline with timestamps."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Timestamped timeline"
+    verification: "Timeline accurate"
+
+  HI-006:
+    domain: resolution
+    statement: "WHEN incident resolved, the SKILL shall document root cause and prevention."
+    pattern: conditional
+    trigger: "Resolution confirmed"
+    priority: high
+    outputs:
+      - "Root cause analysis"
+      - "Prevention recommendations"
+    verification: "Post-mortem complete"
+
+test_cases:
+  T-HI-001:
+    capability: "HI-001"
+    scenario: "User reports incident"
+    given: "Incident occurs"
+    when: "User runs `/aget-handle-incident`"
+    then: "Response workflow begins"
+    verification_method: "manual"
+
+  T-HI-002:
+    capability: "HI-002, HI-003"
+    scenario: "Triage and diagnosis"
+    given: "Incident reported"
+    when: "Triage performed"
+    then: "Severity and diagnostics documented"
+    verification_method: "manual"
+
+  T-HI-003:
+    capability: "HI-006"
+    scenario: "Post-mortem"
+    given: "Incident resolved"
+    when: "Resolution documented"
+    then: "Root cause and prevention recorded"
+    verification_method: "spot-check"
+
+constraints:
+  C-HI-001:
+    statement: "The SKILL shall NOT skip severity assessment."
+    rationale: "Severity drives response priority"
+
+  C-HI-002:
+    statement: "The SKILL shall NOT apply fixes without user approval."
+    rationale: "Production changes require authorization"
+
+  C-HI-003:
+    statement: "The SKILL shall NOT close incident without confirmation."
+    rationale: "Premature closure hides ongoing issues"

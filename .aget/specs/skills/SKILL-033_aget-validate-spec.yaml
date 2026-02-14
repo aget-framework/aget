@@ -1,0 +1,127 @@
+# SKILL-033: aget-validate-spec
+# Purpose: Validate specifications for completeness, consistency, and testability
+# Archetype: spec-engineer
+# Created: 2026-02-14
+# Project: ARC-001 (Archetype Customization v3.5)
+
+spec:
+  id: SKILL-033
+  name: aget-validate-spec
+  version: 1.0.0
+  status: draft
+  created: 2026-02-14
+  format: "EARS with controlled vocabulary"
+  category: Archetype
+  archetype: spec-engineer
+  scope: "Validate specifications for completeness, consistency, and testability"
+
+  traceability:
+    skill_md: ".claude/skills/aget-validate-spec/SKILL.md"
+    archetype_spec: "Spec-Engineer_SPEC.md"
+    ontology: "ONTOLOGY_spec-engineer.yaml"
+    index_ref: "SKILL-A-SPE-001"
+    l_docs:
+      - "L463: Entity-Archetype Alignment"
+      - "L486: Ontology-Driven Creation"
+      - "L482: SKOS+EARS Format"
+    vocabulary_terms:
+      - "Specification"
+      - "Validation"
+      - "Traceability"
+
+capabilities:
+  VS-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-validate-spec`, the SKILL shall validate specification document."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "Specification file or content"
+    outputs:
+      - "Validation report"
+      - "Issue list"
+    verification: "Validation performed"
+
+  VS-002:
+    domain: completeness
+    statement: "The SKILL shall check for required sections (scope, requirements, constraints)."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Completeness checklist"
+    verification: "Missing sections identified"
+
+  VS-003:
+    domain: consistency
+    statement: "The SKILL shall check for internal consistency (no contradictions)."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Consistency findings"
+    verification: "Contradictions flagged"
+
+  VS-004:
+    domain: testability
+    statement: "The SKILL shall verify requirements are testable."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Testability assessment"
+    verification: "Non-testable requirements flagged"
+
+  VS-005:
+    domain: format
+    statement: "The SKILL shall verify EARS format compliance."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Format compliance report"
+    verification: "EARS violations identified"
+
+  VS-006:
+    domain: traceability
+    statement: "The SKILL shall verify traceability links exist."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "Traceability assessment"
+    verification: "Missing links identified"
+
+test_cases:
+  T-VS-001:
+    capability: "VS-001"
+    scenario: "User validates specification"
+    given: "Specification file exists"
+    when: "User runs `/aget-validate-spec`"
+    then: "Validation report produced"
+    verification_method: "manual"
+
+  T-VS-002:
+    capability: "VS-002, VS-005"
+    scenario: "Format and completeness"
+    given: "Spec with missing sections"
+    when: "Validation performed"
+    then: "Missing sections and format issues reported"
+    verification_method: "automated"
+
+  T-VS-003:
+    capability: "VS-004"
+    scenario: "Testability check"
+    given: "Spec with vague requirements"
+    when: "Validation performed"
+    then: "Non-testable requirements flagged"
+    verification_method: "manual"
+
+constraints:
+  C-VS-001:
+    statement: "The SKILL shall NOT pass specifications with EARS violations."
+    rationale: "Format consistency essential"
+
+  C-VS-002:
+    statement: "The SKILL shall NOT modify the specification during validation."
+    rationale: "Validation is read-only"
+
+  C-VS-003:
+    statement: "The SKILL shall NOT skip testability assessment."
+    rationale: "Untestable requirements are not requirements"

@@ -1,0 +1,127 @@
+# SKILL-002: aget-wind-down
+# Purpose: End AGET session with state capture and sanity checks
+# Created: 2026-02-10
+# Based on: L468, L532, SKILL_SPEC_TEMPLATE.yaml
+
+spec:
+  id: SKILL-002
+  name: aget-wind-down
+  version: 1.0.0
+  status: production
+  created: 2026-02-10
+  format: "EARS with controlled vocabulary"
+  category: Session
+  scope: "End session properly with sanity checks, state capture, and handoff notes"
+
+  traceability:
+    skill_md: ".claude/skills/aget-wind-down/SKILL.md"
+    l_docs:
+      - "L468: Re-entrancy Protection"
+      - "L532: Skills vs Learnings Distinction"
+    vocabulary_terms:
+      - "AGET_Skill"
+      - "Session_Termination"
+      - "Wind_Down_Protocol"
+
+capabilities:
+  WD-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-wind-down`, the SKILL shall run the wind-down script and display session summary."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "User invocation via `/aget-wind-down`"
+      - "Optional user notes"
+    outputs:
+      - "Session duration"
+      - "Sanity status"
+      - "Pending items"
+      - "Suggested commit message"
+    verification: "Output includes session summary"
+
+  WD-002:
+    domain: execution
+    statement: "WHEN wind-down script exists, the SKILL shall execute `python3 scripts/wind_down.py`."
+    pattern: event-driven
+    trigger: script_available
+    priority: high
+    verification: "Script executes and produces summary"
+
+  WD-003:
+    domain: sanity
+    statement: "The SKILL shall run sanity checks via housekeeping protocol before session close."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Sanity: [healthy/warnings/errors]"
+    verification: "Sanity status reported"
+
+  WD-004:
+    domain: reentry
+    statement: "WHEN wind-down was run within 5 minutes, the SKILL shall block with exit code 4 unless --force is used."
+    pattern: conditional
+    trigger: recent_execution
+    priority: medium
+    inputs:
+      - "Previous wind-down timestamp"
+    outputs:
+      - "Re-entrancy guard message"
+    verification: "Blocked if run within 5 minutes"
+
+  WD-005:
+    domain: options
+    statement: "WHERE user provides --skip-sanity flag, the SKILL shall skip sanity check execution."
+    pattern: optional
+    priority: low
+    verification: "Sanity skipped when flag present"
+
+  WD-006:
+    domain: options
+    statement: "WHERE user provides --force flag, the SKILL shall bypass re-entrancy guard."
+    pattern: optional
+    priority: low
+    verification: "Guard bypassed when flag present"
+
+  WD-007:
+    domain: output
+    statement: "The SKILL shall suggest a commit message based on session activity."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "Suggested commit message"
+    verification: "Commit message reflects session work"
+
+test_cases:
+  T-WD-001:
+    capability: "WD-001"
+    scenario: "Normal wind-down execution"
+    given: "Active session with uncommitted changes"
+    when: "User runs `/aget-wind-down`"
+    then: "Session summary displayed with commit suggestion"
+    verification_method: "manual"
+
+  T-WD-002:
+    capability: "WD-004"
+    scenario: "Re-entrancy guard blocks rapid execution"
+    given: "Wind-down run 2 minutes ago"
+    when: "User runs `/aget-wind-down` again"
+    then: "Blocked with exit code 4 and cooldown message"
+    verification_method: "automated"
+
+  T-WD-003:
+    capability: "WD-006"
+    scenario: "Force flag bypasses guard"
+    given: "Wind-down run 2 minutes ago"
+    when: "User runs `/aget-wind-down --force`"
+    then: "Executes despite recent run"
+    verification_method: "manual"
+
+constraints:
+  C-WD-001:
+    statement: "The SKILL shall NOT commit changes automatically without user confirmation."
+    rationale: "User controls final commit decision"
+
+  C-WD-002:
+    statement: "The SKILL shall NOT delete any session artifacts."
+    rationale: "Preserve session history"

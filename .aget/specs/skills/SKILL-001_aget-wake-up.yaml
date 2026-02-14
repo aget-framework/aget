@@ -1,0 +1,144 @@
+# SKILL-001: aget-wake-up
+# Purpose: Initialize AGET session with status briefing
+# Created: 2026-02-10
+# Based on: L532, SKILL_SPEC_TEMPLATE.yaml
+
+spec:
+  id: SKILL-001
+  name: aget-wake-up
+  version: 1.0.0
+  status: production
+  created: 2026-02-10
+  format: "EARS with controlled vocabulary"
+  category: Session
+  scope: "Initialize agent session, display identity, version, fleet status, and context"
+
+  traceability:
+    skill_md: ".claude/skills/aget-wake-up/SKILL.md"
+    l_docs:
+      - "L532: Skills vs Learnings Distinction"
+    vocabulary_terms:
+      - "AGET_Skill"
+      - "Skill_Invocation"
+      - "Session_Initialization"
+
+capabilities:
+  WU-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-wake-up`, the SKILL shall run the wake-up script and display agent status."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "User invocation via `/aget-wake-up`"
+    outputs:
+      - "Agent name and version"
+      - "Fleet status (if supervisor)"
+      - "Active projects"
+      - "Skills and Learnings counts"
+    verification: "Output includes agent version from .aget/version.json"
+
+  WU-002:
+    domain: execution
+    statement: "WHEN wake-up script exists, the SKILL shall execute `python3 scripts/wake_up.py`."
+    pattern: event-driven
+    trigger: script_available
+    priority: high
+    inputs:
+      - "scripts/wake_up.py exists"
+    outputs:
+      - "Script stdout"
+    verification: "Script executes without error"
+
+  WU-003:
+    domain: fallback
+    statement: "WHEN wake-up script is missing or fails, the SKILL shall perform manual wake-up reading version.json and AGENTS.md."
+    pattern: conditional
+    trigger: script_failure
+    priority: high
+    inputs:
+      - "Script missing or returns non-zero"
+    outputs:
+      - "Fallback status output"
+    verification: "Fallback produces valid output when script unavailable"
+
+  WU-004:
+    domain: output
+    statement: "The SKILL shall report Skills count from .claude/skills/ and Learnings count from .aget/evolution/L*.md."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "Skills: N"
+      - "Learnings: N"
+    verification: "Counts match actual directory contents"
+
+  WU-005:
+    domain: output
+    statement: "The SKILL shall report git branch and status (clean/dirty)."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "Git: [branch] ([clean/dirty])"
+    verification: "Git status accurately reflects working tree"
+
+  WU-006:
+    domain: error_handling
+    statement: "WHEN script returns exit code 1, the SKILL shall report validation warnings."
+    pattern: event-driven
+    trigger: exit_code_1
+    priority: medium
+    outputs:
+      - "Warning messages"
+    verification: "Warnings displayed for exit code 1"
+
+  WU-007:
+    domain: error_handling
+    statement: "WHEN script returns exit code 2, the SKILL shall report configuration error."
+    pattern: event-driven
+    trigger: exit_code_2
+    priority: medium
+    outputs:
+      - "Configuration error message"
+    verification: "Error displayed for exit code 2"
+
+test_cases:
+  T-WU-001:
+    capability: "WU-001"
+    scenario: "User invokes wake-up with valid configuration"
+    given: ".aget/version.json exists with valid version"
+    when: "User runs `/aget-wake-up`"
+    then: "Agent name and version displayed"
+    verification_method: "manual"
+
+  T-WU-002:
+    capability: "WU-002"
+    scenario: "Script execution succeeds"
+    given: "scripts/wake_up.py exists and is executable"
+    when: "Skill invokes script"
+    then: "Script output captured and displayed"
+    verification_method: "automated"
+
+  T-WU-003:
+    capability: "WU-003"
+    scenario: "Fallback when script missing"
+    given: "scripts/wake_up.py does not exist"
+    when: "User runs `/aget-wake-up`"
+    then: "Fallback reads version.json and AGENTS.md directly"
+    verification_method: "manual"
+
+  T-WU-004:
+    capability: "WU-004"
+    scenario: "Skills and Learnings count accurate"
+    given: "3 skills in .claude/skills/, 304 L-docs in .aget/evolution/"
+    when: "User runs `/aget-wake-up`"
+    then: "Output shows Skills: 3 | Learnings: 304"
+    verification_method: "spot-check"
+
+constraints:
+  C-WU-001:
+    statement: "The SKILL shall NOT modify any files during execution."
+    rationale: "Wake-up is read-only status check"
+
+  C-WU-002:
+    statement: "The SKILL shall NOT block session start if script fails."
+    rationale: "Fallback ensures session can always initialize"

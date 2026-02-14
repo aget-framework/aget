@@ -1,0 +1,124 @@
+# SKILL-013: aget-save-state
+# Purpose: Save workflow state for resume/recovery
+# Created: 2026-02-10
+# Based on: L574, SKILL_SPEC_TEMPLATE.yaml
+
+spec:
+  id: SKILL-013
+  name: aget-save-state
+  version: 1.0.0
+  status: production
+  created: 2026-02-10
+  format: "EARS with controlled vocabulary"
+  category: Session
+  scope: "Create checkpoints for session continuity and context recovery"
+
+  traceability:
+    skill_md: ".claude/skills/aget-save-state/SKILL.md"
+    l_docs:
+      - "L574: Session Continuity"
+      - "L575: Autonomous-Explicit Continuum"
+    vocabulary_terms:
+      - "AGET_Skill"
+      - "Checkpoint"
+      - "Session_State"
+
+capabilities:
+  SS-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-save-state`, the SKILL shall create a checkpoint file."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    outputs:
+      - "sessions/checkpoints/{name}.checkpoint.yaml"
+    verification: "Checkpoint file created"
+
+  SS-002:
+    domain: naming
+    statement: "WHEN invoked with no arguments, the SKILL shall generate timestamp-based name (YYYYMMDD-HHMMSS)."
+    pattern: event-driven
+    trigger: no_args
+    priority: high
+    verification: "Timestamp name generated"
+
+  SS-003:
+    domain: naming
+    statement: "WHEN invoked with text argument, the SKILL shall use provided name (sanitized)."
+    pattern: event-driven
+    trigger: name_provided
+    priority: high
+    verification: "Custom name used"
+
+  SS-004:
+    domain: content
+    statement: "The SKILL shall capture session context, active tasks, and modified files."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Session context summary"
+      - "Active tasks list"
+      - "Modified files list"
+    verification: "Context captured completely"
+
+  SS-005:
+    domain: content
+    statement: "The SKILL shall generate human-readable resume prompt."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "Resume prompt text"
+    verification: "Resume prompt actionable"
+
+  SS-006:
+    domain: directory
+    statement: "The SKILL shall create sessions/checkpoints/ directory if not exists."
+    pattern: ubiquitous
+    priority: medium
+    verification: "Directory created when needed"
+
+  SS-007:
+    domain: overwrite
+    statement: "WHERE checkpoint with same name exists, the SKILL shall overwrite it."
+    pattern: optional
+    trigger: name_collision
+    priority: low
+    verification: "Existing checkpoint replaced"
+
+test_cases:
+  T-SS-001:
+    capability: "SS-001"
+    scenario: "Checkpoint creation"
+    given: "Active session with uncommitted changes"
+    when: "User runs `/aget-save-state`"
+    then: "Checkpoint file created in sessions/checkpoints/"
+    verification_method: "automated"
+
+  T-SS-002:
+    capability: "SS-002"
+    scenario: "Auto-generated name"
+    given: "No name argument provided"
+    when: "User runs `/aget-save-state` at 2026-02-10 14:30:00"
+    then: "Checkpoint named 20260210-143000.checkpoint.yaml"
+    verification_method: "manual"
+
+  T-SS-003:
+    capability: "SS-005"
+    scenario: "Resume prompt generation"
+    given: "Session focused on skill specs"
+    when: "User runs `/aget-save-state`"
+    then: "Resume prompt mentions skill specs context"
+    verification_method: "manual"
+
+constraints:
+  C-SS-001:
+    statement: "The SKILL shall NOT modify files in specs/, governance/, or .aget/."
+    rationale: "State capture scoped to sessions/"
+
+  C-SS-002:
+    statement: "The SKILL shall NOT create checkpoints outside sessions/checkpoints/."
+    rationale: "Checkpoints have standard location"
+
+  C-SS-003:
+    statement: "The SKILL shall NOT include sensitive data (credentials, API keys) in checkpoints."
+    rationale: "Security constraint"

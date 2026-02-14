@@ -1,0 +1,126 @@
+# SKILL-036: aget-review-agent
+# Purpose: Review agent health, conformance, and recent activity
+# Archetype: supervisor
+# Created: 2026-02-14
+# Project: ARC-001 (Archetype Customization v3.5)
+
+spec:
+  id: SKILL-036
+  name: aget-review-agent
+  version: 1.0.0
+  status: draft
+  created: 2026-02-14
+  format: "EARS with controlled vocabulary"
+  category: Archetype
+  archetype: supervisor
+  scope: "Review specific agent's health, conformance, and activity"
+
+  traceability:
+    skill_md: ".claude/skills/aget-review-agent/SKILL.md"
+    archetype_spec: "Supervisor_SPEC.md"
+    ontology: "ONTOLOGY_supervisor.yaml"
+    index_ref: "SKILL-A-SUP-002"
+    l_docs:
+      - "L463: Entity-Archetype Alignment"
+      - "L486: Ontology-Driven Creation"
+    vocabulary_terms:
+      - "Agent_Registry"
+      - "Agent_Status"
+      - "Fleet_Audit"
+
+capabilities:
+  RA-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-review-agent`, the SKILL shall review specified agent."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "Agent name or ID"
+    outputs:
+      - "Agent review report"
+    verification: "Review produced"
+
+  RA-002:
+    domain: health
+    statement: "The SKILL shall assess agent health (version, configuration, dependencies)."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Health assessment"
+    verification: "Health status reported"
+
+  RA-003:
+    domain: conformance
+    statement: "The SKILL shall check conformance level (L0-L5)."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Conformance level"
+      - "Gaps identified"
+    verification: "Conformance assessed"
+
+  RA-004:
+    domain: activity
+    statement: "The SKILL shall summarize recent activity (sessions, commits, issues)."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "Activity summary"
+    verification: "Activity documented"
+
+  RA-005:
+    domain: issues
+    statement: "The SKILL shall identify outstanding issues or blockers."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Issue list"
+    verification: "Issues surfaced"
+
+  RA-006:
+    domain: recommendations
+    statement: "The SKILL shall provide recommendations for agent improvement."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "Improvement recommendations"
+    verification: "Recommendations actionable"
+
+test_cases:
+  T-RA-001:
+    capability: "RA-001"
+    scenario: "User reviews agent"
+    given: "Agent exists in fleet"
+    when: "User runs `/aget-review-agent private-foo-aget`"
+    then: "Review report produced"
+    verification_method: "manual"
+
+  T-RA-002:
+    capability: "RA-002, RA-003"
+    scenario: "Health and conformance"
+    given: "Agent with known conformance gaps"
+    when: "Review performed"
+    then: "Health and conformance reported"
+    verification_method: "manual"
+
+  T-RA-003:
+    capability: "RA-006"
+    scenario: "Recommendations"
+    given: "Agent with improvement opportunities"
+    when: "Review complete"
+    then: "Recommendations provided"
+    verification_method: "spot-check"
+
+constraints:
+  C-RA-001:
+    statement: "The SKILL shall NOT review agents outside supervisor's fleet."
+    rationale: "Scope boundary enforcement"
+
+  C-RA-002:
+    statement: "The SKILL shall NOT modify agent during review."
+    rationale: "Review is read-only"
+
+  C-RA-003:
+    statement: "The SKILL shall NOT expose sensitive agent configurations."
+    rationale: "Security boundary respected"

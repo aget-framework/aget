@@ -1,0 +1,131 @@
+# SKILL-017: aget-generate-report
+# Purpose: Generate reports presenting analysis results, metrics, and insights
+# Archetype: analyst
+# Created: 2026-02-14
+# Project: ARC-001 (Archetype Customization v3.5)
+
+spec:
+  id: SKILL-017
+  name: aget-generate-report
+  version: 1.0.0
+  status: draft
+  created: 2026-02-14
+  format: "EARS with controlled vocabulary"
+  category: Archetype
+  archetype: analyst
+  scope: "Generate structured reports with metrics, findings, and visualizations"
+
+  traceability:
+    skill_md: ".claude/skills/aget-generate-report/SKILL.md"
+    archetype_spec: "Analyst_SPEC.md"
+    ontology: "ONTOLOGY_analyst.yaml"
+    index_ref: "SKILL-A-ANL-002"
+    l_docs:
+      - "L463: Entity-Archetype Alignment"
+      - "L486: Ontology-Driven Creation"
+    vocabulary_terms:
+      - "Report"
+      - "Metric"
+      - "Visualization"
+
+capabilities:
+  GR-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-generate-report`, the SKILL shall create formatted report."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "Report type (status, analysis, summary)"
+      - "Data or findings to include"
+    outputs:
+      - "Formatted report document"
+    verification: "Report generated in specified format"
+
+  GR-002:
+    domain: structure
+    statement: "The SKILL shall include executive summary at report start."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Executive summary section"
+    verification: "Summary appears first, captures key points"
+
+  GR-003:
+    domain: content
+    statement: "The SKILL shall include metrics with clear definitions and units."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Metrics table with definitions"
+    verification: "Metrics include units and context"
+
+  GR-004:
+    domain: visualization
+    statement: "WHEN data supports visualization, the SKILL shall include appropriate charts or tables."
+    pattern: conditional
+    trigger: "Numerical or categorical data present"
+    priority: medium
+    outputs:
+      - "Charts or data tables"
+    verification: "Visualizations support narrative"
+
+  GR-005:
+    domain: structure
+    statement: "The SKILL shall include findings and recommendations sections."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Findings section"
+      - "Recommendations section"
+    verification: "Both sections present with clear separation"
+
+  GR-006:
+    domain: audience
+    statement: "The SKILL shall tailor language and detail level to specified audience."
+    pattern: conditional
+    trigger: "Audience specified (executive, technical, operational)"
+    priority: medium
+    inputs:
+      - "Target audience"
+    outputs:
+      - "Audience-appropriate content"
+    verification: "Language matches audience level"
+
+test_cases:
+  T-GR-001:
+    capability: "GR-001"
+    scenario: "User requests report generation"
+    given: "Analysis complete with findings"
+    when: "User runs `/aget-generate-report`"
+    then: "Formatted report created"
+    verification_method: "manual"
+
+  T-GR-002:
+    capability: "GR-002, GR-005"
+    scenario: "Report structure"
+    given: "Report generated"
+    when: "Structure examined"
+    then: "Executive summary, findings, and recommendations present"
+    verification_method: "manual"
+
+  T-GR-003:
+    capability: "GR-006"
+    scenario: "Executive audience"
+    given: "Audience specified as 'executive'"
+    when: "Report generated"
+    then: "High-level summary, strategic implications emphasized"
+    verification_method: "spot-check"
+
+constraints:
+  C-GR-001:
+    statement: "The SKILL shall NOT include raw data dumps without context."
+    rationale: "Reports must interpret data for the reader"
+
+  C-GR-002:
+    statement: "The SKILL shall NOT bury critical findings in appendices."
+    rationale: "Key findings must be prominent"
+
+  C-GR-003:
+    statement: "The SKILL shall NOT generate reports exceeding 10 pages without sectioned navigation."
+    rationale: "Long reports need structure for usability"

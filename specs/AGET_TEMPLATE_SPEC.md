@@ -1,11 +1,11 @@
 # AGET TEMPLATE Specification
 
-**Version**: 3.3.2
+**Version**: 3.4.0
 **Status**: Active
 **Category**: Standards (Template Architecture)
 **Format Version**: 1.2
 **Created**: 2025-12-27
-**Updated**: 2026-01-18
+**Updated**: 2026-02-14
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_TEMPLATE_SPEC.md`
 **Change Proposal**: CP-017, CP-018
@@ -999,6 +999,98 @@ cd /path/to/template && pytest tests/ -v
 
 ---
 
+### CAP-TPL-016: Archetype Customization (v3.5.0)
+
+The SYSTEM shall support archetype-specific ontologies and skills.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-TPL-016-01 | ubiquitous | The SYSTEM shall include ontology/ directory in each template |
+| CAP-TPL-016-02 | ubiquitous | The SYSTEM shall include ONTOLOGY_{archetype}.yaml in ontology/ |
+| CAP-TPL-016-03 | ubiquitous | The SYSTEM shall include .claude/skills/ directory with AGET skills |
+| CAP-TPL-016-04 | ubiquitous | The SYSTEM shall include 13 universal skills in all templates |
+| CAP-TPL-016-05 | ubiquitous | The SYSTEM shall include archetype-specific skills per archetype |
+| CAP-TPL-016-06 | conditional | IF SKILL.md exists THEN it shall have valid YAML frontmatter |
+
+**Enforcement**: `validate_v3.5.0.py`, `validate_archetype_skills.py`
+
+**Rationale**: v3.5.0 introduces archetype customization with specialized ontologies and skills per archetype. This enables archetype-appropriate capabilities while maintaining a universal skill foundation across all templates.
+
+#### Archetype Ontology Structure
+
+Each template includes an archetype ontology at `ontology/ONTOLOGY_{archetype}.yaml`:
+
+```yaml
+# ontology/ONTOLOGY_{archetype}.yaml
+ontology:
+  meta:
+    archetype: "{archetype}"
+    version: "1.0.0"
+    purpose: "Archetype-specific domain concepts"
+
+  concepts:
+    {Concept_Name}:
+      skos:prefLabel: "{Label}"
+      skos:definition: "{Definition}"
+      skos:related: []
+```
+
+#### Archetype Skill Distribution
+
+| Archetype | Universal | Archetype Skills | Total |
+|-----------|:---------:|:----------------:|:-----:|
+| worker | 13 | execute-task, report-progress | 15 |
+| supervisor | 13 | broadcast-fleet, review-agent, escalate-issue | 16 |
+| developer | 13 | run-tests, lint-code, review-pr | 16 |
+| consultant | 13 | assess-client, propose-engagement | 15 |
+| advisor | 13 | assess-risk, recommend-action | 15 |
+| analyst | 13 | analyze-data, generate-report | 15 |
+| architect | 13 | design-architecture, assess-tradeoffs | 15 |
+| researcher | 13 | search-literature, document-finding | 15 |
+| operator | 13 | handle-incident, run-playbook | 15 |
+| executive | 13 | make-decision, review-budget | 15 |
+| reviewer | 13 | review-artifact, provide-feedback | 15 |
+| spec-engineer | 13 | validate-spec, generate-requirement | 15 |
+
+#### Universal Skills (v3.5.0)
+
+All templates include these 13 universal skills:
+
+| Skill | Category | Purpose |
+|-------|----------|---------|
+| aget-wake-up | Session | Initialize session |
+| aget-wind-down | Session | End session with handoff |
+| aget-check-health | Session | Run health inspection |
+| aget-check-kb | Session | Validate KB health |
+| aget-check-evolution | Session | Monitor evolution directory |
+| aget-check-sessions | Session | Monitor sessions directory |
+| aget-save-state | Session | Save workflow state |
+| aget-record-lesson | Evolution | Record lessons learned |
+| aget-capture-observation | Evolution | Capture research observations |
+| aget-studyup | Research | Focused KB research |
+| aget-create-project | Planning | Create research projects |
+| aget-review-project | Planning | Review project progress |
+| aget-propose-skill | Governance | Propose new skills |
+
+#### Directory Layout (v3.5.0)
+
+```
+template-{archetype}-aget/
+├── ontology/                       # NEW: Archetype ontology
+│   └── ONTOLOGY_{archetype}.yaml
+├── .claude/skills/                 # NEW: AGET skills
+│   ├── aget-wake-up/              # Universal skill
+│   │   └── SKILL.md
+│   ├── aget-{archetype-skill}/    # Archetype-specific
+│   │   └── SKILL.md
+│   └── ...
+├── ...
+```
+
+**Reference**: L574 (v3.5.0 Vocabulary & Skills Architecture), L486 (Ontology-Driven Creation)
+
+---
+
 ## References
 
 - AGET_5D_ARCHITECTURE_SPEC.md - Umbrella 5D specification
@@ -1012,6 +1104,6 @@ cd /path/to/template && pytest tests/ -v
 
 ---
 
-*AGET TEMPLATE Specification v3.3.1*
+*AGET TEMPLATE Specification v3.4.0*
 *"Templates are composable agent patterns enabling consistent 5D composition"*
-*Updated: 2026-01-11 (L520 issue governance)*
+*Updated: 2026-02-14 (CAP-TPL-016 archetype customization)*

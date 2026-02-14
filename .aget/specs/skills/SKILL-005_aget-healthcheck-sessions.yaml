@@ -1,0 +1,120 @@
+# SKILL-005: aget-healthcheck-sessions
+# Purpose: Monitor sessions/ directory health
+# Created: 2026-02-10
+# Based on: L589, SKILL_SPEC_TEMPLATE.yaml
+
+spec:
+  id: SKILL-005
+  name: aget-healthcheck-sessions
+  version: 1.0.0
+  status: production
+  created: 2026-02-10
+  format: "EARS with controlled vocabulary"
+  category: Monitoring
+  scope: "Validate sessions directory health - structure, file counts, naming, disk usage"
+
+  traceability:
+    skill_md: ".claude/skills/aget-healthcheck-sessions/SKILL.md"
+    l_docs:
+      - "L589: Healthcheck Threshold Calibration"
+    vocabulary_terms:
+      - "Healthcheck_Skill"
+      - "Health_Status"
+      - "Sessions_Directory"
+
+capabilities:
+  HS-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-healthcheck-sessions`, the SKILL shall analyze sessions/ and report health status."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    outputs:
+      - "Health Status: OK | WARN | CRITICAL"
+      - "File counts and disk usage"
+    verification: "Health status displayed with metrics"
+
+  HS-002:
+    domain: structure
+    statement: "The SKILL shall detect date subdirectories (YYYY-MM-DD pattern) as anomaly indicators."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Date subdirectories: count (0 = OK, >0 = anomaly)"
+    verification: "Date subdirectories detected and counted"
+
+  HS-003:
+    domain: file_inventory
+    statement: "The SKILL shall count session files and checkpoint files separately."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Session files count"
+      - "Checkpoints count"
+    verification: "Counts accurate per category"
+
+  HS-004:
+    domain: naming
+    statement: "The SKILL shall identify files not matching session_YYYY-MM-DD_*.md pattern."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "Non-conforming files list"
+    verification: "Non-standard session files detected"
+
+  HS-005:
+    domain: disk_usage
+    statement: "The SKILL shall report disk usage of sessions/ directory."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "Disk size in human-readable format"
+    verification: "Disk usage reported accurately"
+
+  HS-006:
+    domain: thresholds
+    statement: "WHEN total files exceeds 500 OR disk exceeds 100MB, the SKILL shall report CRITICAL."
+    pattern: conditional
+    priority: high
+    verification: "CRITICAL reported at threshold breach"
+
+  HS-007:
+    domain: thresholds
+    statement: "WHEN total files exceeds 200 OR disk exceeds 50MB OR date subdirectories exist, the SKILL shall report WARN."
+    pattern: conditional
+    priority: medium
+    verification: "WARN reported at warning threshold"
+
+test_cases:
+  T-HS-001:
+    capability: "HS-001"
+    scenario: "Healthy sessions directory"
+    given: "77 files, 544K disk, no date subdirectories"
+    when: "User runs `/aget-healthcheck-sessions`"
+    then: "Reports OK status"
+    verification_method: "automated"
+
+  T-HS-002:
+    capability: "HS-002"
+    scenario: "Date subdirectory anomaly detected"
+    given: "sessions/2026-01-15/ subdirectory exists"
+    when: "User runs `/aget-healthcheck-sessions`"
+    then: "Reports WARN with date subdirectory alert"
+    verification_method: "manual"
+
+  T-HS-003:
+    capability: "HS-003"
+    scenario: "Checkpoint directory present"
+    given: "sessions/checkpoints/ exists with 5 files"
+    when: "User runs `/aget-healthcheck-sessions`"
+    then: "Reports Checkpoints: 5 (not counted as anomaly)"
+    verification_method: "manual"
+
+constraints:
+  C-HS-001:
+    statement: "The SKILL shall NOT modify any files during execution."
+    rationale: "Healthcheck is read-only monitoring"
+
+  C-HS-002:
+    statement: "The SKILL shall treat checkpoints/ subdirectory as expected, not anomaly."
+    rationale: "Checkpoints are standard session structure"

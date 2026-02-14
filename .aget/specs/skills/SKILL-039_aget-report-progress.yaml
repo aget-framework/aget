@@ -1,0 +1,133 @@
+# SKILL-039: aget-report-progress
+# Purpose: Report progress on current work including completion, blockers, and remaining items
+# Archetype: worker
+# Created: 2026-02-14
+# Project: ARC-001 (Archetype Customization v3.5)
+
+spec:
+  id: SKILL-039
+  name: aget-report-progress
+  version: 1.0.0
+  status: draft
+  created: 2026-02-14
+  format: "EARS with controlled vocabulary"
+  category: Archetype
+  archetype: worker
+  scope: "Report progress including completion percentage, blockers, and remaining work"
+
+  traceability:
+    skill_md: ".claude/skills/aget-report-progress/SKILL.md"
+    archetype_spec: "Worker_SPEC.md"
+    ontology: "ONTOLOGY_worker.yaml"
+    index_ref: "SKILL-A-WRK-002"
+    l_docs:
+      - "L463: Entity-Archetype Alignment"
+      - "L486: Ontology-Driven Creation"
+    vocabulary_terms:
+      - "Progress"
+      - "Task_Status"
+      - "Handoff"
+
+capabilities:
+  RP-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-report-progress`, the SKILL shall generate progress report."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    outputs:
+      - "Progress report"
+    verification: "Report generated"
+
+  RP-002:
+    domain: status
+    statement: "The SKILL shall report overall completion percentage."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Completion percentage"
+    verification: "Percentage accurate"
+
+  RP-003:
+    domain: completed
+    statement: "The SKILL shall list completed items."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Completed items list"
+    verification: "Completed work documented"
+
+  RP-004:
+    domain: remaining
+    statement: "The SKILL shall list remaining items."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Remaining items list"
+    verification: "Remaining work visible"
+
+  RP-005:
+    domain: blockers
+    statement: "The SKILL shall report current blockers."
+    pattern: ubiquitous
+    priority: critical
+    outputs:
+      - "Blocker list"
+    verification: "Blockers surfaced"
+
+  RP-006:
+    domain: risks
+    statement: "The SKILL shall flag risks to completion."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "Risk flags"
+    verification: "Risks identified"
+
+  RP-007:
+    domain: handoff
+    statement: "WHEN handoff needed, the SKILL shall prepare handoff documentation."
+    pattern: conditional
+    trigger: "Session ending or task reassignment"
+    priority: high
+    outputs:
+      - "Handoff document"
+    verification: "Handoff enables continuation"
+
+test_cases:
+  T-RP-001:
+    capability: "RP-001"
+    scenario: "User requests progress"
+    given: "Work in progress"
+    when: "User runs `/aget-report-progress`"
+    then: "Progress report generated"
+    verification_method: "manual"
+
+  T-RP-002:
+    capability: "RP-002, RP-003, RP-004"
+    scenario: "Complete progress picture"
+    given: "Task partially complete"
+    when: "Report generated"
+    then: "Percentage, completed, and remaining shown"
+    verification_method: "manual"
+
+  T-RP-003:
+    capability: "RP-007"
+    scenario: "Handoff preparation"
+    given: "Session ending with incomplete work"
+    when: "Report generated"
+    then: "Handoff document included"
+    verification_method: "spot-check"
+
+constraints:
+  C-RP-001:
+    statement: "The SKILL shall NOT overstate completion percentage."
+    rationale: "Accurate progress essential for planning"
+
+  C-RP-002:
+    statement: "The SKILL shall NOT hide blockers."
+    rationale: "Blockers need attention"
+
+  C-RP-003:
+    statement: "The SKILL shall NOT omit risks to protect optimistic view."
+    rationale: "Honest risk reporting enables intervention"

@@ -1,0 +1,108 @@
+# SKILL-012: aget-create-skill
+# Purpose: Generate SKILL.md from approved proposals
+# Created: 2026-02-10
+# Based on: L532, SKILL_SPEC_TEMPLATE.yaml
+
+spec:
+  id: SKILL-012
+  name: aget-create-skill
+  version: 1.0.0
+  status: production
+  created: 2026-02-10
+  format: "EARS with controlled vocabulary"
+  category: Creation
+  scope: "Create skill implementation from approved proposal"
+
+  traceability:
+    skill_md: ".claude/skills/aget-create-skill/SKILL.md"
+    l_docs:
+      - "L532: Skills vs Learnings Distinction"
+    vocabulary_terms:
+      - "AGET_Skill"
+      - "Skill_Implementation"
+      - "SKILL_MD"
+
+capabilities:
+  CS-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-create-skill {name}`, the SKILL shall create SKILL.md implementation."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    outputs:
+      - ".claude/skills/{name}/SKILL.md"
+    verification: "SKILL.md created"
+
+  CS-002:
+    domain: validation
+    statement: "The SKILL shall validate skill name follows aget-{verb}-{object} pattern."
+    pattern: ubiquitous
+    priority: critical
+    verification: "Invalid names rejected"
+
+  CS-003:
+    domain: proposal
+    statement: "WHERE approved proposal exists, the SKILL shall use proposal content to populate SKILL.md."
+    pattern: optional
+    trigger: proposal_exists
+    priority: high
+    inputs:
+      - "planning/skill-proposals/PROPOSAL_{name}.md"
+    verification: "Proposal content used"
+
+  CS-004:
+    domain: structure
+    statement: "The SKILL shall create SKILL.md with YAML frontmatter (name, description, allowed-tools)."
+    pattern: ubiquitous
+    priority: critical
+    outputs:
+      - "YAML frontmatter block"
+    verification: "Frontmatter valid YAML"
+
+  CS-005:
+    domain: structure
+    statement: "The SKILL shall include Instructions, Constraints, and Traceability sections."
+    pattern: ubiquitous
+    priority: high
+    verification: "Required sections present"
+
+  CS-006:
+    domain: directory
+    statement: "The SKILL shall create .claude/skills/{name}/ directory if not exists."
+    pattern: ubiquitous
+    priority: high
+    verification: "Directory created"
+
+test_cases:
+  T-CS-001:
+    capability: "CS-001"
+    scenario: "Skill creation with valid name"
+    given: "Valid skill name aget-review-plan"
+    when: "User runs `/aget-create-skill aget-review-plan`"
+    then: ".claude/skills/aget-review-plan/SKILL.md created"
+    verification_method: "automated"
+
+  T-CS-002:
+    capability: "CS-002"
+    scenario: "Invalid name rejected"
+    given: "Name 'my-skill' without aget- prefix"
+    when: "User runs `/aget-create-skill my-skill`"
+    then: "Error: Name must follow aget-{verb}-{object} pattern"
+    verification_method: "manual"
+
+  T-CS-003:
+    capability: "CS-003"
+    scenario: "Proposal content integrated"
+    given: "Approved PROPOSAL_aget-review-plan.md exists"
+    when: "User runs `/aget-create-skill aget-review-plan`"
+    then: "SKILL.md populated with proposal content"
+    verification_method: "manual"
+
+constraints:
+  C-CS-001:
+    statement: "The SKILL shall NOT create skills outside .claude/skills/ directory."
+    rationale: "Skills have standard location"
+
+  C-CS-002:
+    statement: "The SKILL shall NOT overwrite existing skill without confirmation."
+    rationale: "Protect existing implementations"

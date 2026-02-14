@@ -1,0 +1,128 @@
+# SKILL-034: aget-generate-requirement
+# Purpose: Generate EARS-compliant requirements from stakeholder input
+# Archetype: spec-engineer
+# Created: 2026-02-14
+# Project: ARC-001 (Archetype Customization v3.5)
+
+spec:
+  id: SKILL-034
+  name: aget-generate-requirement
+  version: 1.0.0
+  status: draft
+  created: 2026-02-14
+  format: "EARS with controlled vocabulary"
+  category: Archetype
+  archetype: spec-engineer
+  scope: "Generate EARS-compliant requirements from input or analysis"
+
+  traceability:
+    skill_md: ".claude/skills/aget-generate-requirement/SKILL.md"
+    archetype_spec: "Spec-Engineer_SPEC.md"
+    ontology: "ONTOLOGY_spec-engineer.yaml"
+    index_ref: "SKILL-A-SPE-002"
+    l_docs:
+      - "L463: Entity-Archetype Alignment"
+      - "L486: Ontology-Driven Creation"
+      - "L482: SKOS+EARS Format"
+    vocabulary_terms:
+      - "Requirement"
+      - "Functional_Requirement"
+      - "Non_Functional_Requirement"
+
+capabilities:
+  GR-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-generate-requirement`, the SKILL shall create EARS requirement."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "Need or capability description"
+      - "Requirement type (optional)"
+    outputs:
+      - "EARS-formatted requirement"
+    verification: "Requirement generated in EARS format"
+
+  GR-002:
+    domain: classification
+    statement: "The SKILL shall classify requirement type (functional, non-functional, constraint)."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Requirement classification"
+    verification: "Type assigned"
+
+  GR-003:
+    domain: format
+    statement: "The SKILL shall apply appropriate EARS template (ubiquitous, event-driven, state-driven)."
+    pattern: ubiquitous
+    priority: critical
+    outputs:
+      - "EARS-formatted requirement"
+    verification: "Template correctly applied"
+
+  GR-004:
+    domain: identifiers
+    statement: "The SKILL shall assign requirement ID following R-XXX-NNN convention."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Requirement ID"
+    verification: "ID follows convention"
+
+  GR-005:
+    domain: testability
+    statement: "The SKILL shall ensure generated requirement is testable."
+    pattern: ubiquitous
+    priority: critical
+    outputs:
+      - "Testability verification"
+    verification: "Requirement is verifiable"
+
+  GR-006:
+    domain: refinement
+    statement: "WHEN requirement is ambiguous, the SKILL shall propose clarifying questions."
+    pattern: conditional
+    trigger: "Ambiguity detected"
+    priority: high
+    outputs:
+      - "Clarifying questions"
+    verification: "Ambiguity addressed"
+
+test_cases:
+  T-GR-001:
+    capability: "GR-001"
+    scenario: "User requests requirement"
+    given: "Need description provided"
+    when: "User runs `/aget-generate-requirement`"
+    then: "EARS requirement generated"
+    verification_method: "manual"
+
+  T-GR-002:
+    capability: "GR-003"
+    scenario: "EARS template application"
+    given: "Event-driven need"
+    when: "Requirement generated"
+    then: "Uses 'WHEN... the [system] shall...' format"
+    verification_method: "automated"
+
+  T-GR-003:
+    capability: "GR-006"
+    scenario: "Ambiguity handling"
+    given: "Vague need description"
+    when: "Generation attempted"
+    then: "Clarifying questions posed"
+    verification_method: "manual"
+
+constraints:
+  C-GR-001:
+    statement: "The SKILL shall NOT generate requirements without EARS format."
+    rationale: "Format consistency required"
+
+  C-GR-002:
+    statement: "The SKILL shall NOT accept untestable requirements."
+    rationale: "Requirements must be verifiable"
+
+  C-GR-003:
+    statement: "The SKILL shall NOT generate duplicate requirement IDs."
+    rationale: "IDs must be unique"

@@ -1,0 +1,129 @@
+# SKILL-019: aget-assess-tradeoffs
+# Purpose: Analyze trade-offs between competing concerns and quality attributes
+# Archetype: architect
+# Created: 2026-02-14
+# Project: ARC-001 (Archetype Customization v3.5)
+
+spec:
+  id: SKILL-019
+  name: aget-assess-tradeoffs
+  version: 1.0.0
+  status: draft
+  created: 2026-02-14
+  format: "EARS with controlled vocabulary"
+  category: Archetype
+  archetype: architect
+  scope: "Analyze trade-offs between competing architectural concerns"
+
+  traceability:
+    skill_md: ".claude/skills/aget-assess-tradeoffs/SKILL.md"
+    archetype_spec: "Architect_SPEC.md"
+    ontology: "ONTOLOGY_architect.yaml"
+    index_ref: "SKILL-A-ARC-002"
+    l_docs:
+      - "L463: Entity-Archetype Alignment"
+      - "L486: Ontology-Driven Creation"
+    vocabulary_terms:
+      - "Trade_off"
+      - "Quality_Attribute"
+      - "Decision"
+
+capabilities:
+  AT-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-assess-tradeoffs`, the SKILL shall analyze competing concerns."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "Competing options or concerns"
+      - "Context and constraints"
+    outputs:
+      - "Trade-off analysis"
+      - "Decision matrix"
+      - "Recommendation"
+    verification: "Output includes structured analysis"
+
+  AT-002:
+    domain: analysis
+    statement: "The SKILL shall identify all competing quality attributes."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "List of quality attributes in tension"
+    verification: "Conflicting attributes explicitly named"
+
+  AT-003:
+    domain: analysis
+    statement: "The SKILL shall evaluate each option against quality attributes."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Option evaluation matrix"
+    verification: "Each option rated against each attribute"
+
+  AT-004:
+    domain: analysis
+    statement: "The SKILL shall identify irreversible vs. reversible decisions."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "Decision reversibility assessment"
+    verification: "Reversibility noted for each decision"
+
+  AT-005:
+    domain: output
+    statement: "The SKILL shall provide recommendation with explicit rationale."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Recommendation"
+      - "Rationale explaining trade-off resolution"
+    verification: "Recommendation includes 'why'"
+
+  AT-006:
+    domain: documentation
+    statement: "The SKILL shall document rejected alternatives for future reference."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "Rejected alternatives with reasons"
+    verification: "Rejected options documented"
+
+test_cases:
+  T-AT-001:
+    capability: "AT-001"
+    scenario: "User requests trade-off analysis"
+    given: "User describes competing concerns"
+    when: "User runs `/aget-assess-tradeoffs`"
+    then: "Trade-off analysis produced"
+    verification_method: "manual"
+
+  T-AT-002:
+    capability: "AT-002, AT-003"
+    scenario: "Quality attribute analysis"
+    given: "Options to compare"
+    when: "Analysis performed"
+    then: "Options evaluated against quality attributes"
+    verification_method: "manual"
+
+  T-AT-003:
+    capability: "AT-004"
+    scenario: "Reversibility assessment"
+    given: "Architectural decision"
+    when: "Trade-off assessed"
+    then: "Reversibility clearly stated"
+    verification_method: "spot-check"
+
+constraints:
+  C-AT-001:
+    statement: "The SKILL shall NOT pretend trade-offs don't exist."
+    rationale: "Architectural honesty requires acknowledging costs"
+
+  C-AT-002:
+    statement: "The SKILL shall NOT recommend without explaining trade-off resolution."
+    rationale: "Recommendations need justification"
+
+  C-AT-003:
+    statement: "The SKILL shall NOT treat all quality attributes as equally important."
+    rationale: "Context determines attribute priority"
