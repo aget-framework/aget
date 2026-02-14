@@ -1,8 +1,8 @@
 # SOP: Release Process
 
-**Version**: 1.4.0
+**Version**: 1.5.0
 **Created**: 2026-01-04
-**Updated**: 2026-01-18
+**Updated**: 2026-02-14
 **Owner**: aget-framework
 **Implements**: AGET_RELEASE_SPEC, CAP-REL-001 through CAP-REL-011, CAP-SOP-001, R-REL-006, CAP-MIG-017, L555-L559, R-SYNC-001
 
@@ -18,8 +18,15 @@ Standard operating procedure for releasing updates to the AGET framework.
 
 This SOP covers releases for:
 - Core framework (aget/)
-- Template repositories (template-*-aget/)
+- Template repositories (template-*-aget/) — 12 repos
 - Organization artifacts (.github/)
+
+**Release Scope**: 14 repositories total (aget + 12 templates + .github)
+
+**Public-Facing Version Indicators** (L578):
+- README.md version badges (all templates)
+- Organization profile (.github/profile/README.md)
+- GitHub Releases (not just git tags)
 
 ---
 
@@ -245,6 +252,47 @@ done
 curl -s https://raw.githubusercontent.com/aget-framework/.github/main/profile/README.md | grep -q "X.Y.Z" && echo "PASS" || echo "FAIL"
 ```
 
+### 6.3 Verify Public-Facing Version Indicators (R-REL-035, R-REL-036, R-REL-037)
+
+**Critical** (L578): Users see README badges and GitHub Releases, not version.json.
+
+#### R-REL-035: README Version Badges
+
+```bash
+# Check ALL 12 templates have correct version badge
+for t in template-*-aget; do
+  VERSION=$(grep -o 'v[0-9]\+\.[0-9]\+\.[0-9]\+' $t/README.md | head -1)
+  echo "$t: $VERSION"
+done
+# Expected: ALL show vX.Y.Z
+```
+
+#### R-REL-036: .github Repo Pushed
+
+```bash
+# Verify .github is NOT ahead of origin
+git -C /path/to/aget-framework/.github status -sb
+# Expected: "## main" (not "## main...origin/main [ahead N]")
+```
+
+#### R-REL-037: GitHub Release Created
+
+```bash
+# Verify GitHub Release exists (not just tag)
+gh release view vX.Y.Z --repo aget-framework/aget
+# Expected: Release details displayed (not "release not found")
+```
+
+**V-Tests**:
+
+| ID | Test | Command | BLOCKING |
+|----|------|---------|----------|
+| V-REL-035 | README badges correct | Loop check all template README.md | **YES** |
+| V-REL-036 | .github repo pushed | `git -C .github status -sb` | **YES** |
+| V-REL-037 | GitHub Release exists | `gh release view vX.Y.Z` | **YES** |
+
+**Decision_Point**: All public-facing indicators updated? [GO/NOGO]
+
 ---
 
 ## Phase 6.5: Remote Upgrade Documentation (CAP-MIG-017)
@@ -422,6 +470,16 @@ gh release view v{PREVIOUS} --repo aget-framework/aget
 ---
 
 ## Changelog
+
+### v1.5.0 (2026-02-14)
+
+- **Added Phase 6.3: Public-Facing Version Indicators** (L578)
+  - R-REL-035: README version badges (all 12 templates)
+  - R-REL-036: .github repo pushed (14 repos total)
+  - R-REL-037: GitHub Release created (not just tags)
+  - V-REL-035/036/037 blocking tests
+- Updated Scope section with explicit 14-repo count
+- Added Public-Facing Version Indicators callout
 
 ### v1.2.0 (2026-01-11)
 
