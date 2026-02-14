@@ -145,7 +145,8 @@ Deployed to specific archetypes only.
 
 | Document | Purpose |
 |----------|---------|
-| SKILL_VOCABULARY.md | Skill terminology definitions |
+| ONTOLOGY_skills.yaml | SKOS-compliant skill concepts (L482) |
+| SKILL_VOCABULARY.md | Human-readable term definitions |
 | ARCHETYPE_SKILLS_INDEX.yaml | Archetype skills registry (aget/specs/) |
 | AGET_SKILLS_SPEC.md | Skills specification (aget/specs/) |
 

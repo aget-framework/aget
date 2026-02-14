@@ -4,8 +4,11 @@
 **Created**: 2026-02-10
 **Updated**: 2026-02-14
 **Status**: production
+**Format**: Human-readable markdown (companion to SKOS ontology)
+**SKOS Version**: ONTOLOGY_skills.yaml (machine-readable, L482-compliant)
 
 This vocabulary defines terms specific to AGET Skills and their specifications.
+For formal SKOS-compliant definitions, see `ONTOLOGY_skills.yaml`.
 
 **Term Count**: 32 terms across 8 categories
 

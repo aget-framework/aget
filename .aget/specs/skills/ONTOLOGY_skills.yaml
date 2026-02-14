@@ -1,0 +1,398 @@
+# AGET Skills Ontology
+#
+# Version: 1.2.0
+# Format: SKOS (Simple Knowledge Organization System)
+# Reference: L482 (Executable Ontology - SKOS+EARS Grounding)
+# Created: 2026-02-14
+# Updated: 2026-02-14
+#
+# This ontology defines concepts for AGET Skills and their specifications.
+# Machine-readable format for validation, tooling, and formal reasoning.
+#
+# Term Count: 32 concepts across 8 clusters
+
+metadata:
+  version: "1.2.0"
+  created: "2026-02-14"
+  updated: "2026-02-14"
+  status: production
+  format: SKOS+EARS
+  reference: L482
+  term_count: 32
+  cluster_count: 8
+
+# ==============================================================================
+# Cluster 1: Core Terms (C001-C005)
+# ==============================================================================
+
+C001_AGET_Skill:
+  skos:prefLabel: "AGET_Skill"
+  skos:definition: "Claude Code capability extension following AGET patterns."
+  skos:scopeNote: |
+    Invoked via /aget-{name} slash command. Located in .claude/skills/{name}/SKILL.md.
+    Has YAML frontmatter with name, description, allowed-tools.
+    Follows AGET governance (propose, review, approve, implement).
+  skos:narrower:
+    - C005_Healthcheck_Skill
+  skos:related:
+    - C002_Skill_Specification
+    - C003_Skill_Invocation
+    - C027_Skill_Implementation
+  skos:example:
+    - "aget-wake-up"
+    - "aget-record-lesson"
+    - "aget-file-issue"
+
+C002_Skill_Specification:
+  skos:prefLabel: "Skill_Specification"
+  skos:definition: "YAML artifact defining skill requirements in EARS format."
+  skos:scopeNote: |
+    Located in .aget/specs/skills/SKILL-XXX_{name}.yaml.
+    Contains capabilities, test_cases, constraints sections.
+    Uses EARS patterns (ubiquitous, event-driven, conditional, optional, complex).
+    Includes traceability to SKILL.md and L-docs.
+  skos:related:
+    - C001_AGET_Skill
+    - C007_EARS_Pattern
+
+C003_Skill_Invocation:
+  skos:prefLabel: "Skill_Invocation"
+  skos:definition: "User triggering skill via /aget-{name} command or Claude auto-invoking based on context."
+  skos:scopeNote: |
+    Primary trigger: explicit slash command.
+    Secondary trigger: Claude context matching (if enabled).
+    Produces skill-specific output.
+  skos:related:
+    - C001_AGET_Skill
+
+C004_Skill_Category:
+  skos:prefLabel: "Skill_Category"
+  skos:definition: "Classification of skill purpose."
+  skos:scopeNote: |
+    Categories: Session, Monitoring, Learning, Governance, Planning, Creation.
+    Each skill belongs to exactly one category.
+  skos:related:
+    - C001_AGET_Skill
+  skos:example:
+    - "Session: aget-wake-up, aget-wind-down"
+    - "Monitoring: aget-check-evolution"
+    - "Learning: aget-record-lesson"
+    - "Governance: aget-propose-skill, aget-file-issue"
+    - "Planning: aget-review-project"
+    - "Creation: aget-create-skill"
+
+C005_Healthcheck_Skill:
+  skos:prefLabel: "Healthcheck_Skill"
+  skos:definition: "Skill that validates directory health against thresholds."
+  skos:scopeNote: |
+    Returns status: OK | WARN | CRITICAL.
+    Based on file count and size metrics.
+    Read-only (never modifies files).
+    Threshold calibrated per agent archetype.
+  skos:broader:
+    - C001_AGET_Skill
+  skos:related:
+    - C006_Health_Status
+  skos:example:
+    - "aget-check-evolution"
+    - "aget-check-sessions"
+    - "aget-check-kb"
+
+# ==============================================================================
+# Cluster 2: Supporting Terms (C006-C008)
+# ==============================================================================
+
+C006_Health_Status:
+  skos:prefLabel: "Health_Status"
+  skos:definition: "Result of health check evaluation."
+  skos:scopeNote: |
+    OK: All metrics within acceptable range.
+    WARN: Some metrics at warning threshold.
+    CRITICAL: Metrics exceed critical threshold or blocking issue found.
+  skos:related:
+    - C005_Healthcheck_Skill
+    - C014_Sanity_Check
+
+C007_EARS_Pattern:
+  skos:prefLabel: "EARS_Pattern"
+  skos:definition: "Easy Approach to Requirements Syntax pattern for capability statements."
+  skos:scopeNote: |
+    Ubiquitous: The SKILL shall {action}.
+    Event-driven: WHEN {trigger}, the SKILL shall {action}.
+    State-driven: WHILE {state}, the SKILL shall {action}.
+    Optional: WHERE {condition}, the SKILL shall {action}.
+    Complex: IF {condition} THEN WHEN {trigger}...
+  skos:related:
+    - C002_Skill_Specification
+  skos:example:
+    - "The SKILL shall report file counts."
+    - "WHEN invoked, the SKILL shall run script."
+
+C008_Advisory_Enforcement:
+  skos:prefLabel: "Advisory_Enforcement"
+  skos:definition: "Governance pattern where compliance is voluntary and supervised, not technically blocked."
+  skos:scopeNote: |
+    No runtime blocking if bypassed.
+    Supervisor detects violations via healthchecks.
+    Intervention follows supervision patterns (critique + teaching).
+  skos:related:
+    - C025_Skill_Proposal
+  skos:example:
+    - "aget-propose-skill uses advisory enforcement"
+
+# ==============================================================================
+# Cluster 3: Session Terms (C009-C014)
+# ==============================================================================
+
+C009_Session_Initialization:
+  skos:prefLabel: "Session_Initialization"
+  skos:definition: "Process of starting an AGET session with status briefing."
+  skos:related:
+    - C001_AGET_Skill
+    - C003_Skill_Invocation
+  skos:example:
+    - "aget-wake-up execution"
+
+C010_Session_Termination:
+  skos:prefLabel: "Session_Termination"
+  skos:definition: "Process of ending an AGET session with state capture."
+  skos:related:
+    - C011_Wind_Down_Protocol
+  skos:example:
+    - "aget-wind-down execution"
+
+C011_Wind_Down_Protocol:
+  skos:prefLabel: "Wind_Down_Protocol"
+  skos:definition: "Structured session ending with notes, commit staging, and sanity checks."
+  skos:related:
+    - C010_Session_Termination
+    - C012_Session_State
+
+C012_Session_State:
+  skos:prefLabel: "Session_State"
+  skos:definition: "Captured context of an active session for resume/recovery."
+  skos:related:
+    - C013_Checkpoint
+    - C020_Session_Artifact
+
+C013_Checkpoint:
+  skos:prefLabel: "Checkpoint"
+  skos:definition: "Saved workflow state at a natural breakpoint for recovery."
+  skos:scopeNote: "Location: sessions/checkpoints/{name}.checkpoint.yaml"
+  skos:related:
+    - C012_Session_State
+  skos:example:
+    - "aget-save-state creates checkpoints"
+
+C014_Sanity_Check:
+  skos:prefLabel: "Sanity_Check"
+  skos:definition: "Health inspection and housekeeping validation of agent state."
+  skos:related:
+    - C005_Healthcheck_Skill
+    - C006_Health_Status
+  skos:example:
+    - "aget-check-health performs sanity checks"
+
+# ==============================================================================
+# Cluster 4: Directory Terms (C015-C017)
+# ==============================================================================
+
+C015_Evolution_Directory:
+  skos:prefLabel: "Evolution_Directory"
+  skos:definition: "Directory containing framework learnings and process patterns."
+  skos:scopeNote: "Location: .aget/evolution/"
+  skos:related:
+    - C018_Learning_Document
+
+C016_Sessions_Directory:
+  skos:prefLabel: "Sessions_Directory"
+  skos:definition: "Directory containing session logs and checkpoints."
+  skos:scopeNote: "Location: sessions/"
+  skos:related:
+    - C020_Session_Artifact
+
+C017_Knowledge_Base:
+  skos:prefLabel: "Knowledge_Base"
+  skos:definition: "Structured collection of agent knowledge including learnings, specs, and vocabulary."
+  skos:related:
+    - C015_Evolution_Directory
+    - C019_Framework_Belief
+
+# ==============================================================================
+# Cluster 5: Learning Terms (C018-C022)
+# ==============================================================================
+
+C018_Learning_Document:
+  skos:prefLabel: "Learning_Document"
+  skos:definition: "Markdown artifact documenting a process learning (L-doc)."
+  skos:scopeNote: |
+    Format: L###_{title}.md
+    Location: .aget/evolution/
+  skos:related:
+    - C019_Framework_Belief
+  skos:example:
+    - "L482_executable_ontology_skos_ears_grounding.md"
+    - "L520_issue_governance_gap.md"
+
+C019_Framework_Belief:
+  skos:prefLabel: "Framework_Belief"
+  skos:definition: "Process pattern or methodology knowledge portable across domains."
+  skos:scopeNote: "Location: .aget/evolution/"
+  skos:related:
+    - C021_Domain_Belief
+    - C018_Learning_Document
+
+C021_Domain_Belief:
+  skos:prefLabel: "Domain_Belief"
+  skos:definition: "Domain-specific knowledge not portable across contexts."
+  skos:scopeNote: "Location: knowledge/ at root"
+  skos:related:
+    - C019_Framework_Belief
+
+C020_Observation:
+  skos:prefLabel: "Observation"
+  skos:definition: "Research finding or pattern discovered during session work."
+  skos:related:
+    - C022_Session_Artifact
+    - C018_Learning_Document
+  skos:example:
+    - "aget-capture-observation records observations"
+
+C022_Session_Artifact:
+  skos:prefLabel: "Session_Artifact"
+  skos:definition: "Any artifact produced during a session (logs, observations, checkpoints)."
+  skos:scopeNote: "Location: sessions/"
+  skos:related:
+    - C020_Observation
+    - C013_Checkpoint
+
+# ==============================================================================
+# Cluster 6: Planning Terms (C023-C026)
+# ==============================================================================
+
+C023_Project_Plan:
+  skos:prefLabel: "Project_Plan"
+  skos:definition: "Gated execution plan for multi-phase work."
+  skos:scopeNote: |
+    Format: PROJECT_PLAN_{name}.md
+    Location: planning/
+  skos:related:
+    - C024_V_Test
+    - C026_Research_Phase
+  skos:example:
+    - "PROJECT_PLAN_archetype_customization_v3.5_v1.0.md"
+
+C024_Project_Review:
+  skos:prefLabel: "Project_Review"
+  skos:definition: "Mid-flight assessment of project health and progress."
+  skos:related:
+    - C023_Project_Plan
+    - C024_V_Test
+  skos:example:
+    - "aget-review-project performs project reviews"
+
+C024_V_Test:
+  skos:prefLabel: "V_Test"
+  skos:definition: "Verification test that validates gate completion."
+  skos:scopeNote: "Format: V-{gate}.{number}"
+  skos:related:
+    - C023_Project_Plan
+
+C026_Research_Phase:
+  skos:prefLabel: "Research_Phase"
+  skos:definition: "Pre-execution phase for gathering evidence and context."
+  skos:related:
+    - C023_Project_Plan
+  skos:example:
+    - "Phase -1 (Due Diligence) in PROJECT_PLANs"
+
+# ==============================================================================
+# Cluster 7: Creation Terms (C027-C029)
+# ==============================================================================
+
+C025_Skill_Proposal:
+  skos:prefLabel: "Skill_Proposal"
+  skos:definition: "Structured proposal for a new skill following governance patterns."
+  skos:scopeNote: "Location: planning/skill-proposals/"
+  skos:related:
+    - C001_AGET_Skill
+    - C008_Advisory_Enforcement
+
+C027_Skill_Implementation:
+  skos:prefLabel: "Skill_Implementation"
+  skos:definition: "The SKILL.md file that implements a skill's behavior."
+  skos:related:
+    - C028_SKILL_MD
+    - C001_AGET_Skill
+
+C028_SKILL_MD:
+  skos:prefLabel: "SKILL_MD"
+  skos:definition: "Markdown file with YAML frontmatter defining skill behavior."
+  skos:scopeNote: "Location: .claude/skills/{name}/SKILL.md"
+  skos:related:
+    - C027_Skill_Implementation
+    - C001_AGET_Skill
+
+# ==============================================================================
+# Cluster 8: Governance Terms (C029-C031)
+# ==============================================================================
+
+C029_Issue_Routing:
+  skos:prefLabel: "Issue_Routing"
+  skos:definition: "Determining correct destination repository for an issue based on agent type."
+  skos:scopeNote: |
+    Private fleet agents route to gmelli/aget-aget.
+    Public/remote agents route to aget-framework/aget.
+    Based on path, version.json, or git remote detection.
+  skos:related:
+    - C030_Content_Sanitization
+  skos:example:
+    - "L520 issue governance gap"
+
+C030_Content_Sanitization:
+  skos:prefLabel: "Content_Sanitization"
+  skos:definition: "Removing or redacting private information before filing to public repositories."
+  skos:scopeNote: |
+    Patterns to sanitize:
+    - Private agent names (private-*-aget)
+    - Internal repo references (gmelli/*)
+    - Fleet size disclosures
+    - Session references
+  skos:related:
+    - C029_Issue_Routing
+
+C031_Issue_Governance:
+  skos:prefLabel: "Issue_Governance"
+  skos:definition: "L520-compliant process for filing issues with correct routing and content handling."
+  skos:scopeNote: |
+    Components:
+    1. Agent type detection
+    2. Destination routing
+    3. Content sanitization
+    4. Template selection
+    5. Validation before filing
+  skos:related:
+    - C029_Issue_Routing
+    - C030_Content_Sanitization
+  skos:example:
+    - "aget-file-issue (SKILL-040)"
+
+# ==============================================================================
+# Traceability
+# ==============================================================================
+
+traceability:
+  l_docs:
+    - L482  # Executable Ontology - SKOS+EARS Grounding
+    - L520  # Issue Governance Gap
+    - L532  # Skill specification original
+    - L589  # Skill remediation
+  specs:
+    - SKILL-001  # through SKILL-013 (universal)
+    - SKILL-014  # through SKILL-039 (archetype)
+    - SKILL-040  # aget-file-issue
+  templates:
+    - SKILL_SPEC_TEMPLATE.yaml
+  projects:
+    - PROJECT_PLAN_skill_specification_remediation_v1.0.md
+    - PROJECT_PLAN_archetype_customization_v3.5_v1.0.md
