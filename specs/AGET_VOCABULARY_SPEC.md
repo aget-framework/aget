@@ -1,11 +1,11 @@
 # AGET Vocabulary Specification
 
-**Version**: 1.11.0
+**Version**: 1.12.0
 **Status**: Active
 **Category**: Core (Standards)
 **Format Version**: 1.2
 **Created**: 2026-01-04
-**Updated**: 2026-02-11
+**Updated**: 2026-02-13
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_VOCABULARY_SPEC.md`
 **Change Origin**: PROJECT_PLAN_standards_ontology_elevation_v1.0
@@ -83,6 +83,13 @@ Custom properties extending SKOS:
 | `aget:core_entity` | Marks entity as inheritable core entity (L459) | boolean |
 | `aget:attributes` | Entity attribute definitions | 0:many |
 | `aget:relationships` | Entity relationship definitions | 0:many |
+| `aget:escalation_trigger` | Conditions requiring supervisor/principal review (L573) | 0:many |
+| `aget:authority_scope` | What capability can touch (read, write, external) (L573) | 0:1 |
+| `aget:format_dialect` | Governance format (contracts, ears, hybrid, skos-only) (L573) | 0:1 |
+| `aget:archetype_constraint` | Agent archetypes permitted to use capability (L573) | 0:many |
+| `aget:portfolio_boundary` | Cross-portfolio usage rules (L573) | 0:1 |
+| `aget:audit_required` | Whether invocations require logging (L573) | boolean |
+| `aget:inherits_from` | Vocabulary inheritance parent (L573) | 0:1 |
 
 ## Entry Format Patterns
 
@@ -196,6 +203,15 @@ Compound AGET Vocabulary terms match this regex:
 | `Aget_Instance` | Concrete agent created from an Aget_Template | Instance |
 | `Core_Template` | Fleet role template (worker, advisor, supervisor) | — |
 | `Specialized_Template` | Task-specific template (spec-engineer, developer) | — |
+
+## Vocabulary Foundation Terms (L573)
+
+| Term | Definition | altLabel |
+|------|------------|----------|
+| `Aget_Core_Vocabulary` | Shared vocabulary inheritance root for all agents; defines foundational terms every agent inherits without per-agent work | aget_core |
+| `Vocabulary_Inheritance` | Pattern where agent vocabulary extends Aget_Core_Vocabulary via aget:inherits_from | — |
+| `Format_Dialect` | Governance format variant used by skill/capability (contracts, ears, hybrid, skos-only) | — |
+| `Ontology_Maturity_Tier` | Classification of agent ontology investment level (Production, Embedded, Planning, None) | — |
 
 ## Organizational Terms
 
@@ -2241,7 +2257,14 @@ Agent_Capability:
   skos:narrower: ["Agent_Skill", "Agent_Hook", "Session_Protocol"]
   skos:related: ["Capability", "Specialization_Mechanism"]
   aget:theoretical_basis: "Object-Capability Model (Dennis & Van Horn 1966)"
-  aget:source: "L536 Ontological Correction"
+  aget:source: "L536 Ontological Correction, L573 Fleet Capability Requirements"
+  # Governance Attributes (L573 Fleet Survey)
+  aget:escalation_trigger: []  # Conditions requiring supervisor/principal review
+  aget:authority_scope: null   # read | write | external
+  aget:format_dialect: null    # contracts | ears | hybrid | skos-only
+  aget:archetype_constraint: []  # Which archetypes may use
+  aget:portfolio_boundary: null  # Cross-portfolio rules
+  aget:audit_required: false   # Whether invocations need logging
 ```
 
 ### Agent_Skill
@@ -2333,17 +2356,127 @@ CLI_Support_Level:
     - Unsupported: "Known blockers exist (does not work)"
 ```
 
+## Capability Governance Terms (L573)
+
+These terms define governance attributes for Agent_Capability concepts, derived from fleet supervisor survey findings.
+
+### Escalation_Trigger
+
+```yaml
+Escalation_Trigger:
+  skos:prefLabel: "Escalation_Trigger"
+  skos:definition: "Condition that requires a capability invocation to be escalated to supervisor or principal for review before execution."
+  skos:altLabel: ["Escalation_Condition"]
+  skos:broader: "Capability_Governance"
+  skos:example: ["external_api_call", "cross_portfolio_access", "write_to_governance"]
+  aget:source: "L573 Fleet Survey"
+  aget:priority: "P0 (convergent across fleets)"
+```
+
+### Authority_Scope
+
+```yaml
+Authority_Scope:
+  skos:prefLabel: "Authority_Scope"
+  skos:definition: "Classification of what resources or systems a capability is authorized to access or modify."
+  skos:altLabel: ["Capability_Scope"]
+  skos:broader: "Capability_Governance"
+  aget:source: "L573 Fleet Survey"
+  aget:priority: "P0 (convergent across fleets)"
+  aget:enum_values:
+    - read: "Read-only access to resources"
+    - write: "Can modify internal resources"
+    - external: "Can access external systems (APIs, networks)"
+```
+
+### Format_Dialect
+
+```yaml
+Format_Dialect:
+  skos:prefLabel: "Format_Dialect"
+  skos:definition: "The governance format variant used to define a capability's behavior and constraints."
+  skos:altLabel: ["Governance_Format"]
+  skos:broader: "Capability_Governance"
+  aget:source: "L573 Fleet Survey (work-fleet pattern)"
+  aget:enum_values:
+    - contracts: "Design-by-Contract (input_schema, postconditions, invariants)"
+    - ears: "EARS-style requirements (C/U/E/S patterns)"
+    - hybrid: "Combination of contracts and EARS"
+    - skos_only: "SKOS vocabulary definitions only"
+```
+
+### Archetype_Constraint
+
+```yaml
+Archetype_Constraint:
+  skos:prefLabel: "Archetype_Constraint"
+  skos:definition: "Specification of which agent archetypes are permitted to use a capability."
+  skos:altLabel: ["Role_Constraint"]
+  skos:broader: "Capability_Governance"
+  skos:example: ["supervisor", "advisor", "worker", "spec-engineer"]
+  aget:source: "L573 Fleet Survey"
+```
+
+### Portfolio_Boundary
+
+```yaml
+Portfolio_Boundary:
+  skos:prefLabel: "Portfolio_Boundary"
+  skos:definition: "Rules governing whether a capability may be used across portfolio boundaries."
+  skos:altLabel: ["Cross_Portfolio_Rule"]
+  skos:broader: "Capability_Governance"
+  skos:related: ["L056 Delegation Protocol"]
+  aget:source: "L573 Fleet Survey"
+  aget:enum_values:
+    - none: "No portfolio restrictions"
+    - same_portfolio: "Must be used within same portfolio"
+    - explicit_grant: "Requires explicit cross-portfolio authorization"
+```
+
+### Audit_Required
+
+```yaml
+Audit_Required:
+  skos:prefLabel: "Audit_Required"
+  skos:definition: "Boolean flag indicating whether invocations of a capability must be logged for compliance or review purposes."
+  skos:broader: "Capability_Governance"
+  aget:source: "L573 Fleet Survey"
+  aget:datatype: "boolean"
+```
+
+### Ontology_Maturity_Tier
+
+```yaml
+Ontology_Maturity_Tier:
+  skos:prefLabel: "Ontology_Maturity_Tier"
+  skos:definition: "Classification of an agent's ontology investment level, determining appropriate governance overhead."
+  skos:altLabel: ["Ontology_Tier"]
+  aget:source: "L573 Fleet Survey (work-fleet pattern)"
+  aget:enum_values:
+    - Production: "Multi-vocabulary, multi-faceted specs, >15 skills"
+    - Embedded: "SKOS in skills, structured vocabulary"
+    - Planning: "Domain identified, project planned"
+    - None: "Universal skills only, minimal vocabulary"
+```
+
 ## Agent Capability Terms Summary
 
 | Term | Type | Parent | Source |
 |------|------|--------|--------|
-| Agent_Capability | Concept | (root) | L536 |
+| Agent_Capability | Concept | (root) | L536, L573 |
 | Agent_Skill | Concept | Agent_Capability | L557 |
 | Agent_Hook | Concept | Agent_Capability | L570 |
 | Session_Protocol | Concept | Agent_Capability | L536 |
 | Lifecycle_Protocol | Concept | Session_Protocol | L536 |
 | On_Demand_Protocol | Concept | Session_Protocol | L536 |
 | CLI_Support_Level | Enum | (root) | L533 |
+| Escalation_Trigger | Property | Capability_Governance | L573 |
+| Authority_Scope | Enum | Capability_Governance | L573 |
+| Format_Dialect | Enum | Capability_Governance | L573 |
+| Archetype_Constraint | Property | Capability_Governance | L573 |
+| Portfolio_Boundary | Enum | Capability_Governance | L573 |
+| Audit_Required | Property | Capability_Governance | L573 |
+| Ontology_Maturity_Tier | Enum | (root) | L573 |
 
 ## Ontology Reference
 
@@ -2406,6 +2539,29 @@ Full concept definitions with theoretical grounding are in:
 ---
 
 ## Changelog
+
+### v1.12.0 (2026-02-13)
+
+- **NEW**: Fleet Capability Ontology terms from L573 fleet supervisor survey
+- Added 7 AGET extension properties for capability governance:
+  - `aget:escalation_trigger`: Conditions requiring escalation
+  - `aget:authority_scope`: What capability can touch (read/write/external)
+  - `aget:format_dialect`: Governance format (contracts/ears/hybrid/skos-only)
+  - `aget:archetype_constraint`: Agent archetypes permitted to use capability
+  - `aget:portfolio_boundary`: Cross-portfolio usage rules
+  - `aget:audit_required`: Whether invocations need logging
+  - `aget:inherits_from`: Vocabulary inheritance parent
+- Added Vocabulary Foundation Terms section (Part 2):
+  - Aget_Core_Vocabulary: Shared vocabulary inheritance root
+  - Vocabulary_Inheritance: Inheritance pattern
+  - Format_Dialect: Governance format classification
+  - Ontology_Maturity_Tier: Agent ontology investment classification
+- Added Capability Governance Terms section (Part 8):
+  - Escalation_Trigger, Authority_Scope, Format_Dialect
+  - Archetype_Constraint, Portfolio_Boundary, Audit_Required
+  - Ontology_Maturity_Tier (Production/Embedded/Planning/None)
+- Updated Agent_Capability with governance attribute slots
+- See: L573, PROJECT_PLAN_fleet_capability_ontology_v3.5_v1.0
 
 ### v1.11.0 (2026-02-11)
 

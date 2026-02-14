@@ -1,0 +1,125 @@
+# SKILL-032: aget-provide-feedback
+# Purpose: Provide structured feedback with severity classification
+# Archetype: reviewer
+# Created: 2026-02-14
+# Project: ARC-001 (Archetype Customization v3.5)
+
+spec:
+  id: SKILL-032
+  name: aget-provide-feedback
+  version: 1.0.0
+  status: draft
+  created: 2026-02-14
+  format: "EARS with controlled vocabulary"
+  category: Archetype
+  archetype: reviewer
+  scope: "Provide structured feedback with severity classification"
+
+  traceability:
+    skill_md: ".claude/skills/aget-provide-feedback/SKILL.md"
+    archetype_spec: "Reviewer_SPEC.md"
+    ontology: "ONTOLOGY_reviewer.yaml"
+    index_ref: "SKILL-A-REV-002"
+    l_docs:
+      - "L463: Entity-Archetype Alignment"
+      - "L486: Ontology-Driven Creation"
+    vocabulary_terms:
+      - "Feedback"
+      - "Issue"
+      - "Approval"
+
+capabilities:
+  PF-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-provide-feedback`, the SKILL shall generate structured feedback."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "Work to provide feedback on"
+    outputs:
+      - "Structured feedback"
+    verification: "Feedback generated"
+
+  PF-002:
+    domain: classification
+    statement: "The SKILL shall classify feedback by severity (blocking, suggestion, nitpick, praise)."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Severity-tagged feedback"
+    verification: "All items have severity"
+
+  PF-003:
+    domain: specificity
+    statement: "The SKILL shall provide specific location for each feedback item."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Location references"
+    verification: "Locations enable navigation"
+
+  PF-004:
+    domain: actionability
+    statement: "The SKILL shall include suggested resolution for issues."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Resolution suggestions"
+    verification: "Suggestions actionable"
+
+  PF-005:
+    domain: balance
+    statement: "The SKILL shall include positive observations where merited."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "Positive feedback items"
+    verification: "Strengths acknowledged"
+
+  PF-006:
+    domain: summary
+    statement: "The SKILL shall provide summary with issue counts by severity."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "Summary statistics"
+    verification: "Counts accurate"
+
+test_cases:
+  T-PF-001:
+    capability: "PF-001"
+    scenario: "User requests feedback"
+    given: "Work product to review"
+    when: "User runs `/aget-provide-feedback`"
+    then: "Structured feedback generated"
+    verification_method: "manual"
+
+  T-PF-002:
+    capability: "PF-002, PF-003"
+    scenario: "Classified feedback"
+    given: "Issues found"
+    when: "Feedback generated"
+    then: "Severity and location included"
+    verification_method: "manual"
+
+  T-PF-003:
+    capability: "PF-005"
+    scenario: "Balanced feedback"
+    given: "Work has both issues and strengths"
+    when: "Feedback provided"
+    then: "Both included"
+    verification_method: "spot-check"
+
+constraints:
+  C-PF-001:
+    statement: "The SKILL shall NOT classify all feedback as blocking."
+    rationale: "Severity inflation reduces effectiveness"
+
+  C-PF-002:
+    statement: "The SKILL shall NOT provide vague feedback."
+    rationale: "Specific feedback enables action"
+
+  C-PF-003:
+    statement: "The SKILL shall NOT use harsh or personal language."
+    rationale: "Constructive tone maintains collaboration"

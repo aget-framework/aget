@@ -1,0 +1,129 @@
+# SKILL-025: aget-make-decision
+# Purpose: Make decisions with documented rationale, authority, and communication plan
+# Archetype: executive
+# Created: 2026-02-14
+# Project: ARC-001 (Archetype Customization v3.5)
+
+spec:
+  id: SKILL-025
+  name: aget-make-decision
+  version: 1.0.0
+  status: draft
+  created: 2026-02-14
+  format: "EARS with controlled vocabulary"
+  category: Archetype
+  archetype: executive
+  scope: "Make decisions with documented rationale and communication plan"
+
+  traceability:
+    skill_md: ".claude/skills/aget-make-decision/SKILL.md"
+    archetype_spec: "Executive_SPEC.md"
+    ontology: "ONTOLOGY_executive.yaml"
+    index_ref: "SKILL-A-EXE-001"
+    l_docs:
+      - "L463: Entity-Archetype Alignment"
+      - "L486: Ontology-Driven Creation"
+    vocabulary_terms:
+      - "Decision"
+      - "Authority"
+      - "Communication"
+
+capabilities:
+  MD-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-make-decision`, the SKILL shall initiate decision process."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "Decision topic or question"
+      - "Options (if known)"
+    outputs:
+      - "Decision document"
+      - "Communication plan"
+    verification: "Decision documented"
+
+  MD-002:
+    domain: authority
+    statement: "The SKILL shall verify decision is within authority scope."
+    pattern: ubiquitous
+    priority: critical
+    outputs:
+      - "Authority verification"
+    verification: "Authority boundary checked"
+
+  MD-003:
+    domain: process
+    statement: "The SKILL shall document options considered with pros/cons."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Options analysis"
+    verification: "Multiple options considered"
+
+  MD-004:
+    domain: documentation
+    statement: "The SKILL shall document rationale for the decision."
+    pattern: ubiquitous
+    priority: critical
+    outputs:
+      - "Decision rationale"
+    verification: "Rationale explains 'why'"
+
+  MD-005:
+    domain: communication
+    statement: "The SKILL shall generate stakeholder communication plan."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Stakeholder list"
+      - "Communication timeline"
+      - "Key messages"
+    verification: "Communication plan actionable"
+
+  MD-006:
+    domain: documentation
+    statement: "The SKILL shall document decision for future reference (ADR format)."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "Decision record"
+    verification: "Record is searchable and complete"
+
+test_cases:
+  T-MD-001:
+    capability: "MD-001"
+    scenario: "User initiates decision"
+    given: "Decision topic provided"
+    when: "User runs `/aget-make-decision`"
+    then: "Decision process begins"
+    verification_method: "manual"
+
+  T-MD-002:
+    capability: "MD-002"
+    scenario: "Authority check"
+    given: "Decision outside authority"
+    when: "Decision attempted"
+    then: "Escalation recommended"
+    verification_method: "manual"
+
+  T-MD-003:
+    capability: "MD-004, MD-005"
+    scenario: "Complete decision"
+    given: "Decision made"
+    when: "Documentation reviewed"
+    then: "Rationale and communication plan present"
+    verification_method: "spot-check"
+
+constraints:
+  C-MD-001:
+    statement: "The SKILL shall NOT make decisions exceeding authority scope."
+    rationale: "Authority boundaries must be respected"
+
+  C-MD-002:
+    statement: "The SKILL shall NOT skip rationale documentation."
+    rationale: "Decisions need audit trail"
+
+  C-MD-003:
+    statement: "The SKILL shall NOT communicate decisions without stakeholder identification."
+    rationale: "Wrong audience creates confusion"

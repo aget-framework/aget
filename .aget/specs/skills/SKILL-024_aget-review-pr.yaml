@@ -1,0 +1,129 @@
+# SKILL-024: aget-review-pr
+# Purpose: Review pull requests for code quality, test coverage, and standards
+# Archetype: developer
+# Created: 2026-02-14
+# Project: ARC-001 (Archetype Customization v3.5)
+
+spec:
+  id: SKILL-024
+  name: aget-review-pr
+  version: 1.0.0
+  status: draft
+  created: 2026-02-14
+  format: "EARS with controlled vocabulary"
+  category: Archetype
+  archetype: developer
+  scope: "Review pull requests for quality, coverage, and standards compliance"
+
+  traceability:
+    skill_md: ".claude/skills/aget-review-pr/SKILL.md"
+    archetype_spec: "Developer_SPEC.md"
+    ontology: "ONTOLOGY_developer.yaml"
+    index_ref: "SKILL-A-DEV-003"
+    l_docs:
+      - "L463: Entity-Archetype Alignment"
+      - "L486: Ontology-Driven Creation"
+    vocabulary_terms:
+      - "Pull_Request"
+      - "Code_Review"
+      - "Code_Change"
+
+capabilities:
+  RP-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-review-pr`, the SKILL shall perform PR review."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "PR number or URL"
+    outputs:
+      - "Review summary"
+      - "Comments"
+      - "Approval recommendation"
+    verification: "Review produced"
+
+  RP-002:
+    domain: analysis
+    statement: "The SKILL shall analyze code changes for correctness and quality."
+    pattern: ubiquitous
+    priority: critical
+    outputs:
+      - "Code quality assessment"
+      - "Potential issues"
+    verification: "Quality issues identified"
+
+  RP-003:
+    domain: analysis
+    statement: "The SKILL shall verify test coverage for changed code."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Test coverage assessment"
+      - "Missing tests"
+    verification: "Coverage gaps identified"
+
+  RP-004:
+    domain: analysis
+    statement: "The SKILL shall check adherence to coding standards."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Standards compliance assessment"
+    verification: "Standards violations noted"
+
+  RP-005:
+    domain: output
+    statement: "The SKILL shall categorize comments by type (blocking, suggestion, nitpick)."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Categorized comments"
+    verification: "Comment severity clear"
+
+  RP-006:
+    domain: output
+    statement: "The SKILL shall provide overall recommendation (approve, request changes, comment)."
+    pattern: ubiquitous
+    priority: critical
+    outputs:
+      - "Recommendation with rationale"
+    verification: "Clear recommendation made"
+
+test_cases:
+  T-RP-001:
+    capability: "RP-001"
+    scenario: "User requests PR review"
+    given: "PR exists"
+    when: "User runs `/aget-review-pr 123`"
+    then: "Review performed"
+    verification_method: "manual"
+
+  T-RP-002:
+    capability: "RP-002, RP-003, RP-004"
+    scenario: "Comprehensive review"
+    given: "PR with code changes"
+    when: "Review performed"
+    then: "Quality, coverage, and standards assessed"
+    verification_method: "manual"
+
+  T-RP-003:
+    capability: "RP-005, RP-006"
+    scenario: "Actionable output"
+    given: "Review complete"
+    when: "Output reviewed"
+    then: "Comments categorized and recommendation clear"
+    verification_method: "spot-check"
+
+constraints:
+  C-RP-001:
+    statement: "The SKILL shall NOT approve PRs with blocking issues."
+    rationale: "Blocking issues must be resolved"
+
+  C-RP-002:
+    statement: "The SKILL shall NOT submit review without user confirmation."
+    rationale: "User controls actual GitHub interaction"
+
+  C-RP-003:
+    statement: "The SKILL shall NOT focus solely on style issues."
+    rationale: "Correctness and design more important than formatting"

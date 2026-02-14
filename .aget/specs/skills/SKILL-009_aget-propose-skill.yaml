@@ -1,0 +1,113 @@
+# SKILL-009: aget-propose-skill
+# Purpose: Enable structured skill proposal before implementation
+# Created: 2026-02-10
+# Based on: SKILL_SPEC_TEMPLATE.yaml
+
+spec:
+  id: SKILL-009
+  name: aget-propose-skill
+  version: 1.0.0
+  status: production
+  created: 2026-02-10
+  format: "EARS with controlled vocabulary"
+  category: Governance
+  scope: "Gate new skill creation with propose → review → approve → implement pattern"
+
+  traceability:
+    skill_md: ".claude/skills/aget-propose-skill/SKILL.md"
+    l_docs: []
+    vocabulary_terms:
+      - "AGET_Skill"
+      - "Skill_Proposal"
+      - "Advisory_Enforcement"
+
+capabilities:
+  PS-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-propose-skill`, the SKILL shall gather information and create a proposal document."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    outputs:
+      - "planning/skill-proposals/PROPOSAL_{name}.md"
+    verification: "Proposal document created"
+
+  PS-002:
+    domain: validation
+    statement: "The SKILL shall validate skill name follows aget-{verb}-{object} pattern."
+    pattern: ubiquitous
+    priority: critical
+    verification: "Invalid names rejected"
+
+  PS-003:
+    domain: validation
+    statement: "The SKILL shall verify skill does not already exist in .claude/skills/."
+    pattern: ubiquitous
+    priority: high
+    verification: "Duplicate skills detected"
+
+  PS-004:
+    domain: validation
+    statement: "The SKILL shall require at least 2 triggers for the proposed skill."
+    pattern: ubiquitous
+    priority: medium
+    verification: "Minimum triggers enforced"
+
+  PS-005:
+    domain: gathering
+    statement: "The SKILL shall collect: skill name, purpose, triggers, category, and scope from user."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Skill metadata for proposal"
+    verification: "All fields collected"
+
+  PS-006:
+    domain: output
+    statement: "The SKILL shall create proposal with PROPOSED status and approval checklist."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Proposal with approval checkboxes"
+    verification: "Proposal has approval workflow"
+
+  PS-007:
+    domain: enforcement
+    statement: "The SKILL shall use advisory enforcement - no technical blocking if bypassed."
+    pattern: ubiquitous
+    priority: low
+    verification: "Compliance voluntary + supervised"
+
+test_cases:
+  T-PS-001:
+    capability: "PS-002"
+    scenario: "Invalid name format rejected"
+    given: "User proposes 'my-skill' (missing aget- prefix)"
+    when: "User runs `/aget-propose-skill my-skill`"
+    then: "Error: Name must follow aget-{verb}-{object} pattern"
+    verification_method: "manual"
+
+  T-PS-002:
+    capability: "PS-003"
+    scenario: "Duplicate skill detected"
+    given: "aget-wake-up already exists"
+    when: "User proposes aget-wake-up"
+    then: "Error: Skill already exists"
+    verification_method: "automated"
+
+  T-PS-003:
+    capability: "PS-006"
+    scenario: "Proposal created with workflow"
+    given: "Valid skill proposal information"
+    when: "User completes skill proposal"
+    then: "PROPOSAL_{name}.md created with approval checklist"
+    verification_method: "manual"
+
+constraints:
+  C-PS-001:
+    statement: "The SKILL shall NOT create skill implementation directly. Only proposals."
+    rationale: "Proposal must be approved before implementation"
+
+  C-PS-002:
+    statement: "The SKILL shall NOT block agents who bypass proposal. Supervision handles compliance."
+    rationale: "Advisory enforcement pattern"

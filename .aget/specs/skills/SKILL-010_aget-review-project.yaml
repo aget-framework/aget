@@ -1,0 +1,128 @@
+# SKILL-010: aget-review-project
+# Purpose: Mid-flight review of active project plans
+# Created: 2026-02-10
+# Based on: SKILL_SPEC_TEMPLATE.yaml
+
+spec:
+  id: SKILL-010
+  name: aget-review-project
+  version: 1.0.0
+  status: production
+  created: 2026-02-10
+  format: "EARS with controlled vocabulary"
+  category: Planning
+  scope: "Evaluate project progress, V-test completion, blockers, and generate recommendations"
+
+  traceability:
+    skill_md: ".claude/skills/aget-review-project/SKILL.md"
+    l_docs: []
+    vocabulary_terms:
+      - "AGET_Skill"
+      - "Project_Review"
+      - "V_Test"
+      - "Health_Status"
+
+capabilities:
+  RP-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-review-project`, the SKILL shall analyze project plan and report health."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    outputs:
+      - "Project review report"
+      - "Health Status: OK | WARN | CRITICAL"
+    verification: "Review report generated"
+
+  RP-002:
+    domain: location
+    statement: "WHEN path argument provided, the SKILL shall analyze that specific project plan."
+    pattern: event-driven
+    trigger: path_arg
+    priority: high
+    verification: "Specified project analyzed"
+
+  RP-003:
+    domain: location
+    statement: "WHEN no path provided, the SKILL shall search planning/PROJECT_PLAN_*.md for active projects."
+    pattern: event-driven
+    trigger: no_path
+    priority: medium
+    verification: "Active projects discovered"
+
+  RP-004:
+    domain: parsing
+    statement: "The SKILL shall extract: metadata, gates, success criteria, and risks from project plan."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Parsed project structure"
+    verification: "All sections extracted"
+
+  RP-005:
+    domain: evaluation
+    statement: "The SKILL shall count V-tests and calculate completion percentage per gate."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "V-test counts per gate"
+      - "Overall completion percentage"
+    verification: "Counts accurate"
+
+  RP-006:
+    domain: blockers
+    statement: "The SKILL shall identify failed V-tests, blocked items, and materialized risks."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Blockers list"
+    verification: "Blockers identified"
+
+  RP-007:
+    domain: recommendations
+    statement: "The SKILL shall generate actionable recommendations based on evaluation."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "Next actions"
+      - "Risk alerts"
+      - "Scope adjustments"
+    verification: "Recommendations actionable"
+
+test_cases:
+  T-RP-001:
+    capability: "RP-001"
+    scenario: "Healthy project review"
+    given: "Project with 17/17 V-tests passed"
+    when: "User runs `/aget-review-project`"
+    then: "Reports OK status with 100% completion"
+    verification_method: "automated"
+
+  T-RP-002:
+    capability: "RP-006"
+    scenario: "Blockers detected"
+    given: "Project with 2 failed V-tests and 1 BLOCKED item"
+    when: "User runs `/aget-review-project`"
+    then: "Blockers section lists 3 items"
+    verification_method: "manual"
+
+  T-RP-003:
+    capability: "RP-003"
+    scenario: "Multiple projects prompt"
+    given: "3 active projects in planning/"
+    when: "User runs `/aget-review-project` without path"
+    then: "User prompted to select project"
+    verification_method: "manual"
+
+constraints:
+  C-RP-001:
+    statement: "The SKILL shall NOT modify project files during review."
+    rationale: "Review is read-only assessment"
+
+  C-RP-002:
+    statement: "The SKILL shall report all gates, even if empty."
+    rationale: "Complete visibility into project structure"
+
+  C-RP-003:
+    statement: "The SKILL shall NOT assess projects outside agent's write scope."
+    rationale: "Respect agent boundaries"

@@ -1,0 +1,131 @@
+# SKILL-023: aget-lint-code
+# Purpose: Run code linting and formatting checks
+# Archetype: developer
+# Created: 2026-02-14
+# Project: ARC-001 (Archetype Customization v3.5)
+
+spec:
+  id: SKILL-023
+  name: aget-lint-code
+  version: 1.0.0
+  status: draft
+  created: 2026-02-14
+  format: "EARS with controlled vocabulary"
+  category: Archetype
+  archetype: developer
+  scope: "Run code linting and formatting checks on files or directories"
+
+  traceability:
+    skill_md: ".claude/skills/aget-lint-code/SKILL.md"
+    archetype_spec: "Developer_SPEC.md"
+    ontology: "ONTOLOGY_developer.yaml"
+    index_ref: "SKILL-A-DEV-002"
+    l_docs:
+      - "L463: Entity-Archetype Alignment"
+      - "L486: Ontology-Driven Creation"
+    vocabulary_terms:
+      - "Code"
+      - "Code_Change"
+      - "Lint"
+
+capabilities:
+  LC-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-lint-code`, the SKILL shall run appropriate linters."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "File or directory path (optional)"
+    outputs:
+      - "Lint results"
+      - "Issue count"
+    verification: "Linter executes and reports issues"
+
+  LC-002:
+    domain: detection
+    statement: "The SKILL shall auto-detect linter configuration (eslint, ruff, golangci-lint, etc.)."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Detected linter"
+    verification: "Linter correctly identified"
+
+  LC-003:
+    domain: reporting
+    statement: "The SKILL shall categorize issues by severity (error, warning, info)."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Issues grouped by severity"
+    verification: "Severity levels shown"
+
+  LC-004:
+    domain: reporting
+    statement: "The SKILL shall report issue location (file, line, column)."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "File path"
+      - "Line number"
+      - "Column (if available)"
+    verification: "Location enables navigation"
+
+  LC-005:
+    domain: fixing
+    statement: "WHEN --fix flag provided, the SKILL shall apply auto-fixable corrections."
+    pattern: conditional
+    trigger: "--fix flag specified"
+    priority: medium
+    outputs:
+      - "Fixed issues count"
+      - "Remaining issues"
+    verification: "Auto-fixes applied"
+
+  LC-006:
+    domain: summary
+    statement: "The SKILL shall provide summary with total issues and recommended actions."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "Issue summary"
+      - "Recommended next steps"
+    verification: "Summary actionable"
+
+test_cases:
+  T-LC-001:
+    capability: "LC-001"
+    scenario: "User runs linter"
+    given: "Linter configuration exists"
+    when: "User runs `/aget-lint-code`"
+    then: "Lint results displayed"
+    verification_method: "automated"
+
+  T-LC-002:
+    capability: "LC-003, LC-004"
+    scenario: "Issue reporting"
+    given: "Code with lint issues"
+    when: "Linter runs"
+    then: "Issues show severity and location"
+    verification_method: "automated"
+
+  T-LC-003:
+    capability: "LC-005"
+    scenario: "Auto-fix"
+    given: "Auto-fixable issues exist"
+    when: "User runs `/aget-lint-code --fix`"
+    then: "Issues auto-corrected"
+    verification_method: "automated"
+
+constraints:
+  C-LC-001:
+    statement: "The SKILL shall NOT apply auto-fixes without explicit --fix flag."
+    rationale: "Lint is read-only by default"
+
+  C-LC-002:
+    statement: "The SKILL shall NOT ignore configuration files (.eslintrc, pyproject.toml, etc.)."
+    rationale: "Project configuration must be respected"
+
+  C-LC-003:
+    statement: "The SKILL shall NOT fail silently when linter is misconfigured."
+    rationale: "Configuration errors must be surfaced"

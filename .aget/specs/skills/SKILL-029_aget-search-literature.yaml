@@ -1,0 +1,129 @@
+# SKILL-029: aget-search-literature
+# Purpose: Search and review relevant literature, papers, and prior work
+# Archetype: researcher
+# Created: 2026-02-14
+# Project: ARC-001 (Archetype Customization v3.5)
+
+spec:
+  id: SKILL-029
+  name: aget-search-literature
+  version: 1.0.0
+  status: draft
+  created: 2026-02-14
+  format: "EARS with controlled vocabulary"
+  category: Archetype
+  archetype: researcher
+  scope: "Search and review literature, papers, and prior work"
+
+  traceability:
+    skill_md: ".claude/skills/aget-search-literature/SKILL.md"
+    archetype_spec: "Researcher_SPEC.md"
+    ontology: "ONTOLOGY_researcher.yaml"
+    index_ref: "SKILL-A-RES-001"
+    l_docs:
+      - "L463: Entity-Archetype Alignment"
+      - "L486: Ontology-Driven Creation"
+    vocabulary_terms:
+      - "Literature"
+      - "Citation"
+      - "Knowledge_Gap"
+
+capabilities:
+  SL-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-search-literature`, the SKILL shall search relevant sources."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "Research topic or question"
+      - "Scope (internal KB, web, papers)"
+    outputs:
+      - "Search results"
+      - "Source summaries"
+    verification: "Relevant sources found"
+
+  SL-002:
+    domain: search
+    statement: "The SKILL shall search internal knowledge base first."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "KB matches (L-docs, patterns, specs)"
+    verification: "KB searched before external"
+
+  SL-003:
+    domain: search
+    statement: "WHEN external search enabled, the SKILL shall search academic and web sources."
+    pattern: conditional
+    trigger: "External scope specified"
+    priority: medium
+    outputs:
+      - "External source results"
+    verification: "External sources cited"
+
+  SL-004:
+    domain: synthesis
+    statement: "The SKILL shall synthesize findings into summary."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Literature summary"
+      - "Key findings"
+    verification: "Summary captures main points"
+
+  SL-005:
+    domain: citations
+    statement: "The SKILL shall provide proper citations for all sources."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Citation list"
+    verification: "Citations complete and accurate"
+
+  SL-006:
+    domain: gaps
+    statement: "The SKILL shall identify knowledge gaps in existing literature."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "Gap identification"
+    verification: "Gaps explicitly noted"
+
+test_cases:
+  T-SL-001:
+    capability: "SL-001"
+    scenario: "User requests literature search"
+    given: "Research topic specified"
+    when: "User runs `/aget-search-literature`"
+    then: "Search performed"
+    verification_method: "manual"
+
+  T-SL-002:
+    capability: "SL-002"
+    scenario: "KB priority"
+    given: "Topic has KB matches"
+    when: "Search performed"
+    then: "KB results shown first"
+    verification_method: "manual"
+
+  T-SL-003:
+    capability: "SL-005"
+    scenario: "Citation accuracy"
+    given: "Sources found"
+    when: "Results presented"
+    then: "Citations verifiable"
+    verification_method: "spot-check"
+
+constraints:
+  C-SL-001:
+    statement: "The SKILL shall NOT fabricate sources or citations."
+    rationale: "Research integrity essential"
+
+  C-SL-002:
+    statement: "The SKILL shall NOT present paraphrased content without attribution."
+    rationale: "Plagiarism must be avoided"
+
+  C-SL-003:
+    statement: "The SKILL shall NOT claim comprehensive coverage without noting limitations."
+    rationale: "Search scope must be acknowledged"

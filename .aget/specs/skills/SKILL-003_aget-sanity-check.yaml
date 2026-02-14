@@ -1,0 +1,125 @@
+# SKILL-003: aget-sanity-check
+# Purpose: Run AGET health inspection and housekeeping checks
+# Created: 2026-02-10
+# Based on: L532, SKILL_SPEC_TEMPLATE.yaml
+
+spec:
+  id: SKILL-003
+  name: aget-sanity-check
+  version: 1.0.0
+  status: production
+  created: 2026-02-10
+  format: "EARS with controlled vocabulary"
+  category: Session
+  scope: "Validate agent structure, configuration, and report health status"
+
+  traceability:
+    skill_md: ".claude/skills/aget-sanity-check/SKILL.md"
+    l_docs:
+      - "L532: Skills vs Learnings Distinction"
+    vocabulary_terms:
+      - "AGET_Skill"
+      - "Health_Status"
+      - "Sanity_Check"
+
+capabilities:
+  SC-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-sanity-check`, the SKILL shall run housekeeping protocol and report health status."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "User invocation via `/aget-sanity-check`"
+    outputs:
+      - "Health status: HEALTHY/WARNINGS/ERRORS"
+      - "Check results per category"
+    verification: "Health status displayed"
+
+  SC-002:
+    domain: structure
+    statement: "The SKILL shall verify .aget/ directory structure exists and is valid."
+    pattern: ubiquitous
+    priority: critical
+    outputs:
+      - "Structure: PASS/WARN/FAIL"
+    verification: "Structure check reports accurately"
+
+  SC-003:
+    domain: version
+    statement: "The SKILL shall verify version.json exists and contains valid version data."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Version: PASS/WARN/FAIL"
+    verification: "Version check validates JSON structure"
+
+  SC-004:
+    domain: identity
+    statement: "WHERE identity.json exists, the SKILL shall validate its contents."
+    pattern: optional
+    priority: medium
+    outputs:
+      - "Identity: PASS/WARN/FAIL"
+    verification: "Identity validated when present"
+
+  SC-005:
+    domain: governance
+    statement: "The SKILL shall verify governance/ directory contents if present."
+    pattern: optional
+    priority: medium
+    outputs:
+      - "Governance: PASS/WARN/FAIL"
+    verification: "Governance check runs when directory exists"
+
+  SC-006:
+    domain: options
+    statement: "WHERE user provides --json flag, the SKILL shall output machine-readable JSON."
+    pattern: optional
+    priority: low
+    outputs:
+      - "JSON formatted output"
+    verification: "Valid JSON output with --json flag"
+
+  SC-007:
+    domain: options
+    statement: "WHERE user provides --fix flag, the SKILL shall attempt auto-fixes for known issues."
+    pattern: optional
+    priority: low
+    outputs:
+      - "Fix attempt results"
+    verification: "Fixes attempted when flag present"
+
+test_cases:
+  T-SC-001:
+    capability: "SC-001"
+    scenario: "Healthy agent sanity check"
+    given: "Valid .aget/ structure with version.json"
+    when: "User runs `/aget-sanity-check`"
+    then: "Reports HEALTHY with all checks PASS"
+    verification_method: "automated"
+
+  T-SC-002:
+    capability: "SC-003"
+    scenario: "Missing version.json detected"
+    given: ".aget/version.json does not exist"
+    when: "User runs `/aget-sanity-check`"
+    then: "Reports ERRORS with Version: FAIL"
+    verification_method: "manual"
+
+  T-SC-003:
+    capability: "SC-006"
+    scenario: "JSON output format"
+    given: "Any agent state"
+    when: "User runs `/aget-sanity-check --json`"
+    then: "Output is valid JSON"
+    verification_method: "automated"
+
+constraints:
+  C-SC-001:
+    statement: "The SKILL shall NOT modify files unless --fix flag is explicitly provided."
+    rationale: "Default behavior is read-only inspection"
+
+  C-SC-002:
+    statement: "The SKILL shall report exit code matching health status (0=healthy, 1=warnings, 2=errors)."
+    rationale: "Enable scripted health checks"

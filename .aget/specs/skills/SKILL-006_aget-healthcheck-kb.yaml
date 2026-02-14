@@ -1,0 +1,126 @@
+# SKILL-006: aget-healthcheck-kb
+# Purpose: Validate Knowledge Base health
+# Created: 2026-02-10
+# Based on: L589, SKILL_SPEC_TEMPLATE.yaml
+
+spec:
+  id: SKILL-006
+  name: aget-healthcheck-kb
+  version: 1.0.0
+  status: production
+  created: 2026-02-10
+  format: "EARS with controlled vocabulary"
+  category: Monitoring
+  scope: "Validate knowledge/ directory health - structure, staleness, conformance"
+
+  traceability:
+    skill_md: ".claude/skills/aget-healthcheck-kb/SKILL.md"
+    l_docs:
+      - "L589: Healthcheck Threshold Calibration"
+    vocabulary_terms:
+      - "Healthcheck_Skill"
+      - "Health_Status"
+      - "Knowledge_Base"
+
+capabilities:
+  HK-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-healthcheck-kb`, the SKILL shall analyze knowledge/ and report health status."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    outputs:
+      - "Health Status: OK | WARN | CRITICAL"
+      - "Structure and staleness metrics"
+    verification: "Health status displayed with metrics"
+
+  HK-002:
+    domain: structure
+    statement: "The SKILL shall verify knowledge/ directory exists."
+    pattern: ubiquitous
+    priority: critical
+    outputs:
+      - "KB exists: yes | no"
+    verification: "Directory existence checked"
+
+  HK-003:
+    domain: structure
+    statement: "The SKILL shall check for README.md in knowledge/."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "README: yes | no"
+    verification: "README presence checked"
+
+  HK-004:
+    domain: staleness
+    statement: "The SKILL shall count files not modified in 90+ days and calculate percentage."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - ">90 days: count (percentage)"
+    verification: "Staleness calculated accurately"
+
+  HK-005:
+    domain: staleness
+    statement: "The SKILL shall count files not modified in 180+ days and calculate percentage."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - ">180 days: count (percentage)"
+    verification: "Deep staleness calculated"
+
+  HK-006:
+    domain: thresholds
+    statement: "WHEN knowledge/ is missing, the SKILL shall report CRITICAL."
+    pattern: conditional
+    priority: critical
+    verification: "CRITICAL when KB missing"
+
+  HK-007:
+    domain: thresholds
+    statement: "WHEN staleness (180+) exceeds 25% OR staleness (90+) exceeds 50%, the SKILL shall report CRITICAL."
+    pattern: conditional
+    priority: high
+    verification: "CRITICAL at staleness threshold"
+
+  HK-008:
+    domain: thresholds
+    statement: "WHEN README missing OR staleness (180+) exceeds 10% OR staleness (90+) exceeds 25%, the SKILL shall report WARN."
+    pattern: conditional
+    priority: medium
+    verification: "WARN at warning threshold"
+
+test_cases:
+  T-HK-001:
+    capability: "HK-001"
+    scenario: "Healthy knowledge base"
+    given: "knowledge/ exists with 14 files, <25% stale"
+    when: "User runs `/aget-healthcheck-kb`"
+    then: "Reports OK status"
+    verification_method: "automated"
+
+  T-HK-002:
+    capability: "HK-006"
+    scenario: "Missing knowledge directory"
+    given: "knowledge/ does not exist"
+    when: "User runs `/aget-healthcheck-kb`"
+    then: "Reports CRITICAL with KB missing"
+    verification_method: "manual"
+
+  T-HK-003:
+    capability: "HK-005"
+    scenario: "Stale content detected"
+    given: "30% of files not modified in 180+ days"
+    when: "User runs `/aget-healthcheck-kb`"
+    then: "Reports CRITICAL with staleness alert"
+    verification_method: "manual"
+
+constraints:
+  C-HK-001:
+    statement: "The SKILL shall NOT modify any files during execution."
+    rationale: "Healthcheck is read-only monitoring"
+
+  C-HK-002:
+    statement: "The SKILL shall report staleness as both count and percentage."
+    rationale: "Enable context-aware assessment"

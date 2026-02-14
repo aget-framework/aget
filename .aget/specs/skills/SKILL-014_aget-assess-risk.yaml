@@ -1,0 +1,131 @@
+# SKILL-014: aget-assess-risk
+# Purpose: Assess risks associated with decisions, actions, or situations
+# Archetype: advisor
+# Created: 2026-02-14
+# Project: ARC-001 (Archetype Customization v3.5)
+
+spec:
+  id: SKILL-014
+  name: aget-assess-risk
+  version: 1.0.0
+  status: draft
+  created: 2026-02-14
+  format: "EARS with controlled vocabulary"
+  category: Archetype
+  archetype: advisor
+  scope: "Assess risks including likelihood, impact, and mitigation options"
+
+  traceability:
+    skill_md: ".claude/skills/aget-assess-risk/SKILL.md"
+    archetype_spec: "Advisor_SPEC.md"
+    ontology: "ONTOLOGY_advisor.yaml"
+    index_ref: "SKILL-A-ADV-001"
+    l_docs:
+      - "L463: Entity-Archetype Alignment"
+      - "L486: Ontology-Driven Creation"
+    vocabulary_terms:
+      - "Risk"
+      - "Mitigation"
+      - "Risk_Assessment"
+
+capabilities:
+  AR-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-assess-risk`, the SKILL shall initiate risk assessment workflow."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "Decision, action, or situation to assess"
+    outputs:
+      - "Risk identification"
+      - "Likelihood assessment"
+      - "Impact assessment"
+      - "Mitigation options"
+    verification: "Output includes structured risk assessment"
+
+  AR-002:
+    domain: analysis
+    statement: "The SKILL shall identify risks using standard risk categories (operational, strategic, financial, compliance)."
+    pattern: ubiquitous
+    priority: high
+    inputs:
+      - "Context description"
+    outputs:
+      - "Categorized risks"
+    verification: "Risks assigned to standard categories"
+
+  AR-003:
+    domain: analysis
+    statement: "The SKILL shall assess likelihood on a scale (Low, Medium, High, Critical)."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Likelihood rating per risk"
+    verification: "Each risk has likelihood rating"
+
+  AR-004:
+    domain: analysis
+    statement: "The SKILL shall assess impact on a scale (Low, Medium, High, Critical)."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Impact rating per risk"
+    verification: "Each risk has impact rating"
+
+  AR-005:
+    domain: output
+    statement: "The SKILL shall generate risk matrix visualization (likelihood × impact)."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "Risk matrix table"
+    verification: "Matrix shows all identified risks"
+
+  AR-006:
+    domain: mitigation
+    statement: "The SKILL shall propose mitigation options for high-priority risks."
+    pattern: conditional
+    trigger: "Risk rated High or Critical"
+    priority: high
+    outputs:
+      - "Mitigation strategies"
+    verification: "High/Critical risks have mitigation options"
+
+test_cases:
+  T-AR-001:
+    capability: "AR-001"
+    scenario: "User invokes risk assessment"
+    given: "User has described a decision or action"
+    when: "User runs `/aget-assess-risk`"
+    then: "Risk assessment workflow initiates"
+    verification_method: "manual"
+
+  T-AR-002:
+    capability: "AR-002, AR-003, AR-004"
+    scenario: "Complete risk analysis"
+    given: "Project migration decision described"
+    when: "Risk assessment performed"
+    then: "Risks categorized with likelihood and impact ratings"
+    verification_method: "manual"
+
+  T-AR-003:
+    capability: "AR-006"
+    scenario: "High-priority risk mitigation"
+    given: "Risk rated as Critical"
+    when: "Assessment completes"
+    then: "Mitigation options proposed"
+    verification_method: "spot-check"
+
+constraints:
+  C-AR-001:
+    statement: "The SKILL shall NOT make decisions on behalf of the user."
+    rationale: "Risk assessment informs decisions; final authority remains with user"
+
+  C-AR-002:
+    statement: "The SKILL shall NOT present speculation as fact."
+    rationale: "Risk assessment must distinguish known facts from assumptions"
+
+  C-AR-003:
+    statement: "The SKILL shall NOT omit identified risks due to perceived sensitivity."
+    rationale: "Complete risk picture essential for informed decisions"

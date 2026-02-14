@@ -1,0 +1,121 @@
+# SKILL-004: aget-healthcheck-evolution
+# Purpose: Monitor .aget/evolution/ directory health
+# Created: 2026-02-10
+# Based on: L589, SKILL_SPEC_TEMPLATE.yaml
+
+spec:
+  id: SKILL-004
+  name: aget-healthcheck-evolution
+  version: 1.0.0
+  status: production
+  created: 2026-02-10
+  format: "EARS with controlled vocabulary"
+  category: Monitoring
+  scope: "Validate evolution directory health - file counts, naming, disk usage, index integrity"
+
+  traceability:
+    skill_md: ".claude/skills/aget-healthcheck-evolution/SKILL.md"
+    l_docs:
+      - "L589: Healthcheck Threshold Calibration"
+    vocabulary_terms:
+      - "Healthcheck_Skill"
+      - "Health_Status"
+      - "Evolution_Directory"
+
+capabilities:
+  HE-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-healthcheck-evolution`, the SKILL shall analyze .aget/evolution/ and report health status."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    outputs:
+      - "Health Status: OK | WARN | CRITICAL"
+      - "File counts and disk usage"
+    verification: "Health status displayed with metrics"
+
+  HE-002:
+    domain: file_inventory
+    statement: "The SKILL shall count total files, L-docs, and non-conforming files in .aget/evolution/."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Total files count"
+      - "L-docs count (L###_*.md pattern)"
+      - "Non-conforming files list"
+    verification: "Counts match actual directory contents"
+
+  HE-003:
+    domain: naming
+    statement: "The SKILL shall identify files not matching L###_*.md pattern (excluding index.json, README.md)."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "Non-conforming files list"
+    verification: "Non-standard files detected and listed"
+
+  HE-004:
+    domain: disk_usage
+    statement: "The SKILL shall report disk usage of .aget/evolution/ directory."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "Disk size in human-readable format"
+    verification: "Disk usage reported accurately"
+
+  HE-005:
+    domain: index_integrity
+    statement: "The SKILL shall validate index.json exists and is valid JSON."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Index Status: valid | invalid | missing"
+    verification: "Index integrity checked"
+
+  HE-006:
+    domain: thresholds
+    statement: "WHEN total files exceeds 750 OR disk exceeds 25MB OR non-standard exceeds 50, the SKILL shall report CRITICAL."
+    pattern: conditional
+    priority: high
+    verification: "CRITICAL reported at threshold breach"
+
+  HE-007:
+    domain: thresholds
+    statement: "WHEN total files exceeds 500 OR disk exceeds 10MB OR non-standard exceeds 10, the SKILL shall report WARN."
+    pattern: conditional
+    priority: medium
+    verification: "WARN reported at warning threshold"
+
+test_cases:
+  T-HE-001:
+    capability: "HE-001"
+    scenario: "Healthy evolution directory"
+    given: "94 files, 800K disk (within OK thresholds)"
+    when: "User runs `/aget-healthcheck-evolution`"
+    then: "Reports OK status"
+    verification_method: "automated"
+
+  T-HE-002:
+    capability: "HE-005"
+    scenario: "Invalid index.json detected"
+    given: "index.json contains invalid JSON"
+    when: "User runs `/aget-healthcheck-evolution`"
+    then: "Reports CRITICAL with index invalid"
+    verification_method: "manual"
+
+  T-HE-003:
+    capability: "HE-003"
+    scenario: "Non-conforming files detected"
+    given: "File named 'notes.txt' in evolution/"
+    when: "User runs `/aget-healthcheck-evolution`"
+    then: "Lists notes.txt as non-conforming"
+    verification_method: "manual"
+
+constraints:
+  C-HE-001:
+    statement: "The SKILL shall NOT modify any files during execution."
+    rationale: "Healthcheck is read-only monitoring"
+
+  C-HE-002:
+    statement: "The SKILL shall list all non-conforming files by name for actionability."
+    rationale: "Enable targeted remediation"

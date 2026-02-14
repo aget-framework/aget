@@ -1,0 +1,119 @@
+# SKILL-020: aget-assess-client
+# Purpose: Assess client needs, constraints, and objectives
+# Archetype: consultant
+# Created: 2026-02-14
+# Project: ARC-001 (Archetype Customization v3.5)
+
+spec:
+  id: SKILL-020
+  name: aget-assess-client
+  version: 1.0.0
+  status: draft
+  created: 2026-02-14
+  format: "EARS with controlled vocabulary"
+  category: Archetype
+  archetype: consultant
+  scope: "Assess client needs, constraints, and objectives for engagement scoping"
+
+  traceability:
+    skill_md: ".claude/skills/aget-assess-client/SKILL.md"
+    archetype_spec: "Consultant_SPEC.md"
+    ontology: "ONTOLOGY_consultant.yaml"
+    index_ref: "SKILL-A-CON-001"
+    l_docs:
+      - "L463: Entity-Archetype Alignment"
+      - "L486: Ontology-Driven Creation"
+    vocabulary_terms:
+      - "Client"
+      - "Client_Need"
+      - "Constraint"
+
+capabilities:
+  AC-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-assess-client`, the SKILL shall initiate needs assessment."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "Client context or description"
+    outputs:
+      - "Needs assessment document"
+      - "Constraints inventory"
+      - "Objectives list"
+    verification: "Output includes structured assessment"
+
+  AC-002:
+    domain: discovery
+    statement: "The SKILL shall identify explicit and implicit client needs."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Explicit needs (stated)"
+      - "Implicit needs (inferred)"
+    verification: "Both need types documented"
+
+  AC-003:
+    domain: discovery
+    statement: "The SKILL shall identify constraints (budget, timeline, technical, organizational)."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Constraint categories with items"
+    verification: "Multiple constraint types considered"
+
+  AC-004:
+    domain: analysis
+    statement: "The SKILL shall prioritize needs using impact/urgency matrix."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "Prioritized needs list"
+    verification: "Needs ranked by priority"
+
+  AC-005:
+    domain: output
+    statement: "The SKILL shall identify gaps between current state and desired state."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Gap analysis"
+    verification: "Gaps clearly articulated"
+
+test_cases:
+  T-AC-001:
+    capability: "AC-001"
+    scenario: "User requests client assessment"
+    given: "User provides client context"
+    when: "User runs `/aget-assess-client`"
+    then: "Needs assessment produced"
+    verification_method: "manual"
+
+  T-AC-002:
+    capability: "AC-002, AC-003"
+    scenario: "Comprehensive discovery"
+    given: "Client description provided"
+    when: "Assessment performed"
+    then: "Needs and constraints identified"
+    verification_method: "manual"
+
+  T-AC-003:
+    capability: "AC-005"
+    scenario: "Gap analysis"
+    given: "Current and desired states described"
+    when: "Assessment complete"
+    then: "Gaps clearly documented"
+    verification_method: "spot-check"
+
+constraints:
+  C-AC-001:
+    statement: "The SKILL shall NOT assume client needs without verification."
+    rationale: "Assumptions lead to scope mismatch"
+
+  C-AC-002:
+    statement: "The SKILL shall NOT ignore stated constraints."
+    rationale: "Constraints bound the solution space"
+
+  C-AC-003:
+    statement: "The SKILL shall NOT conflate wants with needs."
+    rationale: "Distinguishing wants from needs improves engagement focus"

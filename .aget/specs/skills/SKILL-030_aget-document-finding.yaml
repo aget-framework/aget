@@ -1,0 +1,127 @@
+# SKILL-030: aget-document-finding
+# Purpose: Document research findings with evidence, methodology, and implications
+# Archetype: researcher
+# Created: 2026-02-14
+# Project: ARC-001 (Archetype Customization v3.5)
+
+spec:
+  id: SKILL-030
+  name: aget-document-finding
+  version: 1.0.0
+  status: draft
+  created: 2026-02-14
+  format: "EARS with controlled vocabulary"
+  category: Archetype
+  archetype: researcher
+  scope: "Document research findings with evidence and implications"
+
+  traceability:
+    skill_md: ".claude/skills/aget-document-finding/SKILL.md"
+    archetype_spec: "Researcher_SPEC.md"
+    ontology: "ONTOLOGY_researcher.yaml"
+    index_ref: "SKILL-A-RES-002"
+    l_docs:
+      - "L463: Entity-Archetype Alignment"
+      - "L486: Ontology-Driven Creation"
+    vocabulary_terms:
+      - "Finding"
+      - "Evidence"
+      - "Hypothesis"
+
+capabilities:
+  DF-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-document-finding`, the SKILL shall create finding document."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "Finding description"
+      - "Evidence references"
+    outputs:
+      - "Finding document"
+    verification: "Document created"
+
+  DF-002:
+    domain: structure
+    statement: "The SKILL shall include clear finding statement."
+    pattern: ubiquitous
+    priority: critical
+    outputs:
+      - "Finding statement"
+    verification: "Statement is specific and falsifiable"
+
+  DF-003:
+    domain: evidence
+    statement: "The SKILL shall document supporting evidence with references."
+    pattern: ubiquitous
+    priority: critical
+    outputs:
+      - "Evidence section"
+      - "References"
+    verification: "Evidence linked to sources"
+
+  DF-004:
+    domain: methodology
+    statement: "The SKILL shall describe methodology used to arrive at finding."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Methodology description"
+    verification: "Method reproducible"
+
+  DF-005:
+    domain: implications
+    statement: "The SKILL shall articulate implications of the finding."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Implications section"
+    verification: "Implications actionable"
+
+  DF-006:
+    domain: limitations
+    statement: "The SKILL shall note limitations and caveats."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Limitations section"
+    verification: "Limitations honestly stated"
+
+test_cases:
+  T-DF-001:
+    capability: "DF-001"
+    scenario: "User documents finding"
+    given: "Research finding to document"
+    when: "User runs `/aget-document-finding`"
+    then: "Finding document created"
+    verification_method: "manual"
+
+  T-DF-002:
+    capability: "DF-002, DF-003"
+    scenario: "Evidence documentation"
+    given: "Finding with evidence"
+    when: "Document created"
+    then: "Finding statement and evidence present"
+    verification_method: "manual"
+
+  T-DF-003:
+    capability: "DF-006"
+    scenario: "Limitations included"
+    given: "Finding with limitations"
+    when: "Document reviewed"
+    then: "Limitations clearly stated"
+    verification_method: "spot-check"
+
+constraints:
+  C-DF-001:
+    statement: "The SKILL shall NOT document findings without evidence."
+    rationale: "Findings must be supported"
+
+  C-DF-002:
+    statement: "The SKILL shall NOT overstate confidence level."
+    rationale: "Epistemic humility required"
+
+  C-DF-003:
+    statement: "The SKILL shall NOT omit contradictory evidence."
+    rationale: "Complete picture enables sound judgment"

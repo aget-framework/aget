@@ -1,0 +1,120 @@
+# SKILL-035: aget-broadcast-fleet
+# Purpose: Send communications to multiple fleet members
+# Archetype: supervisor
+# Created: 2026-02-14
+# Project: ARC-001 (Archetype Customization v3.5)
+
+spec:
+  id: SKILL-035
+  name: aget-broadcast-fleet
+  version: 1.0.0
+  status: draft
+  created: 2026-02-14
+  format: "EARS with controlled vocabulary"
+  category: Archetype
+  archetype: supervisor
+  scope: "Send communications to fleet members (announcements, directives, handoffs)"
+
+  traceability:
+    skill_md: ".claude/skills/aget-broadcast-fleet/SKILL.md"
+    archetype_spec: "Supervisor_SPEC.md"
+    ontology: "ONTOLOGY_supervisor.yaml"
+    index_ref: "SKILL-A-SUP-001"
+    l_docs:
+      - "L463: Entity-Archetype Alignment"
+      - "L486: Ontology-Driven Creation"
+      - "L511: Release-to-Fleet Propagation"
+    vocabulary_terms:
+      - "Fleet"
+      - "Broadcast"
+      - "Release_Handoff"
+
+capabilities:
+  BF-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-broadcast-fleet`, the SKILL shall prepare fleet communication."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "Message type (announcement, directive, handoff)"
+      - "Message content"
+      - "Target agents (all, portfolio, specific)"
+    outputs:
+      - "Broadcast message"
+      - "Delivery tracking"
+    verification: "Broadcast prepared"
+
+  BF-002:
+    domain: targeting
+    statement: "The SKILL shall resolve target agent list from specification."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Resolved agent list"
+    verification: "Targets identified"
+
+  BF-003:
+    domain: formatting
+    statement: "The SKILL shall format message according to type (announcement, directive, handoff)."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Formatted message"
+    verification: "Format matches type"
+
+  BF-004:
+    domain: delivery
+    statement: "The SKILL shall create handoff artifacts for each target agent."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Handoff artifacts"
+    verification: "Artifacts created"
+
+  BF-005:
+    domain: tracking
+    statement: "The SKILL shall track broadcast delivery status."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "Delivery status"
+    verification: "Status tracked"
+
+test_cases:
+  T-BF-001:
+    capability: "BF-001"
+    scenario: "User broadcasts to fleet"
+    given: "Fleet exists with multiple agents"
+    when: "User runs `/aget-broadcast-fleet`"
+    then: "Broadcast prepared"
+    verification_method: "manual"
+
+  T-BF-002:
+    capability: "BF-002"
+    scenario: "Portfolio targeting"
+    given: "Broadcast targets 'main' portfolio"
+    when: "Targets resolved"
+    then: "Only main portfolio agents listed"
+    verification_method: "manual"
+
+  T-BF-003:
+    capability: "BF-004"
+    scenario: "Release handoff"
+    given: "Handoff broadcast type"
+    when: "Broadcast executed"
+    then: "Handoff artifacts created per agent"
+    verification_method: "spot-check"
+
+constraints:
+  C-BF-001:
+    statement: "The SKILL shall NOT broadcast without target confirmation."
+    rationale: "Accidental broadcasts waste agent attention"
+
+  C-BF-002:
+    statement: "The SKILL shall NOT modify agent configurations during broadcast."
+    rationale: "Broadcast is communication, not configuration"
+
+  C-BF-003:
+    statement: "The SKILL shall NOT suppress delivery failures."
+    rationale: "Failures must be visible"

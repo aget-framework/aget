@@ -1,0 +1,134 @@
+# SKILL-016: aget-analyze-data
+# Purpose: Perform analysis on datasets to discover patterns and generate insights
+# Archetype: analyst
+# Created: 2026-02-14
+# Project: ARC-001 (Archetype Customization v3.5)
+
+spec:
+  id: SKILL-016
+  name: aget-analyze-data
+  version: 1.0.0
+  status: draft
+  created: 2026-02-14
+  format: "EARS with controlled vocabulary"
+  category: Archetype
+  archetype: analyst
+  scope: "Analyze datasets to discover patterns and generate actionable insights"
+
+  traceability:
+    skill_md: ".claude/skills/aget-analyze-data/SKILL.md"
+    archetype_spec: "Analyst_SPEC.md"
+    ontology: "ONTOLOGY_analyst.yaml"
+    index_ref: "SKILL-A-ANL-001"
+    l_docs:
+      - "L463: Entity-Archetype Alignment"
+      - "L486: Ontology-Driven Creation"
+    vocabulary_terms:
+      - "Dataset"
+      - "Analysis"
+      - "Insight"
+      - "Pattern"
+
+capabilities:
+  AD-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-analyze-data`, the SKILL shall initiate data analysis workflow."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "Dataset or data source"
+      - "Analysis question or objective"
+    outputs:
+      - "Analysis summary"
+      - "Key findings"
+      - "Insights"
+    verification: "Output includes structured analysis"
+
+  AD-002:
+    domain: analysis
+    statement: "The SKILL shall identify and describe the dataset structure (fields, types, record count)."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Dataset description"
+      - "Field summary"
+    verification: "Dataset structure documented"
+
+  AD-003:
+    domain: analysis
+    statement: "The SKILL shall compute relevant summary statistics for numerical fields."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Summary statistics (mean, median, range, distribution)"
+    verification: "Statistics computed for numerical data"
+
+  AD-004:
+    domain: pattern_discovery
+    statement: "The SKILL shall identify patterns, trends, and anomalies in the data."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Identified patterns"
+      - "Trend descriptions"
+      - "Anomaly flags"
+    verification: "Patterns explicitly described"
+
+  AD-005:
+    domain: insight
+    statement: "The SKILL shall translate findings into actionable insights."
+    pattern: ubiquitous
+    priority: critical
+    outputs:
+      - "Insight statements"
+      - "Recommendations"
+    verification: "Insights are actionable, not just descriptive"
+
+  AD-006:
+    domain: quality
+    statement: "The SKILL shall assess data quality and note limitations."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "Data quality assessment"
+      - "Limitations or caveats"
+    verification: "Quality issues documented"
+
+test_cases:
+  T-AD-001:
+    capability: "AD-001"
+    scenario: "User requests data analysis"
+    given: "User provides dataset or data reference"
+    when: "User runs `/aget-analyze-data`"
+    then: "Analysis workflow initiates"
+    verification_method: "manual"
+
+  T-AD-002:
+    capability: "AD-002, AD-003"
+    scenario: "Dataset profiling"
+    given: "CSV file with numerical and categorical fields"
+    when: "Analysis performed"
+    then: "Structure described and statistics computed"
+    verification_method: "manual"
+
+  T-AD-003:
+    capability: "AD-005"
+    scenario: "Actionable insights"
+    given: "Analysis complete"
+    when: "Insights generated"
+    then: "Insights include recommended actions"
+    verification_method: "spot-check"
+
+constraints:
+  C-AD-001:
+    statement: "The SKILL shall NOT present correlation as causation."
+    rationale: "Statistical rigor essential for valid analysis"
+
+  C-AD-002:
+    statement: "The SKILL shall NOT ignore outliers without explicit justification."
+    rationale: "Anomalies may be most valuable findings"
+
+  C-AD-003:
+    statement: "The SKILL shall NOT overfit conclusions to limited data."
+    rationale: "Sample size and representativeness must be considered"

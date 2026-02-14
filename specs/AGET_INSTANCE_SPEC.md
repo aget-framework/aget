@@ -298,7 +298,30 @@ governance/    ← preserved          governance/         ← preserved
 planning/      ← preserved          planning/           ← preserved
 sessions/      ← preserved          sessions/           ← preserved
                                     knowledge/          ← ADDED per archetype
+                                    ontology/           ← ADDED (v3.5.0)
 ```
+
+---
+
+### CAP-INST-006: Ontology Directory (v3.5.0)
+
+The SYSTEM shall maintain an ontology directory for formal vocabulary definitions.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-INST-006-01 | ubiquitous | The instance SHALL have an `ontology/` directory |
+| CAP-INST-006-02 | ubiquitous | The `ontology/` directory SHALL contain README.md |
+| CAP-INST-006-03 | conditional | IF instance has domain vocabulary, THEN `ontology/` SHALL contain ONTOLOGY_<domain>_vX.Y.yaml |
+| CAP-INST-006-04 | ubiquitous | The ontology file SHALL use YAML+SKOS format (per L482) |
+
+**Enforcement**: Directory presence check, README validation
+
+**L-doc Reference**: L482 (Executable Ontology - SKOS+EARS Grounding)
+
+**Rationale**: Ontology (schema/concepts) is distinct from knowledge (instances). A dedicated directory enables:
+- Consistent discovery across agents
+- Clear separation from framework config (`.aget/`)
+- Healthcheck coverage for formal vocabulary
 
 ---
 

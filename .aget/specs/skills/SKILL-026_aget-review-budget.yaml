@@ -1,0 +1,119 @@
+# SKILL-026: aget-review-budget
+# Purpose: Review budget allocation, ROI, and resource distribution
+# Archetype: executive
+# Created: 2026-02-14
+# Project: ARC-001 (Archetype Customization v3.5)
+
+spec:
+  id: SKILL-026
+  name: aget-review-budget
+  version: 1.0.0
+  status: draft
+  created: 2026-02-14
+  format: "EARS with controlled vocabulary"
+  category: Archetype
+  archetype: executive
+  scope: "Review budget allocation, ROI, and resource distribution"
+
+  traceability:
+    skill_md: ".claude/skills/aget-review-budget/SKILL.md"
+    archetype_spec: "Executive_SPEC.md"
+    ontology: "ONTOLOGY_executive.yaml"
+    index_ref: "SKILL-A-EXE-002"
+    l_docs:
+      - "L463: Entity-Archetype Alignment"
+      - "L486: Ontology-Driven Creation"
+    vocabulary_terms:
+      - "Budget"
+      - "ROI"
+      - "Delegation"
+
+capabilities:
+  RB-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-review-budget`, the SKILL shall analyze budget allocation."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "Budget data or period"
+    outputs:
+      - "Budget analysis"
+      - "ROI assessment"
+    verification: "Analysis produced"
+
+  RB-002:
+    domain: analysis
+    statement: "The SKILL shall categorize expenditures by type."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Expenditure categories"
+      - "Category totals"
+    verification: "Categories comprehensive"
+
+  RB-003:
+    domain: analysis
+    statement: "The SKILL shall calculate ROI for measurable investments."
+    pattern: conditional
+    trigger: "Investment data available"
+    priority: high
+    outputs:
+      - "ROI calculations"
+    verification: "ROI formula applied correctly"
+
+  RB-004:
+    domain: comparison
+    statement: "The SKILL shall compare actual vs. planned expenditure."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Variance analysis"
+    verification: "Variances highlighted"
+
+  RB-005:
+    domain: recommendations
+    statement: "The SKILL shall identify optimization opportunities."
+    pattern: ubiquitous
+    priority: medium
+    outputs:
+      - "Optimization recommendations"
+    verification: "Actionable improvements suggested"
+
+test_cases:
+  T-RB-001:
+    capability: "RB-001"
+    scenario: "User requests budget review"
+    given: "Budget data available"
+    when: "User runs `/aget-review-budget`"
+    then: "Budget analysis produced"
+    verification_method: "manual"
+
+  T-RB-002:
+    capability: "RB-002, RB-004"
+    scenario: "Comprehensive analysis"
+    given: "Planned and actual data"
+    when: "Analysis performed"
+    then: "Categories and variances shown"
+    verification_method: "manual"
+
+  T-RB-003:
+    capability: "RB-003"
+    scenario: "ROI calculation"
+    given: "Investment with measurable return"
+    when: "ROI calculated"
+    then: "ROI percentage accurate"
+    verification_method: "spot-check"
+
+constraints:
+  C-RB-001:
+    statement: "The SKILL shall NOT fabricate financial data."
+    rationale: "Financial integrity essential"
+
+  C-RB-002:
+    statement: "The SKILL shall NOT make spending decisions."
+    rationale: "Executive reviews, doesn't automate decisions"
+
+  C-RB-003:
+    statement: "The SKILL shall NOT expose sensitive financial details in logs."
+    rationale: "Financial data requires confidentiality"

@@ -70,14 +70,25 @@ to relationship (governed) and capability (autonomous work within bounds).
 
 ## Templates
 
-| Template | Purpose |
-|----------|---------|
-| [template-worker-aget](https://github.com/aget-framework/template-worker-aget) | Foundation template |
-| [template-advisor-aget](https://github.com/aget-framework/template-advisor-aget) | Advisory with personas |
-| template-supervisor-aget *(private)* | Fleet coordination |
-| [template-consultant-aget](https://github.com/aget-framework/template-consultant-aget) | Consulting engagements |
-| [template-developer-aget](https://github.com/aget-framework/template-developer-aget) | Development workflows |
-| [template-spec-engineer-aget](https://github.com/aget-framework/template-spec-engineer-aget) | Specification authoring |
+**12 Archetypes** with specialized skills and ontologies (v3.5.0+):
+
+| Template | Archetype | Key Skills | Use Case |
+|----------|-----------|------------|----------|
+| [template-worker-aget](https://github.com/aget-framework/template-worker-aget) | worker | execute-task, report-progress | Task execution, foundation |
+| [template-supervisor-aget](https://github.com/aget-framework/template-supervisor-aget) | supervisor | broadcast-fleet, review-agent, escalate-issue | Fleet coordination |
+| [template-developer-aget](https://github.com/aget-framework/template-developer-aget) | developer | run-tests, lint-code, review-pr | Development workflows |
+| [template-advisor-aget](https://github.com/aget-framework/template-advisor-aget) | advisor | assess-risk, recommend-action | Advisory with personas |
+| [template-consultant-aget](https://github.com/aget-framework/template-consultant-aget) | consultant | assess-client, propose-engagement | Consulting engagements |
+| [template-analyst-aget](https://github.com/aget-framework/template-analyst-aget) | analyst | analyze-data, generate-report | Data analysis |
+| [template-architect-aget](https://github.com/aget-framework/template-architect-aget) | architect | design-architecture, assess-tradeoffs | System design |
+| [template-researcher-aget](https://github.com/aget-framework/template-researcher-aget) | researcher | search-literature, document-finding | Research workflows |
+| [template-operator-aget](https://github.com/aget-framework/template-operator-aget) | operator | handle-incident, run-playbook | Operations/DevOps |
+| [template-executive-aget](https://github.com/aget-framework/template-executive-aget) | executive | make-decision, review-budget | Executive advisory |
+| [template-reviewer-aget](https://github.com/aget-framework/template-reviewer-aget) | reviewer | review-artifact, provide-feedback | Quality review |
+| [template-spec-engineer-aget](https://github.com/aget-framework/template-spec-engineer-aget) | spec-engineer | validate-spec, generate-requirement | Specification authoring |
+
+**All templates include**: 13 universal skills + archetype-specific skills.
+See [GETTING_STARTED.md](GETTING_STARTED.md) for archetype selection guidance.
 
 ## Session Protocols
 

@@ -1,0 +1,119 @@
+# SKILL-031: aget-review-artifact
+# Purpose: Review artifacts against defined criteria and produce feedback
+# Archetype: reviewer
+# Created: 2026-02-14
+# Project: ARC-001 (Archetype Customization v3.5)
+
+spec:
+  id: SKILL-031
+  name: aget-review-artifact
+  version: 1.0.0
+  status: draft
+  created: 2026-02-14
+  format: "EARS with controlled vocabulary"
+  category: Archetype
+  archetype: reviewer
+  scope: "Review artifacts against criteria and produce structured feedback"
+
+  traceability:
+    skill_md: ".claude/skills/aget-review-artifact/SKILL.md"
+    archetype_spec: "Reviewer_SPEC.md"
+    ontology: "ONTOLOGY_reviewer.yaml"
+    index_ref: "SKILL-A-REV-001"
+    l_docs:
+      - "L463: Entity-Archetype Alignment"
+      - "L486: Ontology-Driven Creation"
+    vocabulary_terms:
+      - "Review"
+      - "Artifact"
+      - "Criteria"
+
+capabilities:
+  RA-001:
+    domain: invocation
+    statement: "WHEN user invokes `/aget-review-artifact`, the SKILL shall perform artifact review."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "Artifact to review"
+      - "Review criteria (optional)"
+    outputs:
+      - "Review summary"
+      - "Detailed feedback"
+      - "Recommendation"
+    verification: "Review complete"
+
+  RA-002:
+    domain: criteria
+    statement: "The SKILL shall identify or apply review criteria."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Criteria used"
+    verification: "Criteria explicit"
+
+  RA-003:
+    domain: analysis
+    statement: "The SKILL shall evaluate artifact against each criterion."
+    pattern: ubiquitous
+    priority: critical
+    outputs:
+      - "Per-criterion assessment"
+    verification: "All criteria addressed"
+
+  RA-004:
+    domain: feedback
+    statement: "The SKILL shall provide specific, actionable feedback."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "Feedback items with location"
+    verification: "Feedback actionable"
+
+  RA-005:
+    domain: recommendation
+    statement: "The SKILL shall provide overall recommendation (approve, revise, reject)."
+    pattern: ubiquitous
+    priority: critical
+    outputs:
+      - "Recommendation with rationale"
+    verification: "Clear recommendation made"
+
+test_cases:
+  T-RA-001:
+    capability: "RA-001"
+    scenario: "User requests artifact review"
+    given: "Artifact exists"
+    when: "User runs `/aget-review-artifact`"
+    then: "Review performed"
+    verification_method: "manual"
+
+  T-RA-002:
+    capability: "RA-002, RA-003"
+    scenario: "Criteria-based review"
+    given: "Review criteria specified"
+    when: "Review performed"
+    then: "Each criterion evaluated"
+    verification_method: "manual"
+
+  T-RA-003:
+    capability: "RA-004"
+    scenario: "Actionable feedback"
+    given: "Issues found"
+    when: "Feedback provided"
+    then: "Feedback includes locations and suggestions"
+    verification_method: "spot-check"
+
+constraints:
+  C-RA-001:
+    statement: "The SKILL shall NOT review without clear criteria."
+    rationale: "Reviews need objective basis"
+
+  C-RA-002:
+    statement: "The SKILL shall NOT provide only negative feedback."
+    rationale: "Balanced feedback more effective"
+
+  C-RA-003:
+    statement: "The SKILL shall NOT approve artifacts with blocking issues."
+    rationale: "Quality gates must be respected"
