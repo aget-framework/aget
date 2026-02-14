@@ -11,7 +11,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+*No unreleased changes.*
+
+---
+
+## [3.5.0] - 2026-02-14
+
+**Theme**: Archetype Customization + Issue Governance
+
 ### Added
+
+- **Archetype-Specific Skills** (26 skills across 12 archetypes):
+  - `aget-assess-risk`, `aget-recommend-action` (advisor)
+  - `aget-analyze-data`, `aget-generate-report` (analyst)
+  - `aget-design-architecture`, `aget-assess-tradeoffs` (architect)
+  - `aget-assess-client`, `aget-propose-engagement` (consultant)
+  - `aget-run-tests`, `aget-lint-code`, `aget-review-pr` (developer)
+  - `aget-make-decision`, `aget-review-budget` (executive)
+  - `aget-handle-incident`, `aget-run-playbook` (operator)
+  - `aget-search-literature`, `aget-document-finding` (researcher)
+  - `aget-review-artifact`, `aget-provide-feedback` (reviewer)
+  - `aget-validate-spec`, `aget-generate-requirement` (spec-engineer)
+  - `aget-broadcast-fleet`, `aget-review-agent`, `aget-escalate-issue` (supervisor)
+  - `aget-execute-task`, `aget-report-progress` (worker)
+
+- **Issue Governance Skill** (L520):
+  - `aget-file-issue`: Universal skill for filing issues with L520 compliance
+  - Automatic destination routing (private → gmelli/aget-aget, public → aget-framework/aget)
+  - Content sanitization for private patterns
+
+- **Archetype Ontologies** (12 YAML files):
+  - `ontology/ONTOLOGY_{archetype}.yaml` in all templates
+  - SKOS+EARS format per L482
+
+- **Skills Specification Infrastructure**:
+  - `.aget/specs/skills/INDEX.md`: 40 skills index (14 universal + 26 archetype)
+  - `.aget/specs/skills/SKILL_VOCABULARY.md` v1.2.0: 32 terms + governance terms
+  - `ONTOLOGY_skills.yaml`: SKOS-compliant skill concepts
+
+- **Agent Capability Ontology** (C041-C047):
+  - Agent_Capability, Capability_Instance, Capability_Cluster concepts
+  - AGET_VOCABULARY_SPEC Part 8: Capability Governance Terms
 
 - **TEMPLATE_unit_test.py**: Formal template for unit test files (CAP-TEST-002-05)
 - **L529 Migration Integrity Checks**: P6 check in aget_verify_conformance.py
@@ -20,8 +60,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **AGET_TEMPLATE_SPEC.md**: 3.3.2 → 3.4.0 (archetype skills requirement)
 - **AGET_TESTING_SPEC.md**: 1.0.0 → 1.1.0 (added CAP-TEST-002-05, template reference)
 - **aget_verify_conformance.py**: 1.0.0 → 1.1.0 (added L529 integrity checks)
+- **SOP_aget_create.md**: 2.1.0 → 2.2.0 (archetype skill deployment)
+- **SOP_aget_migrate.md**: 1.1.0 → 1.2.0 (archetype migration)
 
 ### Breaking Changes
 
@@ -706,5 +749,5 @@ See [UPGRADING.md](docs/UPGRADING.md) for version-specific migration guides and 
 
 ---
 
-*CHANGELOG.md - Updated 2026-01-18*
-*Maintained by: private-aget-framework-AGET*
+*CHANGELOG.md - Updated 2026-02-14*
+*Maintained by: aget-framework maintainers*
