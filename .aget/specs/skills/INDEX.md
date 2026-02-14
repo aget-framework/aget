@@ -1,13 +1,13 @@
 # AGET Skills Index
 
-**Version**: 1.1.0
+**Version**: 1.2.0
 **Updated**: 2026-02-14
-**Total Skills**: 39 (13 universal + 26 archetype)
+**Total Skills**: 40 (14 universal + 26 archetype)
 **Project**: ARC-001 (Archetype Customization v3.5)
 
 ---
 
-## Universal Skills (13)
+## Universal Skills (14)
 
 Deployed to all 12 templates.
 
@@ -26,6 +26,7 @@ Deployed to all 12 templates.
 | SKILL-011 | aget-create-project | Project | Create research projects with scaffolding |
 | SKILL-012 | aget-create-skill | Development | Create new skill with spec |
 | SKILL-013 | aget-save-state | Session | Save workflow state for recovery |
+| SKILL-040 | aget-file-issue | Governance | File issues with L520 governance compliance |
 
 ---
 

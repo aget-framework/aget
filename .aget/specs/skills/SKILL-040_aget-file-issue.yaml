@@ -1,0 +1,109 @@
+---
+skill_id: SKILL-040
+name: aget-file-issue
+version: 1.0.0
+status: active
+category: governance
+archetype: universal
+created: 2026-02-14
+author: private-aget-framework-AGET
+related_specs:
+  - AGET_ISSUE_GOVERNANCE_SPEC
+  - L520
+---
+
+# SKILL-040: aget-file-issue
+
+## Description
+
+File issues to appropriate repositories with L520 governance compliance. Ensures correct routing (private vs public) and content sanitization.
+
+## Capabilities
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-SKILL-040-01 | ubiquitous | The SYSTEM shall determine agent type (private fleet vs public/remote) |
+| CAP-SKILL-040-02 | ubiquitous | The SYSTEM shall route issues to correct destination based on agent type |
+| CAP-SKILL-040-03 | conditional | IF agent is private fleet THEN the SYSTEM shall route to gmelli/aget-aget |
+| CAP-SKILL-040-04 | conditional | IF agent is public/remote THEN the SYSTEM shall route to aget-framework/aget |
+| CAP-SKILL-040-05 | ubiquitous | The SYSTEM shall sanitize content before filing to public repos |
+| CAP-SKILL-040-06 | ubiquitous | The SYSTEM shall support issue types: enhancement, bug, feature |
+| CAP-SKILL-040-07 | ubiquitous | The SYSTEM shall validate required fields before filing |
+
+## Input Format
+
+```
+/aget-file-issue <type> [title]
+
+Types:
+- enhancement: Feature enhancement request
+- bug: Bug report
+- feature: New feature request
+```
+
+## Routing Logic
+
+```
+Agent Detection:
+1. Check if path contains gmelli/ or private- prefix
+2. Check .aget/version.json for fleet=private
+3. Check git remote for gmelli/*
+
+Routing:
+- Private Fleet → gmelli/aget-aget
+- Public/Remote → aget-framework/aget (with sanitization)
+```
+
+## Sanitization Patterns
+
+Patterns to remove/redact before filing to public repos:
+
+| Pattern | Replacement | Example |
+|---------|-------------|---------|
+| `private-*-aget` | `[PRIVATE-AGENT]` | `private-work-supervisor-AGET` |
+| `private-*-AGET` | `[PRIVATE-AGENT]` | `private-aget-framework-AGET` |
+| `gmelli/*` | `[INTERNAL-REPO]` | `gmelli/aget-aget` |
+| Fleet size numbers | `[N agents]` | `28 agents in fleet` |
+| Session references | `[SESSION]` | `SESSION_2026-01-11` |
+
+## Constraints
+
+| ID | Type | Statement |
+|----|------|-----------|
+| C1 | prohibitive | NEVER file to public repo from private agent without sanitization |
+| C2 | prohibitive | NEVER include private agent names in public issues |
+| C3 | prohibitive | NEVER include fleet size in public issues |
+| C4 | prohibitive | NEVER include internal repo references in public issues |
+| C5 | mandatory | ALWAYS use appropriate issue template |
+| C6 | mandatory | ALWAYS validate destination before filing |
+
+## Test Cases
+
+| ID | Test | Expected |
+|----|------|----------|
+| T1 | Private agent files issue | Routes to gmelli/aget-aget |
+| T2 | Public agent files issue | Routes to aget-framework/aget |
+| T3 | Issue contains private-*-aget | Sanitized before public filing |
+| T4 | Issue contains fleet size | Sanitized before public filing |
+| T5 | Missing required fields | Validation error, no filing |
+
+## Allowed Tools
+
+- Bash (for gh issue create)
+- Read (for agent detection)
+- Grep (for sanitization patterns)
+
+## Traceability
+
+| Link | Reference |
+|------|-----------|
+| L-doc | L520 (Issue Governance Gap) |
+| Spec | AGET_ISSUE_GOVERNANCE_SPEC |
+| Requirements | R-ISSUE-001 through R-ISSUE-010 |
+| Validators | validate_issue_destination.py, sanitize_issue_content.py |
+
+---
+
+*SKILL-040_aget-file-issue.yaml*
+*Category: Governance*
+*Archetype: Universal*
