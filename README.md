@@ -61,6 +61,44 @@ AGET works across CLI agent platforms:
 > The progression abstracts away from domain (coding) and interface (CLI)
 to relationship (governed) and capability (autonomous work within bounds).
 
+## Archetype Ecosystem
+
+AGET provides **12 specialized archetypes**, each with purpose-built skills and formal ontology:
+
+| Category | Archetypes | Focus |
+|----------|------------|-------|
+| **Execution** | Worker, Developer, Operator | Task completion, code, operations |
+| **Analysis** | Analyst, Researcher, Reviewer | Data, literature, quality |
+| **Design** | Architect, Spec-Engineer | Systems, requirements |
+| **Advisory** | Advisor, Consultant, Executive | Guidance, engagements, decisions |
+| **Coordination** | Supervisor | Fleet management |
+
+Each archetype includes:
+- **2-3 specialized skills** for archetype-specific workflows
+- **13 universal skills** shared across all agents (session, learning, health)
+- **Formal ontology** defining domain vocabulary
+
+See [ARCHETYPE_GUIDE.md](docs/ARCHETYPE_GUIDE.md) for selection guidance.
+
+## Ontology-Driven Design
+
+v3.5.0 introduces **ontology-driven agent customization**:
+
+```
+Vocabulary → Specification → Implementation
+```
+
+| Layer | Artifact | Purpose |
+|-------|----------|---------|
+| **Vocabulary** | `ontology/ONTOLOGY_{archetype}.yaml` | Domain concepts (SKOS-compliant) |
+| **Specification** | `specs/SKILL_{name}_SPEC.md` | Formal requirements (EARS patterns) |
+| **Implementation** | `.claude/skills/{name}/` | Skill execution |
+
+**Benefits**:
+- **Precision**: Formal vocabulary prevents ambiguity
+- **Consistency**: Same concepts across all archetype instances
+- **Extensibility**: Add domain-specific terms to ontology
+
 ## Quick Start
 
 1. Choose a template from [aget-framework](https://github.com/aget-framework)
