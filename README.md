@@ -148,5 +148,5 @@ Apache License 2.0 - See [LICENSE](LICENSE)
 
 ---
 
-*Generated from specifications on 2026-01-16*
+*Generated from specifications on 2026-02-15*
 *See: [AGET_IDENTITY_SPEC.yaml](specs/AGET_IDENTITY_SPEC.yaml), [AGET_POSITIONING_SPEC.yaml](specs/AGET_POSITIONING_SPEC.yaml)*

@@ -1,7 +1,7 @@
 # SKILL_NAMING_CONVENTION_SPEC
 
 **Version**: 1.0.0
-**Status**: Draft
+**Status**: Active
 **Category**: Specification (Skills)
 **Format Version**: 1.3
 **Created**: 2026-02-15
