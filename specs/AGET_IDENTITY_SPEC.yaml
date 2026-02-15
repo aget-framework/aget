@@ -7,10 +7,10 @@
 
 spec:
   name: AGET_IDENTITY_SPEC
-  version: "1.0.0"
+  version: "1.1.0"
   status: canonical
   created: "2026-01-16"
-  updated: "2026-01-16"
+  updated: "2026-02-15"
   author: private-aget-framework-AGET
   related_specs:
     - AGET_POSITIONING_SPEC
@@ -126,6 +126,9 @@ identity:
       - "Fleet coordination patterns"
       - "Governance boundaries and escalation"
       - "Template specifications and inheritance"
+      - "Skills architecture (13 universal + 26 archetype-specific)"
+      - "Ontology-driven agent customization"
+      - "12 archetype ecosystem"
 
     # What AGET does not manage
     does_not_manage:
@@ -247,6 +250,12 @@ validation:
 # =============================================================================
 
 changelog:
+  - version: "1.1.0"
+    date: "2026-02-15"
+    changes:
+      - "Added v3.5 scope: skills architecture, ontology customization, 12 archetypes"
+      - "Content alignment per L585 (feature-descriptive artifact review)"
+
   - version: "1.0.0"
     date: "2026-01-16"
     changes:

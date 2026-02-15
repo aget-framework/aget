@@ -725,7 +725,7 @@ This version exists in migration_history but was never published as a GitHub Rel
 
 ## Version Support
 
-**Latest Stable**: v3.4.0
+**Latest Stable**: v3.5.0
 **Support Window**: Latest release receives full support (bug fixes, enhancements)
 **Previous Minor** (v3.3.x): Security fixes only
 **Older Versions**: No active support (upgrade recommended)

@@ -7,10 +7,10 @@
 
 spec:
   name: AGET_POSITIONING_SPEC
-  version: "1.0.0"
+  version: "1.1.0"
   status: canonical
   created: "2026-01-16"
-  updated: "2026-01-16"
+  updated: "2026-02-15"
   author: private-aget-framework-AGET
   related_specs:
     - AGET_IDENTITY_SPEC
@@ -237,6 +237,24 @@ positioning:
       mechanism: "BDI, Extended Mind, Transactive Memory foundations"
       benefit: "Framework has intellectual coherence, not ad-hoc patterns"
 
+    - id: D7
+      name: "Skills Architecture"
+      description: "39 skills (13 universal + 26 archetype-specific) enabling agent behavior"
+      mechanism: "Skill specs with constraints, SKOS vocabulary, deployment governance"
+      benefit: "Agents have consistent, reusable capabilities across the fleet"
+
+    - id: D8
+      name: "Ontology-Driven Customization"
+      description: "SKOS+EARS ontologies define archetype-specific vocabulary"
+      mechanism: "Template vocabularies, capability specifications, validation scripts"
+      benefit: "Agents customize through ontology, not code modification"
+
+    - id: D9
+      name: "12 Archetype Ecosystem"
+      description: "Complete archetype coverage from worker to executive"
+      mechanism: "12 templates: advisor, analyst, architect, consultant, developer, executive, operator, researcher, reviewer, spec-engineer, supervisor, worker"
+      benefit: "Choose the right archetype; inherit appropriate skills and vocabulary"
+
   # -----------------------------------------------------------------------------
   # Value Proposition
   # -----------------------------------------------------------------------------
@@ -245,16 +263,22 @@ positioning:
       - "Session continuity across coding sessions"
       - "Portable patterns that work with any CLI agent"
       - "Structured memory that survives context window limits"
+      - "Choose from 12 archetypes to match your workflow"
+      - "39 pre-built skills for common tasks"
 
     for_teams:
       - "Consistent agent behavior across team members"
       - "Shared knowledge base for collective intelligence"
       - "Governance patterns for responsible AI use"
+      - "Ontology-based vocabulary ensures team alignment"
+      - "Archetype selection enables role specialization"
 
     for_enterprises:
       - "Fleet management for multiple agents"
       - "Audit trails and decision documentation"
       - "Platform-agnostic investment protection"
+      - "12 archetypes cover full organizational spectrum"
+      - "Skills architecture enables standardized agent capabilities"
 
   # -----------------------------------------------------------------------------
   # Competitive Landscape (2026)
@@ -354,6 +378,13 @@ validation:
 # =============================================================================
 
 changelog:
+  - version: "1.1.0"
+    date: "2026-02-15"
+    changes:
+      - "Added D7 (Skills Architecture), D8 (Ontology-Driven), D9 (12 Archetypes)"
+      - "Updated value propositions with v3.5 capabilities"
+      - "Content alignment per L585 (feature-descriptive artifact review)"
+
   - version: "1.0.0"
     date: "2026-01-16"
     changes:
