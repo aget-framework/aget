@@ -1,10 +1,10 @@
 # SOP: Release Process
 
-**Version**: 1.5.0
+**Version**: 1.6.0
 **Created**: 2026-01-04
-**Updated**: 2026-02-14
+**Updated**: 2026-02-15
 **Owner**: aget-framework
-**Implements**: AGET_RELEASE_SPEC, CAP-REL-001 through CAP-REL-011, CAP-SOP-001, R-REL-006, CAP-MIG-017, L555-L559, R-SYNC-001
+**Implements**: AGET_RELEASE_SPEC, CAP-REL-001 through CAP-REL-019, CAP-SOP-001, R-REL-006, R-REL-042, CAP-MIG-017, L555-L559, L585, R-SYNC-001
 
 ---
 
@@ -92,6 +92,50 @@ python3 .aget/patterns/validation/validate_template_sync.py
 ```
 **Expected**: PASS (all templates synced)
 **Blocking**: Missing templates block release
+
+### V0.6: Feature-Descriptive Content Review (R-REL-042, L585)
+
+**Applies to**: Major and minor releases only (not patches).
+
+**Purpose**: Ensure specs describing capabilities are aligned with release features.
+
+**Artifact Inventory**:
+
+| Artifact | Section | Review For |
+|----------|---------|------------|
+| AGET_IDENTITY_SPEC.yaml | `scope.manages` | New capabilities added this release |
+| AGET_POSITIONING_SPEC.yaml | `differentiators` | New differentiators |
+| AGET_POSITIONING_SPEC.yaml | `value_proposition` | New value propositions |
+| CHANGELOG.md | Version Support | "Latest Stable" reflects this version |
+
+**V-Test for Feature-Descriptive Review**:
+
+```bash
+# Check identity spec changelog has entry for this year
+grep -q "$(date +%Y)" specs/AGET_IDENTITY_SPEC.yaml && echo "PASS" || echo "WARN: Review AGET_IDENTITY_SPEC"
+
+# Check positioning spec changelog has entry for this year
+grep -q "$(date +%Y)" specs/AGET_POSITIONING_SPEC.yaml && echo "PASS" || echo "WARN: Review AGET_POSITIONING_SPEC"
+
+# Check CHANGELOG "Latest Stable" matches release version
+grep "Latest Stable" CHANGELOG.md | grep -q "X.Y.Z" && echo "PASS" || echo "FAIL: Update Latest Stable"
+```
+
+**Checklist** (manual review):
+
+- [ ] AGET_IDENTITY_SPEC `scope.manages` includes new capabilities
+- [ ] AGET_POSITIONING_SPEC `differentiators` includes new differentiators
+- [ ] AGET_POSITIONING_SPEC `value_proposition` updated for new value
+- [ ] CHANGELOG "Latest Stable" shows this version
+
+**Advisory**: This is a SHOULD requirement. Skip with acknowledgment for releases with no new capabilities.
+
+**Distinction from Version-Indicator Artifacts (L584)**:
+
+| Class | Check Type | When |
+|-------|------------|------|
+| Version-indicator (L584) | Automated | Every release |
+| Feature-descriptive (L585) | Manual review | Major/minor only |
 
 ---
 
@@ -470,6 +514,16 @@ gh release view v{PREVIOUS} --repo aget-framework/aget
 ---
 
 ## Changelog
+
+### v1.6.0 (2026-02-15)
+
+- **Added V0.6: Feature-Descriptive Content Review** (R-REL-042, L585)
+  - Manual review phase for major/minor releases
+  - AGET_IDENTITY_SPEC scope.manages check
+  - AGET_POSITIONING_SPEC differentiators/value_proposition check
+  - CHANGELOG "Latest Stable" check
+  - Distinguishes from version-indicator checks (L584)
+- Updated Implements header to include CAP-REL-019, R-REL-042, L585
 
 ### v1.5.0 (2026-02-14)
 

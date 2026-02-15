@@ -1,11 +1,11 @@
 # AGET Release Specification
 
-**Version**: 1.4.0
+**Version**: 1.5.0
 **Status**: Active
 **Category**: Process (Release Management)
 **Format Version**: 1.2
 **Created**: 2026-01-04
-**Updated**: 2026-01-17
+**Updated**: 2026-02-15
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_RELEASE_SPEC.md`
 **Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.2
@@ -93,6 +93,23 @@ vocabulary:
       aget:preferred_windows: ["Thursday AM", "Friday PM"]
       aget:avoid_windows: ["Monday", "Tuesday", "Wednesday", "Thursday PM", "Friday AM"]
       skos:related: ["CAP-REL-011"]
+
+  content_alignment:
+    Feature_Descriptive_Artifact:
+      skos:definition: "Artifact containing content that describes framework capabilities and should evolve with major/minor releases"
+      skos:example: ["AGET_IDENTITY_SPEC scope.manages", "AGET_POSITIONING_SPEC differentiators"]
+      skos:related: ["L585", "R-REL-042"]
+      skos:narrower: ["Version_Indicator_Artifact"]
+
+    Version_Indicator_Artifact:
+      skos:definition: "Artifact containing embedded version numbers or dates requiring automated release-time updates"
+      skos:example: ["version.json", "AGENTS.md @aget-version"]
+      skos:related: ["L584", "R-REL-VER-001"]
+
+    Feature_Drift:
+      skos:definition: "Anti-pattern where version is updated but feature-descriptive content remains stale"
+      aget:anti_pattern: true
+      skos:related: ["L585"]
 
   anti_patterns:
     Version_Drift:
@@ -491,6 +508,42 @@ VERSION="X.Y.Z"
 [ -f "planning/VERSION_SCOPE_v${VERSION}.md" ] && echo "PASS" || echo "FAIL"
 ```
 
+### CAP-REL-019: Feature-Descriptive Content Review (R-REL-042) (L585)
+
+**SHOULD** requirements for content alignment on major/minor releases:
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| R-REL-042-01 | conditional | BEFORE major/minor release, release manager SHOULD review Feature_Descriptive_Artifacts for content alignment | Semantic accuracy |
+| R-REL-042-02 | conditional | IF new capabilities added THEN AGET_IDENTITY_SPEC scope.manages SHOULD be updated | Identity completeness |
+| R-REL-042-03 | conditional | IF new differentiators exist THEN AGET_POSITIONING_SPEC differentiators SHOULD be updated | Positioning accuracy |
+| R-REL-042-04 | conditional | IF release is stable THEN CHANGELOG "Latest Stable" SHOULD reflect current version | Version clarity |
+
+**Feature-Descriptive Artifact Inventory:**
+
+| Artifact | Section | Review For |
+|----------|---------|------------|
+| AGET_IDENTITY_SPEC.yaml | `scope.manages` | New capabilities |
+| AGET_POSITIONING_SPEC.yaml | `differentiators` | New differentiators |
+| AGET_POSITIONING_SPEC.yaml | `value_proposition` | New value propositions |
+| CHANGELOG.md | Version Support | Current stable version |
+
+**Distinction from Version-Indicator Artifacts (L584):**
+
+| Class | Definition | Check Type | Trigger |
+|-------|------------|------------|---------|
+| **Version-indicator** (L584) | Embedded version numbers/dates | Automated | Every release |
+| **Feature-descriptive** (L585) | Content describing capabilities | Manual review | Major/minor releases |
+
+**V-Test for Feature-Descriptive Review:**
+
+```bash
+# Check identity spec has recent changelog entry
+grep -q "$(date +%Y)" specs/AGET_IDENTITY_SPEC.yaml && echo "PASS: Identity spec reviewed this year" || echo "WARN: Identity spec may need review"
+```
+
+**Prevents**: Feature_Drift anti-pattern (version updated, content stale).
+
 ---
 
 ## Release Gate Structure
@@ -579,6 +632,13 @@ release not found  ← Release missing!
 ---
 
 ## Changelog
+
+### v1.5.0 (2026-02-15)
+
+- Added CAP-REL-019: Feature-Descriptive Content Review (R-REL-042)
+- Added vocabulary: Feature_Descriptive_Artifact, Version_Indicator_Artifact, Feature_Drift
+- Distinguishes version-indicator (L584) from feature-descriptive (L585) artifact classes
+- See: L585, PROJECT_PLAN_feature_descriptive_artifact_alignment_v1.0
 
 ### v1.4.0 (2026-01-17)
 
