@@ -169,7 +169,7 @@ identity:
 # =============================================================================
 
 versioning:
-  current_version: "3.4.0"
+  current_version: "3.5.0"
   version_scheme: "SemVer"
   version_policy:
     major: "Breaking changes to specifications or protocols"
