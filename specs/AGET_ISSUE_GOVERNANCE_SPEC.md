@@ -1,6 +1,6 @@
 # AGET Issue Governance Specification
 
-**Version**: 1.0.0
+**Version**: 1.1.0
 **Status**: Active
 **Category**: Process (Issue Management)
 **Format Version**: 1.3
@@ -151,6 +151,10 @@ PRIVATE_PATTERNS = [
     r'SESSION_\d{4}-\d{2}-\d{2}',  # Session file references
     r'vp_of_ai-aget',              # Known private agent
     r'law_insider-aget',           # Known private agent
+    # Added per L583:
+    r'[Ll]egal[Oo]n',              # Proprietary company name
+    r'[Vv][Pp]-?of-?[Aa][Ii]',     # Cross-fleet agent reference
+    r'[Ww]ork[Cc]o',               # Domain placeholder
 ]
 ```
 
@@ -339,8 +343,9 @@ graduation:
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0.0 | 2026-01-11 | Initial specification: routing, sanitization, repo settings |
+| 1.1.0 | 2026-02-14 | Added LegalOn, VP-of-AI, WorkCo patterns per L583 |
 
 ---
 
-*AGET_ISSUE_GOVERNANCE_SPEC v1.0.0*
+*AGET_ISSUE_GOVERNANCE_SPEC v1.1.0*
 *"Route issues by agent type. Sanitize content for public."*
