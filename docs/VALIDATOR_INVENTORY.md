@@ -18,7 +18,7 @@ This document tracks all validators referenced in AGET specifications, their imp
 
 | Category | Count |
 |----------|-------|
-| **Implemented** | 32 |
+| **Implemented** | 33 |
 | **Planned** | 15 |
 | **Deferred** | 2 |
 | **Total Referenced** | 46 |
@@ -67,6 +67,7 @@ These validators exist in `validation/` and are functional:
 | project_skos_to_ears.py | Internal | ✅ Implemented |
 | validate_artifact_size.py | AGET_SPEC_FORMAT, CAP-PP-012 (L502) | ✅ Implemented (v3.3.0) |
 | validate_template_exemplar.py | CAP-TPL-014, SOP_template_validation | ✅ Implemented (v3.3.0) |
+| validate_skill_dependencies.py | CAP-SKILL-DEP-001, R-SKILL-DEP-001 | ✅ Implemented (v3.5.0) |
 
 ---
 
