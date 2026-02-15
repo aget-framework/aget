@@ -1,6 +1,6 @@
 # SKILL_NAMING_CONVENTION_SPEC
 
-**Version**: 1.0.0
+**Version**: 1.1.0
 **Status**: Active
 **Category**: Specification (Skills)
 **Format Version**: 1.3
@@ -66,6 +66,12 @@ vocabulary:
       skos:prefLabel: "Prohibited_Pattern"
       skos:definition: "Naming patterns that SHALL NOT be used"
       skos:example: ["aget-healthcheck-*", "aget-sanity-*", "aget-*check"]
+
+    Skill_Dependency:
+      skos:prefLabel: "Skill_Dependency"
+      skos:definition: "A file, template, spec, or directory that a skill references and requires to exist at runtime"
+      skos:example: ["templates/poc/RESEARCH_PROJECT_PLAN.template.md", "specs/CLI_VOCABULARY.md"]
+      aget:validation: "All dependencies SHALL exist before skill deployment"
 ```
 
 ---
@@ -170,6 +176,32 @@ Directory: .claude/skills/{skill-name}/
 
 ---
 
+### CAP-SKILL-DEP-001: Dependency Validation
+
+**Statement**: Skills SHALL NOT be deployed without validating that all referenced dependencies exist.
+
+**Pattern**: ubiquitous
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| R-SKILL-DEP-001 | ubiquitous | BEFORE deploying a skill, the deployer SHALL validate all file paths referenced in SKILL.md exist |
+| R-SKILL-DEP-002 | ubiquitous | IF a dependency is missing, deployment SHALL fail with explicit error listing missing paths |
+| R-SKILL-DEP-003 | conditional | IF a skill references a template, THEN the template SHALL exist before deployment |
+| R-SKILL-DEP-004 | conditional | IF a skill references a spec, THEN the spec SHALL exist (stub acceptable) before deployment |
+| R-SKILL-DEP-005 | conditional | IF a skill references a directory, THEN the directory SHALL exist with README before deployment |
+
+**Validation Command**:
+```bash
+# Extract and validate file paths from skill
+python3 aget/validation/validate_skill_dependencies.py --skill .claude/skills/aget-create-project/
+```
+
+**Rationale**: L586 documented 8/8 broken skill dependencies. Skills referencing non-existent files fail at runtime. Validation at deployment prevents this failure class.
+
+**Reference**: L586 (Skill Infrastructure Deployment Gap)
+
+---
+
 ## Migration Guidance
 
 ### Legacy Name Migration
@@ -247,9 +279,10 @@ theoretical_basis:
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.1.0 | 2026-02-15 | Add CAP-SKILL-DEP-001 (R-SKILL-DEP-001 through R-SKILL-DEP-005), Skill_Dependency vocabulary |
 | 1.0.0 | 2026-02-15 | Initial specification from v3.5.0 Phase 2 findings |
 
 ---
 
-*SKILL_NAMING_CONVENTION_SPEC v1.0.0*
+*SKILL_NAMING_CONVENTION_SPEC v1.1.0*
 *"aget-{verb}-{noun}: Consistent, predictable, discoverable."*
