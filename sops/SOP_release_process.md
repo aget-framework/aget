@@ -1,10 +1,10 @@
 # SOP: Release Process
 
-**Version**: 1.6.0
+**Version**: 1.7.0
 **Created**: 2026-01-04
 **Updated**: 2026-02-15
 **Owner**: aget-framework
-**Implements**: AGET_RELEASE_SPEC, CAP-REL-001 through CAP-REL-019, CAP-SOP-001, R-REL-006, R-REL-042, CAP-MIG-017, L555-L559, L585, R-SYNC-001
+**Implements**: AGET_RELEASE_SPEC, CAP-REL-001 through CAP-REL-020, CAP-SOP-001, R-REL-006, R-REL-019, R-REL-042, CAP-MIG-017, L555-L559, L585, L587, R-SYNC-001
 
 ---
 
@@ -136,6 +136,40 @@ grep "Latest Stable" CHANGELOG.md | grep -q "X.Y.Z" && echo "PASS" || echo "FAIL
 |-------|------------|------|
 | Version-indicator (L584) | Automated | Every release |
 | Feature-descriptive (L585) | Manual review | Major/minor only |
+
+### V0.7: Release Handoff Preparation (R-REL-019, L587)
+
+**Purpose**: Ensure release handoff documentation serves external audiences, not just internal teams.
+
+**Background**: Per L587 (Curse of Knowledge Documentation Gap), internal teams document WHAT to do but assume readers understand WHY and WHICH. External fleets cannot execute handoffs that assume internal knowledge.
+
+**Checklist** (per R-REL-019-02 through R-REL-019-06):
+
+- [ ] "Context for External Fleets" section planned
+- [ ] New tools have what/when/how documentation planned
+- [ ] L-doc references will be EXPLAINED (not just labeled)
+- [ ] Archetype features mapped to specific archetypes
+- [ ] Handoff explains WHY and WHICH, not just WHAT
+- [ ] Reviewed with "curse of knowledge" lens: Would someone outside our team understand this?
+
+**V-Test for Handoff Readiness**:
+
+```bash
+# Check template exists
+[ -f "handoffs/TEMPLATE_RELEASE_HANDOFF.md" ] && echo "PASS" || echo "FAIL: Missing template"
+```
+
+**Anti-Patterns to Prevent** (L587):
+
+| Anti-Pattern | Example | Fix |
+|--------------|---------|-----|
+| Label without lesson | "per L582" | Explain the problem/rule/commands |
+| Tool without tutorial | "run validate_skill_dependencies.py" | Add what/when/how/if-fails |
+| Quantity without mapping | "26 archetype skills" | Table: archetype → skills |
+| Action without purpose | "deploy aget-file-issue" | Explain what it does and why |
+| Path without placeholder | "~/github/aget-framework" | Use "~/path/to/framework" |
+
+**Advisory**: This phase prepares for Phase 6.4 (Release Handoff Creation). Actual handoff is created after release completion.
 
 ---
 
@@ -514,6 +548,15 @@ gh release view v{PREVIOUS} --repo aget-framework/aget
 ---
 
 ## Changelog
+
+### v1.7.0 (2026-02-15)
+
+- **Added V0.7: Release Handoff Preparation** (R-REL-019, L587)
+  - Curse of knowledge mitigation checklist
+  - Anti-patterns table (label without lesson, tool without tutorial, etc.)
+  - External audience review step
+  - References TEMPLATE_RELEASE_HANDOFF.md
+- Updated Implements header to include CAP-REL-020, R-REL-019, L587
 
 ### v1.6.0 (2026-02-15)
 

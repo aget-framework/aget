@@ -1,6 +1,6 @@
 # AGET Release Specification
 
-**Version**: 1.5.0
+**Version**: 1.6.0
 **Status**: Active
 **Category**: Process (Release Management)
 **Format Version**: 1.2
@@ -544,6 +544,58 @@ grep -q "$(date +%Y)" specs/AGET_IDENTITY_SPEC.yaml && echo "PASS: Identity spec
 
 **Prevents**: Feature_Drift anti-pattern (version updated, content stale).
 
+### CAP-REL-020: Release Handoff Requirements (R-REL-019) (L511, L587)
+
+**SHALL/SHOULD** requirements for release handoff artifacts targeting external audiences:
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| R-REL-019-01 | ubiquitous | AFTER release completion, release manager SHALL create `handoffs/RELEASE_HANDOFF_vX.Y.Z.md` | Release-to-fleet propagation |
+| R-REL-019-02 | ubiquitous | Handoff SHALL include "Context for External Fleets" section | External audience accessibility |
+| R-REL-019-03 | conditional | IF new tools introduced THEN handoff SHALL explain what/when/how | Tool usability |
+| R-REL-019-04 | conditional | IF L-docs referenced THEN handoff SHALL explain the lesson (not just label) | Knowledge transfer |
+| R-REL-019-05 | conditional | IF archetype features added THEN handoff SHALL map features to archetypes | Applicability clarity |
+| R-REL-019-06 | ubiquitous | Handoff SHALL explain WHY and WHICH, not just WHAT | Curse of knowledge mitigation |
+
+**Vocabulary:**
+
+```yaml
+External_Fleet:
+  skos:definition: "Fleet outside the managing organization with no direct access to internal artifacts"
+  skos:scopeNote: "Cannot read private L-docs, unfamiliar with internal tools"
+  skos:related: ["Release_Handoff", "L587"]
+```
+
+**Handoff Structure (per L587):**
+
+| Section | Purpose | Required |
+|---------|---------|----------|
+| Executive Summary | Theme + key changes | YES |
+| What Changed | Added/changed/breaking | YES |
+| Context for External Fleets | WHY and WHICH explanations | YES (R-REL-019-02) |
+| Critical Mitigations | L-doc explanations with problem/rule/commands | IF L-docs referenced |
+| New Tools | what/when/how/if-fails | IF new tools |
+| Archetype Reference | Feature → archetype mapping | IF archetype features |
+| Pilot Tracking Template | Status table | YES |
+
+**V-Test for Handoff Existence:**
+
+```bash
+VERSION="X.Y.Z"
+[ -f "handoffs/RELEASE_HANDOFF_v${VERSION}.md" ] && echo "PASS" || echo "FAIL"
+```
+
+**V-Test for External Context:**
+
+```bash
+VERSION="X.Y.Z"
+grep -q "Context for External" "handoffs/RELEASE_HANDOFF_v${VERSION}.md" && echo "PASS" || echo "FAIL"
+```
+
+**Prevents**: Curse_of_Knowledge anti-pattern (L587) - internal knowledge assumed in external docs.
+
+**See**: `templates/TEMPLATE_RELEASE_HANDOFF.md` for reference structure.
+
 ---
 
 ## Release Gate Structure
@@ -571,6 +623,7 @@ Standard release gates per PROJECT_PLAN:
 | CAP-REL-005-* | validate_changelog.py | Planned |
 | CAP-REL-006-* | gh release view | Manual |
 | R-REL-010-* | validate_homepage_messaging.py | Planned |
+| R-REL-019-* | V-test scripts (handoff existence, context check) | Implemented |
 
 ---
 
@@ -632,6 +685,18 @@ release not found  ← Release missing!
 ---
 
 ## Changelog
+
+### v1.6.0 (2026-02-15)
+
+- Added CAP-REL-020: Release Handoff Requirements (R-REL-019-01 through R-REL-019-06)
+- Added vocabulary: External_Fleet
+- R-REL-019-02: Handoff SHALL include "Context for External Fleets" section
+- R-REL-019-03: New tools explanation requirement
+- R-REL-019-04: L-doc explanation requirement (not just labels)
+- R-REL-019-05: Archetype feature mapping requirement
+- R-REL-019-06: WHY and WHICH, not just WHAT
+- Addresses "curse of knowledge" gap (L587)
+- See: L511, L587, PROJECT_PLAN_release_handoff_spec_enhancement_v1.0
 
 ### v1.5.0 (2026-02-15)
 
