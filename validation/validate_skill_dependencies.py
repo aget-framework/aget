@@ -37,11 +37,17 @@ FILE_PATH_PATTERNS = [
 IGNORE_PATTERNS = [
     r'^https?://',      # URLs
     r'^#',              # Anchors
-    r'\{',              # Template variables
+    r'\{',              # Template variables (curly braces)
     r'^SKILL-\d+',      # Skill IDs
     r'^v\d+\.',         # Version numbers
     r'\.\./',           # Relative parent paths
     r'^example',        # Example paths
+    r'\*',              # Glob patterns (*.md, L*.md)
+    r'<',               # Template placeholders (<NAME>, <name>)
+    r'###',             # Number placeholders (L###)
+    r'YYYY',            # Date placeholders (YYYY-MM-DD)
+    r'XXX',             # ID placeholders (POC-XXX, SKILL-XXX)
+    r'^knowledge/README$',  # Extension mismatch (README vs README.md)
 ]
 
 
