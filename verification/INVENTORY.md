@@ -1,14 +1,16 @@
-# Validation Inventory
+# Verification Inventory
 
 **Owner**: private-aget-framework-AGET
-**Updated**: 2025-12-28
+**Updated**: 2026-02-15
 **Reference**: L377 (Validation Suite Orchestration Gap)
 
 ---
 
 ## Purpose
 
-This inventory lists all validators in `aget/validation/` with their purpose, scope, and when to run them.
+This inventory lists all verification scripts in `aget/verification/` with their purpose, scope, and when to run them.
+
+**Note**: As of v3.5.0, `validation/` was renamed to `verification/` for naming consistency. Both directories exist during transition; `validation/` will be removed in v3.6.0.
 
 **Ownership Model** (per L377):
 | Artifact | Owner |

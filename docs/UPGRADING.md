@@ -192,6 +192,73 @@ git commit -m "rollback: Revert to vOLD due to [issue]"
 
 ## Version-Specific Migration Guides
 
+### v3.4.0 → v3.5.0
+
+**Release Date**: 2026-02-14
+
+**Theme**: Archetype Customization + Issue Governance
+
+**Breaking Changes**: YES - `validation/` → `verification/` rename
+
+**Do I need to act?**
+- **YES** if: Your code imports from `aget/validation/`
+- **NO** if: You use published templates without custom validators
+
+**New Features**:
+- 26 archetype-specific skills (2-3 per archetype)
+- `aget-file-issue` skill with L520 issue governance
+- `ontology/` directory with SKOS+EARS format
+- Skill deployment governance (L586)
+
+**Migration Steps**:
+
+1. **Update version markers**:
+   ```bash
+   # Use perl on macOS (not sed - see L570)
+   perl -pi -e 's/"aget_version": "3\.4\.0"/"aget_version": "3.5.0"/' .aget/version.json
+   perl -pi -e 's/@aget-version: 3\.4\.0/@aget-version: 3.5.0/' AGENTS.md
+   ```
+
+2. **Handle breaking change** (if applicable):
+   ```bash
+   # Find affected imports
+   grep -r "from validation\." . --include="*.py"
+
+   # Update: from validation.X → from verification.X
+   # Note: Both directories exist during transition
+   ```
+
+3. **Create ontology directory**:
+   ```bash
+   mkdir -p ontology
+   cp ~/path/to/aget-framework/template-{archetype}-aget/ontology/*.yaml ontology/
+   ```
+
+4. **Deploy skills** (diff existing skills first per L582):
+   ```bash
+   # Check for local modifications BEFORE overwriting
+   diff -rq ".claude/skills/aget-wake-up" "template/.claude/skills/aget-wake-up"
+
+   # Deploy aget-file-issue
+   cp -r ~/path/to/aget-framework/aget/.claude/skills/aget-file-issue .claude/skills/
+   ```
+
+5. **Verify**:
+   ```bash
+   python3 .aget/patterns/session/wake_up.py
+   # Should show v3.5.0
+
+   # Check for stale version references
+   grep -r "3\.4\.0" . --include="*.yaml" --include="*.json" | grep -v migration_history
+   # Expected: No results
+   ```
+
+**Estimated Time**: 10-15 minutes per agent
+
+**See Also**: [RELEASE_HANDOFF_v3.5.0.md](../handoffs/RELEASE_HANDOFF_v3.5.0.md)
+
+---
+
 ### v2.10.0 → v2.11.0
 
 **Release Date**: 2025-12-24
