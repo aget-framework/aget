@@ -1,11 +1,11 @@
 # AGET Migration Specification
 
-**Version**: 1.5.0
+**Version**: 1.6.0
 **Status**: Active
 **Category**: Standards (Lifecycle Management)
 **Format Version**: 1.2
 **Created**: 2025-12-27
-**Updated**: 2026-01-11
+**Updated**: 2026-02-20
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_MIGRATION_SPEC.md`
 
@@ -78,6 +78,15 @@ vocabulary:
     Fleet_Migration:
       skos:definition: "Coordinated migration of multiple agents"
       skos:narrower: ["Pilot_Phase", "Expand_Phase", "Complete_Phase"]
+
+  lineage:  # Artifact lineage (v3.6.0, L592)
+    Lineage:
+      skos:definition: "The source from which an artifact (skill, pattern, spec) was derived"
+      skos:note: "Determines classification during migration diff analysis"
+    Lineage_Based_Extension:
+      skos:definition: "An artifact adopted from a different source lineage before the current template existed; classified as EXTENSION, not drift"
+      skos:broader: "Instance_Migration"
+      skos:related: "L592"
 
   phases:  # Migration phases
     Analyze_Phase:
@@ -619,6 +628,47 @@ BRANCH=$(git branch --show-current)
 
 **References**: L457 (Remote Supervisor Upgrade Pattern), FLEET_MIGRATION_GUIDE_v3.md, SOP_fleet_migration.md
 
+### CAP-MIG-018: Lineage-Based Extension Classification (L592, ER-LINEAGE)
+
+The SYSTEM shall classify artifacts by lineage before drift analysis during migration.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-MIG-018-01 | event_driven | WHEN migration diff shows conflicts between agent and template artifacts, the system SHALL determine artifact lineage before classifying as drift |
+| CAP-MIG-018-02 | conditional | IF artifact lineage differs from template lineage THEN the system SHALL classify the artifact as EXTENSION (not drift) and preserve the agent version |
+| CAP-MIG-018-03 | ubiquitous | The system SHALL support 7 migration classification scenarios in the decision matrix |
+| CAP-MIG-018-04 | conditional | IF artifact is classified as Lineage_Based_Extension THEN the system SHALL skip drift analysis for that artifact |
+
+**Decision Matrix (7 scenarios):**
+
+| # | Scenario | Classification | Action |
+|---|----------|---------------|--------|
+| 1 | Local-only artifact | Extension | Preserve |
+| 2 | Template-only artifact | New | Deploy |
+| 3 | Both exist, identical | Aligned | No action |
+| 4 | Both exist, differ (same lineage) | Drift candidate | Review |
+| 5 | Both exist, differ (different lineage) | **Extension** | **Preserve agent version** |
+| 6 | Agent customized template artifact | Extension | Preserve |
+| 7 | Template updated, agent stale (same lineage) | Drift candidate | Review |
+
+**Lineage Check Flow (before drift analysis):**
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  LINEAGE CHECK (Insert before L582 Drift Analysis)       │
+├──────────────────────────────────────────────────────────┤
+│  1. Diff shows conflict between agent and template       │
+│  2. Determine LINEAGE: where did the agent artifact      │
+│     originate? (template, external source, custom)       │
+│  3. IF different lineage → EXTENSION (stop, preserve)    │
+│  4. IF same lineage → continue to DRIFT analysis         │
+└──────────────────────────────────────────────────────────┘
+```
+
+**Rationale**: L592 documented a pattern during v3.5.0 fleet upgrades: skills adopted from a different source lineage (e.g., VP-of-AI spec format vs POC-017 template format) are extensions by definition — the agent adopted them before the template existed. Without lineage classification, these require unnecessary drift analysis.
+
+**References**: L592 (Lineage-Based Extension Classification), L582 (Skill Customization Preservation), L588 (Mechanical vs Judgment Migration Distinction)
+
 ---
 
 ## Authority Model
@@ -815,6 +865,7 @@ python3 aget/scripts/cleanup_template_archive.py template-example-aget/ --execut
 - L376: Legacy File Version Sync (CAP-MIG-014, supervisor)
 - L402: Behavioral Validation Gaps (CAP-MIG-015)
 - L457: Remote Supervisor Upgrade Pattern (CAP-MIG-017)
+- L592: Lineage-Based Extension Classification (CAP-MIG-018)
 - PATTERN_migration_validation_gate.md
 - AGET_TEMPLATE_SPEC.md (target spec)
 - AGET_INSTANCE_SPEC.md (instance requirements)
@@ -840,8 +891,8 @@ graduation:
 
 ---
 
-*AGET Migration Specification v1.5.0*
+*AGET Migration Specification v1.6.0*
 *Format: AGET_SPEC_FORMAT v1.2 (EARS + SKOS)*
 *Part of v3.0.0 Lifecycle Management - Gap C3*
-*Enhanced: CAP-MIG-014 (legacy handling), CAP-MIG-015 (behavioral validation), CAP-MIG-017 (remote supervisor)*
+*Enhanced: CAP-MIG-014 (legacy handling), CAP-MIG-015 (behavioral validation), CAP-MIG-017 (remote supervisor), CAP-MIG-018 (lineage classification)*
 *"Controlled transitions enable safe evolution."*

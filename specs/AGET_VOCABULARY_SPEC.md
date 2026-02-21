@@ -1,6 +1,6 @@
 # AGET Vocabulary Specification
 
-**Version**: 1.14.0
+**Version**: 1.15.0
 **Status**: Active
 **Category**: Core (Standards)
 **Format Version**: 1.2
@@ -325,6 +325,111 @@ Vocabulary_Lattice:
 ```
 
 **L-doc References**: L482 (Executable Ontology - SKOS+EARS Grounding), L601 (Cross-Fleet Ontology Adoption Survey), L602 (Ontology Behavioral Specification Gap)
+
+## Artifact Scope Terms (v3.6.0)
+
+| Term | Definition | altLabel |
+|------|------------|----------|
+| `Artifact_Scope` | Classification of an artifact's ownership boundary: Framework_Scope (public, overwrite-safe) or Instance_Scope (private, agent-owned) | — |
+| `Framework_Scope` | Artifacts published in `aget/` that are maintained by the framework and overwritten on upgrade | — |
+| `Instance_Scope` | Artifacts owned by an agent instance that are never overwritten by framework upgrades | — |
+| `Framework_Artifact` | An artifact with Framework_Scope: published in `aget/`, maintained by the framework owner | — |
+| `Instance_Artifact` | An artifact with Instance_Scope: owned by the agent operator, preserved on upgrade | — |
+| `Framework_Sop` | An SOP published in `aget/sops/` that applies to all AGET agents; overwritten on upgrade | Agent_SOP (contrast) |
+| `Agent_Sop` | An SOP in `{agent}/sops/` that is specific to one agent instance; never overwritten | — |
+| `Artifact_Reference` | A markdown or YAML reference from one artifact to another (link, path, or mention) | — |
+| `Cross_Scope_Reference` | An Artifact_Reference that crosses from Instance_Scope to Framework_Scope (or vice versa) | — |
+| `Dangling_Reference` | ANTI-PATTERN: An Artifact_Reference that cannot be resolved to an existing artifact | — |
+| `Core_Directory` | A required top-level directory in the `aget/` framework distribution (specs/, docs/, sops/, scripts/, validation/) | — |
+
+```yaml
+Artifact_Scope:
+  skos:prefLabel: "Artifact_Scope"
+  skos:definition: "Classification of an artifact's ownership boundary: Framework_Scope (public, overwrite-safe) or Instance_Scope (private, agent-owned)."
+  skos:narrower: ["Framework_Scope", "Instance_Scope"]
+  skos:related: ["Framework_Artifact", "Instance_Artifact"]
+  aget:source: "L568 Framework Artifact Scope Specification Gap"
+
+Framework_Scope:
+  skos:prefLabel: "Framework_Scope"
+  skos:definition: "Artifacts published in aget/ that are maintained by the framework and overwritten on upgrade."
+  skos:broader: "Artifact_Scope"
+  skos:related: ["Framework_Artifact", "Framework_Sop", "Core_Directory"]
+  aget:location: "aget/"
+  aget:note: "Framework_Scope artifacts are sync targets: agents receive them during upgrades."
+
+Instance_Scope:
+  skos:prefLabel: "Instance_Scope"
+  skos:definition: "Artifacts owned by an agent instance that are never overwritten by framework upgrades."
+  skos:broader: "Artifact_Scope"
+  skos:related: ["Instance_Artifact", "Agent_Sop"]
+  aget:note: "Instance_Scope includes agent SOPs, L-docs, governance, planning, and extension files."
+
+Framework_Artifact:
+  skos:prefLabel: "Framework_Artifact"
+  skos:definition: "An artifact with Framework_Scope: published in aget/, maintained by the framework owner."
+  skos:broader: "Artifact_Scope"
+  skos:related: ["Framework_Scope", "Framework_Sop"]
+  skos:example: ["aget/specs/AGET_FRAMEWORK_SPEC.md", "aget/scripts/wake_up.py", "aget/sops/SOP_aget_create.md"]
+
+Instance_Artifact:
+  skos:prefLabel: "Instance_Artifact"
+  skos:definition: "An artifact with Instance_Scope: owned by the agent operator, preserved on upgrade."
+  skos:broader: "Artifact_Scope"
+  skos:related: ["Instance_Scope", "Agent_Sop"]
+  skos:example: ["scripts/wake_up_ext.py", "{agent}/sops/SOP_release_process.md", "{agent}/.aget/evolution/"]
+
+Framework_Sop:
+  skos:prefLabel: "Framework_Sop"
+  skos:altLabel: ["Framework_SOP"]
+  skos:definition: "An SOP published in aget/sops/ that applies to all AGET agents; overwritten on upgrade."
+  skos:broader: "SOP_Document"
+  skos:related: ["Framework_Artifact", "Framework_Scope", "Agent_Sop"]
+  aget:location: "aget/sops/"
+  aget:distinguishedFrom:
+    - term: "Agent_Sop"
+      reason: "Framework_Sop is published and framework-maintained; Agent_Sop is agent-specific and instance-owned."
+
+Agent_Sop:
+  skos:prefLabel: "Agent_Sop"
+  skos:altLabel: ["Agent_SOP"]
+  skos:definition: "An SOP in {agent}/sops/ that is specific to one agent instance; never overwritten."
+  skos:broader: "SOP_Document"
+  skos:related: ["Instance_Artifact", "Instance_Scope", "Framework_Sop"]
+  aget:location: "{agent}/sops/"
+
+Artifact_Reference:
+  skos:prefLabel: "Artifact_Reference"
+  skos:definition: "A markdown or YAML reference from one artifact to another (link, path, or mention)."
+  skos:narrower: ["Cross_Scope_Reference", "Dangling_Reference"]
+  skos:related: ["Framework_Artifact", "Instance_Artifact"]
+  aget:source: "L568"
+
+Cross_Scope_Reference:
+  skos:prefLabel: "Cross_Scope_Reference"
+  skos:definition: "An Artifact_Reference that crosses from Instance_Scope to Framework_Scope (or vice versa)."
+  skos:broader: "Artifact_Reference"
+  skos:related: ["Artifact_Scope", "Dangling_Reference"]
+  aget:note: "Cross-scope references must use explicit paths so instantiated agents can resolve them."
+
+Dangling_Reference:
+  skos:prefLabel: "Dangling_Reference"
+  skos:definition: "ANTI-PATTERN: An Artifact_Reference that cannot be resolved to an existing artifact."
+  skos:broader: "Artifact_Reference"
+  aget:anti_pattern: true
+  skos:related: ["Cross_Scope_Reference", "Artifact_Scope"]
+  aget:source: "L568"
+  skos:example: "Template references SOP_aget_create.md without path; SOP does not exist in aget/sops/"
+
+Core_Directory:
+  skos:prefLabel: "Core_Directory"
+  skos:definition: "A required top-level directory in the aget/ framework distribution (specs/, docs/, sops/, scripts/, validation/)."
+  skos:broader: "Framework_Scope"
+  skos:related: ["Framework_Artifact", "Artifact_Scope"]
+  aget:source: "L568, CAP-CORE-006"
+```
+
+**L-doc References**: L568 (Framework Artifact Scope Specification Gap)
 
 ---
 
@@ -2584,6 +2689,13 @@ Full concept definitions with theoretical grounding are in:
 ---
 
 ## Changelog
+
+### v1.15.0 (2026-02-20)
+
+- **NEW**: Artifact Scope vocabulary — 11 terms for artifact ownership classification (v3.6.0, L568)
+- Added Part 2 section "Artifact Scope Terms": Artifact_Scope, Framework_Scope, Instance_Scope, Framework_Artifact, Instance_Artifact, Framework_Sop, Agent_Sop, Artifact_Reference, Cross_Scope_Reference, Dangling_Reference, Core_Directory
+- All terms include full SKOS YAML definitions with `aget:source` traceability
+- Supports CAP-CORE-006, CAP-TPL-017, CAP-SOP-005
 
 ### v1.14.0 (2026-02-20)
 

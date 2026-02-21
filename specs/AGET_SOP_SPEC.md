@@ -268,6 +268,22 @@ The SYSTEM shall support SOP traceability.
 
 **Enforcement**: Code review, self-documentation
 
+### CAP-SOP-005: Scope Classification (v3.6.0)
+
+The SYSTEM shall classify SOPs by Artifact_Scope.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-SOP-005-01 | ubiquitous | A Framework_Sop shall reside in `aget/sops/` |
+| CAP-SOP-005-02 | ubiquitous | An Agent_Sop shall reside in `{agent}/sops/` |
+| CAP-SOP-005-03 | conditional | IF an SOP applies to all AGET agents THEN it shall be classified as Framework_Sop and published in `aget/sops/` |
+| CAP-SOP-005-04 | conditional | IF an SOP is specific to one agent instance THEN it shall be classified as Agent_Sop |
+| CAP-SOP-005-05 | unwanted | Template artifacts shall NOT reference Agent_Sop files without explicit Cross_Scope_Reference paths |
+
+**Enforcement**: `validate_template_references.py`
+
+**Source**: L568 (Framework Artifact Scope Specification Gap)
+
 ---
 
 ## Authority Model

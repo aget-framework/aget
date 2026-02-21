@@ -1,19 +1,23 @@
 #!/usr/bin/env python3
 """
-Wake Up Protocol - Generic Template
+Wake Up Protocol - Canonical Framework Script
 
 Initialize session for any AGET agent. Displays agent identity, version,
 and session context. Designed to work across CLI agents (Claude Code,
 Codex CLI, Cursor, etc.).
 
-Implements: CAP-SESSION-001 (Wake-Up Protocol), R-SESSION-001-*
+Implements:
+    CAP-SESSION-001 (Wake-Up Protocol), R-SESSION-001-*
+    CAP-SESSION-011 (Calendar-Aware Wake-Up)
 Patterns: L038 (Agent-Agnostic), L021 (Verify-Before-Modify), L039 (Diagnostic Efficiency)
+Extension: WU-008 (Extension Hook per SKILL-001 v1.1.0)
 
 Usage:
     python3 wake_up.py                    # Human-readable output
     python3 wake_up.py --json             # JSON output (for programmatic use)
     python3 wake_up.py --json --pretty    # Pretty-printed JSON
     python3 wake_up.py --dir /path/agent  # Run on specific agent
+    python3 wake_up.py --verify           # Migration verification (L491)
 
 Exit codes:
     0: Success
@@ -28,13 +32,15 @@ L021 Verification Table:
     | 3 | .aget/ dir | Verify exists before reading |
     | 4 | config.json | Load with defaults if missing |
 
-Author: private-aget-framework-AGET (canonical template)
-Version: 1.0.0 (v3.1.0)
+Author: aget-framework (canonical template)
+Version: 2.0.0 (v3.6.0)
 """
 
 import argparse
+import importlib.util
 import json
 import os
+import subprocess
 import sys
 import time
 from datetime import datetime
@@ -56,21 +62,31 @@ def log_diagnostic(msg: str) -> None:
 
 
 # =============================================================================
+# Config-driven display defaults (C3 — CAP-SESSION-001)
+# =============================================================================
+
+DEFAULT_CONFIG = {
+    'show_version': True,
+    'show_purpose': True,
+    'show_archetype': True,
+    'show_template': True,
+    'show_git_status': True,
+    'show_structure': False,
+    'show_calendar': True,
+}
+
+
+# =============================================================================
 # Core Functions
 # =============================================================================
 
 def find_agent_root(start_path: Optional[Path] = None) -> Optional[Path]:
-    """
-    Find agent root by looking for .aget/ directory.
-
-    L021: Verify .aget/ exists before proceeding.
-    """
+    """Find agent root by looking for .aget/ directory."""
     if start_path:
         path = Path(start_path).resolve()
     else:
         path = Path.cwd()
 
-    # Check current and up to 3 parent levels
     for _ in range(4):
         if (path / '.aget').is_dir():
             return path
@@ -82,11 +98,7 @@ def find_agent_root(start_path: Optional[Path] = None) -> Optional[Path]:
 
 
 def load_json_file(path: Path, default: Any = None) -> Any:
-    """
-    Load JSON file with default fallback.
-
-    L021: Verify file exists before reading.
-    """
+    """Load JSON file with default fallback."""
     if not path.exists():
         return default
     try:
@@ -96,12 +108,61 @@ def load_json_file(path: Path, default: Any = None) -> Any:
         return default
 
 
-def get_wake_data(agent_path: Path) -> Dict[str, Any]:
-    """
-    Gather all data needed for wake output.
+def get_git_status(agent_path: Path) -> Dict[str, Any]:
+    """Get git status for the agent directory."""
+    try:
+        result = subprocess.run(
+            ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
+            capture_output=True, text=True, timeout=5,
+            cwd=str(agent_path),
+        )
+        branch = result.stdout.strip() if result.returncode == 0 else 'unknown'
 
-    Returns structured dict suitable for JSON or human output.
-    """
+        result2 = subprocess.run(
+            ['git', 'status', '--porcelain'],
+            capture_output=True, text=True, timeout=5,
+            cwd=str(agent_path),
+        )
+        clean = len(result2.stdout.strip()) == 0 if result2.returncode == 0 else None
+
+        return {'branch': branch, 'clean': clean}
+    except (subprocess.TimeoutExpired, FileNotFoundError):
+        return {'branch': 'unknown', 'clean': None}
+
+
+def get_calendar_context(config: Dict[str, Any]) -> Dict[str, Any]:
+    """CAP-SESSION-011: Calendar awareness for session context."""
+    now = datetime.now()
+    day_name = now.strftime('%A')
+    date_str = now.strftime('%Y-%m-%d')
+
+    # Release window detection (config-driven)
+    release_windows = config.get('release_windows', [])
+    in_release_window = False
+    window_name = ''
+
+    for window in release_windows:
+        window_day = window.get('day', '')
+        window_period = window.get('period', '')
+        if day_name.lower() == window_day.lower():
+            hour = now.hour
+            if window_period == 'AM' and hour < 12:
+                in_release_window = True
+                window_name = f"{window_day} {window_period}"
+            elif window_period == 'PM' and hour >= 12:
+                in_release_window = True
+                window_name = f"{window_day} {window_period}"
+
+    return {
+        'date': date_str,
+        'day': day_name,
+        'in_release_window': in_release_window,
+        'release_window': window_name,
+    }
+
+
+def get_wake_data(agent_path: Path) -> Dict[str, Any]:
+    """Gather all data needed for wake output."""
     data = {
         'timestamp': datetime.now().isoformat(),
         'agent_path': str(agent_path),
@@ -153,49 +214,124 @@ def get_wake_data(agent_path: Path) -> Dict[str, Any]:
     for d in optional_dirs:
         data['structure']['optional'][d] = (agent_path / d).is_dir()
 
-    # L021 Check 4: Config
+    # L021 Check 4: Config (C3 — config-driven display)
     config_file = agent_path / '.aget' / 'config.json'
     config_data = load_json_file(config_file, {})
-    data['config'] = config_data.get('wake_up', {})
+    wake_config = config_data.get('wake_up', {})
+
+    # Merge with defaults
+    data['config'] = {**DEFAULT_CONFIG, **wake_config}
+
+    # Git status (conditional on config toggle)
+    if data['config'].get('show_git_status', True):
+        data['git'] = get_git_status(agent_path)
+
+    # Calendar awareness (CAP-SESSION-011)
+    if data['config'].get('show_calendar', True):
+        data['calendar'] = get_calendar_context(wake_config)
+
+    return data
+
+
+def call_extension_hook(agent_path: Path, data: Dict[str, Any],
+                        verbose: bool = False) -> Dict[str, Any]:
+    """C1 Extension Hook (WU-008): Call wake_up_ext.py:post_wake(data) if present.
+
+    Contract per SKILL-001 v1.1.0 WU-008:
+    - Hook receives data dict
+    - Hook returns augmented data dict (additive-only per L464)
+    - Hook absence = no-op
+    - Hook failure = warning + continue
+    """
+    ext_path = agent_path / 'scripts' / 'wake_up_ext.py'
+    if not ext_path.exists():
+        return data
+
+    try:
+        spec = importlib.util.spec_from_file_location('wake_up_ext', str(ext_path))
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        if hasattr(module, 'post_wake'):
+            result = module.post_wake(data)
+            if isinstance(result, dict):
+                return result
+            if verbose:
+                log_diagnostic("Extension hook returned non-dict, ignoring")
+    except Exception as e:
+        print(f"Warning: Extension hook failed: {e}", file=sys.stderr)
 
     return data
 
 
 def format_human_output(data: Dict[str, Any]) -> str:
-    """Format data for human-readable output."""
+    """Format data for human-readable output with config-driven toggles."""
     lines = []
+    config = data.get('config', DEFAULT_CONFIG)
 
     # Session header
     agent_name = data['identity']['name'] or data['version']['agent_name']
     lines.append(f"\n**Session: {agent_name}**")
 
-    # Version
-    version = data['version']['aget_version']
-    updated = data['version']['updated']
-    if updated:
-        lines.append(f"**Version**: v{version} ({updated})")
-    else:
-        lines.append(f"**Version**: v{version}")
+    # Version (toggle: show_version)
+    if config.get('show_version', True):
+        version = data['version']['aget_version']
+        updated = data['version']['updated']
+        if updated:
+            lines.append(f"**Version**: v{version} ({updated})")
+        else:
+            lines.append(f"**Version**: v{version}")
 
     lines.append("")
 
-    # North star
-    north_star = data['identity']['north_star']
-    if north_star:
-        lines.append(f"Purpose: {north_star}")
-        lines.append("")
+    # North star (toggle: show_purpose)
+    if config.get('show_purpose', True):
+        north_star = data['identity']['north_star']
+        if north_star:
+            lines.append(f"Purpose: {north_star}")
+            lines.append("")
 
-    # Archetype
-    archetype = data['version']['archetype']
-    if archetype:
-        lines.append(f"Archetype: {archetype}")
+    # Archetype (toggle: show_archetype)
+    if config.get('show_archetype', True):
+        archetype = data['version']['archetype']
+        if archetype:
+            lines.append(f"Archetype: {archetype}")
 
-    # Template
-    template = data['version']['template']
-    if template:
-        lines.append(f"Template: {template}")
+    # Template (toggle: show_template)
+    if config.get('show_template', True):
+        template = data['version']['template']
+        if template:
+            lines.append(f"Template: {template}")
 
-    if archetype or template:
+    # Git status (toggle: show_git_status)
+    if config.get('show_git_status', True) and 'git' in data:
+        git = data['git']
+        status = 'clean' if git.get('clean') else 'dirty' if git.get('clean') is False else ''
+        if status:
+            lines.append(f"Git: {git['branch']} ({status})")
+        else:
+            lines.append(f"Git: {git['branch']}")
+
+    # Structure (toggle: show_structure)
+    if config.get('show_structure', False):
+        optional = data.get('structure', {}).get('optional', {})
+        present = [d for d, exists in optional.items() if exists]
+        if present:
+            lines.append(f"Directories: {', '.join(present)}")
+
+    # Calendar (toggle: show_calendar, CAP-SESSION-011)
+    if config.get('show_calendar', True) and 'calendar' in data:
+        cal = data['calendar']
+        lines.append(f"Date: {cal['date']} ({cal['day']})")
+        if cal.get('in_release_window'):
+            lines.append(f"Release Window: {cal['release_window']}")
+
+    lines.append("")
+
+    # Extension output (from hook)
+    ext_output = data.get('extension_output', '')
+    if ext_output:
+        lines.append(ext_output)
         lines.append("")
 
     # Ready
@@ -211,7 +347,7 @@ def format_human_output(data: Dict[str, Any]) -> str:
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Wake up protocol for AGET agents (v3.1 template)',
+        description='Wake up protocol for AGET agents (v2.0.0)',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 L021 Verification Table:
@@ -227,34 +363,47 @@ Exit codes:
         """
     )
     parser.add_argument(
-        '--json',
-        action='store_true',
-        help='Output as JSON'
+        '--json', action='store_true',
+        help='Output as JSON',
     )
     parser.add_argument(
-        '--pretty',
-        action='store_true',
-        help='Pretty-print JSON output'
+        '--pretty', action='store_true',
+        help='Pretty-print JSON output',
     )
     parser.add_argument(
-        '--dir',
-        type=Path,
-        help='Agent directory (default: current directory)'
+        '--dir', type=Path,
+        help='Agent directory (default: current directory)',
     )
     parser.add_argument(
-        '--verbose', '-v',
-        action='store_true',
-        help='Enable diagnostic output to stderr'
+        '--verbose', '-v', action='store_true',
+        help='Enable diagnostic output to stderr',
     )
     parser.add_argument(
-        '--version',
-        action='version',
-        version='wake_up.py 1.0.0 (AGET v3.1.0)'
+        '--verify', action='store_true',
+        help='Migration verification: confirm script is at canonical path (L491)',
+    )
+    parser.add_argument(
+        '--version', action='version',
+        version='wake_up.py 2.0.0 (AGET v3.6.0)',
     )
 
     args = parser.parse_args()
 
-    # L039: Diagnostic timing
+    # L491: --verify mode
+    if args.verify:
+        script_path = Path(__file__).resolve()
+        agent_root = find_agent_root(script_path.parent)
+        if agent_root:
+            expected = agent_root / 'scripts' / 'wake_up.py'
+            if script_path == expected.resolve():
+                print(f"PASS: wake_up.py at canonical path: {expected}")
+                return 0
+            else:
+                print(f"WARN: wake_up.py at {script_path}, expected {expected}")
+                return 1
+        print("WARN: Could not determine agent root for verification")
+        return 1
+
     if args.verbose:
         log_diagnostic("Starting wake_up protocol")
 
@@ -281,9 +430,15 @@ Exit codes:
     if args.verbose:
         log_diagnostic(f"Data gathered, valid={data['valid']}")
 
+    # C1 Extension Hook (WU-008)
+    data = call_extension_hook(agent_path, data, verbose=args.verbose)
+
+    if args.verbose:
+        log_diagnostic("Extension hook complete")
+
     # Output
     if args.json:
-        print(json.dumps(data, indent=2 if args.pretty else None))
+        print(json.dumps(data, indent=2 if args.pretty else None, default=str))
     else:
         print(format_human_output(data))
 
@@ -291,7 +446,6 @@ Exit codes:
         elapsed = (time.time() - _start_time) * 1000
         log_diagnostic(f"Complete in {elapsed:.0f}ms")
 
-    # Exit code based on validation
     return 0 if data['valid'] else 1
 
 
