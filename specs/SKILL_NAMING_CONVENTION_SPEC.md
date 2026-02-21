@@ -1,6 +1,6 @@
 # SKILL_NAMING_CONVENTION_SPEC
 
-**Version**: 1.1.0
+**Version**: 1.2.0
 **Status**: Active
 **Category**: Specification (Skills)
 **Format Version**: 1.3
@@ -34,6 +34,8 @@ Naming inconsistencies observed during v3.5.0 fleet migration:
 - Prohibited patterns
 - Spec-to-skill synchronization requirements
 - Migration guidance for legacy names
+- Skill lifecycle governance (deprecation marking)
+- Dependency validation
 
 **Does not cover**:
 - Skill implementation details (see AGET_SKILL_SPEC)
@@ -72,6 +74,19 @@ vocabulary:
       skos:definition: "A file, template, spec, or directory that a skill references and requires to exist at runtime"
       skos:example: ["templates/poc/RESEARCH_PROJECT_PLAN.template.md", "specs/CLI_VOCABULARY.md"]
       aget:validation: "All dependencies SHALL exist before skill deployment"
+
+    Skill_Status:
+      skos:prefLabel: "Skill_Status"
+      skos:definition: "Lifecycle state of a skill: active (default), deprecated (superseded, scheduled for removal)"
+      skos:example: ["active", "deprecated"]
+      aget:source: "L603 Cross-Fleet Skill Evolution Survey"
+
+    Deprecated_Skill:
+      skos:prefLabel: "Deprecated_Skill"
+      skos:definition: "A skill with status: deprecated — superseded by another skill, scheduled for removal in a future upgrade. Causes healthcheck warnings when present."
+      skos:broader: "Skill_Status"
+      skos:related: ["Skill_Name"]
+      aget:source: "L603 (both supervisors converged: dormant skills waste context and cause model confusion)"
 ```
 
 ---
@@ -202,6 +217,67 @@ python3 aget/validation/validate_skill_dependencies.py --skill .claude/skills/ag
 
 ---
 
+### CAP-SKILL-LIFE-001: Skill Lifecycle Governance
+
+**Statement**: Skills SHALL support lifecycle state tracking through SKILL.md frontmatter fields.
+
+**Pattern**: mixed (ubiquitous + event_driven + conditional)
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| R-SKILL-LIFE-001 | ubiquitous | SKILL.md frontmatter SHALL include a `status` field with value `active` (default) or `deprecated` |
+| R-SKILL-LIFE-002 | conditional | IF `status` is `deprecated`, THEN SKILL.md frontmatter SHALL include `superseded_by` referencing the canonical replacement skill name |
+| R-SKILL-LIFE-003 | conditional | IF `status` is `deprecated`, THEN SKILL.md frontmatter SHALL include `deprecated_date` in YYYY-MM-DD format |
+| R-SKILL-LIFE-004 | event_driven | WHEN healthcheck or validation tooling runs, the system SHALL report deprecated skills that are still present with their `superseded_by` references |
+| R-SKILL-LIFE-005 | event_driven | WHEN a deprecated skill is present, the system SHALL NOT block operations — deprecated is a warning, not an error |
+| R-SKILL-LIFE-006 | conditional | IF `superseded_by` references a skill that does not exist in `.claude/skills/`, THEN validation SHALL warn that the replacement is missing |
+
+**Frontmatter Schema**:
+```yaml
+# Active skill (default — status field optional when active)
+---
+name: aget-check-health
+description: "..."
+---
+
+# Deprecated skill (all three fields required)
+---
+name: aget-healthcheck-evolution
+status: deprecated
+superseded_by: aget-check-evolution
+deprecated_date: 2026-02-20
+description: "..."
+---
+```
+
+**Healthcheck Output**:
+```
+WARN: 3 deprecated skills present:
+  - aget-healthcheck-evolution → superseded by aget-check-evolution
+  - aget-healthcheck-kb → superseded by aget-check-kb
+  - aget-healthcheck-sessions → superseded by aget-check-sessions
+  Action: Remove deprecated skills or update to canonical names
+```
+
+**V-Tests**:
+
+| V-Test | Requirement | Verification |
+|--------|-------------|--------------|
+| V-SKILL-LIFE-001 | R-SKILL-LIFE-001 | Inspect SKILL.md: `status` field present with valid value (`active` or `deprecated`) or absent (defaults to `active`) |
+| V-SKILL-LIFE-002 | R-SKILL-LIFE-002 | For deprecated skills: `superseded_by` field present and contains a valid `aget-{verb}-{noun}` name |
+| V-SKILL-LIFE-003 | R-SKILL-LIFE-003 | For deprecated skills: `deprecated_date` field present in YYYY-MM-DD format |
+| V-SKILL-LIFE-004 | R-SKILL-LIFE-004 | Run healthcheck with deprecated skill present: output includes warning listing the skill and its replacement |
+| V-SKILL-LIFE-005 | R-SKILL-LIFE-005 | Run healthcheck with deprecated skill present: exit code is 0 (warning) not non-zero (error) |
+| V-SKILL-LIFE-006 | R-SKILL-LIFE-006 | Create deprecated skill with `superseded_by: aget-nonexistent`: validation warns replacement is missing |
+
+**Rationale**: L603 cross-fleet survey found dormant skills in both fleets. Supervisor 1 identified that legacy naming duplicates (e.g., `healthcheck-*` alongside `check-*`) waste context window tokens and cause model confusion — Claude Code may invoke the deprecated name instead of the canonical name. Both supervisors converged on deprecation marking as a quick win. Deprecation is a warning (not a block) to avoid disrupting agents that may still reference deprecated skills.
+
+**Theoretical Basis**: Deprecation as a lifecycle phase follows standard software engineering practice. The warning-not-error approach follows AGET's ADR-008 progression (Advisory → Strict → Generator): deprecation starts as advisory, can become strict in future versions.
+
+**Reference**: L603 (Cross-Fleet Skill Evolution Survey), ADR-008 (Advisory → Strict → Generator)
+
+---
+
 ## Migration Guidance
 
 ### Legacy Name Migration
@@ -279,10 +355,11 @@ theoretical_basis:
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.2.0 | 2026-02-20 | Add CAP-SKILL-LIFE-001 (R-SKILL-LIFE-001 through R-SKILL-LIFE-006, 6 V-tests): skill lifecycle governance with deprecation marking. Add Skill_Status and Deprecated_Skill vocabulary. Source: L603 cross-fleet skill evolution survey. |
 | 1.1.0 | 2026-02-15 | Add CAP-SKILL-DEP-001 (R-SKILL-DEP-001 through R-SKILL-DEP-005), Skill_Dependency vocabulary |
 | 1.0.0 | 2026-02-15 | Initial specification from v3.5.0 Phase 2 findings |
 
 ---
 
-*SKILL_NAMING_CONVENTION_SPEC v1.1.0*
+*SKILL_NAMING_CONVENTION_SPEC v1.2.0*
 *"aget-{verb}-{noun}: Consistent, predictable, discoverable."*
