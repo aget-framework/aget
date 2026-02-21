@@ -1,6 +1,6 @@
 # AGET Vocabulary Specification
 
-**Version**: 1.15.0
+**Version**: 1.16.0
 **Status**: Active
 **Category**: Core (Standards)
 **Format Version**: 1.2
@@ -2635,6 +2635,77 @@ Full concept definitions with theoretical grounding are in:
 
 ---
 
+## Compliance Behavioral Terms (v3.6.0)
+
+These terms capture empirically validated compliance dynamics discovered through cross-fleet experimentation (cli-aget RB-054, L606, L564). They name observed phenomena, not aspirational concepts.
+
+### Declarative_Compliance
+
+```yaml
+Declarative_Compliance:
+  skos:prefLabel: "Declarative_Compliance"
+  skos:definition: "An agent's adherence to specification rules at the structural level: files exist, format is correct, required fields are present. Measured by static analysis."
+  skos:altLabel: ["Structural_Compliance"]
+  skos:broader: "Aget_Property"
+  skos:related: ["Behavioral_Compliance", "Compliance_Divergence"]
+  aget:theoretical_basis: "Declarative vs Procedural Knowledge (Anderson 1983)"
+  aget:source: "cli-aget L606 (Declarative vs Behavioral Compliance Divergence)"
+  aget:note: "Typically ~100% in well-configured agents. Necessary but not sufficient for actual rule-following."
+```
+
+### Behavioral_Compliance
+
+```yaml
+Behavioral_Compliance:
+  skos:prefLabel: "Behavioral_Compliance"
+  skos:definition: "An agent's adherence to specification rules during actual operation: behavioral constraints are followed, not just declared. Measured by behavioral observation."
+  skos:altLabel: ["Operational_Compliance"]
+  skos:broader: "Aget_Property"
+  skos:related: ["Declarative_Compliance", "Compliance_Divergence", "Instruction_Asymmetry"]
+  aget:theoretical_basis: "Knowing-Doing Gap (Pfeffer & Sutton 2000)"
+  aget:source: "cli-aget L606, RB-054 G-2 (REFUTED: consumption specs alone insufficient)"
+  aget:note: "Typically ~50% at 30+ rule density. The gap between this and Declarative_Compliance is the Compliance_Divergence."
+```
+
+### Compliance_Divergence
+
+```yaml
+Compliance_Divergence:
+  skos:prefLabel: "Compliance_Divergence"
+  skos:definition: "The measured gap between Declarative_Compliance and Behavioral_Compliance for a given specification or rule set. Quantifies the difference between 'rules exist' and 'rules are followed'."
+  skos:altLabel: ["Compliance_Gap"]
+  skos:broader: "Aget_Property"
+  skos:related: ["Declarative_Compliance", "Behavioral_Compliance"]
+  aget:theoretical_basis: "Implementation Gap theory"
+  aget:source: "cli-aget RB-054 G-2 — vocabulary additions yield +2.1pp at 30+ rule density (threshold: +30pp)"
+  aget:note: "High divergence indicates structural compliance does not predict behavioral compliance. Key design implication: enforcement mechanisms must be behavioral, not declarative."
+```
+
+### Instruction_Asymmetry
+
+```yaml
+Instruction_Asymmetry:
+  skos:prefLabel: "Instruction_Asymmetry"
+  skos:definition: "The observed difference in compliance rates between prohibitive instructions (SHALL NOT, NEVER — ~95% effective) and affirmative instructions (SHALL, ALWAYS — ~0% effective) in AI agent governance."
+  skos:altLabel: ["Prohibition_Affirmation_Asymmetry"]
+  skos:broader: "Aget_Property"
+  skos:related: ["Behavioral_Compliance", "Aget_Prohibition", "Aget_Obligation"]
+  aget:theoretical_basis: "Deontic Logic (von Wright 1951) — prohibition vs obligation modalities"
+  aget:source: "cli-aget L564 (Instruction Asymmetry finding)"
+  aget:note: "Design implication: mandatory governance constraints should be expressed as prohibitions, not affirmations. 'NEVER do X' is far more effective than 'ALWAYS do Y'."
+```
+
+### Compliance Behavioral Terms Summary
+
+| Term | Type | Parent | Source |
+|------|------|--------|--------|
+| Declarative_Compliance | Property | Aget_Property | L606, RB-054 |
+| Behavioral_Compliance | Property | Aget_Property | L606, RB-054 |
+| Compliance_Divergence | Property | Aget_Property | RB-054 |
+| Instruction_Asymmetry | Property | Aget_Property | L564 |
+
+---
+
 ## Requirements
 
 ### CAP-VOC-001: SKOS Foundation
@@ -2689,6 +2760,17 @@ Full concept definitions with theoretical grounding are in:
 ---
 
 ## Changelog
+
+### v1.16.0 (2026-02-21)
+
+- **NEW**: Compliance Behavioral Terms — 4 precision terms from cross-fleet experimentation
+  - `Declarative_Compliance`: Structural adherence (~100% in configured agents)
+  - `Behavioral_Compliance`: Operational adherence (~50% at 30+ rule density)
+  - `Compliance_Divergence`: Gap between declarative and behavioral (RB-054 quantified)
+  - `Instruction_Asymmetry`: Prohibitions ~95% vs affirmations ~0% (L564)
+- All terms empirically grounded: cli-aget RB-054, L606, L564
+- Precision approach per RB-054 finding: 4 validated terms, not volume additions
+- **Source**: v3.6.0 Part B, cli-aget cross-fleet research
 
 ### v1.15.0 (2026-02-20)
 

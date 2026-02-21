@@ -6,12 +6,13 @@ Validates that:
 1. Templates have SKOS-compliant vocabularies in specs/
 2. Instance vocabularies extend (not contradict) template vocabularies
 3. Required SKOS properties are present
+4. YAML ontology files contain required SKOS properties (CAP-INST-008)
 
-Part of v3.3.0 release (G8.10, V8.14).
+Part of v3.3.0 release (G8.10, V8.14), extended v3.6.0 (CAP-INST-008).
 Per L481 (Ontology-Driven Agent Creation) and L482 (SKOS+EARS Grounding).
 
 Usage:
-    # Validate template has vocabulary
+    # Validate template has vocabulary (Markdown + YAML)
     python3 validate_ontology_compliance.py --template template-researcher-aget
 
     # Validate instance extends template
@@ -19,6 +20,9 @@ Usage:
 
     # Validate all templates in a directory
     python3 validate_ontology_compliance.py --all --base-dir /path/to/aget-framework
+
+    # Self-test
+    python3 validate_ontology_compliance.py --test
 
 Exit codes:
     0 - All validations pass
@@ -32,6 +36,13 @@ import re
 import sys
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
+
+# Try to import yaml; fall back gracefully
+try:
+    import yaml
+    HAS_YAML = True
+except ImportError:
+    HAS_YAML = False
 
 
 # SKOS properties that indicate compliance
@@ -276,6 +287,216 @@ def find_all_templates(base_dir: Path) -> List[Path]:
     return sorted(templates)
 
 
+# --- YAML Ontology Validation (CAP-INST-008) ---
+
+
+def find_yaml_ontology_files(template_path: Path) -> List[Path]:
+    """Find YAML ontology files in a template's ontology/ directory."""
+    ontology_dir = template_path / "ontology"
+    if not ontology_dir.is_dir():
+        return []
+    files = []
+    for f in ontology_dir.iterdir():
+        if f.is_file() and f.suffix in ('.yaml', '.yml'):
+            files.append(f)
+    return sorted(files)
+
+
+def parse_yaml_file(filepath: Path) -> Optional[dict]:
+    """Parse a YAML file, returning None on failure."""
+    if HAS_YAML:
+        try:
+            with open(filepath) as f:
+                return yaml.safe_load(f)
+        except Exception:
+            return None
+
+    # Fallback: extract key fields using simple line parsing
+    try:
+        content = filepath.read_text(encoding='utf-8')
+        data = {'concepts': []}
+        for line in content.split('\n'):
+            stripped = line.strip()
+            if stripped.startswith('prefLabel:'):
+                value = stripped.split(':', 1)[1].strip().strip('"\'')
+                data['concepts'].append({'prefLabel': value})
+            elif stripped.startswith('definition:'):
+                value = stripped.split(':', 1)[1].strip().strip('"\'')
+                if data['concepts']:
+                    data['concepts'][-1]['definition'] = value
+        return data
+    except Exception:
+        return None
+
+
+def extract_yaml_concepts(data: dict) -> List[dict]:
+    """Extract concepts from parsed YAML ontology data."""
+    concepts = []
+
+    # Handle top-level concepts list
+    raw_concepts = data.get('concepts', [])
+    if isinstance(raw_concepts, list):
+        for c in raw_concepts:
+            if isinstance(c, dict):
+                concepts.append(c)
+
+    # Handle conceptScheme.concepts (alternative structure)
+    scheme = data.get('conceptScheme', {})
+    if isinstance(scheme, dict):
+        scheme_concepts = scheme.get('concepts', [])
+        if isinstance(scheme_concepts, list):
+            for c in scheme_concepts:
+                if isinstance(c, dict):
+                    concepts.append(c)
+
+    return concepts
+
+
+def validate_yaml_ontology(template_path: Path) -> ValidationResult:
+    """Validate YAML ontology files for SKOS compliance (CAP-INST-008)."""
+    result = ValidationResult(f"YAML Ontology: {template_path.name}")
+
+    yaml_files = find_yaml_ontology_files(template_path)
+    if not yaml_files:
+        result.add_warning("No ontology/ directory or no YAML files found")
+        return result
+
+    result.add_pass(f"ontology/ directory with {len(yaml_files)} YAML file(s)")
+
+    for yaml_file in yaml_files:
+        data = parse_yaml_file(yaml_file)
+        if data is None:
+            result.add_fail(f"{yaml_file.name}: Failed to parse YAML")
+            continue
+
+        concepts = extract_yaml_concepts(data)
+        if not concepts:
+            result.add_fail(f"{yaml_file.name}: No concepts found")
+            continue
+
+        missing_prefLabel = 0
+        missing_definition = 0
+
+        for concept in concepts:
+            if not concept.get('prefLabel'):
+                missing_prefLabel += 1
+            if not concept.get('definition'):
+                missing_definition += 1
+
+        if missing_prefLabel == 0:
+            result.add_pass(f"{yaml_file.name}: All {len(concepts)} concepts have prefLabel")
+        else:
+            result.add_fail(
+                f"{yaml_file.name}: {missing_prefLabel}/{len(concepts)} concepts missing prefLabel"
+            )
+
+        if missing_definition == 0:
+            result.add_pass(f"{yaml_file.name}: All {len(concepts)} concepts have definition")
+        else:
+            result.add_fail(
+                f"{yaml_file.name}: {missing_definition}/{len(concepts)} concepts missing definition"
+            )
+
+    return result
+
+
+def run_self_test() -> bool:
+    """Self-test to verify YAML validation behavior (CAP-INST-008)."""
+    import tempfile
+    import shutil
+
+    test_dir = Path(tempfile.mkdtemp(prefix='aget_ontology_compliance_test_'))
+    passed = 0
+    failed = 0
+
+    try:
+        # Set up mock template
+        (test_dir / 'ontology').mkdir()
+        (test_dir / 'specs').mkdir()
+
+        # T1: Valid YAML ontology
+        valid_yaml = """apiVersion: aget.framework/v1
+kind: OntologySpec
+metadata:
+  name: test-ontology
+  version: 1.0.0
+concepts:
+  - id: T001
+    prefLabel: TestConcept
+    definition: A test concept for validation
+  - id: T002
+    prefLabel: AnotherConcept
+    definition: Another test concept
+  - id: T003
+    prefLabel: ThirdConcept
+    definition: A third concept
+"""
+        (test_dir / 'ontology' / 'ONTOLOGY_test.yaml').write_text(valid_yaml)
+
+        result = validate_yaml_ontology(test_dir)
+        if result.success:
+            print("  [+] T1 PASS: Valid YAML ontology accepted")
+            passed += 1
+        else:
+            print(f"  [-] T1 FAIL: Valid YAML rejected: {result.failed}")
+            failed += 1
+
+        # T2: YAML with missing definition
+        bad_yaml = """apiVersion: aget.framework/v1
+kind: OntologySpec
+metadata:
+  name: bad-ontology
+concepts:
+  - id: B001
+    prefLabel: BadConcept
+  - id: B002
+    prefLabel: OkConcept
+    definition: This one is fine
+"""
+        (test_dir / 'ontology' / 'ONTOLOGY_bad.yaml').write_text(bad_yaml)
+
+        result2 = validate_yaml_ontology(test_dir)
+        has_missing_def = any('missing definition' in f for f in result2.failed)
+        if has_missing_def:
+            print("  [+] T2 PASS: Missing definition detected")
+            passed += 1
+        else:
+            print(f"  [-] T2 FAIL: Expected missing definition finding")
+            failed += 1
+
+        # T3: Coverage reporting
+        yaml_files = find_yaml_ontology_files(test_dir)
+        md_file = find_vocabulary_file(test_dir)
+        yaml_count = len(yaml_files)
+        md_count = 1 if md_file else 0
+        coverage = f"Checked: {yaml_count} YAML, {md_count} Markdown"
+        if yaml_count == 2 and md_count == 0:
+            print(f"  [+] T3 PASS: Coverage report correct ({coverage})")
+            passed += 1
+        else:
+            print(f"  [-] T3 FAIL: Expected 2 YAML, 0 Markdown; got {coverage}")
+            failed += 1
+
+        # T4: No ontology directory
+        empty_dir = Path(tempfile.mkdtemp(prefix='aget_empty_test_'))
+        result4 = validate_yaml_ontology(empty_dir)
+        has_warning = any('No ontology' in w for w in result4.warnings)
+        shutil.rmtree(empty_dir)
+        if has_warning:
+            print("  [+] T4 PASS: Missing ontology/ handled gracefully")
+            passed += 1
+        else:
+            print(f"  [-] T4 FAIL: Expected warning for missing ontology/")
+            failed += 1
+
+    finally:
+        shutil.rmtree(test_dir)
+
+    total = passed + failed
+    print(f"\n  Self-test: {passed}/{total} PASS")
+    return failed == 0
+
+
 def main():
     parser = argparse.ArgumentParser(
         description='Validate template/instance ontology compliance (SKOS)',
@@ -310,8 +531,18 @@ def main():
         action='store_true',
         help='Output results as JSON'
     )
+    parser.add_argument(
+        '--test',
+        action='store_true',
+        help='Run self-test (CAP-INST-008)'
+    )
 
     args = parser.parse_args()
+
+    if args.test:
+        print("validate_ontology_compliance.py self-test (CAP-INST-008)")
+        success = run_self_test()
+        sys.exit(0 if success else 1)
 
     base_dir = Path(args.base_dir)
 
@@ -321,6 +552,10 @@ def main():
 
     results: List[ValidationResult] = []
 
+    # Track format coverage (CAP-INST-008-03)
+    yaml_files_checked = 0
+    md_files_checked = 0
+
     if args.all:
         # Validate all templates
         templates = find_all_templates(base_dir)
@@ -329,7 +564,15 @@ def main():
             sys.exit(2)
 
         for template in templates:
+            # Markdown vocabulary validation
             results.append(validate_template_vocabulary(template))
+            if find_vocabulary_file(template):
+                md_files_checked += 1
+
+            # YAML ontology validation (CAP-INST-008-01)
+            yaml_result = validate_yaml_ontology(template)
+            results.append(yaml_result)
+            yaml_files_checked += len(find_yaml_ontology_files(template))
 
     elif args.template:
         # Resolve template path
@@ -342,6 +585,13 @@ def main():
             sys.exit(2)
 
         results.append(validate_template_vocabulary(template_path))
+        if find_vocabulary_file(template_path):
+            md_files_checked += 1
+
+        # YAML ontology validation (CAP-INST-008-01)
+        yaml_result = validate_yaml_ontology(template_path)
+        results.append(yaml_result)
+        yaml_files_checked += len(find_yaml_ontology_files(template_path))
 
         # If instance specified, validate extension
         if args.instance:
@@ -377,6 +627,10 @@ def main():
                 "total": len(results),
                 "passed": sum(1 for r in results if r.success),
                 "failed": sum(1 for r in results if not r.success)
+            },
+            "coverage": {
+                "yaml_files": yaml_files_checked,
+                "markdown_files": md_files_checked
             }
         }
         print(json.dumps(output, indent=2))
@@ -392,6 +646,8 @@ def main():
 
         print(f"\n{'='*50}")
         print(f"Summary: {passed}/{total} passed, {failed}/{total} failed")
+        # CAP-INST-008-03: Format coverage report
+        print(f"Checked: {yaml_files_checked} YAML, {md_files_checked} Markdown")
         print(f"{'='*50}")
 
     # Exit code
