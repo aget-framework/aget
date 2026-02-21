@@ -1,11 +1,11 @@
 # AGET Instance Specification
 
-**Version**: 1.0.0
+**Version**: 1.1.0
 **Status**: Active
 **Category**: Standards (Instance Architecture)
 **Format Version**: 1.2
 **Created**: 2025-12-27
-**Updated**: 2025-12-27
+**Updated**: 2026-02-20
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_INSTANCE_SPEC.md`
 **Change Origin**: 5-why analysis on missing `knowledge/` directory (G-PRE.3.1)
@@ -322,6 +322,70 @@ The SYSTEM shall maintain an ontology directory for formal vocabulary definition
 - Consistent discovery across agents
 - Clear separation from framework config (`.aget/`)
 - Healthcheck coverage for formal vocabulary
+
+---
+
+### CAP-INST-007: Ontology Inheritance Resolution (v3.6.0)
+
+The SYSTEM shall validate ontology inheritance declarations at gate boundaries.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-INST-007-01 | event_driven | WHEN validation tooling runs, the system SHALL resolve each `inherits:` and `extends:` reference to a canonical vocabulary source |
+| CAP-INST-007-02 | unwanted | IF an `inherits:` reference cannot be resolved, THEN the system SHALL report a validation failure identifying the unresolvable reference |
+| CAP-INST-007-03 | event_driven | WHEN an agent's vocabulary defines a term with the same `skos:prefLabel` as an inherited term, the system SHALL flag the collision with both definitions |
+| CAP-INST-007-04 | ubiquitous | The system SHALL validate Inheritance_Chains as acyclic (consistent with CAP-VOC-001-03) |
+| CAP-INST-007-05 | optional | WHERE `aget:inherits_from` specifies a version constraint, the system SHALL validate version compatibility |
+
+**Enforcement**: Validation_Time_Resolution — checked during healthcheck, pre-release gates, and agent creation. Not checked during normal agent operation.
+
+**L-doc References**: L601 (Cross-Fleet Ontology Adoption Survey), L602 (Ontology Behavioral Specification Gap)
+
+**Rationale**: Cross-fleet survey (L601) found `inherits:` references that resolve to nothing — phantom inheritance survived days undetected. Both fleet supervisors converged on validation-time resolution as the appropriate mechanism. This capability extends CAP-INST-006 (structural) with behavioral requirements:
+- CAP-INST-006 specifies *what ontology artifacts exist* (directory, files, format)
+- CAP-INST-007 specifies *how inheritance declarations are validated* (resolution, conflicts, chains)
+
+**V-tests**:
+
+| V-test | Validates | Method |
+|--------|-----------|--------|
+| V-INST-007-01 | Resolvable `inherits:` passes validation | Create agent with valid `inherits:` → validation succeeds |
+| V-INST-007-02 | Unresolvable `inherits:` fails with clear error | Create agent with phantom `inherits:` → validation fails, error names the reference |
+| V-INST-007-03 | Term collision is flagged | Agent defines term matching inherited term → warning with both definitions |
+| V-INST-007-04 | Cyclic chain is rejected | Create circular `inherits:` → validation fails |
+| V-INST-007-05 | Version constraint is checked (when present) | Specify `inherits_from: "aget_core@>=1.0"` → version validated |
+
+**Compatibility**:
+- Extends CAP-INST-006 (ontology directory structure)
+- Consistent with R-ENT-001–005 (entity inheritance rules)
+- Consistent with CAP-VOC-001-03 (acyclic hierarchies)
+- Does not duplicate CAP-TPL-005/011/012 (template composition is a different mechanism)
+
+---
+
+### CAP-INST-008: YAML Ontology Validation (v3.6.0)
+
+The SYSTEM shall validate YAML ontology files for SKOS compliance.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-INST-008-01 | event_driven | WHEN validation tooling runs against `ontology/`, the system SHALL validate YAML files (not only Markdown) |
+| CAP-INST-008-02 | ubiquitous | The system SHALL validate that each YAML ontology file contains required SKOS properties (`skos:prefLabel`, `skos:definition`) per CAP-VOC-001 |
+| CAP-INST-008-03 | event_driven | WHEN validation completes, the system SHALL report which file formats were checked and which were skipped |
+
+**Enforcement**: Validation tooling (`validate_ontology_compliance.py`) extended to parse YAML.
+
+**L-doc References**: L601 (Cross-Fleet Ontology Adoption Survey), L602 (Ontology Behavioral Specification Gap)
+
+**Rationale**: Current `validate_ontology_compliance.py` only checks Markdown vocabulary files. The primary ontology format is YAML+SKOS (per CAP-INST-006-04), creating a validation gap where the most common format is unvalidated.
+
+**V-tests**:
+
+| V-test | Validates | Method |
+|--------|-----------|--------|
+| V-INST-008-01 | YAML files are validated (not skipped) | Run validator against ontology/ with YAML files → YAML files appear in results |
+| V-INST-008-02 | Missing SKOS properties are caught | Create YAML ontology missing `skos:definition` → validation fails |
+| V-INST-008-03 | Coverage report shows formats checked | Run validator → output includes "Checked: N YAML, M Markdown" |
 
 ---
 

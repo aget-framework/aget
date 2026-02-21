@@ -1,11 +1,11 @@
 # AGET Vocabulary Specification
 
-**Version**: 1.12.0
+**Version**: 1.13.0
 **Status**: Active
 **Category**: Core (Standards)
 **Format Version**: 1.2
 **Created**: 2026-01-04
-**Updated**: 2026-02-13
+**Updated**: 2026-02-20
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_VOCABULARY_SPEC.md`
 **Change Origin**: PROJECT_PLAN_standards_ontology_elevation_v1.0
@@ -254,12 +254,16 @@ Compound AGET Vocabulary terms match this regex:
 | `Pattern_Extraction` | Identifying reusable Aget_Pattern | — |
 | `Knowledge_Migration` | Moving learning between Aget_Instances | — |
 
-## Ontology Terms (v3.5.0)
+## Ontology Terms (v3.5.0, extended v3.6.0)
 
 | Term | Definition | altLabel |
 |------|------------|----------|
 | `Ontology_Directory` | Agent directory containing formal vocabulary definitions using SKOS+EARS format | — |
 | `Ontology_File` | YAML file containing SKOS-aligned concept definitions and optional EARS requirements | — |
+| `Inheritance_Resolution` | The process by which an agent's `inherits:` or `extends:` declaration is resolved to a canonical vocabulary source and validated for term compatibility | — |
+| `Validation_Time_Resolution` | Inheritance_Resolution that occurs at validation/healthcheck boundaries, not during normal agent operation | — |
+| `Inheritance_Chain` | The ordered sequence of vocabulary sources from an agent's Ontology_File to Aget_Core_Vocabulary, following `aget:inherits_from` links | — |
+| `Ontology_Consumption` | Agent behavior that reads, queries, validates, or acts on ontology content during operation; distinct from ontology structure (format, location) | — |
 
 ```yaml
 Ontology_Directory:
@@ -277,9 +281,41 @@ Ontology_File:
   aget:naming_pattern: "ONTOLOGY_<domain>_vX.Y.yaml"
   skos:broader: "Agent_Artifact"
   skos:related: ["Learning_Document", "Specification"]
+
+Inheritance_Resolution:
+  skos:prefLabel: "Inheritance_Resolution"
+  skos:definition: "The process by which an agent's inherits: or extends: declaration is resolved to a canonical vocabulary source and validated for term compatibility."
+  skos:broader: "Vocabulary_Inheritance"
+  skos:related: ["Validation_Time_Resolution", "Inheritance_Chain", "Aget_Core_Vocabulary"]
+  aget:source: "L601 Cross-Fleet Ontology Adoption Survey, L602 Ontology Behavioral Specification Gap"
+  aget:note: "Both fleet supervisors converged on validation-time resolution as the appropriate mechanism."
+
+Validation_Time_Resolution:
+  skos:prefLabel: "Validation_Time_Resolution"
+  skos:definition: "Inheritance_Resolution that occurs at validation/healthcheck boundaries, not during normal agent operation."
+  skos:broader: "Inheritance_Resolution"
+  skos:related: ["V_Test", "Ontology_Consumption"]
+  aget:source: "L601 Q1 follow-up (cross-fleet convergence)"
+  aget:note: "Fits existing validation patterns (contract tests, healthchecks, pre-release gates). Designed path toward file resolution in future."
+
+Inheritance_Chain:
+  skos:prefLabel: "Inheritance_Chain"
+  skos:definition: "The ordered sequence of vocabulary sources from an agent's Ontology_File to Aget_Core_Vocabulary, following aget:inherits_from links."
+  skos:broader: "Inheritance_Resolution"
+  skos:related: ["Aget_Core_Vocabulary", "Ontology_File", "Vocabulary_Inheritance"]
+  aget:source: "L601 Finding 5 (inheritance declared but not resolved)"
+  aget:note: "Must be acyclic (consistent with CAP-VOC-001-03). Validation checks resolvability of each link."
+
+Ontology_Consumption:
+  skos:prefLabel: "Ontology_Consumption"
+  skos:definition: "Agent behavior that reads, queries, validates, or acts on ontology content during operation; distinct from ontology structure (format, location)."
+  skos:related: ["Inheritance_Resolution", "Ontology_Directory", "Ontology_File"]
+  aget:source: "L602 Ontology Behavioral Specification Gap"
+  aget:theoretical_basis: "Syntactic-semantic gap (Guarino 1998): syntactic compliance does not guarantee semantic engagement"
+  aget:note: "L602 root cause: framework specified structure without consumption behavior. This term names the gap."
 ```
 
-**L-doc Reference**: L482 (Executable Ontology - SKOS+EARS Grounding)
+**L-doc References**: L482 (Executable Ontology - SKOS+EARS Grounding), L601 (Cross-Fleet Ontology Adoption Survey), L602 (Ontology Behavioral Specification Gap)
 
 ---
 
@@ -2539,6 +2575,18 @@ Full concept definitions with theoretical grounding are in:
 ---
 
 ## Changelog
+
+### v1.13.0 (2026-02-20)
+
+- **NEW**: Ontology behavioral vocabulary from L601/L602 cross-fleet survey
+- Added 4 terms to Part 2 Ontology Terms section:
+  - `Inheritance_Resolution`: Process of resolving `inherits:`/`extends:` to canonical source
+  - `Validation_Time_Resolution`: Resolution at gate boundaries (not runtime)
+  - `Inheritance_Chain`: Ordered sequence from agent ontology to `Aget_Core_Vocabulary`
+  - `Ontology_Consumption`: Agent behavior interacting with ontology (names L602 gap)
+- All terms include SKOS YAML definitions with `aget:source` traceability
+- Extends existing `Vocabulary_Inheritance` and `Aget_Core_Vocabulary` terms (no duplication)
+- **Source**: OBS-001 Gate 0.1, L601, L602
 
 ### v1.12.0 (2026-02-13)
 
