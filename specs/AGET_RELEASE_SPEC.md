@@ -1,11 +1,11 @@
 # AGET Release Specification
 
-**Version**: 1.6.0
+**Version**: 1.7.0
 **Status**: Active
 **Category**: Process (Release Management)
 **Format Version**: 1.2
 **Created**: 2026-01-04
-**Updated**: 2026-02-15
+**Updated**: 2026-02-20
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_RELEASE_SPEC.md`
 **Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.2
@@ -111,6 +111,34 @@ vocabulary:
       aget:anti_pattern: true
       skos:related: ["L585"]
 
+  observability:
+    Validation_Log:
+      skos:definition: "Persistent structured record of validation script executions"
+      aget:location: ".aget/logs/validation_log.jsonl"
+      aget:format: "JSON Lines (one JSON object per line)"
+      skos:related: ["CAP-REL-021", "L605"]
+
+    Gate_Record:
+      skos:definition: "Immutable record of gate execution with pass/fail status"
+      aget:location: ".aget/logs/gate_log.jsonl"
+      aget:format: "JSON Lines"
+      skos:related: ["CAP-REL-022", "Release_Gate", "L605"]
+
+    Release_Snapshot:
+      skos:definition: "Structured capture of all repo states before and after release execution"
+      aget:location: ".aget/logs/release_snapshots/"
+      skos:related: ["CAP-REL-023", "L605"]
+
+    Propagation_Audit_Record:
+      skos:definition: "Record of expected vs actual propagation state for template-targeting changes"
+      aget:location: ".aget/logs/propagation_log.jsonl"
+      skos:related: ["CAP-REL-024", "L596", "L605"]
+
+    Health_Log:
+      skos:definition: "Persistent record of healthcheck results enabling trend analysis"
+      aget:location: ".aget/logs/health_log.jsonl"
+      skos:related: ["CAP-REL-025", "L605"]
+
   anti_patterns:
     Version_Drift:
       skos:definition: "Managing agent version behind managed repos"
@@ -126,6 +154,21 @@ vocabulary:
       skos:definition: "Releasing outside designated release windows"
       aget:anti_pattern: true
       skos:related: ["CAP-REL-011"]
+
+    Ephemeral_Validation:
+      skos:definition: "Running validation scripts whose results vanish after execution — no audit trail, no trend analysis, no regression detection"
+      aget:anti_pattern: true
+      skos:related: ["L605", "CAP-REL-021"]
+
+    Manual_Gate_Enforcement:
+      skos:definition: "Relying on human discipline (checkboxes, SOP text) to enforce gate sequencing instead of machine-verified blocking"
+      aget:anti_pattern: true
+      skos:related: ["L605", "CAP-REL-022"]
+
+    Workspace_Local_Validation:
+      skos:definition: "Validating changes against authoring workspace instead of deployment targets (template repos)"
+      aget:anti_pattern: true
+      skos:related: ["L596", "L605", "CAP-REL-024"]
 
   scope:
     Version_Scope:
@@ -596,6 +639,200 @@ grep -q "Context for External" "handoffs/RELEASE_HANDOFF_v${VERSION}.md" && echo
 
 **See**: `templates/TEMPLATE_RELEASE_HANDOFF.md` for reference structure.
 
+### CAP-REL-021: Persistent Validation Logging (L605, ER-VALIDATE-LOG)
+
+**SHALL** requirements for validation result persistence:
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| CAP-REL-021-01 | ubiquitous | Every validation script SHALL append a structured JSON record to `.aget/logs/validation_log.jsonl` | Audit trail — results must survive session end |
+| CAP-REL-021-02 | ubiquitous | Each Validation_Log record SHALL include: timestamp, script_name, aget_version, checks_passed (count), checks_failed (count), exit_code, and check_details (array) | Queryable structured data |
+| CAP-REL-021-03 | ubiquitous | The `.aget/logs/` directory SHALL be created automatically if absent when any logging script runs | No manual setup required |
+| CAP-REL-021-04 | conditional | IF a validation script exits non-zero THEN the Validation_Log record SHALL include failure_details with specific check names and error messages | Actionable failure diagnosis |
+| CAP-REL-021-05 | prohibitive | Validation scripts SHALL NOT produce only ephemeral output (stdout/stderr without persistent log) | Prevents Ephemeral_Validation anti-pattern |
+
+**Validation_Log Record Schema:**
+
+```json
+{
+  "timestamp": "2026-02-20T19:50:00Z",
+  "script": "post_release_validation.py",
+  "aget_version": "3.6.0",
+  "checks_passed": 11,
+  "checks_failed": 1,
+  "exit_code": 1,
+  "check_details": [
+    {"name": "version_coherence", "status": "pass"},
+    {"name": "github_releases", "status": "fail", "error": "template-worker-aget missing GitHub Release"}
+  ]
+}
+```
+
+**V-Test for Validation Logging:**
+
+```bash
+# After running any validation script, log should have new entry
+BEFORE=$(wc -l < .aget/logs/validation_log.jsonl 2>/dev/null || echo 0)
+python3 .aget/patterns/session/aget_housekeeping_protocol.py --json
+AFTER=$(wc -l < .aget/logs/validation_log.jsonl 2>/dev/null || echo 0)
+[ "$AFTER" -gt "$BEFORE" ] && echo "PASS: Validation logged" || echo "FAIL: No log entry created"
+```
+
+**Prevents**: Ephemeral_Validation anti-pattern (L605) — validation results that vanish after execution.
+
+### CAP-REL-022: Gate Execution Enforcement (L605, ER-GATE-ENFORCE)
+
+**SHALL** requirements for gate sequencing enforcement:
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| CAP-REL-022-01 | ubiquitous | Gate completion SHALL produce an immutable Gate_Record in `.aget/logs/gate_log.jsonl` | Machine-verifiable gate history |
+| CAP-REL-022-02 | ubiquitous | Each Gate_Record SHALL include: gate_id, timestamp, aget_version, status (pass/fail), validation_summary, and operator | Audit completeness |
+| CAP-REL-022-03 | conditional | BEFORE executing gate N, the system SHALL verify gate N-1 has a PASS record in gate_log.jsonl | Sequential gate enforcement |
+| CAP-REL-022-04 | conditional | IF prior gate record is missing or status is FAIL THEN the system SHALL BLOCK progression and display the blocking reason | Prevents gate skipping |
+| CAP-REL-022-05 | conditional | IF gate is the first in sequence (Gate 0) THEN prior gate check SHALL be skipped | Bootstrap: first gate has no predecessor |
+| CAP-REL-022-06 | prohibitive | Gate completion SHALL NOT be recorded by manual checkbox alone — a gate script SHALL produce the record | Prevents Manual_Gate_Enforcement anti-pattern |
+
+**Gate_Record Schema:**
+
+```json
+{
+  "gate_id": "G7.1",
+  "timestamp": "2026-02-20T19:50:00Z",
+  "aget_version": "3.6.0",
+  "status": "pass",
+  "checks_total": 3,
+  "checks_passed": 3,
+  "checks_failed": 0,
+  "validation_summary": "V7.1.1 PASS, V7.1.2 PASS, V7.1.3 PASS",
+  "operator": "private-aget-framework-AGET",
+  "prior_gate": "G7.0"
+}
+```
+
+**V-Test for Gate Enforcement:**
+
+```bash
+# Attempt gate N+1 without gate N record — should be blocked
+python3 .aget/patterns/release/run_gate.py --gate G7.1 --version 3.6.0 2>&1
+# Expected: "BLOCKED: Gate G7.0 has no PASS record. Complete G7.0 before proceeding to G7.1."
+```
+
+**Prevents**: Manual_Gate_Enforcement anti-pattern (L605) — relying on human checkpoint discipline instead of machine verification.
+
+### CAP-REL-023: Release State Snapshots (L605, ER-RELEASE-SNAPSHOT)
+
+**SHALL/SHOULD** requirements for pre/post release state capture:
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| CAP-REL-023-01 | conditional | BEFORE release execution begins (Gate 0), the system SHALL capture a pre-release Release_Snapshot | Baseline for diff validation |
+| CAP-REL-023-02 | conditional | AFTER release completion (final gate), the system SHALL capture a post-release Release_Snapshot | Outcome measurement |
+| CAP-REL-023-03 | ubiquitous | Each Release_Snapshot SHALL include: version files (all repos), GitHub Release existence, CHANGELOG latest entry, homepage version state | Comprehensive state capture |
+| CAP-REL-023-04 | ubiquitous | The diff between pre and post snapshots SHALL be logged to `.aget/logs/release_snapshots/v{VERSION}_diff.json` | Diff-based validation |
+| CAP-REL-023-05 | conditional | IF diff shows unexpected unchanged items (version file not bumped, GitHub Release not created) THEN the system SHALL flag them as release gaps | Regression detection |
+
+**Release_Snapshot Schema:**
+
+```json
+{
+  "timestamp": "2026-02-20T19:50:00Z",
+  "aget_version": "3.6.0",
+  "phase": "pre-release",
+  "repos": {
+    "aget": {"version_json": "3.5.0", "changelog_latest": "3.5.0", "github_release": "v3.5.0"},
+    "template-worker-aget": {"version_json": "3.5.0", "changelog_latest": "3.5.0", "github_release": "v3.5.0"}
+  },
+  "homepage": {"badge_version": "3.5.0", "roadmap_current": "3.5.0"}
+}
+```
+
+**V-Test for State Snapshots:**
+
+```bash
+VERSION="3.6.0"
+[ -f ".aget/logs/release_snapshots/v${VERSION}_pre.json" ] && echo "PASS: Pre-release snapshot exists" || echo "FAIL"
+[ -f ".aget/logs/release_snapshots/v${VERSION}_post.json" ] && echo "PASS: Post-release snapshot exists" || echo "FAIL"
+[ -f ".aget/logs/release_snapshots/v${VERSION}_diff.json" ] && echo "PASS: Release diff exists" || echo "FAIL"
+```
+
+**Prevents**: Post-release discovery of version drift and stale homepage (L605 categories 1 and 3).
+
+### CAP-REL-024: Propagation Audit (L605, L596, ER-PROPAGATION-AUDIT)
+
+**SHALL** requirements for template propagation tracking:
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| CAP-REL-024-01 | conditional | WHEN changes target template repos, the system SHALL log a Propagation_Audit_Record with expected targets and expected changes | Propagation planning |
+| CAP-REL-024-02 | ubiquitous | Each Propagation_Audit_Record SHALL include: source_repo, target_repos (array), expected_changes, actual_changes, propagation_complete (boolean) | Verifiable propagation state |
+| CAP-REL-024-03 | conditional | IF propagation_complete is false for any target THEN the associated PROJECT_PLAN or release gate SHALL NOT be marked complete | Prevents workspace-local-only validation |
+| CAP-REL-024-04 | ubiquitous | Propagation audit SHALL verify against deployment targets (template-*-aget repos), not the authoring workspace (private-aget-framework-AGET) | L596: measure where users clone from |
+
+**Propagation_Audit_Record Schema:**
+
+```json
+{
+  "timestamp": "2026-02-20T19:50:00Z",
+  "aget_version": "3.6.0",
+  "source_repo": "private-aget-framework-AGET",
+  "targets": [
+    {"repo": "template-worker-aget", "expected": ["version.json", "CHANGELOG.md"], "actual": ["version.json", "CHANGELOG.md"], "complete": true},
+    {"repo": "template-advisor-aget", "expected": ["version.json", "CHANGELOG.md"], "actual": ["version.json"], "complete": false, "missing": ["CHANGELOG.md"]}
+  ],
+  "all_complete": false
+}
+```
+
+**V-Test for Propagation Audit:**
+
+```bash
+# Check propagation log shows all targets complete
+python3 -c "
+import json
+with open('.aget/logs/propagation_log.jsonl') as f:
+    records = [json.loads(l) for l in f if l.strip()]
+latest = records[-1]
+print('PASS' if latest['all_complete'] else 'FAIL: Incomplete propagation — ' + str([t['repo'] for t in latest['targets'] if not t['complete']]))
+"
+```
+
+**Prevents**: Workspace_Local_Validation anti-pattern (L596, L605 category 5) — releasing from authoring workspace without verifying deployment targets received changes.
+
+### CAP-REL-025: Healthcheck Result Persistence (L605, ER-HEALTH-PERSIST)
+
+**SHOULD** requirements for healthcheck trend tracking:
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| CAP-REL-025-01 | ubiquitous | Healthcheck skill executions SHOULD append results to `.aget/logs/health_log.jsonl` | Trend analysis across sessions |
+| CAP-REL-025-02 | ubiquitous | Each Health_Log record SHOULD include: timestamp, check_name, status (OK/WARN/CRITICAL), details, and session_id | Session-correlated health data |
+| CAP-REL-025-03 | conditional | IF session wake-up includes health display THEN it SHOULD show trend vs. prior session (improved/stable/degraded) | Health trajectory visibility |
+| CAP-REL-025-04 | conditional | IF health status transitions from OK to WARN or CRITICAL THEN the system SHOULD flag the regression in wake-up | Regression detection |
+
+**Health_Log Record Schema:**
+
+```json
+{
+  "timestamp": "2026-02-20T19:50:00Z",
+  "session_id": "session_2026-02-20_1950",
+  "checks": [
+    {"name": "evolution_health", "status": "OK", "details": "185 L-docs, naming valid"},
+    {"name": "kb_health", "status": "WARN", "details": "ontology/ stale (>90 days)"}
+  ],
+  "summary": {"ok": 3, "warn": 1, "critical": 0}
+}
+```
+
+**V-Test for Health Persistence:**
+
+```bash
+# After healthcheck, log should have new entry
+[ -f ".aget/logs/health_log.jsonl" ] && echo "PASS: Health log exists" || echo "FAIL: No health log"
+```
+
+**Prevents**: Loss of health trajectory data — healthchecks currently produce ephemeral output with no cross-session comparison capability.
+
 ---
 
 ## Release Gate Structure
@@ -624,6 +861,11 @@ Standard release gates per PROJECT_PLAN:
 | CAP-REL-006-* | gh release view | Manual |
 | R-REL-010-* | validate_homepage_messaging.py | Planned |
 | R-REL-019-* | V-test scripts (handoff existence, context check) | Implemented |
+| CAP-REL-021-* | validation_logger.py (wraps existing scripts) | **v3.6.0** |
+| CAP-REL-022-* | run_gate.py (gate execution + enforcement) | **v3.6.0** |
+| CAP-REL-023-* | release_snapshot.py (pre/post state capture) | **v3.6.0** |
+| CAP-REL-024-* | propagation_audit.py (target verification) | **v3.6.0** |
+| CAP-REL-025-* | health_logger.py (wraps healthcheck skills) | **v3.6.0** |
 
 ---
 
@@ -668,6 +910,75 @@ release not found  ← Release missing!
 - [x] Templates at v3.1.0      ← Marked but never checked!
 ```
 
+### Anti-Pattern 4: Ephemeral Validation (L605)
+
+```
+❌ ANTI-PATTERN: Validation results vanish after execution
+
+$ python3 post_release_validation.py
+PASS: version coherence
+FAIL: template-worker-aget GitHub Release missing
+Exit code: 1
+
+# Session ends. Results gone. Next session: "Did we run validation? What failed?"
+# No audit trail. No trend analysis. No regression detection.
+```
+
+```
+✅ CORRECT: Validation appends to persistent log (CAP-REL-021)
+
+$ python3 post_release_validation.py
+# Stdout output as before, PLUS:
+# → Appended to .aget/logs/validation_log.jsonl
+# → Queryable: "Show all failures for v3.6.0"
+# → Comparable: "What failed this release vs. last?"
+```
+
+### Anti-Pattern 5: Manual Gate Enforcement (L605)
+
+```
+❌ ANTI-PATTERN: Human discipline as gate mechanism
+
+Gate 1: [x] Version updates complete  ← Manual checkbox
+Gate 2: [x] Documentation complete    ← Manual checkbox
+Gate 3: Proceed to release            ← Nothing verifies Gate 1 & 2 actually passed
+
+# SOP says "complete Gate 2 before Gate 3"
+# But nothing prevents jumping to Gate 3 if Gate 2 was skipped
+```
+
+```
+✅ CORRECT: Machine-enforced gate sequencing (CAP-REL-022)
+
+$ python3 run_gate.py --gate G7.2 --version 3.6.0
+BLOCKED: Gate G7.1 has no PASS record in gate_log.jsonl.
+Complete G7.1 before proceeding to G7.2.
+
+# Gate script reads gate_log.jsonl and refuses to proceed
+# No manual discipline required — machine enforces sequence
+```
+
+### Anti-Pattern 6: Workspace-Local Validation (L596, L605)
+
+```
+❌ ANTI-PATTERN: Validate authoring workspace, not deployment targets
+
+$ python3 validate_version_consistency.py  ← Runs in private-aget-framework-AGET
+PASS: All version files match v3.6.0
+
+# But template-worker-aget (what users clone) still at v3.5.0!
+# Validation passed in workspace; deployment target untouched.
+```
+
+```
+✅ CORRECT: Verify deployment targets received changes (CAP-REL-024)
+
+$ python3 propagation_audit.py --version 3.6.0
+template-worker-aget: version.json ✓, CHANGELOG.md ✗ (MISSING)
+template-advisor-aget: version.json ✓, CHANGELOG.md ✓
+INCOMPLETE: 1 target has missing propagation
+```
+
 ---
 
 ## References
@@ -677,6 +988,9 @@ release not found  ← Release missing!
 - L440: Manager Migration Verification Gap
 - L444: Version Inventory Coherence Requirement
 - L521: Version-Bearing File Specification-to-Tool Gap
+- L596: Workspace-Local Remediation Propagation Gap
+- L605: Release Observability and Enforcement Gap
+- L604: Systemic Top-Down-Only Framework Pattern
 - SOP_release_process.md
 - AGET_VERSIONING_CONVENTIONS.md
 - Keep a Changelog (https://keepachangelog.com)
@@ -685,6 +999,20 @@ release not found  ← Release missing!
 ---
 
 ## Changelog
+
+### v1.7.0 (2026-02-20)
+
+- Added CAP-REL-021: Persistent Validation Logging (ER-VALIDATE-LOG, L605)
+- Added CAP-REL-022: Gate Execution Enforcement (ER-GATE-ENFORCE, L605)
+- Added CAP-REL-023: Release State Snapshots (ER-RELEASE-SNAPSHOT, L605)
+- Added CAP-REL-024: Propagation Audit (ER-PROPAGATION-AUDIT, L605, L596)
+- Added CAP-REL-025: Healthcheck Result Persistence (ER-HEALTH-PERSIST, L605)
+- Added vocabulary: Validation_Log, Gate_Record, Release_Snapshot, Propagation_Audit_Record, Health_Log
+- Added anti-patterns: Ephemeral_Validation, Manual_Gate_Enforcement, Workspace_Local_Validation
+- 5 new CAP groups (24 EARS requirements) for release observability and enforcement
+- Enforcement table updated with 5 v3.6.0-targeted validators
+- Design principle: "The user is not the enforcement mechanism" (L605)
+- See: L605, L604, L596, VERSION_SCOPE_v3.6.0.md
 
 ### v1.6.0 (2026-02-15)
 
