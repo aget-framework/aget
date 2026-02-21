@@ -1,6 +1,6 @@
 # AGET Vocabulary Specification
 
-**Version**: 1.13.0
+**Version**: 1.14.0
 **Status**: Active
 **Category**: Core (Standards)
 **Format Version**: 1.2
@@ -313,6 +313,15 @@ Ontology_Consumption:
   aget:source: "L602 Ontology Behavioral Specification Gap"
   aget:theoretical_basis: "Syntactic-semantic gap (Guarino 1998): syntactic compliance does not guarantee semantic engagement"
   aget:note: "L602 root cause: framework specified structure without consumption behavior. This term names the gap."
+
+Vocabulary_Lattice:
+  skos:prefLabel: "Vocabulary_Lattice"
+  skos:definition: "The directed acyclic graph of vocabulary inheritance relationships from agent-level through template, fleet, and framework vocabularies to Aget_Core_Vocabulary."
+  skos:broader: "Inheritance_Chain"
+  skos:related: ["Vocabulary_Inheritance", "Inheritance_Resolution", "Aget_Core_Vocabulary"]
+  skos:scopeNote: "Generalizes Inheritance_Chain from a single path to a lattice, accommodating multi-source inheritance (e.g., agent inheriting both template and framework vocabularies). Template-adjacent agents like supervisors may inherit template ontology directly."
+  aget:source: "L601 cross-fleet survey, OBS-001 multi-level reconciliation"
+  aget:note: "Names the topology. Fleet-level vocabulary is an emerging concept — no agents currently define fleet vocabularies. Defer infrastructure until evidence exists (L289)."
 ```
 
 **L-doc References**: L482 (Executable Ontology - SKOS+EARS Grounding), L601 (Cross-Fleet Ontology Adoption Survey), L602 (Ontology Behavioral Specification Gap)
@@ -2575,6 +2584,13 @@ Full concept definitions with theoretical grounding are in:
 ---
 
 ## Changelog
+
+### v1.14.0 (2026-02-20)
+
+- **NEW**: `Vocabulary_Lattice` — names the DAG topology of multi-source vocabulary inheritance
+- Generalizes `Inheritance_Chain` to accommodate template-adjacent agents (e.g., supervisor inheriting template ontology)
+- Fleet-level vocabulary noted as emerging concept; infrastructure deferred per L289 (evidence-first)
+- **Source**: L601, OBS-001 multi-level reconciliation discussion
 
 ### v1.13.0 (2026-02-20)
 
