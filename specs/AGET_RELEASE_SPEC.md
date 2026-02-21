@@ -1,6 +1,6 @@
 # AGET Release Specification
 
-**Version**: 1.7.0
+**Version**: 1.8.0
 **Status**: Active
 **Category**: Process (Release Management)
 **Format Version**: 1.2
@@ -833,6 +833,34 @@ print('PASS' if latest['all_complete'] else 'FAIL: Incomplete propagation — ' 
 
 **Prevents**: Loss of health trajectory data — healthchecks currently produce ephemeral output with no cross-session comparison capability.
 
+### CAP-REL-026: Release Command Hazards (L589, L570, L594, ER-HAZARD)
+
+Release handoffs and migration scripts SHALL document platform-specific command hazards.
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| CAP-REL-026-01 | ubiquitous | Release handoffs using perl substitution SHALL escape `@` characters in replacement strings | L589: `@aget` interpolates as empty array in perl double-quoted strings |
+| CAP-REL-026-02 | ubiquitous | Release handoffs using sed on macOS SHALL use `sed -i ''` (empty extension) or prefer perl/Edit tool over in-place sed | L570: BSD sed `-i` without extension argument zeroes the file |
+| CAP-REL-026-03 | ubiquitous | Release handoff templates SHALL include a "Platform Hazards" section listing known command pitfalls | Prevents rediscovery of known hazards by downstream operators |
+| CAP-REL-026-04 | conditional | IF a release handoff includes shell commands for downstream execution THEN those commands SHALL be tested on the target platform before inclusion | L594: commands tested on Linux may fail on macOS and vice versa |
+
+**Known Hazards Registry:**
+
+| Hazard | Platform | Command | Symptom | Mitigation | L-doc |
+|--------|----------|---------|---------|------------|-------|
+| Perl sigil interpolation | All | `perl -pi -e 's/old/@new/'` | `@new` expands to empty array | Use `\@new` or single quotes around pattern | L589 |
+| BSD sed file zeroing | macOS | `sed -i 's/old/new/' file` | File becomes 0 bytes | Use `sed -i '' 's/old/new/' file` | L570 |
+| GNU/BSD sed flag incompatibility | Cross-platform | `sed -i` | Different `-i` semantics | Prefer perl or Edit tool for portability | L570 |
+
+**V-Test for Hazard Documentation:**
+
+```bash
+# V-REL-026: Handoff template includes Platform Hazards section
+grep -q "Platform Hazards\|Command Hazards" templates/RELEASE_HANDOFF_TEMPLATE.md && echo "PASS" || echo "FAIL: Missing hazard section"
+```
+
+**Prevents**: Rediscovery_Of_Known_Hazards anti-pattern — operators encountering documented hazards because the documentation wasn't included in release handoffs.
+
 ---
 
 ## Release Gate Structure
@@ -999,6 +1027,12 @@ INCOMPLETE: 1 target has missing propagation
 ---
 
 ## Changelog
+
+### v1.8.0 (2026-02-20)
+
+- Added CAP-REL-026: Release Command Hazards (ER-HAZARD, L589, L570, L594)
+- Added Known Hazards Registry (perl sigil, BSD sed, cross-platform sed)
+- See: L589, L570, L594, VERSION_SCOPE_v3.6.0.md
 
 ### v1.7.0 (2026-02-20)
 

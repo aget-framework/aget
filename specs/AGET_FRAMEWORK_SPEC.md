@@ -243,6 +243,23 @@ The SYSTEM shall validate Configuration on load.
 
 **Enforcement**: Configuration validation
 
+#### CAP-CORE-006: Framework Distribution Structure (v3.6.0)
+
+The SYSTEM shall validate Framework_Scope directory structure in the `aget/` distribution.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-CORE-006-01 | ubiquitous | The SYSTEM shall CHECK that `aget/specs/` directory exists and contains specification files |
+| CAP-CORE-006-02 | ubiquitous | The SYSTEM shall CHECK that `aget/docs/` directory exists |
+| CAP-CORE-006-03 | ubiquitous | The SYSTEM shall CHECK that `aget/sops/` directory exists and contains Framework_Sop files |
+| CAP-CORE-006-04 | ubiquitous | The SYSTEM shall CHECK that `aget/scripts/` directory exists and contains canonical session scripts |
+| CAP-CORE-006-05 | ubiquitous | The SYSTEM shall CHECK that `aget/validation/` directory exists and contains validator scripts |
+| CAP-CORE-006-06 | conditional | IF any Core_Directory is missing THEN the SYSTEM shall WARN "Missing framework directory: {name}" |
+
+**Enforcement**: `validate_template_references.py`
+
+**Source**: L568 (Framework Artifact Scope Specification Gap)
+
 ---
 
 ### CAP-SES: Session Protocol Requirements

@@ -1089,6 +1089,22 @@ template-{archetype}-aget/
 
 **Reference**: L574 (v3.5.0 Vocabulary & Skills Architecture), L486 (Ontology-Driven Creation)
 
+### CAP-TPL-017: Cross-Scope Reference Resolution (v3.6.0)
+
+The SYSTEM shall validate that template Artifact_References resolve to existing Framework_Artifacts.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-TPL-017-01 | ubiquitous | The SYSTEM shall extract Artifact_References from template markdown and YAML files |
+| CAP-TPL-017-02 | event-driven | WHEN validation runs, the SYSTEM shall resolve each Artifact_Reference to a Framework_Artifact in `aget/` |
+| CAP-TPL-017-03 | unwanted | Template artifacts shall NOT contain Dangling_References to non-existent framework artifacts |
+| CAP-TPL-017-04 | conditional | IF Cross_Scope_Reference cannot be resolved THEN the SYSTEM shall report the unresolvable reference |
+| CAP-TPL-017-05 | ubiquitous | Cross_Scope_References shall use explicit paths (e.g., `aget/sops/SOP_aget_create.md`) rather than bare filenames |
+
+**Enforcement**: `validate_template_references.py`
+
+**Source**: L568 (Framework Artifact Scope Specification Gap), CAP-SOP-005
+
 ---
 
 ## References
