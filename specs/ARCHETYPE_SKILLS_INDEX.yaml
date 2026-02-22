@@ -8,11 +8,11 @@
 # Purpose:
 # This index provides the authoritative registry of archetype-specific skills.
 # Each archetype has 2-3 specialized skills derived from its capability spec.
-# Skills are deployed to templates in addition to the universal 13 skills.
+# Skills are deployed to templates in addition to the universal skills.
 
 meta:
   version: "1.0.0"
-  framework_version: "3.5.0"
+  framework_version: "3.6.0"
   spec_reference: "AGET_TEMPLATE_SPEC.md"
   purpose: "Authoritative index for archetype-specific skills"
   project: "PROJECT_PLAN_archetype_customization_v3.5_v1.0.md"
