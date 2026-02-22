@@ -1,0 +1,189 @@
+{
+  "timestamp": "2026-02-22T08:21:45.674234+00:00",
+  "aget_version": "3.6.0",
+  "changes": {
+    "aget": {
+      "changelog_latest": {
+        "before": "3.5.0",
+        "after": "3.6.0"
+      },
+      "github_release": {
+        "before": "missing",
+        "after": "v3.6.0"
+      },
+      "version_json": {
+        "before": "3.5.0",
+        "after": "3.6.0"
+      }
+    },
+    "template-advisor-aget": {
+      "changelog_latest": {
+        "before": "3.5.0",
+        "after": "3.6.0"
+      },
+      "github_release": {
+        "before": "missing",
+        "after": "v3.6.0"
+      },
+      "version_json": {
+        "before": "3.5.0",
+        "after": "3.6.0"
+      }
+    },
+    "template-analyst-aget": {
+      "changelog_latest": {
+        "before": "3.5.0",
+        "after": "3.6.0"
+      },
+      "github_release": {
+        "before": "missing",
+        "after": "v3.6.0"
+      },
+      "version_json": {
+        "before": "3.5.0",
+        "after": "3.6.0"
+      }
+    },
+    "template-architect-aget": {
+      "changelog_latest": {
+        "before": "3.5.0",
+        "after": "3.6.0"
+      },
+      "github_release": {
+        "before": "missing",
+        "after": "v3.6.0"
+      },
+      "version_json": {
+        "before": "3.5.0",
+        "after": "3.6.0"
+      }
+    },
+    "template-consultant-aget": {
+      "changelog_latest": {
+        "before": "3.5.0",
+        "after": "3.6.0"
+      },
+      "github_release": {
+        "before": "missing",
+        "after": "v3.6.0"
+      },
+      "version_json": {
+        "before": "3.5.0",
+        "after": "3.6.0"
+      }
+    },
+    "template-developer-aget": {
+      "changelog_latest": {
+        "before": "3.5.0",
+        "after": "3.6.0"
+      },
+      "github_release": {
+        "before": "missing",
+        "after": "v3.6.0"
+      },
+      "version_json": {
+        "before": "3.5.0",
+        "after": "3.6.0"
+      }
+    },
+    "template-executive-aget": {
+      "changelog_latest": {
+        "before": "3.5.0",
+        "after": "3.6.0"
+      },
+      "github_release": {
+        "before": "missing",
+        "after": "v3.6.0"
+      },
+      "version_json": {
+        "before": "3.5.0",
+        "after": "3.6.0"
+      }
+    },
+    "template-operator-aget": {
+      "changelog_latest": {
+        "before": "3.5.0",
+        "after": "3.6.0"
+      },
+      "github_release": {
+        "before": "missing",
+        "after": "v3.6.0"
+      },
+      "version_json": {
+        "before": "3.5.0",
+        "after": "3.6.0"
+      }
+    },
+    "template-researcher-aget": {
+      "changelog_latest": {
+        "before": "3.5.0",
+        "after": "3.6.0"
+      },
+      "github_release": {
+        "before": "missing",
+        "after": "v3.6.0"
+      },
+      "version_json": {
+        "before": "3.5.0",
+        "after": "3.6.0"
+      }
+    },
+    "template-reviewer-aget": {
+      "changelog_latest": {
+        "before": "3.5.0",
+        "after": "3.6.0"
+      },
+      "github_release": {
+        "before": "missing",
+        "after": "v3.6.0"
+      },
+      "version_json": {
+        "before": "3.5.0",
+        "after": "3.6.0"
+      }
+    },
+    "template-spec-engineer-aget": {
+      "changelog_latest": {
+        "before": "3.5.0",
+        "after": "3.6.0"
+      },
+      "github_release": {
+        "before": "missing",
+        "after": "v3.6.0"
+      },
+      "version_json": {
+        "before": "3.5.0",
+        "after": "3.6.0"
+      }
+    },
+    "template-supervisor-aget": {
+      "changelog_latest": {
+        "before": "3.5.0",
+        "after": "3.6.0"
+      },
+      "github_release": {
+        "before": "missing",
+        "after": "v3.6.0"
+      },
+      "version_json": {
+        "before": "3.5.0",
+        "after": "3.6.0"
+      }
+    },
+    "template-worker-aget": {
+      "changelog_latest": {
+        "before": "3.5.0",
+        "after": "3.6.0"
+      },
+      "github_release": {
+        "before": "missing",
+        "after": "v3.6.0"
+      },
+      "version_json": {
+        "before": "3.5.0",
+        "after": "3.6.0"
+      }
+    }
+  },
+  "gaps": []
+}

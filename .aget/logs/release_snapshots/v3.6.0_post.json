@@ -1,0 +1,72 @@
+{
+  "timestamp": "2026-02-22T08:21:28.559686+00:00",
+  "aget_version": "3.6.0",
+  "phase": "post",
+  "repos": {
+    "aget": {
+      "version_json": "3.6.0",
+      "changelog_latest": "3.6.0",
+      "github_release": "v3.6.0"
+    },
+    "template-advisor-aget": {
+      "version_json": "3.6.0",
+      "changelog_latest": "3.6.0",
+      "github_release": "v3.6.0"
+    },
+    "template-analyst-aget": {
+      "version_json": "3.6.0",
+      "changelog_latest": "3.6.0",
+      "github_release": "v3.6.0"
+    },
+    "template-architect-aget": {
+      "version_json": "3.6.0",
+      "changelog_latest": "3.6.0",
+      "github_release": "v3.6.0"
+    },
+    "template-consultant-aget": {
+      "version_json": "3.6.0",
+      "changelog_latest": "3.6.0",
+      "github_release": "v3.6.0"
+    },
+    "template-developer-aget": {
+      "version_json": "3.6.0",
+      "changelog_latest": "3.6.0",
+      "github_release": "v3.6.0"
+    },
+    "template-executive-aget": {
+      "version_json": "3.6.0",
+      "changelog_latest": "3.6.0",
+      "github_release": "v3.6.0"
+    },
+    "template-operator-aget": {
+      "version_json": "3.6.0",
+      "changelog_latest": "3.6.0",
+      "github_release": "v3.6.0"
+    },
+    "template-researcher-aget": {
+      "version_json": "3.6.0",
+      "changelog_latest": "3.6.0",
+      "github_release": "v3.6.0"
+    },
+    "template-reviewer-aget": {
+      "version_json": "3.6.0",
+      "changelog_latest": "3.6.0",
+      "github_release": "v3.6.0"
+    },
+    "template-spec-engineer-aget": {
+      "version_json": "3.6.0",
+      "changelog_latest": "3.6.0",
+      "github_release": "v3.6.0"
+    },
+    "template-supervisor-aget": {
+      "version_json": "3.6.0",
+      "changelog_latest": "3.6.0",
+      "github_release": "v3.6.0"
+    },
+    "template-worker-aget": {
+      "version_json": "3.6.0",
+      "changelog_latest": "3.6.0",
+      "github_release": "v3.6.0"
+    }
+  }
+}
