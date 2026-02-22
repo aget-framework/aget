@@ -131,7 +131,7 @@ All specs with "Enforcement:" sections referencing missing validators should be 
 Run this to check current theater ratio:
 
 ```bash
-cd /Users/gabormelli/github/aget-framework/aget
+cd /path/to/aget-framework/aget
 
 # Count implemented
 implemented=$(ls validation/validate_*.py 2>/dev/null | wc -l)

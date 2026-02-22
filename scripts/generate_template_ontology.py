@@ -18,6 +18,11 @@ References:
     - L481: Ontology-Driven Agent Creation
     - L482: Executable Ontology - SKOS+EARS Grounding
     - R-REL-015: Template Ontology Conformance
+
+Exit Codes:
+    0: Success
+    1: Failure or validation errors
+    2: Configuration error
 """
 
 import argparse
@@ -455,7 +460,7 @@ def main():
     )
     parser.add_argument(
         "--framework-dir",
-        default="/Users/gabormelli/github/aget-framework",
+        default=os.environ.get('AGET_FRAMEWORK_DIR', '.'),
         help="Path to aget-framework directory"
     )
     parser.add_argument(

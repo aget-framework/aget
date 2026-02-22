@@ -518,7 +518,7 @@ def main():
     )
     parser.add_argument(
         '--base-dir',
-        default=os.environ.get('AGET_FRAMEWORK_DIR', '/Users/gabormelli/github/aget-framework'),
+        default=os.environ.get('AGET_FRAMEWORK_DIR', '.'),
         help='Base directory containing templates (default: AGET_FRAMEWORK_DIR or ~/github/aget-framework)'
     )
     parser.add_argument(

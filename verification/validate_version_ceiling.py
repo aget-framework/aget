@@ -201,7 +201,7 @@ def main():
         candidates = [
             instances_path.parent / "aget-framework" / "aget",
             instances_path.parent / "aget",
-            Path("/Users/gabormelli/github/aget-framework/aget"),
+            Path.cwd(),
         ]
         framework_path = None
         for candidate in candidates:

@@ -110,7 +110,7 @@ class TestExample:
 @pytest.fixture
 def aget_framework_path():
     """Return the path to the aget-framework directory."""
-    return Path('/Users/gabormelli/github/aget-framework')
+    return Path(os.environ.get('AGET_FRAMEWORK_DIR', str(Path(__file__).resolve().parents[3])))
 
 
 # ---------------------------------------------------------------------------

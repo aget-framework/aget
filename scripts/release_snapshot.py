@@ -13,6 +13,11 @@ Usage:
 
 Specification: AGET_RELEASE_SPEC.md CAP-REL-023
 Source: L605 (Release Observability Gap)
+
+Exit Codes:
+    0: Success
+    1: Failure or self-test failure
+    2: Missing pre/post snapshot files
 """
 
 import argparse
@@ -36,7 +41,13 @@ def get_framework_root() -> Path:
         candidate = current.parent.parent.parent
         if any((candidate / d).is_dir() for d in ['template-worker-aget', 'aget']):
             return candidate
-    return Path('/Users/gabormelli/github/aget-framework')
+    # Fallback: use parent of current working directory or cwd itself
+    cwd = Path.cwd()
+    if any((cwd / d).is_dir() for d in ['template-worker-aget', 'aget']):
+        return cwd
+    if any((cwd.parent / d).is_dir() for d in ['template-worker-aget', 'aget']):
+        return cwd.parent
+    return cwd
 
 
 def find_repos(framework_root: Path) -> list:
