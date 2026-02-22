@@ -1107,6 +1107,31 @@ The SYSTEM shall validate that template Artifact_References resolve to existing 
 
 ---
 
+### CAP-INST-001: Instance Content Accuracy (v3.7.0)
+
+Instance AGENTS.md and CLAUDE.md files SHALL maintain accuracy of factual claims. Unlike template-level requirements (CAP-TPL-*), this capability governs deployed instances where configuration contains operational claims (fleet size, agent counts, portfolio composition) that drift as the fleet evolves.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-INST-001-01 | event-driven | WHEN AGENTS.md or CLAUDE.md contains factual claims about fleet composition (agent count, portfolio breakdown), THEN those claims SHALL match current operational state |
+| CAP-INST-001-02 | event-driven | WHEN fleet composition changes (agents added, removed, or reorganized), THEN instance AGENTS.md files referencing fleet data SHALL be updated within one release cycle |
+| CAP-INST-001-03 | unwanted | Instance AGENTS.md files SHALL NOT contain stale fleet counts that diverge from operational reality by more than one release cycle |
+| CAP-INST-001-04 | conditional | IF an instance AGENTS.md references a specific count (e.g., "28 agents"), THEN that count SHALL be verified against .aget/version.json `manages` field or equivalent source-of-truth before each release |
+
+**V-Tests**:
+
+| ID | Test | BLOCKING | Procedure |
+|----|------|----------|-----------|
+| V-INST-001-01 | Fleet count in AGENTS.md matches operational count | YES | `grep -c "Fleet.*[0-9]" CLAUDE.md` and verify number matches supervisor's fleet roster |
+| V-INST-001-02 | Portfolio breakdown sums to fleet total | YES | Extract portfolio counts, verify sum equals stated total |
+| V-INST-001-03 | No stale fleet count from prior release | YES | Compare AGENTS.md fleet count to `MEMORY.md` current state |
+
+**Enforcement**: Manual verification at release gate; candidate for automation in P1.3 (L608 content integrity validators)
+
+**Source**: VERSION_SCOPE_v3.7.0 P1.8, L608 (content claim drift pattern)
+
+---
+
 ## References
 
 - AGET_5D_ARCHITECTURE_SPEC.md - Umbrella 5D specification
