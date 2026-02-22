@@ -1,10 +1,10 @@
 # SOP: Release Process
 
-**Version**: 1.7.0
+**Version**: 1.8.0
 **Created**: 2026-01-04
-**Updated**: 2026-02-15
+**Updated**: 2026-02-21
 **Owner**: aget-framework
-**Implements**: AGET_RELEASE_SPEC, CAP-REL-001 through CAP-REL-020, CAP-SOP-001, R-REL-006, R-REL-019, R-REL-042, CAP-MIG-017, L555-L559, L585, L587, R-SYNC-001
+**Implements**: AGET_RELEASE_SPEC, CAP-REL-001 through CAP-REL-025, CAP-SOP-001, R-REL-006, R-REL-019, R-REL-042, CAP-MIG-017, L555-L559, L585, L587, L605, R-SYNC-001
 
 ---
 
@@ -537,17 +537,55 @@ gh release view v{PREVIOUS} --repo aget-framework/aget
 
 ---
 
+## Release Observability Tooling (v3.6.0, L605)
+
+The following scripts provide persistent, structured observability throughout the release process. All are registered in `SCRIPT_REGISTRY.yaml`.
+
+| Script | CAP | Purpose | When to Use |
+|--------|-----|---------|-------------|
+| `scripts/validation_logger.py` | CAP-REL-021 | Wraps validation scripts with JSONL logging | Every validation step |
+| `scripts/run_gate.py` | CAP-REL-022 | Records gate completion, enforces sequencing | Gate boundaries |
+| `scripts/release_snapshot.py` | CAP-REL-023 | Pre/post release state capture + diff | Gate 0 (pre) and final gate (post) |
+| `scripts/propagation_audit.py` | CAP-REL-024 | Verifies template propagation | After template updates |
+| `scripts/health_logger.py` | CAP-REL-025 | Persistent healthcheck logging | Session wake-up, ad hoc |
+
+**Usage examples:**
+
+```bash
+# Wrap a validation with persistent logging
+python3 scripts/validation_logger.py --wrap scripts/pre_release_validation.py -- --version 3.6.0
+
+# Record gate completion
+python3 scripts/run_gate.py --gate G0 --version 3.6.0 --status pass --summary "V-G0.1 PASS, V-G0.2 PASS"
+
+# Pre-release snapshot
+python3 scripts/release_snapshot.py --version 3.6.0 --phase pre --skip-gh
+
+# Check propagation
+python3 scripts/propagation_audit.py --version 3.6.0 --check
+```
+
+---
+
 ## References
 
-- AGET_RELEASE_SPEC.md
+- AGET_RELEASE_SPEC.md (CAP-REL-001 through CAP-REL-025)
 - AGET_VERSIONING_CONVENTIONS.md
 - RELEASE_VERIFICATION_CHECKLIST.md
 - L440: Manager Migration Verification Gap
 - L435: Retrospective Requirement (CAP-REASON-008)
+- L605: Release Observability Gap
 
 ---
 
 ## Changelog
+
+### v1.8.0 (2026-02-21)
+
+- **Added Release Observability Tooling section** (CAP-REL-021 through 025, L605)
+  - Tool reference table: 5 scripts with CAP mappings and usage guidance
+  - Usage examples for validation logging, gate recording, snapshots, propagation
+  - Updated Implements header to include CAP-REL-021-025 and L605
 
 ### v1.7.0 (2026-02-15)
 

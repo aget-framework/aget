@@ -21,6 +21,10 @@ Usage:
     python3 study_up.py --topic "wind down"       # Research wind down
     python3 study_up.py --topic "release" --json  # JSON output
     python3 study_up.py --verify                  # Migration verification
+
+Exit Codes:
+    0: Success
+    1: Failure or no topic provided
 """
 
 import argparse

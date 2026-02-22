@@ -193,6 +193,48 @@ scripts:
     validates: manifest.yaml $ref references to components
 
   # ============================================================
+  # VALIDATORS - v3.6.0 additions
+  # ============================================================
+
+  - path: validation/validate_skill_deprecation.py
+    description: Validates skill deprecation lifecycle compliance
+    category: validator
+    version: 1.0.0
+    created: 2026-02-15
+    flags: [--help, --dir, --all, --base-dir, --check, --verbose]
+    exit_codes: [0, 1, 2]
+    validates: Skill deprecation lifecycle (CAP-SKILL-LIFE-001)
+    spec: AGET_SKILL_LIFECYCLE_SPEC.md
+
+  - path: validation/validate_template_references.py
+    description: Validates cross-template references and import consistency
+    category: validator
+    version: 1.0.0
+    created: 2026-02-15
+    flags: [--help]
+    exit_codes: [0, 1, 2]
+    validates: Template cross-references
+
+  - path: validation/validate_ontology_inheritance.py
+    description: Validates ontology inheritance chains across templates
+    category: validator
+    version: 1.0.0
+    created: 2026-02-15
+    flags: [--help]
+    exit_codes: [0, 1, 2]
+    validates: Ontology inheritance (CAP-INST-009)
+
+  - path: verification/validate_ontology_compliance.py
+    description: Validates ontology YAML files against AGET_INSTANTIATION_SPEC
+    category: validator
+    version: 1.0.0
+    created: 2026-02-15
+    flags: [--help, --dir, --all, --base-dir, --quiet, --json, --check]
+    exit_codes: [0, 1, 2]
+    validates: Ontology YAML compliance (CAP-INST-008)
+    spec: AGET_INSTANTIATION_SPEC.md
+
+  # ============================================================
   # MIGRATION SCRIPTS (scripts/)
   # ============================================================
 
@@ -395,14 +437,87 @@ scripts:
     exit_codes: [0, 1]
     status: skeleton
 
+  # ============================================================
+  # RELEASE OBSERVABILITY SCRIPTS (scripts/) - v3.6.0
+  # ============================================================
+
+  - path: scripts/validation_logger.py
+    description: Wraps validation scripts with persistent JSON logging
+    category: tool
+    version: 1.0.0
+    created: 2026-02-15
+    flags: [--help, --wrap, --log, --test, --script, --version, --passed, --failed, --exit-code, --details]
+    exit_codes: [0, 1, 3]
+    spec: AGET_RELEASE_SPEC.md
+    implements: CAP-REL-021
+
+  - path: scripts/run_gate.py
+    description: Records gate completion and enforces sequential progression
+    category: tool
+    version: 1.0.0
+    created: 2026-02-15
+    flags: [--help, --gate, --check, --history, --test, --version, --status, --summary, --prior-gate]
+    exit_codes: [0, 1, 2, 3]
+    spec: AGET_RELEASE_SPEC.md
+    implements: CAP-REL-022
+
+  - path: scripts/release_snapshot.py
+    description: Captures pre/post release state snapshots for diff-based validation
+    category: tool
+    version: 1.0.0
+    created: 2026-02-15
+    flags: [--help, --version, --phase, --diff, --framework-dir, --skip-gh, --test]
+    exit_codes: [0, 1, 2]
+    spec: AGET_RELEASE_SPEC.md
+    implements: CAP-REL-023
+
+  - path: scripts/propagation_audit.py
+    description: Tracks template propagation state across deployment targets
+    category: tool
+    version: 1.0.0
+    created: 2026-02-15
+    flags: [--help, --version, --check, --record, --framework-dir, --test]
+    exit_codes: [0, 1]
+    spec: AGET_RELEASE_SPEC.md
+    implements: CAP-REL-024
+
+  - path: scripts/health_logger.py
+    description: Persistent structured logging for health/housekeeping checks
+    category: tool
+    version: 1.0.0
+    created: 2026-02-15
+    flags: [--help, --wrap, --log, --test]
+    exit_codes: [0, 1, 3]
+    spec: AGET_RELEASE_SPEC.md
+    implements: CAP-REL-025
+
+  - path: scripts/study_up.py
+    description: Focused KB research on a specific topic before proposing changes
+    category: tool
+    version: 1.0.0
+    created: 2026-02-15
+    flags: [--help, --topic, --quiet, --json]
+    exit_codes: [0, 1]
+    spec: AGET_SESSION_SPEC.md
+    implements: CAP-SESSION-007
+
+  - path: scripts/generate_template_ontology.py
+    description: Generates ontology YAML files for templates from specs
+    category: tool
+    version: 1.0.0
+    created: 2026-02-15
+    flags: [--help, --template, --all, --framework-dir, --dry-run]
+    exit_codes: [0, 1, 2]
+    spec: AGET_INSTANTIATION_SPEC.md
+
 # Summary statistics
 summary:
-  total_scripts: 39
+  total_scripts: 50
   by_category:
-    validator: 21
-    tool: 6
+    validator: 25
+    tool: 13
     pattern: 12
   by_status:
-    active: 33
+    active: 44
     skeleton: 3
     planned: 3

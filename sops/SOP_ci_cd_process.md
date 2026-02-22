@@ -242,7 +242,7 @@ When updating CI configuration:
 Run contract tests to verify CI compliance:
 
 ```bash
-cd /Users/gabormelli/github/aget-framework/aget
+cd /path/to/aget-framework/aget
 python3 -m pytest tests/ci/test_ci_contract.py -v
 ```
 

@@ -13,6 +13,11 @@ Usage:
 
 Specification: AGET_RELEASE_SPEC.md CAP-REL-025
 Source: L605 (Release Observability Gap)
+
+Exit Codes:
+    0: Success
+    1: Failure or healthcheck errors
+    3: Configuration error
 """
 
 import argparse

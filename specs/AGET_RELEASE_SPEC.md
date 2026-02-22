@@ -680,6 +680,8 @@ AFTER=$(wc -l < .aget/logs/validation_log.jsonl 2>/dev/null || echo 0)
 
 **Prevents**: Ephemeral_Validation anti-pattern (L605) — validation results that vanish after execution.
 
+**Implementing Script**: `scripts/validation_logger.py` (SCRIPT_REGISTRY.yaml)
+
 ### CAP-REL-022: Gate Execution Enforcement (L605, ER-GATE-ENFORCE)
 
 **SHALL** requirements for gate sequencing enforcement:
@@ -720,6 +722,8 @@ python3 .aget/patterns/release/run_gate.py --gate G7.1 --version 3.6.0 2>&1
 
 **Prevents**: Manual_Gate_Enforcement anti-pattern (L605) — relying on human checkpoint discipline instead of machine verification.
 
+**Implementing Script**: `scripts/run_gate.py` (SCRIPT_REGISTRY.yaml)
+
 ### CAP-REL-023: Release State Snapshots (L605, ER-RELEASE-SNAPSHOT)
 
 **SHALL/SHOULD** requirements for pre/post release state capture:
@@ -757,6 +761,8 @@ VERSION="3.6.0"
 ```
 
 **Prevents**: Post-release discovery of version drift and stale homepage (L605 categories 1 and 3).
+
+**Implementing Script**: `scripts/release_snapshot.py` (SCRIPT_REGISTRY.yaml)
 
 ### CAP-REL-024: Propagation Audit (L605, L596, ER-PROPAGATION-AUDIT)
 
@@ -799,6 +805,8 @@ print('PASS' if latest['all_complete'] else 'FAIL: Incomplete propagation — ' 
 
 **Prevents**: Workspace_Local_Validation anti-pattern (L596, L605 category 5) — releasing from authoring workspace without verifying deployment targets received changes.
 
+**Implementing Script**: `scripts/propagation_audit.py` (SCRIPT_REGISTRY.yaml)
+
 ### CAP-REL-025: Healthcheck Result Persistence (L605, ER-HEALTH-PERSIST)
 
 **SHOULD** requirements for healthcheck trend tracking:
@@ -832,6 +840,8 @@ print('PASS' if latest['all_complete'] else 'FAIL: Incomplete propagation — ' 
 ```
 
 **Prevents**: Loss of health trajectory data — healthchecks currently produce ephemeral output with no cross-session comparison capability.
+
+**Implementing Script**: `scripts/health_logger.py` (SCRIPT_REGISTRY.yaml)
 
 ### CAP-REL-026: Release Command Hazards (L589, L570, L594, ER-HAZARD)
 

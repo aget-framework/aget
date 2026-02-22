@@ -12,11 +12,16 @@ Usage:
 
 Specification: AGET_RELEASE_SPEC.md CAP-REL-024
 Source: L605 (Release Observability Gap), L596 (Propagation Gap)
+
+Exit Codes:
+    0: Success (or all targets propagated)
+    1: Incomplete propagation (--check mode)
 """
 
 import argparse
 import json
 import os
+import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -32,7 +37,13 @@ def get_framework_root() -> Path:
         candidate = current.parent.parent.parent
         if any((candidate / d).is_dir() for d in ['template-worker-aget', 'aget']):
             return candidate
-    return Path('/Users/gabormelli/github/aget-framework')
+    # Fallback: use parent of current working directory or cwd itself
+    cwd = Path.cwd()
+    if any((cwd / d).is_dir() for d in ['template-worker-aget', 'aget']):
+        return cwd
+    if any((cwd.parent / d).is_dir() for d in ['template-worker-aget', 'aget']):
+        return cwd.parent
+    return cwd
 
 
 def find_template_repos(framework_root: Path) -> list:
@@ -88,6 +99,66 @@ def check_ontology_dir(repo_path: Path) -> dict:
     return {'exists': True, 'yaml_count': yaml_count}
 
 
+def check_canonical_scripts(repo_path: Path) -> dict:
+    """Check if canonical session scripts exist in scripts/.
+
+    These are Framework_Artifacts that must be present in every template.
+    Per L598/L599: scripts/ is the canonical deployment target.
+    """
+    canonical = ['wake_up.py', 'wind_down.py', 'study_up.py']
+    scripts_dir = repo_path / 'scripts'
+    present = []
+    missing = []
+    for script in canonical:
+        if (scripts_dir / script).is_file():
+            present.append(script)
+        else:
+            missing.append(script)
+    return {
+        'present': present,
+        'missing': missing,
+        'complete': len(missing) == 0,
+    }
+
+
+def check_skill_script_refs(repo_path: Path) -> dict:
+    """Check that every skill's script references resolve to existing files.
+
+    Per L607 (Referential Integrity): propagating a skill definition without
+    its implementing script causes the skill to fail for users.
+    """
+    skills_dir = repo_path / '.claude' / 'skills'
+    if not skills_dir.is_dir():
+        return {'checked': 0, 'broken': [], 'complete': True}
+
+    broken = []
+    checked = 0
+    for skill_dir in sorted(skills_dir.iterdir()):
+        skill_md = skill_dir / 'SKILL.md'
+        if not skill_md.is_file():
+            continue
+        try:
+            content = skill_md.read_text(encoding='utf-8')
+        except Exception:
+            continue
+
+        # Find script references: python3 scripts/X.py or python3 .aget/patterns/*/X.py
+        for match in re.finditer(r'python3\s+(scripts/\S+\.py|\.aget/patterns/\S+\.py)', content):
+            script_ref = match.group(1)
+            checked += 1
+            if not (repo_path / script_ref).is_file():
+                broken.append({
+                    'skill': skill_dir.name,
+                    'reference': script_ref,
+                })
+
+    return {
+        'checked': checked,
+        'broken': broken,
+        'complete': len(broken) == 0,
+    }
+
+
 def audit_propagation(version: str, framework_root: Path) -> dict:
     """Audit propagation across all template repos (CAP-REL-024-01 through 024-04)."""
     repos = find_template_repos(framework_root)
@@ -129,6 +200,21 @@ def audit_propagation(version: str, framework_root: Path) -> dict:
             target['complete'] = False
             target['missing'].append('ontology')
 
+        # Check canonical scripts (L598/L599)
+        scripts_check = check_canonical_scripts(repo)
+        target['checks']['canonical_scripts'] = scripts_check
+        if not scripts_check['complete']:
+            target['complete'] = False
+            target['missing'].append(f"scripts({','.join(scripts_check['missing'])})")
+
+        # Check skill→script referential integrity (L607)
+        refs_check = check_skill_script_refs(repo)
+        target['checks']['skill_script_refs'] = refs_check
+        if not refs_check['complete']:
+            target['complete'] = False
+            for b in refs_check['broken']:
+                target['missing'].append(f"ref({b['skill']}→{b['reference']})")
+
         if not target['complete']:
             record['all_complete'] = False
 
@@ -164,6 +250,9 @@ def run_self_test() -> bool:
         (t1 / 'CHANGELOG.md').write_text('## v3.6.0\n- Changes\n')
         (t1 / 'ontology').mkdir()
         (t1 / 'ontology' / 'ONTOLOGY_worker.yaml').write_text('kind: OntologySpec\n')
+        (t1 / 'scripts').mkdir()
+        for s in ['wake_up.py', 'wind_down.py', 'study_up.py']:
+            (t1 / 'scripts' / s).write_text(f'# {s}\n')
 
         t2 = test_dir / 'template-advisor-aget'
         t2.mkdir()
@@ -198,18 +287,60 @@ def run_self_test() -> bool:
             print(f"  [-] T3 FAIL: Expected all_complete=false")
             failed += 1
 
-        # T4: Record serializable to JSONL
+        # T4: Canonical scripts check
+        t3_scripts = test_dir / 'template-scripts-aget'
+        t3_scripts.mkdir()
+        (t3_scripts / '.aget').mkdir()
+        (t3_scripts / 'scripts').mkdir()
+        (t3_scripts / 'scripts' / 'wake_up.py').write_text('# wake up\n')
+        (t3_scripts / 'scripts' / 'wind_down.py').write_text('# wind down\n')
+        # Missing study_up.py
+        sc = check_canonical_scripts(t3_scripts)
+        if not sc['complete'] and 'study_up.py' in sc['missing']:
+            print("  [+] T4 PASS: Missing canonical script detected")
+            passed += 1
+        else:
+            print(f"  [-] T4 FAIL: Expected missing study_up.py; missing={sc['missing']}")
+            failed += 1
+
+        # T5: Skill→script referential integrity
+        t4_refs = test_dir / 'template-refs-aget'
+        t4_refs.mkdir()
+        (t4_refs / '.claude' / 'skills' / 'test-skill').mkdir(parents=True)
+        (t4_refs / '.claude' / 'skills' / 'test-skill' / 'SKILL.md').write_text(
+            '# Test\n```bash\npython3 scripts/missing_script.py\n```\n'
+        )
+        rc = check_skill_script_refs(t4_refs)
+        if not rc['complete'] and any(b['reference'] == 'scripts/missing_script.py' for b in rc['broken']):
+            print("  [+] T5 PASS: Broken skill→script reference detected")
+            passed += 1
+        else:
+            print(f"  [-] T5 FAIL: Expected broken ref; broken={rc['broken']}")
+            failed += 1
+
+        # T6: Skill with valid script passes
+        (t4_refs / 'scripts').mkdir()
+        (t4_refs / 'scripts' / 'missing_script.py').write_text('# now exists\n')
+        rc2 = check_skill_script_refs(t4_refs)
+        if rc2['complete']:
+            print("  [+] T6 PASS: Valid skill→script reference passes")
+            passed += 1
+        else:
+            print(f"  [-] T6 FAIL: Expected complete; broken={rc2['broken']}")
+            failed += 1
+
+        # T7: Record serializable to JSONL
         try:
             line = json.dumps(record) + '\n'
             parsed = json.loads(line.strip())
             if parsed['aget_version'] == '3.6.0':
-                print("  [+] T4 PASS: Record serializes to JSONL")
+                print("  [+] T7 PASS: Record serializes to JSONL")
                 passed += 1
             else:
-                print(f"  [-] T4 FAIL: Version mismatch after serialization")
+                print(f"  [-] T7 FAIL: Version mismatch after serialization")
                 failed += 1
         except Exception as e:
-            print(f"  [-] T4 FAIL: Serialization error: {e}")
+            print(f"  [-] T7 FAIL: Serialization error: {e}")
             failed += 1
 
     finally:
