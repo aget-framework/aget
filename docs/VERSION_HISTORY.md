@@ -12,13 +12,127 @@ This document provides a complete timeline of AGET Framework versions and their 
 
 ## Current Version
 
-**v3.3.0** (2026-01-10) - Shell Integration + Executable Knowledge Ontology
+**v3.6.0** (2026-02-21) - Infrastructure Maturation
 
-All 12 template repositories have SKOS-compliant vocabularies: ✅
+All 13 repositories (aget + 12 templates) at v3.6.0: ✅
 
 ---
 
 ## Version Timeline
+
+### v3.6.0 (2026-02-21) ✅
+
+**Theme**: Infrastructure Maturation — observability, content integrity, ontology
+
+**Status**: Complete release (all repos)
+
+| Repository | Release | Notes |
+|------------|---------|-------|
+| aget | ✅ | Core framework + 5 observability scripts + 4 validators |
+| template-advisor-aget | ✅ | aget-studyup + platform claims + study_up.py |
+| template-analyst-aget | ✅ | aget-studyup + platform claims + study_up.py |
+| template-architect-aget | ✅ | aget-studyup + platform claims + study_up.py |
+| template-consultant-aget | ✅ | aget-studyup + platform claims + study_up.py |
+| template-developer-aget | ✅ | aget-studyup + platform claims + study_up.py |
+| template-executive-aget | ✅ | aget-studyup + platform claims + study_up.py |
+| template-operator-aget | ✅ | aget-studyup + platform claims + study_up.py |
+| template-researcher-aget | ✅ | aget-studyup + platform claims + study_up.py |
+| template-reviewer-aget | ✅ | aget-studyup + platform claims + study_up.py |
+| template-spec-engineer-aget | ✅ | aget-studyup + platform claims + study_up.py |
+| template-supervisor-aget | ✅ | aget-studyup + platform claims + study_up.py |
+| template-worker-aget | ✅ | aget-studyup + platform claims + study_up.py |
+
+**Key Features**:
+- Release observability tooling (L605): validation_logger, run_gate, release_snapshot, propagation_audit, health_logger
+- Content integrity remediation (L607, L608): 6 dimensions of claim-vs-reality drift fixed
+- Canonical scripts v2.0.0 (CSE-001): C3+C1 architecture (config-driven + hook-based extensions)
+- Universal skill: aget-studyup (14th universal, all 12 templates)
+- Vocabulary precision: 4 compliance behavioral terms (VOCABULARY_SPEC v1.16.0)
+- Platform claims: Claude Code, Codex CLI, Gemini CLI (Cursor/Aider → Experimental)
+- DEPLOYMENT_SPEC_v3.6.0.yaml for fleet deployment
+- Conformance tool v1.3.0 with v3.6.0 support
+
+**See**: CHANGELOG.md for detailed changes
+
+---
+
+### v3.5.0 (2026-02-14) ✅
+
+**Theme**: Archetype Customization + Issue Governance
+
+**Status**: Complete release (all repos)
+
+| Repository | Release | Notes |
+|------------|---------|-------|
+| aget | ✅ | Core framework + 26 archetype skills + issue governance |
+| template-advisor-aget | ✅ | 2 archetype skills + ontology |
+| template-analyst-aget | ✅ | 2 archetype skills + ontology |
+| template-architect-aget | ✅ | 2 archetype skills + ontology |
+| template-consultant-aget | ✅ | 2 archetype skills + ontology |
+| template-developer-aget | ✅ | 3 archetype skills + ontology |
+| template-executive-aget | ✅ | 2 archetype skills + ontology |
+| template-operator-aget | ✅ | 2 archetype skills + ontology |
+| template-researcher-aget | ✅ | 2 archetype skills + ontology |
+| template-reviewer-aget | ✅ | 2 archetype skills + ontology |
+| template-spec-engineer-aget | ✅ | 2 archetype skills + ontology |
+| template-supervisor-aget | ✅ | 3 archetype skills + ontology |
+| template-worker-aget | ✅ | 2 archetype skills + ontology |
+
+**Key Features**:
+- 26 archetype-specific skills across 12 archetypes
+- aget-file-issue universal skill (L520 compliance)
+- Archetype ontologies (ONTOLOGY_{archetype}.yaml) in SKOS+EARS format
+- Skills specification infrastructure (INDEX.md, SKILL_VOCABULARY.md, ONTOLOGY_skills.yaml)
+- DEPLOYMENT_SPEC_v3.5.0.yaml
+
+**See**: CHANGELOG.md for detailed changes
+
+---
+
+### v3.4.0 (2026-01-18) ✅
+
+**Theme**: Session Skills Maturity + Governance Formalization
+
+**Status**: Complete release (all repos)
+
+| Repository | Release | Notes |
+|------------|---------|-------|
+| aget | ✅ | Core framework + session enhancements |
+| template-advisor-aget | ✅ | Session protocol updates |
+| template-analyst-aget | ✅ | Session protocol updates |
+| template-architect-aget | ✅ | Session protocol updates |
+| template-consultant-aget | ✅ | Session protocol updates |
+| template-developer-aget | ✅ | Session protocol updates |
+| template-executive-aget | ✅ | Session protocol updates |
+| template-operator-aget | ✅ | Session protocol updates |
+| template-researcher-aget | ✅ | Session protocol updates |
+| template-reviewer-aget | ✅ | Session protocol updates |
+| template-spec-engineer-aget | ✅ | Session protocol updates |
+| template-supervisor-aget | ✅ | Session protocol updates |
+| template-worker-aget | ✅ | Session protocol updates |
+
+**Key Features**:
+- Re-entrancy guard for wind_down (CAP-SESSION-010)
+- Calendar awareness in wake_up (CAP-SESSION-011)
+- Cross-CLI validation (Claude Code, Codex CLI, Gemini CLI)
+- Governance formalization patterns
+- Self-upgrade validation (L560)
+
+**See**: CHANGELOG.md for detailed changes
+
+---
+
+### v3.3.1 (2026-01-11) ✅
+
+**Theme**: Repository Visibility Governance
+
+**Status**: Complete release (all repos)
+
+**Key Features**: R-REL-016/017/018 repository visibility rules
+
+**See**: CHANGELOG.md for detailed changes
+
+---
 
 ### v3.3.0 (2026-01-10) ✅
 
@@ -263,18 +377,23 @@ During the transition from private experimentation to public framework:
 
 ---
 
-## Going Forward (v2.11.0+)
+## Going Forward (v3.6.0+)
 
 **Commitment**: Every version increment will include:
 
-1. ✅ Git tags (all 7 repos)
-2. ✅ GitHub Releases (all 7 repos)
+1. ✅ Git tags (all 13 repos)
+2. ✅ GitHub Releases (all 13 repos)
 3. ✅ Organization homepage update
 4. ✅ CHANGELOG entries
-5. ✅ Delta specification
+5. ✅ DEPLOYMENT_SPEC (fleet deployment target state)
 6. ✅ Migration guide (if breaking)
 
-**Validation**: Post-release validation script ensures user-visible completeness
+**Validation**: Release observability tooling ensures completeness:
+- `validation_logger.py` — structured pass/fail logging
+- `run_gate.py` — gate execution records
+- `release_snapshot.py` — pre-release state capture
+- `propagation_audit.py` — cross-repo consistency
+- `health_logger.py` — KB health tracking
 
 **Transparency**: Version gaps acknowledged, not hidden
 
@@ -293,19 +412,19 @@ Visit: https://github.com/aget-framework/aget/releases
 gh release list --repo aget-framework/aget
 
 # Clone specific version
-git clone --branch v2.11.0 https://github.com/aget-framework/aget.git
+git clone --branch v3.6.0 https://github.com/aget-framework/aget.git
 
 # Checkout existing clone
-git checkout v2.11.0
+git checkout v3.6.0
 ```
 
 ### Version Compatibility
 
 All templates share the same major.minor version:
-- aget: v2.11.0
-- template-*: v2.11.0
+- aget: v3.6.0
+- template-*: v3.6.0
 
-Templates at v2.11.x are compatible with aget v2.11.y (patch versions independent).
+Templates at v3.x.y are compatible with aget v3.x.z (patch versions independent).
 
 ---
 
@@ -319,5 +438,5 @@ We acknowledge historical gaps transparently and focus on complete releases goin
 ---
 
 *VERSION_HISTORY.md - Complete version timeline for AGET Framework*
-*Last Updated: 2026-01-10*
+*Last Updated: 2026-02-21*
 *Maintained by: aget-framework*
