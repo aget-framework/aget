@@ -163,9 +163,11 @@ AGET Framework aims for universal CLI compatibility:
 | CLI Tool | Compatibility | Notes |
 |----------|---------------|-------|
 | **Claude Code** | ✅ Primary support | Tested with each release |
-| **Cursor** | ✅ Compatible | AGENTS.md standard |
-| **Aider** | ✅ Compatible | AGENTS.md standard |
-| **Windsurf** | ✅ Compatible | AGENTS.md standard |
+| **Codex CLI** | ✅ Compatible | AGENTS.md standard |
+| **Gemini CLI** | ✅ Compatible | AGENTS.md standard |
+| **Cursor** | ⚠️ Experimental | AGENTS.md standard |
+| **Aider** | ⚠️ Experimental | AGENTS.md standard |
+| **Windsurf** | ⚠️ Experimental | AGENTS.md standard |
 | **Others** | ⚠️ Depends | If supports AGENTS.md |
 
 **Minimum Requirements**:

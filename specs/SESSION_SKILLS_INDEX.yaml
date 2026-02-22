@@ -13,7 +13,7 @@
 
 meta:
   version: "1.0.0"
-  framework_version: "3.5.0"
+  framework_version: "3.6.0"
   spec_reference: "AGET_SESSION_SPEC.md"
   purpose: "Authoritative index for session skill disambiguation"
   related_learnings:
