@@ -7,7 +7,7 @@
 **Format Version**: 1.2
 **Created**: 2026-01-04
 **Updated**: 2026-01-04
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/AGET_EXECUTABLE_KNOWLEDGE_SPEC.md`
 **Change Origin**: PROJECT_PLAN_executable_knowledge_ontology_v1.0 Gate 4
 **Related Specs**: AGET_VOCABULARY_SPEC, AGET_FILE_NAMING_CONVENTIONS

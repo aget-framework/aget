@@ -3,7 +3,7 @@
 **Version**: 1.0.0
 **Status**: Active
 **Created**: 2026-02-15
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Category**: Skills
 **Spec Reference**: SKILL_NAMING_CONVENTION_SPEC v1.1.0 (CAP-SKILL-DEP-001)
 

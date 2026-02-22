@@ -1,7 +1,7 @@
 # VALIDATION_REPORT: Claude Code v2.1.9
 
 **Date**: 2026-01-16
-**Tester**: private-aget-framework-AGET (automated + session validation)
+**Tester**: aget-framework (automated + session validation)
 **CLI**: Claude Code
 **CLI Version**: 2.1.9
 **Environment**: macOS Darwin 24.6.0, Python 3.9.6
@@ -190,4 +190,4 @@ $ claude --version
 
 *VALIDATION_REPORT_claude_code_v2.1.9.md*
 *Generated: 2026-01-16*
-*Tester: private-aget-framework-AGET*
+*Tester: aget-framework*

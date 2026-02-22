@@ -150,7 +150,7 @@ Question 3: Capabilities needed from other templates?
 +- Document in G1.3 METHODOLOGY.md
 ```
 
-**Skill Preview**: Each template includes 13 universal skills + archetype-specific skills (15-16 total).
+**Skill Preview**: Each template includes 14 universal skills + archetype-specific skills (16-17 total).
 
 ### V-Tests
 
@@ -556,7 +556,7 @@ ls private-{name}-aget/.aget/patterns/session/
 
 # V3.8: Archetype skills present (v3.5.0+)
 ls private-{name}-aget/.claude/skills/aget-*/SKILL.md | wc -l
-# Expected: 15-16 (13 universal + 2-3 archetype-specific)
+# Expected: 16-17 (14 universal + 2-3 archetype-specific)
 # Verify archetype skills match template:
 #   worker: execute-task, report-progress (2)
 #   supervisor: broadcast-fleet, review-agent, escalate-issue (3)

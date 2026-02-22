@@ -58,7 +58,7 @@ Each agent maintains explicit awareness of:
   "neighbors": {
     "upstream": ["supervisor-aget"],
     "downstream": ["template-advisor-aget", "template-worker-aget"],
-    "peers": ["private-other-framework-AGET"]
+    "peers": ["my-other-framework-AGET"]
   },
   "handoff_matrix": {
     "breaking_changes": "supervisor-aget",

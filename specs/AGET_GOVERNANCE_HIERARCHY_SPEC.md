@@ -6,7 +6,7 @@
 **Format Version**: 1.2
 **Created**: 2025-12-27
 **Updated**: 2025-12-27
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/AGET_GOVERNANCE_HIERARCHY_SPEC.md`
 **Change Origin**: G-PRE.3.2 P2 Specification Remediation
 **Related Specs**: AGET_TOOL_SPEC, AGET_VALIDATION_SPEC
@@ -311,7 +311,7 @@ authority:
 
   governed_by:
     spec: "AGET_GOVERNANCE_HIERARCHY_SPEC"
-    owner: "private-aget-framework-AGET"
+    owner: "aget-framework"
 
   layer_authority:
     specification:

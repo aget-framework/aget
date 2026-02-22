@@ -6,7 +6,7 @@
 **Format Version**: 1.2
 **Created**: 2025-12-26
 **Updated**: 2026-01-04
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/AGET_5D_ARCHITECTURE_SPEC.md`
 **Change Proposal**: CP-008
 **Change Origin**: L394 (Design by Fleet Exploration)
@@ -370,24 +370,24 @@ authority:
 
   governed_by:
     spec: "AGET_5D_ARCHITECTURE_SPEC"
-    owner: "private-aget-framework-AGET"
+    owner: "aget-framework"
 
   dimension_authority:
     D1_PERSONA:
       spec: "AGET_PERSONA_SPEC"
-      owner: "private-aget-framework-AGET"
+      owner: "aget-framework"
     D2_MEMORY:
       spec: "AGET_MEMORY_SPEC"
-      owner: "private-aget-framework-AGET"
+      owner: "aget-framework"
     D3_REASONING:
       spec: "AGET_REASONING_SPEC"
-      owner: "private-aget-framework-AGET"
+      owner: "aget-framework"
     D4_SKILLS:
       spec: "AGET_SKILLS_SPEC"
-      owner: "private-aget-framework-AGET"
+      owner: "aget-framework"
     D5_CONTEXT:
       spec: "AGET_CONTEXT_SPEC"
-      owner: "private-aget-framework-AGET"
+      owner: "aget-framework"
 
   agent_authority:
     can_autonomously:

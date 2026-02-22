@@ -521,4 +521,4 @@ echo "PASS: All repository READMEs valid"
 
 *R-PUB-001: Public Release Completeness*
 *Ensures user-visible release artifacts are complete, accessible, and authoritative*
-*Created: 2025-12-24 | Owner: private-aget-framework-AGET*
+*Created: 2025-12-24 | Owner: aget-framework*

@@ -36,7 +36,7 @@ This specification defines canonical file naming conventions for all AGET framew
 | H | Change Proposals | `CP-{NNN}_{name}.md` | `CP-001_capability.md` |
 | I | Protocols | `{NAME}_PROTOCOL.md` | `WAKE_UP_PROTOCOL.md` |
 | J | Checklists | `{NAME}_CHECKLIST.md` | `RELEASE_CHECKLIST.md` |
-| — | Directories | `{visibility}-{identifier}-{type}` | `private-supervisor-AGET` |
+| — | Directories | `{visibility}-{identifier}-{type}` | `my-supervisor-AGET` |
 
 ---
 
@@ -500,7 +500,7 @@ type:        aget (read-only) or AGET (action-taking)
 
 ```
 ✅ template-worker-aget
-✅ private-supervisor-AGET
+✅ my-supervisor-AGET
 ✅ public-OpenAI-DeepResearch-aget
 ```
 
@@ -524,7 +524,7 @@ Standard internal directories use lowercase:
 |---------|------------|---------|
 | TYPE prefix | SCREAMING_CASE | `PROJECT_PLAN`, `SPEC`, `SOP` |
 | Descriptive name (files) | snake_case | `file_naming_conventions` |
-| Descriptive name (dirs) | kebab-case | `private-supervisor-AGET` |
+| Descriptive name (dirs) | kebab-case | `my-supervisor-AGET` |
 | Sequence numbers | 3-digit padded | `001`, `012`, `338` |
 | Version prefix | lowercase v | `_v1.0`, `_v2.1-alpha` |
 | Date format | ISO 8601 | `2025-12-20` |

@@ -135,14 +135,28 @@ cd my-agent-name
 claude code .
 ```
 
-### With Cursor
+### With Codex CLI
+
+```bash
+cd my-agent-name
+codex
+```
+
+### With Gemini CLI
+
+```bash
+cd my-agent-name
+gemini
+```
+
+### With Cursor (Experimental — not validated)
 
 ```bash
 cd my-agent-name
 cursor .
 ```
 
-### With Aider
+### With Aider (Experimental — not validated)
 
 ```bash
 cd my-agent-name
@@ -167,7 +181,7 @@ Once your agent is running, use these commands:
 
 ## What's Included
 
-### Universal Skills (13)
+### Universal Skills (14)
 
 All templates include these skills:
 - `aget-wake-up` — Session initialization
@@ -219,7 +233,7 @@ ls ontology/ONTOLOGY_*.yaml
 
 # Verify archetype skills exist
 ls .claude/skills/aget-*/SKILL.md | wc -l
-# Should be 15-16 (13 universal + 2-3 archetype)
+# Should be 16-17 (14 universal + 2-3 archetype)
 
 # Run validation
 python3 -m pytest tests/ -v

@@ -1,7 +1,7 @@
 # VALIDATION_REPORT: Gemini CLI v0.23.0
 
 **Date**: 2026-01-16
-**Tester**: private-aget-framework-AGET (automated)
+**Tester**: aget-framework (automated)
 **CLI**: Gemini CLI (Google)
 **CLI Version**: 0.23.0
 **Environment**: macOS Darwin 24.6.0, Python 3.9.6
@@ -205,4 +205,4 @@ $ gemini --version
 
 *VALIDATION_REPORT_gemini_cli_v0.23.0.md*
 *Generated: 2026-01-16*
-*Tester: private-aget-framework-AGET*
+*Tester: aget-framework*

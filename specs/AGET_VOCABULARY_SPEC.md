@@ -6,7 +6,7 @@
 **Format Version**: 1.2
 **Created**: 2026-01-04
 **Updated**: 2026-02-20
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/AGET_VOCABULARY_SPEC.md`
 **Change Origin**: PROJECT_PLAN_standards_ontology_elevation_v1.0
 **Related Specs**: AGET_FRAMEWORK_SPEC
@@ -1147,7 +1147,7 @@ Aget_Instance:
   skos:definition: "Aget_AI_System that is configured using the AGET framework (version.json + AGENTS.md)."
   skos:broader: "Aget_AI_System"
   aget:core_entity: true
-  skos:example: "private-aget-framework-AGET is an Aget_Instance — an AI system configured via AGET."
+  skos:example: "my-framework-manager is an Aget_Instance — an AI system configured via AGET."
 
 Aget_Organization:
   skos:prefLabel: "Aget_Organization"

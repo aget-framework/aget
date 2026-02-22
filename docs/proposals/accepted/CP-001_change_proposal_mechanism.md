@@ -1,7 +1,7 @@
 ---
 proposal_id: CP-001
 title: Change Proposal Mechanism
-author: private-aget-framework-AGET
+author: aget-framework
 date_submitted: 2025-12-26
 status: CLOSED
 category: standards

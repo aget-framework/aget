@@ -23,8 +23,8 @@ abstract: |
   AGET is a platform-agnostic governance framework for CLI-based human-AI
   agentic work. It provides session continuity, shared memory architecture,
   fleet coordination, and human-supervised autonomy patterns that work
-  across AI coding assistants including Claude Code, Cursor, Aider, and
-  Windsurf.
+  across AI coding assistants. Validated platforms include Claude Code,
+  Codex CLI, and Gemini CLI.
 
 keywords:
   - agentic-ai

@@ -6,7 +6,7 @@
 **Format Version**: 1.2
 **Created**: 2025-12-26
 **Updated**: 2025-12-27
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/AGET_CHANGE_PROPOSAL_SPEC.md`
 **Change Proposal**: CP-001
 
@@ -281,7 +281,7 @@ authority:
 
   governed_by:
     spec: "AGET_CHANGE_PROPOSAL_SPEC"
-    owner: "private-aget-framework-AGET"
+    owner: "aget-framework"
 
   agent_authority:
     can_autonomously:

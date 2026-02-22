@@ -31,7 +31,7 @@ L021 Verification Table:
     | 4 | governance/ | Check before verifying files |
     | 5 | evolution/ | Check before counting L-docs |
 
-Author: private-aget-framework-AGET (canonical template)
+Author: aget-framework (canonical template)
 Version: 1.0.0 (v3.1.0)
 """
 

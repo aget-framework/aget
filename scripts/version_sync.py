@@ -27,7 +27,7 @@ L021 Verification Table:
     | 2 | version.json | Load before reading version |
     | 3 | version.json | Verify writable before updating |
 
-Author: private-aget-framework-AGET
+Author: aget-framework
 Version: 1.0.0 (v3.1.0)
 """
 

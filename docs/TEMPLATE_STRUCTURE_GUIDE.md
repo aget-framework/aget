@@ -303,8 +303,8 @@ type: aget | AGET
 
 Examples:
 - template-worker-aget
-- private-supervisor-AGET
-- private-impact-aget
+- my-supervisor-AGET
+- my-impact-aget
 ```
 
 ### File Names

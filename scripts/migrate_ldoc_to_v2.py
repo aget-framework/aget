@@ -27,7 +27,7 @@ L021 Verification Table:
     | 3 | evolution/ | Verify directory exists |
     | 4 | Backup | Create backup before modifying |
 
-Author: private-aget-framework-AGET
+Author: aget-framework
 Version: 1.0.0 (v3.1.0)
 """
 

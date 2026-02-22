@@ -288,7 +288,7 @@ def main():
         # Default locations
         paths = [
             'specs/capabilities/',
-            '../private-aget-framework-AGET/specs/capabilities/',
+            os.environ.get('AGET_MANAGER_PATH', '../framework-manager') + '/specs/capabilities/',
         ]
         paths = [p for p in paths if os.path.exists(p)]
     elif args.paths:

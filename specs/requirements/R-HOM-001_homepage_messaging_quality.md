@@ -304,4 +304,4 @@ for use_case in homepage_use_cases:
 
 *R-HOM-001: Homepage Messaging Quality*
 *Ensures homepage claims are credible, audience-appropriate, and evidence-based*
-*Created: 2025-12-29 | Owner: private-aget-framework-AGET*
+*Created: 2025-12-29 | Owner: aget-framework*

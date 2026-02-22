@@ -2,7 +2,7 @@
 # JSON Schema for AGET Template Manifest v3.0 (5D Composition Architecture)
 # Version: 3.0.0
 # Created: 2025-12-27
-# Author: private-aget-framework-AGET
+# Author: aget-framework
 #
 # This schema defines the structure for template manifests v3.0, which declare
 # how agents are composed using the 5D Composition Architecture:
@@ -351,7 +351,7 @@ examples:
       description: "Foundation template for task execution agents"
       version: "3.0.0"
       created: "2025-12-27"
-      author: "private-aget-framework-AGET"
+      author: "aget-framework"
       inherits_from: null
     composition:
       persona:

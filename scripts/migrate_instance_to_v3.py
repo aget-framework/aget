@@ -26,7 +26,7 @@ Reference:
     - SOP_aget_migrate.md
     - AGET_INSTANCE_SPEC v1.0.0
 
-Author: private-aget-framework-AGET
+Author: aget-framework
 Date: 2025-12-27
 Updated: 2025-12-28 (G-1.9 directory discoverability)
 """
@@ -427,7 +427,7 @@ This directory contains governance artifacts that define agent boundaries and au
 ---
 
 *Template version: 1.0.0 (G-1.9 discoverability)*
-*Created by: private-aget-framework-AGET*
+*Created by: aget-framework*
 """
 
 
@@ -508,7 +508,7 @@ FLEET_MIGRATION_PLAN_v<version>.md
 ---
 
 *Template version: 1.0.0 (G-1.9 discoverability)*
-*Created by: private-aget-framework-AGET*
+*Created by: aget-framework*
 """
 
 
@@ -588,7 +588,7 @@ HANDOFF_<topic>_YYYY-MM-DD.md
 ---
 
 *Template version: 1.0.0 (G-1.9 discoverability)*
-*Created by: private-aget-framework-AGET*
+*Created by: aget-framework*
 """
 
 
@@ -868,7 +868,7 @@ def migrate_instance(
     current_version = get_current_version_info(agent_path)
     agent_name = current_version.get("agent_name", agent_path.name)
     portfolio = current_version.get("portfolio", "main")
-    managed_by = current_version.get("managed_by", "private-supervisor-AGET")
+    managed_by = current_version.get("managed_by", "my-supervisor-AGET")
     ldoc_count = count_ldocs(agent_path)
     project_plans = find_project_plans(agent_path)
 

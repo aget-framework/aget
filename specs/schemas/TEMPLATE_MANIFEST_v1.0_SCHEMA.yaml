@@ -2,7 +2,7 @@
 # JSON Schema for AGET Template Manifest (Agent Composition Declaration)
 # Version: 1.0.0
 # Created: 2025-12-24
-# Author: private-aget-framework-AGET
+# Author: aget-framework
 #
 # This schema defines the structure for template manifests, which declare
 # how agents are composed from base templates and capabilities.
@@ -484,4 +484,4 @@ $comment: |
     - COMPOSITION_SPEC_v1.0.md: Composition rules
 
   Created: 2025-12-24
-  Author: private-aget-framework-AGET
+  Author: aget-framework

@@ -6,7 +6,7 @@
 **Format Version**: 1.2
 **Created**: 2026-01-04
 **Updated**: 2026-01-04
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/AGET_DOCUMENTATION_SPEC.md`
 **Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.3
 **Related Specs**: AGET_FILE_NAMING_CONVENTIONS, AGET_TEMPLATE_SPEC

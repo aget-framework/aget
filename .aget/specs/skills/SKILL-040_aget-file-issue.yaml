@@ -6,7 +6,7 @@ status: active
 category: governance
 archetype: universal
 created: 2026-02-14
-author: private-aget-framework-AGET
+author: aget-framework
 related_specs:
   - AGET_ISSUE_GOVERNANCE_SPEC
   - L520

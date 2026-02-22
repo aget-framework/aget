@@ -6,7 +6,7 @@
 **Format Version**: 1.2
 **Created**: 2025-12-27
 **Updated**: 2025-12-27
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/AGET_COMPATIBILITY_SPEC.md`
 
 ---
@@ -367,7 +367,7 @@ authority:
 
   governed_by:
     spec: "AGET_COMPATIBILITY_SPEC"
-    owner: "private-aget-framework-AGET"
+    owner: "aget-framework"
 
   framework_authority:
     can_autonomously:

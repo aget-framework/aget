@@ -7,7 +7,7 @@
 **Format Version**: 1.2
 **Created**: 2026-01-06
 **Updated**: 2026-01-18
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/AGET_EVOLUTION_SPEC.md`
 **Change Origin**: L460 (Directory Semantics Reconciliation Gap), L461 (Evolution Entry Type Standardization)
 **Related Specs**: AGET_LDOC_SPEC, AGET_TEMPLATE_SPEC (CAP-TPL-013), AGET_FILE_NAMING_CONVENTIONS

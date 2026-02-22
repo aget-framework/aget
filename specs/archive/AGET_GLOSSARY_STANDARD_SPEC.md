@@ -6,7 +6,7 @@
 **Format Version**: 1.2
 **Created**: 2025-12-21
 **Updated**: 2025-12-27
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/AGET_GLOSSARY_STANDARD_SPEC.md`
 **Change Proposal**: CP-003
 **Enhancement**: [aget-framework/aget#9](https://github.com/aget-framework/aget/issues/9)
@@ -388,7 +388,7 @@ authority:
 
   governed_by:
     spec: "AGET_GLOSSARY_STANDARD_SPEC"
-    owner: "private-aget-framework-AGET"
+    owner: "aget-framework"
 
   agent_authority:
     can_autonomously:

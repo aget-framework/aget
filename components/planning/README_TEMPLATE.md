@@ -73,4 +73,4 @@ FLEET_MIGRATION_PLAN_v<version>.md
 ---
 
 *Template version: 1.0.0 (L403 pattern)*
-*Created by: private-aget-framework-AGET*
+*Created by: aget-framework*

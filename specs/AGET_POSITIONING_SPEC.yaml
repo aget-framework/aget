@@ -11,7 +11,7 @@ spec:
   status: canonical
   created: "2026-01-16"
   updated: "2026-02-15"
-  author: private-aget-framework-AGET
+  author: aget-framework
   related_specs:
     - AGET_IDENTITY_SPEC
     - AGET_VOCABULARY_SPEC
@@ -28,7 +28,7 @@ positioning:
   # What layer AGET occupies in the stack
   layer: "Governance substrate"
   layer_description: |
-    AGET sits above CLI agent platforms (Claude Code, Cursor, Aider) as a
+    AGET sits above CLI agent platforms (Claude Code, Codex CLI, Gemini CLI) as a
     governance layer. CLI agents are the runtime; AGET is the governance
     substrate that enables consistent behavior across platforms.
 
@@ -57,36 +57,12 @@ positioning:
         integration_status: "primary"
         notes: "Primary development platform, most mature integration"
 
-      - name: "Cursor"
-        type: "IDE"
-        vendor: "Cursor Inc"
-        relationship: "runtime"
-        integration_mechanism: ".cursor/rules, .cursorrules"
-        integration_status: "supported"
-        notes: "IDE-based, rules file integration"
-
-      - name: "Aider"
-        type: "CLI"
-        vendor: "Open Source"
-        relationship: "runtime"
-        integration_mechanism: ".aider.conf.yml, CONVENTIONS.md"
-        integration_status: "supported"
-        notes: "Git-focused, convention file integration"
-
-      - name: "Windsurf"
-        type: "IDE"
-        vendor: "Codeium"
-        relationship: "runtime"
-        integration_mechanism: "TBD"
-        integration_status: "planned"
-        notes: "Emerging platform, integration in development"
-
       - name: "Codex CLI"
         type: "CLI"
         vendor: "OpenAI"
         relationship: "runtime"
         integration_mechanism: "AGENTS.md, .codex/"
-        integration_status: "experimental"
+        integration_status: "compatible"
         notes: "Wrapper script pattern for session protocols"
 
       - name: "Gemini CLI"
@@ -94,8 +70,32 @@ positioning:
         vendor: "Google"
         relationship: "runtime"
         integration_mechanism: "Hooks (experimental)"
-        integration_status: "experimental"
+        integration_status: "compatible"
         notes: "Preview support, hooks system emerging"
+
+      - name: "Cursor"
+        type: "IDE"
+        vendor: "Cursor Inc"
+        relationship: "runtime"
+        integration_mechanism: ".cursor/rules, .cursorrules"
+        integration_status: "experimental"
+        notes: "IDE-based, rules file integration"
+
+      - name: "Aider"
+        type: "CLI"
+        vendor: "Open Source"
+        relationship: "runtime"
+        integration_mechanism: ".aider.conf.yml, CONVENTIONS.md"
+        integration_status: "experimental"
+        notes: "Git-focused, convention file integration"
+
+      - name: "Windsurf"
+        type: "IDE"
+        vendor: "Codeium"
+        relationship: "runtime"
+        integration_mechanism: "TBD"
+        integration_status: "experimental"
+        notes: "Emerging platform, integration in development"
 
   # -----------------------------------------------------------------------------
   # Strategic Thesis
@@ -239,7 +239,7 @@ positioning:
 
     - id: D7
       name: "Skills Architecture"
-      description: "39 skills (13 universal + 26 archetype-specific) enabling agent behavior"
+      description: "40 skills (14 universal + 26 archetype-specific) enabling agent behavior"
       mechanism: "Skill specs with constraints, SKOS vocabulary, deployment governance"
       benefit: "Agents have consistent, reusable capabilities across the fleet"
 

@@ -27,7 +27,7 @@ L021 Verification Table:
     | 2 | issue_routing.yaml | Load routing config |
     | 3 | GitHub CLI | Check gh available for --create |
 
-Author: private-aget-framework-AGET
+Author: aget-framework
 Version: 1.0.0 (v3.1.0)
 """
 

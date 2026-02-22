@@ -30,7 +30,7 @@ This guide covers:
    ```bash
    python3 -m pytest tests/ -v
    ```
-5. **Start using** with your CLI tool (Claude Code, Cursor, Aider, etc.)
+5. **Start using** with your CLI tool (Claude Code, Codex CLI, Gemini CLI, etc.)
 
 ### What You Get
 
@@ -38,7 +38,7 @@ This guide covers:
 |-----------|-------------|
 | `.aget/` | Agent configuration and evolution tracking |
 | `ontology/` | Domain concepts for your archetype |
-| `.claude/skills/` | 13 universal + 2-3 archetype skills |
+| `.claude/skills/` | 14 universal + 2-3 archetype skills |
 | `tests/` | Contract tests for validation |
 | `AGENTS.md` / `CLAUDE.md` | CLI tool configuration |
 
@@ -112,7 +112,7 @@ rm -rf /tmp/template-${ARCHETYPE}
 # Check ontology
 ls ontology/ONTOLOGY_*.yaml
 
-# Check skill count (should be 15-16)
+# Check skill count (should be 16-17)
 ls .claude/skills/aget-*/SKILL.md | wc -l
 
 # Run tests
@@ -139,7 +139,7 @@ Edit `.aget/version.json` to add migration entry:
 | Version updated | `jq '.aget_version' .aget/version.json` | `"3.5.0"` |
 | Archetype set | `jq '.archetype' .aget/version.json` | Your archetype |
 | Ontology exists | `ls ontology/ONTOLOGY_*.yaml` | 1 file |
-| Skills deployed | `ls .claude/skills/aget-*/SKILL.md \| wc -l` | 15-16 |
+| Skills deployed | `ls .claude/skills/aget-*/SKILL.md \| wc -l` | 16-17 |
 | Tests pass | `pytest tests/ -v` | All pass |
 
 ---
@@ -306,7 +306,7 @@ When filing issues:
 ### v3.5.0 (2026-02-14)
 
 - **Archetype Customization**: 12 archetype ontologies, 26 archetype skills
-- **Skill Framework**: 39 total skills (13 universal + 26 archetype)
+- **Skill Framework**: 40 total skills (14 universal + 26 archetype)
 - **Ontology-Driven Creation**: Vocabulary → Specification → Instance pattern
 - **SOP Updates**: SOP_aget_create v2.2.0, SOP_aget_migrate v1.2.0
 

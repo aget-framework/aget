@@ -3,7 +3,7 @@
 **Version**: 1.4.0
 **Status**: Active
 **Updated**: 2026-01-12
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 
 This document provides an index of all AGET framework specifications with their Spec IDs, status, authority level, and descriptions.
 

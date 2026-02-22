@@ -73,7 +73,7 @@ title: L-Doc Format v2 Proposal
 format_version: "2.0"
 created: 2026-01-04
 updated: 2026-01-04
-author: private-aget-framework-AGET
+author: aget-framework
 summary: |
   Structured L-doc format with YAML frontmatter enabling
   cross-agent pattern discovery and enforcement tracking.

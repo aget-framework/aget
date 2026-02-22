@@ -19,7 +19,7 @@ Exit codes:
     2: Errors found
     3: Configuration error
 
-Author: private-aget-framework-AGET
+Author: aget-framework
 Version: 1.0.0 (v3.1.0)
 """
 

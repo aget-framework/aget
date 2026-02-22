@@ -1,7 +1,7 @@
 ---
 proposal_id: CP-003
 title: Artifact Graduation Pathway
-author: private-aget-framework-AGET
+author: aget-framework
 date_submitted: 2025-12-26
 status: CLOSED
 category: standards

@@ -6,7 +6,7 @@
 **Format Version**: 1.2
 **Created**: 2025-12-26
 **Updated**: 2026-01-04
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/AGET_FRAMEWORK_SPEC.md`
 **Previous**: v2.11.0
 **Vocabulary**: AGET_GLOSSARY_STANDARD_SPEC.md
@@ -1014,7 +1014,7 @@ authority:
 
   governed_by:
     spec: "AGET_FRAMEWORK_SPEC"
-    owner: "private-aget-framework-AGET"
+    owner: "aget-framework"
 
   agent_authority:
     can_autonomously:

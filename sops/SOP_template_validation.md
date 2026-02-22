@@ -3,7 +3,7 @@
 **Version**: 1.0.0
 **Date**: 2026-01-11
 **Status**: Active
-**Owner**: private-aget-framework-AGET
+**Owner**: aget-framework
 **Implements**: CAP-TPL-014, R-REL-015
 
 ---

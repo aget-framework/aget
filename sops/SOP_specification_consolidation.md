@@ -2,7 +2,7 @@
 
 **Version**: 1.0.0
 **Created**: 2026-01-12
-**Owner**: private-aget-framework-AGET
+**Owner**: aget-framework
 **Related**: L434 (Spec Fragmentation), AGET_VOCABULARY_SPEC Part 7
 
 ---

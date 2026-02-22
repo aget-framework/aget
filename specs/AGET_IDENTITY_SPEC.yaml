@@ -11,7 +11,7 @@ spec:
   status: canonical
   created: "2026-01-16"
   updated: "2026-02-15"
-  author: private-aget-framework-AGET
+  author: aget-framework
   related_specs:
     - AGET_POSITIONING_SPEC
     - AGET_VOCABULARY_SPEC
@@ -45,8 +45,8 @@ identity:
       AGET is a platform-agnostic governance framework for CLI-based human-AI
       agentic work. It provides session continuity, shared memory architecture,
       fleet coordination, and human-supervised autonomy patterns that work
-      across AI coding assistants including Claude Code, Cursor, Aider, and
-      Windsurf.
+      across AI coding assistants. Validated platforms include Claude Code,
+      Codex CLI, and Gemini CLI.
 
     # Technical definition - for specifications, formal documents
     technical: |
@@ -65,7 +65,7 @@ identity:
       clarification: "AGET is a governance layer that works with any LLM backend"
 
     - id: NOT-2
-      statement: "A replacement for Claude Code, Cursor, or Aider"
+      statement: "A replacement for Claude Code, Codex CLI, or Gemini CLI"
       clarification: "AGET sits above these platforms as a governance substrate"
 
     - id: NOT-3
@@ -126,7 +126,7 @@ identity:
       - "Fleet coordination patterns"
       - "Governance boundaries and escalation"
       - "Template specifications and inheritance"
-      - "Skills architecture (13 universal + 26 archetype-specific)"
+      - "Skills architecture (14 universal + 26 archetype-specific)"
       - "Ontology-driven agent customization"
       - "12 archetype ecosystem"
 

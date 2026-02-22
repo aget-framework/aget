@@ -3,7 +3,7 @@
 **Version**: 1.2.0
 **Status**: Active
 **Updated**: 2026-01-07
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 
 This document provides traceability from L-docs and issues to CAP requirements and specifications.
 

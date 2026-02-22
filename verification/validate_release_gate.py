@@ -16,13 +16,13 @@ Requirements Implemented:
 Usage:
     python3 validate_release_gate.py <version> [--manager-path PATH]
     python3 validate_release_gate.py 3.2.0
-    python3 validate_release_gate.py 3.2.0 --manager-path ../private-aget-framework-AGET
+    python3 validate_release_gate.py 3.2.0 --manager-path ../framework-manager
 
 Exit Codes:
     0 - All validations passed
     1 - Validation failures detected
 
-Author: private-aget-framework-AGET
+Author: aget-framework
 Version: 1.1.0
 
 Changelog:
@@ -87,7 +87,7 @@ def validate_manager_version(
 
     if manager_path is None:
         # Try to find manager path
-        candidate = Path("../private-aget-framework-AGET")
+        candidate = Path(os.environ.get("AGET_MANAGER_PATH", "../framework-manager"))
         if candidate.exists():
             manager_path = candidate
         else:
@@ -370,7 +370,7 @@ def main():
         "--manager-path",
         type=Path,
         default=None,
-        help="Path to private-aget-framework-AGET (for R-REL-006)"
+        help="Path to framework manager agent (for R-REL-006)"
     )
     parser.add_argument(
         "-v", "--verbose",

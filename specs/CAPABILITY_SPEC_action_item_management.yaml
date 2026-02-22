@@ -6,7 +6,7 @@
 # Version: 1.0.0
 # Status: Draft
 # Created: 2026-01-09
-# Author: private-aget-framework-AGET
+# Author: aget-framework
 
 capability_id: capability-action-item-management
 version: "1.0.0"
@@ -30,7 +30,7 @@ metadata:
   category: "session-enhancement"
   priority: "P1"
 
-  author: "private-aget-framework-AGET"
+  author: "aget-framework"
   created: "2026-01-09"
 
   # EKO classification (L451)

@@ -254,7 +254,7 @@ During the transition from private experimentation to public framework:
 - **Internal versioning** (version.json, migration_history) was maintained ✅
 - **Public releases** (GitHub Releases, tags, announcements) were inconsistent ❌
 
-**Analysis**: See `.aget/evolution/L358_tags_vs_releases_github.md` in private-aget-framework-AGET
+**Analysis**: See `.aget/evolution/L358_tags_vs_releases_github.md` in the framework manager agent
 
 **Resolution**: Public framework governance established (v2.11.0+) with:
 - Post-release validation (user-visible state)
@@ -320,4 +320,4 @@ We acknowledge historical gaps transparently and focus on complete releases goin
 
 *VERSION_HISTORY.md - Complete version timeline for AGET Framework*
 *Last Updated: 2026-01-10*
-*Maintained by: private-aget-framework-AGET*
+*Maintained by: aget-framework*

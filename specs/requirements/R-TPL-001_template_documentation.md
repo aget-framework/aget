@@ -6,7 +6,7 @@
 **Format Version**: 1.2
 **Created**: 2025-12-29
 **Updated**: 2025-12-29
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/requirements/R-TPL-001_template_documentation.md`
 **Change Origin**: Gap analysis - internal specs not visible in public READMEs
 **Related Specs**: AGET_TEMPLATE_SPEC, WORKER_TEMPLATE_SPEC, R-PUB-001
@@ -217,7 +217,7 @@ authority:
 
   governed_by:
     spec: "R-TPL-001"
-    owner: "private-aget-framework-AGET"
+    owner: "aget-framework"
 
   enforcement:
     automated: "validate_readme_claims.py"
