@@ -2,7 +2,7 @@
 
 **Version**: 1.0.0
 **Status**: Active (v3.4.0)
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Reference**: L459 (Core Entity Vocabulary Vision), AGET_VOCABULARY_SPEC Part 6, CAP-TPL-012
 
 ---

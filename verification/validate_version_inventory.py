@@ -29,7 +29,7 @@ Exit Codes:
     0 - All validations passed (coherence verified)
     1 - Validation failures detected (version mismatch)
 
-Author: private-aget-framework-AGET
+Author: aget-framework
 Version: 1.1.0
 Created: 2026-01-04
 Updated: 2026-01-12

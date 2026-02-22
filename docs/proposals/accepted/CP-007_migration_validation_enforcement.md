@@ -1,7 +1,7 @@
 ---
 proposal_id: CP-007
 title: Migration Validation Enforcement
-author: private-aget-framework-AGET
+author: aget-framework
 date_submitted: 2025-12-26
 status: CLOSED
 category: process

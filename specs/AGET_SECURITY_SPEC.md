@@ -6,7 +6,7 @@
 **Format Version**: 1.2
 **Created**: 2026-01-04
 **Updated**: 2026-01-04
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/AGET_SECURITY_SPEC.md`
 **Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.6
 **Related Specs**: AGET_LICENSE_SPEC, AGET_TEMPLATE_SPEC

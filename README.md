@@ -7,8 +7,8 @@
 AGET is a platform-agnostic governance framework for CLI-based human-AI
 agentic work. It provides session continuity, shared memory architecture,
 fleet coordination, and human-supervised autonomy patterns that work
-across AI coding assistants including Claude Code, Cursor, Aider, and
-Windsurf.
+across AI coding assistants. Validated platforms include Claude Code,
+Codex CLI, and Gemini CLI.
 
 ## Philosophy
 
@@ -23,23 +23,25 @@ Windsurf.
 ## What AGET is NOT
 
 - **A specific AI model or runtime** — AGET is a governance layer that works with any LLM backend
-- **A replacement for Claude Code, Cursor, or Aider** — AGET sits above these platforms as a governance substrate
+- **A replacement for Claude Code, Codex CLI, or Gemini CLI** — AGET sits above these platforms as a governance substrate
 - **An autonomous AI system** — AGET explicitly requires human supervision and gate discipline
 - **A coding-only framework** — AGET supports advisory, consulting, supervision, and general knowledge work
 - **A vendor lock-in solution** — Three-tier degradation ensures portability (gh → git → filesystem)
 
 ## Supported Platforms
 
-AGET works across CLI agent platforms:
+AGET is designed to be platform-agnostic. Validated platforms:
 
-| Platform | Type | Integration |
-|----------|------|-------------|
-| Claude Code | CLI | `CLAUDE.md, .claude/` |
-| Cursor | IDE | `.cursor/rules, .cursorrules` |
-| Aider | CLI | `.aider.conf.yml, CONVENTIONS.md` |
-| Windsurf | IDE | `TBD` |
-| Codex CLI | CLI | `AGENTS.md, .codex/` |
-| Gemini CLI | CLI | `Hooks (experimental)` |
+| Platform | Type | Integration | Status |
+|----------|------|-------------|--------|
+| **Claude Code** | CLI | `CLAUDE.md, .claude/` | **Baseline** — primary development target |
+| **Codex CLI** | CLI | `AGENTS.md, .codex/` | **Compatible** — validated |
+| **Gemini CLI** | CLI | `AGENTS.md` | **Compatible** — validated |
+| Cursor | IDE | `.cursor/rules, .cursorrules` | Experimental — not validated |
+| Aider | CLI | `.aider.conf.yml, CONVENTIONS.md` | Experimental — not validated |
+| Windsurf | IDE | `TBD` | Experimental — not validated |
+
+See [CLI Support Matrix](docs/AGET_CLI_SUPPORT_MATRIX.md) for detailed validation status.
 
 ## Key Features
 
@@ -75,10 +77,10 @@ AGET provides **12 specialized archetypes**, each with purpose-built skills and 
 
 Each archetype includes:
 - **2-3 specialized skills** for archetype-specific workflows
-- **13 universal skills** shared across all agents (session, learning, health)
+- **14 universal skills** shared across all agents (session, learning, health)
 - **Formal ontology** defining domain vocabulary
 
-See [ARCHETYPE_GUIDE.md](docs/ARCHETYPE_GUIDE.md) for selection guidance.
+See [GETTING_STARTED.md](GETTING_STARTED.md) for archetype selection guidance.
 
 ## Ontology-Driven Design
 
@@ -125,7 +127,7 @@ Vocabulary → Specification → Implementation
 | [template-reviewer-aget](https://github.com/aget-framework/template-reviewer-aget) | reviewer | review-artifact, provide-feedback | Quality review |
 | [template-spec-engineer-aget](https://github.com/aget-framework/template-spec-engineer-aget) | spec-engineer | validate-spec, generate-requirement | Specification authoring |
 
-**All templates include**: 13 universal skills + archetype-specific skills.
+**All templates include**: 14 universal skills + archetype-specific skills.
 See [GETTING_STARTED.md](GETTING_STARTED.md) for archetype selection guidance.
 
 ## Session Protocols
@@ -140,7 +142,7 @@ See [GETTING_STARTED.md](GETTING_STARTED.md) for archetype selection guidance.
 
 ## Contributing
 
-Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions welcome! See the [Issues page](https://github.com/aget-framework/aget/issues) to report bugs or suggest features.
 
 ## License
 

@@ -37,7 +37,7 @@ Create `~/.aget/agents.zsh` with your agent shortcuts:
 
 ```zsh
 # ~/.aget/agents.zsh
-alias supervisor='aget ~/github/private-supervisor-AGET'
+alias supervisor='aget ~/github/my-supervisor-agent'
 alias myagent='aget ~/github/my-project-aget'
 ```
 
@@ -67,7 +67,7 @@ supervisor
 supervisor "implement the new feature"
 
 # Full form
-aget ~/github/private-supervisor-AGET "implement the new feature"
+aget ~/github/my-supervisor-agent "implement the new feature"
 ```
 
 ### Switching CLIs
@@ -125,15 +125,15 @@ Your personal agent aliases. Example:
 
 ```zsh
 # Core agents
-alias supervisor='aget ~/github/private-supervisor-AGET'
-alias framework='aget ~/github/aget-framework/private-aget-framework-AGET'
+alias supervisor='aget ~/github/my-supervisor-agent'
+alias framework='aget ~/github/aget-framework/my-framework-manager'
 
 # Project agents
-alias myproject='aget ~/github/my-project/private-myproject-aget'
+alias myproject='aget ~/github/my-project/my-project-agent'
 alias webapp='aget ~/github/webapp/agent'
 
 # Grouped by portfolio
-alias ccb='aget ~/github/GM-CCB/private-ccb-AGET'
+alias ccb='aget ~/github/my-org/my-ccb-AGET'
 ```
 
 ### profiles_local.zsh (Optional)
@@ -190,7 +190,7 @@ For large fleets, generate aliases from an inventory:
 ```bash
 # Generate aliases from FLEET_STATE.yaml
 python3 /path/to/aget/scripts/generate_agents_zsh.py \
-  --fleet ~/github/private-supervisor-AGET/FLEET_STATE.yaml \
+  --fleet ~/github/my-supervisor-agent/FLEET_STATE.yaml \
   --output ~/.aget/agents.zsh
 ```
 

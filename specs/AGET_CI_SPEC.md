@@ -6,7 +6,7 @@
 **Format Version**: 1.2
 **Created**: 2025-12-28
 **Updated**: 2025-12-28
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/AGET_CI_SPEC.md`
 **Change Origin**: L404 (CI Test Isolation Requirements)
 **Related Specs**: AGET_VALIDATION_SPEC, AGET_TEMPLATE_SPEC

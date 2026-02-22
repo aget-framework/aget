@@ -6,7 +6,7 @@
 **Format Version**: 1.2
 **Created**: 2025-12-27
 **Updated**: 2026-02-14
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/AGET_TEMPLATE_SPEC.md`
 **Change Proposal**: CP-017, CP-018
 **Change Origin**: L394 (Design by Fleet Exploration)
@@ -1008,7 +1008,7 @@ The SYSTEM shall support archetype-specific ontologies and skills.
 | CAP-TPL-016-01 | ubiquitous | The SYSTEM shall include ontology/ directory in each template |
 | CAP-TPL-016-02 | ubiquitous | The SYSTEM shall include ONTOLOGY_{archetype}.yaml in ontology/ |
 | CAP-TPL-016-03 | ubiquitous | The SYSTEM shall include .claude/skills/ directory with AGET skills |
-| CAP-TPL-016-04 | ubiquitous | The SYSTEM shall include 13 universal skills in all templates |
+| CAP-TPL-016-04 | ubiquitous | The SYSTEM shall include 14 universal skills in all templates |
 | CAP-TPL-016-05 | ubiquitous | The SYSTEM shall include archetype-specific skills per archetype |
 | CAP-TPL-016-06 | conditional | IF SKILL.md exists THEN it shall have valid YAML frontmatter |
 
@@ -1039,22 +1039,22 @@ ontology:
 
 | Archetype | Universal | Archetype Skills | Total |
 |-----------|:---------:|:----------------:|:-----:|
-| worker | 13 | execute-task, report-progress | 15 |
-| supervisor | 13 | broadcast-fleet, review-agent, escalate-issue | 16 |
-| developer | 13 | run-tests, lint-code, review-pr | 16 |
-| consultant | 13 | assess-client, propose-engagement | 15 |
-| advisor | 13 | assess-risk, recommend-action | 15 |
-| analyst | 13 | analyze-data, generate-report | 15 |
-| architect | 13 | design-architecture, assess-tradeoffs | 15 |
-| researcher | 13 | search-literature, document-finding | 15 |
-| operator | 13 | handle-incident, run-playbook | 15 |
-| executive | 13 | make-decision, review-budget | 15 |
-| reviewer | 13 | review-artifact, provide-feedback | 15 |
-| spec-engineer | 13 | validate-spec, generate-requirement | 15 |
+| worker | 14 | execute-task, report-progress | 16 |
+| supervisor | 14 | broadcast-fleet, review-agent, escalate-issue | 17 |
+| developer | 14 | run-tests, lint-code, review-pr | 17 |
+| consultant | 14 | assess-client, propose-engagement | 16 |
+| advisor | 14 | assess-risk, recommend-action | 16 |
+| analyst | 14 | analyze-data, generate-report | 16 |
+| architect | 14 | design-architecture, assess-tradeoffs | 16 |
+| researcher | 14 | search-literature, document-finding | 16 |
+| operator | 14 | handle-incident, run-playbook | 16 |
+| executive | 14 | make-decision, review-budget | 16 |
+| reviewer | 14 | review-artifact, provide-feedback | 16 |
+| spec-engineer | 14 | validate-spec, generate-requirement | 16 |
 
 #### Universal Skills (v3.5.0)
 
-All templates include these 13 universal skills:
+All templates include these 14 universal skills:
 
 | Skill | Category | Purpose |
 |-------|----------|---------|

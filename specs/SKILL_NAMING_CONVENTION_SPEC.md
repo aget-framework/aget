@@ -5,7 +5,7 @@
 **Category**: Specification (Skills)
 **Format Version**: 1.3
 **Created**: 2026-02-15
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/SKILL_NAMING_CONVENTION_SPEC.md`
 **Related Specs**: AGET_SESSION_SPEC, AGET_SKILL_SPEC
 **Related Learnings**: L582 (skill sync), Phase 2 v3.5.0 migration findings

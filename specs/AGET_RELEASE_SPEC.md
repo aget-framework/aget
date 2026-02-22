@@ -6,7 +6,7 @@
 **Format Version**: 1.2
 **Created**: 2026-01-04
 **Updated**: 2026-02-20
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/AGET_RELEASE_SPEC.md`
 **Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.2
 **Related Specs**: AGET_FRAMEWORK_SPEC, AGET_VERSIONING_CONVENTIONS
@@ -274,7 +274,7 @@ python3 -c "import json; v=json.load(open('.aget/version.json')); print('PASS' i
 **Repo Coordination Order:**
 
 ```
-1. private-aget-framework-AGET (manager) → version bump first
+1. framework-manager (manager) → version bump first
 2. aget-framework/aget (core) → version bump + CHANGELOG
 3. template-supervisor-aget → version bump + CHANGELOG
 4. template-worker-aget → version bump + CHANGELOG
@@ -337,7 +337,7 @@ python3 -c "import json; v=json.load(open('.aget/version.json')); print('PASS' i
 **Deep Release Notes Location:**
 
 ```
-private-aget-framework-AGET/release-notes/v{VERSION}.md
+framework-manager/release-notes/v{VERSION}.md
 ```
 
 ### R-REL-VER-001: Version-Bearing File Coherence (L521)
@@ -707,7 +707,7 @@ AFTER=$(wc -l < .aget/logs/validation_log.jsonl 2>/dev/null || echo 0)
   "checks_passed": 3,
   "checks_failed": 0,
   "validation_summary": "V7.1.1 PASS, V7.1.2 PASS, V7.1.3 PASS",
-  "operator": "private-aget-framework-AGET",
+  "operator": "framework-manager",
   "prior_gate": "G7.0"
 }
 ```
@@ -773,7 +773,7 @@ VERSION="3.6.0"
 | CAP-REL-024-01 | conditional | WHEN changes target template repos, the system SHALL log a Propagation_Audit_Record with expected targets and expected changes | Propagation planning |
 | CAP-REL-024-02 | ubiquitous | Each Propagation_Audit_Record SHALL include: source_repo, target_repos (array), expected_changes, actual_changes, propagation_complete (boolean) | Verifiable propagation state |
 | CAP-REL-024-03 | conditional | IF propagation_complete is false for any target THEN the associated PROJECT_PLAN or release gate SHALL NOT be marked complete | Prevents workspace-local-only validation |
-| CAP-REL-024-04 | ubiquitous | Propagation audit SHALL verify against deployment targets (template-*-aget repos), not the authoring workspace (private-aget-framework-AGET) | L596: measure where users clone from |
+| CAP-REL-024-04 | ubiquitous | Propagation audit SHALL verify against deployment targets (template-*-aget repos), not the authoring workspace (framework-manager) | L596: measure where users clone from |
 
 **Propagation_Audit_Record Schema:**
 
@@ -781,7 +781,7 @@ VERSION="3.6.0"
 {
   "timestamp": "2026-02-20T19:50:00Z",
   "aget_version": "3.6.0",
-  "source_repo": "private-aget-framework-AGET",
+  "source_repo": "framework-manager",
   "targets": [
     {"repo": "template-worker-aget", "expected": ["version.json", "CHANGELOG.md"], "actual": ["version.json", "CHANGELOG.md"], "complete": true},
     {"repo": "template-advisor-aget", "expected": ["version.json", "CHANGELOG.md"], "actual": ["version.json"], "complete": false, "missing": ["CHANGELOG.md"]}
@@ -914,7 +914,7 @@ Standard release gates per PROJECT_PLAN:
 ```
 ❌ ANTI-PATTERN: Manager behind managed repos
 
-private-aget-framework-AGET: v3.0.0  ← Still at old version!
+framework-manager: v3.0.0  ← Still at old version!
 aget-framework/aget: v3.1.0          ← Released
 templates: v3.1.0                    ← Released
 ```
@@ -922,7 +922,7 @@ templates: v3.1.0                    ← Released
 ```
 ✅ CORRECT: Manager updates first (R-REL-006)
 
-private-aget-framework-AGET: v3.1.0  ← Updated FIRST
+framework-manager: v3.1.0  ← Updated FIRST
 aget-framework/aget: v3.1.0          ← Then released
 templates: v3.1.0                    ← Then released
 ```
@@ -1001,7 +1001,7 @@ Complete G7.1 before proceeding to G7.2.
 ```
 ❌ ANTI-PATTERN: Validate authoring workspace, not deployment targets
 
-$ python3 validate_version_consistency.py  ← Runs in private-aget-framework-AGET
+$ python3 validate_version_consistency.py  ← Runs in framework-manager workspace
 PASS: All version files match v3.6.0
 
 # But template-worker-aget (what users clone) still at v3.5.0!

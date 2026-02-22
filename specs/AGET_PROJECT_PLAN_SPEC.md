@@ -6,7 +6,7 @@
 **Format Version**: 1.2
 **Created**: 2026-01-04
 **Updated**: 2026-01-18
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/AGET_PROJECT_PLAN_SPEC.md`
 **Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.7, Issue #30
 **Related Specs**: AGET_RELEASE_SPEC, AGET_REASONING_SPEC, AGET_SOP_SPEC

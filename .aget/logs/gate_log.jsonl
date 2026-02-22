@@ -1,0 +1,2 @@
+{"gate_id":"test-G0","timestamp":"2026-02-21T23:50:52.165453+00:00","aget_version":"test","status":"pass","checks_total":0,"checks_passed":0,"checks_failed":0,"validation_summary":"self_test PASS","operator":"unknown"}
+{"gate_id":"test-G1","timestamp":"2026-02-21T23:50:52.166256+00:00","aget_version":"test","status":"pass","checks_total":0,"checks_passed":0,"checks_failed":0,"validation_summary":"self_test PASS","operator":"unknown","prior_gate":"test-G0"}

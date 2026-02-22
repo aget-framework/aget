@@ -27,7 +27,7 @@ L021 Verification Table:
     | 2 | SOPs dir | Check sops/ exists |
     | 3 | Target SOP | Verify writable before modifying |
 
-Author: private-aget-framework-AGET
+Author: aget-framework
 Version: 1.0.0 (v3.1.0)
 """
 

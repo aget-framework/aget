@@ -15,7 +15,7 @@ Exit Codes:
     0 - All instances within ceiling
     1 - Version overrun detected (instance > framework)
 
-Author: private-aget-framework-AGET
+Author: aget-framework
 Version: 1.0.0
 Created: 2026-01-11
 Implements: CAP-REL-010, L517

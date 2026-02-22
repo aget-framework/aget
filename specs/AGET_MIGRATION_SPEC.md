@@ -6,7 +6,7 @@
 **Format Version**: 1.2
 **Created**: 2025-12-27
 **Updated**: 2026-02-20
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/AGET_MIGRATION_SPEC.md`
 
 ---
@@ -679,7 +679,7 @@ authority:
 
   governed_by:
     spec: "AGET_MIGRATION_SPEC"
-    owner: "private-aget-framework-AGET"
+    owner: "aget-framework"
 
   agent_authority:
     can_autonomously:

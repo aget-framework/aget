@@ -6,7 +6,7 @@
 **Format Version**: 1.2
 **Created**: 2025-12-28
 **Updated**: 2026-01-04
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/AGET_SOP_SPEC.md`
 **Change Origin**: Pre-migration conformance review
 **Related Specs**: AGET_VALIDATION_SPEC, AGET_FILE_NAMING_CONVENTIONS
@@ -294,7 +294,7 @@ authority:
 
   governed_by:
     spec: "AGET_SOP_SPEC"
-    owner: "private-aget-framework-AGET"
+    owner: "aget-framework"
 
   agent_authority:
     autonomous:

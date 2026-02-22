@@ -93,7 +93,7 @@ def load_fleet_yaml(fleet_file: Path) -> list[dict]:
     Expected format:
     agents:
       - name: supervisor
-        path: ~/github/private-supervisor-AGET
+        path: ~/github/my-supervisor-agent
         portfolio: main
     """
     if not HAS_YAML:

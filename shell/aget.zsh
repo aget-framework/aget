@@ -49,8 +49,8 @@ fi
 # with the appropriate wake-up prompt.
 #
 # Examples:
-#   aget ~/github/private-supervisor-AGET
-#   aget ~/github/private-supervisor-AGET "fix the authentication bug"
+#   aget ~/github/my-supervisor-agent
+#   aget ~/github/my-supervisor-agent "fix the authentication bug"
 #   AGET_CLI=gemini aget ~/github/my-agent "review the PR"
 #
 aget() {
@@ -149,8 +149,8 @@ USAGE
   aget <directory> [focus topic...]
 
 EXAMPLES
-  aget ~/github/private-supervisor-AGET
-  aget ~/github/private-supervisor-AGET "fix the authentication bug"
+  aget ~/github/my-supervisor-agent
+  aget ~/github/my-supervisor-agent "fix the authentication bug"
   AGET_CLI=gemini aget ~/github/my-agent "review the PR"
 
 With agent aliases:

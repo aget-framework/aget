@@ -1,6 +1,6 @@
 # Verification Inventory
 
-**Owner**: private-aget-framework-AGET
+**Owner**: aget-framework
 **Updated**: 2026-02-15
 **Reference**: L377 (Validation Suite Orchestration Gap)
 
@@ -128,4 +128,4 @@ python3 -m pytest tests/test_identity_contract.py -v
 
 *Inventory created: 2025-12-28*
 *Reference: L377 (Validation Suite Orchestration Gap)*
-*Owner: private-aget-framework-AGET*
+*Owner: aget-framework*

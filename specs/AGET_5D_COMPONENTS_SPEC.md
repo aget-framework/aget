@@ -6,7 +6,7 @@
 **Format Version**: 1.2
 **Created**: 2026-01-04
 **Updated**: 2026-01-04
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/AGET_5D_COMPONENTS_SPEC.md`
 **Change Origin**: PROJECT_PLAN_v3.2.0 Gate 3.2
 **Related Specs**: AGET_5D_ARCHITECTURE_SPEC, AGET_VOCABULARY_SPEC

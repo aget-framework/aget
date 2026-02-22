@@ -5,7 +5,7 @@
 **Category**: Standards (Governance)
 **Format Version**: 1.2
 **Created**: 2025-12-27
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/AGET_LICENSE_SPEC.md`
 
 ---
@@ -179,7 +179,7 @@ authority:
 
   governed_by:
     spec: "AGET_LICENSE_SPEC"
-    owner: "private-aget-framework-AGET"
+    owner: "aget-framework"
 
   framework_authority:
     license: "Apache-2.0"

@@ -6,7 +6,7 @@
 **Format Version**: 1.2
 **Created**: 2025-12-26
 **Updated**: 2025-12-27
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/AGET_MEMORY_SPEC.md`
 
 ---
@@ -386,7 +386,7 @@ The SYSTEM shall support L-doc scaling through indexing.
 ```yaml
 rationale:
   problem: "Real agents accumulate 300+ L-docs"
-  evidence: "private-supervisor-AGET: 338 L-docs"
+  evidence: "supervisor-agent: 338 L-docs"
   solution: "Index + flat structure"
   tradeoffs:
     index_overhead: "Minimal (generated automatically)"
@@ -405,7 +405,7 @@ authority:
 
   governed_by:
     spec: "AGET_MEMORY_SPEC"
-    owner: "private-aget-framework-AGET"
+    owner: "aget-framework"
 
   agent_authority:
     can_autonomously:

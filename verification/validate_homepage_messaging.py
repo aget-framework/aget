@@ -18,7 +18,7 @@ Exit Codes:
     0 - All validations passed
     1 - Validation failures detected
 
-Author: private-aget-framework-AGET
+Author: aget-framework
 Version: 1.0.0
 """
 

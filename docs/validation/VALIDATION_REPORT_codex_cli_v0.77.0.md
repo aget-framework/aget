@@ -1,7 +1,7 @@
 # VALIDATION_REPORT: Codex CLI v0.77.0
 
 **Date**: 2026-01-16
-**Tester**: private-aget-framework-AGET (automated)
+**Tester**: aget-framework (automated)
 **CLI**: Codex CLI (OpenAI)
 **CLI Version**: 0.77.0
 **Environment**: macOS Darwin 24.6.0, Python 3.9.6
@@ -205,4 +205,4 @@ codex-cli 0.77.0
 
 *VALIDATION_REPORT_codex_cli_v0.77.0.md*
 *Generated: 2026-01-16*
-*Tester: private-aget-framework-AGET*
+*Tester: aget-framework*

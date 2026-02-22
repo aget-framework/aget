@@ -2,7 +2,7 @@
 
 **Version**: 1.0.0
 **Date**: 2025-12-24
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Status**: Approved
 **Reference**: L330 (Capability Composition Architecture)
 

@@ -6,7 +6,7 @@
 **Format Version**: 1.2
 **Created**: 2025-12-26
 **Updated**: 2025-12-27
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/AGET_PYTHON_SCRIPT_SPEC.md`
 **Change Proposal**: CP-002
 
@@ -272,7 +272,7 @@ scripts:
     description: Validates manifest.yaml against TemplateManifest schema
     category: validator
     version: 1.0.0
-    author: private-aget-framework-AGET
+    author: aget-framework
     created: 2025-12-20
     flags:
       - --help
@@ -339,7 +339,7 @@ authority:
 
   governed_by:
     spec: "AGET_PYTHON_SCRIPT_SPEC"
-    owner: "private-aget-framework-AGET"
+    owner: "aget-framework"
 
   agent_authority:
     can_autonomously:

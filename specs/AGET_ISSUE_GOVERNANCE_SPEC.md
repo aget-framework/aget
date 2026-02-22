@@ -5,7 +5,7 @@
 **Category**: Process (Issue Management)
 **Format Version**: 1.3
 **Created**: 2026-01-11
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/AGET_ISSUE_GOVERNANCE_SPEC.md`
 **Change Origin**: PROJECT_PLAN_issue_governance_v1.0
 **Related Specs**: AGET_RELEASE_SPEC, AGET_TEMPLATE_SPEC, AGET_ORGANIZATION_SPEC

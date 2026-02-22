@@ -6,7 +6,7 @@
 **Format Version**: 1.2
 **Created**: 2025-12-27
 **Updated**: 2026-01-18
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/AGET_SESSION_SPEC.md`
 **Change Origin**: 5-why analysis on session continuity gaps (G-PRE.3.1)
 **Related Specs**: AGET_MEMORY_SPEC, AGET_INSTANCE_SPEC
@@ -477,7 +477,7 @@ authority:
 
   governed_by:
     spec: "AGET_SESSION_SPEC"
-    owner: "private-aget-framework-AGET"
+    owner: "aget-framework"
 
   agent_authority:
     autonomous:
@@ -713,7 +713,7 @@ aget() {
 }
 
 # Agent aliases
-alias supervisor='aget ~/github/private-supervisor-AGET'
+alias supervisor='aget ~/github/my-supervisor-agent'
 ```
 
 See `docs/SHELL_INTEGRATION.md` for full setup guide including:

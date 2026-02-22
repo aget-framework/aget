@@ -168,7 +168,7 @@ Add to your RSS reader for automatic notifications.
 - No breaking changes (unless major release)
 
 **Example**: v2.11.0 Memory Architecture
-- Proven in private-supervisor-AGET (L335)
+- Proven in supervisor agent (L335)
 - L352 traceability pattern validated across 5 requirement groups
 - 40 contract tests written
 - Full documentation (patterns, SOPs, L-docs)

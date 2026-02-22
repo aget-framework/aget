@@ -14,7 +14,7 @@ Options:
     --dry-run   Show what would be changed (default)
     --execute   Actually make changes
 
-Author: private-aget-framework-AGET
+Author: aget-framework
 Version: 1.0.0
 """
 
@@ -121,7 +121,7 @@ def generate_new_header(fields: Dict[str, str], spec_id: Optional[str], filename
     lines.append(f"**Format Version**: {fields.get('Format Version', '1.2')}")
     lines.append(f"**Created**: {fields.get('Created', str(date.today()))}")
     lines.append(f"**Updated**: {fields.get('Updated', str(date.today()))}")
-    lines.append(f"**Author**: {fields.get('Author', 'private-aget-framework-AGET')}")
+    lines.append(f"**Author**: {fields.get('Author', 'aget-framework')}")
 
     # Location
     location = fields.get("Location", f"`aget/specs/{filename}`")

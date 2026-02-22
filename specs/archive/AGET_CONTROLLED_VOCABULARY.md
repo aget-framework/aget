@@ -312,7 +312,7 @@ This document defines the canonical vocabulary for AGET framework specifications
 
 | Artifact Type | Pattern | Example |
 |---------------|---------|---------|
-| Agent directories | `{visibility}-{identifier}-{type}` | `private-supervisor-AGET` |
+| Agent directories | `{visibility}-{identifier}-{type}` | `my-supervisor-AGET` |
 | Specs | `{NAME}_SPEC_v{M}.{m}.yaml` | `WORKER_TEMPLATE_SPEC_v1.0.yaml` |
 | PROJECT_PLANs | `PROJECT_PLAN_{name}_v{M}.{m}.md` | `PROJECT_PLAN_file_naming_v1.0.md` |
 | ADRs | `ADR-{NNN}-{kebab-case}.md` | `ADR-001-initial-architecture.md` |
@@ -327,7 +327,7 @@ This document defines the canonical vocabulary for AGET framework specifications
 |---------|------------|---------|
 | TYPE prefix | SCREAMING_CASE | `PROJECT_PLAN`, `SPEC` |
 | Descriptive name (files) | snake_case | `file_naming_conventions` |
-| Descriptive name (dirs) | kebab-case | `private-supervisor-AGET` |
+| Descriptive name (dirs) | kebab-case | `my-supervisor-AGET` |
 | Version | `_v{M}.{m}` | `_v1.0`, `_v2.1-alpha` |
 
 ---

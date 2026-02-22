@@ -311,7 +311,7 @@ metadata:
   name: memory-management
   version: 1.0.0
   created: "2025-12-19"
-  author: private-aget-framework-AGET
+  author: aget-framework
   status: approved
   target_version: v2.12.0
 

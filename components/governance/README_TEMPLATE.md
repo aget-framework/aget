@@ -51,4 +51,4 @@ This directory contains governance artifacts that define agent boundaries and au
 ---
 
 *Template version: 1.0.0 (L403 pattern)*
-*Created by: private-aget-framework-AGET*
+*Created by: aget-framework*

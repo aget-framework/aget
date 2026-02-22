@@ -6,7 +6,7 @@
 **Format Version**: 1.2
 **Created**: 2026-01-04
 **Updated**: 2026-01-18
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/AGET_TESTING_SPEC.md`
 **Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.1
 **Related Specs**: AGET_VALIDATION_SPEC, AGET_CI_SPEC

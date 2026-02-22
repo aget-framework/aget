@@ -6,7 +6,7 @@
 **Format Version**: 1.2
 **Created**: 2025-12-27
 **Updated**: 2026-02-20
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/AGET_INSTANCE_SPEC.md`
 **Change Origin**: 5-why analysis on missing `knowledge/` directory (G-PRE.3.1)
 **Related Specs**: AGET_TEMPLATE_SPEC, AGET_5D_ARCHITECTURE_SPEC, AGET_PORTABILITY_SPEC
@@ -22,7 +22,7 @@ This specification defines the requirements for AGET agent instances. Instances 
 Analysis revealed that while AGET_TEMPLATE_SPEC defines template structure, no specification existed for instances:
 
 1. **No instance-specific requirements**: Templates have manifest_version, archetype fields; instances lacked formalization
-2. **Archetype baseline drift**: Instance pilot (private-aget-framework-AGET) missing `knowledge/` directory despite operator archetype requiring it
+2. **Archetype baseline drift**: Instance pilot (framework-manager) missing `knowledge/` directory despite operator archetype requiring it
 3. **Template vs instance confusion**: Users cloning templates encounter validation failures with no guidance
 4. **Instance migration undefined**: L395 pattern emerged from practice but lacked spec backing
 
@@ -137,7 +137,7 @@ The SYSTEM shall maintain instance identity distinct from templates.
 
 ```json
 {
-  "agent_name": "private-aget-framework-AGET",
+  "agent_name": "my-framework-manager",
   "version": "3.0.0",
   "instance_type": "aget",
   "manifest_version": "3.0",
@@ -397,7 +397,7 @@ authority:
 
   governed_by:
     spec: "AGET_INSTANCE_SPEC"
-    owner: "private-aget-framework-AGET"
+    owner: "aget-framework"
 
   agent_authority:
     autonomous:

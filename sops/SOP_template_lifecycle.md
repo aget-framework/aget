@@ -3,7 +3,7 @@
 **Version**: 1.0.0
 **Date**: 2026-01-11
 **Status**: Active
-**Owner**: private-aget-framework-AGET
+**Owner**: aget-framework
 **Implements**: L515 (Template Coherence Gap), #189 (Protocol Template Propagation)
 
 ---
@@ -36,7 +36,7 @@ This SOP applies to:
 
 ## Prerequisites
 
-- Template ownership (private-aget-framework-AGET for public framework)
+- Template ownership (framework manager for public framework)
 - Understanding of corresponding validator behavior
 - Access to `aget/validation/` directory
 

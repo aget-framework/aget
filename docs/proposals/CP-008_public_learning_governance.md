@@ -1,7 +1,7 @@
 ---
 proposal_id: CP-008
 title: Public Learning Governance
-author: private-aget-framework-AGET
+author: aget-framework
 date_submitted: 2026-01-11
 status: ACCEPTED
 category: process

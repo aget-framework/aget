@@ -3,7 +3,7 @@
 **Version**: 1.2.0
 **Created**: 2026-01-05
 **Updated**: 2026-01-11
-**Owner**: private-supervisor-AGET
+**Owner**: aget-framework
 **Implements**: CAP-MIG-017 (Remote Supervisor Upgrade)
 **Related**: L455 (AGENTS.md Invocation Verification), L457 (Cross-Machine Pre-Flight), AGET_RELEASE_SPEC, PROJECT_PLAN_fleet_v3.2_migration.md
 
@@ -316,9 +316,9 @@ sed -i '' "s/last_updated:.*/last_updated: '$(date +%Y-%m-%d)'/" ~/.../FLEET_STA
 #### Gate 5.1: Commit FLEET_STATE
 
 ```bash
-git -C ~/github/private-supervisor-AGET add .aget/fleet/FLEET_STATE.yaml
-git -C ~/github/private-supervisor-AGET commit -m "feat: Complete Fleet vX.Y.Z Migration"
-git -C ~/github/private-supervisor-AGET push
+git -C ~/github/my-supervisor-agent add .aget/fleet/FLEET_STATE.yaml
+git -C ~/github/my-supervisor-agent commit -m "feat: Complete Fleet vX.Y.Z Migration"
+git -C ~/github/my-supervisor-agent push
 ```
 
 #### Gate 5.2: Session Log

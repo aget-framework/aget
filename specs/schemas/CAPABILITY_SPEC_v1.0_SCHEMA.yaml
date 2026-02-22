@@ -2,7 +2,7 @@
 # JSON Schema for AGET Capability Specifications
 # Version: 1.0.0
 # Created: 2025-12-24
-# Author: private-aget-framework-AGET
+# Author: aget-framework
 #
 # This schema defines the structure for all capability specifications
 # in the AGET framework. Capabilities are composable behavioral units
@@ -517,7 +517,7 @@ examples:
       name: example-capability
       version: 1.0.0
       created: "2025-12-24"
-      author: private-aget-framework-AGET
+      author: aget-framework
       status: draft
     spec:
       name: example-capability
@@ -562,5 +562,5 @@ $comment: |
     - L332: Theoretical Grounding Protocol
 
   Created: 2025-12-24
-  Author: private-aget-framework-AGET
+  Author: aget-framework
   License: AGET Framework

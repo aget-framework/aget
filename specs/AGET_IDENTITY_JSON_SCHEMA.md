@@ -152,7 +152,7 @@ Different archetypes may include additional fields:
   "identity_dimensions": {
     "role": "Research Engineer (action-taking for POCs)",
     "scope": "CLI agent subsystems across multiple CLI tools",
-    "relationship_to_supervisor": "Child agent managed by private-supervisor-AGET",
+    "relationship_to_supervisor": "Child agent managed by my-supervisor-agent",
     "relationship_to_framework": "Research arm informing aget-framework governance"
   },
   "operating_principles": [
@@ -177,7 +177,7 @@ Different archetypes may include additional fields:
 
 ```json
 {
-  "name": "private-supervisor-AGET",
+  "name": "my-supervisor-agent",
   "created": "2025-09-24",
   "updated": "2026-01-08",
   "version": "1.0.0",

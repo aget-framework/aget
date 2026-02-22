@@ -4,7 +4,7 @@
 **Status**: Complete
 **Created**: 2026-01-07
 **Updated**: 2026-01-07
-**Author**: private-legalon-vp_of_ai-aget (cross-AGET discovery)
+**Author**: aget-framework (cross-AGET discovery)
 **Theme**: Shell helper prompt clarity
 **Tracking**: [Issue #53](https://github.com/aget-framework/aget/issues/53)
 **CAP-PP-011 Compliant**: Yes (all gates have V-tests)
@@ -123,7 +123,7 @@ Discovery: Principal noted inconsistent wake protocol execution when using the `
 
 #### V0.1: L050 exists
 ```bash
-[ -f ~/code/gmelli/private-legalon-vp_of_ai-aget/.aget/evolution/L050_directive_prompt_language_pattern.md ] && echo "PASS" || echo "FAIL"
+[ -f ~/code/my-org/my-agent/.aget/evolution/L050_directive_prompt_language_pattern.md ] && echo "PASS" || echo "FAIL"
 ```
 **Expected:** PASS
 
