@@ -15,6 +15,69 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.6.0] - 2026-02-21
+
+**Theme**: Infrastructure Maturation — observability, content integrity, ontology
+
+### Added
+
+- **Release Observability Tooling** (L605 remediation — 5 scripts):
+  - `scripts/validation_logger.py`: Persistent validation logging to `.aget/logs/validation_log.jsonl` (CAP-REL-021)
+  - `scripts/run_gate.py`: Gate execution enforcement with sequential dependencies (CAP-REL-022)
+  - `scripts/release_snapshot.py`: Pre/post release state snapshots (CAP-REL-023)
+  - `scripts/propagation_audit.py`: Template propagation tracking with referential integrity (CAP-REL-024)
+  - `scripts/health_logger.py`: Healthcheck result persistence (CAP-REL-025)
+
+- **Validation Tooling**:
+  - `verification/validate_template_references.py`: Reference integrity validation (Part A, ER-568)
+  - `verification/validate_ontology_inheritance.py`: Ontology inheritance resolution (CAP-INST-007)
+  - `verification/validate_skill_deprecation.py`: Skill deprecation lifecycle (CAP-SKILL-LIFE-001)
+
+- **Universal Skill**: `aget-studyup` — focused KB research before implementation (14th universal skill, propagated to all 12 templates)
+
+- **Canonical Script**: `scripts/study_up.py` — study-up protocol implementation
+
+- **DEPLOYMENT_SPEC_v3.6.0.yaml**: Complete target state specification for fleet deployment
+
+- **Vocabulary Terms** (AGET_VOCABULARY_SPEC v1.16.0):
+  - `Declarative_Compliance`, `Behavioral_Compliance`, `Compliance_Divergence`, `Instruction_Asymmetry` — precision terms from cross-fleet compliance research
+
+- **Spec Enhancements**:
+  - AGET_RELEASE_SPEC v1.8.0: CAP-REL-021 through CAP-REL-026, Known Hazards Registry (CAP-REL-026)
+  - AGET_MIGRATION_SPEC v1.6.0: CAP-MIG-018 lineage classification (7-scenario decision matrix)
+  - 11 artifact scope vocabulary terms (CAP-CORE-006, CAP-TPL-017, CAP-SOP-005)
+
+- **Learnings**: L606 (Development Standard Enforcement Gap), L607 (Referential Integrity Across Deployment Boundaries), L608 (Content Claim Drift)
+
+### Changed
+
+- **Canonical Scripts v2.0.0**: `wake_up.py` and `wind_down.py` rewritten with C3+C1 architecture (config-driven display + hook-based extensions)
+- **Platform Claims**: All AGENTS.md now reference "Claude Code, Codex CLI, Gemini CLI" (was "Claude Code, Cursor, Aider, Windsurf"). Cursor and Aider moved to "Experimental" in CLI Support Matrix.
+- **validate_ontology_compliance.py**: Extended with YAML ontology validation support (CAP-INST-008)
+- **SOP_release_process.md v1.8.0**: Three-pass update (requirement refs, tool refs, observability tooling section)
+- **SCRIPT_REGISTRY.yaml**: 50 entries (was 39, +11 new scripts)
+- **README.md**: Platform status table with CLI Support Matrix link
+- **GETTING_STARTED.md**: Added Codex CLI and Gemini CLI setup sections
+
+### Fixed
+
+- **Content Integrity** (6 dimensions of L607/L608):
+  - Private agent name sanitization: 134 instances removed from public repo
+  - template-spec-engineer-aget AGENTS.md: Replaced 1368-line copy-paste error with correct content
+  - 3 missing template AGENTS.md created (executive, operator, reviewer)
+  - Skill counts corrected: "13 universal" → "14 universal" in 8 files
+  - Sub-template platform claims: 15 files across 5 templates updated
+  - Dead links in README.md: ARCHETYPE_GUIDE.md → GETTING_STARTED.md, CONTRIBUTING.md → Issues page
+
+### Notes
+
+- This release builds enforcement tooling (Gates 1-3) before using it for release execution (Gates 4-6), breaking the cycle identified in L605
+- Phase 0.9 pilot subsumed by comprehensive conformance check (12/12 templates CONFORMANT)
+- 17 phantom SOPs documented as known gap (deferred to v3.7.0)
+- VERSION_HISTORY.md backfill included (v3.4.0, v3.5.0, v3.6.0 entries)
+
+---
+
 ## [3.5.0] - 2026-02-14
 
 **Theme**: Archetype Customization + Issue Governance
