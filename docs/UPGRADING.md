@@ -192,6 +192,90 @@ git commit -m "rollback: Revert to vOLD due to [issue]"
 
 ## Version-Specific Migration Guides
 
+### v3.5.0 → v3.6.0
+
+**Release Date**: 2026-02-21
+
+**Theme**: Infrastructure Maturation — Observability, Content Integrity, Ontology
+
+**Breaking Changes**: None. Fully backward compatible with v3.5.x.
+
+**Do I need to act?**
+- **YES** if: You want the new `aget-studyup` skill and updated platform claims
+- **NO** if: You only need the version bump (Steps 1-2 below)
+
+**New Features**:
+- `aget-studyup` skill (14th universal skill for KB research)
+- Release observability tooling (5 scripts)
+- Canonical scripts v2.0 (`scripts/` is now the deployment target)
+- Platform claims updated: Claude Code, Codex CLI, Gemini CLI
+
+**Prerequisite**: Sync your framework clone first (especially on remote machines):
+```bash
+cd /path/to/aget-framework/aget && git pull origin main
+cd /path/to/template-{archetype}-aget && git pull origin main
+
+# Verify v3.6.0 is available
+cat /path/to/aget-framework/aget/.aget/version.json | grep aget_version
+# Expected: "3.6.0"
+```
+
+**Migration Steps**:
+
+1. **Update version markers**:
+   ```bash
+   AGENT=/path/to/your-agent
+
+   # Use perl on macOS (not sed — see L570)
+   perl -pi -e 's/"aget_version": "3\.5\.0"/"aget_version": "3.6.0"/' $AGENT/.aget/version.json
+   perl -pi -e 's/@aget-version: 3\.5\.0/@aget-version: 3.6.0/' $AGENT/AGENTS.md
+   ```
+
+2. **Update platform claims** in AGENTS.md:
+   ```bash
+   # Change "Cursor, Aider, Windsurf" → "Claude Code, Codex CLI, Gemini CLI"
+   # Or if already listing Claude Code, add Codex CLI and Gemini CLI
+   ```
+
+3. **Deploy aget-studyup skill**:
+   ```bash
+   TEMPLATE=/path/to/template-{archetype}-aget
+
+   # Diff existing skills first (L582)
+   diff -rq "$AGENT/.claude/skills/aget-studyup" "$TEMPLATE/.claude/skills/aget-studyup" 2>/dev/null
+
+   # Deploy
+   cp -r $TEMPLATE/.claude/skills/aget-studyup $AGENT/.claude/skills/
+   ```
+
+4. **Deploy study_up.py script**:
+   ```bash
+   cp $TEMPLATE/scripts/study_up.py $AGENT/scripts/
+   ```
+
+5. **Add migration_history entry** to `.aget/version.json`:
+   ```json
+   "migration_history": [
+     "v3.5.0 -> v3.6.0: YYYY-MM-DD (Infrastructure Maturation)"
+   ]
+   ```
+
+6. **Verify**:
+   ```bash
+   python3 $AGENT/scripts/wake_up.py
+   # Should show v3.6.0
+
+   # Check for stale version references
+   grep -r "3\.5\.0" $AGENT --include="*.yaml" --include="*.json" | grep -v migration_history
+   # Expected: No results (or only feature-introduction markers)
+   ```
+
+**Estimated Time**: 5-10 minutes per agent
+
+**See Also**: [RELEASE_HANDOFF_v3.5.0.md](../handoffs/RELEASE_HANDOFF_v3.5.0.md) (format reference; v3.6.0 handoff forthcoming)
+
+---
+
 ### v3.4.0 → v3.5.0
 
 **Release Date**: 2026-02-14
@@ -623,4 +707,4 @@ For comprehensive cross-machine migration procedures, see:
 ---
 
 *UPGRADING.md - Safe version upgrade procedures*
-*Created: 2025-12-24 | Updated: 2026-01-11 | Version: 1.1*
+*Created: 2025-12-24 | Updated: 2026-02-22 | Version: 1.2*
