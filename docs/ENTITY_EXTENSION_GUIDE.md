@@ -50,13 +50,13 @@ entities:
   extends:
     Person:
       attributes:
-        - bar_number: {type: string}
-        - jurisdiction: {type: string}
+        - orcid: {type: string}
+        - institution: {type: string}
     Document:
       attributes:
-        - confidentiality: {type: enum, values: [public, confidential, privileged]}
+        - access_level: {type: enum, values: [open, restricted, embargoed]}
       relationships:
-        - subject_of: {target: Legal_Matter, cardinality: "0:many"}
+        - part_of: {target: Research_Study, cardinality: "0:many"}
 ```
 
 ---
@@ -152,18 +152,18 @@ extends:
 
 Extended entities remain compatible with consumers expecting the base entity.
 
-If code expects a `Person` with `name`, your extended `Legal_Person` with `name` + `bar_number` will work because `name` is still present.
+If code expects a `Person` with `name`, your extended `Research_Person` with `name` + `orcid` will work because `name` is still present.
 
 ---
 
 ## Extension Examples
 
-### Example 1: Legal Domain Agent
+### Example 1: Research Domain Agent
 
-A legal practice management agent needs attorneys and case documents:
+A research project management agent needs researchers and study documents:
 
 ```yaml
-# manifest.yaml for legal-practice-aget
+# manifest.yaml for research-project-aget
 
 entities:
   inherits:
@@ -176,29 +176,29 @@ entities:
   extends:
     Person:
       attributes:
-        - bar_number: {type: string}
-        - jurisdiction: {type: string}
-        - practice_areas: {type: array, items: string}
-        - billable_rate: {type: number}
+        - orcid: {type: string}
+        - institution: {type: string}
+        - research_areas: {type: array, items: string}
+        - h_index: {type: number}
       relationships:
-        - represents: {target: Organization, cardinality: "0:many"}
-        - assigned_cases: {target: Legal_Matter, cardinality: "0:many"}
+        - affiliated_with: {target: Organization, cardinality: "0:many"}
+        - assigned_studies: {target: Research_Study, cardinality: "0:many"}
 
     Document:
       attributes:
-        - document_type: {type: enum, values: [pleading, motion, contract, memo, letter]}
-        - confidentiality: {type: enum, values: [public, confidential, privileged]}
-        - court_filed: {type: boolean}
-        - filing_date: {type: date}
+        - document_type: {type: enum, values: [paper, proposal, report, dataset, review]}
+        - access_level: {type: enum, values: [open, restricted, embargoed]}
+        - peer_reviewed: {type: boolean}
+        - publication_date: {type: date}
       relationships:
-        - filed_in: {target: Court, cardinality: "0:1"}
-        - subject_of: {target: Legal_Matter, cardinality: "1:1"}
+        - published_in: {target: Journal, cardinality: "0:1"}
+        - part_of: {target: Research_Study, cardinality: "1:1"}
 
     Organization:
       attributes:
-        - client_type: {type: enum, values: [individual, corporation, government, nonprofit]}
-        - billing_address: {type: string}
-        - matter_limit: {type: number}
+        - org_type: {type: enum, values: [university, corporation, government, nonprofit]}
+        - department: {type: string}
+        - grant_capacity: {type: number}
       relationships:
         - primary_contact: {target: Person, cardinality: "1:1"}
 ```
@@ -359,10 +359,10 @@ When adding domain-specific attributes, document their purpose:
 extends:
   Person:
     attributes:
-      # Legal domain: Bar association membership
-      - bar_number: {type: string}
-      # Geographic scope of practice
-      - jurisdiction: {type: string}
+      # Research domain: Unique researcher identifier
+      - orcid: {type: string}
+      # Institutional affiliation
+      - institution: {type: string}
 ```
 
 ### 4. Use Standard Types

@@ -1,19 +1,20 @@
 # AGET Framework
 
-> Configuration & lifecycle management for governed agentic work
+> Persistent domain intelligence for governed agentic work
 
 ## What is AGET?
 
-AGET is a platform-agnostic governance framework for CLI-based human-AI
-agentic work. It provides session continuity, shared memory architecture,
+AGET enables AI agents that build persistent domain knowledge serving
+human decisions. It provides session continuity, shared memory architecture,
 fleet coordination, and human-supervised autonomy patterns that work
-across AI coding assistants. Validated platforms include Claude Code,
-Codex CLI, and Gemini CLI.
+across CLI agent platforms. Governance ensures knowledge accumulates
+reliably. Validated platforms include Claude Code, Codex CLI, and Gemini CLI.
 
 ## Philosophy
 
 **Human-AI collaboration quality over autonomous agent speed**
 
+- **Domain Intelligence First**: Agent value is measured by domain knowledge that serves human decisions
 - **Governed Autonomy**: Agents act autonomously within explicit boundaries
 - **Portable Memory**: Knowledge persists across sessions and platforms
 - **Platform Agnostic**: Patterns work across CLI agent platforms
@@ -45,8 +46,9 @@ See [CLI Support Matrix](docs/AGET_CLI_SUPPORT_MATRIX.md) for detailed validatio
 
 ## Key Features
 
-- **Platform Portability**: Three-tier degradation ensures functionality across environments
+- **Persistent Domain Knowledge**: Agents accumulate expertise that compounds across sessions
 - **Memory Architecture**: KB as shared collaboration substrate
+- **Platform Portability**: Three-tier degradation ensures functionality across environments
 - **Gate Discipline**: Explicit decision points with human approval
 - **Fleet Patterns**: Multi-agent coordination with clear authority
 - **Evidence-First Design**: Audit before architecture, validate before shipping
@@ -150,5 +152,5 @@ Apache License 2.0 - See [LICENSE](LICENSE)
 
 ---
 
-*Generated from specifications on 2026-02-15*
+*Generated from specifications on 2026-02-22*
 *See: [AGET_IDENTITY_SPEC.yaml](specs/AGET_IDENTITY_SPEC.yaml), [AGET_POSITIONING_SPEC.yaml](specs/AGET_POSITIONING_SPEC.yaml)*
