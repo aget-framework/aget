@@ -17,20 +17,20 @@ AGET provides **12 archetypes**, each with specialized skills and domain concept
 
 ### Archetype Selection Guide
 
-| If you need to... | Choose | Key Skills |
-|-------------------|--------|------------|
-| Execute tasks, track progress | **worker** | execute-task, report-progress |
-| Coordinate multiple agents | **supervisor** | broadcast-fleet, review-agent, escalate-issue |
-| Write, test, review code | **developer** | run-tests, lint-code, review-pr |
-| Provide guidance with personas | **advisor** | assess-risk, recommend-action |
-| Run strategic engagements | **consultant** | assess-client, propose-engagement |
-| Analyze data, generate reports | **analyst** | analyze-data, generate-report |
-| Design systems, evaluate tradeoffs | **architect** | design-architecture, assess-tradeoffs |
-| Research topics, document findings | **researcher** | search-literature, document-finding |
-| Handle incidents, run playbooks | **operator** | handle-incident, run-playbook |
-| Make decisions, review budgets | **executive** | make-decision, review-budget |
-| Review artifacts, provide feedback | **reviewer** | review-artifact, provide-feedback |
-| Write specifications, validate requirements | **spec-engineer** | validate-spec, generate-requirement |
+| If you need to... | Choose | Key Skills | Evidence |
+|-------------------|--------|------------|----------|
+| Execute tasks, track progress | **worker** | execute-task, report-progress | Demonstrated |
+| Coordinate multiple agents | **supervisor** | broadcast-fleet, review-agent, escalate-issue | Demonstrated |
+| Write, test, review code | **developer** | run-tests, lint-code, review-pr | Demonstrated |
+| Provide guidance with personas | **advisor** | assess-risk, recommend-action | Demonstrated |
+| Run strategic engagements | **consultant** | assess-client, propose-engagement | Template |
+| Analyze data, generate reports | **analyst** | analyze-data, generate-report | Template |
+| Design systems, evaluate tradeoffs | **architect** | design-architecture, assess-tradeoffs | Template |
+| Research topics, document findings | **researcher** | search-literature, document-finding | Demonstrated |
+| Handle incidents, run playbooks | **operator** | handle-incident, run-playbook | Template |
+| Make decisions, review budgets | **executive** | make-decision, review-budget | Template |
+| Review artifacts, provide feedback | **reviewer** | review-artifact, provide-feedback | Template |
+| Write specifications, validate requirements | **spec-engineer** | validate-spec, generate-requirement | Template |
 
 ### Decision Tree
 
