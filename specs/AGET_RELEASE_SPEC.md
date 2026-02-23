@@ -599,6 +599,7 @@ grep -q "$(date +%Y)" specs/AGET_IDENTITY_SPEC.yaml && echo "PASS: Identity spec
 | R-REL-019-04 | conditional | IF L-docs referenced THEN handoff SHALL explain the lesson (not just label) | Knowledge transfer |
 | R-REL-019-05 | conditional | IF archetype features added THEN handoff SHALL map features to archetypes | Applicability clarity |
 | R-REL-019-06 | ubiquitous | Handoff SHALL explain WHY and WHICH, not just WHAT | Curse of knowledge mitigation |
+| R-REL-019-07 | ubiquitous | AFTER release completion, release manager SHALL publish a sanitized handoff to the public framework repository at `aget/handoffs/RELEASE_HANDOFF_vX.Y.Z.md` | External fleet discoverability (L612) |
 
 **Vocabulary:**
 
@@ -621,11 +622,33 @@ External_Fleet:
 | Archetype Reference | Feature → archetype mapping | IF archetype features |
 | Pilot Tracking Template | Status table | YES |
 
+**Sanitization Requirements (R-REL-019-07):**
+
+The public handoff MUST NOT contain:
+- Private agent names (`private-*-aget`, `private-*-AGET`)
+- Private repository paths (`~/github/private-*`, `gmelli/*`)
+- Fleet size disclosures (e.g., "32 agents")
+- Internal tracking tables (pilot commit hashes, internal dates)
+
 **V-Test for Handoff Existence:**
 
 ```bash
 VERSION="X.Y.Z"
 [ -f "handoffs/RELEASE_HANDOFF_v${VERSION}.md" ] && echo "PASS" || echo "FAIL"
+```
+
+**V-Test for Public Handoff Existence (R-REL-019-07):**
+
+```bash
+VERSION="X.Y.Z"
+[ -f "aget/handoffs/RELEASE_HANDOFF_v${VERSION}.md" ] && echo "PASS" || echo "FAIL"
+```
+
+**V-Test for Sanitization (R-REL-019-07):**
+
+```bash
+VERSION="X.Y.Z"
+grep -c "private-" "aget/handoffs/RELEASE_HANDOFF_v${VERSION}.md" | grep -q "^0$" && echo "PASS" || echo "FAIL: contains private references"
 ```
 
 **V-Test for External Context:**
@@ -1037,6 +1060,13 @@ INCOMPLETE: 1 target has missing propagation
 ---
 
 ## Changelog
+
+### v1.9.0 (2026-02-22)
+
+- Added R-REL-019-07: Public handoff publication requirement (L612)
+- Added sanitization requirements for public handoffs (no private names, paths, fleet size)
+- Added V-tests for public handoff existence and sanitization
+- See: L612, PROJECT_PLAN_public_release_handoff_remediation_v1.0.md
 
 ### v1.8.0 (2026-02-20)
 
