@@ -107,10 +107,10 @@ Edit `.aget/version.json`:
 
 | Field | Description | Example |
 |-------|-------------|---------|
-| `agent_name` | Your agent's name | `my-legal-assistant` |
+| `agent_name` | Your agent's name | `my-dev-assistant` |
 | `instance_type` | `AGET` (action) or `aget` (advisory) | `AGET` |
 | `archetype` | From Step 1 | `developer` |
-| `domain` | Your work domain | `legal_contract_analysis` |
+| `domain` | Your work domain | `code_quality` |
 
 ---
 

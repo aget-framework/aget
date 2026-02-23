@@ -217,16 +217,16 @@ In each agent's `.aget/version.json`, set fleet reference:
 Add domain-specific concepts to `ontology/ONTOLOGY_{archetype}.yaml`:
 
 ```yaml
-# Example: Adding legal domain concepts to advisor ontology
+# Example: Adding research domain concepts to advisor ontology
 concepts:
   - id: C100
-    prefLabel: Legal_Case
-    definition: A legal matter being analyzed
+    prefLabel: Research_Study
+    definition: A research investigation being analyzed
     category: domain_extension
 
   - id: C101
-    prefLabel: Contract_Clause
-    definition: A specific provision within a contract
+    prefLabel: Finding
+    definition: A specific conclusion supported by evidence
     category: domain_extension
 ```
 
