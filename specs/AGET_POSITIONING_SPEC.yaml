@@ -7,10 +7,10 @@
 
 spec:
   name: AGET_POSITIONING_SPEC
-  version: "1.1.0"
+  version: "1.2.0"
   status: canonical
   created: "2026-01-16"
-  updated: "2026-02-15"
+  updated: "2026-02-22"
   author: aget-framework
   related_specs:
     - AGET_IDENTITY_SPEC
@@ -19,6 +19,9 @@ spec:
     - L545  # Strategic Positioning Evolution
     - L143  # Framework Landscape Positioning
     - L530  # Ontology Foundation Research
+    - L407  # Pain-Point Framing Superiority
+    - L408  # 5D Use Case Characterization
+    - L610  # Evidence-Based Positioning Reframe
 
 # =============================================================================
 # POSITIONING
@@ -26,11 +29,12 @@ spec:
 
 positioning:
   # What layer AGET occupies in the stack
-  layer: "Governance substrate"
+  layer: "Domain intelligence enabler"
   layer_description: |
-    AGET sits above CLI agent platforms (Claude Code, Codex CLI, Gemini CLI) as a
-    governance layer. CLI agents are the runtime; AGET is the governance
-    substrate that enables consistent behavior across platforms.
+    AGET enables AI agents to build persistent domain knowledge that serves
+    human decisions. It sits above CLI agent platforms (Claude Code, Codex CLI,
+    Gemini CLI) as a governance layer — CLI agents are the runtime; AGET provides
+    the structure that turns transient conversations into accumulated expertise.
 
   # -----------------------------------------------------------------------------
   # Relationship to Platforms
@@ -255,30 +259,79 @@ positioning:
       mechanism: "12 templates: advisor, analyst, architect, consultant, developer, executive, operator, researcher, reviewer, spec-engineer, supervisor, worker"
       benefit: "Choose the right archetype; inherit appropriate skills and vocabulary"
 
+    - id: D10
+      name: "Persistent Domain Intelligence"
+      description: "Agents accumulate domain expertise that serves human decisions"
+      mechanism: "Knowledge base as collaboration substrate, structured learning capture, session continuity"
+      benefit: "Domain knowledge compounds over time instead of resetting each session"
+
+  # -----------------------------------------------------------------------------
+  # Evidence-Based Positioning (L610, L407, L408)
+  # -----------------------------------------------------------------------------
+  evidence_based_positioning:
+    principle: "Claim only what we demonstrate (L407)"
+    rationale: |
+      Fleet evidence from two independent analyses shows AGET's primary value is
+      persistent domain knowledge consumed by principals for decisions (30% of
+      agent time, 2.2:1 overhead-to-value ratio). Governance is the enabler,
+      not the headline. Public content must lead with demonstrated value and
+      exclude undemonstrated audience claims.
+
+    credibility_taxonomy:
+      - level: "Demonstrated"
+        definition: "Validated by deployment evidence across fleet"
+        usage: "Primary content, headlines, feature lists"
+        examples:
+          - "Session continuity"
+          - "Fleet coordination"
+          - "Governance compliance"
+          - "Domain knowledge persistence"
+
+      - level: "Validated"
+        definition: "Template exists, limited deployment evidence"
+        usage: "Secondary content, qualified claims"
+        examples:
+          - "Code development workflows"
+          - "Advisory patterns"
+          - "Research workflows"
+
+      - level: "Aspirational"
+        definition: "Architecturally possible, no deployment evidence"
+        usage: "Must NOT appear in primary content"
+        examples:
+          - "Legal contract analysis"
+          - "Healthcare diagnosis support"
+          - "Executive decision workflows"
+
+    messaging_order:
+      primary: "Domain intelligence — what practitioners gain"
+      secondary: "Governance — how AGET enables it"
+      excluded: "Specific profession claims without deployment evidence"
+
   # -----------------------------------------------------------------------------
   # Value Proposition
   # -----------------------------------------------------------------------------
   value_proposition:
-    for_individual_developers:
-      - "Session continuity across coding sessions"
+    for_individual_practitioners:
+      - "Persistent domain knowledge that compounds across sessions"
+      - "Session continuity — pick up where you left off"
       - "Portable patterns that work with any CLI agent"
       - "Structured memory that survives context window limits"
       - "Choose from 12 archetypes to match your workflow"
-      - "39 pre-built skills for common tasks"
 
     for_teams:
+      - "Shared domain knowledge base for collective intelligence"
       - "Consistent agent behavior across team members"
-      - "Shared knowledge base for collective intelligence"
       - "Governance patterns for responsible AI use"
       - "Ontology-based vocabulary ensures team alignment"
       - "Archetype selection enables role specialization"
 
     for_enterprises:
+      - "Domain expertise that accumulates at organizational scale"
       - "Fleet management for multiple agents"
       - "Audit trails and decision documentation"
       - "Platform-agnostic investment protection"
       - "12 archetypes cover full organizational spectrum"
-      - "Skills architecture enables standardized agent capabilities"
 
   # -----------------------------------------------------------------------------
   # Competitive Landscape (2026)
@@ -378,6 +431,17 @@ validation:
 # =============================================================================
 
 changelog:
+  - version: "1.2.0"
+    date: "2026-02-22"
+    changes:
+      - "Added evidence_based_positioning section (L610, L407, L408)"
+      - "Added D10 (Persistent Domain Intelligence)"
+      - "Reframed layer from 'Governance substrate' to 'Domain intelligence enabler'"
+      - "Renamed for_individual_developers → for_individual_practitioners"
+      - "Reframed value_proposition tiers to lead with domain knowledge value"
+      - "Added credibility taxonomy (Demonstrated/Validated/Aspirational)"
+      - "Established messaging order: domain intelligence first, governance second"
+
   - version: "1.1.0"
     date: "2026-02-15"
     changes:
