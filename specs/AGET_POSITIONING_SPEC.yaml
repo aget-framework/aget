@@ -7,7 +7,7 @@
 
 spec:
   name: AGET_POSITIONING_SPEC
-  version: "1.2.0"
+  version: "1.3.0"
   status: canonical
   created: "2026-01-16"
   updated: "2026-02-22"
@@ -313,25 +313,34 @@ positioning:
   # -----------------------------------------------------------------------------
   value_proposition:
     for_individual_practitioners:
-      - "Persistent domain knowledge that compounds across sessions"
-      - "Session continuity — pick up where you left off"
-      - "Portable patterns that work with any CLI agent"
-      - "Structured memory that survives context window limits"
-      - "Choose from 12 archetypes to match your workflow"
+      evidence_level: "Demonstrated"
+      description: "Building persistent AI expertise in a specific domain"
+      propositions:
+        - "Persistent domain knowledge that compounds across sessions"
+        - "Session continuity — pick up where you left off"
+        - "Portable patterns that work with any CLI agent"
+        - "Structured memory that survives context window limits"
+        - "Choose from 12 archetypes to match your workflow"
 
-    for_teams:
-      - "Shared domain knowledge base for collective intelligence"
-      - "Consistent agent behavior across team members"
-      - "Governance patterns for responsible AI use"
-      - "Ontology-based vocabulary ensures team alignment"
-      - "Archetype selection enables role specialization"
+    for_power_users:
+      evidence_level: "Demonstrated"
+      description: "Coordinating specialized agents across domains"
+      propositions:
+        - "Fleet management for multiple agents"
+        - "Shared learning propagation across agent fleet"
+        - "Governance patterns for responsible AI use"
+        - "Archetype selection enables role specialization"
+        - "Audit trails and decision documentation"
 
-    for_enterprises:
-      - "Domain expertise that accumulates at organizational scale"
-      - "Fleet management for multiple agents"
-      - "Audit trails and decision documentation"
-      - "Platform-agnostic investment protection"
-      - "12 archetypes cover full organizational spectrum"
+    for_ai_tool_builders:
+      evidence_level: "Validated"
+      description: "Wanting a governance layer for agent deployments"
+      propositions:
+        - "Open standard (AGENTS.md) for ecosystem integration"
+        - "Platform-agnostic investment protection"
+        - "Ontology-based vocabulary ensures consistency"
+        - "Contract testing for deployment verification"
+        - "12 archetypes as starting points for customization"
 
   # -----------------------------------------------------------------------------
   # Competitive Landscape (2026)
@@ -431,6 +440,13 @@ validation:
 # =============================================================================
 
 changelog:
+  - version: "1.3.0"
+    date: "2026-02-22"
+    changes:
+      - "Reframed value_proposition audiences: for_teams → for_power_users, for_enterprises → for_ai_tool_builders"
+      - "Added evidence_level and description fields to each audience tier"
+      - "Audiences now match evidenced adoption patterns (L407, L610)"
+
   - version: "1.2.0"
     date: "2026-02-22"
     changes:
