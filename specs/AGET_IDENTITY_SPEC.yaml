@@ -7,10 +7,10 @@
 
 spec:
   name: AGET_IDENTITY_SPEC
-  version: "1.1.0"
+  version: "1.2.0"
   status: canonical
   created: "2026-01-16"
-  updated: "2026-02-15"
+  updated: "2026-02-22"
   author: aget-framework
   related_specs:
     - AGET_POSITIONING_SPEC
@@ -19,6 +19,8 @@ spec:
     - L545  # Strategic Positioning Evolution
     - L143  # Framework Landscape Positioning
     - L530  # Ontology Foundation Research
+    - L407  # Pain-Point Framing Superiority
+    - L610  # Evidence-Based Positioning Reframe
 
 # =============================================================================
 # IDENTITY
@@ -38,15 +40,15 @@ identity:
   # -----------------------------------------------------------------------------
   definition:
     # Short definition (max 120 characters) - for badges, metadata, one-liners
-    short: "Configuration & lifecycle management for governed agentic work"
+    short: "Persistent domain intelligence for governed agentic work"
 
     # Full definition - for README, documentation
     full: |
-      AGET is a platform-agnostic governance framework for CLI-based human-AI
-      agentic work. It provides session continuity, shared memory architecture,
+      AGET enables AI agents that build persistent domain knowledge serving
+      human decisions. It provides session continuity, shared memory architecture,
       fleet coordination, and human-supervised autonomy patterns that work
-      across AI coding assistants. Validated platforms include Claude Code,
-      Codex CLI, and Gemini CLI.
+      across CLI agent platforms. Governance ensures knowledge accumulates
+      reliably. Validated platforms include Claude Code, Codex CLI, and Gemini CLI.
 
     # Technical definition - for specifications, formal documents
     technical: |
@@ -74,7 +76,7 @@ identity:
 
     - id: NOT-4
       statement: "A coding-only framework"
-      clarification: "AGET supports advisory, consulting, supervision, and general knowledge work"
+      clarification: "AGET supports advisory, consulting, supervision, and general knowledge work. Note: validated archetypes are developer, advisor, consultant, supervisor, worker, and spec-engineer (have template repos). Other archetypes are architecturally supported but not yet deployment-validated."
 
     - id: NOT-5
       statement: "A vendor lock-in solution"
@@ -89,6 +91,11 @@ identity:
 
     # Supporting principles
     principles:
+      - id: P0
+        name: "Domain Intelligence First"
+        statement: "Agent value is measured by domain knowledge that serves human decisions"
+        mechanism: "Knowledge base accumulation, session continuity, structured learning capture"
+
       - id: P1
         name: "Governed Autonomy"
         statement: "Agents act autonomously within explicit boundaries"
@@ -250,6 +257,15 @@ validation:
 # =============================================================================
 
 changelog:
+  - version: "1.2.0"
+    date: "2026-02-22"
+    changes:
+      - "Reframed short definition: lead with 'persistent domain intelligence'"
+      - "Reframed full definition: lead with agents building persistent domain knowledge"
+      - "Added P0 principle: Domain Intelligence First"
+      - "Qualified NOT-4 with evidence note about validated vs architectural archetypes"
+      - "Evidence-based positioning reframe per L610, L407"
+
   - version: "1.1.0"
     date: "2026-02-15"
     changes:
