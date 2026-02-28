@@ -21,15 +21,17 @@ AGET (Agent Configuration & Lifecycle Management) is a framework for human-AI co
 
 ### 1. Choose a Template
 
+> **Recommended Starting Point**: Start with `template-supervisor-aget`. The supervisor can create and coordinate other agents in your fleet using `/aget-create-aget`. See [Supervisor-First Workflow](#supervisor-first-workflow) below.
+
 AGET provides 12 archetype templates:
 
 | Template | Role | Key Capability |
 |----------|------|----------------|
+| `template-supervisor-aget` | Team coordinator | Multi-agent oversight (**start here**) |
 | `template-worker-aget` | Base agent | Task execution |
 | `template-advisor-aget` | Read-only advisor | Recommendations without changes |
 | `template-developer-aget` | Software developer | Code implementation |
 | `template-architect-aget` | System designer | Architecture decisions |
-| `template-supervisor-aget` | Team coordinator | Multi-agent oversight |
 | `template-consultant-aget` | Domain expert | Specialized expertise |
 | `template-spec-engineer-aget` | Specification author | EARS/SKOS authoring |
 | `template-executive-aget` | Strategic leader | Portfolio oversight |
@@ -319,6 +321,58 @@ governance:
 2. Capture learnings as L-docs
 3. Create session handoff
 4. Note pending work
+
+---
+
+## Supervisor-First Workflow
+
+The recommended way to build an AGET fleet:
+
+### 1. Start with a Supervisor
+
+```bash
+# Clone the supervisor template
+gh repo clone aget-framework/template-supervisor-aget my-supervisor
+cd my-supervisor
+
+# Configure identity
+vim .aget/version.json  # Set agent_name, domain
+
+# Verify setup
+python3 -m pytest tests/ -v
+```
+
+### 2. Use the Supervisor to Create Agents
+
+```bash
+# In your CLI agent (Claude Code, Codex CLI, etc.)
+/aget-create-aget worker my-first-worker-AGET
+```
+
+The `/aget-create-aget` skill guides you through a 9-gate creation process:
+- **G0**: Prerequisites and naming
+- **G1**: Ontology creation (domain vocabulary)
+- **G3**: Template instantiation
+- **G5**: Validation (contract tests)
+- **G7**: Supervisor handoff (fleet registration)
+
+### 3. Grow Your Fleet
+
+Each new agent is created through the supervisor, ensuring:
+- Consistent configuration across your fleet
+- Fleet registry tracking
+- Shared learning propagation
+- Coordinated version upgrades
+
+### When to Start Without a Supervisor
+
+Not every use case needs fleet coordination. Start with a single-purpose template if:
+
+- **Solo agent**: You need one agent for one domain — start with `template-worker-aget` or a specialized archetype
+- **Learning AGET**: You want to understand the framework basics first — any template works
+- **Single repository**: Your work is contained in one project — a worker or developer agent is sufficient
+
+You can always add a supervisor later when you need fleet coordination.
 
 ---
 

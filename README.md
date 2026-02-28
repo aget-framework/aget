@@ -105,9 +105,11 @@ Vocabulary → Specification → Implementation
 
 ## Quick Start
 
-1. Choose a template from [aget-framework](https://github.com/aget-framework)
-2. Copy template to your project
-3. Configure `AGENTS.md` or `CLAUDE.md` for your CLI agent
+> **Recommended Starting Point**: Start with the [Supervisor template](https://github.com/aget-framework/template-supervisor-aget). It coordinates your agent fleet and can create new agents using `/aget-create-aget`. See [GETTING_STARTED.md](GETTING_STARTED.md) for the supervisor-first workflow.
+
+1. Clone a template from [aget-framework](https://github.com/aget-framework)
+2. Configure `.aget/version.json` and `AGENTS.md` for your agent
+3. Run `python3 -m pytest tests/ -v` to verify setup
 4. Start with `wake up` protocol
 
 ## Templates
@@ -116,8 +118,8 @@ Vocabulary → Specification → Implementation
 
 | Template | Archetype | Key Skills | Use Case |
 |----------|-----------|------------|----------|
+| [**template-supervisor-aget**](https://github.com/aget-framework/template-supervisor-aget) | supervisor | broadcast-fleet, review-agent, escalate-issue, create-aget | Fleet coordination (**recommended start**) |
 | [template-worker-aget](https://github.com/aget-framework/template-worker-aget) | worker | execute-task, report-progress | Task execution, foundation |
-| template-supervisor-aget (private) | supervisor | broadcast-fleet, review-agent, escalate-issue | Fleet coordination |
 | [template-developer-aget](https://github.com/aget-framework/template-developer-aget) | developer | run-tests, lint-code, review-pr | Development workflows |
 | [template-advisor-aget](https://github.com/aget-framework/template-advisor-aget) | advisor | assess-risk, recommend-action | Advisory with personas |
 | [template-consultant-aget](https://github.com/aget-framework/template-consultant-aget) | consultant | assess-client, propose-engagement | Consulting engagements |
