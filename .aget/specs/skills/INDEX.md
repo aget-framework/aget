@@ -1,13 +1,13 @@
 # AGET Skills Index
 
-**Version**: 1.2.0
-**Updated**: 2026-02-14
-**Total Skills**: 40 (14 universal + 26 archetype)
+**Version**: 1.3.0
+**Updated**: 2026-02-28
+**Total Skills**: 44 (15 universal + 29 archetype)
 **Project**: ARC-001 (Archetype Customization v3.5)
 
 ---
 
-## Universal Skills (14)
+## Universal Skills (15)
 
 Deployed to all 12 templates.
 
@@ -15,10 +15,10 @@ Deployed to all 12 templates.
 |----|------|----------|-------------|
 | SKILL-001 | aget-wake-up | Session | Initialize AGET session with status briefing |
 | SKILL-002 | aget-wind-down | Session | End AGET session with state capture |
-| SKILL-003 | aget-sanity-check | Health | Run AGET health inspection |
-| SKILL-004 | aget-healthcheck-evolution | Health | Check evolution directory health |
-| SKILL-005 | aget-healthcheck-sessions | Health | Check sessions directory health |
-| SKILL-006 | aget-healthcheck-kb | Health | Validate Knowledge Base health |
+| SKILL-003 | aget-check-health | Health | Run AGET health inspection |
+| SKILL-004 | aget-check-evolution | Health | Check evolution directory health |
+| SKILL-005 | aget-check-sessions | Health | Check sessions directory health |
+| SKILL-006 | aget-check-kb | Health | Validate Knowledge Base health |
 | SKILL-007 | aget-record-lesson | Evolution | Record lessons learned as L-docs |
 | SKILL-008 | aget-capture-observation | Evolution | Capture research observations |
 | SKILL-009 | aget-propose-skill | Governance | Propose new skills with governance |
@@ -26,6 +26,7 @@ Deployed to all 12 templates.
 | SKILL-011 | aget-create-project | Project | Create research projects with scaffolding |
 | SKILL-012 | aget-create-skill | Development | Create new skill with spec |
 | SKILL-013 | aget-save-state | Session | Save workflow state for recovery |
+| SKILL-042 | aget-study-up | Research | Focused KB research on topic before implementation |
 | SKILL-040 | aget-file-issue | Governance | File issues with L520 governance compliance |
 
 ---
@@ -105,13 +106,16 @@ Deployed to specific archetypes only.
 | SKILL-033 | aget-validate-spec | CAP-SPE-001 | Validate specifications for completeness |
 | SKILL-034 | aget-generate-requirement | CAP-SPE-002 | Generate EARS-compliant requirements |
 
-### Supervisor (3 skills)
+### Supervisor (6 skills)
 
 | ID | Name | Capability | Description |
 |----|------|------------|-------------|
 | SKILL-035 | aget-broadcast-fleet | CAP-SUP-001 | Send communications to fleet members |
 | SKILL-036 | aget-review-agent | CAP-SUP-002 | Review agent health and conformance |
 | SKILL-037 | aget-escalate-issue | CAP-SUP-003 | Escalate issues to higher authority |
+| — | aget-create-aget | CAP-SUP-004 | Create new agent from template |
+| — | aget-check-fleet | CAP-SUP-005 | Check fleet agent health and status |
+| — | aget-review-handoff | CAP-SUP-006 | Review release handoff artifacts |
 
 ### Worker (2 skills)
 
@@ -126,18 +130,18 @@ Deployed to specific archetypes only.
 
 | Archetype | Universal | Archetype-Specific | Total |
 |-----------|:---------:|:------------------:|:-----:|
-| advisor | 13 | 2 | 15 |
-| analyst | 13 | 2 | 15 |
-| architect | 13 | 2 | 15 |
-| consultant | 13 | 2 | 15 |
-| developer | 13 | 3 | 16 |
-| executive | 13 | 2 | 15 |
-| operator | 13 | 2 | 15 |
-| researcher | 13 | 2 | 15 |
-| reviewer | 13 | 2 | 15 |
-| spec-engineer | 13 | 2 | 15 |
-| supervisor | 13 | 3 | 16 |
-| worker | 13 | 2 | 15 |
+| advisor | 15 | 2 | 17 |
+| analyst | 15 | 2 | 17 |
+| architect | 15 | 2 | 17 |
+| consultant | 15 | 2 | 17 |
+| developer | 15 | 3 | 18 |
+| executive | 15 | 2 | 17 |
+| operator | 15 | 2 | 17 |
+| researcher | 15 | 2 | 17 |
+| reviewer | 15 | 2 | 17 |
+| spec-engineer | 15 | 2 | 17 |
+| supervisor | 15 | 6 | 21 |
+| worker | 15 | 2 | 17 |
 
 ---
 
@@ -158,8 +162,10 @@ Deployed to specific archetypes only.
 |---------|------|---------|
 | 1.0.0 | 2026-02-10 | Initial index with 13 universal skills |
 | 1.1.0 | 2026-02-14 | Added 26 archetype skills (ARC-001) |
+| 1.2.0 | 2026-02-14 | Added SKILL-040 aget-file-issue as universal (14 total) |
+| 1.3.0 | 2026-02-28 | P1.1 reconciliation: fixed 4 stale names (sanity-check→check-health, healthcheck-*→check-*), added SKILL-042 aget-study-up, updated distribution table (13→15 universal), supervisor archetype 3→6 skills. Total: 15 universal + 29 archetype = 44. Supervisor archetype 3→6 (P2.11: create-aget, check-fleet, review-handoff) |
 
 ---
 
 *INDEX.md - AGET Skills Index*
-*Last Updated: 2026-02-14*
+*Last Updated: 2026-02-28*

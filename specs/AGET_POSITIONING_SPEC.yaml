@@ -243,7 +243,7 @@ positioning:
 
     - id: D7
       name: "Skills Architecture"
-      description: "40 skills (14 universal + 26 archetype-specific) enabling agent behavior"
+      description: "44 skills (15 universal + 29 archetype-specific) enabling agent behavior"
       mechanism: "Skill specs with constraints, SKOS vocabulary, deployment governance"
       benefit: "Agents have consistent, reusable capabilities across the fleet"
 

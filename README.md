@@ -79,7 +79,7 @@ AGET provides **12 specialized archetypes**, each with purpose-built skills and 
 
 Each archetype includes:
 - **2-3 specialized skills** for archetype-specific workflows
-- **14 universal skills** shared across all agents (session, learning, health)
+- **15 universal skills** shared across all agents (session, health, learning, governance)
 - **Formal ontology** defining domain vocabulary
 
 See [GETTING_STARTED.md](GETTING_STARTED.md) for archetype selection guidance.
@@ -131,7 +131,7 @@ Vocabulary → Specification → Implementation
 | [template-reviewer-aget](https://github.com/aget-framework/template-reviewer-aget) | reviewer | review-artifact, provide-feedback | Quality review |
 | [template-spec-engineer-aget](https://github.com/aget-framework/template-spec-engineer-aget) | spec-engineer | validate-spec, generate-requirement | Specification authoring |
 
-**All templates include**: 14 universal skills + archetype-specific skills.
+**All templates include**: 15 universal skills + archetype-specific skills.
 See [GETTING_STARTED.md](GETTING_STARTED.md) for archetype selection guidance.
 
 ## Session Protocols

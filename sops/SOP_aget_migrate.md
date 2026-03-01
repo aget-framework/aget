@@ -210,7 +210,7 @@ TEMPLATE_PATH="$HOME/github/aget-framework/template-${ARCHETYPE}-aget"
 EXISTING_SKILLS=$(ls .claude/skills/aget-*/SKILL.md 2>/dev/null | wc -l)
 echo "Current skill count: $EXISTING_SKILLS"
 
-# Expected: 16-17 (14 universal + 2-3 archetype)
+# Expected: 16-17 (15 universal + 2-3 archetype)
 if [ "$EXISTING_SKILLS" -lt 16 ]; then
   echo "WARN Missing archetype skills. Copying from template..."
 
@@ -376,7 +376,7 @@ SKILL_COUNT=$(ls .claude/skills/aget-*/SKILL.md 2>/dev/null | wc -l)
 echo "Archetype: $ARCHETYPE"
 echo "Skill count: $SKILL_COUNT"
 
-# Expected: 16-17 skills (14 universal + 2-3 archetype)
+# Expected: 16-17 skills (15 universal + 2-3 archetype)
 [ "$SKILL_COUNT" -ge 16 ] && echo "PASS Skill count OK" || echo "FAIL Missing skills"
 
 # Verify archetype-specific skills

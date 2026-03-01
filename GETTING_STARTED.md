@@ -181,7 +181,7 @@ Once your agent is running, use these commands:
 
 ## What's Included
 
-### Universal Skills (14)
+### Universal Skills (15)
 
 All templates include these skills:
 - `aget-wake-up` — Session initialization
@@ -197,6 +197,8 @@ All templates include these skills:
 - `aget-check-sessions` — Session health
 - `aget-check-evolution` — Evolution health
 - `aget-check-kb` — KB health
+- `aget-file-issue` — Issue filing with governance
+- `aget-create-skill` — Skill creation with spec
 
 ### Archetype Skills (2-3 per archetype)
 
@@ -233,7 +235,7 @@ ls ontology/ONTOLOGY_*.yaml
 
 # Verify archetype skills exist
 ls .claude/skills/aget-*/SKILL.md | wc -l
-# Should be 16-17 (14 universal + 2-3 archetype)
+# Should be 17-18 (15 universal + 2-3 archetype)
 
 # Run validation
 python3 -m pytest tests/ -v
