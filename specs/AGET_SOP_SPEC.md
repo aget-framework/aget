@@ -1,11 +1,11 @@
 # AGET SOP Specification
 
-**Version**: 1.1.0
+**Version**: 1.2.0
 **Status**: Active
 **Category**: Standards (Process)
 **Format Version**: 1.2
 **Created**: 2025-12-28
-**Updated**: 2026-01-04
+**Updated**: 2026-02-28
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_SOP_SPEC.md`
 **Change Origin**: Pre-migration conformance review
@@ -47,11 +47,12 @@ Why no enforcement?
 - Required sections and structure
 - Vocabulary compliance requirements
 - Traceability requirements
+- Lifecycle state management
 - Validation criteria
 
 **Related**:
 - AGET_FILE_NAMING_CONVENTIONS (naming rules)
-- AGET_CORE_VOCABULARY (controlled terms)
+- AGET_VOCABULARY_SPEC (controlled terms)
 - AGET_VALIDATION_SPEC (validator structure)
 
 ---
@@ -91,7 +92,7 @@ vocabulary:
 
   compliance:  # Vocabulary compliance
     Vocabulary_Term:
-      skos:definition: "Controlled term from AGET_CORE_VOCABULARY"
+      skos:definition: "Controlled term from AGET_VOCABULARY_SPEC"
       skos:example: "Gate, Validation, Migration"
     Informal_Term:
       skos:definition: "Non-controlled term that should be replaced"
@@ -116,6 +117,25 @@ vocabulary:
       skos:definition: "Process by which repeated PROJECT_PLANs become formalized SOPs"
       skos:related: ["PROJECT_PLAN", "SOP"]
       aget:trigger: "Pattern executed successfully 2+ times"
+
+  lifecycle:  # CAP-SOP-006: SOP Lifecycle States
+    SOP_Status:
+      skos:definition: "Current lifecycle state of an SOP"
+      aget:values: ["Draft", "Active", "Deprecated"]
+      skos:related: ["AGET_SPEC_FORMAT.status"]
+    Draft:
+      skos:definition: "SOP under development, not for production use"
+      aget:entry_condition: "SOP created or graduated from PROJECT_PLAN"
+    Active:
+      skos:definition: "SOP is current guidance for production use"
+      aget:entry_condition: "SOP passes structural validation"
+    Deprecated:
+      skos:definition: "SOP superseded or no longer applicable"
+      aget:entry_condition: "Replacement exists or pattern no longer used"
+    SOP_Graduation:
+      skos:definition: "Transition from PROJECT_PLAN to SOP when pattern repeats 2+ times"
+      skos:related: ["Graduation", "PROJECT_PLAN"]
+      aget:marks: "Source PROJECT_PLAN reference preserved in header"
 ```
 
 **Process Artifact Hierarchy (L436):**
@@ -157,6 +177,7 @@ The SYSTEM shall enforce standard SOP structure.
 # SOP: {Title}
 
 **Version**: {M.m.p}
+**Status**: {Draft|Active|Deprecated}
 **Created**: {YYYY-MM-DD}
 **Owner**: {agent-name}
 **Related**: {L-docs, specs, patterns}
@@ -183,8 +204,8 @@ The SYSTEM shall enforce controlled vocabulary in SOPs.
 | ID | Pattern | Statement |
 |----|---------|-----------|
 | CAP-SOP-002-01 | ubiquitous | The SOP shall use Title_Case for domain objects |
-| CAP-SOP-002-02 | ubiquitous | The SOP shall use controlled vocabulary terms from AGET_CORE_VOCABULARY |
-| CAP-SOP-002-03 | conditional | IF term not in AGET_CORE_VOCABULARY THEN the SOP shall define it locally |
+| CAP-SOP-002-02 | ubiquitous | The SOP shall use controlled vocabulary terms from AGET_VOCABULARY_SPEC |
+| CAP-SOP-002-03 | conditional | IF term not in AGET_VOCABULARY_SPEC THEN the SOP shall define it locally |
 | CAP-SOP-002-04 | prohibited | The SOP shall NOT use informal terms in requirement statements |
 | CAP-SOP-002-05 | conditional | IF generic term has AGET-specific context THEN the SOP shall use compound term |
 | CAP-SOP-002-06 | ubiquitous | The SOP shall prefer compound vocabulary (e.g., `Validation_Gate`) over generic vocabulary (e.g., `Gate`) |
@@ -284,6 +305,41 @@ The SYSTEM shall classify SOPs by Artifact_Scope.
 
 **Source**: L568 (Framework Artifact Scope Specification Gap)
 
+### CAP-SOP-006: Lifecycle Management
+
+The SYSTEM shall enforce SOP lifecycle governance.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-SOP-006-01 | ubiquitous | The SOP shall include Status in header |
+| CAP-SOP-006-02 | ubiquitous | The SOP Status shall be one of: Draft, Active, Deprecated |
+| CAP-SOP-006-03 | conditional | IF SOP Status is Draft THEN the SOP shall NOT be referenced as normative guidance |
+| CAP-SOP-006-04 | conditional | IF SOP Status is Deprecated THEN the SOP shall include Superseded_By field |
+| CAP-SOP-006-05 | conditional | IF SOP Status is Deprecated THEN the SOP shall include Deprecation_Date field |
+| CAP-SOP-006-06 | event-driven | WHEN SOP graduates from PROJECT_PLAN THEN the SOP shall include Graduated_From field referencing the source PROJECT_PLAN |
+| CAP-SOP-006-07 | event-driven | WHEN SOP transitions from Draft to Active THEN Version shall be 1.0.0 or higher |
+| CAP-SOP-006-08 | prohibited | The SOP shall NOT remain in Draft status for more than 2 minor framework versions without review |
+
+**Enforcement**: `validate_sop_lifecycle.py` (future)
+
+**Source**: L624 (Skill Governance Logging Gap), fleet audit (6/104 SOPs have explicit status)
+
+#### Lifecycle State Diagram
+
+```
+PROJECT_PLAN ──graduation──→ Draft ──validation──→ Active ──superseded──→ Deprecated
+                                                     │
+                                                     └──no longer applicable──→ Deprecated
+```
+
+#### Transition Rules
+
+| Transition | Trigger | Decision Maker | Evidence Required |
+|------------|---------|----------------|-------------------|
+| → Draft | SOP created or graduated from PROJECT_PLAN | SOP owner | Purpose section explains gap |
+| Draft → Active | SOP passes CAP-SOP-001 through CAP-SOP-005 validation | SOP owner (Agent_Sop) or framework owner (Framework_Sop) | Structural validation pass |
+| Active → Deprecated | Pattern superseded or no longer applicable | Framework owner | Replacement SOP exists (Superseded_By) OR documented justification |
+
 ---
 
 ## Authority Model
@@ -305,7 +361,7 @@ authority:
     requires_approval:
       - action: "create framework-wide SOP"
         approver: "framework owner"
-      - action: "modify AGET_CORE_VOCABULARY"
+      - action: "modify AGET_VOCABULARY_SPEC"
         approver: "framework owner"
 ```
 
@@ -388,7 +444,7 @@ theoretical_basis:
     - "Self-Documentation"
   rationale: >
     SOPs are operational documentation that must be consistent, clear,
-    and traceable. Vocabulary control (AGET_CORE_VOCABULARY) ensures
+    and traceable. Vocabulary control (AGET_VOCABULARY_SPEC) ensures
     terms have consistent meaning. Traceability (Related, References)
     enables change impact analysis. Self-documentation (Purpose, Scope)
     ensures SOPs justify their existence.
@@ -414,7 +470,7 @@ grep -E '\b(gate|validation|migration|rollback)\b' sops/*.md
 ## References
 
 - AGET_FILE_NAMING_CONVENTIONS.md (naming rules)
-- AGET_CORE_VOCABULARY.md (controlled vocabulary)
+- AGET_VOCABULARY_SPEC.md (controlled vocabulary)
 - AGET_VALIDATION_SPEC.md (validator structure pattern)
 - AGET_REASONING_SPEC.md (PROJECT_PLAN requirements)
 - L377: Validation Suite Orchestration Gap
@@ -440,10 +496,15 @@ graduation:
     - update: "process_hierarchy vocabulary"
       source: "L436"
       description: "PROJECT_PLAN to SOP graduation pattern"
+
+  v1.2.0_additions:
+    - update: "CAP-SOP-006 SOP Lifecycle Management"
+      source: "L624, fleet audit"
+      description: "Lifecycle states, transitions, deprecation rules"
 ```
 
 ---
 
-*AGET SOP Specification v1.1.0*
+*AGET SOP Specification v1.2.0*
 *Format: AGET_SPEC_FORMAT v1.2 (EARS + SKOS)*
 *"Standardized procedures enable standardized quality."*
