@@ -1,0 +1,176 @@
+---
+skill_id: SKILL-041
+name: aget-enhance-spec
+version: 1.0.0
+status: active
+category: governance
+archetype: universal
+created: 2026-02-28
+author: aget-framework
+related_specs:
+  - AGET_SOP_SPEC
+  - L622
+  - L623
+  - ADR-008
+---
+
+# SKILL-041: aget-enhance-spec
+
+## Description
+
+Guide agents through the 7-phase core specification enhancement lifecycle (Phases 0-6 from L622). Provides governed workflow for creating, updating, wiring, and validating AGET specifications. This is the Generator layer (ADR-008 step 3), built on SOP_specification_enhancement.md (Advisory) and this spec (Strict).
+
+## Capabilities
+
+### Phase 0: Trigger & Diagnosis
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| R-ENHANCE-SPEC-001 | ubiquitous | The SYSTEM shall prompt the user to classify the Enhancement_Category (NEW, UPDATE, ADD-REQ, WIRE, CONSOLIDATE, DEPRECATE) |
+| R-ENHANCE-SPEC-002 | ubiquitous | The SYSTEM shall gather evidence by searching L-docs, specs, and fleet data relevant to the enhancement |
+| R-ENHANCE-SPEC-003 | ubiquitous | The SYSTEM shall document the gap statement, category, and evidence before proceeding |
+
+### Phase 1: Governing Spec Verification
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| R-ENHANCE-SPEC-004 | ubiquitous | The SYSTEM shall read the governing spec(s) for artifacts being modified |
+| R-ENHANCE-SPEC-005 | ubiquitous | The SYSTEM shall cite specific requirements (CAP-xxx-nnn) from governing specs |
+| R-ENHANCE-SPEC-006 | ubiquitous | The SYSTEM shall verify cross-reference targets in governing specs are not stale |
+| R-ENHANCE-SPEC-007 | conditional | IF spec basis is declared but no CAP citations appear in deliverables THEN the SYSTEM shall flag Decorative Spec Basis anti-pattern |
+
+### Phase 2: Census & Classification
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| R-ENHANCE-SPEC-008 | ubiquitous | The SYSTEM shall enumerate all specs/artifacts in scope and produce a census table |
+| R-ENHANCE-SPEC-009 | ubiquitous | The SYSTEM shall identify dependency order among artifacts and prioritize accordingly |
+| R-ENHANCE-SPEC-010 | ubiquitous | The SYSTEM shall record current version and status of each artifact from file reads, not memory |
+
+### Phase 3: Draft/Update Spec
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| R-ENHANCE-SPEC-011 | ubiquitous | The SYSTEM shall write requirements in EARS patterns (ubiquitous, conditional, event-driven, optional, prohibited, unwanted) |
+| R-ENHANCE-SPEC-012 | ubiquitous | The SYSTEM shall assign unique requirement IDs following the R-{DOMAIN}-{NNN} pattern |
+| R-ENHANCE-SPEC-013 | conditional | IF new vocabulary terms are introduced THEN the SYSTEM shall include a vocabulary section in SKOS format |
+
+### Phase 4: Structural Validation
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| R-ENHANCE-SPEC-014 | ubiquitous | The SYSTEM shall validate that all required sections are present per the governing spec format |
+| R-ENHANCE-SPEC-015 | ubiquitous | The SYSTEM shall validate EARS pattern compliance for all requirements |
+| R-ENHANCE-SPEC-016 | conditional | IF structural validators exist THEN the SYSTEM shall run them and report results |
+
+### Phase 5: Cross-Reference Wiring
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| R-ENHANCE-SPEC-017 | ubiquitous | The SYSTEM shall verify all cross-reference targets exist and are current before wiring (Phase 5a) |
+| R-ENHANCE-SPEC-018 | conditional | IF stale targets are found THEN the SYSTEM shall flag them for remediation before proceeding |
+| R-ENHANCE-SPEC-019 | ubiquitous | The SYSTEM shall link each requirement to evidence (L-doc) and enforcement (V-test) |
+| R-ENHANCE-SPEC-020 | ubiquitous | The SYSTEM shall verify bidirectional references — outgoing targets acknowledge this spec and incoming sources are acknowledged |
+
+### Phase 6: Self-Compliance Check
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| R-ENHANCE-SPEC-021 | ubiquitous | The SYSTEM shall check for bootstrapping paradox (L560) — does the output comply with its own requirements |
+| R-ENHANCE-SPEC-022 | ubiquitous | The SYSTEM shall verify the spec complies with its own requirements |
+| R-ENHANCE-SPEC-023 | prohibited | The SYSTEM shall NOT provide an option to skip the self-compliance check |
+
+### General Requirements
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| R-ENHANCE-SPEC-024 | ubiquitous | The SYSTEM shall present user checkpoints at Phases 0, 2, 3, 5, and 6 |
+| R-ENHANCE-SPEC-025 | ubiquitous | The SYSTEM shall produce a cross-reference report mapping requirements to evidence and enforcement |
+| R-ENHANCE-SPEC-026 | ubiquitous | The SYSTEM shall produce an enhancement decision log recording category, citations, and compliance results |
+| R-ENHANCE-SPEC-027 | prohibited | The SYSTEM shall NOT execute deployment phases 7-10 (template, tooling, fleet, post-deploy) |
+| R-ENHANCE-SPEC-028 | conditional | IF Enhancement_Category is CONSOLIDATE THEN the SYSTEM shall reference SOP_specification_consolidation.md |
+| R-ENHANCE-SPEC-029 | conditional | IF Enhancement_Category is WIRE THEN the SYSTEM shall execute only Phases 0, 1, and 5 |
+| R-ENHANCE-SPEC-030 | conditional | IF Enhancement_Category is DEPRECATE THEN the SYSTEM shall execute only Phases 0, 1, and 3 |
+
+## Input Format
+
+```
+/aget-enhance-spec <category> [spec-path] [--version <target-version>]
+
+Categories:
+- NEW: Create spec from scratch
+- UPDATE: Version bump with added/changed requirements
+- ADD-REQ: Add requirements to existing spec
+- WIRE: Add cross-references between specs
+- CONSOLIDATE: Merge related specs
+- DEPRECATE: Mark spec as superseded
+
+Examples:
+- /aget-enhance-spec NEW specs/AGET_FOO_SPEC.md
+- /aget-enhance-spec UPDATE aget/specs/AGET_SOP_SPEC.md --version 1.2.0
+- /aget-enhance-spec WIRE aget/specs/AGET_SKILLS_SPEC.md
+- /aget-enhance-spec ADD-REQ aget/specs/AGET_SOP_SPEC.md
+```
+
+## Constraints
+
+| ID | Type | Statement |
+|----|------|-----------|
+| C1 | prohibitive | NEVER skip Phase 1 (Governing Spec Verification) |
+| C2 | prohibitive | NEVER assert spec state from memory — always read files (L611) |
+| C3 | prohibitive | NEVER skip Phase 6 (Self-Compliance Check) |
+| C4 | prohibitive | NEVER execute deployment phases 7-10 |
+| C5 | mandatory | ALWAYS present user checkpoint before proceeding past Phases 0, 2, 3, 5, 6 |
+| C6 | mandatory | ALWAYS produce cross-reference report as output |
+| C7 | mandatory | ALWAYS cite governing spec requirements (CAP-xxx-nnn) in deliverables |
+| C8 | mandatory | ALWAYS use EARS patterns for requirements |
+| C9 | mandatory | ALWAYS assign unique R-{DOMAIN}-{NNN} IDs to requirements |
+
+## Test Cases
+
+| ID | Test | Expected | Traces To |
+|----|------|----------|-----------|
+| V-ENHANCE-001 | Invoke with NEW category | All 7 phases execute in order | R-ENHANCE-SPEC-001, -003 |
+| V-ENHANCE-002 | Invoke with WIRE category | Only Phases 0, 1, 5 execute | R-ENHANCE-SPEC-029 |
+| V-ENHANCE-003 | Invoke with DEPRECATE category | Only Phases 0, 1, 3 execute | R-ENHANCE-SPEC-030 |
+| V-ENHANCE-004 | Phase 1 reads governing spec | File contents displayed, CAP citations extracted | R-ENHANCE-SPEC-004, -005 |
+| V-ENHANCE-005 | Phase 1 detects no CAP citations in deliverables | Decorative Spec Basis flagged | R-ENHANCE-SPEC-007 |
+| V-ENHANCE-006 | Phase 2 produces census table | Artifact, version, category, dependencies, priority columns present | R-ENHANCE-SPEC-008 |
+| V-ENHANCE-007 | Phase 3 writes requirements | EARS patterns used, R-{DOMAIN}-{NNN} IDs assigned | R-ENHANCE-SPEC-011, -012 |
+| V-ENHANCE-008 | Phase 5a finds stale target | Target flagged for remediation before wiring | R-ENHANCE-SPEC-017, -018 |
+| V-ENHANCE-009 | Phase 5b produces cross-ref report | Each requirement maps to evidence + enforcement | R-ENHANCE-SPEC-019, -025 |
+| V-ENHANCE-010 | Phase 6 detects bootstrapping paradox | Non-compliance flagged, user must acknowledge | R-ENHANCE-SPEC-021 |
+| V-ENHANCE-011 | Attempt to skip Phase 6 | Not possible — no skip option | R-ENHANCE-SPEC-023 |
+| V-ENHANCE-012 | User checkpoint at Phase 0 | Execution pauses, user confirms category | R-ENHANCE-SPEC-024 |
+| V-ENHANCE-013 | Deployment phases requested | Refused — out of scope | R-ENHANCE-SPEC-027 |
+| V-ENHANCE-014 | CONSOLIDATE category invoked | SOP_specification_consolidation referenced | R-ENHANCE-SPEC-028 |
+| V-ENHANCE-015 | Phase 2 reports spec version | Version read from file, not asserted from memory | R-ENHANCE-SPEC-010 |
+
+## Allowed Tools
+
+- Read (spec files, L-docs, governance artifacts)
+- Grep (cross-reference searches, requirement ID scans)
+- Glob (artifact discovery)
+- Write (new spec files)
+- Edit (spec updates)
+- Bash (validator scripts, test execution)
+- Task (parallel research agents)
+
+## Traceability
+
+| Link | Reference |
+|------|-----------|
+| SOP | SOP_specification_enhancement.md v1.0.0 (Advisory layer) |
+| L-docs | L622 (lifecycle), L623 (meta-governance gap), L560 (bootstrapping), L557 (traceability), L555 (certainty bias), L611 (stale assertions) |
+| Proposal | SP-002 (planning/skill-proposals/PROPOSAL_aget-enhance-spec.md) |
+| Parent Plan | PROJECT_PLAN_aget_enhance_spec_skill_v1.0.md |
+| Verb Registration | DESIGN_DIRECTION_skill_verb_vocabulary.md (verb #25, 4th domain innovation) |
+| ADR-008 Chain | L622/L623 (L-docs) → SOP_specification_enhancement (Advisory) → SKILL-041 (Strict) → /aget-enhance-spec (Generator) |
+| Requirements | R-ENHANCE-SPEC-001 through R-ENHANCE-SPEC-030 |
+
+---
+
+*SKILL-041_aget-enhance-spec.yaml*
+*Category: Governance*
+*Archetype: Universal*
+*ADR-008 Position: Strict (step 2 of Advisory → Strict → Generator)*
