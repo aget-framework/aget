@@ -91,6 +91,8 @@ Guide agents through the 7-phase core specification enhancement lifecycle (Phase
 | R-ENHANCE-SPEC-028 | conditional | IF Enhancement_Category is CONSOLIDATE THEN the SYSTEM shall reference SOP_specification_consolidation.md |
 | R-ENHANCE-SPEC-029 | conditional | IF Enhancement_Category is WIRE THEN the SYSTEM shall execute only Phases 0, 1, and 5 |
 | R-ENHANCE-SPEC-030 | conditional | IF Enhancement_Category is DEPRECATE THEN the SYSTEM shall execute only Phases 0, 1, and 3 |
+| R-ENHANCE-SPEC-031 | conditional | IF Enhancement_Scope is public framework AND Enhancement_Category is UPDATE or NEW THEN the SYSTEM shall require a PROJECT_PLAN governance artifact before proceeding past Phase 0 |
+| R-ENHANCE-SPEC-032 | conditional | IF Enhancement_Scope is private agent OR Enhancement_Category is ADD-REQ or WIRE THEN the SYSTEM shall use the built-in Enhancement_Decision_Log as sufficient governance |
 
 ## Input Format
 
@@ -145,6 +147,8 @@ Examples:
 | V-ENHANCE-013 | Deployment phases requested | Refused — out of scope | R-ENHANCE-SPEC-027 |
 | V-ENHANCE-014 | CONSOLIDATE category invoked | SOP_specification_consolidation referenced | R-ENHANCE-SPEC-028 |
 | V-ENHANCE-015 | Phase 2 reports spec version | Version read from file, not asserted from memory | R-ENHANCE-SPEC-010 |
+| V-ENHANCE-016 | Public framework UPDATE invoked without PROJECT_PLAN | Blocked at Phase 0 — PROJECT_PLAN required | R-ENHANCE-SPEC-031 |
+| V-ENHANCE-017 | Private agent ADD-REQ invoked | Proceeds with Enhancement_Decision_Log only | R-ENHANCE-SPEC-032 |
 
 ## Allowed Tools
 
