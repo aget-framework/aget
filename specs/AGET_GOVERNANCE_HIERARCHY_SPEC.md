@@ -290,7 +290,7 @@ PATTERN_session_handoff.md
     │ Pattern: Create handoff when pending work
     │
     ▼
-SOP_session_end.md
+SOP_session_handoff.md (instance-level)
     │
     │ Step 4: If pending work, create session note
     │
