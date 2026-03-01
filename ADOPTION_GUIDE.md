@@ -38,7 +38,7 @@ This guide covers:
 |-----------|-------------|
 | `.aget/` | Agent configuration and evolution tracking |
 | `ontology/` | Domain concepts for your archetype |
-| `.claude/skills/` | 14 universal + 2-3 archetype skills |
+| `.claude/skills/` | 15 universal + 2-3 archetype skills |
 | `tests/` | Contract tests for validation |
 | `AGENTS.md` / `CLAUDE.md` | CLI tool configuration |
 
@@ -306,7 +306,7 @@ When filing issues:
 ### v3.5.0 (2026-02-14)
 
 - **Archetype Customization**: 12 archetype ontologies, 26 archetype skills
-- **Skill Framework**: 40 total skills (14 universal + 26 archetype)
+- **Skill Framework**: 44 total skills (15 universal + 29 archetype)
 - **Ontology-Driven Creation**: Vocabulary → Specification → Instance pattern
 - **SOP Updates**: SOP_aget_create v2.2.0, SOP_aget_migrate v1.2.0
 

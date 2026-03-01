@@ -110,7 +110,11 @@ universal_skills:
     - name: "aget-propose-skill"
       purpose: "Skill proposal governance"
 
-  count: 14  # +1 from v3.5.0: aget-studyup now universal
+    # Development Skills
+    - name: "aget-create-skill"
+      purpose: "Skill creation with spec scaffolding"
+
+  count: 15  # +2 from v3.5.0: aget-studyup + aget-create-skill now universal
 
 # =============================================================================
 # SKILL SPECIFICATIONS
@@ -123,7 +127,7 @@ skill_specs:
 
   required_files:
     - pattern: "SKILL-*.yaml"
-      min_count: 14
+      min_count: 15
 
     - file: "INDEX.md"
       purpose: "Skill index"
@@ -375,9 +379,9 @@ verification_script: |
 
   echo ""
 
-  # 2. Universal skills (14 in v3.6.0)
+  # 2. Universal skills (15 in v3.6.0+)
   echo "--- Universal Skills ---"
-  UNIVERSAL="aget-wake-up aget-wind-down aget-studyup aget-check-health aget-check-kb aget-check-evolution aget-check-sessions aget-create-project aget-review-project aget-save-state aget-record-lesson aget-capture-observation aget-file-issue aget-propose-skill"
+  UNIVERSAL="aget-wake-up aget-wind-down aget-studyup aget-check-health aget-check-kb aget-check-evolution aget-check-sessions aget-create-project aget-review-project aget-save-state aget-record-lesson aget-capture-observation aget-file-issue aget-propose-skill aget-create-skill"
   for skill in $UNIVERSAL; do
     if [ -d "$AGENT_DIR/.claude/skills/$skill" ]; then
       echo "[OK] $skill"
@@ -387,7 +391,7 @@ verification_script: |
     fi
   done
   SKILL_COUNT=$(ls "$AGENT_DIR/.claude/skills/" 2>/dev/null | wc -l | tr -d ' ')
-  echo "Total skills: $SKILL_COUNT (minimum 14 universal)"
+  echo "Total skills: $SKILL_COUNT (minimum 15 universal)"
 
   echo ""
 
@@ -426,7 +430,7 @@ verification_script: |
   # 5. Skill specs
   echo "--- Skill Specs ---"
   SPEC_COUNT=$(ls "$AGENT_DIR/.aget/specs/skills/SKILL-"*.yaml 2>/dev/null | wc -l | tr -d ' ')
-  [ "$SPEC_COUNT" -ge 14 ] && echo "[OK] Skill specs: $SPEC_COUNT" || { echo "[WARN] Skill specs: $SPEC_COUNT (expected 14+)"; ((WARNINGS++)); }
+  [ "$SPEC_COUNT" -ge 15 ] && echo "[OK] Skill specs: $SPEC_COUNT" || { echo "[WARN] Skill specs: $SPEC_COUNT (expected 15+)"; ((WARNINGS++)); }
 
   if [ -f "$AGENT_DIR/.aget/specs/skills/SKILL_VOCABULARY.md" ]; then
     echo "[OK] SKILL_VOCABULARY.md exists"
@@ -489,9 +493,9 @@ deployment_checklist:
     - "Add migration_history entry: v3.5.0 -> v3.6.0"
 
   skill_sync:
-    - "Sync all 14 universal skills from template-worker-aget"
+    - "Sync all 15 universal skills from template-worker-aget"
     - "Verify aget-studyup skill present (new in v3.6.0)"
-    - "Verify all 14 skills have SKILL.md files"
+    - "Verify all 15 skills have SKILL.md files"
 
   script_sync:
     - "Sync wake_up.py, wind_down.py, study_up.py, aget_housekeeping_protocol.py from aget/scripts/"

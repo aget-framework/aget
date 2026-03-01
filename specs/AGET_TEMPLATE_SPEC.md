@@ -1008,7 +1008,7 @@ The SYSTEM shall support archetype-specific ontologies and skills.
 | CAP-TPL-016-01 | ubiquitous | The SYSTEM shall include ontology/ directory in each template |
 | CAP-TPL-016-02 | ubiquitous | The SYSTEM shall include ONTOLOGY_{archetype}.yaml in ontology/ |
 | CAP-TPL-016-03 | ubiquitous | The SYSTEM shall include .claude/skills/ directory with AGET skills |
-| CAP-TPL-016-04 | ubiquitous | The SYSTEM shall include 14 universal skills in all templates |
+| CAP-TPL-016-04 | ubiquitous | The SYSTEM shall include 15 universal skills in all templates |
 | CAP-TPL-016-05 | ubiquitous | The SYSTEM shall include archetype-specific skills per archetype |
 | CAP-TPL-016-06 | conditional | IF SKILL.md exists THEN it shall have valid YAML frontmatter |
 
@@ -1054,7 +1054,7 @@ ontology:
 
 #### Universal Skills (v3.5.0)
 
-All templates include these 14 universal skills:
+All templates include these 15 universal skills:
 
 | Skill | Category | Purpose |
 |-------|----------|---------|
@@ -1071,6 +1071,8 @@ All templates include these 14 universal skills:
 | aget-create-project | Planning | Create research projects |
 | aget-review-project | Planning | Review project progress |
 | aget-propose-skill | Governance | Propose new skills |
+| aget-file-issue | Governance | File issues with routing governance |
+| aget-create-skill | Development | Create new skill with spec |
 
 #### Directory Layout (v3.5.0)
 
