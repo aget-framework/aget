@@ -1,11 +1,12 @@
 # SOP: Skill Deployment
 
-**Version**: 1.0.0
+**Version**: 1.1.0
 **Status**: Active
 **Created**: 2026-02-15
+**Updated**: 2026-03-01
 **Author**: aget-framework
 **Category**: Skills
-**Spec Reference**: SKILL_NAMING_CONVENTION_SPEC v1.1.0 (CAP-SKILL-DEP-001)
+**Spec Reference**: SKILL_NAMING_CONVENTION_SPEC v1.2.0 (CAP-SKILL-DEP-001, CAP-SKILL-LIFE-001)
 
 ---
 
@@ -179,17 +180,77 @@ or equivalent minimal invocation.
 
 ---
 
+### Phase 4: Deprecation Marking (Optional)
+
+**When to use**: When retiring a skill in favor of a canonical replacement.
+
+**Spec Reference**: CAP-SKILL-LIFE-001 (R-SKILL-LIFE-001 through R-SKILL-LIFE-006)
+
+#### D4.1: Add Deprecation Frontmatter
+
+In the deprecated skill's `.claude/skills/aget-old-name/SKILL.md`, add status fields:
+
+```yaml
+---
+name: aget-old-name
+status: deprecated
+superseded_by: aget-new-canonical-name
+deprecated_date: 2026-03-01
+description: "..."
+---
+```
+
+**Required fields** (all three mandatory when `status: deprecated`):
+- `status: deprecated` — marks skill as deprecated
+- `superseded_by: aget-{verb}-{noun}` — canonical replacement name
+- `deprecated_date: YYYY-MM-DD` — date of deprecation
+
+#### D4.2: Validate Deprecation
+
+```bash
+python3 aget/validation/validate_skill_deprecation.py \
+  --dir .claude/skills/aget-old-name/ \
+  --check
+
+# Expected: exit 0 (warnings reported, not errors per R-SKILL-LIFE-005)
+```
+
+#### D4.3: Verify Replacement Exists
+
+```bash
+test -d ".claude/skills/aget-new-canonical-name/" && echo "PASS" || echo "FAIL: Replacement skill missing"
+```
+
+**If replacement missing**: Create and deploy the replacement skill BEFORE deprecating the old one.
+
+#### D4.4: Deprecation Checklist
+
+```markdown
+## Skill Deprecation: {old-skill-name} → {new-skill-name}
+
+- [ ] Replacement skill deployed and functional
+- [ ] `status: deprecated` added to old SKILL.md
+- [ ] `superseded_by` references valid canonical name
+- [ ] `deprecated_date` set to today
+- [ ] `validate_skill_deprecation.py --check` passes (exit 0)
+- [ ] Healthcheck reports deprecated skill as WARN (not ERROR)
+```
+
+**Key principle** (ADR-008): Deprecated is a **warning**, not an error. Agents can continue using deprecated skills — they just receive warnings encouraging migration.
+
+---
+
 ## Traceability
 
 | Link | Reference |
 |------|-----------|
-| Spec | SKILL_NAMING_CONVENTION_SPEC v1.1.0 |
-| Requirements | CAP-SKILL-DEP-001 (R-SKILL-DEP-001 through R-SKILL-DEP-005) |
-| Validator | validation/validate_skill_dependencies.py |
-| Trigger | L586 (Skill Infrastructure Deployment Gap) |
+| Spec | SKILL_NAMING_CONVENTION_SPEC v1.2.0 |
+| Requirements | CAP-SKILL-DEP-001 (R-SKILL-DEP-001 through R-SKILL-DEP-005), CAP-SKILL-LIFE-001 (R-SKILL-LIFE-001 through R-SKILL-LIFE-006) |
+| Validators | validation/validate_skill_dependencies.py, validation/validate_skill_deprecation.py |
+| Trigger | L586 (Skill Infrastructure Deployment Gap), L603 (Cross-Fleet Skill Survey) |
 | Related | L582 (Universal Skill Customization Preservation) |
 
 ---
 
-*SOP_skill_deployment.md v1.0.0*
+*SOP_skill_deployment.md v1.1.0*
 *"Validate before deploy, prevent runtime failures"*

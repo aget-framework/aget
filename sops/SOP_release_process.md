@@ -1,8 +1,8 @@
 # SOP: Release Process
 
-**Version**: 1.8.0
+**Version**: 1.9.0
 **Created**: 2026-01-04
-**Updated**: 2026-02-21
+**Updated**: 2026-03-01
 **Owner**: aget-framework
 **Implements**: AGET_RELEASE_SPEC, CAP-REL-001 through CAP-REL-025, CAP-SOP-001, R-REL-006, R-REL-019, R-REL-042, CAP-MIG-017, L555-L559, L585, L587, L605, R-SYNC-001
 
@@ -373,6 +373,73 @@ gh release view vX.Y.Z --repo aget-framework/aget
 
 ---
 
+## Phase 6.4: Release Handoff Creation and Publication (R-REL-019)
+
+**Objective**: Create release handoff artifact and publish sanitized copy to public repository for fleet discovery.
+
+**Spec Reference**: R-REL-019-01 through R-REL-019-07
+
+### 6.4.1 Create Release Handoff
+
+Create internal handoff from template:
+
+```bash
+cp aget/handoffs/TEMPLATE_RELEASE_HANDOFF.md handoffs/RELEASE_HANDOFF_vX.Y.Z.md
+```
+
+Populate all required sections:
+- [ ] Executive Summary (theme + key changes)
+- [ ] What Changed (Added/Changed/Breaking)
+- [ ] Upgrade Checklist (per-agent + fleet-wide steps)
+- [ ] Context for External Fleets (R-REL-019-02: WHY and WHICH)
+- [ ] Pilot Tracking Template (status table)
+- [ ] References (CHANGELOG, UPGRADING, SOPs)
+
+**Exemplar**: See `aget/handoffs/RELEASE_HANDOFF_v3.5.0.md`
+
+### 6.4.2 Sanitize for Public Publication (R-REL-019-07)
+
+Create sanitized copy for public `aget/handoffs/`:
+
+```bash
+cp handoffs/RELEASE_HANDOFF_vX.Y.Z.md aget/handoffs/RELEASE_HANDOFF_vX.Y.Z.md
+```
+
+**Sanitization checklist** — public copy must NOT contain:
+- [ ] Private agent names (`private-*-aget`, `private-*-AGET`)
+- [ ] Private repo references (`gmelli/*`)
+- [ ] Fleet size disclosures ("32 agents in fleet")
+- [ ] Internal session references
+
+```bash
+# Verify sanitization
+grep -c "private-" aget/handoffs/RELEASE_HANDOFF_vX.Y.Z.md
+# Expected: 0
+
+grep -c "gmelli/" aget/handoffs/RELEASE_HANDOFF_vX.Y.Z.md
+# Expected: 0
+```
+
+### 6.4.3 Commit and Push Public Handoff
+
+```bash
+git -C /path/to/aget-framework/aget add handoffs/RELEASE_HANDOFF_vX.Y.Z.md
+git -C /path/to/aget-framework/aget commit -m "handoff: RELEASE_HANDOFF_vX.Y.Z"
+```
+
+### 6.4.4 V-Tests
+
+| ID | Test | Command | BLOCKING |
+|----|------|---------|----------|
+| V-REL-038 | Handoff file created | `test -f handoffs/RELEASE_HANDOFF_vX.Y.Z.md` | **YES** |
+| V-REL-039 | Handoff sanitized | `grep -c "private-" aget/handoffs/RELEASE_HANDOFF_vX.Y.Z.md` → 0 | **YES** |
+| V-REL-040 | Public handoff exists | `test -f aget/handoffs/RELEASE_HANDOFF_vX.Y.Z.md` | **YES** |
+| V-REL-041 | External context present | `grep -q "Context for External" aget/handoffs/RELEASE_HANDOFF_vX.Y.Z.md` | No |
+
+**Decision_Point**: Release handoff published to public repo? [GO/NOGO]
+
+---
+
 ## Phase 6.5: Remote Upgrade Documentation (CAP-MIG-017)
 
 **Objective**: Ensure remote upgrade documentation is current for this release.
@@ -579,6 +646,14 @@ python3 scripts/propagation_audit.py --version 3.6.0 --check
 ---
 
 ## Changelog
+
+### v1.9.0 (2026-03-01)
+
+- **Added Phase 6.4: Release Handoff Creation and Publication** (R-REL-019-07, L511)
+  - 3 steps: create handoff, sanitize for public, commit to aget/handoffs/
+  - Sanitization checklist (no private-*, gmelli/*, fleet size)
+  - 4 V-tests (V-REL-038 through V-REL-041)
+  - Decision point before Phase 6.5
 
 ### v1.8.0 (2026-02-21)
 
