@@ -1,11 +1,11 @@
-# SKILL-006: aget-healthcheck-kb
+# SKILL-006: aget-check-kb
 # Purpose: Validate Knowledge Base health
 # Created: 2026-02-10
 # Based on: L589, SKILL_SPEC_TEMPLATE.yaml
 
 spec:
   id: SKILL-006
-  name: aget-healthcheck-kb
+  name: aget-check-kb
   version: 1.0.0
   status: production
   created: 2026-02-10
@@ -14,7 +14,7 @@ spec:
   scope: "Validate knowledge/ directory health - structure, staleness, conformance"
 
   traceability:
-    skill_md: ".claude/skills/aget-healthcheck-kb/SKILL.md"
+    skill_md: ".claude/skills/aget-check-kb/SKILL.md"
     l_docs:
       - "L589: Healthcheck Threshold Calibration"
     vocabulary_terms:
@@ -25,7 +25,7 @@ spec:
 capabilities:
   HK-001:
     domain: invocation
-    statement: "WHEN user invokes `/aget-healthcheck-kb`, the SKILL shall analyze knowledge/ and report health status."
+    statement: "WHEN user invokes `/aget-check-kb`, the SKILL shall analyze knowledge/ and report health status."
     pattern: event-driven
     trigger: slash_command
     priority: critical
@@ -96,7 +96,7 @@ test_cases:
     capability: "HK-001"
     scenario: "Healthy knowledge base"
     given: "knowledge/ exists with 14 files, <25% stale"
-    when: "User runs `/aget-healthcheck-kb`"
+    when: "User runs `/aget-check-kb`"
     then: "Reports OK status"
     verification_method: "automated"
 
@@ -104,7 +104,7 @@ test_cases:
     capability: "HK-006"
     scenario: "Missing knowledge directory"
     given: "knowledge/ does not exist"
-    when: "User runs `/aget-healthcheck-kb`"
+    when: "User runs `/aget-check-kb`"
     then: "Reports CRITICAL with KB missing"
     verification_method: "manual"
 
@@ -112,7 +112,7 @@ test_cases:
     capability: "HK-005"
     scenario: "Stale content detected"
     given: "30% of files not modified in 180+ days"
-    when: "User runs `/aget-healthcheck-kb`"
+    when: "User runs `/aget-check-kb`"
     then: "Reports CRITICAL with staleness alert"
     verification_method: "manual"
 

@@ -1,11 +1,11 @@
-# SKILL-005: aget-healthcheck-sessions
+# SKILL-005: aget-check-sessions
 # Purpose: Monitor sessions/ directory health
 # Created: 2026-02-10
 # Based on: L589, SKILL_SPEC_TEMPLATE.yaml
 
 spec:
   id: SKILL-005
-  name: aget-healthcheck-sessions
+  name: aget-check-sessions
   version: 1.0.0
   status: production
   created: 2026-02-10
@@ -14,7 +14,7 @@ spec:
   scope: "Validate sessions directory health - structure, file counts, naming, disk usage"
 
   traceability:
-    skill_md: ".claude/skills/aget-healthcheck-sessions/SKILL.md"
+    skill_md: ".claude/skills/aget-check-sessions/SKILL.md"
     l_docs:
       - "L589: Healthcheck Threshold Calibration"
     vocabulary_terms:
@@ -25,7 +25,7 @@ spec:
 capabilities:
   HS-001:
     domain: invocation
-    statement: "WHEN user invokes `/aget-healthcheck-sessions`, the SKILL shall analyze sessions/ and report health status."
+    statement: "WHEN user invokes `/aget-check-sessions`, the SKILL shall analyze sessions/ and report health status."
     pattern: event-driven
     trigger: slash_command
     priority: critical
@@ -90,7 +90,7 @@ test_cases:
     capability: "HS-001"
     scenario: "Healthy sessions directory"
     given: "77 files, 544K disk, no date subdirectories"
-    when: "User runs `/aget-healthcheck-sessions`"
+    when: "User runs `/aget-check-sessions`"
     then: "Reports OK status"
     verification_method: "automated"
 
@@ -98,7 +98,7 @@ test_cases:
     capability: "HS-002"
     scenario: "Date subdirectory anomaly detected"
     given: "sessions/2026-01-15/ subdirectory exists"
-    when: "User runs `/aget-healthcheck-sessions`"
+    when: "User runs `/aget-check-sessions`"
     then: "Reports WARN with date subdirectory alert"
     verification_method: "manual"
 
@@ -106,7 +106,7 @@ test_cases:
     capability: "HS-003"
     scenario: "Checkpoint directory present"
     given: "sessions/checkpoints/ exists with 5 files"
-    when: "User runs `/aget-healthcheck-sessions`"
+    when: "User runs `/aget-check-sessions`"
     then: "Reports Checkpoints: 5 (not counted as anomaly)"
     verification_method: "manual"
 

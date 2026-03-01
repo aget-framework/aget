@@ -1,11 +1,11 @@
-# SKILL-003: aget-sanity-check
+# SKILL-003: aget-check-health
 # Purpose: Run AGET health inspection and housekeeping checks
 # Created: 2026-02-10
 # Based on: L532, SKILL_SPEC_TEMPLATE.yaml
 
 spec:
   id: SKILL-003
-  name: aget-sanity-check
+  name: aget-check-health
   version: 1.0.0
   status: production
   created: 2026-02-10
@@ -14,7 +14,7 @@ spec:
   scope: "Validate agent structure, configuration, and report health status"
 
   traceability:
-    skill_md: ".claude/skills/aget-sanity-check/SKILL.md"
+    skill_md: ".claude/skills/aget-check-health/SKILL.md"
     l_docs:
       - "L532: Skills vs Learnings Distinction"
     vocabulary_terms:
@@ -25,12 +25,12 @@ spec:
 capabilities:
   SC-001:
     domain: invocation
-    statement: "WHEN user invokes `/aget-sanity-check`, the SKILL shall run housekeeping protocol and report health status."
+    statement: "WHEN user invokes `/aget-check-health`, the SKILL shall run housekeeping protocol and report health status."
     pattern: event-driven
     trigger: slash_command
     priority: critical
     inputs:
-      - "User invocation via `/aget-sanity-check`"
+      - "User invocation via `/aget-check-health`"
     outputs:
       - "Health status: HEALTHY/WARNINGS/ERRORS"
       - "Check results per category"
@@ -95,7 +95,7 @@ test_cases:
     capability: "SC-001"
     scenario: "Healthy agent sanity check"
     given: "Valid .aget/ structure with version.json"
-    when: "User runs `/aget-sanity-check`"
+    when: "User runs `/aget-check-health`"
     then: "Reports HEALTHY with all checks PASS"
     verification_method: "automated"
 
@@ -103,7 +103,7 @@ test_cases:
     capability: "SC-003"
     scenario: "Missing version.json detected"
     given: ".aget/version.json does not exist"
-    when: "User runs `/aget-sanity-check`"
+    when: "User runs `/aget-check-health`"
     then: "Reports ERRORS with Version: FAIL"
     verification_method: "manual"
 
@@ -111,7 +111,7 @@ test_cases:
     capability: "SC-006"
     scenario: "JSON output format"
     given: "Any agent state"
-    when: "User runs `/aget-sanity-check --json`"
+    when: "User runs `/aget-check-health --json`"
     then: "Output is valid JSON"
     verification_method: "automated"
 

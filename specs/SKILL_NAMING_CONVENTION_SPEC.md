@@ -185,9 +185,7 @@ Directory: .claude/skills/{skill-name}/
 | Spec File | Skill Directory | Status |
 |-----------|-----------------|--------|
 | `SKILL-003_aget-check-health.yaml` | `.claude/skills/aget-check-health/` | ✅ Synchronized |
-| `SKILL-004_aget-healthcheck-evolution.yaml` | `.claude/skills/aget-check-evolution/` | ❌ Diverged |
-
-**Correction**: Rename spec to `SKILL-004_aget-check-evolution.yaml`
+| `SKILL-004_aget-check-evolution.yaml` | `.claude/skills/aget-check-evolution/` | ✅ Synchronized |
 
 ---
 
