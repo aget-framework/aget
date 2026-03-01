@@ -1,11 +1,11 @@
-# SKILL-004: aget-healthcheck-evolution
+# SKILL-004: aget-check-evolution
 # Purpose: Monitor .aget/evolution/ directory health
 # Created: 2026-02-10
 # Based on: L589, SKILL_SPEC_TEMPLATE.yaml
 
 spec:
   id: SKILL-004
-  name: aget-healthcheck-evolution
+  name: aget-check-evolution
   version: 1.0.0
   status: production
   created: 2026-02-10
@@ -14,7 +14,7 @@ spec:
   scope: "Validate evolution directory health - file counts, naming, disk usage, index integrity"
 
   traceability:
-    skill_md: ".claude/skills/aget-healthcheck-evolution/SKILL.md"
+    skill_md: ".claude/skills/aget-check-evolution/SKILL.md"
     l_docs:
       - "L589: Healthcheck Threshold Calibration"
     vocabulary_terms:
@@ -25,7 +25,7 @@ spec:
 capabilities:
   HE-001:
     domain: invocation
-    statement: "WHEN user invokes `/aget-healthcheck-evolution`, the SKILL shall analyze .aget/evolution/ and report health status."
+    statement: "WHEN user invokes `/aget-check-evolution`, the SKILL shall analyze .aget/evolution/ and report health status."
     pattern: event-driven
     trigger: slash_command
     priority: critical
@@ -91,7 +91,7 @@ test_cases:
     capability: "HE-001"
     scenario: "Healthy evolution directory"
     given: "94 files, 800K disk (within OK thresholds)"
-    when: "User runs `/aget-healthcheck-evolution`"
+    when: "User runs `/aget-check-evolution`"
     then: "Reports OK status"
     verification_method: "automated"
 
@@ -99,7 +99,7 @@ test_cases:
     capability: "HE-005"
     scenario: "Invalid index.json detected"
     given: "index.json contains invalid JSON"
-    when: "User runs `/aget-healthcheck-evolution`"
+    when: "User runs `/aget-check-evolution`"
     then: "Reports CRITICAL with index invalid"
     verification_method: "manual"
 
@@ -107,7 +107,7 @@ test_cases:
     capability: "HE-003"
     scenario: "Non-conforming files detected"
     given: "File named 'notes.txt' in evolution/"
-    when: "User runs `/aget-healthcheck-evolution`"
+    when: "User runs `/aget-check-evolution`"
     then: "Lists notes.txt as non-conforming"
     verification_method: "manual"
 
