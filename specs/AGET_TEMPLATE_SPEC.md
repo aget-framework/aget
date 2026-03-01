@@ -1039,18 +1039,18 @@ ontology:
 
 | Archetype | Universal | Archetype Skills | Total |
 |-----------|:---------:|:----------------:|:-----:|
-| worker | 14 | execute-task, report-progress | 16 |
-| supervisor | 14 | broadcast-fleet, review-agent, escalate-issue | 17 |
-| developer | 14 | run-tests, lint-code, review-pr | 17 |
-| consultant | 14 | assess-client, propose-engagement | 16 |
-| advisor | 14 | assess-risk, recommend-action | 16 |
-| analyst | 14 | analyze-data, generate-report | 16 |
-| architect | 14 | design-architecture, assess-tradeoffs | 16 |
-| researcher | 14 | search-literature, document-finding | 16 |
-| operator | 14 | handle-incident, run-playbook | 16 |
-| executive | 14 | make-decision, review-budget | 16 |
-| reviewer | 14 | review-artifact, provide-feedback | 16 |
-| spec-engineer | 14 | validate-spec, generate-requirement | 16 |
+| worker | 15 | execute-task, report-progress | 17 |
+| supervisor | 15 | broadcast-fleet, review-agent, escalate-issue | 18 |
+| developer | 15 | run-tests, lint-code, review-pr | 18 |
+| consultant | 15 | assess-client, propose-engagement | 17 |
+| advisor | 15 | assess-risk, recommend-action | 17 |
+| analyst | 15 | analyze-data, generate-report | 17 |
+| architect | 15 | design-architecture, assess-tradeoffs | 17 |
+| researcher | 15 | search-literature, document-finding | 17 |
+| operator | 15 | handle-incident, run-playbook | 17 |
+| executive | 15 | make-decision, review-budget | 17 |
+| reviewer | 15 | review-artifact, provide-feedback | 17 |
+| spec-engineer | 15 | validate-spec, generate-requirement | 17 |
 
 #### Universal Skills (v3.5.0)
 
