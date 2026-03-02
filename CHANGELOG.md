@@ -11,7 +11,71 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-*No unreleased changes.*
+**Theme**: Quality Reconciliation — aligning claims with reality, closing SOP gaps, content integrity
+
+### Added
+
+- **CONTENT_INTEGRITY_VALIDATION_SPEC v1.0.0** (L608 remediation):
+  - 8 CAP-CIV groups covering all L608 content claim drift dimensions
+  - 38 EARS requirements with enforcement matrix (pre-release, post-release, conformance)
+  - SKOS vocabulary (6 terms), 3 operational validators mapped
+
+- **Specification Enhancement Lifecycle** (L622, ADR-008):
+  - SKILL-041 `aget-enhance-spec` v1.1.0: 30 requirements, 15 V-tests
+  - SOP_specification_enhancement.md: 7-phase lifecycle (Advisory enforcement)
+  - Governance logging requirements (L624)
+
+- **SOPs**:
+  - `SOP_release_scope_decision.md` v1.0.0: 7-phase scope decision lifecycle with P1/P2/P3 rubric, value-cost scoring, deferral staleness tracking, and JSONL decision log
+  - `SOP_pre_release_research.md` v1.3.0: Pre-release research procedure (18 requirements, 7 phases)
+
+- **Spec Enhancements**:
+  - AGET_RELEASE_SPEC v1.9.0: R-REL-019-07 public release handoff requirement (L511, L612)
+  - CAP-INST-001: Instance Content Accuracy requirements (fleet count, portfolio count)
+  - v3.6.0 upgrade guide section in UPGRADING.md
+
+- **Validation Tooling**:
+  - `tests/test_instantiate_template.py`: Agent creation template tests
+  - `verify/validate_py_version_strings.py`: Python version string scanner (L608 Dim 8)
+
+### Changed
+
+- **AGET_SOP_SPEC v1.2.0**: CAP-SOP-006 SOP Lifecycle Management — 8 EARS requirements for lifecycle states (Draft, Active, Deprecated), phantom resolution, deprecation/redirect, referential integrity. 7 stale AGET_CORE_VOCABULARY cross-references fixed (→ AGET_VOCABULARY_SPEC).
+
+- **Evidence-Based Positioning** (P2.7 — 15 READMEs + 2 specs):
+  - AGET_POSITIONING_SPEC v1.3.0: Audience tiers reframed with evidenced capabilities
+  - AGET_IDENTITY_SPEC v1.2.0: Value proposition reframed to lead with domain intelligence
+  - All 12 template READMEs + 3 core READMEs: Removed undemonstrated profession claims, lead with persistent domain knowledge value
+
+- **SOP_release_process.md v1.9.0**: Phase 6.4 added — release handoff creation, content sanitization checklist (no private agent names, repo references, fleet size), publication to `aget/handoffs/`, 4 V-tests (V-REL-038 through V-REL-041)
+
+- **SOP_skill_deployment.md v1.1.0**: Phase 4 added — deprecation marking with `status: deprecated`, `superseded_by`, `deprecated_date` frontmatter fields. Validator integration (`validate_skill_deprecation.py`). Key principle: deprecated = warning, not error (ADR-008).
+
+- **Skill Verb Vocabulary Reconciliation** (P2.10 — ~75 files across 14 repos):
+  - 4 YAML skill spec renames: `aget-healthcheck-*` → `aget-check-*`, `aget-sanity-check` → `aget-check-health`, `aget-studyup` → `aget-study-up`
+  - `check` and `study` registered as approved verbs
+  - DESIGN_DIRECTION_skill_verb_vocabulary.md published
+
+- **Skill Count Alignment** (P1.1): 3-way mismatch resolved — spec, README, and deployed skill counts aligned at 15 universal skills (was 14/14/15). INDEX.md v1.3.0 with 4 stale name fixes. 10 files updated.
+
+- **`scripts/instantiate_template.py`**: Enhanced agent creation script with improved template instantiation
+
+- **Supervisor Template**: 2 new archetype skills (`aget-check-fleet`, `aget-review-handoff`), evidence-rich `/aget-create-project` mode, version-aware health check fix. 21 total skills (6 archetype + 15 universal).
+
+### Fixed
+
+- **Phantom SOP Reference**: `SOP_session_end.md` → `SOP_session_handoff.md` in AGET_GOVERNANCE_HIERARCHY_SPEC (P2.5 — file never existed)
+- **Stale Cross-References**: 7 `AGET_CORE_VOCABULARY` references → `AGET_VOCABULARY_SPEC` in AGET_SOP_SPEC (P2.8)
+- **CHANGELOG Version Support**: "Latest Stable" corrected from v3.5.0 to current release
+
+### Notes
+
+- 19/26 VERSION_SCOPE items complete; 7 deferred to v3.8.0 (P2.3, P3.1-P3.5, CAP-REL-027)
+- Phantom SOP recount (P2.5): Original "17 phantom SOPs" from v3.6.0 reduced to 2 actionable gaps after systematic audit — most had been created during v3.6.0 and v3.7.0 development
+- First `/aget-enhance-spec` dogfood complete (L624) — skill deployment deferred to v3.8.0; SOP + spec ship in this release
+- Governance docs (CHARTER, MISSION, SCOPE_BOUNDARIES) enhanced with 5 structural improvements: canonical template registry, rolling goals, decision authority attribution, governance intensity declaration, quantitative baselines (P2.12)
+- L626: Release planning lifecycle gap identified — release spec governs execution but not planning; CAP-REL-027 deferred to v3.8.0
+- Contract tests: 135 passing
 
 ---
 
@@ -788,7 +852,7 @@ This version exists in migration_history but was never published as a GitHub Rel
 
 ## Version Support
 
-**Latest Stable**: v3.5.0
+**Latest Stable**: v3.6.0
 **Support Window**: Latest release receives full support (bug fixes, enhancements)
 **Previous Minor** (v3.3.x): Security fixes only
 **Older Versions**: No active support (upgrade recommended)
@@ -812,5 +876,5 @@ See [UPGRADING.md](docs/UPGRADING.md) for version-specific migration guides and 
 
 ---
 
-*CHANGELOG.md - Updated 2026-02-14*
+*CHANGELOG.md - Updated 2026-03-01*
 *Maintained by: aget-framework maintainers*
