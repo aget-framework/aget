@@ -23,7 +23,7 @@ vim .aget/version.json
 python3 -m pytest tests/ -v
 
 # 4. Check wake-up
-python3 .aget/patterns/session/wake_up.py
+python3 scripts/wake_up.py
 # Should display new version
 ```
 
@@ -127,7 +127,7 @@ python3 -m pytest tests/ -v
 #### Check Wake-Up
 
 ```bash
-python3 .aget/patterns/session/wake_up.py
+python3 scripts/wake_up.py
 ```
 
 **Expected Output**:
@@ -210,7 +210,8 @@ git commit -m "rollback: Revert to vOLD due to [issue]"
 - AGET_SOP_SPEC v1.2.0 (SOP lifecycle management)
 - Evidence-based positioning (15 READMEs reframed)
 - Skill verb vocabulary aligned (4 renames)
-- Supervisor template: 2 new archetype skills
+- Supervisor template: 1 new archetype skill (`aget-review-handoff`; `aget-check-fleet` was v3.6.0)
+- wind_down.py exit code fix (warnings no longer return exit 1)
 
 **Prerequisite**: Sync your framework clone first:
 ```bash
@@ -233,7 +234,7 @@ jq -r .aget_version ~/path/to/aget-framework/aget/.aget/version.json
    perl -pi -e 's/@aget-version: 3\.6\.0/@aget-version: 3.7.0/' $AGENT/AGENTS.md
    ```
 
-2. **Rename 4 skill directories** (P2.10 verb vocabulary):
+2. **Rename skill directories** (P2.10 verb vocabulary):
    ```bash
    # Rename skills to new canonical names
    cd $AGENT/.claude/skills/
@@ -244,9 +245,18 @@ jq -r .aget_version ~/path/to/aget-framework/aget/.aget/version.json
    [ -d "aget-healthcheck-sessions" ] && mv aget-healthcheck-sessions aget-check-sessions
    [ -d "aget-sanity-check" ] && mv aget-sanity-check aget-check-health
    ```
+   **Note**: If upgrading from v3.6.0, only `aget-studyup` → `aget-study-up` is needed — the other 3 were already renamed in v3.6.0. The `[ -d ... ] &&` guards make this safe either way.
+
    **Why**: AGET verb vocabulary now follows approved verb patterns. `check` replaces `healthcheck`/`sanity-check`; `study-up` adds the required hyphen. Templates include symlinks for backward compatibility, but canonical names have changed.
 
-3. **Update skill references in AGENTS.md** (if your AGENTS.md lists skills):
+3. **Sync wind_down.py** (exit code fix):
+   ```bash
+   TEMPLATE=~/path/to/template-{archetype}-aget
+   cp $TEMPLATE/scripts/wind_down.py $AGENT/scripts/wind_down.py
+   ```
+   **Why**: v3.7.0 fixes wind_down.py to no longer return exit code 1 for persistent warnings (e.g., skill drift). Only errors (broken state) produce non-zero exit codes. This prevents users from ignoring exit codes.
+
+4. **Update skill references in AGENTS.md** (if your AGENTS.md lists skills):
    ```bash
    perl -pi -e 's/aget-studyup/aget-study-up/g' $AGENT/AGENTS.md
    perl -pi -e 's/aget-healthcheck-kb/aget-check-kb/g' $AGENT/AGENTS.md
@@ -254,14 +264,14 @@ jq -r .aget_version ~/path/to/aget-framework/aget/.aget/version.json
    perl -pi -e 's/aget-sanity-check/aget-check-health/g' $AGENT/AGENTS.md
    ```
 
-4. **Add migration_history entry** to `.aget/version.json`:
+5. **Add migration_history entry** to `.aget/version.json`:
    ```json
    "migration_history": [
      "v3.6.0 -> v3.7.0: YYYY-MM-DD (Quality Reconciliation - content integrity, SOP lifecycle, positioning reframe)"
    ]
    ```
 
-5. **Verify**:
+6. **Verify**:
    ```bash
    python3 $AGENT/scripts/wake_up.py
    # Should show v3.7.0
