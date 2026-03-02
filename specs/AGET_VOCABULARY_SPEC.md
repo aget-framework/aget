@@ -663,13 +663,13 @@ Issue_Destination:
 
 Private_Issue_Destination:
   skos:prefLabel: "Private_Issue_Destination"
-  skos:definition: "Issue destination for Private_Fleet_Agent (gmelli/aget-aget)."
+  skos:definition: "Default issue destination for all agents (gmelli/aget-aget). Private-first routing per L638."
   skos:broader: "Issue_Destination"
   aget:value: "gmelli/aget-aget"
 
 Public_Issue_Destination:
   skos:prefLabel: "Public_Issue_Destination"
-  skos:definition: "Issue destination for Public_Remote_Agent (aget-framework/aget)."
+  skos:definition: "Promotion-only destination for principal-approved public issues (aget-framework/aget). Per L638, R-ISSUE-011."
   skos:broader: "Issue_Destination"
   aget:value: "aget-framework/aget"
 
@@ -685,8 +685,8 @@ Public_Remote_Agent:
 
 Issue_Sanitization:
   skos:prefLabel: "Issue_Sanitization"
-  skos:definition: "Process of removing private information from issue content before public filing."
-  skos:related: ["R-ISSUE-003", "R-ISSUE-004", "Private_Pattern"]
+  skos:definition: "Process of removing private information from issue content before promotion to public. Applies at promotion boundary only (L638)."
+  skos:related: ["R-ISSUE-003", "R-ISSUE-004", "R-ISSUE-012", "R-ISSUE-014", "Private_Pattern"]
   aget:enforcement: "sanitize_issue_content.py"
 
 Private_Pattern:
@@ -697,10 +697,10 @@ Private_Pattern:
 
 Cross_Boundary_Filing:
   skos:prefLabel: "Cross_Boundary_Filing"
-  skos:definition: "ANTI-PATTERN: Private agent filing to public repo without sanitization."
+  skos:definition: "ANTI-PATTERN: Any agent filing directly to public repo without promotion (L638)."
   aget:anti_pattern: true
   aget:severity: "high"
-  skos:related: ["R-ISSUE-001", "R-ISSUE-005"]
+  skos:related: ["R-ISSUE-001", "R-ISSUE-002", "R-ISSUE-011"]
 
 Issue_Fragmentation:
   skos:prefLabel: "Issue_Fragmentation"
@@ -711,9 +711,9 @@ Issue_Fragmentation:
 
 | Term | Definition |
 |------|------------|
-| `Issue_Destination` | Target repository for issue filing based on agent type |
-| `Private_Issue_Destination` | Private fleet issue destination (gmelli/aget-aget) |
-| `Public_Issue_Destination` | Public/remote issue destination (aget-framework/aget) |
+| `Issue_Destination` | Target repository for issue filing |
+| `Private_Issue_Destination` | Default issue destination for all agents (gmelli/aget-aget) |
+| `Public_Issue_Destination` | Promotion-only destination for principal-approved public issues (aget-framework/aget) |
 | `Private_Fleet_Agent` | Agent in private fleet, may include private details |
 | `Public_Remote_Agent` | Agent outside private fleet, content must be sanitized |
 | `Issue_Sanitization` | Removing private info before public issue filing |
