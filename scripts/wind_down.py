@@ -665,11 +665,13 @@ Exit codes:
             log_diagnostic(f"Complete in {elapsed:.0f}ms")
 
         # Exit code based on sanity status
+        # Only errors (broken state) produce non-zero exit codes.
+        # Warnings are informational and already printed in output —
+        # returning exit 1 for persistent warnings (e.g., skill drift)
+        # trains users to ignore exit codes, defeating their purpose.
         sanity_status = data['sanity_check'].get('status', 'unknown')
         if sanity_status == 'error':
             return 2
-        elif sanity_status == 'warning':
-            return 1
         return 0
 
     finally:
