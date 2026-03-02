@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [3.7.0] - 2026-03-05
 
 **Theme**: Quality Reconciliation — aligning claims with reality, closing SOP gaps, content integrity
 
@@ -38,6 +38,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `tests/test_instantiate_template.py`: Agent creation template tests
   - `verify/validate_py_version_strings.py`: Python version string scanner (L608 Dim 8)
 
+- **Release Artifacts** (L628 remediation):
+  - `DEPLOYMENT_SPEC_v3.7.0.yaml`: Target-state deployment specification with embedded verification script
+  - v3.7.0 conformance checks in `conformance_config.yaml`: 20 checks including verb naming, skill count, positioning
+  - v3.6.0→v3.7.0 migration section in `docs/UPGRADING.md`: 5-step guide with verb rename commands
+
 ### Changed
 
 - **AGET_SOP_SPEC v1.2.0**: CAP-SOP-006 SOP Lifecycle Management — 8 EARS requirements for lifecycle states (Draft, Active, Deprecated), phantom resolution, deprecation/redirect, referential integrity. 7 stale AGET_CORE_VOCABULARY cross-references fixed (→ AGET_VOCABULARY_SPEC).
@@ -52,7 +57,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **SOP_skill_deployment.md v1.1.0**: Phase 4 added — deprecation marking with `status: deprecated`, `superseded_by`, `deprecated_date` frontmatter fields. Validator integration (`validate_skill_deprecation.py`). Key principle: deprecated = warning, not error (ADR-008).
 
 - **Skill Verb Vocabulary Reconciliation** (P2.10 — ~75 files across 14 repos):
-  - 4 YAML skill spec renames: `aget-healthcheck-*` → `aget-check-*`, `aget-sanity-check` → `aget-check-health`, `aget-studyup` → `aget-study-up`
+  - 4 skill renames: `aget-healthcheck-*` → `aget-check-*`, `aget-sanity-check` → `aget-check-health`, `aget-studyup` → `aget-study-up`
+  - YAML spec renames, SKILL.md content updates, `.claude/skills/` directory renames across all 12 templates
   - `check` and `study` registered as approved verbs
   - DESIGN_DIRECTION_skill_verb_vocabulary.md published
 
@@ -70,12 +76,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Notes
 
-- 19/26 VERSION_SCOPE items complete; 7 deferred to v3.8.0 (P2.3, P3.1-P3.5, CAP-REL-027)
+- 19/26 VERSION_SCOPE items complete; 8 deferred to v3.8.0 (P2.3, P3.1-P3.5, CAP-REL-027, CAP-REL-028, CAP-DEP-010/011/012)
 - Phantom SOP recount (P2.5): Original "17 phantom SOPs" from v3.6.0 reduced to 2 actionable gaps after systematic audit — most had been created during v3.6.0 and v3.7.0 development
 - First `/aget-enhance-spec` dogfood complete (L624) — skill deployment deferred to v3.8.0; SOP + spec ship in this release
 - Governance docs (CHARTER, MISSION, SCOPE_BOUNDARIES) enhanced with 5 structural improvements: canonical template registry, rolling goals, decision authority attribution, governance intensity declaration, quantitative baselines (P2.12)
-- L626: Release planning lifecycle gap identified — release spec governs execution but not planning; CAP-REL-027 deferred to v3.8.0
-- Contract tests: 135 passing
+- Release governance gap trilogy identified (L626/L627/L628): release planning lifecycle, SOP coverage completeness, version-coupled artifact inventory — structural fixes deferred to v3.8.0, immediate mitigations in release plan
+- Contract tests: 134 passing + 1 skip (transient version state)
 
 ---
 
