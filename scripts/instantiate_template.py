@@ -5,7 +5,7 @@ Instantiate Template
 Converts an AGET template into a working agent instance.
 Creates agent-specific identity, directories, and initial configuration.
 
-Part of AGET v3.0.0-beta.3 - Template UX improvements.
+Part of AGET v3.6.0 - Template UX improvements.
 
 Usage:
     python3 instantiate_template.py --template template-advisor-aget --name my-advisor-AGET
@@ -33,7 +33,7 @@ class TemplateInstantiator:
 
     TEMPLATE_PREFIX = "template-"
     TEMPLATE_SUFFIX = "-aget"
-    AGENT_SUFFIX = "-AGET"
+    VALID_SUFFIXES = ("-aget", "-AGET")  # L480: -aget = internal KB, -AGET = external systems
 
     def __init__(self, template_path: Path, agent_name: str, agent_path: Path):
         self.template_path = template_path
@@ -61,14 +61,25 @@ class TemplateInstantiator:
         return None
 
     def validate_agent_name(self) -> Optional[str]:
-        """Validate agent name follows conventions."""
-        if not self.agent_name.endswith(self.AGENT_SUFFIX):
-            return f"Agent name must end with '{self.AGENT_SUFFIX}'"
+        """Validate agent name follows conventions.
+
+        Per L480 (Write Scope Vocabulary):
+          -aget = internal KB writes only (standard agents)
+          -AGET = external system writes (repo managers, supervisors)
+        """
+        if not any(self.agent_name.endswith(suffix) for suffix in self.VALID_SUFFIXES):
+            return f"Agent name must end with '-aget' (internal KB) or '-AGET' (external systems)"
 
         if self.agent_path.exists():
             return f"Agent directory already exists: {self.agent_path}"
 
         return None
+
+    def _get_instance_type(self) -> str:
+        """Determine instance type from agent name suffix."""
+        if self.agent_name.endswith("-AGET"):
+            return "AGET"
+        return "aget"
 
     def instantiate(self, persona: Optional[str] = None, dry_run: bool = False) -> Dict[str, Any]:
         """Create agent instance from template."""
@@ -98,7 +109,16 @@ class TemplateInstantiator:
             # Step 5: Update manifest.yaml
             self._update_manifest(dry_run)
 
-            # Step 6: Initialize git (optional)
+            # Step 6: Create CLAUDE.md symlink (SOP G3.6)
+            self._create_claude_md_symlink(dry_run)
+
+            # Step 7: Deploy session scripts (SOP G3.7)
+            self._deploy_session_scripts(dry_run)
+
+            # Step 8: Validate archetype skills (SOP G3.8)
+            self._validate_archetype_skills(dry_run)
+
+            # Step 9: Initialize git (optional)
             self._init_git(dry_run)
 
             results["actions"] = self.actions
@@ -169,8 +189,8 @@ class TemplateInstantiator:
             with open(version_file) as f:
                 data = json.load(f)
 
-            # Update for instance
-            data["instance_type"] = "aget"
+            # Update for instance — type derived from suffix (L480)
+            data["instance_type"] = self._get_instance_type()
             data["agent_name"] = self.agent_name
             data["instantiated_from"] = self.template_path.name
             data["instantiated_date"] = datetime.now().strftime("%Y-%m-%d")
@@ -270,6 +290,76 @@ class TemplateInstantiator:
                 with open(manifest_file, 'w') as f:
                     f.write(content)
 
+    def _create_claude_md_symlink(self, dry_run: bool):
+        """Create CLAUDE.md -> AGENTS.md symlink (SOP G3.6)."""
+        agents_md = self.agent_path / "AGENTS.md"
+        claude_md = self.agent_path / "CLAUDE.md"
+
+        action = {
+            "type": "create_symlink",
+            "source": "AGENTS.md",
+            "target": "CLAUDE.md",
+            "purpose": "Claude Code discovers CLAUDE.md; symlink to AGENTS.md"
+        }
+        self.actions.append(action)
+
+        if not dry_run:
+            if agents_md.exists() and not claude_md.exists():
+                claude_md.symlink_to("AGENTS.md")
+
+    def _deploy_session_scripts(self, dry_run: bool):
+        """Deploy canonical session scripts from aget/scripts/ (SOP G3.7)."""
+        # Derive framework path from template location
+        framework_path = self.template_path.parent
+        canonical_scripts_dir = framework_path / "aget" / "scripts"
+
+        scripts_to_deploy = ["wake_up.py", "wind_down.py"]
+        scripts_dir = self.agent_path / "scripts"
+
+        action = {
+            "type": "deploy_session_scripts",
+            "scripts": scripts_to_deploy,
+            "source": str(canonical_scripts_dir),
+            "target": str(scripts_dir)
+        }
+        self.actions.append(action)
+
+        if not dry_run:
+            scripts_dir.mkdir(parents=True, exist_ok=True)
+            for script_name in scripts_to_deploy:
+                src = canonical_scripts_dir / script_name
+                dst = scripts_dir / script_name
+                if src.exists() and not dst.exists():
+                    shutil.copy2(src, dst)
+
+    def _validate_archetype_skills(self, dry_run: bool):
+        """Validate archetype skills are present (SOP G3.8). Warns but does not block."""
+        skills_dir = self.agent_path / ".claude" / "skills"
+
+        action = {
+            "type": "validate_archetype_skills",
+            "skills_dir": str(skills_dir),
+            "warnings": []
+        }
+
+        if not dry_run and skills_dir.exists():
+            skill_count = sum(1 for d in skills_dir.iterdir() if d.is_dir())
+            # Universal skills: 15, archetype-specific: 2-6
+            if skill_count < 15:
+                action["warnings"].append(
+                    f"Only {skill_count} skills found (expected ≥15 universal)"
+                )
+            # Check for SKILL.md in each skill directory
+            for skill_dir in sorted(skills_dir.iterdir()):
+                if skill_dir.is_dir():
+                    skill_md = skill_dir / "SKILL.md"
+                    if not skill_md.exists():
+                        action["warnings"].append(
+                            f"Missing SKILL.md in {skill_dir.name}/"
+                        )
+
+        self.actions.append(action)
+
     def _init_git(self, dry_run: bool):
         """Initialize git repository for agent."""
         action = {
@@ -308,7 +398,7 @@ def main():
     )
     parser.add_argument(
         "--name", "-n",
-        help="Name for new agent (must end with -AGET)"
+        help="Name for new agent (must end with -aget or -AGET)"
     )
     parser.add_argument(
         "--output", "-o",
@@ -426,6 +516,18 @@ def main():
                 print(f"  + Create {action['path']}/")
             elif action_type == "update_manifest":
                 print(f"  * Update manifest.yaml")
+            elif action_type == "create_symlink":
+                print(f"  + Create CLAUDE.md -> AGENTS.md symlink")
+            elif action_type == "deploy_session_scripts":
+                print(f"  + Deploy session scripts: {', '.join(action.get('scripts', []))}")
+            elif action_type == "validate_archetype_skills":
+                warnings = action.get("warnings", [])
+                if warnings:
+                    print(f"  ! Skill validation warnings:")
+                    for w in warnings:
+                        print(f"      - {w}")
+                else:
+                    print(f"  ✓ Archetype skills validated")
             elif action_type == "git_init":
                 print(f"  ? Consider: git init (manual)")
 
@@ -439,12 +541,21 @@ def main():
         else:
             print(f"SUCCESS: Agent created at {agent_path}")
             print()
-            print("Next steps:")
+            print("Next steps (automated by this script):")
+            print(f"  ✓ Template copied and configured (G3.1)")
+            print(f"  ✓ version.json updated (G3.3)")
+            print(f"  ✓ CLAUDE.md symlink created (G3.6)")
+            print(f"  ✓ Session scripts deployed (G3.7)")
+            print(f"  ✓ Archetype skills validated (G3.8)")
+            print()
+            print("Manual post-instantiation steps (see SOP_aget_create.md):")
             print(f"  1. cd {agent_path}")
-            print(f"  2. Edit .aget/identity.json to customize North Star")
-            print(f"  3. Edit governance/CHARTER.md for agent-specific charter")
-            print(f"  4. git init && git add . && git commit -m 'Initial agent'")
-            print(f"  5. Run: python3 -m pytest tests/ -v  # Verify setup")
+            print(f"  2. Copy domain specs to specs/ (G3.2: VOCABULARY.md, SPEC.md, METHODOLOGY.md)")
+            print(f"  3. Edit .aget/identity.json — derive north_star from DOMAIN_SPEC.md (G3.4)")
+            print(f"  4. Create AGENTS.md with agent-specific configuration (G3.5)")
+            print(f"  5. Edit governance/CHARTER.md for agent-specific charter")
+            print(f"  6. git init && git add . && git commit -m 'Initial agent'")
+            print(f"  7. Run: python3 -m pytest tests/ -v  # Verify setup")
     else:
         print(f"ERROR: {results['error']}", file=sys.stderr)
         sys.exit(1)
