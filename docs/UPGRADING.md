@@ -192,6 +192,95 @@ git commit -m "rollback: Revert to vOLD due to [issue]"
 
 ## Version-Specific Migration Guides
 
+### v3.6.0 → v3.7.0
+
+**Release Date**: 2026-03-05
+
+**Theme**: Quality Reconciliation — Content Integrity, SOP Lifecycle, Positioning Reframe
+
+**Breaking Changes**: None. Fully backward compatible with v3.6.x. However, 4 skill directory renames require attention.
+
+**Do I need to act?**
+- **YES** if: You have skills with old names (`aget-studyup`, `aget-healthcheck-*`, `aget-sanity-check`)
+- **YES** if: Your AGENTS.md mentions "lawyers", "doctors", or similar profession claims
+- **Minimal** if: You only need the version bump (Steps 1-2 below)
+
+**New Features**:
+- CONTENT_INTEGRITY_VALIDATION_SPEC v1.0.0 (8 dimensions of claim drift)
+- AGET_SOP_SPEC v1.2.0 (SOP lifecycle management)
+- Evidence-based positioning (15 READMEs reframed)
+- Skill verb vocabulary aligned (4 renames)
+- Supervisor template: 2 new archetype skills
+
+**Prerequisite**: Sync your framework clone first:
+```bash
+cd ~/path/to/aget-framework/aget && git pull origin main
+cd ~/path/to/template-{archetype}-aget && git pull origin main
+
+# Verify v3.7.0 is available
+jq -r .aget_version ~/path/to/aget-framework/aget/.aget/version.json
+# Expected: "3.7.0"
+```
+
+**Migration Steps**:
+
+1. **Update version markers**:
+   ```bash
+   AGENT=~/path/to/your-agent
+
+   # Use perl on macOS (not sed — see L570)
+   perl -pi -e 's/"aget_version": "3\.6\.0"/"aget_version": "3.7.0"/' $AGENT/.aget/version.json
+   perl -pi -e 's/@aget-version: 3\.6\.0/@aget-version: 3.7.0/' $AGENT/AGENTS.md
+   ```
+
+2. **Rename 4 skill directories** (P2.10 verb vocabulary):
+   ```bash
+   # Rename skills to new canonical names
+   cd $AGENT/.claude/skills/
+
+   # Only rename if old name exists
+   [ -d "aget-studyup" ] && mv aget-studyup aget-study-up
+   [ -d "aget-healthcheck-kb" ] && mv aget-healthcheck-kb aget-check-kb
+   [ -d "aget-healthcheck-sessions" ] && mv aget-healthcheck-sessions aget-check-sessions
+   [ -d "aget-sanity-check" ] && mv aget-sanity-check aget-check-health
+   ```
+   **Why**: AGET verb vocabulary now follows approved verb patterns. `check` replaces `healthcheck`/`sanity-check`; `study-up` adds the required hyphen. Templates include symlinks for backward compatibility, but canonical names have changed.
+
+3. **Update skill references in AGENTS.md** (if your AGENTS.md lists skills):
+   ```bash
+   perl -pi -e 's/aget-studyup/aget-study-up/g' $AGENT/AGENTS.md
+   perl -pi -e 's/aget-healthcheck-kb/aget-check-kb/g' $AGENT/AGENTS.md
+   perl -pi -e 's/aget-healthcheck-sessions/aget-check-sessions/g' $AGENT/AGENTS.md
+   perl -pi -e 's/aget-sanity-check/aget-check-health/g' $AGENT/AGENTS.md
+   ```
+
+4. **Add migration_history entry** to `.aget/version.json`:
+   ```json
+   "migration_history": [
+     "v3.6.0 -> v3.7.0: YYYY-MM-DD (Quality Reconciliation - content integrity, SOP lifecycle, positioning reframe)"
+   ]
+   ```
+
+5. **Verify**:
+   ```bash
+   python3 $AGENT/scripts/wake_up.py
+   # Should show v3.7.0
+
+   # Check for stale skill names
+   ls $AGENT/.claude/skills/ | grep -E "studyup|healthcheck|sanity-check"
+   # Expected: No results
+
+   # Check for stale version references
+   grep -r "3\.6\.0" $AGENT --include="*.yaml" --include="*.json" | grep -v migration_history
+   # Expected: No results (or only feature-introduction markers)
+   ```
+
+**Estimated Time**: 5-10 minutes per agent
+
+**See Also**: [RELEASE_HANDOFF_v3.7.0.md](../handoffs/RELEASE_HANDOFF_v3.7.0.md)
+
+---
+
 ### v3.5.0 → v3.6.0
 
 **Release Date**: 2026-02-21

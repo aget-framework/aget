@@ -1,0 +1,501 @@
+# DEPLOYMENT_SPEC_v3.7.0.yaml
+# Complete target state specification for v3.7.0 deployment
+#
+# Purpose: Define what a correctly-deployed v3.7.0 agent looks like.
+# Usage: Supervisors use this to verify fleet deployments.
+# Governance: R-DEP-002 (State-Based Deployment Requirement)
+#
+# Created: 2026-03-01
+# Origin: L541 (Delta vs State Gap), DEPLOYMENT_SPEC_v3.6.0.yaml
+# Release: Quality Reconciliation (content integrity, SOP lifecycle, positioning reframe)
+# L628: Version-coupled artifact — must be created per release
+
+version: "3.7.0"
+spec_version: "1.3.0"
+created: "2026-03-01"
+status: active
+supersedes: "DEPLOYMENT_SPEC_v3.6.0.yaml"
+
+# =============================================================================
+# VERSION INDICATORS
+# =============================================================================
+# All agents MUST have these version indicators set to 3.7.0
+
+version_indicators:
+  version_json:
+    path: ".aget/version.json"
+    field: "aget_version"
+    value: "3.7.0"
+    verification: "jq -r .aget_version .aget/version.json"
+
+  agents_md:
+    path: "AGENTS.md"
+    pattern: "@aget-version: 3.7.0"
+    verification: "grep '@aget-version' AGENTS.md"
+
+  manifest_yaml:
+    path: "manifest.yaml"
+    field: "version"
+    value: "3.7.0"
+    verification: "yq -r .version manifest.yaml"
+
+  readme_md:
+    path: "README.md"
+    pattern: "**Version**: v3.7.0"
+    verification: "grep 'Version' README.md | head -1"
+
+# =============================================================================
+# UNIVERSAL SKILLS (Required for ALL agents)
+# =============================================================================
+# Canonical source: template-worker-aget/.claude/skills/ (reference implementation)
+# v3.7.0 CHANGE: 4 verb renames (P2.10)
+
+universal_skills:
+  source: "template-worker-aget/.claude/skills/"
+  verification: "core_match"  # Per L582
+  extension_policy: "preserve"  # Agent-specific extensions MUST be preserved
+
+  # Pre-sync protocol (R-DEP-004, R-DEP-005)
+  pre_sync_check: |
+    Before overwriting any skill with local modifications:
+    1. Run diff: compare local vs template
+    2. Classify divergence: drift (fix) vs extension (preserve)
+    3. If extension detected: merge, don't overwrite
+    4. Document preserved extensions in commit message
+
+  required:
+    # Session Skills
+    - name: "aget-wake-up"
+      purpose: "Session initialization"
+
+    - name: "aget-wind-down"
+      purpose: "Session closure"
+
+    - name: "aget-study-up"
+      purpose: "Focused KB research on topic before implementation"
+      new_in: "3.6.0"
+      renamed_in: "3.7.0"
+      old_name: "aget-studyup"
+
+    # Health Skills (renamed in v3.7.0 from healthcheck-* to check-*)
+    - name: "aget-check-health"
+      purpose: "Sanity check orchestration"
+      renamed_in: "3.7.0"
+      old_name: "aget-sanity-check"
+
+    - name: "aget-check-kb"
+      purpose: "Knowledge base health"
+      renamed_in: "3.7.0"
+      old_name: "aget-healthcheck-kb"
+
+    - name: "aget-check-evolution"
+      purpose: "Evolution directory health"
+
+    - name: "aget-check-sessions"
+      purpose: "Sessions directory health"
+      renamed_in: "3.7.0"
+      old_name: "aget-healthcheck-sessions"
+
+    # Project Skills
+    - name: "aget-create-project"
+      purpose: "Research-informed project creation"
+
+    - name: "aget-review-project"
+      purpose: "Mid-flight project review"
+
+    - name: "aget-save-state"
+      purpose: "Workflow state capture"
+
+    # Learning Skills
+    - name: "aget-record-lesson"
+      purpose: "L-doc creation"
+
+    - name: "aget-capture-observation"
+      purpose: "Lightweight observation capture"
+
+    # Governance Skills
+    - name: "aget-file-issue"
+      purpose: "Issue filing with L520 compliance"
+
+    - name: "aget-propose-skill"
+      purpose: "Skill proposal governance"
+
+    # Development Skills
+    - name: "aget-create-skill"
+      purpose: "Skill creation with spec scaffolding"
+
+  count: 15  # Same count as v3.6.0; 4 renamed, 0 added/removed
+
+  # v3.7.0 renames (P2.10 verb vocabulary reconciliation)
+  renames:
+    - old: "aget-studyup"
+      new: "aget-study-up"
+      reason: "Hyphen required per PS-002"
+
+    - old: "aget-healthcheck-kb"
+      new: "aget-check-kb"
+      reason: "check is approved verb; healthcheck is not"
+
+    - old: "aget-healthcheck-sessions"
+      new: "aget-check-sessions"
+      reason: "check is approved verb; healthcheck is not"
+
+    - old: "aget-sanity-check"
+      new: "aget-check-health"
+      reason: "Object is health, verb is check"
+
+# =============================================================================
+# SKILL SPECIFICATIONS
+# =============================================================================
+# Canonical source: aget/.aget/specs/skills/
+
+skill_specs:
+  source: "aget/.aget/specs/skills/"
+  verification: "count_and_hash"
+
+  required_files:
+    - pattern: "SKILL-*.yaml"
+      min_count: 15
+
+    - file: "INDEX.md"
+      purpose: "Skill index"
+
+    - file: "SKILL_VOCABULARY.md"
+      purpose: "Skill vocabulary definitions"
+
+    - file: "ONTOLOGY_skills.yaml"
+      purpose: "Skills ontology"
+
+# =============================================================================
+# ONTOLOGY (Archetype-specific)
+# =============================================================================
+# Canonical source: template-{archetype}-aget/ontology/
+
+ontology:
+  verification: "exists"
+
+  archetypes:
+    worker:
+      source: "template-worker-aget/ontology/"
+      file: "ONTOLOGY_worker.yaml"
+
+    supervisor:
+      source: "template-supervisor-aget/ontology/"
+      file: "ONTOLOGY_supervisor.yaml"
+      changes_in_370:
+        - "2 new archetype skills: aget-check-fleet, aget-review-handoff"
+
+    developer:
+      source: "template-developer-aget/ontology/"
+      file: "ONTOLOGY_developer.yaml"
+
+    researcher:
+      source: "template-researcher-aget/ontology/"
+      file: "ONTOLOGY_researcher.yaml"
+
+    analyst:
+      source: "template-analyst-aget/ontology/"
+      file: "ONTOLOGY_analyst.yaml"
+
+    consultant:
+      source: "template-consultant-aget/ontology/"
+      file: "ONTOLOGY_consultant.yaml"
+
+    advisor:
+      source: "template-advisor-aget/ontology/"
+      file: "ONTOLOGY_advisor.yaml"
+
+    operator:
+      source: "template-operator-aget/ontology/"
+      file: "ONTOLOGY_operator.yaml"
+
+    executive:
+      source: "template-executive-aget/ontology/"
+      file: "ONTOLOGY_executive.yaml"
+
+    reviewer:
+      source: "template-reviewer-aget/ontology/"
+      file: "ONTOLOGY_reviewer.yaml"
+
+    spec_engineer:
+      source: "template-spec-engineer-aget/ontology/"
+      file: "ONTOLOGY_spec-engineer.yaml"
+
+# =============================================================================
+# SESSION SCRIPTS
+# =============================================================================
+# Canonical source: aget/scripts/
+
+session_scripts:
+  source: "aget/scripts/"
+  target: "scripts/"
+  verification: "hash_match"
+
+  deprecated_paths:
+    - ".aget/patterns/session/"
+
+  required:
+    - name: "wake_up.py"
+      purpose: "Session initialization (v2.0.0 with C3+C1 extensions)"
+      classification: "Framework_Artifact"
+
+    - name: "wind_down.py"
+      purpose: "Session closure (v2.0.0 with C3+C1 extensions)"
+      classification: "Framework_Artifact"
+
+    - name: "study_up.py"
+      purpose: "Focused KB research on topic"
+      classification: "Framework_Artifact"
+
+    - name: "aget_housekeeping_protocol.py"
+      purpose: "Sanity check implementation"
+      classification: "Framework_Artifact"
+
+  extensions:
+    policy: "preserve"
+    description: "Agent-specific extensions that augment framework scripts"
+    files:
+      - name: "wake_up_ext.py"
+        purpose: "Domain-specific wake-up additions"
+        contract: "post_wake(data) -> augmented data dict"
+        required: false
+
+      - name: "wind_down_ext.py"
+        purpose: "Domain-specific wind-down additions"
+        contract: "post_wind_down(data) -> augmented data dict"
+        required: false
+
+# =============================================================================
+# POSITIONING (Changed in v3.7.0)
+# =============================================================================
+
+positioning:
+  description: "Evidence-based positioning reframe (P2.7)"
+  changes_in_370:
+    - "Removed undemonstrated profession claims (lawyers, doctors)"
+    - "Lead with persistent domain knowledge value"
+    - "All 15 READMEs updated"
+
+  banned_patterns:
+    - "lawyers"
+    - "doctors"
+    - "legal professionals"
+    - "healthcare"
+
+  verification: |
+    grep -rn "lawyers\|doctors\|legal professionals\|healthcare" AGENTS.md README.md
+    # Expected: 0 matches
+
+# =============================================================================
+# PLATFORM COMPATIBILITY
+# =============================================================================
+
+platform_compatibility:
+  source_of_truth: "aget/docs/AGET_CLI_SUPPORT_MATRIX.md"
+  agents_md_line: "Works with Claude Code, Codex CLI, Gemini CLI, and other CLI coding agents."
+  supported:
+    - name: "Claude Code"
+      status: "Baseline"
+    - name: "Codex CLI"
+      status: "Compatible"
+    - name: "Gemini CLI"
+      status: "Compatible"
+  experimental:
+    - name: "Cursor"
+      status: "Experimental"
+    - name: "Aider"
+      status: "Experimental"
+
+# =============================================================================
+# MIGRATION HISTORY
+# =============================================================================
+
+migration_history:
+  required_entry: "v3.6.0 -> v3.7.0"
+  pattern: "v3.6.0 -> v3.7.0: YYYY-MM-DD (Quality Reconciliation - content integrity, SOP lifecycle, positioning reframe)"
+  verification: "jq '.migration_history | last' .aget/version.json | grep '3.7.0'"
+
+# =============================================================================
+# VERIFICATION SCRIPT
+# =============================================================================
+
+verification_script: |
+  #!/bin/bash
+  # v3.7.0 Deployment Verification
+  # Usage: ./verify_v3.7.0.sh /path/to/agent
+
+  AGENT_DIR="${1:-.}"
+  VERSION="3.7.0"
+  ERRORS=0
+  WARNINGS=0
+
+  echo "=== v$VERSION Deployment Verification ==="
+  echo "Agent: $AGENT_DIR"
+  echo ""
+
+  # 1. Version indicators
+  echo "--- Version Indicators ---"
+  VJ=$(jq -r .aget_version "$AGENT_DIR/.aget/version.json" 2>/dev/null)
+  [ "$VJ" = "$VERSION" ] && echo "[OK] version.json: $VJ" || { echo "[FAIL] version.json: $VJ"; ((ERRORS++)); }
+
+  AM=$(grep -o '@aget-version: [0-9.]*' "$AGENT_DIR/AGENTS.md" 2>/dev/null | cut -d' ' -f2)
+  [ "$AM" = "$VERSION" ] && echo "[OK] AGENTS.md: $AM" || { echo "[FAIL] AGENTS.md: $AM"; ((ERRORS++)); }
+
+  echo ""
+
+  # 2. Universal skills (15, with v3.7.0 names)
+  echo "--- Universal Skills (v3.7.0 names) ---"
+  UNIVERSAL="aget-wake-up aget-wind-down aget-study-up aget-check-health aget-check-kb aget-check-evolution aget-check-sessions aget-create-project aget-review-project aget-save-state aget-record-lesson aget-capture-observation aget-file-issue aget-propose-skill aget-create-skill"
+  for skill in $UNIVERSAL; do
+    if [ -d "$AGENT_DIR/.claude/skills/$skill" ]; then
+      echo "[OK] $skill"
+    else
+      echo "[FAIL] $skill MISSING"
+      ((ERRORS++))
+    fi
+  done
+
+  # Check for old names (should NOT exist)
+  echo ""
+  echo "--- Stale Skill Names (should not exist) ---"
+  OLD_NAMES="aget-studyup aget-healthcheck-kb aget-healthcheck-sessions aget-sanity-check"
+  for old in $OLD_NAMES; do
+    if [ -d "$AGENT_DIR/.claude/skills/$old" ]; then
+      echo "[WARN] $old still exists (rename to new name)"
+      ((WARNINGS++))
+    fi
+  done
+
+  echo ""
+
+  # 3. Session scripts
+  echo "--- Session Scripts ---"
+  for script in wake_up.py wind_down.py study_up.py aget_housekeeping_protocol.py; do
+    if [ -f "$AGENT_DIR/scripts/$script" ]; then
+      echo "[OK] scripts/$script"
+    elif [ -f "$AGENT_DIR/.aget/patterns/session/$script" ]; then
+      echo "[WARN] $script at deprecated path (.aget/patterns/session/)"
+      ((WARNINGS++))
+    else
+      echo "[FAIL] $script MISSING"
+      ((ERRORS++))
+    fi
+  done
+
+  echo ""
+
+  # 4. Positioning (P2.7)
+  echo "--- Positioning (no undemonstrated claims) ---"
+  BANNED=$(grep -ci "lawyers\|doctors\|legal professionals\|healthcare" "$AGENT_DIR/AGENTS.md" 2>/dev/null)
+  [ "$BANNED" = "0" ] && echo "[OK] No banned positioning terms" || { echo "[FAIL] $BANNED banned term(s) found"; ((ERRORS++)); }
+
+  echo ""
+
+  # 5. Migration history
+  echo "--- Migration History ---"
+  MH=$(jq -r '.migration_history | last' "$AGENT_DIR/.aget/version.json" 2>/dev/null)
+  if echo "$MH" | grep -q "$VERSION"; then
+    echo "[OK] migration_history includes $VERSION"
+  else
+    echo "[FAIL] migration_history missing $VERSION entry"
+    ((ERRORS++))
+  fi
+
+  echo ""
+  echo "=== Summary ==="
+  if [ $ERRORS -eq 0 ] && [ $WARNINGS -eq 0 ]; then
+    echo "PASS: Agent is correctly deployed at v$VERSION"
+    exit 0
+  elif [ $ERRORS -eq 0 ]; then
+    echo "PASS (with $WARNINGS warning(s)): Agent is deployed at v$VERSION"
+    exit 0
+  else
+    echo "FAIL: $ERRORS error(s), $WARNINGS warning(s)"
+    exit 1
+  fi
+
+# =============================================================================
+# DEPLOYMENT CHECKLIST
+# =============================================================================
+
+deployment_checklist:
+  pre_deployment:
+    - "Verify agent is at v3.6.0"
+    - "Backup current .claude/skills/ directory"
+    - "Read CANONICAL_SOURCES.md for sync commands"
+
+  version_bump:
+    - "Update .aget/version.json aget_version to 3.7.0"
+    - "Update AGENTS.md @aget-version line"
+    - "Update manifest.yaml version field"
+    - "Add migration_history entry: v3.6.0 -> v3.7.0"
+
+  skill_renames:
+    - "Rename .claude/skills/aget-studyup → aget-study-up"
+    - "Rename .claude/skills/aget-healthcheck-kb → aget-check-kb"
+    - "Rename .claude/skills/aget-healthcheck-sessions → aget-check-sessions"
+    - "Rename .claude/skills/aget-sanity-check → aget-check-health"
+    - "Update any AGENTS.md references to old names"
+
+  positioning_update:
+    - "Verify AGENTS.md has no undemonstrated profession claims"
+    - "Lead with persistent domain knowledge value"
+
+  script_sync:
+    - "Sync wake_up.py, wind_down.py, study_up.py from aget/scripts/"
+    - "Preserve wake_up_ext.py and wind_down_ext.py if they exist"
+
+  verification:
+    - "Run verification script (see above)"
+    - "All checks pass with zero errors"
+
+  commit:
+    - "Commit with message: 'chore: Upgrade to v3.7.0 (Quality Reconciliation)'"
+
+# =============================================================================
+# WHAT'S NEW IN v3.7.0
+# =============================================================================
+
+whats_new:
+  summary: "Quality Reconciliation - content integrity, SOP lifecycle, positioning reframe"
+
+  highlights:
+    - title: "Content Integrity Spec (L608)"
+      description: "CONTENT_INTEGRITY_VALIDATION_SPEC v1.0.0 — 8 CAP-CIV groups, 38 EARS requirements covering all claim drift dimensions"
+
+    - title: "SOP Lifecycle (CAP-SOP-006)"
+      description: "AGET_SOP_SPEC v1.2.0 — lifecycle states (Draft, Active, Deprecated), phantom resolution, referential integrity"
+
+    - title: "Evidence-Based Positioning (P2.7)"
+      description: "15 READMEs + 2 specs reframed to lead with domain intelligence value. Zero undemonstrated profession claims."
+
+    - title: "Skill Verb Vocabulary (P2.10)"
+      description: "4 skill renames to comply with approved verb vocabulary. healthcheck→check, studyup→study-up."
+
+    - title: "Skill Count Alignment (P1.1)"
+      description: "3-way mismatch resolved. Spec, README, and deployed all at 15 universal skills."
+
+    - title: "Supervisor Template (P2.11)"
+      description: "2 new archetype skills (aget-check-fleet, aget-review-handoff), evidence-rich /aget-create-project."
+
+# =============================================================================
+# TRACEABILITY
+# =============================================================================
+
+traceability:
+  origin:
+    - "L608: Content Claim Drift (8 dimensions)"
+    - "L626: Release Planning Lifecycle Gap"
+    - "L627: Release Plan SOP Coverage Gap"
+    - "L628: Version-Coupled Artifact Inventory Gap"
+  project: "PROJECT_PLAN_v3.7.0_release_v1.0.md"
+  supersedes: "DEPLOYMENT_SPEC_v3.6.0.yaml"
+  requirements:
+    - "R-DEP-001: Canonical Source Requirement"
+    - "R-DEP-002: State-Based Deployment Requirement"
+    - "R-REL-038: Deployment Specification Requirement"
+  related:
+    - "docs/CANONICAL_SOURCES.md"
+    - "docs/VERSION_BEARING_FILES.md"
+    - "sops/SOP_release_process.md"
+    - "docs/UPGRADING.md"
