@@ -252,6 +252,20 @@ python3 validation/validate_identity_json.py .aget/identity.json
 
 ---
 
+## Deprecation Schedule
+
+### north_star String Format
+
+| Phase | Version | Status | Behavior |
+|-------|---------|--------|----------|
+| De facto deprecated | v3.0.0 | **Current** | String format causes wake_up.py `AttributeError`. No formal deprecation notice. |
+| Formal deprecation | v3.7.0 | Planned | `validate_identity_json.py` emits WARNING for string format. Migration guide referenced. |
+| Hard removal | v4.0.0 | Planned | String format rejected by validation. Object format required. |
+
+**Migration**: See [From String north_star to Object](#from-string-north_star-to-object) below.
+
+---
+
 ## Migration Guide
 
 ### From String north_star to Object
