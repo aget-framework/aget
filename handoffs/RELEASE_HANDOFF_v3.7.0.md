@@ -71,6 +71,8 @@ None. v3.7.0 is fully backward compatible with v3.6.x.
    ```
    **Why**: AGET verb vocabulary now follows PowerShell Approved Verbs pattern. `check` replaces `healthcheck`/`sanity-check`; `study-up` adds required hyphen.
 
+   **Warning — Skill Customization Risk**: If any agent has customized `SKILL.md` content (modified prompts, added domain context, adjusted parameters), a simple `mv` preserves those customizations. However, if you copy fresh `SKILL.md` files from templates instead, customizations will be lost. **Before renaming**: `diff` each agent's `SKILL.md` against the template version. Classify as framework-standard (safe to overwrite) or customized (preserve and merge). There is no automated tool for this — manual review is required. Automated skill customization detection is planned for v3.8.0.
+
 4. **Update skill references in AGENTS.md** (if present):
    - `aget-studyup` → `aget-study-up`
    - `aget-healthcheck-kb` → `aget-check-kb`
