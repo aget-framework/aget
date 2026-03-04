@@ -4,7 +4,7 @@
 **Status**: Active
 **Created**: 2026-02-15
 **Updated**: 2026-03-01
-**Author**: aget-framework
+**Owner**: aget-framework
 **Category**: Skills
 **Spec Reference**: SKILL_NAMING_CONVENTION_SPEC v1.2.0 (CAP-SKILL-DEP-001, CAP-SKILL-LIFE-001)
 

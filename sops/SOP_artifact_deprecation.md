@@ -1,6 +1,7 @@
 # SOP: Artifact Deprecation
 
 **Version**: 1.0.0
+**Status**: Active
 **Created**: 2026-01-12
 **Owner**: aget-framework
 **Related**: AGET_VOCABULARY_SPEC Part 7 (Authority Model)

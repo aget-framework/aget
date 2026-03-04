@@ -1,7 +1,7 @@
 # SOP: Template Validation
 
 **Version**: 1.0.0
-**Date**: 2026-01-11
+**Created**: 2026-01-11
 **Status**: Active
 **Owner**: aget-framework
 **Implements**: CAP-TPL-014, R-REL-015

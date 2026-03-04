@@ -1,6 +1,7 @@
 # SOP: Release Scope Decision
 
 **Version**: 1.0.0
+**Status**: Active
 **Created**: 2026-02-28
 **Owner**: private-aget-framework-AGET
 **Related**: L465, L553, L591, L605, L621, AGET_SOP_SPEC v1.1.0

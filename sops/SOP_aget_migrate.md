@@ -1,6 +1,7 @@
 # SOP: Instance_Migration to v3.0
 
 **Version**: 1.2.0
+**Status**: Active
 **Created**: 2025-12-27
 **Updated**: 2026-02-14 (v3.5.0 ontology/skill migration steps)
 **Owner**: aget-framework
@@ -14,6 +15,14 @@
 ## Purpose
 
 Standard operating procedure for Instance_Migration from v2.x to v3.0 5D Composition Architecture. This SOP prevents common misconceptions and ensures Structural_Validation compliance.
+
+---
+
+## Scope
+
+**Applies to**: All AGET instances migrating from v2.x to v3.0+ (also applicable for v3.4→v3.5 structural changes).
+
+**Does not apply to**: New agent creation (see SOP_aget_create.md), fleet-wide migrations (see SOP_fleet_migration.md).
 
 ---
 

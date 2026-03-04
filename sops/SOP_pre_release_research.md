@@ -28,9 +28,10 @@
 ---
 
 **Version**: 1.3.0
+**Status**: Active
 **Created**: 2026-01-04
 **Updated**: 2026-01-17
-**Owner**: {agent-name}
+**Owner**: aget-framework
 **Category**: Release Management
 **Related**: L332, L346, SOP_release_process.md, RELEASE_VERIFICATION_CHECKLIST.md
 
