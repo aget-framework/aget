@@ -1,7 +1,7 @@
 # SOP: Template Lifecycle Management
 
 **Version**: 1.0.0
-**Date**: 2026-01-11
+**Created**: 2026-01-11
 **Status**: Active
 **Owner**: aget-framework
 **Implements**: L515 (Template Coherence Gap), #189 (Protocol Template Propagation)

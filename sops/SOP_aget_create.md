@@ -1,6 +1,7 @@
 # SOP: Agent Instance Creation (Ontology-Driven)
 
 **Version**: 2.2.0
+**Status**: Active
 **Created**: 2026-01-07
 **Updated**: 2026-02-14 (Archetype skill guidance per v3.5.0)
 **Owner**: aget-framework
@@ -17,6 +18,14 @@
 Standard operating procedure for creating new agent instances using **ontology-driven** approach. Vocabulary and specifications DRIVE agent creation - they are not afterthoughts.
 
 **Key Principle (L481)**: Define what the agent IS before instantiating it.
+
+---
+
+## Scope
+
+**Applies to**: Creation of new AGET agent instances from templates.
+
+**Does not apply to**: Upgrading existing agents (see SOP_aget_migrate.md), template creation (see SOP_template_lifecycle.md).
 
 ---
 

@@ -2,6 +2,8 @@
 
 **Version**: 1.3.0
 **Status**: ACTIVE
+**Created**: 2026-01-04
+**Owner**: aget-framework
 **Implements**: R-PUB-001, R-REL-001, R-REL-010, R-REL-011, R-LIC-001, R-SPEC-010, L515
 **Updated**: 2026-01-11
 
@@ -10,6 +12,14 @@
 ## Purpose
 
 Pre-release verification checklist ensuring quality, consistency, and governance compliance before publishing AGET framework releases.
+
+---
+
+## Scope
+
+**Applies to**: All AGET framework releases (MINOR and MAJOR).
+
+**Does not apply to**: Hotfixes (see SOP_hotfix_process.md), private agent-only changes.
 
 ---
 

@@ -1,6 +1,7 @@
 # SOP: Learning Publication
 
 **Version**: 1.0.0
+**Status**: Active
 **Created**: 2026-01-11
 **Owner**: aget-framework
 **Implements**: CAP-EVOL-007 (Public Learning Publication), CP-008

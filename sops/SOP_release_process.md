@@ -1,6 +1,7 @@
 # SOP: Release Process
 
 **Version**: 1.9.0
+**Status**: Active
 **Created**: 2026-01-04
 **Updated**: 2026-03-01
 **Owner**: aget-framework

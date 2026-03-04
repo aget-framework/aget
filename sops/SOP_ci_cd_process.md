@@ -1,7 +1,9 @@
 # SOP: CI/CD Process
 
 **Version**: 1.0
+**Status**: Active
 **Created**: 2025-12-28
+**Owner**: aget-framework
 **Reference Spec**: AGET_CI_SPEC.md
 **Change Origin**: L404 (CI Test Isolation Requirements)
 

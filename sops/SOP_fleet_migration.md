@@ -1,6 +1,7 @@
 # SOP: Fleet Migration
 
 **Version**: 1.2.0
+**Status**: Active
 **Created**: 2026-01-05
 **Updated**: 2026-01-11
 **Owner**: aget-framework
