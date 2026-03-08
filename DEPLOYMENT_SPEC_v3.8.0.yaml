@@ -1,0 +1,383 @@
+# DEPLOYMENT_SPEC_v3.8.0.yaml
+# Complete target state specification for v3.8.0 deployment
+#
+# Purpose: Define what a correctly-deployed v3.8.0 agent looks like.
+# Usage: Supervisors use this to verify fleet deployments.
+# Governance: R-DEP-002 (State-Based Deployment Requirement)
+#
+# Created: 2026-03-08
+# Origin: L643 (Meta-Principle Codification), DEPLOYMENT_SPEC_v3.7.0.yaml
+# Release: Governance Maturation (principle codification, deliverable conformance, structural enforcement)
+# L628: Version-coupled artifact — must be created per release
+
+version: "3.8.0"
+spec_version: "1.4.0"
+created: "2026-03-08"
+status: active
+supersedes: "DEPLOYMENT_SPEC_v3.7.0.yaml"
+
+# =============================================================================
+# VERSION INDICATORS
+# =============================================================================
+# All agents MUST have these version indicators set to 3.8.0
+
+version_indicators:
+  version_json:
+    path: ".aget/version.json"
+    field: "aget_version"
+    value: "3.8.0"
+    verification: "jq -r .aget_version .aget/version.json"
+
+  agents_md:
+    path: "AGENTS.md"
+    pattern: "@aget-version: 3.8.0"
+    verification: "grep '@aget-version' AGENTS.md"
+
+  manifest_yaml:
+    path: "manifest.yaml"
+    field: "version"
+    value: "3.8.0"
+    verification: "yq -r .version manifest.yaml"
+
+  readme_md:
+    path: "README.md"
+    pattern: "**Version**: v3.8.0"
+    verification: "grep 'Version' README.md | head -1"
+
+# =============================================================================
+# UNIVERSAL SKILLS (Required for ALL agents)
+# =============================================================================
+# Canonical source: template-worker-aget/.claude/skills/ (reference implementation)
+# v3.8.0 CHANGE: +2 optional skills (aget-enhance-spec, aget-expand-ontology)
+
+universal_skills:
+  source: "template-worker-aget/.claude/skills/"
+  verification: "core_match"  # Per L582
+  extension_policy: "preserve"  # Agent-specific extensions MUST be preserved
+
+  # Pre-sync protocol (R-DEP-004, R-DEP-005, CAP-DEP-010/011/012)
+  pre_sync_check: |
+    Before overwriting any skill with local modifications:
+    1. Run: python3 .aget/patterns/upgrade/pre_sync_check.py --baseline TEMPLATE --instance AGENT
+    2. Classify divergence: drift (fix) vs extension (preserve) vs conflict (review)
+    3. If extension detected: merge, don't overwrite
+    4. Document preserved extensions in commit message
+
+  required:
+    # Session Skills
+    - name: "aget-wake-up"
+      purpose: "Session initialization"
+
+    - name: "aget-wind-down"
+      purpose: "Session closure"
+
+    - name: "aget-study-up"
+      purpose: "Focused KB research on topic before implementation"
+
+    # Health Skills
+    - name: "aget-check-health"
+      purpose: "Sanity check orchestration"
+
+    - name: "aget-check-kb"
+      purpose: "Knowledge base health"
+
+    - name: "aget-check-evolution"
+      purpose: "Evolution directory health"
+
+    - name: "aget-check-sessions"
+      purpose: "Sessions directory health"
+
+    # Project Skills
+    - name: "aget-create-project"
+      purpose: "Research-informed project creation"
+
+    - name: "aget-review-project"
+      purpose: "Mid-flight project review"
+
+    - name: "aget-save-state"
+      purpose: "Workflow state capture"
+
+    # Learning Skills
+    - name: "aget-record-lesson"
+      purpose: "L-doc creation"
+
+    - name: "aget-capture-observation"
+      purpose: "Lightweight observation capture"
+
+    # Governance Skills
+    - name: "aget-file-issue"
+      purpose: "Issue filing with L520 compliance"
+
+    - name: "aget-propose-skill"
+      purpose: "Skill proposal governance"
+
+    # Development Skills
+    - name: "aget-create-skill"
+      purpose: "Skill creation with spec scaffolding"
+
+    # New in v3.8.0
+    - name: "aget-enhance-spec"
+      purpose: "Specification enhancement lifecycle (7-phase)"
+      new_in: "3.8.0"
+
+  count: 16  # +1 from v3.7.0 (aget-enhance-spec added to universal set)
+
+  optional:
+    - name: "aget-expand-ontology"
+      purpose: "SKOS ontology expansion with evidence-backed concepts"
+      new_in: "3.8.0"
+      acquisition: "demand-triggered (acquire when >10 vocab entries from domain work)"
+
+# =============================================================================
+# GOVERNANCE DOCUMENTS (New/Changed in v3.8.0)
+# =============================================================================
+
+governance:
+  new_in_380:
+    - file: "governance/GOVERNANCE_PRINCIPLES.md"
+      version: "1.1.0"
+      purpose: "Meta-principles — what rules govern the rules"
+      tiers:
+        - tier: 1
+          count: 6
+          description: "Foundation principles (MP-0 through MP-5)"
+        - tier: 2
+          count: 5
+          description: "Advisory principles"
+
+  changed_in_380:
+    - file: "governance/DESIGN_PHILOSOPHY.md"
+      change: "Structural Aesthetics added as principle #3"
+
+    - file: "governance/MISSION.md"
+      change: "Structural Aesthetics added as principle #3"
+
+# =============================================================================
+# SCRIPTS (New in v3.8.0)
+# =============================================================================
+
+scripts:
+  new_in_380:
+    - name: "scripts/validate_project_plan.py"
+      purpose: "PROJECT_PLAN existence validator (R-GOV-PLAN-001/002/003)"
+      classification: "Framework_Artifact"
+
+  upgraded_in_380:
+    - name: ".aget/patterns/upgrade/pre_sync_check.py"
+      purpose: "Skill customization detection (CAP-DEP-010/011/012)"
+      changes: "New script — detect, classify, report skill customizations before upgrade"
+
+# =============================================================================
+# TEMPLATE CHANGES (v3.8.0)
+# =============================================================================
+
+template_changes:
+  all_templates:
+    - "AGENTS.md: Governance patterns backported (TEMPLATE_AGENTS_MD_SPEC v1.0.0)"
+    - ".claude/ scaffolding: settings.json, skills directory structure"
+    - "identity.json: type field added"
+    - "SOP headers: CAP-SOP-001 compliance"
+    - "CHANGELOG.md: v3.7.0 + v3.8.0 entries added"
+
+# =============================================================================
+# PLATFORM COMPATIBILITY
+# =============================================================================
+
+platform_compatibility:
+  source_of_truth: "aget/docs/AGET_CLI_SUPPORT_MATRIX.md"
+  agents_md_line: "Works with Claude Code, Codex CLI, Gemini CLI, and other CLI coding agents."
+  supported:
+    - name: "Claude Code"
+      status: "Baseline"
+    - name: "Codex CLI"
+      status: "Compatible"
+    - name: "Gemini CLI"
+      status: "Compatible"
+
+# =============================================================================
+# MIGRATION HISTORY
+# =============================================================================
+
+migration_history:
+  required_entry: "v3.7.0 -> v3.8.0"
+  pattern: "v3.7.0 -> v3.8.0: YYYY-MM-DD (Governance Maturation - principle codification, deliverable conformance)"
+  verification: "jq '.migration_history | last' .aget/version.json | grep '3.8.0'"
+
+# =============================================================================
+# VERIFICATION SCRIPT
+# =============================================================================
+
+verification_script: |
+  #!/bin/bash
+  # v3.8.0 Deployment Verification
+  # Usage: ./verify_v3.8.0.sh /path/to/agent
+
+  AGENT_DIR="${1:-.}"
+  VERSION="3.8.0"
+  ERRORS=0
+  WARNINGS=0
+
+  echo "=== v$VERSION Deployment Verification ==="
+  echo "Agent: $AGENT_DIR"
+  echo ""
+
+  # 1. Version indicators
+  echo "--- Version Indicators ---"
+  VJ=$(jq -r .aget_version "$AGENT_DIR/.aget/version.json" 2>/dev/null)
+  [ "$VJ" = "$VERSION" ] && echo "[OK] version.json: $VJ" || { echo "[FAIL] version.json: $VJ"; ((ERRORS++)); }
+
+  AM=$(grep -o '@aget-version: [0-9.]*' "$AGENT_DIR/AGENTS.md" 2>/dev/null | cut -d' ' -f2)
+  [ "$AM" = "$VERSION" ] && echo "[OK] AGENTS.md: $AM" || { echo "[FAIL] AGENTS.md: $AM"; ((ERRORS++)); }
+
+  echo ""
+
+  # 2. Universal skills (16 required + 1 optional)
+  echo "--- Universal Skills (v3.8.0) ---"
+  UNIVERSAL="aget-wake-up aget-wind-down aget-study-up aget-check-health aget-check-kb aget-check-evolution aget-check-sessions aget-create-project aget-review-project aget-save-state aget-record-lesson aget-capture-observation aget-file-issue aget-propose-skill aget-create-skill aget-enhance-spec"
+  for skill in $UNIVERSAL; do
+    if [ -d "$AGENT_DIR/.claude/skills/$skill" ]; then
+      echo "[OK] $skill"
+    else
+      echo "[FAIL] $skill MISSING"
+      ((ERRORS++))
+    fi
+  done
+
+  # Optional skills
+  echo ""
+  echo "--- Optional Skills ---"
+  OPTIONAL="aget-expand-ontology"
+  for skill in $OPTIONAL; do
+    if [ -d "$AGENT_DIR/.claude/skills/$skill" ]; then
+      echo "[OK] $skill (acquired)"
+    else
+      echo "[--] $skill (not acquired — optional)"
+    fi
+  done
+
+  echo ""
+
+  # 3. Governance documents
+  echo "--- Governance (v3.8.0) ---"
+  if [ -f "$AGENT_DIR/governance/GOVERNANCE_PRINCIPLES.md" ]; then
+    echo "[OK] GOVERNANCE_PRINCIPLES.md exists"
+  else
+    echo "[--] GOVERNANCE_PRINCIPLES.md not present (framework-level only)"
+  fi
+
+  echo ""
+
+  # 4. Session scripts
+  echo "--- Session Scripts ---"
+  for script in wake_up.py wind_down.py study_up.py aget_housekeeping_protocol.py; do
+    if [ -f "$AGENT_DIR/scripts/$script" ]; then
+      echo "[OK] scripts/$script"
+    elif [ -f "$AGENT_DIR/.aget/patterns/session/$script" ]; then
+      echo "[WARN] $script at deprecated path (.aget/patterns/session/)"
+      ((WARNINGS++))
+    else
+      echo "[FAIL] $script MISSING"
+      ((ERRORS++))
+    fi
+  done
+
+  echo ""
+
+  # 5. Migration history
+  echo "--- Migration History ---"
+  MH=$(jq -r '.migration_history | last' "$AGENT_DIR/.aget/version.json" 2>/dev/null)
+  if echo "$MH" | grep -q "$VERSION"; then
+    echo "[OK] migration_history includes $VERSION"
+  else
+    echo "[FAIL] migration_history missing $VERSION entry"
+    ((ERRORS++))
+  fi
+
+  echo ""
+  echo "=== Summary ==="
+  if [ $ERRORS -eq 0 ] && [ $WARNINGS -eq 0 ]; then
+    echo "PASS: Agent is correctly deployed at v$VERSION"
+    exit 0
+  elif [ $ERRORS -eq 0 ]; then
+    echo "PASS (with $WARNINGS warning(s)): Agent is deployed at v$VERSION"
+    exit 0
+  else
+    echo "FAIL: $ERRORS error(s), $WARNINGS warning(s)"
+    exit 1
+  fi
+
+# =============================================================================
+# DEPLOYMENT CHECKLIST
+# =============================================================================
+
+deployment_checklist:
+  pre_deployment:
+    - "Verify agent is at v3.7.0"
+    - "Backup current .claude/skills/ directory"
+    - "Run pre_sync_check.py to detect customizations"
+
+  version_bump:
+    - "Update .aget/version.json aget_version to 3.8.0"
+    - "Update AGENTS.md @aget-version line"
+    - "Update manifest.yaml version field"
+    - "Add migration_history entry: v3.7.0 -> v3.8.0"
+
+  skill_updates:
+    - "Deploy aget-enhance-spec skill"
+    - "Optional: acquire aget-expand-ontology if ontology work needed"
+
+  verification:
+    - "Run verification script (see above)"
+    - "All checks pass with zero errors"
+
+  commit:
+    - "Commit with message: 'chore: Upgrade to v3.8.0 (Governance Maturation)'"
+
+# =============================================================================
+# WHAT'S NEW IN v3.8.0
+# =============================================================================
+
+whats_new:
+  summary: "Governance Maturation - principle codification, deliverable conformance, structural enforcement"
+
+  highlights:
+    - title: "Meta-Principle Codification (L643)"
+      description: "GOVERNANCE_PRINCIPLES.md v1.1.0 — 6 Tier 1 + 5 Tier 2 meta-principles. Fourth governance principle category answers 'what rules govern the rules?'"
+
+    - title: "Structural Aesthetics (L635)"
+      description: "Third design principle: 'Beauty signals health; ugliness signals problems worth investigating.' Integrated into DESIGN_PHILOSOPHY, MISSION, homepage."
+
+    - title: "Skill Customization Detection (CAP-DEP-010/011/012)"
+      description: "pre_sync_check.py — detect, classify, and report skill customizations before upgrade. Prevents silent data loss."
+
+    - title: "PROJECT_PLAN Existence Validator (L340)"
+      description: "validate_project_plan.py — prevents prompt-as-plan anti-pattern by verifying governance artifact exists before work begins."
+
+    - title: "Deliverable Conformance (Gate 4.5)"
+      description: "Cross-artifact conformance audit found and fixed 5 SHALL violations. New release phase proposed for v3.9.0 (SOP Phase 0.85)."
+
+    - title: "Template Governance Patterns (L640)"
+      description: "TEMPLATE_AGENTS_MD_SPEC v1.0.0 — all 12 templates updated with .claude/ scaffolding and governance patterns."
+
+# =============================================================================
+# TRACEABILITY
+# =============================================================================
+
+traceability:
+  origin:
+    - "L635: Structural Aesthetics Principle"
+    - "L640: Research-to-Adoption Gap"
+    - "L643: Meta-Principle Codification"
+    - "L644: Template-Spec Drift & Anti-Patterns"
+    - "L649: Closure-Time Structural Gap"
+  project: "PROJECT_PLAN_v3.8.0_release_v1.0.md"
+  supersedes: "DEPLOYMENT_SPEC_v3.7.0.yaml"
+  requirements:
+    - "R-DEP-001: Canonical Source Requirement"
+    - "R-DEP-002: State-Based Deployment Requirement"
+    - "R-REL-038: Deployment Specification Requirement"
+  related:
+    - "docs/CANONICAL_SOURCES.md"
+    - "docs/VERSION_BEARING_FILES.md"
+    - "sops/SOP_release_process.md"
+    - "docs/UPGRADING.md"
