@@ -61,6 +61,9 @@ Govern VERSION_SCOPE lifecycle from initialization through post-release logging.
    - Deferred items from prior release
    - New proposals from PROJECT_PLANs, L-docs, user directives
    - Backlog items flagged for reassessment
+   - Pre-prioritized follow-on items from prior RELEASE_BRIDGE document (if exists)
+   - Recurring gaps identified in bridge (items deferred 2+ consecutive releases)
+   - Velocity calibration from bridge data (apply to effort estimates)
 3. Initialize Decision_Log: `planning/SCOPE_DECISION_LOG_v{VERSION}.jsonl`
 4. Apply Deferral_Staleness pre-check to seeded deferrals (identify items at ≥2 consecutive deferrals)
 5. Log each seeded item as an ADD entry in Decision_Log
