@@ -192,6 +192,84 @@ git commit -m "rollback: Revert to vOLD due to [issue]"
 
 ## Version-Specific Migration Guides
 
+### v3.7.0 → v3.8.0
+
+**Release Date**: 2026-03-08
+
+**Theme**: Governance Maturation — Principle Codification, Deliverable Conformance, Structural Enforcement
+
+**Breaking Changes**: None. Fully backward compatible with v3.7.x.
+
+**Do I need to act?**
+- **YES** if: You want the new `aget-enhance-spec` skill or governance principles
+- **Minimal** if: You only need the version bump (Steps 1-2 below)
+
+**New Features**:
+- GOVERNANCE_PRINCIPLES.md v1.1.0 (6 Tier 1 + 5 Tier 2 meta-principles)
+- Structural Aesthetics design principle (integrated into DESIGN_PHILOSOPHY, MISSION)
+- `aget-enhance-spec` skill (specification enhancement lifecycle)
+- `aget-expand-ontology` skill (optional, demand-triggered)
+- `pre_sync_check.py` (skill customization detection before upgrades)
+- `validate_project_plan.py` (PROJECT_PLAN existence validator)
+- TEMPLATE_AGENTS_MD_SPEC v1.0.0 (governance patterns in templates)
+
+**Prerequisite**: Sync your framework clone first:
+```bash
+cd ~/path/to/aget-framework/aget && git pull origin main
+cd ~/path/to/template-{archetype}-aget && git pull origin main
+
+# Verify v3.8.0 is available
+jq -r .aget_version ~/path/to/aget-framework/aget/.aget/version.json
+# Expected: "3.8.0"
+```
+
+**Migration Steps**:
+
+1. **Update version markers**:
+   ```bash
+   AGENT=~/path/to/your-agent
+
+   # Use perl on macOS (not sed — see L570)
+   perl -pi -e 's/"aget_version": "3\.7\.0"/"aget_version": "3.8.0"/' $AGENT/.aget/version.json
+   perl -pi -e 's/@aget-version: 3\.7\.0/@aget-version: 3.8.0/' $AGENT/AGENTS.md
+   ```
+
+2. **Deploy aget-enhance-spec skill**:
+   ```bash
+   TEMPLATE=~/path/to/template-{archetype}-aget
+
+   # Check for customizations first (new in v3.8.0!)
+   python3 $TEMPLATE/.aget/patterns/upgrade/pre_sync_check.py \
+     --baseline $TEMPLATE/.claude/skills \
+     --instance $AGENT/.claude/skills
+
+   # Deploy
+   cp -r $TEMPLATE/.claude/skills/aget-enhance-spec $AGENT/.claude/skills/
+   ```
+
+3. **Add migration_history entry** to `.aget/version.json`:
+   ```json
+   "migration_history": [
+     "v3.7.0 -> v3.8.0: YYYY-MM-DD (Governance Maturation - principle codification, deliverable conformance)"
+   ]
+   ```
+
+4. **Verify**:
+   ```bash
+   python3 $AGENT/scripts/wake_up.py
+   # Should show v3.8.0
+
+   # Check for stale version references
+   grep -r "3\.7\.0" $AGENT --include="*.yaml" --include="*.json" | grep -v migration_history
+   # Expected: No results (or only feature-introduction markers)
+   ```
+
+**Estimated Time**: 5 minutes per agent
+
+**See Also**: [RELEASE_HANDOFF_v3.8.0.md](../handoffs/RELEASE_HANDOFF_v3.8.0.md)
+
+---
+
 ### v3.6.0 → v3.7.0
 
 **Release Date**: 2026-03-05

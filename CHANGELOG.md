@@ -9,6 +9,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.8.0] - 2026-03-08
+
+**Theme**: Governance Maturation — principle codification, deliverable conformance, structural enforcement
+
+### Added
+
+- **GOVERNANCE_PRINCIPLES.md v1.1.0**: 6 Tier 1 + 5 Tier 2 meta-principles codifying "what rules govern the rules" (L643, H-MPC-001 CONFIRMED)
+
+- **Structural Aesthetics Principle**: Third design principle integrated into DESIGN_PHILOSOPHY.md, MISSION.md, and homepage (L635, H-AES-001 CONFIRMED)
+
+- **Skills**:
+  - `aget-enhance-spec` v1.1.0: Specification enhancement lifecycle skill (30 requirements, 15 V-tests)
+  - `aget-expand-ontology` v1.0.0: SKOS ontology expansion with web-researched, evidence-backed concepts
+
+- **Scripts**:
+  - `scripts/validate_project_plan.py`: PROJECT_PLAN existence validator — prevents prompt-as-plan anti-pattern (L340, R-GOV-PLAN-001/002/003)
+  - `.aget/patterns/upgrade/pre_sync_check.py`: Skill customization detection before upgrade (CAP-DEP-010/011/012)
+
+- **TEMPLATE_AGENTS_MD_SPEC v1.0.0**: Governance pattern backport to all 12 templates — `.claude/` scaffolding, skill routing tables, CLI feature adoption patterns (L640)
+
+- **DEPLOYMENT_SPEC_v3.8.0.yaml**: Target-state deployment specification with verification script
+
+### Changed
+
+- **Conformance script**: 3 missing v3.7.0-specific check methods implemented (D16)
+- **Session scripts**: 4 scripts migrated from `.aget/patterns/session/` to `scripts/` (D17)
+- **identity.json**: `type` field added across templates (D19)
+- **CLAUDE.md**: Stale references updated across templates (D20)
+- **identity.json variants**: Archetype-specific variants aligned (D21)
+- **Notification validation**: Post-release validator checks notification delivery (D13)
+- **SOP headers**: 19 mechanical header edits for CAP-SOP-001 compliance (D32)
+- **Deliverable conformance**: 5 SHALL violations fixed across scripts, skills, SOPs (Gate 4.5)
+
+### Fixed
+
+- **codemeta.json**: Version corrected from 3.6.0 to 3.8.0 (missed in v3.7.0)
+- **CITATION.cff**: Version corrected from 3.6.0 to 3.8.0 (missed in v3.7.0)
+
+### Notes
+
+- 16/38 VERSION_SCOPE items implemented; remaining deferred to v3.9.0
+- Contract tests: 135 passing
+- Velocity: 0.15x estimated time (3.5h actual vs 23.5h estimated for development gates)
+- Gate 4.5 (unplanned): Cross-artifact conformance audit found 5 SHALL violations — all fixed before release
+
+---
+
 ## [3.7.0] - 2026-03-05
 
 **Theme**: Quality Reconciliation — aligning claims with reality, closing SOP gaps, content integrity
