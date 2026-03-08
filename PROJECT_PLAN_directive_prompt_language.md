@@ -37,11 +37,11 @@ Discovery: Principal noted inconsistent wake protocol execution when using the `
 - Fleet-wide `.zshrc` migration script → user responsibility
 
 **Dependencies:**
-- L050 lesson learned document (✅ created in vpofai)
+- L050 lesson learned document (✅ created in my-agent)
 - Issue #53 filed (✅ created)
 
 **Deviation Note:**
-- L050 resides in `vpofai/.aget/evolution/` (discovery context)
+- L050 resides in `my-agent/.aget/evolution/` (discovery context)
 - Framework repo (`aget`) is not itself an AGET, so has no `.aget/evolution/`
 - Pattern documentation now lives in `docs/SHELL_INTEGRATION.md` (canonical location)
 - This cross-repo pattern (discovery in AGET → fix in framework) is expected for framework enhancements
@@ -116,8 +116,8 @@ Discovery: Principal noted inconsistent wake protocol execution when using the `
 
 | ID | Deliverable | Owner | Status |
 |----|-------------|-------|--------|
-| G0.1 | L050 lesson learned document | vpofai-aget | Done |
-| G0.2 | Issue #53 filed | vpofai-aget | Done |
+| G0.1 | L050 lesson learned document | my-agent-aget | Done |
+| G0.2 | Issue #53 filed | my-agent-aget | Done |
 
 ### Verification Tests
 
@@ -159,21 +159,21 @@ gh issue view 53 --repo aget-framework/aget --json state -q '.state' | grep -q "
 
 #### V1.1: Claude profile uses directive language
 ```bash
-grep -q "Read AGENTS.md and execute" ~/code/gmelli/aget/docs/SHELL_INTEGRATION.md && echo "PASS" || echo "FAIL"
+grep -q "Read AGENTS.md and execute" ~/code/aget-framework/aget/docs/SHELL_INTEGRATION.md && echo "PASS" || echo "FAIL"
 ```
 **Expected:** PASS
 **Actual:** PASS ✅
 
 #### V1.2: Prompt Language Guidelines section exists
 ```bash
-grep -q "## Prompt Language Guidelines" ~/code/gmelli/aget/docs/SHELL_INTEGRATION.md && echo "PASS" || echo "FAIL"
+grep -q "## Prompt Language Guidelines" ~/code/aget-framework/aget/docs/SHELL_INTEGRATION.md && echo "PASS" || echo "FAIL"
 ```
 **Expected:** PASS
 **Actual:** PASS ✅
 
 #### V1.3: Anti-patterns documented
 ```bash
-[ $(grep -c "❌" ~/code/gmelli/aget/docs/SHELL_INTEGRATION.md) -ge 2 ] && echo "PASS" || echo "FAIL"
+[ $(grep -c "❌" ~/code/aget-framework/aget/docs/SHELL_INTEGRATION.md) -ge 2 ] && echo "PASS" || echo "FAIL"
 ```
 **Expected:** PASS
 **Actual:** PASS ✅ (5 anti-patterns)
@@ -204,7 +204,7 @@ grep -q "## Prompt Language Guidelines" ~/code/gmelli/aget/docs/SHELL_INTEGRATIO
 
 #### V2.1: Changes committed
 ```bash
-cd ~/code/gmelli/aget && git log -1 --oneline | grep -qi "prompt\|directive\|L050" && echo "PASS" || echo "FAIL"
+cd ~/code/aget-framework/aget && git log -1 --oneline | grep -qi "prompt\|directive\|L050" && echo "PASS" || echo "FAIL"
 ```
 **Expected:** PASS
 **Actual:** PASS ✅ (`341942b docs: Add directive prompt language pattern (L050)`)
@@ -264,7 +264,7 @@ gh issue view 53 --repo aget-framework/aget --json state -q '.state' | grep -q "
 ## References (CAP-PP-010)
 
 ### L-docs
-- L050: Directive Prompt Language Pattern (vpofai)
+- L050: Directive Prompt Language Pattern (my-agent)
 
 ### Files
 - `docs/SHELL_INTEGRATION.md` - Primary update target
