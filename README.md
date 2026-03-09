@@ -1,5 +1,7 @@
 # AGET Framework
 
+[![Latest Release](https://img.shields.io/github/v/release/aget-framework/aget?style=flat-square)](https://github.com/aget-framework/aget/releases/latest)
+
 > Persistent domain intelligence for governed agentic work
 
 ## What is AGET?
@@ -86,7 +88,7 @@ See [GETTING_STARTED.md](GETTING_STARTED.md) for archetype selection guidance.
 
 ## Ontology-Driven Design
 
-v3.5.0 introduces **ontology-driven agent customization**:
+AGET uses **ontology-driven agent customization**:
 
 ```
 Vocabulary → Specification → Implementation
@@ -114,7 +116,7 @@ Vocabulary → Specification → Implementation
 
 ## Templates
 
-**12 Archetypes** with specialized skills and ontologies (v3.5.0+):
+**12 Archetypes** with specialized skills and ontologies:
 
 | Template | Archetype | Key Skills | Use Case |
 |----------|-----------|------------|----------|
