@@ -1,11 +1,11 @@
 # AGET Organization Specification
 
-**Version**: 1.0.0
+**Version**: 1.1.0
 **Status**: Active
 **Category**: Process (Organization)
 **Format Version**: 1.2
 **Created**: 2026-01-04
-**Updated**: 2026-01-04
+**Updated**: 2026-03-08
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_ORGANIZATION_SPEC.md`
 **Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.4
@@ -56,6 +56,7 @@ L431 (Release Artifact Inventory) revealed organization-level gaps.
 | R-REL-010-03 | Next version SHALL be documented | Roadmap clarity |
 | CAP-ORG-001-04 | Homepage SHALL link to key documentation | Accessibility |
 | CAP-ORG-001-05 | Homepage SHALL be updated with each release | Currency |
+| CAP-ORG-001-06 | Roadmap SHALL include an entry for every publicly released version | Completeness (L657) |
 
 **Homepage Location:** `.github/profile/README.md`
 
@@ -72,6 +73,16 @@ L431 (Release Artifact Inventory) revealed organization-level gaps.
 | CAP-ORG-002-05 | Repositories | Links to key repos with descriptions |
 | CAP-ORG-002-06 | Documentation | Links to specs, guides, resources |
 | CAP-ORG-002-07 | Contributing | Link to contribution guide |
+
+#### Roadmap Quality (L657)
+
+**SHALL** requirements for roadmap section content accuracy:
+
+| ID | Requirement | Rationale |
+|----|-------------|-----------|
+| CAP-ORG-002-08 | Each roadmap entry SHALL attribute only deliverables from that specific release | Attribution accuracy — prevents Content Absorption (L657) |
+| CAP-ORG-002-09 | Each roadmap entry SHALL show accurate release date matching GitHub Release | Date accuracy — prevents stale date propagation |
+| CAP-ORG-002-10 | Roadmap updates SHALL preserve existing release entries (incremental update, not full replacement) | Prior entry preservation — prevents version erasure |
 
 **Badge Requirements:**
 
@@ -134,11 +145,17 @@ See [Getting Started Guide](link)
 
 ## Roadmap
 
-| Version | Status | Theme |
-|---------|--------|-------|
-| vX.Y.Z | **Current** | Theme Name |
-| vA.B.C | Next | Theme Name |
-| vD.E.F | Planned | Theme Name |
+### vX.Y.Z (Current) - Theme Name
+**Released**: YYYY-MM-DD
+
+- Highlight 1 (attributed to THIS release only, per CAP-ORG-002-08)
+- Highlight 2
+
+### vA.B.C - Previous Theme
+**Released**: YYYY-MM-DD
+
+- Highlight 1
+- Highlight 2
 
 ## Repositories
 
@@ -177,12 +194,20 @@ Apache 2.0
 ## References
 
 - L431: Release Artifact Inventory
+- L657: Homepage Content Absorption During Release Rewrite
 - AGET_FRAMEWORK_SPEC.md (CAP-ORG expansion)
 - AGET_RELEASE_SPEC.md (R-REL-010, R-REL-011)
 
 ---
 
 ## Changelog
+
+### v1.1.0 (2026-03-08)
+
+- Added CAP-ORG-001-06: Roadmap completeness (every released version needs an entry)
+- Added CAP-ORG-002-08/09/10: Roadmap quality — attribution accuracy, date accuracy, prior entry preservation
+- Updated Homepage Template to reflect actual homepage format (bullet list pattern)
+- Added L657 reference (Homepage Content Absorption During Release Rewrite)
 
 ### v1.0.0 (2026-01-04)
 
