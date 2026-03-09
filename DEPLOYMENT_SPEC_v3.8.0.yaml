@@ -174,8 +174,7 @@ scripts:
 template_changes:
   all_templates:
     - "AGENTS.md: Governance patterns backported (TEMPLATE_AGENTS_MD_SPEC v1.0.0)"
-    - ".claude/ scaffolding: settings.json, skills directory structure"
-    - "identity.json: type field added"
+    - ".claude/ scaffolding: skills directory structure"
     - "SOP headers: CAP-SOP-001 compliance"
     - "CHANGELOG.md: v3.7.0 + v3.8.0 entries added"
 
