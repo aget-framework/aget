@@ -1,6 +1,6 @@
 # AGET Release Specification
 
-**Version**: 1.8.0
+**Version**: 1.10.0
 **Status**: Active
 **Category**: Process (Release Management)
 **Format Version**: 1.2
@@ -169,6 +169,26 @@ vocabulary:
       skos:definition: "Validating changes against authoring workspace instead of deployment targets (template repos)"
       aget:anti_pattern: true
       skos:related: ["L596", "L605", "CAP-REL-024"]
+
+    Loading_Dock:
+      skos:definition: "Starting next-release planning before verifying current-release deployment — finished goods sit undelivered while next batch starts production"
+      aget:anti_pattern: true
+      skos:related: ["L656", "CAP-REL-027"]
+
+  deployment:
+    Deployment_Status_Record:
+      skos:definition: "Machine-readable record tracking release deployment lifecycle from RELEASED through DEPLOYED"
+      aget:location: ".aget/logs/deployment_status.jsonl"
+      aget:format: "JSON Lines"
+      skos:related: ["CAP-REL-027", "L656"]
+
+    Release_Discovery:
+      skos:definition: "Process by which a downstream agent discovers new upstream releases without manual notification"
+      skos:related: ["CAP-REL-027", "L656", "L604"]
+
+    Deployment_Delta:
+      skos:definition: "Version gap between released version and deployed version on a target"
+      skos:related: ["CAP-REL-027", "L656"]
 
   scope:
     Version_Scope:
@@ -894,6 +914,38 @@ grep -q "Platform Hazards\|Command Hazards" templates/RELEASE_HANDOFF_TEMPLATE.m
 
 **Prevents**: Rediscovery_Of_Known_Hazards anti-pattern — operators encountering documented hazards because the documentation wasn't included in release handoffs.
 
+### CAP-REL-027: Post-Release Deployment Monitoring (L656, L604, ER-DEPLOY-MONITOR)
+
+After release completion, the releasing agent SHALL monitor deployment status to prevent the Loading_Dock anti-pattern — starting next-release planning before verifying current-release deployment.
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| R-REL-027-01 | event-driven | WHEN a release is completed, the releasing agent SHALL record a Deployment_Status_Record in `.aget/logs/deployment_status.jsonl` with status=RELEASED and confirmed_deployments=0 | Deployment tracking starts at release, not at deployment |
+| R-REL-027-02 | event-driven | WHEN wake-up runs on an agent with `release_discovery` configured, the extension SHALL query the latest GitHub release from the configured repo | Pull-based discovery eliminates manual notification dependency (L604) |
+| R-REL-027-03 | conditional | IF the discovered version is newer than the agent's current version THEN the extension SHALL display an upgrade advisory referencing the DEPLOYMENT_SPEC | Advisory encourages spec verification, not automatic upgrade |
+| R-REL-027-04 | conditional | WHEN the releasing agent's wake-up runs AND the latest deployment record shows 0 confirmed deployments AND release is >= 48h old THEN the extension SHALL display a DEPLOYMENT UNVERIFIED warning | Time-based escalation surfaces stalled deployments |
+| R-REL-027-05 | prohibitive | The releasing agent SHALL NOT create a VERSION_SCOPE for the next release WHEN the latest deployment record shows 0 confirmed deployments | Structural gate prevents Loading_Dock anti-pattern |
+
+**Design Principles:**
+
+- **Deployable signal, not just existence**: R-REL-027-03 references DEPLOYMENT_SPEC, not RELEASE_HANDOFF. Remote supervisors access DEPLOYMENT_SPEC via `gh` from the public repo.
+- **Three-tier degradation** (ADR-004): Deployment monitoring uses filesystem for local checks (tier_basic), `gh` CLI for remote checks (tier_rich). Release discovery is non-blocking — `gh` failure = graceful degradation.
+- **Non-blocking wake-up** (C-WU-002): All deployment checks in wake_up_ext.py must not block session initialization.
+
+**V-Test for Deployment Monitoring:**
+
+```bash
+# V-REL-027: Deployment status record exists after release
+[ -f ".aget/logs/deployment_status.jsonl" ] && echo "PASS: Deployment log exists" || echo "FAIL: No deployment log"
+
+# V-REL-027: VERSION_SCOPE blocked when unverified
+python3 scripts/deployment_monitor.py --check --version X.Y.Z --json | python3 -c "import sys,json; d=json.load(sys.stdin); print('PASS' if d.get('confirmed_deployments',0)==0 and d.get('blocked',False) else 'FAIL')"
+```
+
+**Prevents**: Loading_Dock anti-pattern — governance rewards artifact creation (IMPLEMENTED) but has no mechanism to verify deployment. Releasing agent starts next-cycle planning before current-cycle deployment is confirmed. (L656)
+
+**Implementing Script**: `scripts/deployment_monitor.py` (SCRIPT_REGISTRY.yaml)
+
 ---
 
 ## Release Gate Structure
@@ -927,6 +979,7 @@ Standard release gates per PROJECT_PLAN:
 | CAP-REL-023-* | release_snapshot.py (pre/post state capture) | **v3.6.0** |
 | CAP-REL-024-* | propagation_audit.py (target verification) | **v3.6.0** |
 | CAP-REL-025-* | health_logger.py (wraps healthcheck skills) | **v3.6.0** |
+| CAP-REL-027-* | deployment_monitor.py (deployment tracking + VERSION_SCOPE gate) | **v3.9.0** |
 
 ---
 
@@ -1040,6 +1093,33 @@ template-advisor-aget: version.json ✓, CHANGELOG.md ✓
 INCOMPLETE: 1 target has missing propagation
 ```
 
+### Anti-Pattern 7: Loading Dock (L656)
+
+```
+❌ ANTI-PATTERN: Start next release before verifying current deployment
+
+v3.8.0 released ← Artifacts created, GitHub tagged
+Supervisor notified ← Notification in sender's repo
+Fleet at v3.7.0 ← No deployment verified
+Agent proposes v3.9.0 ← Next batch starts while v3.8.0 sits on loading dock
+
+# Governance declared victory at IMPLEMENTED
+# 0/32 agents deployed. CREATED ≠ DEPLOYED.
+```
+
+```
+✅ CORRECT: Deployment monitoring blocks next-release planning (CAP-REL-027)
+
+$ python3 scripts/deployment_monitor.py --check --version 3.8.0
+Status: RELEASED (72h ago)
+Confirmed deployments: 0
+⚠️ DEPLOYMENT UNVERIFIED — verify supervisor deployment before VERSION_SCOPE
+
+$ python3 scripts/deployment_monitor.py --confirm --version 3.8.0 --deployer supervisor
+Status: DEPLOYING (1 confirmed)
+✅ VERSION_SCOPE creation unblocked
+```
+
 ---
 
 ## References
@@ -1052,6 +1132,7 @@ INCOMPLETE: 1 target has missing propagation
 - L596: Workspace-Local Remediation Propagation Gap
 - L605: Release Observability and Enforcement Gap
 - L604: Systemic Top-Down-Only Framework Pattern
+- L656: Loading Dock Anti-Pattern
 - SOP_release_process.md
 - AGET_VERSIONING_CONVENTIONS.md
 - Keep a Changelog (https://keepachangelog.com)
@@ -1060,6 +1141,16 @@ INCOMPLETE: 1 target has missing propagation
 ---
 
 ## Changelog
+
+### v1.10.0 (2026-03-08)
+
+- Added CAP-REL-027: Post-Release Deployment Monitoring (ER-DEPLOY-MONITOR, L656, L604)
+- Added vocabulary: Deployment_Status_Record, Release_Discovery, Deployment_Delta, Loading_Dock (anti-pattern)
+- Added Anti-Pattern 7: Loading Dock (L656)
+- Added enforcement table entry: deployment_monitor.py (v3.9.0)
+- 5 EARS requirements for deployment status tracking, release discovery, and VERSION_SCOPE blocking
+- Design principles: deployable signal (not just existence), ADR-004 three-tier, C-WU-002 non-blocking
+- See: L656, L604, PROJECT_PLAN_structural_deployment_verification_v1.0.md
 
 ### v1.9.0 (2026-02-22)
 
