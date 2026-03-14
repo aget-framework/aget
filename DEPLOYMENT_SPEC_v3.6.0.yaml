@@ -12,7 +12,8 @@
 version: "3.6.0"
 spec_version: "1.2.0"
 created: "2026-02-21"
-status: active
+status: superseded
+superseded_by: "DEPLOYMENT_SPEC_v3.7.0.yaml"
 supersedes: "DEPLOYMENT_SPEC_v3.5.0.yaml"
 
 # =============================================================================
