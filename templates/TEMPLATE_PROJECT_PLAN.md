@@ -59,6 +59,8 @@ principal_checkpoints: {count}
 | Artifact | Lines/Sections | Key Finding |
 |----------|----------------|-------------|
 | {document} | {lines} | {finding} |
+| RELEASE_BRIDGE_vPRIOR_to_next.md | Velocity, follow-on, recurring gaps | {velocity calibration, pre-prioritized items} |
+| PROJECT_PLAN_vPRIOR_release (Retrospective) | All subsections | {what went well/poorly, lessons learned} |
 
 ### Scope Verification
 
@@ -196,23 +198,35 @@ See: `sops/SOP_release_process.md` Section "Definition of Done (L553)"
 
 ---
 
-### Gate 0: {Gate Name} ⏳
+### Gate 0: Spec Verification (MP-1) ⏳
 
-**Objective**: {What this gate achieves}
-**Principal Checkpoint**: {REQUIRED | OPTIONAL}
+<!-- MANDATORY gate per D39. Verify or create governing specs for all in-scope items
+     BEFORE implementation begins. Prevents "fix-first" anti-pattern (L289, ADR-008). -->
+
+**Objective**: Verify or create governing specs for all in-scope deliverables BEFORE implementation
+**Principal Checkpoint**: OPTIONAL
+**SOP Phase**: N/A (principle-enforcement gate)
 
 **Deliverables**:
-1. [ ] {Deliverable 1}
-2. [ ] {Deliverable 2}
+1. [ ] Spec-status verification sweep — verify each in-scope item against actual files:
+
+| D-item | Expected Spec | Verified? | Action Needed |
+|--------|--------------|:---------:|---------------|
+| {item} | {spec reference} | ⏳ | {verify / write / precedent sufficient} |
+
+<!-- Add rows for each in-scope deliverable. Check L611 (stale VERSION_SCOPE) —
+     items may be PRE-RESOLVED. RELEASE_BRIDGE calibration: ~40% pre-resolved probability. -->
+
+2. [ ] For items with no governing spec: write formal requirements before implementation
 
 **V-Tests**:
 
 | ID | Test | BLOCKING | Result |
 |----|------|----------|--------|
-| V-G0.1 | {Verification criterion} | YES | ⏳ |
-| V-G0.2 | {Verification criterion} | YES | ⏳ |
+| V-G0.1 | All in-scope items have verified spec status | YES | ⏳ |
+| V-G0.2 | Items without specs have formal requirements written | YES | ⏳ |
 
-**DECISION POINT**: {Question}? [GO/NO-GO]
+**DECISION POINT**: All specs verified or created? Implementation may begin? [GO/NO-GO]
 
 ---
 
@@ -330,11 +344,35 @@ See: `sops/SOP_release_process.md` Section "Definition of Done (L553)"
 1. {lesson 1}
 2. {lesson 2}
 
+### Release Bridge
+
+<!-- [CONDITIONAL] Include for release PROJECT_PLANs only. Omit for operational/research plans. -->
+<!-- Feeds into RELEASE_BRIDGE document per SOP_release_process.md Phase 7.1 -->
+
+| Field | Value |
+|-------|-------|
+| Velocity Profile | {per-gate-type ratios, overall ratio} |
+| Pre-Resolved Probability | {percentage of items already done at start} |
+
+#### Gate Innovations
+
+| Gate | Value Demonstrated | Recommendation |
+|------|-------------------|----------------|
+| {gate} | {evidence} | {Standard / Optional / One-off} |
+
+#### Cumulative Pre-Release Checklist Additions
+
+- [ ] {new check discovered this release}
+
+#### Operational Advice
+
+1. {what I wish I knew at the start}
+
 ### Project Closure Checklist
 
 - [ ] All gates passed (all BLOCKING V-tests ✅)
 - [ ] All deliverables verified
-- [ ] Retrospective complete (all 8 subsections)
+- [ ] Retrospective complete (all 9 subsections; Release Bridge conditional for release plans)
 - [ ] Follow-on work documented
 - [ ] L-docs filed if applicable
 - [ ] Status updated to COMPLETE
