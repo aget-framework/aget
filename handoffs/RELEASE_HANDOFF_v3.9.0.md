@@ -188,10 +188,10 @@ A BLOCKING validation mode that verifies all 27 version-bearing files across 13 
 
 | Fleet | Supervisor | Agents | Status | Date | Notes |
 |-------|-----------|--------|--------|------|-------|
-| main | private-supervisor-AGET | 0/32 | PENDING | — | — |
+| main | private-supervisor-AGET | 32/32 | COMPLETE | 2026-03-14 | 1 SKIP (framework-AGET self-managed). 0 rollbacks, 0 failures. L583 filed, #438 filed. |
 | legalon | private-legalon-supervisor-AGET | 0/8 | PENDING | — | — |
 
-**Total**: 0/40 agents at v3.9.0.
+**Total**: 32/40 agents at v3.9.0.
 
 ---
 
@@ -236,10 +236,12 @@ A BLOCKING validation mode that verifies all 27 version-bearing files across 13 
 
 ### Acknowledgment
 
-- [ ] Governance Checklist completed
-- [ ] Acknowledged by: ___
-- [ ] Date: ___
+- [x] Governance Checklist completed
+- [x] Acknowledged by: private-supervisor-AGET (FLEET-UPG-006)
+- [x] Date: 2026-03-14
 - [ ] Fleet broadcast sent: ___
+- [x] Main fleet: 32/32 at v3.9.0 (2026-03-14)
+- [ ] Remote fleet: 0/8 (pending)
 
 ---
 
