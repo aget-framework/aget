@@ -9,6 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.9.0] - 2026-03-15
+
+**Theme**: Governance Enforcement — release readiness, version management, process standardization
+
+### Added
+
+- **Phase -1: Release Readiness** in SOP_release_process.md: 3 sub-phases (B.1 Assessment, B.2 Conformance Audit, B.3 Principal Approval) with 12-item checklist — governs Gap B transition (L663)
+
+- **Phase 0.85: Deliverable Conformance Check** in SOP_release_process.md: SHALL violations are BLOCKING. Inserted between Phase 0.8 (Verification Logging) and Phase 0.9 (Pre-Release Summary)
+
+- **Gate 0: Spec Verification (MP-1)** in TEMPLATE_PROJECT_PLAN.md: Mandatory spec verification sweep before implementation begins. Includes L611 guidance (~40% pre-resolved probability)
+
+- **GOVERNANCE_PRINCIPLES.md**: 6 Tier 1 + 5 Tier 2 meta-principles (first publication to public repo)
+
+- **release-notes/v3.9.0.md**: Deep release notes with migration guide
+
+### Changed
+
+- **version_bump.py**: Extended from 2/5 to 5/5 artifact types — now covers version.json, README.md, AGENTS.md, codemeta.json, CITATION.cff. New `--check VERSION` mode validates all 27 files with exit code 1 on mismatch (D64)
+
+### Fixed
+
+- **aget-enhance-spec SKILL.md**: Phase Selection table now includes Phase 6 (Self-Compliance) for all categories (#418). Phantom AGET_SKILLS_SPEC reference replaced with SKILL_NAMING_CONVENTION_SPEC (#419)
+
 ## [3.8.0] - 2026-03-08
 
 **Theme**: Governance Maturation — principle codification, deliverable conformance, structural enforcement
