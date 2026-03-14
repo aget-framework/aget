@@ -17,7 +17,7 @@ repository-code: "https://github.com/aget-framework/aget"
 url: "https://github.com/aget-framework"
 license: Apache-2.0
 version: "3.9.0"
-date-released: "2026-03-08"
+date-released: "2026-03-15"
 
 abstract: |
   AGET is a platform-agnostic governance framework for CLI-based human-AI

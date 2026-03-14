@@ -33,8 +33,8 @@
 **User-Visible Steps**:
 
 1. **Development**: Features/fixes implemented in private
-2. **Validation**: Contract tests must pass (80+ tests)
-3. **Version Bump**: All 7 repos synchronized
+2. **Validation**: Contract tests must pass (135+ tests)
+3. **Version Bump**: All 13 repos synchronized
 4. **Tagging**: Git tags created
 5. **Release Creation**: GitHub Releases published
 6. **Homepage Update**: Organization badge updated
@@ -56,10 +56,10 @@ Every AGET Framework release includes:
 
 ### Required Artifacts
 
-- ✅ **Git Tags**: All 7 repositories tagged
-- ✅ **GitHub Releases**: All 7 repos have release on GitHub
+- ✅ **Git Tags**: All 13 repositories tagged
+- ✅ **GitHub Releases**: All 13 repos have release on GitHub
 - ✅ **Version Consistency**: All templates at same version
-- ✅ **Contract Tests**: 80+ tests passing (100% pass rate)
+- ✅ **Contract Tests**: 135+ tests passing (100% pass rate)
 - ✅ **CHANGELOG**: User-facing changes documented
 - ✅ **Delta Specification**: Technical changes documented
 - ✅ **Organization Homepage**: Badge shows current version
@@ -229,7 +229,7 @@ Add to your RSS reader for automatic notifications.
 
 ### Contract Tests
 
-**Requirement**: All 80+ contract tests must pass
+**Requirement**: All 135+ contract tests must pass
 
 **What They Validate**:
 - Wake-up protocol
@@ -320,7 +320,7 @@ python3 -m pytest tests/ -v
 
 **Resolution**: v2.11.0 established public framework governance (R-PUB-001 requirements, post-release validation, organization homepage updates).
 
-**Commitment**: v2.11.0+ have complete releases guaranteed.
+**Commitment**: v2.11.0+ have complete releases guaranteed. v3.6.0+ includes automated validation tooling.
 
 **Details**: [VERSION_HISTORY.md](VERSION_HISTORY.md)
 
@@ -372,9 +372,9 @@ python3 -m pytest tests/ -v
 **Older Releases**: No active support (upgrade recommended)
 
 **Example**:
-- v2.11.x: Full support
-- v2.10.x: Security fixes
-- v2.9.x and earlier: No support
+- v3.9.x: Full support
+- v3.8.x: Security fixes
+- v3.7.x and earlier: No support
 
 ---
 
@@ -421,4 +421,4 @@ python3 -m pytest tests/ -v
 ---
 
 *RELEASES.md - Understanding AGET Framework releases*
-*Created: 2025-12-24 | Version: 1.0*
+*Created: 2025-12-24 | Updated: 2026-03-15 | Version: 1.1*

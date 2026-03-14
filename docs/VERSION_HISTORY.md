@@ -12,13 +12,114 @@ This document provides a complete timeline of AGET Framework versions and their 
 
 ## Current Version
 
-**v3.6.0** (2026-02-21) - Infrastructure Maturation
+**v3.9.0** (2026-03-15) - Governance Enforcement
 
-All 13 repositories (aget + 12 templates) at v3.6.0: ✅
+All 13 repositories (aget + 12 templates) at v3.9.0: ✅
 
 ---
 
 ## Version Timeline
+
+### v3.9.0 (2026-03-15) ✅
+
+**Theme**: Governance Enforcement — release readiness, version management, process standardization
+
+**Status**: Complete release (all repos)
+
+| Repository | Release | Notes |
+|------------|---------|-------|
+| aget | ✅ | Core framework + SOP release process v1.28 + GOVERNANCE_PRINCIPLES |
+| template-advisor-aget | ✅ | Version bump + CHANGELOG |
+| template-analyst-aget | ✅ | Version bump + CHANGELOG |
+| template-architect-aget | ✅ | Version bump + CHANGELOG |
+| template-consultant-aget | ✅ | Version bump + CHANGELOG |
+| template-developer-aget | ✅ | Version bump + CHANGELOG |
+| template-executive-aget | ✅ | Version bump + CHANGELOG |
+| template-operator-aget | ✅ | Version bump + CHANGELOG |
+| template-researcher-aget | ✅ | Version bump + CHANGELOG |
+| template-reviewer-aget | ✅ | Version bump + CHANGELOG |
+| template-spec-engineer-aget | ✅ | Version bump + CHANGELOG |
+| template-supervisor-aget | ✅ | Version bump + CHANGELOG |
+| template-worker-aget | ✅ | Version bump + CHANGELOG |
+
+**Key Features**:
+- SOP release process v1.28 with Phase -1 (readiness assessment) and Phase 0.85 (scope lock)
+- GOVERNANCE_PRINCIPLES.md published (meta-principles for governance rules)
+- PROJECT_PLAN template with Gate 0 (due diligence)
+- version_bump.py v1.5 covering 5 artifact types (version.json, README.md, AGENTS.md, codemeta.json, CITATION.cff)
+- 135+ contract tests passing
+- /aget-create-project principles enforcement (ADR-008 Advisory → Strict for MP-1/MP-5)
+
+**See**: CHANGELOG.md for detailed changes
+
+---
+
+### v3.8.0 (2026-03-08) ✅
+
+**Theme**: Governance Maturation — principle codification, deliverable conformance
+
+**Status**: Complete release (all repos)
+
+| Repository | Release | Notes |
+|------------|---------|-------|
+| aget | ✅ | Core framework + governance principles + conformance tooling |
+| template-advisor-aget | ✅ | Version bump + CHANGELOG |
+| template-analyst-aget | ✅ | Version bump + CHANGELOG |
+| template-architect-aget | ✅ | Version bump + CHANGELOG |
+| template-consultant-aget | ✅ | Version bump + CHANGELOG |
+| template-developer-aget | ✅ | Version bump + CHANGELOG |
+| template-executive-aget | ✅ | Version bump + CHANGELOG |
+| template-operator-aget | ✅ | Version bump + CHANGELOG |
+| template-researcher-aget | ✅ | Version bump + CHANGELOG |
+| template-reviewer-aget | ✅ | Version bump + CHANGELOG |
+| template-spec-engineer-aget | ✅ | Version bump + CHANGELOG |
+| template-supervisor-aget | ✅ | Version bump + CHANGELOG |
+| template-worker-aget | ✅ | Version bump + CHANGELOG |
+
+**Key Features**:
+- Meta-principles codification (GOVERNANCE_PRINCIPLES.md draft)
+- Deliverable conformance tooling and gap analysis
+- Loading Dock anti-pattern defense (L656 — deployment verification before next-cycle planning)
+- Homepage quality rubric (L657 — 5 dimensions, L0-L3)
+- wake_up.py v2.0.0 rolled out to all 12 templates
+- DEPLOYMENT_SPEC reconciliation (6 divergences resolved)
+- post_release_validation.py check 15 (template content verification)
+
+**See**: CHANGELOG.md for detailed changes
+
+---
+
+### v3.7.0 (2026-03-01) ✅
+
+**Theme**: Quality Reconciliation — content integrity, SOP lifecycle, positioning reframe
+
+**Status**: Complete release (all repos)
+
+| Repository | Release | Notes |
+|------------|---------|-------|
+| aget | ✅ | Core framework + content integrity + SOP lifecycle |
+| template-advisor-aget | ✅ | Version bump + CHANGELOG |
+| template-analyst-aget | ✅ | Version bump + CHANGELOG |
+| template-architect-aget | ✅ | Version bump + CHANGELOG |
+| template-consultant-aget | ✅ | Version bump + CHANGELOG |
+| template-developer-aget | ✅ | Version bump + CHANGELOG |
+| template-executive-aget | ✅ | Version bump + CHANGELOG |
+| template-operator-aget | ✅ | Version bump + CHANGELOG |
+| template-researcher-aget | ✅ | Version bump + CHANGELOG |
+| template-reviewer-aget | ✅ | Version bump + CHANGELOG |
+| template-spec-engineer-aget | ✅ | Version bump + CHANGELOG |
+| template-supervisor-aget | ✅ | Version bump + CHANGELOG |
+| template-worker-aget | ✅ | Version bump + CHANGELOG |
+
+**Key Features**:
+- Content integrity remediation (claim-vs-reality drift)
+- SOP lifecycle governance improvements
+- Positioning reframe (AGET as governance framework, not autonomous agent platform)
+- Release observability enhancements
+
+**See**: CHANGELOG.md for detailed changes
+
+---
 
 ### v3.6.0 (2026-02-21) ✅
 
@@ -377,7 +478,7 @@ During the transition from private experimentation to public framework:
 
 ---
 
-## Going Forward (v3.6.0+)
+## Going Forward (v3.9.0+)
 
 **Commitment**: Every version increment will include:
 
@@ -412,17 +513,17 @@ Visit: https://github.com/aget-framework/aget/releases
 gh release list --repo aget-framework/aget
 
 # Clone specific version
-git clone --branch v3.6.0 https://github.com/aget-framework/aget.git
+git clone --branch v3.9.0 https://github.com/aget-framework/aget.git
 
 # Checkout existing clone
-git checkout v3.6.0
+git checkout v3.9.0
 ```
 
 ### Version Compatibility
 
 All templates share the same major.minor version:
-- aget: v3.6.0
-- template-*: v3.6.0
+- aget: v3.9.0
+- template-*: v3.9.0
 
 Templates at v3.x.y are compatible with aget v3.x.z (patch versions independent).
 
@@ -438,5 +539,5 @@ We acknowledge historical gaps transparently and focus on complete releases goin
 ---
 
 *VERSION_HISTORY.md - Complete version timeline for AGET Framework*
-*Last Updated: 2026-02-21*
+*Last Updated: 2026-03-15*
 *Maintained by: aget-framework*
