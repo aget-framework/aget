@@ -1,6 +1,6 @@
 # SOP: Fleet Migration
 
-**Version**: 1.2.0
+**Version**: 1.3.0
 **Status**: Active
 **Created**: 2026-01-05
 **Updated**: 2026-01-11
@@ -144,10 +144,12 @@ cat /path/to/your/aget-framework/aget/.aget/version.json | grep aget_version
 
 **Objective**: Validate migration approach on representative agents
 
-**Selection Criteria** (3 agents minimum):
-- 1 agent from Main portfolio (typical worker)
-- 1 agent from high-sensitivity portfolio (e.g., CCB)
-- 1 agent from secondary portfolio (e.g., RKB)
+**Selection Criteria** (3 agents minimum, L583):
+- 1 simple agent (structural validation — does the upgrade script work?)
+- 1 high-value agent (signal validation — does it break what matters? e.g., professional-core, cli-aget)
+- 1 high-complexity agent (divergence validation — does it handle organic customizations? e.g., supervisor-level skills)
+
+**Anti-pattern**: Selecting only dormant/simple agents optimizes for procedural safety, not validation signal. Pilot evidence must be compelling enough for external fleet deployments.
 
 #### Gate 1.1: Pilot Agent Migration
 
@@ -171,7 +173,74 @@ sed -i '' 's/"aget_version": "[^"]*"/"aget_version": "X.Y.Z"/' $AGENT_PATH/.aget
 sed -i '' 's/@aget-version: .*/@aget-version: X.Y.Z/' $AGENT_PATH/AGENTS.md
 ```
 
-#### Gate 1.2: L455 Verification (V-MIG-AGENTS Tests)
+#### Gate 1.2: Skill Content Sync (Conservative Protocol)
+
+**Objective**: Sync framework skill updates to agent instances without destroying organic customizations.
+
+**When this applies**: When the release includes skill SKILL.md changes (check RELEASE_HANDOFF for "skill updates" section).
+
+**Why conservative**: Remote fleets have minimal visibility to outcomes. A blunt overwrite can destroy organic features (evidence-rich mode, custom project types, invocation recording, disable-model-invocation) that the agent developed through use. The classify-archive-diff-merge-verify protocol prevents silent regressions.
+
+**Note**: ~50% of agents have `.claude/` in `.gitignore` (#317). Skill file commits require `git add -f` for these agents.
+
+For each skill with framework updates:
+
+```bash
+AGENT_PATH=~/github/{agent-name}
+TEMPLATE_PATH=~/github/aget-framework/template-{archetype}-aget
+SKILL_NAME=aget-create-project  # Replace per skill
+
+# Step 1: CLASSIFY — detect organic customizations
+python3 .aget/patterns/upgrade/pre_sync_check.py \
+  --baseline $TEMPLATE_PATH/.claude/skills/$SKILL_NAME/ \
+  --instance $AGENT_PATH/.claude/skills/$SKILL_NAME/
+
+# If pre_sync_check unavailable or single-file, classify manually:
+diff $TEMPLATE_PATH/.claude/skills/$SKILL_NAME/SKILL.md \
+     $AGENT_PATH/.claude/skills/$SKILL_NAME/SKILL.md | head -40
+
+# Step 2: ARCHIVE — preserve current version before any changes
+cp $AGENT_PATH/.claude/skills/$SKILL_NAME/SKILL.md \
+   $AGENT_PATH/.claude/skills/$SKILL_NAME/SKILL.md.pre-vX.Y.Z
+
+# Step 3: CLASSIFY result determines action:
+```
+
+| Classification | Organic Customizations? | Action |
+|---------------|------------------------|--------|
+| **Clean** (identical to prior template) | No | Safe to overwrite: `cp $TEMPLATE_PATH/...SKILL.md $AGENT_PATH/...SKILL.md` |
+| **Extension** (template + additions) | Yes | **MERGE**: Add framework updates into agent's file, preserving organic sections |
+| **Conflict** (incompatible changes) | Yes | **MANUAL**: Review diff, resolve conflicts, preserve organic intent |
+
+```bash
+# Step 4: For CLEAN agents — direct copy
+cp $TEMPLATE_PATH/.claude/skills/$SKILL_NAME/SKILL.md \
+   $AGENT_PATH/.claude/skills/$SKILL_NAME/SKILL.md
+
+# Step 4: For EXTENSION/CONFLICT agents — manual merge
+# Read both files, identify framework additions vs organic features
+# Add framework steps into agent's file preserving organic content
+
+# Step 5: VERIFY — confirm framework updates present AND organic features preserved
+echo "=== Framework updates ==="
+grep -c "Step 0\|Step 3.6\|Step 3.7\|Step 3.8\|Step 8" \
+  $AGENT_PATH/.claude/skills/$SKILL_NAME/SKILL.md
+# Expected: 5+ matches for D62
+
+echo "=== Organic features ==="
+# Check for agent-specific features (varies per agent)
+grep -c "disable-model-invocation\|evidence-rich\|gap\|record_invocation" \
+  $AGENT_PATH/.claude/skills/$SKILL_NAME/SKILL.md
+# Expected: matches for any organic features the agent had
+
+# Step 6: COMMIT (use -f if .claude/ is gitignored)
+git -C $AGENT_PATH add -f .claude/skills/$SKILL_NAME/SKILL.md \
+  .claude/skills/$SKILL_NAME/SKILL.md.pre-vX.Y.Z
+```
+
+**Decision_Point**: Skill sync verified for pilot agents? [GO/NOGO]
+
+#### Gate 1.3: L455 Verification (V-MIG-AGENTS Tests)
 
 ```bash
 # V-MIG-AGENTS.1: No stale patterns
@@ -185,7 +254,7 @@ python3 $AGENT_PATH/scripts/aget_housekeeping_protocol.py --json --dir $AGENT_PA
 ```
 **Expected**: PASS, PASS, healthy/warning
 
-#### Gate 1.3: Pilot Commit
+#### Gate 1.4: Pilot Commit
 
 ```bash
 git -C $AGENT_PATH add -A
@@ -410,6 +479,17 @@ See: FLEET_MIGRATION_GUIDE_v3.md (Cross-Machine Pre-Flight), L457
 ---
 
 ## Changelog
+
+### v1.3.0 (2026-03-14)
+
+- Added Gate 1.2: Skill Content Sync (Conservative Protocol)
+- 6-step classify-archive-diff-merge-verify-commit protocol
+- Clean/Extension/Conflict classification determines sync strategy
+- Preserves organic customizations during framework skill updates
+- Documents .claude/ gitignore workaround (git add -f, #317)
+- Renumbered Gates 1.2→1.3, 1.3→1.4
+- Implements #441 (SOP skill sync phase gap)
+- Validated by: FLEET-UPG-006 supervisor D62 self-remediation (2026-03-14)
 
 ### v1.2.0 (2026-01-11)
 
