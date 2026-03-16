@@ -1,9 +1,10 @@
 # AGET L-Doc Specification
 
 **Spec ID**: SPEC-LDOC-001
-**Version**: 2.0.0
+**Version**: 2.1.0
 **Status**: ACTIVE
 **Implements**: L419 (L-Doc Format v2)
+**Updated**: 2026-03-16
 
 ---
 
@@ -259,23 +260,41 @@ python3 scripts/migrate_ldoc_to_v2.py --dry-run .aget/evolution/
 
 ---
 
+## Requirements
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-LDOC-001 | ubiquitous | The SYSTEM shall name all Learning_Document files using the pattern `L{NUMBER}_{snake_case_title}.md`. |
+| CAP-LDOC-002 | ubiquitous | The SYSTEM shall include YAML frontmatter containing `id`, `title`, `format_version`, `created`, and `summary` fields in every Learning_Document. |
+| CAP-LDOC-003 | prohibited | The Evolution_Index shall NOT have a Learning_Document count more than 10 behind the actual file count. |
+| CAP-LDOC-004 | conditional | IF a Learning_Document applies beyond a single agent, THEN the SYSTEM shall include an `applicability.scope` field with one of: agent, archetype, fleet, universal. |
+| CAP-LDOC-005 | ubiquitous | The SYSTEM shall include `Context`, `Learning`, `Application`, `Evidence`, and `Related` sections in every Learning_Document body. |
+| CAP-LDOC-006 | event-driven | WHEN a Learning_Document is created or updated, THEN the SYSTEM shall regenerate the Evolution_Index. |
+| CAP-LDOC-007 | ubiquitous | The SYSTEM shall track Enforcement_Status for each Learning_Document using one of: observation, recommendation, advisory, enforced. |
+
+**Vocabulary**: Learning_Document, Evolution_Index, Enforcement_Status, Applicability_Scope
+
+**Migration**: R-LDOC-001→CAP-LDOC-001, R-LDOC-002→CAP-LDOC-002, R-LDOC-003→CAP-LDOC-003. CAP-LDOC-004 through CAP-LDOC-007 are new (codified from existing spec content).
+
+---
+
 ## Validation
 
-### R-LDOC-001: Filename Format
+### CAP-LDOC-001: Filename Format
 
 ```bash
 # All L-docs must match pattern
 ls .aget/evolution/L*.md | grep -E "^L[0-9]+_[a-z0-9_]+\.md$"
 ```
 
-### R-LDOC-002: Required Frontmatter
+### CAP-LDOC-002: Required Frontmatter
 
 ```bash
 # Must have id, title, format_version, created, summary
 python3 scripts/validate_ldoc.py L419_example.md
 ```
 
-### R-LDOC-003: Index Freshness
+### CAP-LDOC-003: Index Freshness
 
 ```bash
 # Index should not be more than 10 L-docs behind
@@ -295,4 +314,13 @@ indexed=$(python3 -c "import json; print(json.load(open('.aget/evolution/index.j
 
 ---
 
-*AGET_LDOC_SPEC.md - L-Doc Format Specification v2.0*
+## Changelog
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 2.1.0 | 2026-03-16 | Added EARS-patterned requirements (CAP-LDOC-001 through 007). Migrated R-LDOC-* IDs to CAP-LDOC-*. Per L682 maturity uplift L0→L1. |
+| 2.0.0 | — | Initial v2 format with YAML frontmatter and cross-agent discovery. |
+
+---
+
+*AGET_LDOC_SPEC.md - L-Doc Format Specification v2.1.0*

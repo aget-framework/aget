@@ -126,7 +126,21 @@ All tests should pass before using your agent.
 
 ---
 
-## Step 5: Start Using
+## Step 5: Terminal Emulator Considerations
+
+Your terminal emulator choice affects your AI CLI tool experience. AGET is terminal-agnostic, but the CLI tools underneath are not.
+
+| Feature | Why It Matters |
+|---------|---------------|
+| **GPU-accelerated rendering** | AI CLI tools generate high volumes of terminal output; non-GPU terminals may flicker or scroll uncontrollably |
+| **24-bit truecolor** | Diffs, syntax highlighting, and status indicators require full color support |
+| **Multi-line input (Shift+Enter)** | Essential for writing multi-line prompts; native in iTerm2, WezTerm, Ghostty, Kitty |
+
+Terminals with known smooth AI CLI experiences: **iTerm2** (macOS), **Ghostty** (macOS/Linux), **Kitty** (macOS/Linux), **WezTerm** (cross-platform). Check your CLI tool's documentation for terminal-specific configuration (e.g., Claude Code's `/terminal-setup` command).
+
+---
+
+## Step 6: Start Using
 
 ### With Claude Code
 

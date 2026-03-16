@@ -1,7 +1,8 @@
 # AGET Identity JSON Schema Specification
 
-**Version**: 1.0.0
+**Version**: 1.1.0
 **Created**: 2026-01-08
+**Updated**: 2026-03-16
 **Status**: Active
 **Implements**: AGET_INSTANCE_SPEC.md (identity.json requirements)
 **Context**: Created following L488 (SOP Template vs Operational Reality Gap)
@@ -212,28 +213,45 @@ Different archetypes may include additional fields:
 
 ---
 
+## Requirements
+
+| ID | Pattern | Statement | V-Test |
+|----|---------|-----------|--------|
+| CAP-IDJSON-001 | ubiquitous | The SYSTEM shall store agent identity in a valid JSON file at `.aget/identity.json`. | V1 |
+| CAP-IDJSON-002 | ubiquitous | The Identity_File shall contain a `name` field of type string. | V4 |
+| CAP-IDJSON-003 | ubiquitous | The Identity_File shall contain a `north_star` field of type object. | V2 |
+| CAP-IDJSON-004 | ubiquitous | The North_Star object shall contain a `type` field with value in: "purpose", "ambition", "curiosity", "wonder". | V3 |
+| CAP-IDJSON-005 | ubiquitous | The North_Star object shall contain a `statement` field of type string with length greater than 10 characters. | V2 |
+| CAP-IDJSON-006 | ubiquitous | The Identity_File shall contain a `created` field in ISO date format. | V5 |
+| CAP-IDJSON-007 | prohibited | The `north_star` field shall NOT be a bare string. | V2 |
+| CAP-IDJSON-008 | optional | WHERE Archetype_Specific_Fields are included, the Identity_File should include the `archetype` field. | — |
+
+**Vocabulary**: Identity_File, North_Star, Archetype_Specific_Fields, Enforcement_Status
+
+---
+
 ## Validation
 
 ### V-Tests
 
 ```bash
-# V1: JSON is valid
+# V1: JSON is valid (CAP-IDJSON-001)
 cat .aget/identity.json | python3 -m json.tool > /dev/null
 # Expected: Exit 0 (valid JSON)
 
-# V2: north_star is object with statement (CRITICAL)
+# V2: north_star is object with statement (CAP-IDJSON-003, CAP-IDJSON-005, CAP-IDJSON-007)
 jq -e '.north_star.statement' .aget/identity.json > /dev/null
 # Expected: Exit 0 (statement exists)
 
-# V3: north_star.type is valid
+# V3: north_star.type is valid (CAP-IDJSON-004)
 jq -e '.north_star.type | . == "purpose" or . == "ambition" or . == "curiosity" or . == "wonder"' .aget/identity.json
 # Expected: true
 
-# V4: name field exists
+# V4: name field exists (CAP-IDJSON-002)
 jq -e '.name' .aget/identity.json > /dev/null
 # Expected: Exit 0
 
-# V5: created field exists
+# V5: created field exists (CAP-IDJSON-006)
 jq -e '.created' .aget/identity.json > /dev/null
 # Expected: Exit 0
 
@@ -346,6 +364,15 @@ else:
 
 ---
 
-**Schema Version**: 1.0.0
+## Changelog
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.1.0 | 2026-03-16 | Added EARS-patterned requirements (CAP-IDJSON-001 through 008). Cross-referenced V-tests to CAP IDs. Per L682 maturity uplift L0→L1. |
+| 1.0.0 | 2026-01-08 | Initial schema specification. |
+
+---
+
+**Schema Version**: 1.1.0
 **Effective Date**: 2026-01-08
 **Review Cycle**: On schema change or consumer update
