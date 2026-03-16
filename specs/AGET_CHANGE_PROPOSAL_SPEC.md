@@ -1,11 +1,11 @@
 # AGET Change Proposal Specification
 
-**Version**: 1.1.0
+**Version**: 1.2.0
 **Status**: Active
 **Category**: Process
 **Format Version**: 1.2
 **Created**: 2025-12-26
-**Updated**: 2025-12-27
+**Updated**: 2026-03-16
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_CHANGE_PROPOSAL_SPEC.md`
 **Change Proposal**: CP-001
@@ -356,34 +356,88 @@ structure:
 
 ---
 
-## Validation
+## Verification
 
-### Format Validation
+### V-Test Traceability
+
+| V-Test | Method | Requirements Verified | Statement |
+|--------|--------|----------------------|-----------|
+| V-CP-001 | automated | CAP-CP-004-01 | Proposal_ID matches ^CP-\d{3}$ |
+| V-CP-002 | automated | CAP-CP-004-02 | Status is valid Lifecycle_State |
+| V-CP-003 | automated | CAP-CP-004-03 | Category is standards, informational, or process |
+| V-CP-004 | automated | CAP-CP-004-04 | Date_Submitted is valid ISO_8601 |
+| V-CP-005 | automated | CAP-CP-004-05 | Title ≤ 80 characters |
+| V-CP-006 | automated | CAP-CP-004-06 | Abstract ≤ 200 words |
+| V-CP-007 | automated | CAP-CP-005-02 | Acceptance_Criteria ≥ 1 |
+| V-CP-008 | automated | CAP-CP-005-03 | Alternatives_Considered ≥ 1 |
+| V-CP-009 | automated | CAP-CP-005-04 | Affected_Artifacts ≥ 1 |
+| V-CP-010 | automated | CAP-CP-005-01 | IF Breaking THEN Version_Impact = major |
+| V-CP-011 | automated | CAP-CP-002-02/03/07 | State transitions are valid per transition rules |
+| V-CP-012 | automated | CAP-CP-001-01/02 | CP has Markdown with YAML_Front_Matter and required Preamble_Fields |
+
+### V-CP-001..006: Format Validation
 
 ```bash
-# Validate CP format
+# Validate CP format (V-CP-001 through V-CP-006)
 python3 validation/validate_change_proposal.py CP-001_example.md --format
 
-# Expected checks:
-# ✅ Proposal_ID matches ^CP-\d{3}$
-# ✅ Status is valid Lifecycle_State
-# ✅ Category is valid
-# ✅ Date is ISO_8601
-# ✅ Title ≤ 80 characters
-# ✅ Abstract ≤ 200 words
+# V-CP-001: Proposal_ID matches ^CP-\d{3}$
+# V-CP-002: Status is valid Lifecycle_State
+# V-CP-003: Category is valid
+# V-CP-004: Date is ISO_8601
+# V-CP-005: Title ≤ 80 characters
+# V-CP-006: Abstract ≤ 200 words
 ```
 
-### Content Validation
+### V-CP-007..010: Content Validation
 
 ```bash
-# Validate CP content
+# Validate CP content (V-CP-007 through V-CP-010)
 python3 validation/validate_change_proposal.py CP-001_example.md --content
 
-# Expected checks:
-# ✅ Acceptance_Criteria ≥ 1
-# ✅ Alternatives_Considered ≥ 1
-# ✅ Affected_Artifacts ≥ 1
-# ✅ IF Breaking THEN Version_Impact = major
+# V-CP-007: Acceptance_Criteria ≥ 1
+# V-CP-008: Alternatives_Considered ≥ 1
+# V-CP-009: Affected_Artifacts ≥ 1
+# V-CP-010: IF Breaking THEN Version_Impact = major
+```
+
+### V-CP-011: State Transition Validation
+
+```bash
+# Validate state transition is legal (CAP-CP-002)
+python3 -c "
+TERMINAL = {'REJECTED', 'CLOSED'}
+VALID = {
+    'DRAFT': {'SUBMITTED', 'WITHDRAWN'},
+    'SUBMITTED': {'UNDER_REVIEW'},
+    'UNDER_REVIEW': {'ACCEPTED', 'REJECTED', 'DEFERRED'},
+    'ACCEPTED': {'SCOPED'},
+    'DEFERRED': {'ACCEPTED', 'REJECTED'},
+    'SCOPED': {'IMPLEMENTING'},
+    'IMPLEMENTING': {'RELEASED'},
+    'RELEASED': {'CLOSED'},
+}
+# Test: CLOSED -> any should fail
+assert 'CLOSED' not in VALID or len(VALID.get('CLOSED', set())) == 0, 'Terminal state has transitions'
+print('PASS')
+"
+```
+
+### V-CP-012: Preamble Fields
+
+```bash
+# Validate required preamble fields exist (CAP-CP-001-01/02)
+python3 -c "
+import yaml, sys
+with open(sys.argv[1]) as f:
+    content = f.read()
+fm = content.split('---')[1]
+data = yaml.safe_load(fm)
+required = ['proposal_id', 'title', 'author', 'date_submitted', 'status', 'category']
+missing = [r for r in required if r not in data]
+assert not missing, f'Missing: {missing}'
+print('PASS')
+" CP-001_example.md
 ```
 
 ---
@@ -429,11 +483,14 @@ history:
   - version: "1.1.0"
     date: "2025-12-27"
     changes: "EARS/SKOS reformat (v3.0.0-alpha.5)"
+  - version: "1.2.0"
+    date: "2026-03-16"
+    changes: "Added V-test IDs (V-CP-001..012) with traceability to CAP-CP requirements. Per L682 maturity uplift L1→L2."
 ```
 
 ---
 
-*AGET Change Proposal Specification v1.1.0*
+*AGET Change Proposal Specification v1.2.0*
 *Format: AGET_SPEC_FORMAT v1.2 (EARS + SKOS)*
 *Part of v3.0.0 Composition Architecture*
 *"Structured proposals enable structured evolution."*

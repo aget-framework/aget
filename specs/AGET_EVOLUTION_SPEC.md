@@ -1,12 +1,12 @@
 # AGET Evolution Specification
 
 **Spec ID**: SPEC-EVOL-001
-**Version**: 1.1.0
+**Version**: 1.2.0
 **Status**: ACTIVE
 **Category**: Standards (Knowledge Management)
 **Format Version**: 1.2
 **Created**: 2026-01-06
-**Updated**: 2026-01-18
+**Updated**: 2026-03-16
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_EVOLUTION_SPEC.md`
 **Change Origin**: L460 (Directory Semantics Reconciliation Gap), L461 (Evolution Entry Type Standardization)
@@ -416,34 +416,81 @@ archive:
 
 ---
 
-## Validation
+## Verification
 
-### R-EVOL-001: Entry Prefix Format
+### V-Test Traceability
+
+| V-Test | Method | Requirements Verified | Statement |
+|--------|--------|----------------------|-----------|
+| V-EVOL-001 | automated | CAP-EVOL-001-01/02, CAP-EVOL-002-01/02, CAP-EVOL-003-01/02 | All evolution entries have valid prefix format |
+| V-EVOL-002 | automated | CAP-EVOL-004-01/02/03 | No subdirectories in Evolution_Directory |
+| V-EVOL-003 | automated | CAP-EVOL-005-02/05 | No PROJECT_PLANs in Evolution_Directory |
+| V-EVOL-004 | automated | CAP-EVOL-001-03/04 | No duplicate L-numbers in sequence |
+| V-EVOL-005 | automated | CAP-EVOL-002-03/04/05 | Decision entries contain required sections |
+| V-EVOL-006 | automated | CAP-EVOL-003-03/04 | Discovery entries contain required sections |
+| V-EVOL-007 | automated | CAP-EVOL-006-01/03 | Evolution_Index has valid format and entry metadata |
+| V-EVOL-008 | manual | CAP-EVOL-007-01/02/03 | Published learnings are sanitized and fleet-applicable |
+
+### V-EVOL-001: Entry Prefix Format
 
 ```bash
-# All evolution entries must have valid prefix
-ls .aget/evolution/*.md | grep -vE "^(L|D|DISC)[0-9]+_|README|MAINTENANCE|index" && echo "INVALID" || echo "VALID"
+# All evolution entries must have valid prefix (CAP-EVOL-001, 002, 003)
+ls .aget/evolution/*.md | grep -vE "^(L|D|DISC|PP)[0-9]+_|README|MAINTENANCE|index" && echo "FAIL" || echo "PASS"
 ```
 
-### R-EVOL-002: No Subdirectories
+### V-EVOL-002: No Subdirectories
 
 ```bash
-# Evolution directory should not contain subdirectories (except allowed)
-find .aget/evolution -type d -mindepth 1 | grep -vE "^$" && echo "SUBDIRS FOUND" || echo "VALID"
+# Evolution directory must be flat (CAP-EVOL-004)
+find .aget/evolution -type d -mindepth 1 | grep -vE "^$" && echo "FAIL" || echo "PASS"
 ```
 
-### R-EVOL-003: No PROJECT_PLANs in Evolution
+### V-EVOL-003: No PROJECT_PLANs in Evolution
 
 ```bash
-# PROJECT_PLANs must not be in evolution
-ls .aget/evolution/PROJECT_PLAN*.md 2>/dev/null && echo "MISPLACED" || echo "VALID"
+# Active PROJECT_PLANs must not be in evolution (CAP-EVOL-005)
+ls .aget/evolution/PROJECT_PLAN*.md 2>/dev/null && echo "FAIL" || echo "PASS"
 ```
 
-### R-EVOL-004: Number Sequence
+### V-EVOL-004: Number Sequence
 
 ```bash
-# Check for duplicate L-numbers
-ls .aget/evolution/L*.md | sed 's/_.*//;s/.*\///' | sort | uniq -d
+# No duplicate L-numbers (CAP-EVOL-001-03/04)
+dupes=$(ls .aget/evolution/L*.md | sed 's/_.*//;s/.*\///' | sort | uniq -d)
+[ -z "$dupes" ] && echo "PASS" || echo "FAIL: $dupes"
+```
+
+### V-EVOL-005: Decision Entry Sections
+
+```bash
+# Decision entries must have Options_Considered, Decision, Consequences (CAP-EVOL-002-03/04/05)
+for f in .aget/evolution/D*.md; do
+  grep -q "## Options" "$f" && grep -q "## Decision" "$f" && grep -q "## Consequences" "$f" || echo "FAIL: $f"
+done
+```
+
+### V-EVOL-006: Discovery Entry Sections
+
+```bash
+# Discovery entries must have Evidence and Implications (CAP-EVOL-003-03/04)
+for f in .aget/evolution/DISC*.md; do
+  grep -q "## Evidence" "$f" && grep -q "## Implications" "$f" || echo "FAIL: $f"
+done
+```
+
+### V-EVOL-007: Index File Format
+
+```bash
+# Index file must have valid JSON with required fields (CAP-EVOL-006)
+python3 -c "import json; idx=json.load(open('.aget/evolution/index.json')); assert 'entries' in idx; assert 'stats' in idx; print('PASS')"
+```
+
+### V-EVOL-008: Published Learning Sanitization
+
+```
+Method: Manual inspection (CAP-EVOL-007)
+Check: Published learnings in docs/learnings/ contain no private agent names,
+no .aget/ paths, no internal tracking issues.
 ```
 
 ---
@@ -532,4 +579,14 @@ See: `scripts/migrate_project_plans.py`
 
 ---
 
-*AGET_EVOLUTION_SPEC.md - Evolution Directory Specification v1.0*
+## Changelog
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.2.0 | 2026-03-16 | Added V-test IDs (V-EVOL-001..008) with traceability to CAP-EVOL requirements. Added V-EVOL-005/006/007 executable checks. Per L682 maturity uplift L1→L2. |
+| 1.1.0 | 2026-01-18 | Added CAP-EVOL-008 (PP-prefix PROJECT_PLAN entries). |
+| 1.0.0 | 2026-01-06 | Initial specification (L460, L461). |
+
+---
+
+*AGET_EVOLUTION_SPEC.md - Evolution Directory Specification v1.2.0*
