@@ -831,19 +831,33 @@ theoretical_basis:
 
 ---
 
-## Validation
+## Verification Tests
+
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-MIG-001 | CAP-MIG-001 | automated | All 3 migration types (template, instance, fleet) supported |
+| V-MIG-002 | CAP-MIG-002 | automated | Phase ordering enforced (Analyze→Plan→Execute→Validate→Cleanup) |
+| V-MIG-003 | CAP-MIG-003 | automated | Compliance analysis produces JSON report with compliant/legacy classification |
+| V-MIG-004 | CAP-MIG-004 | inspection | PROJECT_PLAN includes validation gate and rollback strategy |
+| V-MIG-005 | CAP-MIG-005 | automated | Archive directory created with manifest before legacy items moved |
+| V-MIG-006 | CAP-MIG-006 | automated | All required validators pass with exit code 0 |
+| V-MIG-007 | CAP-MIG-006-03a | automated | Behavioral validation: wake_up.py executes without error post-migration |
+| V-MIG-008 | CAP-MIG-004-05 | manual | User approval required before execute phase |
+| V-MIG-009 | CAP-MIG-001-04 | manual | Fleet migration uses pilot phase before full rollout |
+
+### Validation Commands
 
 ```bash
-# Analyze compliance
+# Analyze compliance (V-MIG-003)
 python3 aget/scripts/analyze_template_compliance.py template-example-aget/
 
-# Dry run migration
+# Dry run migration (V-MIG-002, V-MIG-005)
 python3 aget/scripts/migrate_template_to_v3.py template-example-aget/ --dry-run
 
-# Execute migration
+# Execute migration (V-MIG-001)
 python3 aget/scripts/migrate_template_to_v3.py template-example-aget/ --execute
 
-# Run validators
+# Run validators (V-MIG-006)
 python3 validation/validate_version_consistency.py template-example-aget/
 python3 validation/validate_template_manifest.py template-example-aget/manifest.yaml
 

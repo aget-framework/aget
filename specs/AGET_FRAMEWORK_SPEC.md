@@ -1146,6 +1146,34 @@ theoretical_basis:
 
 ---
 
+## Verification Tests
+
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-FW-001 | CAP-CORE-001 | automated | Version identity loading reads all 7 fields from version.json |
+| V-FW-002 | CAP-CORE-002 | automated | AGENTS.md parsing extracts North Star, Identity, and Purpose sections |
+| V-FW-003 | CAP-CORE-003 | automated | Directory structure validation checks .aget/, governance/, planning/ |
+| V-FW-004 | CAP-CORE-004 | automated | Version format conforms to semver MAJOR.MINOR.PATCH |
+| V-FW-005 | CAP-CORE-001-08 | automated | Missing version.json produces failure message |
+| V-FW-006 | CAP-CORE-002-07 | automated | CLAUDE.md exists as symlink to AGENTS.md |
+| V-FW-007 | CAP-SESSION (cross-ref) | automated | Session protocol requirements validated via V-SESSION-* |
+| V-FW-008 | CAP-GOV (cross-ref) | inspection | Governance requirements validated via V-GOV-* when available |
+
+### Validation Commands
+
+```bash
+# Directory structure validation (V-FW-003)
+python3 aget/scripts/validate_agent_structure.py template-example-aget/
+
+# Version consistency (V-FW-001, V-FW-004)
+python3 .aget/patterns/sync/version_consistency.py
+
+# Contract tests (automated, covers V-FW-001 through V-FW-006)
+python3 -m pytest tests/ -v -k "version or structure or agents_md"
+```
+
+---
+
 ## References
 
 | Document | Purpose |

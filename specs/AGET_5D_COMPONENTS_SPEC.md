@@ -919,6 +919,34 @@ All five dimensions are grounded in established theory (L331):
 
 ---
 
+## Verification Tests
+
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-COMP-001 | CAP-PERSONA-001 | automated | Archetype declared in manifest.yaml matches standard values |
+| V-COMP-002 | CAP-PERSONA-002 | automated | Exactly one governance capability specified |
+| V-COMP-003 | CAP-PERSONA-005 | automated | All 5 identity files exist (identity.json, version.json, CHARTER, MISSION, AGENTS.md) |
+| V-COMP-004 | CAP-MEMORY-001 | inspection | Memory layers 1-4 present; layer 5 present if fleet member |
+| V-COMP-005 | CAP-MEMORY-002 | automated | L-doc index.json exists and entries match filesystem |
+| V-COMP-006 | CAP-PERSONA-003 | inspection | Communication style matches governance intensity |
+| V-COMP-007 | CAP-PERSONA-004 | automated | North Star present in identity.json; Mission present in MISSION.md |
+| V-COMP-008 | CAP-MEMORY-002-03 | inspection | Patterns with 3+ applications flagged for graduation |
+
+### Validation Commands
+
+```bash
+# Persona validation (V-COMP-001, V-COMP-002, V-COMP-003)
+python3 aget/scripts/validate_persona_compliance.py template-example-aget/
+
+# Memory validation (V-COMP-004, V-COMP-005)
+python3 aget/scripts/validate_memory_compliance.py template-example-aget/
+
+# L-doc index integrity (V-COMP-005)
+python3 aget/scripts/validate_ldoc_index.py template-example-aget/
+```
+
+---
+
 ## References
 
 - L331: Theoretical Foundations of Agency
