@@ -278,26 +278,28 @@ python3 scripts/migrate_ldoc_to_v2.py --dry-run .aget/evolution/
 
 ---
 
-## Validation
+## Verification Tests
 
-### CAP-LDOC-001: Filename Format
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-LDOC-001 | CAP-LDOC-001 | automated | All L-doc filenames match `L[0-9]+_[a-z0-9_]+.md` pattern |
+| V-LDOC-002 | CAP-LDOC-002 | automated | Required frontmatter fields present (id, title, format_version, created, summary) |
+| V-LDOC-003 | CAP-LDOC-003 | automated | Index freshness: gap between actual L-docs and indexed count <= 10 |
+| V-LDOC-004 | CAP-LDOC-004 | inspection | L-doc categories match allowed taxonomy |
+| V-LDOC-005 | CAP-LDOC-005 | automated | No duplicate L-doc IDs in index.json |
+| V-LDOC-006 | CAP-LDOC-006 | manual | Framework vs Domain classification confirmed by user before writing |
+| V-LDOC-007 | CAP-LDOC-007 | automated | Index.json `next_id` is consistent with highest L-doc on filesystem |
+
+### Validation Commands
 
 ```bash
-# All L-docs must match pattern
+# V-LDOC-001: Filename format
 ls .aget/evolution/L*.md | grep -E "^L[0-9]+_[a-z0-9_]+\.md$"
-```
 
-### CAP-LDOC-002: Required Frontmatter
-
-```bash
-# Must have id, title, format_version, created, summary
+# V-LDOC-002: Required frontmatter
 python3 scripts/validate_ldoc.py L419_example.md
-```
 
-### CAP-LDOC-003: Index Freshness
-
-```bash
-# Index should not be more than 10 L-docs behind
+# V-LDOC-003: Index freshness
 actual=$(ls .aget/evolution/L*.md | wc -l)
 indexed=$(python3 -c "import json; print(json.load(open('.aget/evolution/index.json'))['count'])")
 [ $((actual - indexed)) -le 10 ]

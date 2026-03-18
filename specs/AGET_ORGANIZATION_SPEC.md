@@ -1,6 +1,6 @@
 # AGET Organization Specification
 
-**Version**: 1.1.0
+**Version**: 1.1.1
 **Status**: Active
 **Category**: Process (Organization)
 **Format Version**: 1.2
@@ -179,6 +179,14 @@ See [CONTRIBUTING.md](link)
 Apache 2.0
 ```
 
+### CAP-ORG-006: EARS System-Level Requirements
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-ORG-006-01 | ubiquitous | The SYSTEM shall validate homepage content against CAP-ORG-001 completeness requirements after every release. |
+| CAP-ORG-006-02 | event-driven | WHEN a new version is released, THEN the SYSTEM shall update the homepage roadmap entry for that version. |
+| CAP-ORG-006-03 | prohibited | The SYSTEM shall NOT publish homepage content that references unreleased versions as current. |
+
 ---
 
 ## Enforcement
@@ -201,6 +209,11 @@ Apache 2.0
 ---
 
 ## Changelog
+
+### v1.1.1 (2026-03-17)
+
+- Added CAP-ORG-006: EARS System-Level Requirements (L682 L0→L1 uplift)
+- 3 requirements with SYSTEM subject, ubiquitous/event-driven/prohibited patterns
 
 ### v1.1.0 (2026-03-08)
 

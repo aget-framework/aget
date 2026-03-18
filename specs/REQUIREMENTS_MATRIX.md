@@ -1,6 +1,6 @@
 # AGET Requirements Traceability Matrix
 
-**Version**: 1.2.0
+**Version**: 1.2.1
 **Status**: Active
 **Updated**: 2026-01-07
 **Author**: aget-framework
@@ -228,9 +228,22 @@ Issue/L-doc → CAP Requirement → Specification → Validator → Test
 | #33 | Naming Convention Expansion | CAP-NAME-* (File Naming) | Complete |
 | #36 | Validator Enforcement | CAP-TEST-006 | In Progress |
 
+### R-RTM-001: EARS System-Level Requirements
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| R-RTM-001-01 | ubiquitous | The SYSTEM shall maintain traceability from every L-doc to its corresponding CAP requirements. |
+| R-RTM-001-02 | event-driven | WHEN a new CAP requirement is added to any specification, THEN the SYSTEM shall update the Requirements Traceability Matrix. |
+| R-RTM-001-03 | conditional | IF a CAP requirement has no linked L-doc or issue origin, THEN the SYSTEM shall flag it as untraced. |
+
 ---
 
 ## Changelog
+
+### v1.2.1 (2026-03-17)
+
+- Added R-RTM-001: EARS System-Level Requirements (L682 L0→L1 uplift)
+- 3 requirements with SYSTEM subject, ubiquitous/event-driven/conditional patterns
 
 ### v1.0.0 (2026-01-04)
 

@@ -1,6 +1,6 @@
 # AGET PROJECT_PLAN Specification
 
-**Version**: 1.2.0
+**Version**: 1.2.1
 **Status**: Active
 **Category**: Process (Planning)
 **Format Version**: 1.2
@@ -657,7 +657,27 @@ See: `templates/PROJECT_PLAN_TEMPLATE.md` (G2.9 deliverable)
 9. Velocity Analysis (post-execution)
 10. Retrospective (per CAP-REASON-008)
 
+### CAP-PP-019: EARS System-Level Requirements
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-PP-019-01 | ubiquitous | The SYSTEM shall validate all PROJECT_PLAN documents against CAP-PP-001 structural requirements before accepting them as governance artifacts. |
+| CAP-PP-019-02 | event-driven | WHEN all V-tests for a Gate pass, THEN the SYSTEM shall present the Gate's Decision_Point for principal approval. |
+| CAP-PP-019-03 | conditional | IF a Gate has 4 or more deliverables, THEN the SYSTEM shall insert a mid-gate checkpoint at the 50% mark (L002). |
+
 ---
+
+## Verification Tests
+
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-PP-001 | CAP-PP-001 | automated | PROJECT_PLAN contains required sections (Context, Gates, Success Criteria) |
+| V-PP-002 | CAP-PP-002 | automated | Each gate has go/no-go decision point and deliverables list |
+| V-PP-003 | CAP-PP-003 | manual | Due diligence section references 3+ KB precedents |
+| V-PP-004 | CAP-PP-011 | inspection | Gate completion includes V-test execution evidence |
+| V-PP-005 | CAP-PP-012 | automated | Artifact sizes within thresholds |
+| V-PP-006 | CAP-PP-018 | manual | Retrospective section present with minimum depth (not perfunctory) |
+| V-PP-007 | CAP-PP-019 | automated | Plan status field is valid enum (PROPOSED/IN_PROGRESS/COMPLETE/SUPERSEDED) |
 
 ## Enforcement
 
@@ -757,6 +777,11 @@ See G2.8 (already in plan) or defer to v3.3.0.
 ---
 
 ## Changelog
+
+### v1.2.1 (2026-03-17)
+
+- Added CAP-PP-019: EARS System-Level Requirements (L682 L0→L1 uplift)
+- 3 requirements with SYSTEM subject, ubiquitous/event-driven/conditional patterns
 
 ### v1.2.0 (2026-01-18)
 

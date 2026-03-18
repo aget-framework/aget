@@ -1,7 +1,7 @@
 # AGET Executable Knowledge Specification
 
 **Spec ID**: AGET-EKO-001
-**Version**: 1.0.0
+**Version**: 1.0.1
 **Status**: Active
 **Category**: Core (Ontology)
 **Format Version**: 1.2
@@ -152,6 +152,14 @@ Syllogistic       → Agent MUST consult human
 | CAP-EKO-004-01 | EKO vocabulary SHALL be self-contained | Community contribution readiness |
 | CAP-EKO-004-02 | External ontologies MAY inform but SHALL NOT bind | No approval gates |
 
+### CAP-EKO-005: EARS System-Level Requirements
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-EKO-005-01 | ubiquitous | The SYSTEM shall classify every executable artifact along the three EKO axes (Abstraction, Determinism, Reusability). |
+| CAP-EKO-005-02 | conditional | IF an artifact's classification changes, THEN the SYSTEM shall update the corresponding vocabulary entry. |
+| CAP-EKO-005-03 | prohibited | The SYSTEM shall NOT create executable artifacts without explicit classification metadata. |
+
 ---
 
 ## Enforcement
@@ -223,6 +231,11 @@ EKO is grounded in established theory:
 ---
 
 ## Changelog
+
+### v1.0.1 (2026-03-17)
+
+- Added CAP-EKO-005: EARS System-Level Requirements (L682 L0→L1 uplift)
+- 3 requirements with SYSTEM subject, ubiquitous/conditional/prohibited patterns
 
 ### v1.0.0 (2026-01-04)
 

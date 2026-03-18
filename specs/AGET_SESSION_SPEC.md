@@ -640,28 +640,35 @@ session_naming_standard:
 
 ---
 
-## Validation
+## Verification Tests
+
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-SESSION-001 | CAP-SESSION-001 | automated | Wake-up script executes and produces formatted output |
+| V-SESSION-002 | CAP-SESSION-002 | automated | Wind-down script executes and detects pending work |
+| V-SESSION-003 | CAP-SESSION-003 | automated | Study-up script returns results for known topics |
+| V-SESSION-004 | CAP-SESSION-004 | manual | Clean-close session creates session file when pending work exists |
+| V-SESSION-005 | CAP-SESSION-005 | automated | Session file naming matches `SESSION_YYYY-MM-DD_*.md` pattern |
+| V-SESSION-006 | CAP-SESSION-007 | automated | Study-up multi-word topics return results (L637, #466) |
+| V-SESSION-007 | CAP-SESSION-010 | manual | Wind-down re-entrancy guard prevents double execution |
+| V-SESSION-008 | CAP-SESSION-012 | automated | Sanity gate runs housekeeping checks (9/9 expected) |
+
+### Validation Commands
 
 ```bash
-# Test wake-up protocol
-python3 .aget/patterns/session/wake_up.py --verify
+# Test wake-up protocol (V-SESSION-001)
+python3 scripts/wake_up.py
 
-# Test wind-down protocol
-python3 .aget/patterns/session/wind_down.py --verify
+# Test wind-down protocol (V-SESSION-002)
+python3 scripts/wind_down.py
 
-# Test step-back protocol
-python3 .aget/patterns/session/step_back.py --verify
+# Test study-up protocol (V-SESSION-003, V-SESSION-006)
+python3 scripts/study_up.py --topic "release"
 
-# Test study-up protocol
-python3 .aget/patterns/session/study_up.py --verify
+# Test sanity check (V-SESSION-008)
+python3 scripts/aget_housekeeping_protocol.py --json
 
-# Test sanity check protocol
-python3 .aget/patterns/session/aget_housekeeping_protocol.py --verify
-
-# Verify all protocols (migration check)
-python3 .aget/patterns/session/verify_session_protocols.py
-
-# Contract tests
+# Contract tests (automated, covers V-SESSION-001 through V-SESSION-008)
 python3 -m pytest tests/test_session_protocol.py -v
 ```
 

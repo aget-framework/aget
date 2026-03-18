@@ -1,6 +1,6 @@
 # AGET Security Specification
 
-**Version**: 1.0.0
+**Version**: 1.0.1
 **Status**: Active
 **Category**: Technical (Security)
 **Format Version**: 1.2
@@ -195,6 +195,14 @@ path = path.replace("/home/username/", "/path/to/")
 text = text.replace("private-supervisor-AGET", "supervisor-agent")
 ```
 
+### CAP-SEC-006: EARS System-Level Requirements
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-SEC-006-01 | ubiquitous | The SYSTEM shall scan all public-facing content for private agent names and internal paths before publication. |
+| CAP-SEC-006-02 | event-driven | WHEN a file is staged for commit to a public repository, THEN the SYSTEM shall validate it against CAP-SEC-001 content security rules. |
+| CAP-SEC-006-03 | prohibited | The SYSTEM shall NOT include files matching `.env`, `credentials.*`, or `*_SECRET*` patterns in public commits. |
+
 ---
 
 ## Enforcement
@@ -247,6 +255,11 @@ cd /path/to/aget-framework/aget
 ---
 
 ## Changelog
+
+### v1.0.1 (2026-03-17)
+
+- Added CAP-SEC-006: EARS System-Level Requirements (L682 L0→L1 uplift)
+- 3 requirements with SYSTEM subject, ubiquitous/event-driven/prohibited patterns
 
 ### v1.0.0 (2026-01-04)
 

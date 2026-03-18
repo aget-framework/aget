@@ -1,6 +1,6 @@
 # COMPOSITION_SPEC v1.0
 
-**Version**: 1.0.0
+**Version**: 1.0.1
 **Date**: 2025-12-24
 **Author**: aget-framework
 **Status**: Approved
@@ -556,12 +556,21 @@ The composition model is extensible:
 | CAPABILITY_SPEC_v1.0_SCHEMA | Capability schema |
 | TEMPLATE_MANIFEST_v1.0_SCHEMA | Manifest schema |
 
+### R-COMP-006: EARS System-Level Requirements
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| R-COMP-006-01 | ubiquitous | The SYSTEM shall validate that capability composition graphs are acyclic (DAG property). |
+| R-COMP-006-02 | conditional | IF a template declares a capability dependency, THEN the SYSTEM shall verify that dependency exists in the capability registry. |
+| R-COMP-006-03 | prohibited | The SYSTEM shall NOT allow circular capability inheritance chains. |
+
 ---
 
 ## Changelog
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.0.1 | 2026-03-17 | Added R-COMP-006: EARS System-Level Requirements (L682 L0→L1 uplift) |
 | 1.0.0 | 2025-12-24 | Initial specification |
 
 ---

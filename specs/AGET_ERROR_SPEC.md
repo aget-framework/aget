@@ -1,6 +1,6 @@
 # AGET Error Specification
 
-**Version**: 1.0.0
+**Version**: 1.0.1
 **Status**: Active
 **Category**: Technical (Error Handling)
 **Format Version**: 1.2
@@ -148,6 +148,14 @@ if violations:
     sys.exit(EXIT_VALIDATION_FAILED)
 ```
 
+### CAP-ERR-005: EARS System-Level Requirements
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-ERR-005-01 | ubiquitous | The SYSTEM shall assign a unique exit code to each error category per CAP-ERR-001. |
+| CAP-ERR-005-02 | event-driven | WHEN a validation script encounters an error, THEN the SYSTEM shall output a structured error message containing error code, description, and recovery suggestion. |
+| CAP-ERR-005-03 | prohibited | The SYSTEM shall NOT use exit code 0 for operations that completed with warnings or partial failures. |
+
 ---
 
 ## Enforcement
@@ -182,6 +190,11 @@ if violations:
 ---
 
 ## Changelog
+
+### v1.0.1 (2026-03-17)
+
+- Added CAP-ERR-005: EARS System-Level Requirements (L682 L0→L1 uplift)
+- 3 requirements with SYSTEM subject, ubiquitous/event-driven/prohibited patterns
 
 ### v1.0.0 (2026-01-04)
 

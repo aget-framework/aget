@@ -1,6 +1,6 @@
 # AGET Testing Specification
 
-**Version**: 1.1.0
+**Version**: 1.1.1
 **Status**: Active
 **Category**: Technical (Quality Assurance)
 **Format Version**: 1.2
@@ -245,6 +245,14 @@ python3 -c "import json; v=json.load(open('.aget/version.json')); print('PASS' i
                                       - Fast, independent
 ```
 
+### CAP-TEST-007: EARS System-Level Requirements
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-TEST-007-01 | ubiquitous | The SYSTEM shall require all Contract_Tests to trace to at least one CAP requirement. |
+| CAP-TEST-007-02 | event-driven | WHEN a release gate is reached, THEN the SYSTEM shall execute all relevant V-tests before presenting the Decision_Point. |
+| CAP-TEST-007-03 | prohibited | The SYSTEM shall NOT mark a gate as complete without passing V-tests (L440). |
+
 ---
 
 ## Enforcement
@@ -376,6 +384,11 @@ def test_version_format():
 ---
 
 ## Changelog
+
+### v1.1.1 (2026-03-17)
+
+- Added CAP-TEST-007: EARS System-Level Requirements (L682 L0→L1 uplift)
+- 3 requirements with SYSTEM subject, ubiquitous/event-driven/prohibited patterns
 
 ### v1.1.0 (2026-01-18)
 

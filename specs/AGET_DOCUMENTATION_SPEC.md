@@ -1,6 +1,6 @@
 # AGET Documentation Specification
 
-**Version**: 1.0.0
+**Version**: 1.0.1
 **Status**: Active
 **Category**: Format (Documentation Standards)
 **Format Version**: 1.2
@@ -376,6 +376,14 @@ Example:
 | SOP | Human User | AI Assistant |
 | Inline docs | Framework Developer | AI Assistant |
 
+### CAP-DOC-007: EARS System-Level Requirements
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-DOC-007-01 | ubiquitous | The SYSTEM shall validate all README files against CAP-DOC-001 structural requirements. |
+| CAP-DOC-007-02 | event-driven | WHEN a new template is created, THEN the SYSTEM shall generate a README from the template-appropriate structure. |
+| CAP-DOC-007-03 | conditional | IF a specification references other specs, THEN the SYSTEM shall verify those cross-references resolve to existing files. |
+
 ---
 
 ## Enforcement
@@ -504,6 +512,11 @@ validate_naming("/path/to/repo")
 ---
 
 ## Changelog
+
+### v1.0.1 (2026-03-17)
+
+- Added CAP-DOC-007: EARS System-Level Requirements (L682 L0→L1 uplift)
+- 3 requirements with SYSTEM subject, ubiquitous/event-driven/conditional patterns
 
 ### v1.0.0 (2026-01-04)
 

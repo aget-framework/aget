@@ -1,6 +1,6 @@
 # AGET Vocabulary Specification
 
-**Version**: 1.16.0
+**Version**: 1.16.1
 **Status**: Active
 **Category**: Core (Standards)
 **Format Version**: 1.2
@@ -2732,6 +2732,14 @@ Instruction_Asymmetry:
 | CAP-VOC-003-02 | Declarative_Completion SHALL be marked anti-pattern | Prevention |
 | CAP-VOC-003-03 | Verified_Completion SHALL be marked pattern | Best practice |
 
+### CAP-VOC-004: EARS System-Level Requirements
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-VOC-004-01 | ubiquitous | The SYSTEM shall require every vocabulary term to include skos:prefLabel and skos:definition properties. |
+| CAP-VOC-004-02 | prohibited | The SYSTEM shall NOT accept single-word vocabulary terms (R-VOC-PROSE-003). |
+| CAP-VOC-004-03 | conditional | IF a new specification introduces domain terms, THEN the SYSTEM shall add those terms to the controlled vocabulary. |
+
 ---
 
 ## Enforcement
@@ -2760,6 +2768,11 @@ Instruction_Asymmetry:
 ---
 
 ## Changelog
+
+### v1.16.1 (2026-03-17)
+
+- Added CAP-VOC-004: EARS System-Level Requirements (L682 L0→L1 uplift)
+- 3 requirements with SYSTEM subject, ubiquitous/prohibited/conditional patterns
 
 ### v1.16.0 (2026-02-21)
 

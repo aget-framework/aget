@@ -1,6 +1,6 @@
 # AGET File Naming Conventions
 
-**Version**: 2.1.0
+**Version**: 2.1.1
 **Date**: 2026-01-04
 **Status**: CANONICAL
 **Location**: aget/specs/AGET_FILE_NAMING_CONVENTIONS.md
@@ -735,9 +735,22 @@ New files MUST follow this specification.
 - PEP 8 - Python code style
 - PEP 423 - Python package naming
 
+### R-NAME-019: EARS System-Level Requirements
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| R-NAME-019-01 | ubiquitous | The SYSTEM shall validate all new file names against the naming conventions defined in this specification. |
+| R-NAME-019-02 | conditional | IF a file name contains spaces or special characters, THEN the SYSTEM shall reject the file with a naming convention violation. |
+| R-NAME-019-03 | prohibited | The SYSTEM shall NOT create files with names that violate the category-specific patterns (Categories A through J). |
+
 ---
 
 ## Changelog
+
+### v2.1.1 (2026-03-17)
+
+- Added R-NAME-019: EARS System-Level Requirements (L682 L0→L1 uplift)
+- 3 requirements with SYSTEM subject, ubiquitous/conditional/prohibited patterns
 
 ### v2.1.0 (2026-01-04)
 

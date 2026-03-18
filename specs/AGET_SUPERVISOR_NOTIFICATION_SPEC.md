@@ -1,6 +1,6 @@
 # AGET Supervisor Notification Specification
 
-**Version**: 1.1.0
+**Version**: 1.1.1
 **Status**: Active
 **Category**: Process (Release Communication)
 **Format Version**: 1.3
@@ -233,6 +233,13 @@ Release Complete
 
 **Distinction**: The handoff is the *how* (detailed upgrade guide). The notification is the *what* and *why* (summary trigger + quality evidence).
 
+### CAP-NOTIFY-006: EARS System-Level Requirements
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-NOTIFY-006-01 | ubiquitous | The SYSTEM shall validate all Supervisor_Notification artifacts against R-NOTIFY sanitization requirements before delivery. |
+| CAP-NOTIFY-006-02 | event-driven | WHEN a release is completed, THEN the SYSTEM shall generate a Supervisor_Notification from the release handoff data. |
+
 ---
 
 ## Enforcement
@@ -257,6 +264,11 @@ Release Complete
 ---
 
 ## Changelog
+
+### v1.1.1 (2026-03-17)
+
+- Added CAP-NOTIFY-006: EARS System-Level Requirements (L682 L0→L1 uplift)
+- 2 requirements with SYSTEM subject, ubiquitous/event-driven patterns
 
 ### v1.1.0 (2026-03-05)
 

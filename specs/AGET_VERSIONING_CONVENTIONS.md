@@ -1,6 +1,6 @@
 # AGET Versioning Conventions
 
-**Version**: 1.0.0
+**Version**: 1.0.1
 **Date**: 2025-12-01
 **Status**: CANONICAL
 **Location**: aget/specs/AGET_VERSIONING_CONVENTIONS.md
@@ -308,6 +308,27 @@ def test_version_is_valid_semver():
 - [Semantic Versioning 2.0.0](https://semver.org/)
 - ADR-012: Migration Strategy
 - AGET_SPEC_FORMAT_v1.1.md
+
+### R-VER-001: EARS System-Level Requirements
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| R-VER-001-01 | ubiquitous | The SYSTEM shall validate all version strings against Semantic Versioning 2.0.0 format (MAJOR.MINOR.PATCH). |
+| R-VER-001-02 | event-driven | WHEN a breaking change is introduced, THEN the SYSTEM shall increment the MAJOR version number. |
+| R-VER-001-03 | prohibited | The SYSTEM shall NOT release a version without updating all version-bearing artifacts defined in the version manifest. |
+
+---
+
+## Changelog
+
+### v1.0.1 (2026-03-17)
+
+- Added R-VER-001: EARS System-Level Requirements (L682 L0→L1 uplift)
+- 3 requirements with SYSTEM subject, ubiquitous/event-driven/prohibited patterns
+
+### v1.0.0 (2025-12-01)
+
+- Initial specification
 
 ---
 
