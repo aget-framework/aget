@@ -1,11 +1,11 @@
 # AGET 5D Composition Architecture Specification
 
-**Version**: 1.3.0
+**Version**: 1.4.0
 **Status**: Active
 **Category**: Standards (Umbrella)
 **Format Version**: 1.2
 **Created**: 2025-12-26
-**Updated**: 2026-01-04
+**Updated**: 2026-03-18
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_5D_ARCHITECTURE_SPEC.md`
 **Change Proposal**: CP-008
@@ -153,70 +153,70 @@ vocabulary:
 
 ## Requirements
 
-### CAP-5D-001: Dimension Completeness
+### CAP-ARCH-001: Dimension Completeness
 
 The SYSTEM shall address all five dimensions in agent design.
 
 | ID | Pattern | Statement |
 |----|---------|-----------|
-| CAP-5D-001-01 | ubiquitous | The SYSTEM shall have defined PERSONA (Archetype + Governance_Intensity) |
-| CAP-5D-001-02 | ubiquitous | The SYSTEM shall have MEMORY structure (.aget/evolution, governance, planning) |
-| CAP-5D-001-03 | ubiquitous | The SYSTEM shall follow REASONING patterns appropriate to Governance_Intensity |
-| CAP-5D-001-04 | ubiquitous | The SYSTEM shall declare SKILLS via Capabilities or Manifest_Yaml |
-| CAP-5D-001-05 | ubiquitous | The SYSTEM shall have CONTEXT awareness (Scope_Boundaries, Relationships) |
+| CAP-ARCH-001-01 | ubiquitous | The SYSTEM shall have defined PERSONA (Archetype + Governance_Intensity) |
+| CAP-ARCH-001-02 | ubiquitous | The SYSTEM shall have MEMORY structure (.aget/evolution, governance, planning) |
+| CAP-ARCH-001-03 | ubiquitous | The SYSTEM shall follow REASONING patterns appropriate to Governance_Intensity |
+| CAP-ARCH-001-04 | ubiquitous | The SYSTEM shall declare SKILLS via Capabilities or Manifest_Yaml |
+| CAP-ARCH-001-05 | ubiquitous | The SYSTEM shall have CONTEXT awareness (Scope_Boundaries, Relationships) |
 
 **Enforcement**: `validate_5d_compliance.py`
 
-### CAP-5D-002: Dimension Orthogonality
+### CAP-ARCH-002: Dimension Orthogonality
 
 Dimensions SHALL be independent and compose without interference.
 
 | ID | Pattern | Statement |
 |----|---------|-----------|
-| CAP-5D-002-01 | ubiquitous | The SYSTEM shall ensure PERSONA choices do NOT constrain MEMORY structure |
-| CAP-5D-002-02 | ubiquitous | The SYSTEM shall ensure SKILLS compose independently of REASONING patterns |
-| CAP-5D-002-03 | ubiquitous | The SYSTEM shall ensure CONTEXT awareness does NOT override PERSONA identity |
-| CAP-5D-002-04 | ubiquitous | The SYSTEM shall make Dimension configurations separately testable |
+| CAP-ARCH-002-01 | ubiquitous | The SYSTEM shall ensure PERSONA choices do NOT constrain MEMORY structure |
+| CAP-ARCH-002-02 | ubiquitous | The SYSTEM shall ensure SKILLS compose independently of REASONING patterns |
+| CAP-ARCH-002-03 | ubiquitous | The SYSTEM shall ensure CONTEXT awareness does NOT override PERSONA identity |
+| CAP-ARCH-002-04 | ubiquitous | The SYSTEM shall make Dimension configurations separately testable |
 
 **Enforcement**: Architecture review, dimension validators
 
-### CAP-5D-003: Dimension Documentation
+### CAP-ARCH-003: Dimension Documentation
 
 The SYSTEM shall document its 5D configuration.
 
 | ID | Pattern | Statement |
 |----|---------|-----------|
-| CAP-5D-003-01 | ubiquitous | The SYSTEM shall include Dimension_Summary section in Agents_Md |
-| CAP-5D-003-02 | ubiquitous | The SYSTEM shall declare Capabilities (SKILLS dimension) in Manifest_Yaml |
-| CAP-5D-003-03 | ubiquitous | The SYSTEM shall declare PERSONA elements in Identity_Json |
-| CAP-5D-003-04 | ubiquitous | The SYSTEM shall operationalize Dimension requirements in Claude_Md |
+| CAP-ARCH-003-01 | ubiquitous | The SYSTEM shall include Dimension_Summary section in Agents_Md |
+| CAP-ARCH-003-02 | ubiquitous | The SYSTEM shall declare Capabilities (SKILLS dimension) in Manifest_Yaml |
+| CAP-ARCH-003-03 | ubiquitous | The SYSTEM shall declare PERSONA elements in Identity_Json |
+| CAP-ARCH-003-04 | ubiquitous | The SYSTEM shall operationalize Dimension requirements in Claude_Md |
 
 **Enforcement**: `validate_5d_compliance.py`, documentation review
 
-### CAP-5D-004: Dimension Interaction
+### CAP-ARCH-004: Dimension Interaction
 
 The SYSTEM shall support appropriate Dimension_Interactions.
 
 | ID | Pattern | Statement |
 |----|---------|-----------|
-| CAP-5D-004-01 | conditional | IF Governance_Rigorous is active THEN the SYSTEM shall apply full REASONING protocols |
-| CAP-5D-004-02 | ubiquitous | The SYSTEM shall use MEMORY to inform CONTEXT awareness |
-| CAP-5D-004-03 | ubiquitous | The SYSTEM shall use SKILLS availability to shape REASONING approach |
-| CAP-5D-004-04 | conditional | IF CONTEXT changes significantly THEN the SYSTEM may invoke PERSONA Governance_Shift |
+| CAP-ARCH-004-01 | conditional | IF Governance_Rigorous is active THEN the SYSTEM shall apply full REASONING protocols |
+| CAP-ARCH-004-02 | ubiquitous | The SYSTEM shall use MEMORY to inform CONTEXT awareness |
+| CAP-ARCH-004-03 | ubiquitous | The SYSTEM shall use SKILLS availability to shape REASONING approach |
+| CAP-ARCH-004-04 | conditional | IF CONTEXT changes significantly THEN the SYSTEM may invoke PERSONA Governance_Shift |
 
 **Enforcement**: Operational review
 
-### CAP-5D-005: Dimension Extensions
+### CAP-ARCH-005: Dimension Extensions
 
 The SYSTEM shall support Dimension_Extensions beyond the core 5D.
 
 | ID | Pattern | Statement |
 |----|---------|-----------|
-| CAP-5D-005-01 | optional | WHERE agent complexity requires, the SYSTEM may add D6+ dimensions |
-| CAP-5D-005-02 | ubiquitous | The SYSTEM shall name extension dimensions as D6_{domain}, D7_{domain}, etc. |
-| CAP-5D-005-03 | ubiquitous | The SYSTEM shall place extension dimension config in .aget/D6_{domain}/ |
-| CAP-5D-005-04 | ubiquitous | The SYSTEM shall document extension dimensions in manifest.yaml |
-| CAP-5D-005-05 | ubiquitous | The SYSTEM shall ensure extension dimensions maintain Dimension_Orthogonality |
+| CAP-ARCH-005-01 | optional | WHERE agent complexity requires, the SYSTEM may add D6+ dimensions |
+| CAP-ARCH-005-02 | ubiquitous | The SYSTEM shall name extension dimensions as D6_{domain}, D7_{domain}, etc. |
+| CAP-ARCH-005-03 | ubiquitous | The SYSTEM shall place extension dimension config in .aget/D6_{domain}/ |
+| CAP-ARCH-005-04 | ubiquitous | The SYSTEM shall document extension dimensions in manifest.yaml |
+| CAP-ARCH-005-05 | ubiquitous | The SYSTEM shall ensure extension dimensions maintain Dimension_Orthogonality |
 
 **Enforcement**: Architecture review, manifest validation
 
@@ -563,6 +563,26 @@ theoretical_basis:
 
 ---
 
+## Verification Tests
+
+| V-Test | Requirement | Method | Verification |
+|--------|-------------|--------|--------------|
+| V-ARCH-001 | CAP-ARCH-001-01 | automated | Validate .aget/identity.json contains archetype and governance_intensity fields |
+| V-ARCH-002 | CAP-ARCH-001-02 | automated | Validate .aget/evolution/, governance/, planning/ directories exist |
+| V-ARCH-003 | CAP-ARCH-001-03 | inspection | Verify CLAUDE.md contains reasoning patterns appropriate to governance intensity |
+| V-ARCH-004 | CAP-ARCH-001-04 | automated | Validate manifest.yaml declares at least one capability |
+| V-ARCH-005 | CAP-ARCH-001-05 | automated | Validate governance/CHARTER.md or SCOPE_BOUNDARIES.md exists |
+| V-ARCH-006 | CAP-ARCH-002-01 | inspection | Verify PERSONA changes do not require MEMORY restructuring |
+| V-ARCH-007 | CAP-ARCH-002-04 | manual | Run dimension validators independently and confirm no cross-dimension failures |
+| V-ARCH-008 | CAP-ARCH-003-01 | automated | Validate AGENTS.md or CLAUDE.md contains dimension summary |
+| V-ARCH-009 | CAP-ARCH-003-02 | automated | Validate manifest.yaml declares capabilities |
+| V-ARCH-010 | CAP-ARCH-003-03 | automated | Validate .aget/identity.json contains persona elements |
+| V-ARCH-011 | CAP-ARCH-004-01 | inspection | Verify rigorous governance agents apply full reasoning protocols |
+| V-ARCH-012 | CAP-ARCH-005-02 | automated | Validate extension dimensions follow D6_{domain} naming pattern |
+| V-ARCH-013 | CAP-ARCH-005-04 | automated | Validate extension dimensions are declared in manifest.yaml |
+
+---
+
 ## References
 
 - L330: Capability Composition Architecture
@@ -586,8 +606,8 @@ graduation:
 
 ---
 
-*AGET 5D Composition Architecture Specification v1.2.0*
+*AGET 5D Composition Architecture Specification v1.4.0*
 *Format: AGET_SPEC_FORMAT v1.2 (EARS + SKOS)*
 *Part of v3.0.0 Composition Architecture*
 *"Five dimensions, extensible when needed, one coherent agent."*
-*Updated: 2025-12-27 (L394 dimension extensions)*
+*Updated: 2026-03-18 (CAP-5D→CAP-ARCH ID prefix fix, V-tests added)*

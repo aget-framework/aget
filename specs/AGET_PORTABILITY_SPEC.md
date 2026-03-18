@@ -1,11 +1,11 @@
 # AGET Portability Specification
 
-**Version**: 1.1.0
+**Version**: 1.2.0
 **Status**: Active
 **Category**: Standards (Architecture)
 **Format Version**: 1.2
 **Created**: 2025-12-27
-**Updated**: 2025-12-27
+**Updated**: 2026-03-18
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_PORTABILITY_SPEC.md`
 **Change Origin**: L394 (Design by Fleet Exploration)
@@ -108,16 +108,16 @@ The SYSTEM shall distinguish Portable_Content from Framework_Configuration.
 
 **Enforcement**: Export mechanism validation
 
-### CAP-PORT-001A: Visibility Requirement
+### CAP-PORT-006: Visibility Requirement
 
 The SYSTEM shall ensure Portable_Content is visible (not hidden).
 
 | ID | Pattern | Statement |
 |----|---------|-----------|
-| CAP-PORT-001A-01 | ubiquitous | The SYSTEM shall place Portable_Content in visible directories |
-| CAP-PORT-001A-02 | ubiquitous | The SYSTEM shall NOT place user content in hidden directories (except .aget/evolution/) |
-| CAP-PORT-001A-03 | conditional | IF privacy-sensitive content exists THEN the SYSTEM shall use .gitignore (not hiding) |
-| CAP-PORT-001A-04 | ubiquitous | The SYSTEM shall treat .aget/evolution/ as portable exception (hidden but portable) |
+| CAP-PORT-006-01 | ubiquitous | The SYSTEM shall place Portable_Content in visible directories |
+| CAP-PORT-006-02 | ubiquitous | The SYSTEM shall NOT place user content in hidden directories (except .aget/evolution/) |
+| CAP-PORT-006-03 | conditional | IF privacy-sensitive content exists THEN the SYSTEM shall use .gitignore (not hiding) |
+| CAP-PORT-006-04 | ubiquitous | The SYSTEM shall treat .aget/evolution/ as portable exception (hidden but portable) |
 
 **Enforcement**: Directory structure validation
 
@@ -494,6 +494,28 @@ python3 validation/validate_portability_compliance.py --dir /path/to/agent
 
 ---
 
+## Verification Tests
+
+| V-Test | Requirement | Method | Verification |
+|--------|-------------|--------|--------------|
+| V-PORT-001 | CAP-PORT-001-01 | inspection | Verify L-doc content is classified as Portable_Content in export output |
+| V-PORT-002 | CAP-PORT-001-02 | automated | Validate governance/ directory files appear in export manifest as Portable_Content |
+| V-PORT-003 | CAP-PORT-001-05 | automated | Validate .aget/*.json files are classified as Framework_Configuration |
+| V-PORT-004 | CAP-PORT-001-10 | automated | Validate .aget/state/ files are classified as Framework_Configuration |
+| V-PORT-005 | CAP-PORT-002-01 | automated | Validate export_agent_knowledge.py script exists |
+| V-PORT-006 | CAP-PORT-002-03 | manual | Run export and verify L-docs are preserved in original markdown format |
+| V-PORT-007 | CAP-PORT-002-04 | automated | Run export and verify EXPORT_MANIFEST.md is generated |
+| V-PORT-008 | CAP-PORT-002-06 | automated | Run export with --dry-run and verify no files are modified |
+| V-PORT-009 | CAP-PORT-003-01 | automated | Validate README documents .aget/ contents |
+| V-PORT-010 | CAP-PORT-004-01 | automated | Run export with --remove-framework without --acknowledge-constraints-removed and verify it fails |
+| V-PORT-011 | CAP-PORT-004-02 | manual | Run export with --remove-framework and verify REMOVED_CONSTRAINTS.md lists inviolables |
+| V-PORT-012 | CAP-PORT-005-01 | inspection | Verify L-doc insights are accessible without AGET framework installed |
+| V-PORT-013 | CAP-PORT-005-03 | automated | Validate exported L-docs retain .md extension and markdown formatting |
+| V-PORT-014 | CAP-PORT-006-01 | automated | Validate Portable_Content directories are not hidden (no dot prefix except .aget/evolution/) |
+| V-PORT-015 | CAP-PORT-006-04 | inspection | Verify .aget/evolution/ is included in export despite being hidden |
+
+---
+
 ## References
 
 - AGET_LICENSE_SPEC.md (licensing separation)
@@ -516,7 +538,7 @@ graduation:
 
 ---
 
-*AGET Portability Specification v1.1.0*
+*AGET Portability Specification v1.2.0*
 *Format: AGET_SPEC_FORMAT v1.2 (EARS + SKOS)*
 *"Your knowledge is yours. The framework is just the scaffold."*
-*Updated: 2025-12-27 (L394 visibility requirement)*
+*Updated: 2026-03-18 (CAP-PORT-001A→CAP-PORT-006 renumber, V-tests added)*
