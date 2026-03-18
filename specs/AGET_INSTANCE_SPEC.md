@@ -533,6 +533,39 @@ theoretical_basis:
 
 ---
 
+## Verification Tests
+
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-INST-001 | CAP-INST-001-01 | automated | Instance version.json has `instance_type: "aget"` |
+| V-INST-002 | CAP-INST-001-03 | automated | Instance version.json has populated `agent_name` field |
+| V-INST-003 | CAP-INST-002-01 | automated | Instance has all core directories: governance/, sessions/, planning/, knowledge/ |
+| V-INST-004 | CAP-INST-002 | automated | Instance has archetype-specific directory matching the archetype directory matrix |
+| V-INST-005 | CAP-INST-003-01 | automated | Template validation skips instance-specific tests when `instance_type: "template"` |
+| V-INST-006 | CAP-INST-004-04 | manual | Migration between framework versions preserves accumulated content (L-docs, sessions, governance) |
+| V-INST-007 | CAP-INST-005-05 | automated | Migration appends entry to version.json `migration_history` array |
+| V-INST-008 | CAP-INST-006-01 | automated | Instance has `ontology/` directory with README.md |
+
+Note: V-tests for CAP-INST-007 (V-INST-007-01 through V-INST-007-05) and CAP-INST-008 (V-INST-008-01 through V-INST-008-03) are defined inline within their respective requirement sections above.
+
+### Validation Commands
+
+```bash
+# Check instance identity fields (V-INST-001, V-INST-002)
+python3 -c "import json; d=json.load(open('.aget/version.json')); assert d['instance_type']=='aget'; assert d.get('agent_name'); print('PASS')"
+
+# Check core directories exist (V-INST-003)
+for d in governance sessions planning knowledge; do test -d "$d" && echo "PASS: $d/" || echo "FAIL: $d/"; done
+
+# Check ontology directory (V-INST-008)
+test -d ontology && test -f ontology/README.md && echo "PASS: ontology/" || echo "FAIL: ontology/"
+
+# Full instance validation (V-INST-001 through V-INST-005)
+python3 validation/validate_template_instance.py /path/to/instance -v
+```
+
+---
+
 ## References
 
 - AGET_TEMPLATE_SPEC.md (template requirements)

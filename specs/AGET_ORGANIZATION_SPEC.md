@@ -199,6 +199,37 @@ Apache 2.0
 
 ---
 
+## Verification Tests
+
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-ORG-001 | CAP-ORG-001 | automated | Homepage shows current version badge matching latest GitHub release |
+| V-ORG-002 | CAP-ORG-001-06 | manual | Roadmap contains an entry for every publicly released version |
+| V-ORG-003 | CAP-ORG-002 | inspection | Homepage contains all 7 required content sections (Header, Overview, Quick Start, Roadmap, Repositories, Documentation, Contributing) |
+| V-ORG-004 | CAP-ORG-002-08 | manual | Each roadmap entry attributes only deliverables from that specific release (no Content Absorption) |
+| V-ORG-005 | CAP-ORG-003-02 | automated | Template repositories follow `template-{archetype}-aget` naming convention |
+| V-ORG-006 | CAP-ORG-004 | inspection | Pinned repositories include aget (core) and total no more than 6 |
+| V-ORG-007 | CAP-ORG-005 | manual | Major releases are announced and roadmap shows migration version history |
+| V-ORG-008 | CAP-ORG-006-03 | automated | Homepage does not reference unreleased versions as current |
+
+### Validation Commands
+
+```bash
+# Check homepage version badge matches latest release (V-ORG-001, V-ORG-008)
+grep -E "version-[0-9]+\.[0-9]+\.[0-9]+" .github/profile/README.md
+
+# Check template repo naming convention (V-ORG-005)
+ls -d template-*-aget/ 2>/dev/null | wc -l
+
+# Check homepage has required sections (V-ORG-003)
+grep -cE "^## (Overview|Quick Start|Roadmap|Repositories|Documentation|Contributing)" .github/profile/README.md
+
+# Future: automated homepage content validation (V-ORG-001)
+python3 validation/validate_homepage_messaging.py
+```
+
+---
+
 ## References
 
 - L431: Release Artifact Inventory

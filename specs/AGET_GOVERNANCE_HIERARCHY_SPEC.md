@@ -451,6 +451,37 @@ python3 validation/validate_governance_traceability.py
 
 ---
 
+## Verification Tests
+
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-GOV-001 | CAP-GOV-001 | inspection | Five governance layers are defined: Specifications, Capabilities, Patterns, SOPs, Tools |
+| V-GOV-002 | CAP-GOV-002 | inspection | Authority flows from higher to lower layers; conflicts resolved by higher layer winning |
+| V-GOV-003 | CAP-GOV-002-03 | manual | Verify no lower-layer artifact overrides a higher-layer requirement (spot-check tools against specs) |
+| V-GOV-004 | CAP-GOV-003-01 | automated | Specification files use EARS patterns and contain CAP IDs |
+| V-GOV-005 | CAP-GOV-003-05 | automated | Tool scripts contain Implements clause referencing spec or SOP |
+| V-GOV-006 | CAP-GOV-004 | manual | When a tool-spec conflict is detected, resolution follows the conflict resolution flowchart (lower layer updated) |
+| V-GOV-007 | CAP-GOV-005-01 | automated | Tools contain traceability references (Implements, See) to SOPs or Specs |
+| V-GOV-008 | CAP-GOV-005-05 | automated | Traceability validation script executes and reports coverage across layers |
+
+### Validation Commands
+
+```bash
+# Check tools have Implements clause (V-GOV-005, V-GOV-007)
+grep -r "Implements:" scripts/*.py .aget/patterns/**/*.py
+
+# Check specs use EARS patterns and CAP IDs (V-GOV-004)
+grep -cE "CAP-[A-Z]+-[0-9]{3}" aget/specs/AGET_*_SPEC.md
+
+# Check SOPs reference patterns (V-GOV-002)
+grep -l "Pattern:" sops/*.md
+
+# Future: automated traceability validation (V-GOV-008)
+python3 validation/validate_governance_traceability.py
+```
+
+---
+
 ## References
 
 - AGET_TOOL_SPEC.md (tool requirements)
