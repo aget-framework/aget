@@ -500,6 +500,39 @@ validate_naming("/path/to/repo")
 
 ---
 
+## Verification Tests
+
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-DOC-001 | CAP-DOC-001-01 | automated | Verify every repository has a README.md file |
+| V-DOC-002 | CAP-DOC-001-02 | automated | Verify README.md contains a project purpose section |
+| V-DOC-003 | CAP-DOC-001-03 | automated | Verify README.md contains a quickstart section |
+| V-DOC-004 | CAP-DOC-002-01 | automated | Verify every template has an AGENTS.md file |
+| V-DOC-005 | CAP-DOC-002-03 | automated | Verify AGENTS.md includes agent identity information |
+| V-DOC-006 | CAP-DOC-003-01 | automated | Verify Python modules in validation/ have module docstrings |
+| V-DOC-007 | CAP-DOC-005-01 | inspection | Verify specifications include at least one example section |
+| V-DOC-008 | CAP-DOC-006-02 | automated | Verify version numbers in documentation match current release |
+| V-DOC-009 | CAP-DOC-007-01 | automated | Verify README files pass CAP-DOC-001 structural validation |
+| V-DOC-010 | CAP-DOC-007-03 | automated | Verify spec cross-references resolve to existing files |
+
+### Validation Commands
+
+```bash
+# Check all repos have README.md (V-DOC-001)
+for repo in aget/ template-*-aget/; do [ -f "$repo/README.md" ] && echo "PASS: $repo" || echo "FAIL: $repo missing README.md"; done
+
+# Check templates have AGENTS.md (V-DOC-004)
+for tmpl in template-*-aget/; do [ -f "$tmpl/AGENTS.md" ] && echo "PASS: $tmpl" || echo "FAIL: $tmpl missing AGENTS.md"; done
+
+# Check Python modules have docstrings (V-DOC-006)
+for py in validation/*.py; do python3 -c "import ast; t=ast.parse(open('$py').read()); print('PASS' if ast.get_docstring(t) else 'FAIL')" 2>/dev/null; done
+
+# Check spec cross-references (V-DOC-010)
+grep -roh "AGET_[A-Z_]*_SPEC\.md" aget/specs/ | sort -u | while read spec; do [ -f "aget/specs/$spec" ] && echo "PASS: $spec" || echo "FAIL: $spec not found"; done
+```
+
+---
+
 ## References
 
 - R-TPL-001: Template README requirements

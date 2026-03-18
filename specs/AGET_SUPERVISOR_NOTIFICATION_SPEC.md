@@ -263,6 +263,37 @@ Release Complete
 
 ---
 
+## Verification Tests
+
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-NOTIF-001 | CAP-NOTIFY-001 | automated | Verify notification contains all 7 required sections (Executive Summary, Release Highlights, Breaking Changes, Fleet Action Required, Post-Release Quality, Traceability, Supervisor Response Log) |
+| V-NOTIF-002 | CAP-NOTIFY-002 | inspection | Verify conditional sections (Upgrade Warnings, Known Items) are present when trigger conditions apply |
+| V-NOTIF-003 | CAP-NOTIFY-003 | automated | Verify From/To fields use role names, not private agent names, and traceability links use public URLs |
+| V-NOTIF-004 | CAP-NOTIFY-004 | automated | Verify notification content does not match any NOTIFICATION_PRIVATE_PATTERNS (private agent names, repo paths, fleet sizes, session references) |
+| V-NOTIF-005 | CAP-NOTIFY-005 | automated | Verify notification artifact naming follows SUPERVISOR_NOTIFICATION_YYYY-MM-DD.md convention in handoffs/ directory |
+| V-NOTIF-006 | CAP-NOTIFY-006 | automated | Verify system-level validation runs against R-NOTIFY sanitization requirements before delivery |
+| V-NOTIF-007 | CAP-NOTIFY-001 | inspection | Verify Fleet Action Required section step 1 is governance setup (create PROJECT_PLAN per local upgrade SOP) |
+| V-NOTIF-008 | CAP-NOTIFY-003 | manual | Verify notification is audience-appropriate for both internal and external supervisors without requiring separate versions |
+
+### Validation Commands
+
+```bash
+# Verify required sections are present (V-NOTIF-001)
+FILE="handoffs/SUPERVISOR_NOTIFICATION_YYYY-MM-DD.md"
+for section in "Executive Summary" "Release Highlights" "Breaking Changes" "Fleet Action Required" "Post-Release Quality" "Traceability" "Supervisor Response Log"; do
+  grep -q "## $section" "$FILE" && echo "PASS: $section" || echo "FAIL: $section"
+done
+
+# Verify no private patterns in notification (V-NOTIF-004)
+grep -cE "private-\w+-[aA][gG][eE][tT]|gmelli/|~/github/private-" "$FILE" | grep -q "^0$" && echo "PASS" || echo "FAIL: contains private references"
+
+# Verify artifact naming convention (V-NOTIF-005)
+ls handoffs/SUPERVISOR_NOTIFICATION_*.md 2>/dev/null && echo "PASS: naming convention" || echo "FAIL: no notification artifacts found"
+```
+
+---
+
 ## Changelog
 
 ### v1.1.1 (2026-03-17)

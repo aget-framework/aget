@@ -547,6 +547,34 @@ The composition model is extensible:
 
 ---
 
+## Verification Tests
+
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-COMPOSE-001 | R-COMP-001 | automated | Verify duplicate capability detection reports warning for same-name different-version capabilities |
+| V-COMPOSE-002 | R-COMP-002 | automated | Verify behavior overlap detection reports error when two capabilities define identical behavior names |
+| V-COMPOSE-003 | R-COMP-003 | automated | Verify prerequisite validation reports error when required capabilities are missing from composition |
+| V-COMPOSE-004 | R-COMP-004 | automated | Verify cycle detection reports error and fails composition when prerequisite graph contains a cycle |
+| V-COMPOSE-005 | R-COMP-005 | automated | Verify version constraint checking reports error for incompatible capability versions |
+| V-COMPOSE-006 | R-COMP-006-01 | automated | Verify composition graphs are validated as acyclic (DAG property) |
+| V-COMPOSE-007 | R-COMP-006-02 | automated | Verify declared capability dependencies exist in the capability registry |
+| V-COMPOSE-008 | R-COMP-006-03 | automated | Verify circular capability inheritance chains are rejected |
+
+### Validation Commands
+
+```bash
+# Run composition validation (V-COMPOSE-001 through V-COMPOSE-005)
+python3 validate_composition.py --manifest manifest.yaml
+
+# Run DAG cycle detection (V-COMPOSE-004, V-COMPOSE-006)
+python3 validate_composition.py --manifest manifest.yaml --check-dag
+
+# Run full composition test suite (V-COMPOSE-001 through V-COMPOSE-008)
+python3 -m pytest tests/test_composition.py -v
+```
+
+---
+
 ## References
 
 | Document | Purpose |

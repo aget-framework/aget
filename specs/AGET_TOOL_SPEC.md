@@ -352,16 +352,37 @@ theoretical_basis:
 
 ---
 
-## Validation
+## Verification Tests
+
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-TOOL-001 | CAP-TOOL-001-01 | automated | Verify all tool scripts include Implements section in docstring |
+| V-TOOL-002 | CAP-TOOL-001-02 | automated | Verify Implements sections list CAP requirement IDs |
+| V-TOOL-003 | CAP-TOOL-001-03 | automated | Verify tool scripts include See section linking to specification file |
+| V-TOOL-004 | CAP-TOOL-002-01 | manual | Verify tools implement all requirements they claim to implement |
+| V-TOOL-005 | CAP-TOOL-002-02 | inspection | Verify no tool behavior contradicts its governing specification |
+| V-TOOL-006 | CAP-TOOL-003-01 | automated | Verify tools use argparse for command-line arguments |
+| V-TOOL-007 | CAP-TOOL-003-02 | automated | Verify tools return exit code 0 for success, non-zero for failure |
+| V-TOOL-008 | CAP-TOOL-003-03 | automated | Verify tools include --help documentation |
+| V-TOOL-009 | CAP-TOOL-004-01 | inspection | Verify tools acknowledge specs as authoritative over tool behavior |
+| V-TOOL-010 | CAP-TOOL-005-02 | manual | Verify tools version-track which spec version they implement |
+
+### Validation Commands
 
 ```bash
-# Check tool has Implements clause
-grep -l "Implements:" aget/scripts/*.py .aget/patterns/**/*.py
+# Check tool has Implements clause (V-TOOL-001)
+grep -l "Implements:" scripts/*.py .aget/patterns/**/*.py
 
-# Verify alignment (future validation script)
+# Check Implements sections have CAP IDs (V-TOOL-002)
+grep -A2 "Implements:" scripts/*.py | grep -q "CAP-" && echo "PASS" || echo "FAIL"
+
+# Verify alignment (future validation script) (V-TOOL-004)
 python3 validation/validate_tool_alignment.py .aget/patterns/session/wind_down.py
 
-# Contract tests for tool
+# Check tools support --help (V-TOOL-008)
+for py in scripts/*.py; do python3 "$py" --help >/dev/null 2>&1 && echo "PASS: $py" || echo "FAIL: $py"; done
+
+# Contract tests for tool (V-TOOL-007)
 python3 -m pytest tests/test_session_protocol.py -v
 ```
 

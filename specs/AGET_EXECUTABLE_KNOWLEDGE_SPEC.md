@@ -208,6 +208,36 @@ EKO is grounded in established theory:
 
 ---
 
+## Verification Tests
+
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-EK-001 | CAP-EKO-001 | inspection | Verify executable artifacts classify abstraction level using EKO vocabulary terms |
+| V-EK-002 | CAP-EKO-002 | inspection | Verify executable artifacts classify determinism level (Deterministic, Probabilistic, Syllogistic) |
+| V-EK-003 | CAP-EKO-003 | inspection | Verify executable artifacts classify reusability level (Universal, Parameterized, One_Time) |
+| V-EK-004 | CAP-EKO-004 | automated | Verify EKO vocabulary is self-contained and does not bind to external ontologies |
+| V-EK-005 | CAP-EKO-005 | automated | Verify all executable artifacts have explicit classification metadata along the three EKO axes |
+| V-EK-006 | CAP-EKO-001 | automated | Verify AGET artifact classification table covers all standard artifact types (SOP, RUNBOOK, PLAYBOOK, PROJECT_PLAN, PATTERN, PROTOCOL, CHECKLIST) |
+| V-EK-007 | CAP-EKO-002 | inspection | Verify autonomy delegation follows determinism axis (Deterministic=autonomous, Probabilistic=verify, Syllogistic=consult) |
+| V-EK-008 | CAP-EKO-005 | manual | Verify classification changes trigger vocabulary entry updates |
+
+### Validation Commands
+
+```bash
+# Verify EKO artifact classification table exists (V-EK-006)
+grep -c "SOP_\|RUNBOOK_\|PLAYBOOK_\|PROJECT_PLAN_\|PATTERN_\|PROTOCOL\|CHECKLIST" aget/specs/AGET_EXECUTABLE_KNOWLEDGE_SPEC.md
+
+# Verify vocabulary is self-contained (V-EK-004)
+grep -q "SHALL NOT bind" aget/specs/AGET_EXECUTABLE_KNOWLEDGE_SPEC.md && echo "PASS: independence requirement" || echo "FAIL: missing independence"
+
+# Verify three axes are defined (V-EK-005)
+for axis in "Abstraction" "Determinism" "Reusability"; do
+  grep -q "### Axis.*$axis\|$axis Level" aget/specs/AGET_EXECUTABLE_KNOWLEDGE_SPEC.md && echo "PASS: $axis axis" || echo "FAIL: $axis missing"
+done
+```
+
+---
+
 ## References
 
 ### L-docs

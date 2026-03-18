@@ -2752,6 +2752,39 @@ Instruction_Asymmetry:
 
 ---
 
+## Verification Tests
+
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-VOCAB-001 | CAP-VOC-001-01 | automated | Verify all vocabulary terms include skos:prefLabel property |
+| V-VOCAB-002 | CAP-VOC-001-02 | automated | Verify all vocabulary terms include skos:definition property |
+| V-VOCAB-003 | CAP-VOC-001-03 | inspection | Verify vocabulary hierarchies (skos:broader/narrower) contain no cycles |
+| V-VOCAB-004 | CAP-VOC-002-01 | manual | Verify specifications use controlled vocabulary terms from this spec |
+| V-VOCAB-005 | CAP-VOC-002-03 | automated | Verify vocabulary terms use Title_Case naming convention |
+| V-VOCAB-006 | CAP-VOC-003-01 | inspection | Verify V_Test term is used for gate verification in PROJECT_PLANs |
+| V-VOCAB-007 | CAP-VOC-003-02 | automated | Verify Declarative_Completion is marked as anti_pattern in vocabulary |
+| V-VOCAB-008 | CAP-VOC-004-01 | automated | Verify every vocabulary term has both skos:prefLabel and skos:definition |
+| V-VOCAB-009 | CAP-VOC-004-02 | automated | Verify no single-word vocabulary terms exist (compound forms required) |
+| V-VOCAB-010 | CAP-VOC-004-03 | manual | Verify new spec domain terms are added to controlled vocabulary |
+
+### Validation Commands
+
+```bash
+# Check all vocabulary terms have skos:definition (V-VOCAB-002)
+grep -c "skos:definition" aget/specs/AGET_VOCABULARY_SPEC.md
+
+# Check for single-word vocabulary entries (V-VOCAB-009)
+grep -E "^    [A-Z][a-z]+:$" aget/specs/AGET_VOCABULARY_SPEC.md && echo "WARN: Single-word terms found" || echo "PASS"
+
+# Check Declarative_Completion is anti-pattern (V-VOCAB-007)
+grep -A2 "Declarative_Completion" aget/specs/AGET_VOCABULARY_SPEC.md | grep -q "anti_pattern: true" && echo "PASS" || echo "FAIL"
+
+# Check Title_Case naming convention (V-VOCAB-005)
+grep -E "^    [a-z]" aget/specs/AGET_VOCABULARY_SPEC.md | grep -v "skos:\|aget:\|meta:\|domain:\|version:\|inherits:" && echo "WARN: Non-Title_Case terms" || echo "PASS"
+```
+
+---
+
 ## References
 
 - ADR-001: Controlled Vocabulary Standard Selection

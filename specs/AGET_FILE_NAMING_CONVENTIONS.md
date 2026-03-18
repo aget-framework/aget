@@ -691,25 +691,34 @@ Is it a checklist?
 
 ---
 
-## Validation
+## Verification Tests
+
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-NAME-001 | R-NAME-019-01 | automated | Validate that all new file names conform to the category-specific patterns (A through J) |
+| V-NAME-002 | R-NAME-019-02 | automated | Verify that file names containing spaces or special characters are rejected |
+| V-NAME-003 | R-NAME-019-03 | automated | Verify that no files are created with names violating category-specific patterns |
+| V-NAME-004 | R-NAME-019-01 | inspection | Verify TYPE prefix uses SCREAMING_CASE and descriptive name uses snake_case |
+| V-NAME-005 | R-NAME-019-01 | automated | Verify versioned artifacts follow `_v{M}.{m}` format with lowercase v |
+| V-NAME-006 | R-NAME-019-01 | inspection | Verify Category F (open-source) files use exact community names (README.md, LICENSE, etc.) |
+
+### Validation Commands
+
+```bash
+# Run file naming validator (V-NAME-001, V-NAME-002, V-NAME-003)
+python3 .aget/tools/validate_file_naming.py <path>
+```
 
 ### Manual Checklist
 
 Before committing a new artifact:
-- [ ] Identified correct category (A-E)
+- [ ] Identified correct category (A-J)
 - [ ] Used correct pattern for category
 - [ ] TYPE prefix is SCREAMING_CASE
 - [ ] Descriptive name is snake_case
 - [ ] Version format is `_v{M}.{m}` (if versioned)
 - [ ] No spaces or special characters
 - [ ] Extension matches content type
-
-### Automated Validation
-
-```bash
-# Run file naming validator
-python3 .aget/tools/validate_file_naming.py <path>
-```
 
 ---
 

@@ -230,32 +230,43 @@ Different archetypes may include additional fields:
 
 ---
 
-## Validation
+## Verification Tests
 
-### V-Tests
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-ID-001 | CAP-IDJSON-001 | automated | Validate that `.aget/identity.json` is valid JSON |
+| V-ID-002 | CAP-IDJSON-002 | automated | Verify `name` field exists and is a string |
+| V-ID-003 | CAP-IDJSON-003 | automated | Verify `north_star` field is an object (not a string) |
+| V-ID-004 | CAP-IDJSON-004 | automated | Verify `north_star.type` is one of: purpose, ambition, curiosity, wonder |
+| V-ID-005 | CAP-IDJSON-005 | automated | Verify `north_star.statement` exists and length > 10 characters |
+| V-ID-006 | CAP-IDJSON-006 | automated | Verify `created` field exists in ISO date format |
+| V-ID-007 | CAP-IDJSON-007 | automated | Verify `north_star` is NOT a bare string (prohibited pattern) |
+| V-ID-008 | CAP-IDJSON-008 | inspection | Where archetype-specific fields are present, verify `archetype` field is included |
+
+### Validation Commands
 
 ```bash
-# V1: JSON is valid (CAP-IDJSON-001)
+# Validate JSON syntax (V-ID-001)
 cat .aget/identity.json | python3 -m json.tool > /dev/null
 # Expected: Exit 0 (valid JSON)
 
-# V2: north_star is object with statement (CAP-IDJSON-003, CAP-IDJSON-005, CAP-IDJSON-007)
+# Verify north_star is object with statement (V-ID-003, V-ID-005, V-ID-007)
 jq -e '.north_star.statement' .aget/identity.json > /dev/null
 # Expected: Exit 0 (statement exists)
 
-# V3: north_star.type is valid (CAP-IDJSON-004)
+# Verify north_star.type is valid (V-ID-004)
 jq -e '.north_star.type | . == "purpose" or . == "ambition" or . == "curiosity" or . == "wonder"' .aget/identity.json
 # Expected: true
 
-# V4: name field exists (CAP-IDJSON-002)
+# Verify name field exists (V-ID-002)
 jq -e '.name' .aget/identity.json > /dev/null
 # Expected: Exit 0
 
-# V5: created field exists (CAP-IDJSON-006)
+# Verify created field exists (V-ID-006)
 jq -e '.created' .aget/identity.json > /dev/null
 # Expected: Exit 0
 
-# Full validation script
+# Full validation script (all V-ID-* tests)
 python3 validation/validate_identity_json.py .aget/identity.json
 # Expected: All checks pass
 ```

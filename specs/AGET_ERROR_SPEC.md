@@ -189,6 +189,38 @@ if violations:
 
 ---
 
+## Verification Tests
+
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-ERR-001 | CAP-ERR-001 | automated | Verify scripts use standard exit code taxonomy (0=success, 1=validation failure, 2=invalid args, 3=file not found, 4=permission, 5=config) |
+| V-ERR-002 | CAP-ERR-002 | inspection | Verify error messages include what failed, why it failed, and how to fix |
+| V-ERR-003 | CAP-ERR-002 | automated | Verify errors are written to stderr (not stdout) |
+| V-ERR-004 | CAP-ERR-003 | automated | Verify scripts support --verbose flag for detailed progress output |
+| V-ERR-005 | CAP-ERR-004 | inspection | Verify scripts use collect-all pattern for validation errors rather than fail-fast |
+| V-ERR-006 | CAP-ERR-004 | automated | Verify validation scripts provide fix suggestions in error output |
+| V-ERR-007 | CAP-ERR-005 | automated | Verify exit code 0 is not used for operations with warnings or partial failures |
+| V-ERR-008 | CAP-ERR-005 | automated | Verify structured error messages contain error code, description, and recovery suggestion |
+
+### Validation Commands
+
+```bash
+# Verify exit code taxonomy in Python scripts (V-ERR-001)
+for script in scripts/*.py; do
+  grep -q "sys.exit" "$script" && echo "PASS: $script uses sys.exit" || echo "SKIP: $script"
+done
+
+# Verify errors go to stderr (V-ERR-003)
+grep -rn "file=sys.stderr" scripts/*.py && echo "PASS: stderr usage found" || echo "WARN: check stderr usage"
+
+# Verify --verbose flag support (V-ERR-004)
+for script in scripts/*.py; do
+  grep -q "\-\-verbose\|verbose" "$script" && echo "PASS: $script supports verbose" || echo "INFO: $script no verbose"
+done
+```
+
+---
+
 ## Changelog
 
 ### v1.0.1 (2026-03-17)

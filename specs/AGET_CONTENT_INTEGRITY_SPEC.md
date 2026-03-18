@@ -277,6 +277,39 @@ The SYSTEM shall integrate content integrity validation at release gate boundari
 
 ---
 
+## Verification Tests
+
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-CINT-001 | R-CI-001 | inspection | Verify Claim_Source_Mapping table exists for each Content_Integrity_Dimension |
+| V-CINT-002 | R-CI-003 | automated | Verify all Source_Of_Truth files referenced in mappings exist on disk |
+| V-CINT-003 | R-CI-005 | automated | Verify Platform_Claims in documentation match CLI_SUPPORT_MATRIX.md |
+| V-CINT-004 | R-CI-010 | automated | Verify public-facing content contains no private agent name patterns |
+| V-CINT-005 | R-CI-016 | automated | Verify internal markdown links resolve to existing files on disk |
+| V-CINT-006 | R-CI-017 | automated | Verify SOP references resolve to existing files in sops/ directory |
+| V-CINT-007 | R-CI-021 | automated | Verify version strings in Version_Bearing_Files match .aget/version.json |
+| V-CINT-008 | R-CI-024 | automated | Verify Version_Producing_Scripts do not hardcode version constants |
+| V-CINT-009 | R-CI-028 | manual | Verify content integrity validation is executed at release gate boundaries |
+| V-CINT-010 | R-CI-031 | inspection | Verify release does not proceed past gate when content integrity validation fails |
+
+### Validation Commands
+
+```bash
+# Check no private names in public content (V-CINT-004)
+grep -rn "private-.*-aget\|private-.*-AGET" aget/ template-*-aget/ --include="*.md" && echo "FAIL: Private names found" || echo "PASS"
+
+# Check SOP references resolve (V-CINT-006)
+grep -roh "SOP_[a-z_]*\.md" docs/ aget/ --include="*.md" | sort -u | while read sop; do [ -f "sops/$sop" ] && echo "PASS: $sop" || echo "FAIL: $sop not found"; done
+
+# Check version consistency in Version_Bearing_Files (V-CINT-007)
+python3 .aget/patterns/sync/version_consistency.py
+
+# Check for hardcoded versions in scripts (V-CINT-008)
+python3 -m pytest tests/test_version_enforcement.py -v
+```
+
+---
+
 ## References
 
 - L608: Content Claim Drift (8 dimensions)

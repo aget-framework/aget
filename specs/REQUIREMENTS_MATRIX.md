@@ -238,6 +238,34 @@ Issue/L-doc → CAP Requirement → Specification → Validator → Test
 
 ---
 
+## Verification Tests
+
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-RMAT-001 | CAP-PERSONA-001 | automated | Verify PERSONA domain requirements have linked validators (validate_persona_compliance.py) |
+| V-RMAT-002 | CAP-MEMORY-001 | automated | Verify MEMORY domain requirements have linked validators (validate_memory_compliance.py) |
+| V-RMAT-003 | CAP-REASON-001 | automated | Verify REASON domain requirements have linked validators (validate_project_plan.py) |
+| V-RMAT-004 | CAP-SKILL-001 | automated | Verify SKILL domain requirements have linked validators (validate_template_manifest.py) |
+| V-RMAT-005 | CAP-REL-001 | automated | Verify REL domain requirements have linked validators (validate_release_gate.py) |
+| V-RMAT-006 | CAP-PP-001 | automated | Verify PP domain requirements have linked validators (validate_project_plan.py) |
+| V-RMAT-007 | R-RTM-001-01 | inspection | Verify every L-doc in the traceability table maps to at least one CAP requirement |
+| V-RMAT-008 | R-RTM-001-03 | manual | Verify all CAP requirements have a linked L-doc or issue origin (no untraced requirements) |
+
+### Validation Commands
+
+```bash
+# Verify traceability completeness (V-RMAT-007, V-RMAT-008)
+# Check that every CAP-* ID in specs/ appears in REQUIREMENTS_MATRIX.md
+grep -oP 'CAP-[A-Z]+-\d{3}' aget/specs/REQUIREMENTS_MATRIX.md | sort -u | wc -l
+
+# Verify validator scripts exist (V-RMAT-001 through V-RMAT-006)
+for v in validate_persona_compliance.py validate_memory_compliance.py validate_project_plan.py validate_template_manifest.py validate_release_gate.py; do
+  test -f "validation/$v" && echo "PASS: $v" || echo "MISSING: $v"
+done
+```
+
+---
+
 ## Changelog
 
 ### v1.2.1 (2026-03-17)

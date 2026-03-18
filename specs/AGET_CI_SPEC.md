@@ -250,27 +250,46 @@ The SYSTEM shall validate CI configuration.
 
 ---
 
-## Validation
+## Verification Tests
 
-### Test Collection Check
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-CI-001 | CAP-CI-001 | automated | Verify template tests do not import from external packages unless installed via setup.py |
+| V-CI-002 | CAP-CI-001 | automated | Verify no @patch decorators reference non-existent modules |
+| V-CI-003 | CAP-CI-002 | automated | Verify all package directories contain __init__.py and setup.py uses find_packages correctly |
+| V-CI-004 | CAP-CI-003 | automated | Verify CI workflow file includes test, lint, and security jobs with Python version matrix |
+| V-CI-005 | CAP-CI-004 | automated | Verify CI triggers are configured for push on main/develop and PR on main |
+| V-CI-006 | CAP-CI-005 | automated | Verify test collection succeeds without import errors before running tests |
+| V-CI-007 | CAP-CI-002 | inspection | Verify setup.py declares python_requires with minimum version |
+| V-CI-008 | CAP-CI-003 | automated | Verify CI workflow YAML syntax is valid |
 
-Before running tests, verify collection succeeds:
+### Validation Commands
 
 ```bash
-# Verify test collection
+# Verify test collection succeeds (V-CI-006)
 python3 -m pytest tests/ --collect-only 2>&1 | grep -E "error|Error"
 
-# Should return empty (no errors)
-```
-
-### CI Workflow Validation
-
-```bash
-# Check CI file exists
+# Verify CI file exists and is valid YAML (V-CI-008)
 ls .github/workflows/ci.yml
-
-# Validate YAML syntax
 python3 -c "import yaml; yaml.safe_load(open('.github/workflows/ci.yml'))"
+
+# Verify CI jobs exist (V-CI-004)
+python3 -c "
+import yaml
+with open('.github/workflows/ci.yml') as f:
+    ci = yaml.safe_load(f)
+jobs = ci.get('jobs', {})
+for required in ['test', 'lint', 'security']:
+    print(f'{required}: {\"PASS\" if required in jobs else \"FAIL\"}')"
+
+# Verify CI triggers (V-CI-005)
+python3 -c "
+import yaml
+with open('.github/workflows/ci.yml') as f:
+    ci = yaml.safe_load(f)
+on = ci.get('on', ci.get(True, {}))
+print('push:', 'PASS' if 'push' in on else 'FAIL')
+print('pull_request:', 'PASS' if 'pull_request' in on else 'FAIL')"
 ```
 
 ---

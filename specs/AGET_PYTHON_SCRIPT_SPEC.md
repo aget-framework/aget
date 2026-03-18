@@ -427,24 +427,42 @@ structure:
 
 ---
 
-## Validation
+## Verification Tests
 
-### Script Compliance Check
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-PY-001 | CAP-SCRIPT-001-01 | automated | Verify all scripts support --help flag |
+| V-PY-002 | CAP-SCRIPT-001-06 | automated | Verify all scripts use argparse for argument parsing |
+| V-PY-003 | CAP-SCRIPT-002-01 | automated | Verify scripts return exit code 0 on success |
+| V-PY-004 | CAP-SCRIPT-002-02 | automated | Verify scripts return exit code 1 on validation failure |
+| V-PY-005 | CAP-SCRIPT-003-04 | inspection | Verify scripts format summary lines as {symbol} {passed}/{total} {description} |
+| V-PY-006 | CAP-SCRIPT-004-01 | automated | Verify all scripts have module docstrings describing purpose |
+| V-PY-007 | CAP-SCRIPT-005-01 | automated | Verify validators follow validate_{target}.py naming pattern |
+| V-PY-008 | CAP-SCRIPT-005-04 | automated | Verify all script names use snake_case |
+| V-PY-009 | CAP-SCRIPT-006-01 | automated | Verify all scripts have entries in SCRIPT_REGISTRY.yaml |
+| V-PY-010 | CAP-SCRIPT-007-01 | automated | Verify all scripts include shebang #!/usr/bin/env python3 as first line |
+
+### Validation Commands
 
 ```bash
-# Validate script registry
+# Validate script registry (V-PY-009)
 python3 validation/validate_script_registry.py SCRIPT_REGISTRY.yaml
 
-# Check individual script compliance (future)
+# Check individual script compliance (V-PY-001, V-PY-002)
 python3 validation/validate_script_compliance.py validation/validate_template_manifest.py
 
-# Verify all scripts registered
+# Verify all scripts registered (V-PY-009)
 python3 validation/validate_script_registry.py SCRIPT_REGISTRY.yaml --check-files
-```
 
-### EARS Pattern Verification
+# Check shebang lines (V-PY-010)
+for py in validation/*.py scripts/*.py; do head -1 "$py" | grep -q "#!/usr/bin/env python3" && echo "PASS: $py" || echo "FAIL: $py missing shebang"; done
 
-```bash
+# Check module docstrings (V-PY-006)
+for py in validation/*.py scripts/*.py; do python3 -c "import ast; t=ast.parse(open('$py').read()); print('PASS: $py' if ast.get_docstring(t) else 'FAIL: $py')" 2>/dev/null; done
+
+# Check validator naming (V-PY-007)
+ls validation/*.py | grep -v "^validation/validate_" | grep -v "__" && echo "FAIL: Non-conforming validator names" || echo "PASS"
+
 # Count EARS patterns in this spec
 grep -cE "WHEN |WHILE |WHERE |IF .* THEN|The SYSTEM shall" aget/specs/AGET_PYTHON_SCRIPT_SPEC.md
 # Expected: > 25

@@ -378,15 +378,36 @@ theoretical_basis:
 
 ---
 
-## Validation
+## Verification Tests
+
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-VAL-001 | CAP-VAL-001-01 | automated | Verify validation tests document which CAP requirement each test validates |
+| V-VAL-002 | CAP-VAL-001-02 | automated | Verify test docstrings or decorators include CAP IDs |
+| V-VAL-003 | CAP-VAL-002-01 | automated | Verify validation scripts include spec reference in script header |
+| V-VAL-004 | CAP-VAL-002-02 | automated | Verify validation scripts return exit code 0 for pass, non-zero for fail |
+| V-VAL-005 | CAP-VAL-003-01 | automated | Verify tests are marked as template, instance, or universal |
+| V-VAL-006 | CAP-VAL-004-01 | manual | Verify test failures are classified as test_bug or compliance_gap |
+| V-VAL-007 | CAP-VAL-004-05 | inspection | Verify no specs were created solely to justify existing test assertions |
+| V-VAL-008 | CAP-VAL-005-01 | automated | Verify validation scripts output pass/fail summary |
+| V-VAL-009 | CAP-VAL-005-02 | automated | Verify validation scripts output total counts (passed, failed, skipped) |
+| V-VAL-010 | CAP-VAL-003-04 | automated | Verify tests use pytest markers or equivalent for categorization |
+
+### Validation Commands
 
 ```bash
-# Run all validation scripts
+# Run all validation scripts (V-VAL-004)
 python3 validation/validate_spec_format.py aget/specs/*.md
 python3 validation/validate_template_instance.py /path/to/agent -v
 
-# Run contract tests
+# Run contract tests (V-VAL-001, V-VAL-002)
 python3 -m pytest tests/ -v
+
+# Check tests have CAP references in docstrings (V-VAL-002)
+grep -rl "CAP-" tests/test_*.py | wc -l
+
+# Check validation scripts have spec references (V-VAL-003)
+for py in validation/validate_*.py; do grep -q "Implements:\|Traces to:\|Validates:" "$py" && echo "PASS: $py" || echo "FAIL: $py missing spec reference"; done
 
 # Generate traceability report (future)
 python3 validation/generate_traceability_matrix.py

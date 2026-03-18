@@ -627,24 +627,33 @@ R-PERSONA-001  →  CAP-PERSONA-001
 
 ---
 
-## Validation
+## Verification Tests
 
-### EARS Pattern Check
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-SFMT-001 | CAP-PERSONA-001 | automated | Verify all requirement statements use EARS patterns (shall, WHEN/THEN, WHILE, WHERE, IF/THEN) |
+| V-SFMT-002 | CAP-PERSONA-001 | automated | Verify capability IDs match `CAP-[A-Z]+-[0-9]{3}(-[0-9]{2})?` format |
+| V-SFMT-003 | CAP-MEMORY-003 | automated | Verify domain objects use Title_Case naming convention |
+| V-SFMT-004 | CAP-REASON-002 | inspection | Verify specs include required sections: Abstract, Motivation, Scope, Requirements, Validation, References |
+| V-SFMT-005 | CAP-PERSONA-001 | automated | Verify requirement statements name the SYSTEM as subject |
 
-Compliant statements contain one of:
-- `The SYSTEM shall` (ubiquitous)
-- `WHEN .* the SYSTEM shall` (event-driven)
-- `WHILE .* the SYSTEM shall` (state-driven)
-- `WHERE .* the SYSTEM shall` (optional)
-- `IF .* THEN the SYSTEM shall` (conditional)
+### Validation Commands
 
-### Vocabulary Check
+```bash
+# EARS Pattern Check (V-SFMT-001, V-SFMT-005)
+# Compliant statements contain one of:
+# - "The SYSTEM shall" (ubiquitous)
+# - "WHEN .* the SYSTEM shall" (event-driven)
+# - "WHILE .* the SYSTEM shall" (state-driven)
+# - "WHERE .* the SYSTEM shall" (optional)
+# - "IF .* THEN the SYSTEM shall" (conditional)
 
-Domain objects should be Title_Case: `[A-Z][a-z]+(_[A-Z][a-z]+)*`
+# Vocabulary Check (V-SFMT-003)
+# Domain objects should be Title_Case: [A-Z][a-z]+(_[A-Z][a-z]+)*
 
-### ID Format Check
-
-Capability IDs match: `CAP-[A-Z]+-[0-9]{3}(-[0-9]{2})?`
+# ID Format Check (V-SFMT-002)
+# Capability IDs match: CAP-[A-Z]+-[0-9]{3}(-[0-9]{2})?
+```
 
 ---
 

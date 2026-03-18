@@ -303,6 +303,30 @@ def test_version_is_valid_semver():
 
 ---
 
+## Verification Tests
+
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-VER-001 | R-VER-001-01 | automated | Verify all version strings in version.json conform to semver MAJOR.MINOR.PATCH format |
+| V-VER-002 | R-VER-001-02 | inspection | Verify that breaking changes increment the MAJOR version number |
+| V-VER-003 | R-VER-001-03 | automated | Verify all version-bearing artifacts are updated before release (version_bump.py --check) |
+| V-VER-004 | R-VER-001-01 | automated | Verify aget_version field in version.json matches a released framework version |
+
+### Validation Commands
+
+```bash
+# Validate semver format (V-VER-001)
+python3 -c "import re, json; v=json.load(open('.aget/version.json'))['aget_version']; assert re.match(r'^\d+\.\d+\.\d+(-[a-zA-Z0-9]+)?$', v), f'Invalid: {v}'"
+
+# Check version consistency across repos (V-VER-003)
+python3 scripts/version_sync.py --check
+
+# Validate version-bearing artifacts (V-VER-003)
+python3 .aget/patterns/release/version_bump.py --check
+```
+
+---
+
 ## References
 
 - [Semantic Versioning 2.0.0](https://semver.org/)

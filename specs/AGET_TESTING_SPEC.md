@@ -371,6 +371,42 @@ def test_version_format():
 
 ---
 
+## Verification Tests
+
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-TEST-001 | CAP-TEST-001-01 | automated | Verify every template directory contains contract test files in tests/ |
+| V-TEST-002 | CAP-TEST-001-02 | automated | Verify contract tests contain CAP requirement references in docstrings |
+| V-TEST-003 | CAP-TEST-002-01 | automated | Verify validators in validation/ have corresponding unit tests in tests/ |
+| V-TEST-004 | CAP-TEST-002-04 | automated | Verify all test files use pytest as the test framework |
+| V-TEST-005 | CAP-TEST-003-01 | automated | Verify test files follow test_{module}.py naming pattern |
+| V-TEST-006 | CAP-TEST-004-01 | automated | Verify validator coverage meets 80% threshold via pytest-cov |
+| V-TEST-007 | CAP-TEST-005-02 | inspection | Verify CI configuration blocks merge on test failure |
+| V-TEST-008 | CAP-TEST-006-01 | manual | Verify active PROJECT_PLANs include V-tests for each gate |
+| V-TEST-009 | CAP-TEST-006-05 | automated | Verify V-test identifiers follow V{gate}.{test} naming convention |
+| V-TEST-010 | CAP-TEST-007-03 | inspection | Verify no gate is marked complete without corresponding V-test PASS evidence |
+
+### Validation Commands
+
+```bash
+# Check contract test files exist for each template (V-TEST-001)
+for tmpl in template-*-aget/; do ls "$tmpl/tests/test_"*_contract.py 2>/dev/null || echo "FAIL: $tmpl missing contract tests"; done
+
+# Check contract tests reference CAP requirements (V-TEST-002)
+grep -rl "CAP-" tests/test_*_contract.py && echo "PASS" || echo "FAIL"
+
+# Check test file naming conventions (V-TEST-005)
+find tests/ -name "*.py" ! -name "test_*.py" ! -name "__init__.py" ! -name "conftest.py" | grep -v __pycache__ && echo "FAIL: Non-conforming test names" || echo "PASS"
+
+# Check validator coverage (V-TEST-006)
+pytest --cov=validation --cov-report=term-missing --cov-fail-under=80 tests/
+
+# Check V-test naming in PROJECT_PLANs (V-TEST-009)
+grep -rE "V\d+\.\d+" planning/PROJECT_PLAN_*.md && echo "PASS: V-tests found" || echo "WARN: No V-tests in plans"
+```
+
+---
+
 ## References
 
 - L352: Requirement-to-Test Traceability

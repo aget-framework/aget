@@ -452,16 +452,37 @@ theoretical_basis:
 
 ---
 
-## Validation
+## Verification Tests
+
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-SOP-001 | CAP-SOP-001-01 | automated | Verify all SOP files include Version in header metadata |
+| V-SOP-002 | CAP-SOP-001-04 | automated | Verify all SOP files include a Purpose section |
+| V-SOP-003 | CAP-SOP-002-01 | inspection | Verify SOP requirement statements use Title_Case for domain objects |
+| V-SOP-004 | CAP-SOP-002-04 | automated | Verify SOP requirement statements do not contain informal terms |
+| V-SOP-005 | CAP-SOP-003-01 | automated | Verify SOP files follow SOP_{snake_case}.md naming pattern |
+| V-SOP-006 | CAP-SOP-003-04 | automated | Verify all SOP files reside in the sops/ directory |
+| V-SOP-007 | CAP-SOP-005-01 | automated | Verify Framework_Sop files reside in aget/sops/ |
+| V-SOP-008 | CAP-SOP-006-01 | automated | Verify all SOP files include Status in header metadata |
+| V-SOP-009 | CAP-SOP-006-02 | automated | Verify SOP Status values are one of Draft, Active, or Deprecated |
+| V-SOP-010 | CAP-SOP-004-04 | manual | Verify SOP Version is updated when SOP content changes |
+
+### Validation Commands
 
 ```bash
-# Validate SOP naming
+# Validate SOP naming (V-SOP-005)
 python3 validation/validate_naming_conventions.py /path/to/agent
 
-# Validate SOP structure (future)
-python3 validation/validate_sop_compliance.py sops/*.md
+# Check SOP files have Version header (V-SOP-001)
+for sop in sops/SOP_*.md; do grep -q "^\*\*Version\*\*:" "$sop" && echo "PASS: $sop" || echo "FAIL: $sop missing Version"; done
 
-# Vocabulary audit (manual)
+# Check SOP files have Purpose section (V-SOP-002)
+for sop in sops/SOP_*.md; do grep -q "^## Purpose" "$sop" && echo "PASS: $sop" || echo "FAIL: $sop missing Purpose"; done
+
+# Check SOP files have Status header (V-SOP-008)
+for sop in sops/SOP_*.md; do grep -q "^\*\*Status\*\*:" "$sop" && echo "PASS: $sop" || echo "FAIL: $sop missing Status"; done
+
+# Vocabulary audit — detect informal terms in requirement statements (V-SOP-004)
 grep -E '\b(gate|validation|migration|rollback)\b' sops/*.md
 ```
 

@@ -291,39 +291,33 @@ def detect_agent_type(agent_root: Path) -> str:
 
 ---
 
-## Validation
+## Verification Tests
 
-### Pre-Filing Validation
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-ISSUE-001 | CAP-ISSUE-001 | automated | Verify default issue destination resolves to gmelli/aget-aget for all agents |
+| V-ISSUE-002 | CAP-ISSUE-002 | automated | Verify promoted issue content does not match PRIVATE_PATTERNS (agent names, repo paths, fleet sizes) |
+| V-ISSUE-003 | CAP-ISSUE-003 | automated | Verify pre-filing validation confirms destination is gmelli/aget-aget |
+| V-ISSUE-004 | CAP-ISSUE-004 | automated | Verify template repositories have GitHub issues disabled and aget-framework/aget accepts issues |
+| V-ISSUE-005 | CAP-ISSUE-005 | manual | Verify promoted issues have principal approval and reference private source issue |
+| V-ISSUE-006 | CAP-ISSUE-002 | automated | Verify sanitize_issue_content.py detects all PRIVATE_PATTERNS at promotion boundary |
+| V-ISSUE-007 | CAP-ISSUE-004 | automated | Verify organization config repository (.github) has issues disabled |
+| V-ISSUE-008 | CAP-ISSUE-001 | inspection | Verify private-first routing eliminates content sanitization requirement at filing time |
+
+### Validation Commands
 
 ```bash
-# Check destination before filing (should always return gmelli/aget-aget)
+# Check destination before filing (V-ISSUE-001, V-ISSUE-003)
 python3 .aget/patterns/github/validate_issue_destination.py --check
 
-# File with governance checks (default — routes to gmelli/aget-aget)
+# File with governance checks (V-ISSUE-001)
 python3 .aget/patterns/github/create_issue.py --title "..." --body "..."
-```
 
-### Promotion Validation
-
-```bash
-# Check content for private patterns (before promotion only)
+# Check content for private patterns at promotion boundary (V-ISSUE-002, V-ISSUE-006)
 echo "Issue body text" | python3 .aget/patterns/github/sanitize_issue_content.py --check
-```
 
-### Repository Settings Validation
-
-```bash
-# Verify all repos have correct issue settings
+# Verify all repos have correct issue settings (V-ISSUE-004, V-ISSUE-007)
 python3 .aget/patterns/validation/repo_settings_validator.py --check-issues
-```
-
-### Expected Output
-
-```
-Issue Governance Check
-======================
-Destination: gmelli/aget-aget (private-first routing)
-Repository Settings: 14/15 repos have issues disabled (expected)
 ```
 
 ---

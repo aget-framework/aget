@@ -246,6 +246,36 @@ cd /path/to/aget-framework/aget
 
 ---
 
+## Verification Tests
+
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-SEC-001 | CAP-SEC-001 | automated | Verify public repos do not contain PII, secrets, or internal paths by scanning for known private patterns |
+| V-SEC-002 | CAP-SEC-002 | automated | Verify .gitignore excludes credential file patterns (.env, *.pem, *.key, credentials.json, secrets.yaml) |
+| V-SEC-003 | CAP-SEC-003 | manual | Verify pre-publication review checklist is completed before public pushes (PII, secrets, internal paths, agent names) |
+| V-SEC-004 | CAP-SEC-004 | automated | Verify public repos do not reference private repos (private-*-AGET, gmelli/*) |
+| V-SEC-005 | CAP-SEC-005 | inspection | Verify releases record what was published with publication dates and reviewer |
+| V-SEC-006 | CAP-SEC-006 | automated | Verify system scans public-facing content for private agent names and internal paths before publication |
+| V-SEC-007 | CAP-SEC-002 | automated | Verify .env files are not committed to any repository |
+| V-SEC-008 | CAP-SEC-001 | automated | Verify L-docs in public repos are sanitized (no PII, no user-specific paths) |
+
+### Validation Commands
+
+```bash
+# Scan for private patterns in public repo (V-SEC-001, V-SEC-004)
+grep -rE "private-\w+-[aA][gG][eE][tT]|gmelli/|/Users/\w+/" aget/ --include="*.md" && echo "FAIL: private content found" || echo "PASS: no private content"
+
+# Verify .gitignore excludes credential patterns (V-SEC-002)
+for pattern in ".env" "*.pem" "*.key" "credentials.json"; do
+  grep -q "$pattern" .gitignore && echo "PASS: $pattern excluded" || echo "FAIL: $pattern not excluded"
+done
+
+# Verify no .env files committed (V-SEC-007)
+git ls-files | grep -E "\.env$|\.env\." && echo "FAIL: .env files committed" || echo "PASS: no .env files"
+```
+
+---
+
 ## References
 
 - L430: Content Security for Public Repos

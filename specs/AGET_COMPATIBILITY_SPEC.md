@@ -484,20 +484,37 @@ theoretical_basis:
 
 ---
 
-## Validation
+## Verification Tests
+
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-COMPAT-001 | CAP-COMPAT-001 | automated | Verify all versions follow MAJOR.MINOR.PATCH format with optional pre-release suffix |
+| V-COMPAT-002 | CAP-COMPAT-002 | inspection | Verify compatibility matrix is documented and agents from N-1 minor versions are supported |
+| V-COMPAT-003 | CAP-COMPAT-003 | inspection | Verify breaking change criteria are applied correctly (structural, behavioral, API breaks require major bump) |
+| V-COMPAT-004 | CAP-COMPAT-004 | manual | Verify deprecated features provide 2 minor versions of warning with migration path before removal |
+| V-COMPAT-005 | CAP-COMPAT-005 | automated | Verify migration scripts exist for major version upgrades and direct upgrade works within same major |
+| V-COMPAT-006 | CAP-COMPAT-006 | inspection | Verify downgrade constraints are enforced (patch OK, minor with warning, cross-major prohibited) |
+| V-COMPAT-007 | CAP-COMPAT-007 | automated | Verify each spec has independent version number following semantic versioning |
+| V-COMPAT-008 | CAP-COMPAT-001 | automated | Verify version.json across all templates uses valid MAJOR.MINOR.PATCH format |
+| V-COMPAT-009 | CAP-COMPAT-004 | automated | Verify CHANGELOG documents deprecation notices with removal version target |
+| V-COMPAT-010 | CAP-COMPAT-005 | manual | Verify sequential migration is required when upgrading across multiple major versions |
+
+### Validation Commands
 
 ```bash
-# Check version format
+# Check version format consistency (V-COMPAT-001, V-COMPAT-008)
 python3 validation/validate_version_consistency.py agent-path/
 
-# Check compatibility (hypothetical)
+# Check framework-agent compatibility (V-COMPAT-002)
 python3 validation/validate_compatibility.py \
   --framework-version 3.1.0 \
   --agent-version 3.0.0
 
-# Expected output:
-# ✅ Compatible: Framework v3.1.0 supports agent v3.0.0
-# ⚠️ Note: Agent may not use v3.1.0 features (D6+ extensions)
+# Verify spec version independence (V-COMPAT-007)
+for spec in aget/specs/AGET_*_SPEC.md; do
+  version=$(grep -m1 "^\*\*Version\*\*:" "$spec" | sed 's/.*: //')
+  echo "$spec: $version"
+done
 ```
 
 ---

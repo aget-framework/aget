@@ -302,17 +302,33 @@ theoretical_basis:
 
 ---
 
-## Validation
+## Verification Tests
+
+| V-test ID | Requirement | Method | Description |
+|-----------|-------------|--------|-------------|
+| V-LIC-001 | CAP-LIC-001 | automated | Verify LICENSE file exists in template root and contains Apache-2.0 text with copyright notice |
+| V-LIC-002 | CAP-LIC-001 | inspection | Verify patent grant and patent retaliation clauses are present in LICENSE |
+| V-LIC-003 | CAP-LIC-002 | inspection | Verify instance code is not constrained by framework license and user can choose own license |
+| V-LIC-004 | CAP-LIC-003 | automated | Verify .aget/ directory is identified as Framework_Code (Apache 2.0) and code outside .aget/ is Instance_Code |
+| V-LIC-005 | CAP-LIC-004 | inspection | Verify CONTRIBUTING.md or DCO reference requires Apache-2.0 for contributions |
+| V-LIC-006 | CAP-LIC-005 | automated | Verify LICENSE file exists in each template root and is not in .gitignore |
+| V-LIC-007 | CAP-LIC-003 | automated | Verify modifications to Framework_Code inside .aget/ remain under Apache 2.0 |
+| V-LIC-008 | CAP-LIC-005 | automated | Verify NOTICE file exists when third-party components are present |
+
+### Validation Commands
 
 ```bash
-# Validate license compliance
+# Validate license compliance (V-LIC-001, V-LIC-006)
 python3 validation/validate_license_compliance.py --dir /path/to/template
 
-# Expected output:
-# ✅ LICENSE file exists
-# ✅ LICENSE contains Apache-2.0
-# ✅ Copyright notice present
-# ⚠️  NOTICE file missing (optional)
+# Verify LICENSE file exists and contains Apache-2.0 (V-LIC-001)
+grep -q "Apache License" LICENSE && echo "PASS: Apache License found" || echo "FAIL: LICENSE missing Apache text"
+
+# Verify LICENSE is not gitignored (V-LIC-006)
+! grep -q "LICENSE" .gitignore && echo "PASS: LICENSE not gitignored" || echo "FAIL: LICENSE in .gitignore"
+
+# Verify copyright notice (V-LIC-001)
+grep -q "Copyright" LICENSE && echo "PASS: copyright present" || echo "FAIL: no copyright notice"
 ```
 
 ---
