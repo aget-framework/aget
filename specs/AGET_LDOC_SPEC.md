@@ -352,8 +352,8 @@ vocabulary:
 | V-LDOC-002 | CAP-LDOC-002 | automated | Required frontmatter fields present (id, title, format_version, created, summary) |
 | V-LDOC-003 | CAP-LDOC-003 | automated | Index freshness: gap between actual L-docs and indexed count <= 10 |
 | V-LDOC-004 | CAP-LDOC-004 | inspection | L-doc categories match allowed taxonomy |
-| V-LDOC-005 | CAP-LDOC-005 | automated | No duplicate L-doc IDs in index.json |
-| V-LDOC-006 | CAP-LDOC-006 | manual | Framework vs Domain classification confirmed by user before writing |
+| V-LDOC-005 | CAP-LDOC-005 | inspection | L-doc body contains required sections (Context, Learning, Application, Evidence, Related) |
+| V-LDOC-006 | CAP-LDOC-006 | automated | Evolution index regenerated when L-doc is created or updated |
 | V-LDOC-007 | CAP-LDOC-007 | automated | Index.json `next_id` is consistent with highest L-doc on filesystem |
 
 ### Validation Commands

@@ -595,7 +595,7 @@ vocabulary:
       skos:definition: "Binary operator (denoted as a circled plus) that combines a base template or agent with a capability to produce an enhanced agent"
       skos:notation: "⊕"
     Base_Template:
-      skos:definition: "Starting archetype template from which an agent is composed, such as worker, advisor, supervisor, or developer"
+      skos:definition: "Starting archetype template from which an agent is composed, such as worker, advisor, supervisor, consultant, developer, or spec-engineer"
     Capability:
       skos:definition: "A defined specification that adds behaviors, contracts, and configuration to an agent through the composition operator"
     Conflict_Resolution_Strategy:
