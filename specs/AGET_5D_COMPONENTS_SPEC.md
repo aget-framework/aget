@@ -919,6 +919,38 @@ All five dimensions are grounded in established theory (L331):
 
 ---
 
+## Authority Model
+
+```yaml
+authority:
+  applies_to: "5d_component_definitions"
+
+  governed_by:
+    spec: "AGET_5D_COMPONENTS_SPEC"
+    owner: "aget-framework"
+
+  agent_authority:
+    can_autonomously:
+      - "Define persona archetype and governance intensity"
+      - "Create and manage L-docs in evolution directory"
+      - "Declare capabilities in manifest.yaml"
+      - "Maintain memory layer artifacts (layers 1-4)"
+      - "Execute context recovery and session protocols"
+    requires_approval:
+      - action: "Add new dimension to 5D architecture"
+        approver: "principal"
+      - action: "Modify inviolable constraints"
+        approver: "principal"
+      - action: "Change governance intensity level (rigorous agents)"
+        approver: "principal"
+
+  conformance:
+    validator: "spec_readiness_validator.py"
+    method: "automated"
+```
+
+---
+
 ## Verification Tests
 
 | V-test ID | Requirement | Method | Description |

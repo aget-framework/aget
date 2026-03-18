@@ -199,6 +199,71 @@ Apache 2.0
 
 ---
 
+## Authority Model
+
+```yaml
+authority:
+  applies_to: "organization_management"
+
+  governed_by:
+    spec: "AGET_ORGANIZATION_SPEC"
+    owner: "aget-framework"
+
+  agent_authority:
+    can_autonomously:
+      - "Update homepage version badges after a release"
+      - "Update roadmap entries with accurate release dates and deliverables"
+      - "Verify homepage content against CAP-ORG-002 structure requirements"
+      - "Validate repository naming follows CAP-ORG-003 patterns"
+    requires_approval:
+      - action: "Change homepage content structure (add/remove sections)"
+        approver: "aget-framework maintainer"
+      - action: "Change pinned repository selection"
+        approver: "principal"
+      - action: "Add new repository naming patterns"
+        approver: "aget-framework maintainer"
+      - action: "Major release announcements"
+        approver: "principal"
+
+  conformance:
+    validator: "spec_readiness_validator.py"
+    method: "automated"
+```
+
+---
+
+## Vocabulary
+
+Domain terms for the Organization specification:
+
+```yaml
+vocabulary:
+  meta:
+    domain: "organization"
+    version: "1.0.0"
+    inherits: "aget_core"
+
+  terms:
+    Organization_Homepage:
+      skos:definition: "The GitHub organization profile page rendered from .github/profile/README.md, serving as the primary public entry point"
+      aget:location: ".github/profile/README.md"
+    Roadmap_Entry:
+      skos:definition: "A versioned section on the homepage attributing specific deliverables to a single release with an accurate release date"
+    Content_Absorption:
+      skos:definition: "Anti-pattern where a homepage rewrite attributes deliverables from prior releases to the current release, erasing version history"
+      skos:related: ["L657"]
+    Version_Badge:
+      skos:definition: "Shield.io badge on the homepage displaying the current framework version, release date, or license"
+    Pinned_Repository:
+      skos:definition: "GitHub repository pinned to the organization profile for discovery, limited to a maximum of six"
+    Repository_Naming_Convention:
+      skos:definition: "Standard naming pattern for organization repositories: aget for core, template-{archetype}-aget for templates, .github for profile"
+    Release_Visibility:
+      skos:definition: "The degree to which release information (changelog, migration history, version) is accessible from the organization homepage"
+```
+
+---
+
 ## Verification Tests
 
 | V-test ID | Requirement | Method | Description |

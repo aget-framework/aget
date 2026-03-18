@@ -230,6 +230,71 @@ Different archetypes may include additional fields:
 
 ---
 
+## Authority Model
+
+```yaml
+authority:
+  applies_to: "identity_json_schema"
+
+  governed_by:
+    spec: "AGET_IDENTITY_JSON_SCHEMA"
+    owner: "aget-framework"
+
+  agent_authority:
+    can_autonomously:
+      - "Create identity.json with required fields (name, north_star, created)"
+      - "Set north_star type, statement, success/failure indicators"
+      - "Add recommended fields (updated, version, identity_dimensions)"
+      - "Add archetype-specific fields matching agent archetype"
+      - "Migrate north_star from string to object format"
+    requires_approval:
+      - action: "Add new required fields to the identity schema"
+        approver: "aget-framework maintainer"
+      - action: "Add new north_star type values beyond purpose/ambition/curiosity/wonder"
+        approver: "aget-framework maintainer"
+      - action: "Change deprecation schedule phases"
+        approver: "principal"
+
+  conformance:
+    validator: "spec_readiness_validator.py"
+    method: "automated"
+```
+
+---
+
+## Vocabulary
+
+Domain terms for the Identity JSON Schema specification:
+
+```yaml
+vocabulary:
+  meta:
+    domain: "identity_schema"
+    version: "1.0.0"
+    inherits: "aget_core"
+
+  terms:
+    Identity_File:
+      skos:definition: "JSON file at .aget/identity.json that declares an agent's name, purpose, and dimensional attributes"
+      aget:location: ".aget/identity.json"
+    North_Star:
+      skos:definition: "Structured object within the identity file containing the agent's core mission statement and success/failure indicators"
+      skos:narrower: ["North_Star_Type", "North_Star_Statement"]
+    North_Star_Type:
+      skos:definition: "Classification of the agent's motivational orientation, one of: purpose, ambition, curiosity, wonder"
+    North_Star_Statement:
+      skos:definition: "Free-text string (minimum 10 characters) expressing the agent's core mission"
+    Identity_Dimensions:
+      skos:definition: "Recommended object describing role, scope, and hierarchical relationships of the agent"
+    Archetype:
+      skos:definition: "Functional classification of an agent such as Worker, Supervisor, Researcher, or Research_Engineer"
+      skos:narrower: ["Worker", "Operator", "Supervisor", "Researcher", "Research_Engineer"]
+    Enforcement_Status:
+      skos:definition: "Current validation state of an identity file field, ranging from de facto deprecated to formally enforced"
+```
+
+---
+
 ## Verification Tests
 
 | V-test ID | Requirement | Method | Description |

@@ -278,6 +278,72 @@ python3 scripts/migrate_ldoc_to_v2.py --dry-run .aget/evolution/
 
 ---
 
+## Authority Model
+
+```yaml
+authority:
+  applies_to: "ldoc_management"
+
+  governed_by:
+    spec: "AGET_LDOC_SPEC"
+    owner: "aget-framework"
+
+  agent_authority:
+    can_autonomously:
+      - "Create L-docs with required frontmatter (id, title, format_version, created, summary)"
+      - "Set applicability scope (agent, archetype, fleet, universal)"
+      - "Set enforcement status (observation, recommendation, advisory)"
+      - "Update the evolution index when L-docs are created or modified"
+      - "Migrate L-docs from v1 to v2 format"
+    requires_approval:
+      - action: "Promote enforcement status to 'enforced'"
+        approver: "principal"
+      - action: "Add new applicability scope values"
+        approver: "aget-framework maintainer"
+      - action: "Change required frontmatter fields"
+        approver: "aget-framework maintainer"
+
+  conformance:
+    validator: "spec_readiness_validator.py"
+    method: "automated"
+```
+
+---
+
+## Vocabulary
+
+Domain terms for the L-Doc specification:
+
+```yaml
+vocabulary:
+  meta:
+    domain: "ldoc"
+    version: "1.0.0"
+    inherits: "aget_core"
+
+  terms:
+    Learning_Document:
+      skos:definition: "Markdown file capturing experiential knowledge gained during agent operation, named L{NUMBER}_{snake_case_title}.md with structured YAML frontmatter"
+      skos:altLabel: "L-doc"
+    Evolution_Index:
+      skos:definition: "JSON file at .aget/evolution/index.json that catalogs all L-docs with their category, scope, and enforcement status for cross-agent discovery"
+      aget:location: ".aget/evolution/index.json"
+    Enforcement_Status:
+      skos:definition: "Progression level indicating how strictly a learning is applied, one of: observation, recommendation, advisory, enforced"
+      skos:narrower: ["Observation", "Recommendation", "Advisory", "Enforced"]
+    Applicability_Scope:
+      skos:definition: "Breadth of a learning's relevance, one of: agent (single agent), archetype (all agents of a type), fleet (all agents), universal (beyond AGET)"
+      skos:narrower: ["Agent_Scope", "Archetype_Scope", "Fleet_Scope", "Universal_Scope"]
+    YAML_Frontmatter:
+      skos:definition: "Structured metadata block at the top of an L-doc containing required fields (id, title, format_version, created, summary) and optional discovery fields"
+    Cross_Agent_Discovery:
+      skos:definition: "Capability to query and find relevant L-docs across agents using the evolution index, filtered by scope, category, or enforcement status"
+    Format_Version:
+      skos:definition: "Schema version of the L-doc structure, currently 2.0, distinguishing structured frontmatter format from legacy free-form format"
+```
+
+---
+
 ## Verification Tests
 
 | V-test ID | Requirement | Method | Description |

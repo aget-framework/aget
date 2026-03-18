@@ -1122,6 +1122,41 @@ Status: DEPLOYING (1 confirmed)
 
 ---
 
+## Authority Model
+
+```yaml
+authority:
+  applies_to: "version_releases_and_tagging"
+
+  governed_by:
+    spec: "AGET_RELEASE_SPEC"
+    owner: "aget-framework"
+
+  agent_authority:
+    can_autonomously:
+      - "Bump version numbers across all repos"
+      - "Update CHANGELOG entries"
+      - "Run release validation scripts"
+      - "Create release handoff artifacts"
+      - "Monitor deployment status post-release"
+      - "Capture release state snapshots"
+    requires_approval:
+      - action: "Tag and push release to public repos"
+        approver: "principal"
+      - action: "Create GitHub Releases"
+        approver: "principal"
+      - action: "Increment MAJOR version"
+        approver: "principal"
+      - action: "Override release window timing"
+        approver: "principal"
+
+  conformance:
+    validator: "spec_readiness_validator.py"
+    method: "automated"
+```
+
+---
+
 ## References
 
 - L358: Release Artifact Gaps

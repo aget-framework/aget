@@ -762,6 +762,38 @@ See G2.8 (already in plan) or defer to v3.3.0.
 
 ---
 
+## Authority Model
+
+```yaml
+authority:
+  applies_to: "project_plan_creation_and_execution"
+
+  governed_by:
+    spec: "AGET_PROJECT_PLAN_SPEC"
+    owner: "aget-framework"
+
+  agent_authority:
+    can_autonomously:
+      - "Create PROJECT_PLANs for multi-gate work"
+      - "Define gates with deliverables and V-tests"
+      - "Execute gates within approved plan scope"
+      - "Record velocity analysis and retrospectives"
+      - "Track plan status transitions (Draft to In Progress)"
+    requires_approval:
+      - action: "Mark plan as Complete"
+        approver: "principal"
+      - action: "Skip or abandon a gate"
+        approver: "principal"
+      - action: "Expand scope mid-gate"
+        approver: "principal"
+
+  conformance:
+    validator: "spec_readiness_validator.py"
+    method: "automated"
+```
+
+---
+
 ## References
 
 - L42: Gate Boundary Discipline

@@ -277,6 +277,36 @@ The SYSTEM shall integrate content integrity validation at release gate boundari
 
 ---
 
+## Authority Model
+
+```yaml
+authority:
+  applies_to: "content_integrity_validation"
+
+  governed_by:
+    spec: "AGET_CONTENT_INTEGRITY_SPEC"
+    owner: "aget-framework"
+
+  agent_authority:
+    can_autonomously:
+      - "Run content integrity validators across all dimensions"
+      - "Update claim-source mappings when sources change"
+      - "Flag content claim drift in documentation"
+      - "Scan for private name leaks in public content"
+      - "Verify version string consistency across repos"
+    requires_approval:
+      - action: "Add new content integrity dimension"
+        approver: "principal"
+      - action: "Change source-of-truth designation for a dimension"
+        approver: "principal"
+
+  conformance:
+    validator: "spec_readiness_validator.py"
+    method: "automated"
+```
+
+---
+
 ## Verification Tests
 
 | V-test ID | Requirement | Method | Description |

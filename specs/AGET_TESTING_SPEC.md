@@ -407,6 +407,38 @@ grep -rE "V\d+\.\d+" planning/PROJECT_PLAN_*.md && echo "PASS: V-tests found" ||
 
 ---
 
+## Authority Model
+
+```yaml
+authority:
+  applies_to: "test_creation_and_execution"
+
+  governed_by:
+    spec: "AGET_TESTING_SPEC"
+    owner: "aget-framework"
+
+  agent_authority:
+    can_autonomously:
+      - "Create and update contract tests"
+      - "Create and update unit tests"
+      - "Define V-tests in PROJECT_PLANs"
+      - "Execute test suites and report results"
+      - "Update test coverage thresholds"
+    requires_approval:
+      - action: "Remove existing contract tests"
+        approver: "principal"
+      - action: "Lower coverage thresholds below minimum"
+        approver: "principal"
+      - action: "Skip BLOCKING V-tests"
+        approver: "principal"
+
+  conformance:
+    validator: "spec_readiness_validator.py"
+    method: "automated"
+```
+
+---
+
 ## References
 
 - L352: Requirement-to-Test Traceability

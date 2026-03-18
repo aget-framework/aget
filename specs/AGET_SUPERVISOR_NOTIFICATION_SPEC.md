@@ -263,6 +263,35 @@ Release Complete
 
 ---
 
+## Authority Model
+
+```yaml
+authority:
+  applies_to: "supervisor_notification_delivery"
+
+  governed_by:
+    spec: "AGET_SUPERVISOR_NOTIFICATION_SPEC"
+    owner: "aget-framework"
+
+  agent_authority:
+    can_autonomously:
+      - "Create release notification artifacts in handoffs/"
+      - "Run sanitization checks on notification content"
+      - "Validate required notification sections are present"
+      - "Populate notification from release handoff data"
+    requires_approval:
+      - action: "Send notification to external fleet supervisors"
+        approver: "principal"
+      - action: "Include fleet-specific observations in notification"
+        approver: "principal"
+
+  conformance:
+    validator: "spec_readiness_validator.py"
+    method: "automated"
+```
+
+---
+
 ## Verification Tests
 
 | V-test ID | Requirement | Method | Description |

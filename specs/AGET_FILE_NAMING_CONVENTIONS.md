@@ -691,6 +691,79 @@ Is it a checklist?
 
 ---
 
+## Authority Model
+
+```yaml
+authority:
+  applies_to: "file_naming_conventions"
+
+  governed_by:
+    spec: "AGET_FILE_NAMING_CONVENTIONS"
+    owner: "aget-framework"
+
+  agent_authority:
+    can_autonomously:
+      - "Name files following established category patterns (A through J)"
+      - "Apply case conventions (SCREAMING_CASE for types, snake_case for names)"
+      - "Use existing domain codes from the Domain Codes Registry"
+      - "Create git branches and tags following naming patterns"
+      - "Archive previous versions per archive policy"
+    requires_approval:
+      - action: "Add new naming categories beyond A-J"
+        approver: "aget-framework maintainer"
+      - action: "Add new domain codes to the registry"
+        approver: "aget-framework maintainer"
+      - action: "Grant grandfathered exceptions for non-conforming files"
+        approver: "principal"
+
+  conformance:
+    validator: "spec_readiness_validator.py"
+    method: "automated"
+```
+
+---
+
+## Vocabulary
+
+Domain terms for the File Naming Conventions specification:
+
+```yaml
+vocabulary:
+  meta:
+    domain: "file_naming"
+    version: "1.0.0"
+    inherits: "aget_core"
+
+  terms:
+    Naming_Category:
+      skos:definition: "Classification of AGET artifacts into groups (A through J) with distinct naming patterns"
+      skos:narrower: ["Category_A_Versioned", "Category_B_Sequenced", "Category_C_Temporal", "Category_D_Stable", "Category_E_Code", "Category_F_OpenSource", "Category_G_Requirements", "Category_H_ChangeProposals", "Category_I_Protocols", "Category_J_Checklists"]
+    SCREAMING_CASE:
+      skos:definition: "Naming convention using all uppercase letters with underscores separating words, used for TYPE prefixes"
+      skos:example: ["PROJECT_PLAN", "SOP", "SPEC"]
+    snake_case:
+      skos:definition: "Naming convention using all lowercase letters with underscores separating words, used for descriptive file name components"
+      skos:example: ["file_naming_conventions", "release_process"]
+    kebab_case:
+      skos:definition: "Naming convention using all lowercase letters with hyphens separating words, used for directory names and git branches"
+      skos:example: ["my-supervisor-AGET", "template-worker-aget"]
+    Versioned_Artifact:
+      skos:definition: "Artifact evolving through discrete versions using _v{M}.{m} suffix format"
+      skos:related: ["Category_A_Versioned"]
+    Sequenced_Artifact:
+      skos:definition: "Artifact identified by a permanent sequence number that serves as its unique identifier"
+      skos:related: ["Category_B_Sequenced"]
+      skos:example: ["L338_gate_verification.md", "ADR-001-initial-architecture.md"]
+    Temporal_Artifact:
+      skos:definition: "Artifact identified by an ISO 8601 creation date serving as its unique identifier"
+      skos:related: ["Category_C_Temporal"]
+    Domain_Code:
+      skos:definition: "Three-to-four letter code identifying a requirement domain in the R-{DOMAIN}-{NNN} pattern"
+      skos:example: ["REL", "TPL", "WAKE", "SEC"]
+```
+
+---
+
 ## Verification Tests
 
 | V-test ID | Requirement | Method | Description |

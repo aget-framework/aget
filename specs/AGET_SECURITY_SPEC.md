@@ -246,6 +246,74 @@ cd /path/to/aget-framework/aget
 
 ---
 
+## Authority Model
+
+```yaml
+authority:
+  applies_to: "security_operations"
+
+  governed_by:
+    spec: "AGET_SECURITY_SPEC"
+    owner: "aget-framework"
+
+  agent_authority:
+    can_autonomously:
+      - "Scan content for PII, secrets, and internal paths before publication"
+      - "Apply sanitization patterns to L-docs and paths"
+      - "Validate .gitignore excludes credential file patterns"
+      - "Enforce public/private boundary markings"
+      - "Block commits containing detected secrets or PII"
+    requires_approval:
+      - action: "Publish content to public repositories"
+        approver: "principal"
+      - action: "Migrate content from private to public repos"
+        approver: "principal"
+      - action: "Change credential pattern definitions"
+        approver: "aget-framework maintainer"
+      - action: "Grant exceptions to pre-publication review"
+        approver: "principal"
+
+  conformance:
+    validator: "spec_readiness_validator.py"
+    method: "automated"
+```
+
+---
+
+## Vocabulary
+
+Domain terms for the Security specification:
+
+```yaml
+vocabulary:
+  meta:
+    domain: "security"
+    version: "1.0.0"
+    inherits: "aget_core"
+
+  terms:
+    Content_Security:
+      skos:definition: "Set of requirements ensuring public repositories do not contain personally identifiable information, secrets, or internal references"
+      skos:related: ["L430"]
+    Secrets_Management:
+      skos:definition: "Practices and rules for preventing credentials, API keys, tokens, and other sensitive data from being committed to repositories"
+    Pre_Publication_Review:
+      skos:definition: "Mandatory review process applied before content is pushed to a public repository, checking for PII, secrets, and internal references"
+    Public_Private_Boundary:
+      skos:definition: "The security perimeter separating private agent repositories (private-*-AGET) from public aget-framework repositories, requiring sanitization for content crossing it"
+    Sanitization:
+      skos:definition: "Process of removing or abstracting personally identifiable information, internal paths, and private agent names from content before public publication"
+    Credential_Pattern:
+      skos:definition: "File name or content pattern indicating potential secrets, including .env, *.pem, *.key, credentials.json, and secrets.yaml"
+    Audit_Trail:
+      skos:definition: "Record of what was published, when it was published, and who reviewed it, providing accountability for public content"
+    PII:
+      skos:definition: "Personally Identifiable Information including names, email addresses, usernames, and user-specific file paths"
+      skos:altLabel: "Personally_Identifiable_Information"
+```
+
+---
+
 ## Verification Tests
 
 | V-test ID | Requirement | Method | Description |

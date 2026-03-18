@@ -303,6 +303,72 @@ def test_version_is_valid_semver():
 
 ---
 
+## Authority Model
+
+```yaml
+authority:
+  applies_to: "versioning_conventions"
+
+  governed_by:
+    spec: "AGET_VERSIONING_CONVENTIONS"
+    owner: "aget-framework"
+
+  agent_authority:
+    can_autonomously:
+      - "Validate version strings against semver format"
+      - "Bump PATCH versions for bug fixes and documentation"
+      - "Bump MINOR versions for backward-compatible features"
+      - "Update migration_history in version.json"
+      - "Run version sync validation across repositories"
+      - "Apply deprecation notices per deprecation policy"
+    requires_approval:
+      - action: "Bump MAJOR version (breaking changes)"
+        approver: "principal"
+      - action: "Remove deprecated features"
+        approver: "principal"
+      - action: "Change version compatibility matrix"
+        approver: "aget-framework maintainer"
+
+  conformance:
+    validator: "spec_readiness_validator.py"
+    method: "automated"
+```
+
+---
+
+## Vocabulary
+
+Domain terms for the Versioning Conventions specification:
+
+```yaml
+vocabulary:
+  meta:
+    domain: "versioning"
+    version: "1.0.0"
+    inherits: "aget_core"
+
+  terms:
+    Semantic_Version:
+      skos:definition: "Version string following Semantic Versioning 2.0.0 format: MAJOR.MINOR.PATCH with optional pre-release suffix"
+      skos:notation: "MAJOR.MINOR.PATCH[-PRERELEASE]"
+    Breaking_Change:
+      skos:definition: "A modification that requires existing agents to alter their configuration to remain compliant, triggering a MAJOR version increment"
+    Version_Json:
+      skos:definition: "JSON file at .aget/version.json containing the aget_version field and migration history"
+      aget:location: ".aget/version.json"
+    Migration_History:
+      skos:definition: "Array in version.json tracking the sequence of version upgrades with dates and descriptions"
+    Deprecation_Notice:
+      skos:definition: "Formal declaration that a feature will be removed in a future MAJOR version, including deprecated_in version, removed_in version, and replacement reference"
+    Version_Sync:
+      skos:definition: "State where all repositories in the aget-framework organization share the same aget_version value"
+    Atomic_Fleet_Release:
+      skos:definition: "Release process where the core repository is versioned first and all template repositories are tagged with the same version in a coordinated sequence"
+      skos:related: ["R-REL-001"]
+```
+
+---
+
 ## Verification Tests
 
 | V-test ID | Requirement | Method | Description |

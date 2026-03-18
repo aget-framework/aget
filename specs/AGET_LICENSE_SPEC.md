@@ -333,6 +333,15 @@ grep -q "Copyright" LICENSE && echo "PASS: copyright present" || echo "FAIL: no 
 
 ---
 
+## Evidence
+
+This specification is grounded in the following L-doc decisions and learnings:
+
+- **L439**: Standard Open-Source Files — established that community-standard files (including LICENSE) follow external conventions, not AGET-specific patterns. This informed the Category F recognition in AGET_FILE_NAMING_CONVENTIONS and the license file placement requirements in CAP-LIC-005.
+- **L289**: Evidence-First Design — the dual-license model (framework Apache 2.0 / instance user choice) was validated through audit of existing enterprise adoption patterns before being formalized into this specification.
+
+---
+
 ## References
 
 - Apache License 2.0: https://www.apache.org/licenses/LICENSE-2.0

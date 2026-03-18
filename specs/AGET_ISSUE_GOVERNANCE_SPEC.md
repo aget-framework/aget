@@ -291,6 +291,38 @@ def detect_agent_type(agent_root: Path) -> str:
 
 ---
 
+## Authority Model
+
+```yaml
+authority:
+  applies_to: "issue_routing_and_sanitization"
+
+  governed_by:
+    spec: "AGET_ISSUE_GOVERNANCE_SPEC"
+    owner: "aget-framework"
+
+  agent_authority:
+    can_autonomously:
+      - "File issues to gmelli/aget-aget (private tracker)"
+      - "Run content sanitization checks on issue content"
+      - "Validate issue destination before filing"
+      - "Verify repository issue settings"
+      - "Detect private patterns in issue content"
+    requires_approval:
+      - action: "Promote issue from private to public tracker"
+        approver: "principal"
+      - action: "Enable issues on template repositories"
+        approver: "principal"
+      - action: "Modify private pattern detection rules"
+        approver: "principal"
+
+  conformance:
+    validator: "spec_readiness_validator.py"
+    method: "automated"
+```
+
+---
+
 ## Verification Tests
 
 | V-test ID | Requirement | Method | Description |

@@ -568,6 +568,37 @@ See: `scripts/migrate_project_plans.py`
 
 ---
 
+## Authority Model
+
+```yaml
+authority:
+  applies_to: "evolution_directory_management"
+
+  governed_by:
+    spec: "AGET_EVOLUTION_SPEC"
+    owner: "aget-framework"
+
+  agent_authority:
+    can_autonomously:
+      - "Create L-docs (learning entries) in .aget/evolution/"
+      - "Create D-docs (decision entries) in .aget/evolution/"
+      - "Create DISC-docs (discovery entries) in .aget/evolution/"
+      - "Archive completed PROJECT_PLANs as PP-prefix entries"
+      - "Update evolution index.json"
+      - "Publish sanitized learnings to docs/learnings/"
+    requires_approval:
+      - action: "Delete or archive existing L-docs"
+        approver: "principal"
+      - action: "Publish learnings to public repo"
+        approver: "principal"
+
+  conformance:
+    validator: "spec_readiness_validator.py"
+    method: "automated"
+```
+
+---
+
 ## References
 
 - **AGET_LDOC_SPEC.md**: L-doc format details

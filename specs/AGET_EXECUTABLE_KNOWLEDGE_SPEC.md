@@ -208,6 +208,72 @@ EKO is grounded in established theory:
 
 ---
 
+## Authority Model
+
+```yaml
+authority:
+  applies_to: "executable_knowledge_classification"
+
+  governed_by:
+    spec: "AGET_EXECUTABLE_KNOWLEDGE_SPEC"
+    owner: "aget-framework"
+
+  agent_authority:
+    can_autonomously:
+      - "Classify artifacts along the three EKO axes (Abstraction, Determinism, Reusability)"
+      - "Apply autonomy delegation principle based on determinism level"
+      - "Create new executable artifacts with classification metadata"
+      - "Update artifact classifications when artifact behavior changes"
+    requires_approval:
+      - action: "Add new values to any EKO axis taxonomy"
+        approver: "aget-framework maintainer"
+      - action: "Change autonomy delegation mappings"
+        approver: "principal"
+      - action: "Bind EKO to external ontologies (L453 violation)"
+        approver: "principal"
+
+  conformance:
+    validator: "spec_readiness_validator.py"
+    method: "automated"
+```
+
+---
+
+## Vocabulary
+
+Domain terms for the Executable Knowledge Ontology specification:
+
+```yaml
+vocabulary:
+  meta:
+    domain: "executable_knowledge"
+    version: "1.0.0"
+    inherits: "aget_core"
+
+  terms:
+    Executable_Knowledge:
+      skos:definition: "Actionable artifact that an agent can produce, consume, or execute, classified along three axes"
+      skos:narrower: ["SOP", "Runbook", "Playbook", "PROJECT_PLAN", "Pattern", "Protocol", "Checklist"]
+    Abstraction_Level:
+      skos:definition: "Classification axis measuring an artifact's position from abstract specification to concrete execution"
+      skos:narrower: ["Algorithm", "Function", "Procedure", "Protocol_Abstraction", "Process", "Workflow", "Execution"]
+    Determinism_Level:
+      skos:definition: "Classification axis measuring the predictability of artifact behavior and its autonomy delegation implications"
+      skos:narrower: ["Deterministic", "Probabilistic", "Syllogistic"]
+    Reusability_Level:
+      skos:definition: "Classification axis measuring the frequency and scope of artifact application"
+      skos:narrower: ["Universal", "Parameterized", "One_Time"]
+    Autonomy_Delegation:
+      skos:definition: "Principle mapping determinism level to the degree of human oversight required for artifact execution"
+    Three_Axis_Taxonomy:
+      skos:definition: "EKO classification system using Abstraction, Determinism, and Reusability as orthogonal dimensions"
+    Composition_Operator:
+      skos:definition: "Operator that combines a base template with capabilities to produce an enhanced agent artifact"
+      skos:notation: "⊕"
+```
+
+---
+
 ## Verification Tests
 
 | V-test ID | Requirement | Method | Description |

@@ -388,6 +388,16 @@ python3 -m pytest tests/test_session_protocol.py -v
 
 ---
 
+## Evidence
+
+This specification is grounded in the following L-doc decisions and learnings:
+
+- **L289**: Evidence-First Design — the tool-spec alignment requirement was established after auditing actual divergence between wind_down.py behavior and AGET_SESSION_SPEC requirements, following the evidence-first approach.
+- **L335**: Memory Architecture Principles — tool traceability (Implements clause) enables the knowledge base to serve as a collaboration substrate by maintaining requirement-to-implementation chains across sessions.
+- **L474**: CLI Agent Skills Enforcement Model — established that tools operating outside AGENTS.md governance require explicit spec alignment to maintain behavioral guarantees.
+
+---
+
 ## References
 
 - AGET_VALIDATION_SPEC.md (validation requirements)

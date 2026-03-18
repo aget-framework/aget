@@ -492,6 +492,10 @@ authority:
         approver: "user"
       - action: "skip mandatory handoff"
         approver: "user (with --no-handoff acknowledgment)"
+
+  conformance:
+    validator: "spec_readiness_validator.py"
+    method: "automated"
 ```
 
 ---

@@ -250,6 +250,36 @@ The SYSTEM shall validate CI configuration.
 
 ---
 
+## Authority Model
+
+```yaml
+authority:
+  applies_to: "ci_cd_pipeline_operations"
+
+  governed_by:
+    spec: "AGET_CI_SPEC"
+    owner: "aget-framework"
+
+  agent_authority:
+    can_autonomously:
+      - "Configure CI workflow files for templates"
+      - "Add or update test jobs, lint jobs, and security jobs"
+      - "Update Python version matrix"
+      - "Fix test isolation issues in template tests"
+      - "Update package configuration (setup.py, __init__.py)"
+    requires_approval:
+      - action: "Remove CI jobs from workflow"
+        approver: "principal"
+      - action: "Change CI trigger branches"
+        approver: "principal"
+
+  conformance:
+    validator: "spec_readiness_validator.py"
+    method: "automated"
+```
+
+---
+
 ## Verification Tests
 
 | V-test ID | Requirement | Method | Description |

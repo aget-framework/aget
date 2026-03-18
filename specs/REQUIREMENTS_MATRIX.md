@@ -238,6 +238,67 @@ Issue/L-doc → CAP Requirement → Specification → Validator → Test
 
 ---
 
+## Authority Model
+
+```yaml
+authority:
+  applies_to: "requirements_traceability"
+
+  governed_by:
+    spec: "REQUIREMENTS_MATRIX"
+    owner: "aget-framework"
+
+  agent_authority:
+    can_autonomously:
+      - "Add new CAP requirement entries to the traceability matrix"
+      - "Update validator references for existing CAP requirements"
+      - "Add new L-doc to CAP traceability mappings"
+      - "Add new issue to CAP traceability mappings"
+      - "Flag untraced requirements per R-RTM-001-03"
+    requires_approval:
+      - action: "Create new CAP requirement domains"
+        approver: "aget-framework maintainer"
+      - action: "Remove or deprecate existing CAP requirements"
+        approver: "principal"
+      - action: "Change traceability structure (Issue/L-doc -> CAP -> Spec -> Validator -> Test)"
+        approver: "aget-framework maintainer"
+
+  conformance:
+    validator: "spec_readiness_validator.py"
+    method: "automated"
+```
+
+---
+
+## Vocabulary
+
+Domain terms for the Requirements Traceability Matrix specification:
+
+```yaml
+vocabulary:
+  meta:
+    domain: "requirements_traceability"
+    version: "1.0.0"
+    inherits: "aget_core"
+
+  terms:
+    CAP_Requirement:
+      skos:definition: "A formally identified capability requirement with a unique CAP-{DOMAIN}-{NNN} identifier, linked to a source L-doc or issue and a governing specification"
+    Requirements_Traceability:
+      skos:definition: "The ability to trace a requirement from its origin (L-doc or issue) through specification, validator, and test, ensuring complete coverage"
+    Requirement_Domain:
+      skos:definition: "A logical grouping of related CAP requirements such as PERSONA, MEMORY, REASON, SKILL, CONTEXT, or REL"
+      skos:narrower: ["PERSONA", "MEMORY", "REASON", "SKILL", "CONTEXT", "VOC", "TEST", "REL", "PP", "EVOL", "EKO", "DOC", "ORG", "ERR", "SEC"]
+    Validator:
+      skos:definition: "A Python script that verifies compliance with one or more CAP requirements, referenced in the Validator column of the traceability table"
+    Untraced_Requirement:
+      skos:definition: "A CAP requirement that lacks a linked L-doc or issue origin, flagged for investigation per R-RTM-001-03"
+    L_Doc_Traceability:
+      skos:definition: "The mapping from a learning document (L-doc) to the CAP requirements it motivated or informed"
+```
+
+---
+
 ## Verification Tests
 
 | V-test ID | Requirement | Method | Description |

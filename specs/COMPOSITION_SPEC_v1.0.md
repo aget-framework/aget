@@ -547,6 +547,72 @@ The composition model is extensible:
 
 ---
 
+## Authority Model
+
+```yaml
+authority:
+  applies_to: "composition_operations"
+
+  governed_by:
+    spec: "COMPOSITION_SPEC"
+    owner: "aget-framework"
+
+  agent_authority:
+    can_autonomously:
+      - "Compose agents from base templates and capabilities using the composition operator"
+      - "Run DAG validation on capability prerequisite graphs"
+      - "Detect and report composition conflicts (duplicate, overlap, circular)"
+      - "Apply conflict resolution strategies (error, first-wins, last-wins, merge)"
+      - "Validate version compatibility of composed capabilities"
+    requires_approval:
+      - action: "Add new composition axioms or modify existing algebra"
+        approver: "aget-framework maintainer"
+      - action: "Add new conflict resolution strategies"
+        approver: "aget-framework maintainer"
+      - action: "Change prerequisite validation rules"
+        approver: "principal"
+
+  conformance:
+    validator: "spec_readiness_validator.py"
+    method: "automated"
+```
+
+---
+
+## Vocabulary
+
+Domain terms for the Composition specification:
+
+```yaml
+vocabulary:
+  meta:
+    domain: "composition"
+    version: "1.0.0"
+    inherits: "aget_core"
+
+  terms:
+    Composition_Operator:
+      skos:definition: "Binary operator (denoted as a circled plus) that combines a base template or agent with a capability to produce an enhanced agent"
+      skos:notation: "⊕"
+    Base_Template:
+      skos:definition: "Starting archetype template from which an agent is composed, such as worker, advisor, supervisor, or developer"
+    Capability:
+      skos:definition: "A defined specification that adds behaviors, contracts, and configuration to an agent through the composition operator"
+    Conflict_Resolution_Strategy:
+      skos:definition: "Policy for handling behavior overlaps during composition, one of: error, first-wins, last-wins, or merge"
+      skos:narrower: ["Strategy_Error", "Strategy_First_Wins", "Strategy_Last_Wins", "Strategy_Merge"]
+    Prerequisite_Graph:
+      skos:definition: "Directed graph where nodes represent capabilities and edges represent prerequisite dependencies, which must be acyclic (DAG)"
+    Behavior_Overlap:
+      skos:definition: "Conflict condition where two or more capabilities define behaviors with identical names in the same composition"
+    DAG_Validation:
+      skos:definition: "Process of verifying that the capability prerequisite graph forms a directed acyclic graph with no cycles, missing prerequisites, or version incompatibilities"
+    Composition_Algebra:
+      skos:definition: "Mathematical framework governing capability composition through four axioms: identity, commutativity, idempotency, and associativity"
+```
+
+---
+
 ## Verification Tests
 
 | V-test ID | Requirement | Method | Description |

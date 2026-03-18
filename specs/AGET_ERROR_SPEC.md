@@ -189,6 +189,68 @@ if violations:
 
 ---
 
+## Authority Model
+
+```yaml
+authority:
+  applies_to: "error_handling"
+
+  governed_by:
+    spec: "AGET_ERROR_SPEC"
+    owner: "aget-framework"
+
+  agent_authority:
+    can_autonomously:
+      - "Define and use exit codes per CAP-ERR-001 taxonomy"
+      - "Format error messages per CAP-ERR-002 structure"
+      - "Implement verbose logging per CAP-ERR-003"
+      - "Apply collect-all or fail-fast recovery patterns per CAP-ERR-004"
+    requires_approval:
+      - action: "Add new exit code categories (10+)"
+        approver: "aget-framework maintainer"
+      - action: "Change exit code semantics for existing codes"
+        approver: "principal"
+
+  conformance:
+    validator: "spec_readiness_validator.py"
+    method: "automated"
+```
+
+---
+
+## Vocabulary
+
+Domain terms for the Error Handling specification:
+
+```yaml
+vocabulary:
+  meta:
+    domain: "error_handling"
+    version: "1.0.0"
+    inherits: "aget_core"
+
+  terms:
+    Exit_Code:
+      skos:definition: "Numeric code returned by a script to indicate success or failure category"
+      skos:narrower: ["Exit_Success", "Exit_Validation_Failed", "Exit_Invalid_Args", "Exit_File_Not_Found", "Exit_Permission_Error", "Exit_Config_Error"]
+    Error_Message:
+      skos:definition: "Structured output describing what failed, why it failed, and how to fix it"
+      skos:related: ["Recovery_Suggestion"]
+    Recovery_Suggestion:
+      skos:definition: "Actionable guidance included in an error message to help the user resolve the failure"
+    Collect_All_Pattern:
+      skos:definition: "Error handling strategy that accumulates all validation errors before reporting, rather than failing on the first error"
+      skos:altLabel: "Accumulate-and-Report"
+    Fail_Fast_Pattern:
+      skos:definition: "Error handling strategy that terminates immediately on critical errors such as configuration or permission failures"
+    Verbose_Mode:
+      skos:definition: "Optional script output mode providing detailed progress and timestamp information for debugging"
+    Validation_Failure:
+      skos:definition: "Condition where content or configuration does not meet specification requirements, resulting in exit code 1"
+```
+
+---
+
 ## Verification Tests
 
 | V-test ID | Requirement | Method | Description |
