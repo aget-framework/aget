@@ -1,7 +1,7 @@
 ---
 skill_id: SKILL-041
 name: aget-enhance-spec
-version: 1.0.0
+version: 1.1.0
 status: active
 category: governance
 archetype: universal
@@ -38,6 +38,12 @@ Guide agents through the 7-phase core specification enhancement lifecycle (Phase
 | R-ENHANCE-SPEC-005 | ubiquitous | The SYSTEM shall cite specific requirements (CAP-xxx-nnn) from governing specs |
 | R-ENHANCE-SPEC-006 | ubiquitous | The SYSTEM shall verify cross-reference targets in governing specs are not stale |
 | R-ENHANCE-SPEC-007 | conditional | IF spec basis is declared but no CAP citations appear in deliverables THEN the SYSTEM shall flag Decorative Spec Basis anti-pattern |
+
+### Phase 0.5: Maturity Assessment
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| R-ENHANCE-SPEC-033 | conditional | IF Enhancement_Category is UPDATE, ADD-REQ, or WIRE THEN the SYSTEM shall assess the target spec against RUBRIC_specification_maturity_v1.0 and report current maturity profile (C/E/A/P/G) |
 
 ### Phase 2: Census & Classification
 
@@ -89,8 +95,8 @@ Guide agents through the 7-phase core specification enhancement lifecycle (Phase
 | R-ENHANCE-SPEC-026 | ubiquitous | The SYSTEM shall produce an enhancement decision log recording category, citations, and compliance results |
 | R-ENHANCE-SPEC-027 | prohibited | The SYSTEM shall NOT execute deployment phases 7-10 (template, tooling, fleet, post-deploy) |
 | R-ENHANCE-SPEC-028 | conditional | IF Enhancement_Category is CONSOLIDATE THEN the SYSTEM shall reference SOP_specification_consolidation.md |
-| R-ENHANCE-SPEC-029 | conditional | IF Enhancement_Category is WIRE THEN the SYSTEM shall execute only Phases 0, 1, and 5 |
-| R-ENHANCE-SPEC-030 | conditional | IF Enhancement_Category is DEPRECATE THEN the SYSTEM shall execute only Phases 0, 1, and 3 |
+| R-ENHANCE-SPEC-029 | conditional | IF Enhancement_Category is WIRE THEN the SYSTEM shall execute only Phases 0, 1, 5, and 6 |
+| R-ENHANCE-SPEC-030 | conditional | IF Enhancement_Category is DEPRECATE THEN the SYSTEM shall execute only Phases 0, 1, 3, and 6 |
 | R-ENHANCE-SPEC-031 | conditional | IF Enhancement_Scope is public framework AND Enhancement_Category is UPDATE or NEW THEN the SYSTEM shall require a PROJECT_PLAN governance artifact before proceeding past Phase 0 |
 | R-ENHANCE-SPEC-032 | conditional | IF Enhancement_Scope is private agent OR Enhancement_Category is ADD-REQ or WIRE THEN the SYSTEM shall use the built-in Enhancement_Decision_Log as sufficient governance |
 
@@ -110,7 +116,7 @@ Categories:
 Examples:
 - /aget-enhance-spec NEW specs/AGET_FOO_SPEC.md
 - /aget-enhance-spec UPDATE aget/specs/AGET_SOP_SPEC.md --version 1.2.0
-- /aget-enhance-spec WIRE aget/specs/AGET_SKILLS_SPEC.md
+- /aget-enhance-spec WIRE aget/specs/SKILL_NAMING_CONVENTION_SPEC.md
 - /aget-enhance-spec ADD-REQ aget/specs/AGET_SOP_SPEC.md
 ```
 
@@ -133,8 +139,8 @@ Examples:
 | ID | Test | Expected | Traces To |
 |----|------|----------|-----------|
 | V-ENHANCE-001 | Invoke with NEW category | All 7 phases execute in order | R-ENHANCE-SPEC-001, -003 |
-| V-ENHANCE-002 | Invoke with WIRE category | Only Phases 0, 1, 5 execute | R-ENHANCE-SPEC-029 |
-| V-ENHANCE-003 | Invoke with DEPRECATE category | Only Phases 0, 1, 3 execute | R-ENHANCE-SPEC-030 |
+| V-ENHANCE-002 | Invoke with WIRE category | Only Phases 0, 1, 5, 6 execute | R-ENHANCE-SPEC-029 |
+| V-ENHANCE-003 | Invoke with DEPRECATE category | Only Phases 0, 1, 3, 6 execute | R-ENHANCE-SPEC-030 |
 | V-ENHANCE-004 | Phase 1 reads governing spec | File contents displayed, CAP citations extracted | R-ENHANCE-SPEC-004, -005 |
 | V-ENHANCE-005 | Phase 1 detects no CAP citations in deliverables | Decorative Spec Basis flagged | R-ENHANCE-SPEC-007 |
 | V-ENHANCE-006 | Phase 2 produces census table | Artifact, version, category, dependencies, priority columns present | R-ENHANCE-SPEC-008 |
@@ -149,6 +155,7 @@ Examples:
 | V-ENHANCE-015 | Phase 2 reports spec version | Version read from file, not asserted from memory | R-ENHANCE-SPEC-010 |
 | V-ENHANCE-016 | Public framework UPDATE invoked without PROJECT_PLAN | Blocked at Phase 0 — PROJECT_PLAN required | R-ENHANCE-SPEC-031 |
 | V-ENHANCE-017 | Private agent ADD-REQ invoked | Proceeds with Enhancement_Decision_Log only | R-ENHANCE-SPEC-032 |
+| V-ENHANCE-018 | UPDATE category invoked on existing spec | Maturity assessment (C/E/A/P/G) displayed before Phase 1 | R-ENHANCE-SPEC-033 |
 
 ## Allowed Tools
 
@@ -170,7 +177,16 @@ Examples:
 | Parent Plan | PROJECT_PLAN_aget_enhance_spec_skill_v1.0.md |
 | Verb Registration | DESIGN_DIRECTION_skill_verb_vocabulary.md (verb #25, 4th domain innovation) |
 | ADR-008 Chain | L622/L623 (L-docs) → SOP_specification_enhancement (Advisory) → SKILL-041 (Strict) → /aget-enhance-spec (Generator) |
-| Requirements | R-ENHANCE-SPEC-001 through R-ENHANCE-SPEC-030 |
+| Requirements | R-ENHANCE-SPEC-001 through R-ENHANCE-SPEC-033 |
+
+---
+
+## Changelog
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.1.0 | 2026-03-19 | Fix R-029/R-030 to include Phase 6 (was contradicting C3). Add R-ENHANCE-SPEC-033 (Phase 0.5 Maturity Assessment, L682). Add V-ENHANCE-018. Fix archived spec in example. |
+| 1.0.0 | 2026-02-28 | Initial specification. 32 requirements, 17 V-tests. |
 
 ---
 
