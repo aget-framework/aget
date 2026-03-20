@@ -1,8 +1,8 @@
 # AGET Specification Index
 
-**Version**: 1.4.0
+**Version**: 1.5.0
 **Status**: Active
-**Updated**: 2026-01-12
+**Updated**: 2026-03-20
 **Author**: aget-framework
 
 This document provides an index of all AGET framework specifications with their Spec IDs, status, authority level, and descriptions.
@@ -45,8 +45,16 @@ This document provides an index of all AGET framework specifications with their 
 | AGET-DOC-001 | AGET_DOCUMENTATION_SPEC | Active | Active | Documentation requirements |
 | AGET-TOOL-001 | AGET_TOOL_SPEC | Active | Active | Tool specifications |
 | AGET-COMP-001 | COMPOSITION_SPEC_v1.0 | Approved | Active | Capability composition mechanism |
+| AGET-ID-001 | AGET_IDENTITY_SPEC | Active | Active | Agent identity structure and requirements |
+| AGET-ID-002 | AGET_IDENTITY_JSON_SCHEMA | Active | Active | Identity JSON schema definition |
+| AGET-ISS-001 | AGET_ISSUE_GOVERNANCE_SPEC | Active | Active | Issue filing governance and routing |
+| AGET-POS-001 | AGET_POSITIONING_SPEC | Active | Active | Strategic positioning requirements |
+| AGET-SUP-001 | AGET_SUPERVISOR_NOTIFICATION_SPEC | Active | Active | Supervisor notification protocols |
+| AGET-CIV-001 | AGET_CONTENT_INTEGRITY_SPEC | Active | Active | Content integrity validation |
+| AGET-SKILL-001 | SKILL_NAMING_CONVENTION_SPEC | Active | Active | Skill naming conventions |
+| AGET-WORK-001 | WORKER_TEMPLATE_SPEC | Active | Active | Worker template requirements |
 
-**Total: 32 specifications**
+**Total: 40 specifications**
 
 ### Authority Levels
 
@@ -107,6 +115,13 @@ AGET-{DOMAIN}-{NNN}
 | DOC | Documentation | 1 |
 | TOOL | Tools | 1 |
 | COMP | Composition | 1 |
+| ID | Identity | 2 |
+| ISS | Issue Governance | 1 |
+| POS | Positioning | 1 |
+| SUP | Supervisor | 1 |
+| CIV | Content Integrity | 1 |
+| SKILL | Skill Naming | 1 |
+| WORK | Worker Template | 1 |
 
 ---
 
@@ -131,6 +146,8 @@ AGET-{DOMAIN}-{NNN}
 | AGET-LIC-001 | AGET_LICENSE_SPEC | Apache 2.0 requirements |
 | AGET-ORG-001 | AGET_ORGANIZATION_SPEC | GitHub org requirements |
 | AGET-SEC-001 | AGET_SECURITY_SPEC | Content security |
+| AGET-ISS-001 | AGET_ISSUE_GOVERNANCE_SPEC | Issue filing and routing |
+| AGET-CIV-001 | AGET_CONTENT_INTEGRITY_SPEC | Content integrity validation |
 
 ### Lifecycle
 
@@ -140,6 +157,9 @@ AGET-{DOMAIN}-{NNN}
 | AGET-INST-001 | AGET_INSTANCE_SPEC | Instance requirements |
 | AGET-MIG-001 | AGET_MIGRATION_SPEC | Migration procedures |
 | AGET-COMPAT-001 | AGET_COMPATIBILITY_SPEC | Version compatibility |
+| AGET-ID-001 | AGET_IDENTITY_SPEC | Agent identity structure |
+| AGET-ID-002 | AGET_IDENTITY_JSON_SCHEMA | Identity JSON schema |
+| AGET-WORK-001 | WORKER_TEMPLATE_SPEC | Worker template requirements |
 
 ### Technical
 
@@ -153,6 +173,8 @@ AGET-{DOMAIN}-{NNN}
 | AGET-PORT-001 | AGET_PORTABILITY_SPEC | Portability requirements |
 | AGET-ERR-001 | AGET_ERROR_SPEC | Error handling |
 | AGET-TOOL-001 | AGET_TOOL_SPEC | Tool specifications |
+| AGET-SUP-001 | AGET_SUPERVISOR_NOTIFICATION_SPEC | Supervisor notifications |
+| AGET-POS-001 | AGET_POSITIONING_SPEC | Strategic positioning |
 
 ### Process
 
@@ -172,6 +194,7 @@ AGET-{DOMAIN}-{NNN}
 | AGET-NAME-001 | AGET_FILE_NAMING_CONVENTIONS | Naming conventions |
 | AGET-VER-001 | AGET_VERSIONING_CONVENTIONS | Versioning conventions |
 | AGET-DOC-001 | AGET_DOCUMENTATION_SPEC | Documentation standards |
+| AGET-SKILL-001 | SKILL_NAMING_CONVENTION_SPEC | Skill naming conventions |
 
 ---
 
@@ -209,10 +232,20 @@ The following specs have been superseded and moved to `specs/archive/`:
 | Testing requirements | AGET-TEST-001 |
 | File naming | AGET-NAME-001 |
 | PROJECT_PLAN format | AGET-PP-001 |
+| Agent identity | AGET-ID-001 |
+| Issue governance | AGET-ISS-001 |
+| Skill naming | AGET-SKILL-001 |
 
 ---
 
 ## Changelog
+
+### v1.5.0 (2026-03-20)
+
+- Registered 8 unindexed specs: AGET_IDENTITY_SPEC, AGET_IDENTITY_JSON_SCHEMA, AGET_ISSUE_GOVERNANCE_SPEC, AGET_POSITIONING_SPEC, AGET_SUPERVISOR_NOTIFICATION_SPEC, AGET_CONTENT_INTEGRITY_SPEC, SKILL_NAMING_CONVENTION_SPEC, WORKER_TEMPLATE_SPEC
+- Added 8 new domain codes (ID, ISS, POS, SUP, CIV, SKILL, WORK)
+- Total specifications: 32 → 40
+- Remediation of 27% staleness gap identified 2026-03-19
 
 ### v1.3.0 (2026-01-09)
 
