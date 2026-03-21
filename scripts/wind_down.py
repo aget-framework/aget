@@ -248,9 +248,16 @@ def get_session_state(agent_path: Path) -> Dict[str, Any]:
 
 
 def scan_pending_work(agent_path: Path) -> List[str]:
-    """Scan planning/ for in-progress work."""
+    """Scan planning/ for in-progress work.
+
+    Checks the top-level status field (first 30 lines) rather than
+    scanning full content, to avoid false positives from historical
+    gate descriptions like 'Gate X: IN_PROGRESS -> COMPLETE'.
+    """
     pending = []
     planning_dir = agent_path / 'planning'
+    completed_statuses = {'complete', 'completed', 'superseded', 'archived',
+                          'released', 'abandoned', 'closed'}
 
     if not planning_dir.is_dir():
         return pending
@@ -258,12 +265,83 @@ def scan_pending_work(agent_path: Path) -> List[str]:
     for plan_file in planning_dir.glob('PROJECT_PLAN_*.md'):
         try:
             content = plan_file.read_text()
-            if 'IN_PROGRESS' in content.upper() or 'status: in_progress' in content.lower():
+            # Extract top-level status from first 30 lines
+            top_status = None
+            for line in content.split('\n')[:30]:
+                line_stripped = line.strip().lower()
+                # Match patterns: "status: X", "**status**: X", "**Status**: X"
+                for prefix in ('status:', '**status**:', '**status:'):
+                    if line_stripped.startswith(prefix):
+                        top_status = line_stripped.split(':', 1)[1].strip().strip('*').strip()
+                        break
+                if top_status:
+                    break
+
+            # Skip plans with completed top-level status
+            if top_status and any(s in top_status for s in completed_statuses):
+                continue
+
+            # Check top-level status for in-progress indicators
+            in_progress_statuses = {'in_progress', 'in progress', 'draft', 'pending',
+                                    'active', 'blocked'}
+            if top_status and any(s in top_status for s in in_progress_statuses):
+                pending.append(plan_file.name)
+            # Fallback: scan content for IN_PROGRESS (plans without top-level status)
+            elif not top_status and ('IN_PROGRESS' in content.upper()
+                                     or 'IN PROGRESS' in content.upper()):
                 pending.append(plan_file.name)
         except IOError:
             pass
 
     return pending
+
+
+def scan_nuggets(agent_path: Path) -> List[Dict[str, Any]]:
+    """Scan for pre-CLI nugget files in known locations.
+
+    Checks two directories:
+    - ~/.aget/nuggets/ (global, cross-agent)
+    - <agent_root>/.aget/evolution/nuggets/ (local, agent-specific)
+
+    Returns list of nugget dicts with file, subject, age_days, stale flag.
+    Feature-gated: returns [] if neither directory exists.
+    """
+    nuggets = []
+    now = datetime.now()
+    stale_days = 30
+
+    locations = [
+        ('global', Path.home() / '.aget' / 'nuggets'),
+        ('local', agent_path / '.aget' / 'evolution' / 'nuggets'),
+    ]
+
+    for scope, nugget_dir in locations:
+        if not nugget_dir.is_dir():
+            continue
+        for f in sorted(nugget_dir.glob('*.md')):
+            if f.name.lower() == 'readme.md':
+                continue
+            try:
+                content = f.read_text().strip()
+                # Subject: first non-empty, non-header line
+                subject = ''
+                for line in content.split('\n'):
+                    line = line.strip()
+                    if line and not line.startswith('#'):
+                        subject = line[:80]
+                        break
+                age_days = (now - datetime.fromtimestamp(f.stat().st_mtime)).days
+                nuggets.append({
+                    'file': f.name,
+                    'scope': scope,
+                    'subject': subject,
+                    'age_days': age_days,
+                    'stale': age_days > stale_days,
+                })
+            except (IOError, OSError):
+                pass
+
+    return nuggets
 
 
 def get_uncommitted_changes(agent_path: Path) -> List[str]:
@@ -389,6 +467,9 @@ def get_wind_down_data(agent_path: Path,
     # L021 Check 3: Pending work
     data['pending_work'] = scan_pending_work(agent_path)
 
+    # Nuggets scan
+    data['nuggets'] = scan_nuggets(agent_path)
+
     # Uncommitted changes
     data['uncommitted_changes'] = get_uncommitted_changes(agent_path)
 
@@ -499,6 +580,16 @@ def format_human_output(data: Dict[str, Any]) -> str:
         if data.get('mandatory_handoff'):
             lines.append("  [MANDATORY HANDOFF TRIGGERED - CAP-SESSION-005-01]")
             lines.append("")
+
+    # Nuggets
+    nuggets = data.get('nuggets', [])
+    if nuggets:
+        stale_count = sum(1 for n in nuggets if n.get('stale'))
+        lines.append(f"Nuggets ({len(nuggets)} pending{f', {stale_count} stale' if stale_count else ''}):")
+        for n in nuggets:
+            stale_tag = " [STALE]" if n.get('stale') else ""
+            lines.append(f"  - [{n['scope']}] {n['file']}: {n['subject']}{stale_tag}")
+        lines.append("")
 
     # Uncommitted changes
     uncommitted = data.get('uncommitted_changes', [])
