@@ -47,11 +47,11 @@ universal_skills:
     - aget-check-sessions
     - aget-check-kb
     - aget-record-lesson
-    - aget-capture-observation
+    - aget-record-observation
     - aget-create-project
     - aget-review-project
     - aget-propose-skill
-    - aget-studyup
+    - aget-study-topic
   reference: "SESSION_SKILLS_INDEX.yaml"
 
 # ============================================================================

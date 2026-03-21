@@ -256,7 +256,7 @@ C020_Observation:
     - C022_Session_Artifact
     - C018_Learning_Document
   skos:example:
-    - "aget-capture-observation records observations"
+    - "aget-record-observation records observations"
 
 C022_Session_Artifact:
   skos:prefLabel: "Session_Artifact"

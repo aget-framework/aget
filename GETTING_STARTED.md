@@ -207,7 +207,7 @@ All templates include these skills:
 - `aget-review-project` — Project assessment
 - `aget-save-state` — State persistence
 - `aget-propose-skill` — Skill governance
-- `aget-capture-observation` — Research capture
+- `aget-record-observation` — Research observation recording
 - `aget-check-sessions` — Session health
 - `aget-check-evolution` — Evolution health
 - `aget-check-kb` — KB health

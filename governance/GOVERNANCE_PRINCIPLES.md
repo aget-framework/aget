@@ -144,7 +144,7 @@ The loop closes: meta-principles constrain governance, governance constrains age
 **In Practice**:
 - CLAUDE.md: Session init (Layer 1 — highest reliability for session-scoped principles)
 - SOP trigger: Point-of-use (Layer 2 — activated when relevant action begins)
-- KB index: Searchable (Layer 3 — discoverable via /aget-study-up)
+- KB index: Searchable (Layer 3 — discoverable via /aget-study-topic)
 - Wake-up: Proactive surfacing (Layer 4 — presented at session start)
 - Validator: Automated (Layer 5 — highest reliability for testable rules)
 

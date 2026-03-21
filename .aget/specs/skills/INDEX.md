@@ -20,13 +20,13 @@ Deployed to all 12 templates.
 | SKILL-005 | aget-check-sessions | Health | Check sessions directory health |
 | SKILL-006 | aget-check-kb | Health | Validate Knowledge Base health |
 | SKILL-007 | aget-record-lesson | Evolution | Record lessons learned as L-docs |
-| SKILL-008 | aget-capture-observation | Evolution | Capture research observations |
+| SKILL-008 | aget-record-observation | Evolution | Record research observations |
 | SKILL-009 | aget-propose-skill | Governance | Propose new skills with governance |
 | SKILL-010 | aget-review-project | Project | Mid-flight review of project plans |
 | SKILL-011 | aget-create-project | Project | Create research projects with scaffolding |
 | SKILL-012 | aget-create-skill | Development | Create new skill with spec |
 | SKILL-013 | aget-save-state | Session | Save workflow state for recovery |
-| SKILL-042 | aget-study-up | Research | Focused KB research on topic before implementation |
+| SKILL-042 | aget-study-topic | Research | Focused KB research on topic before implementation |
 | SKILL-040 | aget-file-issue | Governance | File issues with L520 governance compliance |
 
 ---

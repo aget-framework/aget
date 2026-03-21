@@ -1066,8 +1066,8 @@ All templates include these 15 universal skills:
 | aget-check-sessions | Session | Monitor sessions directory |
 | aget-save-state | Session | Save workflow state |
 | aget-record-lesson | Evolution | Record lessons learned |
-| aget-capture-observation | Evolution | Capture research observations |
-| aget-studyup | Research | Focused KB research |
+| aget-record-observation | Evolution | Record research observations |
+| aget-study-topic | Research | Focused KB research |
 | aget-create-project | Planning | Create research projects |
 | aget-review-project | Planning | Review project progress |
 | aget-propose-skill | Governance | Propose new skills |

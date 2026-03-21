@@ -1,11 +1,11 @@
-# SKILL-008: aget-capture-observation
+# SKILL-008: aget-record-observation
 # Purpose: Capture research observations without committing specs
 # Created: 2026-02-10
 # Based on: L570, L574, SKILL_SPEC_TEMPLATE.yaml
 
 spec:
   id: SKILL-008
-  name: aget-capture-observation
+  name: aget-record-observation
   version: 1.0.0
   status: production
   created: 2026-02-10
@@ -14,7 +14,7 @@ spec:
   scope: "Capture observations mid-session for later review at wind-down"
 
   traceability:
-    skill_md: ".claude/skills/aget-capture-observation/SKILL.md"
+    skill_md: ".claude/skills/aget-record-observation/SKILL.md"
     l_docs:
       - "L570: Observation Capture Protocol"
       - "L574: Session Continuity"
@@ -27,7 +27,7 @@ spec:
 capabilities:
   CO-001:
     domain: invocation
-    statement: "WHEN user invokes `/aget-capture-observation`, the SKILL shall capture observation to session file."
+    statement: "WHEN user invokes `/aget-record-observation`, the SKILL shall capture observation to session file."
     pattern: event-driven
     trigger: slash_command
     priority: critical
@@ -82,7 +82,7 @@ test_cases:
     capability: "CO-002"
     scenario: "Autonomous signal detection"
     given: "Session with vocabulary candidates discussed"
-    when: "User runs `/aget-capture-observation`"
+    when: "User runs `/aget-record-observation`"
     then: "Vocabulary candidates captured to session file"
     verification_method: "manual"
 
@@ -90,7 +90,7 @@ test_cases:
     capability: "CO-004"
     scenario: "Explicit observation capture"
     given: "User provides 'pattern: Gate discipline'"
-    when: "User runs `/aget-capture-observation 'pattern: Gate discipline'`"
+    when: "User runs `/aget-record-observation 'pattern: Gate discipline'`"
     then: "Captured under Patterns section"
     verification_method: "manual"
 
@@ -98,7 +98,7 @@ test_cases:
     capability: "CO-003"
     scenario: "Time-budget depth scaling"
     given: "User specifies 20min time budget"
-    when: "User runs `/aget-capture-observation 20min`"
+    when: "User runs `/aget-record-observation 20min`"
     then: "Deep analysis with RQ proposals and L-doc candidates"
     verification_method: "manual"
 

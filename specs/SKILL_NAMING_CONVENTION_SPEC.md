@@ -128,7 +128,7 @@ aget-{verb}-{noun}
 | `aget-create-project` | create | project | Create PROJECT_PLAN |
 | `aget-save-state` | save | state | Save workflow state |
 | `aget-review-project` | review | project | Review PROJECT_PLAN |
-| `aget-capture-observation` | capture | observation | Capture observation |
+| `aget-record-observation` | record | observation | Record observation |
 | `aget-wake-up` | wake | up | Session initialization |
 | `aget-wind-down` | wind | down | Session termination |
 | `aget-file-issue` | file | issue | File GitHub issue |
