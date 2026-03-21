@@ -1,0 +1,118 @@
+# SKILL_SPEC_TEMPLATE.yaml
+# Purpose: Structural template for AGET skill specifications
+# Version: 1.0.0
+# Created: 2026-03-21
+# Resolves: #439 (247 broken references across fleet)
+# See: SKILL_VOCABULARY.md, ONTOLOGY_skills.yaml, private-cli-aget SKILL_SPEC_TEMPLATE.md
+
+# ============================================================
+# Usage: Copy this template when creating a new SKILL-xxx spec.
+# Replace all {PLACEHOLDER} values with actual content.
+# Remove this usage comment block after copying.
+# ============================================================
+
+# --- Header (required) ---
+# # SKILL-{NNN}: {skill-name}
+# # Purpose: {1-line purpose}
+# # Created: {YYYY-MM-DD}
+# # Based on: {L-docs}, SKILL_SPEC_TEMPLATE.yaml
+
+spec:
+  # --- Identity (all required) ---
+  id: "SKILL-{NNN}"
+  name: "{aget-skill-name}"
+  version: "1.0.0"
+  status: "production"          # DRAFT | production | DEPRECATED
+  created: "{YYYY-MM-DD}"
+  format: "EARS with controlled vocabulary"
+  category: "{Category}"        # Session | Learning | Governance | Health | Research | Operational
+  scope: "{1-line description of what the skill does}"
+
+  # --- Traceability (required) ---
+  traceability:
+    skill_md: ".claude/skills/{skill-name}/SKILL.md"
+    l_docs:
+      - "L532: Skills vs Learnings Distinction"
+      # Add L-docs that informed this skill's design
+    vocabulary_terms:
+      - "AGET_Skill"
+      - "Skill_Invocation"
+      # Add SKILL_VOCABULARY.md terms this skill implements
+
+# --- Capabilities (required, 1+ entries) ---
+# Each capability is an EARS requirement with a unique prefix-NNN ID.
+# ID prefix convention: 2-letter abbreviation of skill name (e.g., WU for wake-up).
+capabilities:
+  "{PREFIX}-001":
+    domain: "invocation"        # invocation | execution | fallback | output | classification | error_handling | {custom}
+    statement: "WHEN user invokes `/aget-{skill-name}`, the SKILL shall {primary behavior}."
+    pattern: "event-driven"     # event-driven | conditional | ubiquitous | optional
+    trigger: "slash_command"    # slash_command | script_available | script_failure | {custom}
+    priority: "critical"        # critical | high | medium | low
+    inputs:
+      - "User invocation via `/aget-{skill-name}`"
+    outputs:
+      - "{Primary output}"
+    verification: "{How to verify this capability}"
+
+  # Add additional capabilities as needed:
+  # "{PREFIX}-002":
+  #   domain: "execution"
+  #   statement: "..."
+  #   ...
+
+# --- Test Cases (required, 1+ entries) ---
+# Each test case maps to a capability and follows Given/When/Then.
+test_cases:
+  "T-{PREFIX}-001":
+    capability: "{PREFIX}-001"
+    scenario: "{Descriptive scenario name}"
+    given: "{Preconditions}"
+    when: "{Triggering action}"
+    then: "{Expected outcome}"
+    verification_method: "manual"   # manual | automated | spot-check
+
+# --- Constraints (required, 1+ entries) ---
+# Prohibitive requirements: what the skill SHALL NOT do.
+constraints:
+  "C-{PREFIX}-001":
+    statement: "The SKILL shall NOT {prohibited behavior}."
+    rationale: "{Why this constraint exists}"
+
+# ============================================================
+# Template Structure Reference
+# ============================================================
+#
+# Required sections:
+#   spec           - Identity, traceability
+#   capabilities   - EARS behavioral requirements (1+)
+#   test_cases     - Given/When/Then verification (1+)
+#   constraints    - Prohibitive requirements (1+)
+#
+# Optional sections (add as needed):
+#   enhancement_history  - Version changelog
+#   deployment           - Deployment targets and instructions
+#   dependencies         - Other skills or specs required
+#
+# EARS patterns used:
+#   ubiquitous    - "The SKILL shall {behavior}."
+#   event-driven  - "WHEN {trigger}, the SKILL shall {behavior}."
+#   conditional   - "IF {condition}, the SKILL shall {behavior}."
+#   optional      - "The SKILL may {behavior}."
+#   prohibitive   - "The SKILL shall NOT {behavior}."
+#
+# Naming conventions:
+#   Capability IDs: {PREFIX}-{NNN}  (e.g., WU-001, RL-003)
+#   Test IDs:       T-{PREFIX}-{NNN}
+#   Constraint IDs: C-{PREFIX}-{NNN}
+#
+# Design principles (from L-docs):
+#   L561: Prohibitive instructions (~90-100% compliance) > Affirmative (~0%)
+#   L563: Scope stratification: Managed > Personal > Project
+#   L538: Explicit prohibitions resist override; soft constraints yield
+#   L532: Skills = behavioral (SKILL.md); Learnings = knowledge (L-docs)
+#
+# See: SKILL_VOCABULARY.md for controlled vocabulary
+# See: ONTOLOGY_skills.yaml for ontological relationships
+# See: INDEX.md for skill registry
+# ============================================================
