@@ -9,6 +9,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.10.0] - 2026-03-21
+
+**Theme**: Structural Enforcement — converting behavioral governance to structural governance
+
+### Added
+
+- **MUST-invoke directives** in CLAUDE.md for `/aget-create-project` and `/aget-file-issue` — structural prevention of ungoverned project creation and issue filing (D71 Layer 1)
+
+- **Gate Boundary Protocol** in SOP_release_process.md — 6-item checklist requiring plan update + commit as structural proof of gate completion (D71 Layer 2)
+
+- **Skill Completion Signal** pattern in `/aget-create-project` and `/aget-enhance-spec` — signal absence = incomplete execution (D71 Layer 3)
+
+- **Structural Skill Routing table** and **Governance Bypass Detection** in CLAUDE.md — machine-readable routing with 3 bypass-type detection
+
+- **SOP Phase -0.5: Content Sync** in SOP_release_process.md — private→public content synchronization before version bump, 4-item checklist (D69/GOV-040)
+
+- **R-SYNC-002** spec — 6 EARS requirements governing 4 artifact types (scripts, SOPs, specs, templates) with security scan + sync manifest
+
+- **validate_content_sync.py** — validates file-by-file sync between private and public repos
+
+- **validate_changelogs.py** — validates CHANGELOG.md consistency across all repos for a target version
+
+- **SYNC_MANIFEST template** — tracks sync pairs with security scan status per release
+
+- **SKILL_SPEC_TEMPLATE.yaml** deployed to all 12 templates (#439)
+
+- **Structural Trigger Conditions** in PATTERN_step_back_review_kb — gate completion, assumption-changing findings, boundary slack detection
+
+### Changed
+
+- **Skill renames** (#480): `aget-capture-observation` → `aget-record-observation`, `aget-capture-nugget` → `aget-record-nugget`, `aget-study-up` → `aget-study-topic` — 633 refs + 30 dirs across 14 repos
+
+- **`capture` verb retired** from Learning family, replaced by `record` (CS-002 conformance)
+
+- **Gate Execution Discipline (L001)** strengthened: MUST update plan + MUST commit at every gate boundary
+
+### Fixed
+
+- **Template hygiene** (#574): VERSION, setup.py classifier, SECURITY.md version corrected in 4 templates
+
+- **wind_down.py**: smarter status detection (first 30 lines), new `scan_nuggets()` function
+
 ## [3.9.0] - 2026-03-15
 
 **Theme**: Governance Enforcement — release readiness, version management, process standardization

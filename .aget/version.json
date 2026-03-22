@@ -1,7 +1,7 @@
 {
-  "aget_version": "3.9.0",
+  "aget_version": "3.10.0",
   "created": "2025-09-21",
-  "updated": "2026-03-14",
+  "updated": "2026-03-21",
   "component": "core",
   "description": "AGET Framework Core - Specifications, templates, and validation",
   "repository": "aget-framework/aget",
@@ -25,7 +25,8 @@
     "v3.5.0 -> v3.6.0: 2026-02-21 (Infrastructure Maturation)",
     "v3.6.0 -> v3.7.0: 2026-03-01",
     "v3.7.0 -> v3.8.0: 2026-03-08",
-    "v3.8.0 -> v3.9.0: 2026-03-14"
+    "v3.8.0 -> v3.9.0: 2026-03-14",
+    "v3.9.0 -> v3.10.0: 2026-03-21"
   ],
   "contents": {
     "specs/": "Canonical specifications (AGET_VERSIONING_CONVENTIONS, etc.)",
