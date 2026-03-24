@@ -1,6 +1,6 @@
 ---
 name: aget-file-issue
-description: File issues with L520 governance compliance
+description: File GitHub issues with private-first routing (L638). ALL agents route to gmelli/aget-aget. Public issues require promotion with principal approval.
 archetype: universal
 allowed-tools:
   - Bash
@@ -10,13 +10,13 @@ allowed-tools:
 
 # /aget-file-issue
 
-File issues to appropriate repositories with L520 governance compliance (routing + sanitization).
+File issues with private-first routing governance (L638). ALL issues go to `gmelli/aget-aget`. Public issues on `aget-framework/aget` require explicit promotion.
 
 ## Purpose
 
 Structured issue filing with:
-- Automatic destination routing based on agent type
-- Content sanitization for public issues
+- Private-first routing: ALL agents → `gmelli/aget-aget` (L638)
+- Content sanitization at promotion boundary only
 - Template selection (enhancement, bug, feature)
 
 ## Input
@@ -48,58 +48,37 @@ else
 fi
 ```
 
-### Step 2: Determine Destination
+### Step 2: Route to Private Tracker
 
-| Agent Type | Destination |
-|------------|-------------|
-| Private Fleet | `gmelli/aget-aget` |
-| Public/Remote | `aget-framework/aget` |
+**ALL agents route to `gmelli/aget-aget`** (L638 private-first routing).
 
-### Step 3: Prepare Content
+Agent type detection is retained for metadata tagging, but does NOT affect routing destination. Under the v2.0.0 policy, all agents — private fleet and public/remote — file to the private tracker.
 
-For private agents filing to public repo, sanitize:
-
-| Pattern | Replacement |
-|---------|-------------|
-| `private-*-aget` | `[PRIVATE-AGENT]` |
-| `private-*-AGET` | `[PRIVATE-AGENT]` |
-| `gmelli/*` | `[INTERNAL-REPO]` |
-| `\d+ agents? in fleet` | `[N agents]` |
-| `SESSION_\d{4}-\d{2}-\d{2}` | `[SESSION]` |
-
-### Step 4: Validate
+### Step 3: Validate
 
 Check required fields:
 - Title present
 - Type valid (enhancement, bug, feature)
 - Body not empty (for bugs)
 
-### Step 5: File Issue
+### Step 4: File Issue
 
 ```bash
-# Private fleet agent
+# ALL agents — private-first routing (L638)
 gh issue create \
   --repo gmelli/aget-aget \
   --title "$TITLE" \
   --body "$BODY" \
   --label "type:$TYPE"
-
-# Public/remote agent (sanitized)
-gh issue create \
-  --repo aget-framework/aget \
-  --title "$TITLE" \
-  --body "$SANITIZED_BODY" \
-  --label "type:$TYPE"
 ```
 
-### Step 6: Report
+### Step 5: Report
 
 Output:
 ```
 Issue filed: <URL>
-Destination: <repo>
+Destination: gmelli/aget-aget
 Type: <type>
-Sanitization: <applied/not-needed>
 ```
 
 ## Output Format
@@ -109,26 +88,44 @@ Sanitization: <applied/not-needed>
 
 | Field | Value |
 |-------|-------|
-| URL | https://github.com/aget-framework/aget/issues/123 |
-| Destination | aget-framework/aget |
+| URL | https://github.com/gmelli/aget-aget/issues/456 |
+| Destination | gmelli/aget-aget |
 | Type | enhancement |
-| Sanitization | applied |
-
-**Content Sanitized**:
-- 2 private agent names redacted
-- 1 internal repo reference redacted
 ```
+
+## Promotion to Public (Separate Workflow)
+
+To make a private issue publicly visible on `aget-framework/aget`:
+
+1. Get **principal approval** (R-ISSUE-011)
+2. Run sanitization check (R-ISSUE-012):
+   ```bash
+   echo "issue body" | python3 .aget/patterns/github/sanitize_issue_content.py --check
+   ```
+3. Create public issue with **source reference** (R-ISSUE-013)
+4. Verify **no private identifiers** in promoted content (R-ISSUE-014)
+
+### Sanitization Patterns (Promotion Boundary Only)
+
+| Pattern | Replacement |
+|---------|-------------|
+| `private-*-aget` | `[PRIVATE-AGENT]` |
+| `private-*-AGET` | `[PRIVATE-AGENT]` |
+| `gmelli/*` | `[INTERNAL-REPO]` |
+| `\d+ agents? in fleet` | `[N agents]` |
+| `SESSION_\d{4}-\d{2}-\d{2}` | `[SESSION]` |
+| `FLEET-\w+-\d+` | `[PROJECT-ID]` |
 
 ## Constraints
 
 These are INVIOLABLE:
 
-- **C1**: NEVER file to public repo from private agent without sanitization
-- **C2**: NEVER include private agent names (`private-*-aget`, `private-*-AGET`) in public issues
-- **C3**: NEVER include fleet size disclosures in public issues
-- **C4**: NEVER include internal repo references (`gmelli/*`) in public issues
-- **C5**: ALWAYS validate destination before filing
-- **C6**: ALWAYS report sanitization actions taken
+- **C1**: NEVER file directly to `aget-framework/aget` — ALL issues go to `gmelli/aget-aget`
+- **C2**: NEVER include private agent names in promoted public issues
+- **C3**: NEVER include fleet size disclosures in promoted public issues
+- **C4**: NEVER include internal repo references in promoted public issues
+- **C5**: ALWAYS route to `gmelli/aget-aget` regardless of agent type
+- **C6**: ALWAYS validate destination before filing
 
 ## Examples
 
@@ -146,13 +143,11 @@ These are INVIOLABLE:
 /aget-file-issue bug Template fails on Windows
 ```
 
-**Result**: Files to `aget-framework/aget` (sanitization checked, none needed)
+**Result**: Files to `gmelli/aget-aget` (same destination — L638 private-first)
 
-### Example 3: Private Agent with Sensitive Content
+### Example 3: Promoting a Private Issue
 
-If body contains `private-work-supervisor-AGET noticed an issue...`:
-
-**Result**: Sanitized to `[PRIVATE-AGENT] noticed an issue...` before filing to public repo
+After principal approval, sanitized content filed to `aget-framework/aget` with reference to source issue in `gmelli/aget-aget`.
 
 ## Error Handling
 
@@ -162,13 +157,13 @@ If body contains `private-work-supervisor-AGET noticed an issue...`:
 | Not authenticated | "Error: gh not authenticated. Run: gh auth login" |
 | Missing title | "Error: Title required. Usage: /aget-file-issue <type> <title>" |
 | Invalid type | "Error: Invalid type. Use: enhancement, bug, feature" |
-| Sanitization failed | "Error: Could not sanitize. Review content manually." |
 
 ## Related
 
 - L520: Issue Governance Gap
-- AGET_ISSUE_GOVERNANCE_SPEC: R-ISSUE-001 through R-ISSUE-010
-- SKILL-040: aget-file-issue specification
+- L638: Private-First Issue Routing
+- AGET_ISSUE_GOVERNANCE_SPEC v2.0.0: R-ISSUE-001 through R-ISSUE-014
+- SKILL-040: aget-file-issue specification v1.1.0
 - validate_issue_destination.py
 - sanitize_issue_content.py
 
@@ -176,12 +171,12 @@ If body contains `private-work-supervisor-AGET noticed an issue...`:
 
 | Link | Reference |
 |------|-----------|
-| Spec | SKILL-040_aget-file-issue.yaml |
-| L-doc | L520 (Issue Governance Gap) |
-| Project | PROJECT_PLAN_archetype_customization_v3.5_v1.0.md Gate 6 |
+| Spec | SKILL-040_aget-file-issue.yaml v1.1.0 |
+| L-doc | L520 (Issue Governance Gap), L638 (Private-First Routing) |
+| Governing Spec | AGET_ISSUE_GOVERNANCE_SPEC v2.0.0 |
 
 ---
 
-*aget-file-issue v1.0.0*
+*aget-file-issue v1.1.0*
 *Category: Governance*
-*Archetype: Universal (14th universal skill)*
+*Archetype: Universal*
