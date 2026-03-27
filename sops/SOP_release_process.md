@@ -2683,6 +2683,83 @@ python3 scripts/deployment_monitor.py --confirm --version X.Y.Z --deployer "supe
 
 ---
 
+#### 7.4. Stability Certification (L721)
+
+**When**: AFTER local fleet deployment is COMPLETE with 0 rollbacks AND all hotfix cycles are closed. BEFORE announcing to remote/external fleet supervisors.
+
+**Purpose**: Formalize the moment when a release is declared "stable for external fleet consumption." Without this gate, "released + locally deployed" is conflated with "stable for remote announcement" — but v3.10.0 demonstrated that two hotfix cycles can occur between these states.
+
+**Rationale** (L721): The release SOP had gates for release execution (Phase 5), handoff creation (Phase 6), and deployment monitoring (Phase 7.3), but no gate for declaring stability. The gap between "locally deployed" and "externally announced" was unstructured. Three classes of evidence must accumulate:
+
+| Evidence Class | Criterion | V-Test |
+|----------------|-----------|--------|
+| Validation | Post-release validators PASS, contract tests green | `python3 -m pytest tests/ -q` exit 0 |
+| Deployment | Local fleet deployment COMPLETE, 0 rollbacks, hotfix cycle closed | Pilot tracking table shows 100% local fleet |
+| Parity | Template-fleet parity verified (templates match fleet state) | Phase 6.3 template-fleet parity V-test PASS |
+
+**Steps**:
+
+1. Verify all 3 evidence classes have PASS results
+2. Verify no open hotfix PROJECT_PLANs targeting this version:
+   ```bash
+   grep -l "status:.*\(active\|in.progress\|pending\)" planning/PROJECT_PLAN_*hotfix* 2>/dev/null | wc -l
+   # Expected: 0
+   ```
+3. Update handoff pilot tracking with local fleet results
+4. Record stability certification date in handoff footer
+
+**Output**: Handoff footer amended with stability certification date. Release is now cleared for remote/external fleet announcement.
+
+**Checkpoint**: Stability certified. Remote fleet supervisors may now be notified.
+
+---
+
+#### 7.5. Next Release Seeding (L738 — BLOCKING)
+
+**When**: AFTER stability certification (7.4) AND deployment verification GREEN (7.3). This phase is STRUCTURAL — always executes. Not discretionary.
+
+**Purpose**: Ensure the next release cycle is structurally initiated before the current release's context dissipates. Without this phase, the RELEASE_BRIDGE is a passive artifact that classifies follow-on items but triggers nothing — the bridge-to-scope handoff depends on someone organically saying "let's start the next release."
+
+**Rationale** (L738): The SOP had gates for bridge creation (7.1), prior release research (7.2), and stability certification (7.4), but no gate for *initiating* the next release. The trigger chain was: bridge exists → someone proposes new version → Phase 0 runs. The middle step ("someone proposes") is unstructured. This phase makes it structural.
+
+**Steps**:
+
+1. Determine next version number:
+   - If RELEASE_BRIDGE follow-on items include breaking changes → MAJOR bump
+   - If RELEASE_BRIDGE follow-on items are features/improvements → MINOR bump
+   - Default: MINOR bump (vX.Y+1.0)
+
+2. Create `planning/VERSION_SCOPE_v{NEXT}.md` from `planning/TEMPLATE_VERSION_SCOPE.md` in DRAFT status
+
+3. Seed with RELEASE_BRIDGE follow-on items:
+   - Import all P1 items first
+   - Import P2/P3 items
+   - Apply Deferral_Staleness pre-check (items deferred 2+ consecutive releases)
+   - Apply velocity calibration from bridge data to effort estimates
+
+4. Execute `aget/sops/SOP_release_scope_decision.md` Phase 0 (Scope_Initialization)
+
+5. Log completion in RELEASE_BRIDGE: append row to Wind-Down Markers table:
+   ```
+   | VERSION_SCOPE seeded | ✅ | VERSION_SCOPE_v{NEXT}.md (DRAFT) |
+   ```
+
+**Verification**:
+```bash
+# VERSION_SCOPE for next version exists
+ls planning/VERSION_SCOPE_v*.md | tail -1
+# Contains DRAFT status
+grep -q "DRAFT" planning/VERSION_SCOPE_v*.md | tail -1 && echo "PASS" || echo "FAIL"
+```
+
+**Output**: `VERSION_SCOPE_v{NEXT}.md` exists in DRAFT. Next release cycle is structurally initiated.
+
+**Checkpoint**: Next release VERSION_SCOPE created and seeded. Bridge-to-scope handoff complete.
+
+**Implements**: L738 (Next Release Initiation Gap)
+
+---
+
 ## Rollback
 
 If release has issues:
