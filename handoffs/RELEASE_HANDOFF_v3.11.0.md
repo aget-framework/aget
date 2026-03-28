@@ -3,7 +3,7 @@
 **Version**: 3.11.0
 **Released**: 2026-03-28
 **Breaking Changes**: No
-**Framework Manager**: private-aget-framework-AGET
+**Framework Manager**: aget-framework release manager
 **DEPLOYMENT_SPEC**: `specs/DEPLOYMENT_SPEC_v3.11.0.yaml`
 **Theme**: Skill Conformance, Configuration & Requirements Formalization
 
@@ -161,7 +161,7 @@ v3.11.0 is available. Key items for your fleet:
 
 | Agent | Version | Date | Status | Notes |
 |-------|---------|------|--------|-------|
-| private-aget-framework-AGET | 3.11.0 | 2026-03-28 | DEPLOYED | Self-upgrade, managing agent |
+| aget-framework release manager | 3.11.0 | 2026-03-28 | DEPLOYED | Self-upgrade, managing agent |
 | | | | | |
 
 ---
