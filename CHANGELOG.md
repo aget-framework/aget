@@ -9,6 +9,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.11.0] - 2026-03-28
+
+**Theme**: Skill Conformance, Configuration & Requirements Formalization
+
+### Added
+
+- **Requirements directory** (`requirements/`): New human-level requirements layer per L742 two-level model. REQUIREMENTS_FORMAT.md v1.0 defines the format. REQ-REL v1.1.0 is the first exemplar (6 functional + 3 quality requirements for release quality). (#725)
+- **Hooks directory** (`.claude/hooks/`): Scaffolded across all 12 templates with README. HOOK_ADOPTION_GUIDE.md published. ADR-008 Generator level infrastructure. (#505)
+- **Governance intensity field**: All 12 template AGENTS.md files now declare `governance_intensity` (Rigorous/Standard/Lightweight). 6/12 contract tests added. (#732)
+- **Pre-push hook** (`push_window_guard.sh`): Blocks non-Saturday pushes to aget-framework repos. ADR-008 Generator level. (#672)
+- **Homepage roadmap section**: "What's Next" section in README.md. (#637)
+- **DEPLOYMENT_SPEC_v3.11.0.yaml**: State specification for v3.11.0 deployment verification.
+
+### Changed
+
+- **AGET_RELEASE_SPEC** v1.10.0 → v1.11.0: Added Requirements Grounding section (L742). First bidirectional requirements ↔ spec traceability. Maps 9 REQ-REL requirements to 27 CAP-RELs.
+- **17 skill instructions remediated** for L736 conformance (SICR, #678). Assert-before-verify anti-pattern eliminated across all SKILL.md files.
+- **"sanity check" → "health check"** terminology: 72 references updated across 12 files. (#658)
+- **study_up.py**: Fixed punctuation token filter + 2-keyword threshold for cross-cutting topics. (#731)
+- **REQ-REL** v1.0.0 → v1.1.0: Added CAP-REL traceability column. Status draft → proposed.
+
+### Fixed
+
+- **Phantom traceability**: 2 phantom CAP references cleaned (CAP-CLI-082/083, CAP-SKILL-005-001..011). (#552)
+- **wind_down.py** content sync: sanity → health terminology aligned between private and public copies.
+
+---
+
 ## [3.10.0] - 2026-03-21
 
 **Theme**: Structural Enforcement — converting behavioral governance to structural governance

@@ -1,6 +1,6 @@
 # AGET Release Specification
 
-**Version**: 1.10.0
+**Version**: 1.11.0
 **Status**: Active
 **Category**: Process (Release Management)
 **Format Version**: 1.2
@@ -1157,6 +1157,39 @@ authority:
 
 ---
 
+## Requirements Grounding (L742)
+
+Per the two-level model (L742): requirements define principal intent (human level); specifications define testable contracts (contract level). This spec traces to `requirements/REQ-REL_release_quality.md`.
+
+| Requirement | Title | CAP-REL Coverage |
+|-------------|-------|-----------------|
+| REQ-REL-F-001 | Release Readiness Gate | CAP-REL-001, CAP-REL-009, CAP-REL-012 |
+| REQ-REL-F-002 | Handoff Completeness | CAP-REL-020, CAP-REL-007 |
+| REQ-REL-F-003 | Stability Certification | CAP-REL-027, CAP-REL-016 |
+| REQ-REL-F-004 | Template-Fleet Content Parity | CAP-REL-004, CAP-REL-024 |
+| REQ-REL-F-005 | Post-Release Validation | CAP-REL-009, CAP-REL-021, CAP-REL-025 |
+| REQ-REL-F-006 | Version Scope Pre-Release Audit | CAP-REL-012, CAP-REL-013, CAP-REL-014 |
+| REQ-REL-Q-001 | Release Predictability | CAP-REL-011 (timing), SOP velocity tracking |
+| REQ-REL-Q-002 | Downstream Executability | CAP-REL-020, CAP-REL-007 |
+| REQ-REL-Q-003 | Zero-Hotfix Release Target | CAP-REL-009, CAP-REL-021-025 (observability) |
+
+**Uncovered CAP-RELs** (no upward requirement yet — candidates for REQ-REL v1.1):
+- CAP-REL-002 (Version Numbering) — SemVer is an industry standard, not a principal requirement
+- CAP-REL-003 (Manager Migration) — operational detail, not principal intent
+- CAP-REL-005 (CHANGELOG) — documentation format, subsumed by F-002/Q-002
+- CAP-REL-006 (GitHub Releases) — delivery channel, subsumed by F-002
+- CAP-REL-008 (Homepage Update) — subsumed by F-002
+- CAP-REL-010 (Version Ceiling) — architectural constraint
+- CAP-REL-015 (Rollback Plan) — operational detail
+- CAP-REL-017/018 (VERSION_SCOPE compliance/reconstruction) — administrative
+- CAP-REL-019 (Feature-Descriptive Review) — review process detail
+- CAP-REL-022/023 (Gate Enforcement, Snapshots) — observability infrastructure
+- CAP-REL-026 (Command Hazards) — operational safety
+
+**Note**: Not every CAP-REL needs a requirement. Specs may contain implementation-level details (operational constraints, format standards) that don't map to principal-level requirements. The traceability table above captures the meaningful upward links.
+
+---
+
 ## References
 
 - L358: Release Artifact Gaps
@@ -1176,6 +1209,14 @@ authority:
 ---
 
 ## Changelog
+
+### v1.11.0 (2026-03-28)
+
+- Added Requirements Grounding section (L742 two-level model)
+- Maps 9 REQ-REL requirements → CAP-REL coverage
+- Identifies 11 uncovered CAP-RELs (operational/format details without principal-level requirements)
+- First spec to implement bidirectional requirements ↔ spec traceability
+- See: requirements/REQ-REL_release_quality.md, L742, #725
 
 ### v1.10.0 (2026-03-08)
 

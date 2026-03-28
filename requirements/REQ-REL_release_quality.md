@@ -1,8 +1,8 @@
 # REQ-REL: Release Quality Requirements
 
-**Version**: 1.0.0
+**Version**: 1.1.0
 **Date**: 2026-03-28
-**Status**: proposed
+**Status**: proposed (wired to AGET_RELEASE_SPEC v1.11.0)
 **Domain**: REL (Release Management)
 **Format**: REQUIREMENTS_FORMAT v1.0 (requirements/REQUIREMENTS_FORMAT.md)
 **Specifications**: AGET_RELEASE_SPEC.md, SOP_release_process.md, RUBRIC_release_handoff_quality_v1.0.md
@@ -48,7 +48,7 @@ priority: P0
 specifications:
   - R-REL-025 (Release Readiness)
   - SOP Phase -1
-status: draft
+status: proposed
 originator: operational-evidence
 ```
 
@@ -79,7 +79,7 @@ specifications:
   - SOP Phase 5.3 (DEPLOYMENT_SPEC — BLOCKING)
   - SOP Phase 6.3 (Handoff Template Conformance V-test)
   - RUBRIC_release_handoff_quality_v1.0.md
-status: draft
+status: proposed
 originator: operational-evidence
 ```
 
@@ -109,7 +109,7 @@ fit_criterion: >
 priority: P0
 specifications:
   - SOP Phase 7.4 (Stability Certification Gate)
-status: draft
+status: proposed
 originator: operational-evidence
 ```
 
@@ -140,7 +140,7 @@ priority: P1
 specifications:
   - R-SYNC-002 (Content Sync)
   - SOP Phase -0.5 (Dual-Repo Sync)
-status: draft
+status: proposed
 originator: operational-evidence
 ```
 
@@ -171,7 +171,7 @@ priority: P1
 specifications:
   - SOP Phase 4.3 (Post-Release Validation — BLOCKING)
   - R-REL-025-029
-status: draft
+status: proposed
 originator: operational-evidence
 ```
 
@@ -202,7 +202,7 @@ priority: P2
 specifications:
   - SOP Phase 0 (Scope Initialization)
   - VERSION_SCOPE template
-status: draft
+status: proposed
 originator: operational-evidence
 ```
 
@@ -233,7 +233,7 @@ fit_criterion: >
   releases.
 priority: P2
 specifications: []
-status: draft
+status: proposed
 originator: operational-evidence
 ```
 
@@ -263,7 +263,7 @@ fit_criterion: >
 priority: P1
 specifications:
   - RUBRIC_release_handoff_quality D4 (Downstream Executability)
-status: draft
+status: proposed
 originator: operational-evidence
 ```
 
@@ -293,7 +293,7 @@ fit_criterion: >
 priority: P2
 specifications:
   - SOP Phase 7.4 (Stability Certification)
-status: draft
+status: proposed
 originator: operational-evidence
 ```
 
@@ -313,17 +313,17 @@ originator: operational-evidence
 
 ## Traceability
 
-| Requirement | Specification(s) | Rubric Dimension |
-|-------------|-------------------|-----------------|
-| REQ-REL-F-001 | R-REL-025, SOP Phase -1 | — |
-| REQ-REL-F-002 | R-REL-019, SOP Phase 5.3/6.3 | RUBRIC_release_handoff D1-D4 |
-| REQ-REL-F-003 | SOP Phase 7.4 | — |
-| REQ-REL-F-004 | R-SYNC-002, SOP Phase -0.5 | — |
-| REQ-REL-F-005 | SOP Phase 4.3, R-REL-025-029 | — |
-| REQ-REL-F-006 | SOP Phase 0, VERSION_SCOPE | — |
-| REQ-REL-Q-001 | RELEASE_BRIDGE velocity | — |
-| REQ-REL-Q-002 | RUBRIC D4 | RUBRIC_release_handoff D4 |
-| REQ-REL-Q-003 | SOP Phase 7.4 | — |
+| Requirement | Specification(s) | CAP-REL Coverage | Rubric Dimension |
+|-------------|-------------------|-----------------|-----------------|
+| REQ-REL-F-001 | R-REL-025, SOP Phase -1 | CAP-REL-001, CAP-REL-009, CAP-REL-012 | — |
+| REQ-REL-F-002 | R-REL-019, SOP Phase 5.3/6.3 | CAP-REL-020, CAP-REL-007 | RUBRIC_release_handoff D1-D4 |
+| REQ-REL-F-003 | SOP Phase 7.4 | CAP-REL-027, CAP-REL-016 | — |
+| REQ-REL-F-004 | R-SYNC-002, SOP Phase -0.5 | CAP-REL-004, CAP-REL-024 | — |
+| REQ-REL-F-005 | SOP Phase 4.3, R-REL-025-029 | CAP-REL-009, CAP-REL-021, CAP-REL-025 | — |
+| REQ-REL-F-006 | SOP Phase 0, VERSION_SCOPE | CAP-REL-012, CAP-REL-013, CAP-REL-014 | — |
+| REQ-REL-Q-001 | RELEASE_BRIDGE velocity | CAP-REL-011 | — |
+| REQ-REL-Q-002 | RUBRIC D4 | CAP-REL-020, CAP-REL-007 | RUBRIC_release_handoff D4 |
+| REQ-REL-Q-003 | SOP Phase 7.4 | CAP-REL-009, CAP-REL-021—025 | — |
 
 ---
 

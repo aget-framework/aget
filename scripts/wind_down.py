@@ -2,14 +2,14 @@
 """
 Wind Down Protocol - Canonical Framework Script
 
-End session for any AGET agent with proper state capture and sanity checks.
+End session for any AGET agent with proper state capture and health checks.
 Designed to work across CLI agents (Claude Code, Codex CLI, Cursor, etc.).
 
 Implements:
     CAP-SESSION-003 (Wind Down Protocol), R-WIND-001-*
     CAP-SESSION-005 (Mandatory Handoff Trigger)
     CAP-SESSION-010 (Re-entrancy Guard)
-    CAP-SESSION-012 (Sanity Gate)
+    CAP-SESSION-012 (Health Gate)
 Patterns: L038 (Agent-Agnostic), L021 (Verify-Before-Modify), L039 (Diagnostic Efficiency)
 Extension: WD-008 (Extension Hook per SKILL-002 v1.1.0)
 
@@ -19,12 +19,12 @@ Usage:
     python3 wind_down.py --json --pretty    # Pretty-printed JSON
     python3 wind_down.py --dir /path/agent  # Run on specific agent
     python3 wind_down.py --notes "..."      # Add handoff notes
-    python3 wind_down.py --skip-sanity      # Skip sanity check (not recommended)
+    python3 wind_down.py --skip-health      # Skip health check (not recommended)
     python3 wind_down.py --force            # Bypass re-entrancy guard (L468)
     python3 wind_down.py --verify           # Migration verification (L491)
 
 Exit codes:
-    0: Clean close (sanity healthy)
+    0: Clean close (health check passed)
     1: Close with warnings
     2: Close with errors (requires acknowledgment in interactive mode)
     3: Configuration error
@@ -34,7 +34,7 @@ L021 Verification Table:
     | Check | Resource | Before Action |
     |-------|----------|---------------|
     | 1 | session_state.json | Load to calculate duration |
-    | 2 | housekeeping | Run sanity check before summary |
+    | 2 | housekeeping | Run health check before summary |
     | 3 | planning/ | Scan for pending work |
     | 4 | sessions/ | Verify exists before writing |
 
@@ -172,8 +172,8 @@ def load_json_file(path: Path, default: Any = None) -> Any:
         return default
 
 
-def run_sanity_check(agent_path: Path, verbose: bool = False) -> Dict[str, Any]:
-    """CAP-SESSION-012: Run housekeeping sanity check before wind-down."""
+def run_health_check(agent_path: Path, verbose: bool = False) -> Dict[str, Any]:
+    """CAP-SESSION-012: Run housekeeping health check before wind-down."""
     script_locations = [
         agent_path / 'scripts' / 'aget_housekeeping_protocol.py',
         agent_path / '.aget' / 'patterns' / 'session' / 'aget_housekeeping_protocol.py',
@@ -193,7 +193,7 @@ def run_sanity_check(agent_path: Path, verbose: bool = False) -> Dict[str, Any]:
             'checks_total': 0,
             'warnings': 0,
             'errors': 0,
-            'message': 'No sanity check script found',
+            'message': 'No health check script found',
         }
 
     try:
@@ -415,7 +415,7 @@ status: completed
 
 
 def get_wind_down_data(agent_path: Path,
-                       skip_sanity: bool = False,
+                       skip_health: bool = False,
                        handoff_notes: str = "",
                        verbose: bool = False) -> Dict[str, Any]:
     """Gather all data needed for wind down output."""
@@ -429,7 +429,7 @@ def get_wind_down_data(agent_path: Path,
             'started': None,
             'duration_seconds': None,
         },
-        'sanity_check': {},
+        'health_check': {},
         'pending_work': [],
         'uncommitted_changes': [],
         'handoff_notes': handoff_notes,
@@ -450,8 +450,8 @@ def get_wind_down_data(agent_path: Path,
             pass
 
     # L021 Check 2: Sanity check (CAP-SESSION-012)
-    if skip_sanity:
-        data['sanity_check'] = {
+    if skip_health:
+        data['health_check'] = {
             'status': 'skipped',
             'checks_passed': 0,
             'checks_total': 0,
@@ -461,8 +461,8 @@ def get_wind_down_data(agent_path: Path,
         }
     else:
         if verbose:
-            log_diagnostic("Running sanity check...")
-        data['sanity_check'] = run_sanity_check(agent_path, verbose)
+            log_diagnostic("Running health check...")
+        data['health_check'] = run_health_check(agent_path, verbose)
 
     # L021 Check 3: Pending work
     data['pending_work'] = scan_pending_work(agent_path)
@@ -481,8 +481,8 @@ def get_wind_down_data(agent_path: Path,
             data['session_file'] = session_file
 
     # Determine clean close
-    sanity_status = data['sanity_check'].get('status', 'unknown')
-    if sanity_status == 'error':
+    health_status = data['health_check'].get('status', 'unknown')
+    if health_status == 'error':
         data['clean_close'] = False
 
     # Load agent identity for display
@@ -550,10 +550,10 @@ def format_human_output(data: Dict[str, Any]) -> str:
     lines.append("")
 
     # Sanity check
-    sanity = data['sanity_check']
-    status = sanity.get('status', 'unknown')
-    passed = sanity.get('checks_passed', 0)
-    total = sanity.get('checks_total', 0)
+    health = data['health_check']
+    status = health.get('status', 'unknown')
+    passed = health.get('checks_passed', 0)
+    total = health.get('checks_total', 0)
 
     if status == 'healthy':
         lines.append(f"Sanity Gate: Sanity check passed ({passed}/{total})")
@@ -631,7 +631,7 @@ def main():
         epilog="""
 L021 Verification Table:
   1. session_state.json - Load to calculate duration
-  2. housekeeping - Run sanity check before summary
+  2. housekeeping - Run health check before summary
   3. planning/ - Scan for pending work
   4. sessions/ - Verify exists before writing
 
@@ -660,8 +660,8 @@ Exit codes:
         help='Handoff notes for next session',
     )
     parser.add_argument(
-        '--skip-sanity', action='store_true',
-        help='Skip sanity check (not recommended)',
+        '--skip-health', action='store_true',
+        help='Skip health check (not recommended)',
     )
     parser.add_argument(
         '--force', action='store_true',
@@ -731,7 +731,7 @@ Exit codes:
         # Gather data
         data = get_wind_down_data(
             agent_path,
-            skip_sanity=args.skip_sanity,
+            skip_health=args.skip_health,
             handoff_notes=args.notes,
             verbose=args.verbose,
         )
@@ -755,13 +755,13 @@ Exit codes:
             elapsed = (time.time() - _start_time) * 1000
             log_diagnostic(f"Complete in {elapsed:.0f}ms")
 
-        # Exit code based on sanity status
+        # Exit code based on health check status
         # Only errors (broken state) produce non-zero exit codes.
         # Warnings are informational and already printed in output —
         # returning exit 1 for persistent warnings (e.g., skill drift)
         # trains users to ignore exit codes, defeating their purpose.
-        sanity_status = data['sanity_check'].get('status', 'unknown')
-        if sanity_status == 'error':
+        health_status = data['health_check'].get('status', 'unknown')
+        if health_status == 'error':
             return 2
         return 0
 
