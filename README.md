@@ -148,12 +148,11 @@ See [GETTING_STARTED.md](GETTING_STARTED.md) for archetype selection guidance.
 
 ## What's Next
 
-**v3.11.0** — Skill Conformance, Configuration & Requirements Formalization
+**v3.12.0** — Homepage Rewrite, Configuration Enhancement & Issue Management
 
-- **Requirements layer**: Published human-level requirements alongside specifications
-- **Hook adoption**: Lifecycle automation via platform-native hooks
-- **Configuration enhancement**: Tiered configuration system
-- **Terminology modernization**: Inclusive language across the framework
+- **Homepage rewrite**: Principal's voice, pain-point framing, quick-start experience
+- **Configuration enhancement**: `/aget-enhance-config` tiered configuration system
+- **Issue management**: Ontology expansion, governance spec v2.1.0, triage automation
 
 See the [Issues page](https://github.com/aget-framework/aget/issues) for the full backlog.
 
