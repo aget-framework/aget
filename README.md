@@ -6,9 +6,9 @@
 
 ## What is AGET?
 
-**The problem**: AI coding agents lose context between sessions. Knowledge resets daily. Agents can't learn from each other. There's no way to coordinate a fleet of agents with confidence.
+**Solve**: Lost context between sessions, knowledge that resets daily, agents that can't learn from each other, deployment confidence across your fleet.
 
-AGET solves this with persistent domain knowledge, shared memory architecture, fleet coordination, and human-supervised autonomy patterns — all working across CLI agent platforms. Governance ensures knowledge accumulates reliably. Works with Claude Code, Codex CLI, and Gemini CLI ([support matrix](docs/AGET_CLI_SUPPORT_MATRIX.md)).
+AGET provides persistent domain knowledge, shared memory architecture, fleet coordination, and human-supervised autonomy patterns across CLI agent platforms. Governance ensures knowledge accumulates reliably. Works with Claude Code, Codex CLI, and Gemini CLI ([support matrix](docs/AGET_CLI_SUPPORT_MATRIX.md)).
 
 ## Philosophy
 
