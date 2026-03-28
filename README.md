@@ -146,6 +146,17 @@ See [GETTING_STARTED.md](GETTING_STARTED.md) for archetype selection guidance.
 | `sanity check` | Sanity_Check_Protocol | Verify agent health |
 | `wind down` | Wind_Down_Protocol | End session, create handoff |
 
+## What's Next
+
+**v3.11.0** — Skill Conformance, Configuration & Requirements Formalization
+
+- **Requirements layer**: Published human-level requirements alongside specifications
+- **Hook adoption**: Lifecycle automation via platform-native hooks
+- **Configuration enhancement**: Tiered configuration system
+- **Terminology modernization**: Inclusive language across the framework
+
+See the [Issues page](https://github.com/aget-framework/aget/issues) for the full backlog.
+
 ## Contributing
 
 Contributions welcome! See the [Issues page](https://github.com/aget-framework/aget/issues) to report bugs or suggest features.
