@@ -6,11 +6,9 @@
 
 ## What is AGET?
 
-AGET enables AI agents that build persistent domain knowledge serving
-human decisions. It provides session continuity, shared memory architecture,
-fleet coordination, and human-supervised autonomy patterns that work
-across CLI agent platforms. Governance ensures knowledge accumulates
-reliably. Validated platforms include Claude Code, Codex CLI, and Gemini CLI.
+**The problem**: AI coding agents lose context between sessions. Knowledge resets daily. Agents can't learn from each other. There's no way to coordinate a fleet of agents with confidence.
+
+AGET solves this with persistent domain knowledge, shared memory architecture, fleet coordination, and human-supervised autonomy patterns — all working across CLI agent platforms. Governance ensures knowledge accumulates reliably. Works with Claude Code, Codex CLI, and Gemini CLI ([support matrix](docs/AGET_CLI_SUPPORT_MATRIX.md)).
 
 ## Philosophy
 
@@ -48,13 +46,13 @@ See [CLI Support Matrix](docs/AGET_CLI_SUPPORT_MATRIX.md) for detailed validatio
 
 ## Key Features
 
-- **Persistent Domain Knowledge**: Agents accumulate expertise that compounds across sessions
-- **Memory Architecture**: KB as shared collaboration substrate
+- **Persistent Domain Knowledge**: Agents accumulate expertise that compounds across sessions ([evolution/](https://github.com/aget-framework/aget/tree/main/docs) L-docs)
+- **Memory Architecture**: KB as shared collaboration substrate ([MEMORY_VISION](https://github.com/aget-framework/aget/blob/main/docs/MEMORY_VISION.md))
+- **Requirements-Driven**: Human-level requirements ground testable specifications ([requirements/](https://github.com/aget-framework/aget/tree/main/requirements))
 - **Platform Portability**: Three-tier degradation ensures functionality across environments
-- **Gate Discipline**: Explicit decision points with human approval
+- **Gate Discipline**: Explicit decision points with human approval ([GOVERNANCE_PRINCIPLES](https://github.com/aget-framework/aget/blob/main/docs/GOVERNANCE_PRINCIPLES.md))
 - **Fleet Patterns**: Multi-agent coordination with clear authority
 - **Evidence-First Design**: Audit before architecture, validate before shipping
-- **Theoretical Grounding**: Concepts mapped to established theory
 
 ## Strategic Context
 
@@ -143,7 +141,7 @@ See [GETTING_STARTED.md](GETTING_STARTED.md) for archetype selection guidance.
 | `wake up` | Wake_Protocol | Initialize session, load context |
 | `study up [topic]` | Study_Up_Protocol | Deep dive on specific topic |
 | `step back` | Step_Back_Protocol | Review KB before proposing |
-| `sanity check` | Sanity_Check_Protocol | Verify agent health |
+| `health check` | Health_Check_Protocol | Verify agent health |
 | `wind down` | Wind_Down_Protocol | End session, create handoff |
 
 ## What's Next
