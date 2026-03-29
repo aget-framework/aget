@@ -1,6 +1,6 @@
 # REQ-REL: Release Quality Requirements
 
-**Version**: 1.1.0
+**Version**: 1.2.0
 **Date**: 2026-03-28
 **Status**: proposed (wired to AGET_RELEASE_SPEC v1.11.0)
 **Domain**: REL (Release Management)
@@ -297,6 +297,39 @@ status: proposed
 originator: operational-evidence
 ```
 
+```yaml
+id: REQ-REL-F-007
+title: "Deployment Verification Tooling"
+type: functional
+description: >
+  Every DEPLOYMENT_SPEC should include or reference an executable
+  verification script that checks whether an agent is correctly
+  deployed at the target version. The verification script is the
+  enforcement mechanism for the state description.
+rationale: >
+  DEPLOYMENT_SPEC_v3.10.0 included verify_v3.10.0.sh (100+ lines,
+  7 check categories). DEPLOYMENT_SPEC_v3.11.0 was created without
+  one. The supervisor reached fleet migration G2 (pilot validation)
+  without version-specific verification tooling, forcing ad hoc
+  script adaptation.
+evidence:
+  - L754 (Deployment Verification Script Gap)
+  - L671 (Classification Without Consequence — state without enforcement)
+  - DEPLOYMENT_SPEC_v3.10.0 (has script, used in FLEET-UPG-008)
+  - DEPLOYMENT_SPEC_v3.11.0 (missing script, caught during FLEET-UPG-009 prep)
+fit_criterion: >
+  DEPLOYMENT_SPEC_vX.Y.Z includes a verification_script section
+  referencing an executable script. The script accepts --version
+  and --path arguments and returns exit code 0 (pass) or 1 (fail).
+  Running the script against a correctly deployed agent produces
+  0 FAIL results.
+priority: P1
+specifications:
+  - R-REL-038 (DEPLOYMENT_SPEC Required)
+status: proposed
+originator: operational-evidence
+```
+
 ---
 
 ## Constraints
@@ -321,6 +354,7 @@ originator: operational-evidence
 | REQ-REL-F-004 | R-SYNC-002, SOP Phase -0.5 | CAP-REL-004, CAP-REL-024 | — |
 | REQ-REL-F-005 | SOP Phase 4.3, R-REL-025-029 | CAP-REL-009, CAP-REL-021, CAP-REL-025 | — |
 | REQ-REL-F-006 | SOP Phase 0, VERSION_SCOPE | CAP-REL-012, CAP-REL-013, CAP-REL-014 | — |
+| REQ-REL-F-007 | R-REL-038, verify_deployment.py | R-REL-038 | — |
 | REQ-REL-Q-001 | RELEASE_BRIDGE velocity | CAP-REL-011 | — |
 | REQ-REL-Q-002 | RUBRIC D4 | CAP-REL-020, CAP-REL-007 | RUBRIC_release_handoff D4 |
 | REQ-REL-Q-003 | SOP Phase 7.4 | CAP-REL-009, CAP-REL-021—025 | — |
