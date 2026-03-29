@@ -29,7 +29,7 @@ import sys
 from pathlib import Path
 
 
-def check_version_indicators(agent_path: Path, version: str) -> list:
+def check_version_indicators(agent_path: Path, version: str, is_framework: bool = False) -> list:
     """Check all version-bearing files match target version."""
     results = []
 
@@ -49,9 +49,11 @@ def check_version_indicators(agent_path: Path, version: str) -> list:
     else:
         results.append(("FAIL", "version.json: file not found"))
 
-    # AGENTS.md
-    agents_path = agent_path / "AGENTS.md"
-    if agents_path.exists():
+    # AGENTS.md (not present in framework core repo)
+    if is_framework:
+        results.append(("OK", "AGENTS.md: N/A (framework core)"))
+    elif (agent_path / "AGENTS.md").exists():
+        agents_path = agent_path / "AGENTS.md"
         content = agents_path.read_text()
         match = re.search(r"@aget-version:\s*(\S+)", content)
         if match:
@@ -169,6 +171,8 @@ def check_terminology(agent_path: Path) -> list:
     scripts_dir = agent_path / "scripts"
     if scripts_dir.is_dir():
         for py_file in scripts_dir.glob("*.py"):
+            if py_file.name == "verify_deployment.py":
+                continue  # Skip self — contains the search pattern
             content = py_file.read_text()
             matches = len(re.findall(r"sanity.check", content, re.IGNORECASE))
             if matches:
@@ -271,22 +275,36 @@ def main():
     agent_path = Path(args.path).resolve()
     version = args.version
 
+    # Auto-detect: framework core repo vs agent repo
+    is_framework = (agent_path.name == "aget" and
+                    not (agent_path / "AGENTS.md").exists() and
+                    (agent_path / "specs").is_dir())
+
     print(f"=== AGET Deployment Verification: v{version} ===")
-    print(f"Agent: {agent_path.name}")
+    print(f"Agent: {agent_path.name}" + (" (framework core)" if is_framework else ""))
     print()
 
     all_results = []
 
-    categories = [
-        ("Version Indicators", check_version_indicators(agent_path, version)),
-        ("Migration History", check_migration_history(agent_path, version)),
-        ("Required Directories (v3.11+)", check_required_directories(agent_path)),
-        ("Governance Intensity (v3.11+)", check_governance_intensity(agent_path)),
-        ("Terminology (v3.11+)", check_terminology(agent_path)),
-        ("Universal Skills", check_universal_skills(agent_path)),
-        ("Session Scripts", check_session_scripts(agent_path)),
-        ("Structural Enforcement (v3.10+)", check_structural_enforcement(agent_path)),
-    ]
+    # Framework core has different check set than agent repos
+    if is_framework:
+        categories = [
+            ("Version Indicators", check_version_indicators(agent_path, version, is_framework=True)),
+            ("Migration History", check_migration_history(agent_path, version)),
+            ("Required Directories (v3.11+)", check_required_directories(agent_path)),
+            ("Session Scripts", check_session_scripts(agent_path)),
+        ]
+    else:
+        categories = [
+            ("Version Indicators", check_version_indicators(agent_path, version)),
+            ("Migration History", check_migration_history(agent_path, version)),
+            ("Required Directories (v3.11+)", check_required_directories(agent_path)),
+            ("Governance Intensity (v3.11+)", check_governance_intensity(agent_path)),
+            ("Terminology (v3.11+)", check_terminology(agent_path)),
+            ("Universal Skills", check_universal_skills(agent_path)),
+            ("Session Scripts", check_session_scripts(agent_path)),
+            ("Structural Enforcement (v3.10+)", check_structural_enforcement(agent_path)),
+        ]
 
     errors = 0
     warnings = 0
