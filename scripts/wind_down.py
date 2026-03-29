@@ -226,7 +226,7 @@ def run_health_check(agent_path: Path, verbose: bool = False) -> Dict[str, Any]:
             'checks_total': passed + failed,
             'warnings': failed,
             'errors': 0,
-            'message': f'Sanity check passed ({passed}/{passed + failed})',
+            'message': f'Health check passed ({passed}/{passed + failed})',
         }
     except (subprocess.TimeoutExpired, Exception) as e:
         if verbose:
@@ -556,15 +556,15 @@ def format_human_output(data: Dict[str, Any]) -> str:
     total = health.get('checks_total', 0)
 
     if status == 'healthy':
-        lines.append(f"Sanity Gate: Sanity check passed ({passed}/{total})")
+        lines.append(f"Health Gate: Health check passed ({passed}/{total})")
     elif status == 'warning':
-        lines.append(f"Sanity Gate: WARNING ({passed}/{total} passed)")
+        lines.append(f"Health Gate: WARNING ({passed}/{total} passed)")
     elif status == 'error':
-        lines.append(f"Sanity Gate: ERROR ({passed}/{total} passed)")
+        lines.append(f"Health Gate: ERROR ({passed}/{total} passed)")
     elif status == 'skipped':
-        lines.append("Sanity Gate: SKIPPED")
+        lines.append("Health Gate: SKIPPED")
     else:
-        lines.append(f"Sanity Gate: {status.upper()}")
+        lines.append(f"Health Gate: {status.upper()}")
 
     lines.append("")
 
