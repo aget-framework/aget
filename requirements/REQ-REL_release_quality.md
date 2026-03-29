@@ -1,6 +1,6 @@
 # REQ-REL: Release Quality Requirements
 
-**Version**: 1.2.0
+**Version**: 1.3.0
 **Date**: 2026-03-28
 **Status**: proposed (wired to AGET_RELEASE_SPEC v1.11.0)
 **Domain**: REL (Release Management)
@@ -330,6 +330,38 @@ status: proposed
 originator: operational-evidence
 ```
 
+```yaml
+id: REQ-REL-F-008
+title: "Remote Fleet Notification"
+type: functional
+description: >
+  Every release should notify all known fleet supervisors,
+  local and remote, within the release session. Remote
+  supervisors who monitor the public repo passively may not
+  discover releases for hours or days, leading to planning
+  against wrong assumptions.
+rationale: >
+  v3.11.0 released 2026-03-28. Workco remote supervisor
+  was still planning for "v3.11 likely theme: Ontology
+  Coherence" 6+ hours later. No push notification exists
+  for remote fleets, only pull (GitHub Release page).
+evidence:
+  - L723 (Remote Fleet Handoff Delivery Gap)
+  - L747 (Event Awareness SLA)
+  - L755 (Post-Release Premature Victory)
+  - v3.11.0 remote supervisor unaware 6+ hours after release
+fit_criterion: >
+  REMOTE_MIGRATION_MESSAGE_vX.Y.Z.md created and delivered
+  to all known remote fleet supervisors within the release
+  session. Delivery confirmation recorded in pilot tracking.
+priority: P1
+specifications:
+  - SOP Phase 7.3 (Remote Fleet Notification)
+  - R-REL-019 (Release-to-Fleet Handoff)
+status: proposed
+originator: operational-evidence
+```
+
 ---
 
 ## Constraints
@@ -355,6 +387,7 @@ originator: operational-evidence
 | REQ-REL-F-005 | SOP Phase 4.3, R-REL-025-029 | CAP-REL-009, CAP-REL-021, CAP-REL-025 | — |
 | REQ-REL-F-006 | SOP Phase 0, VERSION_SCOPE | CAP-REL-012, CAP-REL-013, CAP-REL-014 | — |
 | REQ-REL-F-007 | R-REL-038, verify_deployment.py | R-REL-038 | — |
+| REQ-REL-F-008 | SOP Phase 7.3, R-REL-019 | R-REL-019 | — |
 | REQ-REL-Q-001 | RELEASE_BRIDGE velocity | CAP-REL-011 | — |
 | REQ-REL-Q-002 | RUBRIC D4 | CAP-REL-020, CAP-REL-007 | RUBRIC_release_handoff D4 |
 | REQ-REL-Q-003 | SOP Phase 7.4 | CAP-REL-009, CAP-REL-021—025 | — |

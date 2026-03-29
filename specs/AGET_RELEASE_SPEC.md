@@ -1,6 +1,6 @@
 # AGET Release Specification
 
-**Version**: 1.12.0
+**Version**: 1.13.0
 **Status**: Active
 **Category**: Process (Release Management)
 **Format Version**: 1.2
@@ -1170,6 +1170,7 @@ Per the two-level model (L742): requirements define principal intent (human leve
 | REQ-REL-F-005 | Post-Release Validation | CAP-REL-009, CAP-REL-021, CAP-REL-025 |
 | REQ-REL-F-006 | Version Scope Pre-Release Audit | CAP-REL-012, CAP-REL-013, CAP-REL-014 |
 | REQ-REL-F-007 | Deployment Verification Tooling | R-REL-038 (DEPLOYMENT_SPEC) |
+| REQ-REL-F-008 | Remote Fleet Notification | R-REL-019, CAP-REL-020 |
 | REQ-REL-Q-001 | Release Predictability | CAP-REL-011 (timing), SOP velocity tracking |
 | REQ-REL-Q-002 | Downstream Executability | CAP-REL-020, CAP-REL-007 |
 | REQ-REL-Q-003 | Zero-Hotfix Release Target | CAP-REL-009, CAP-REL-021-025 (observability) |
