@@ -1,13 +1,13 @@
 # AGET Skills Index
 
-**Version**: 1.3.0
-**Updated**: 2026-02-28
-**Total Skills**: 44 (15 universal + 29 archetype)
+**Version**: 1.4.0
+**Updated**: 2026-04-04
+**Total Skills**: 45 (16 universal + 29 archetype)
 **Project**: ARC-001 (Archetype Customization v3.5)
 
 ---
 
-## Universal Skills (15)
+## Universal Skills (16)
 
 Deployed to all 12 templates.
 
@@ -28,6 +28,7 @@ Deployed to all 12 templates.
 | SKILL-013 | aget-save-state | Session | Save workflow state for recovery |
 | SKILL-042 | aget-study-topic | Research | Focused KB research on topic before implementation |
 | SKILL-040 | aget-file-issue | Governance | File issues with L520 governance compliance |
+| SKILL-043 | aget-create-briefing | Creation | Generate narrative documents from session artifacts for target consumption media |
 
 ---
 

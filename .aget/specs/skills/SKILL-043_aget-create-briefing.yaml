@@ -1,0 +1,220 @@
+# SKILL-043: aget-create-briefing
+# Purpose: Generate standalone narrative documents from session artifacts for target consumption media
+# Created: 2026-04-04
+# Based on: REQ-BRF v0.1.0, SKILL_SPEC_TEMPLATE.yaml, SP-005
+
+spec:
+  id: SKILL-043
+  name: aget-create-briefing
+  version: 1.0.0
+  status: production
+  created: 2026-04-04
+  updated: 2026-04-04
+  format: "EARS with controlled vocabulary"
+  category: Creation
+  scope: "Generate standalone narrative documents from session artifacts, optimized for target consumption medium (NotebookLM, slides, memo, share-draft)"
+  archetype: Universal
+
+  # Architecture: Option A — pure SKILL.md instruction set, no script
+  # Canonical source: aget/.claude/skills/aget-create-briefing/SKILL.md (framework-owned)
+  # No script dependency — LLM performs synthesis directly
+
+  traceability:
+    skill_md: ".claude/skills/aget-create-briefing/SKILL.md"
+    requirements: "docs/drafts/REQ-BRF_briefing_creation.md"
+    proposal: "planning/skill-proposals/PROPOSAL_aget-create-briefing.md"
+    tracking_issue: "gmelli/aget-aget#810"
+    l_docs:
+      - "L384: Specification Narrative Pattern"
+      - "L733: Voice as Composition Driver"
+      - "L742: Two-Level Model (Requirements vs Specifications)"
+      - "L745: Multi-Modal Effectiveness"
+      - "L758: Cross-Agent Research Convergence"
+      - "L771: Cross-Agent Proposal Discovery Gap"
+      - "L781: Requirements-to-Implementation Velocity"
+    vocabulary_terms:
+      - "AGET_Skill"
+      - "Skill_Invocation"
+      - "create"
+    cross_agent:
+      - "CCB P-005: demand signal, parameter design, working exemplar"
+
+capabilities:
+  BRF-001:
+    domain: source_resolution
+    requirement: REQ-BRF-F-001
+    statement: "WHEN user invokes `/aget-create-briefing`, the SKILL shall resolve the --source parameter to KB artifacts, supporting 4 source types: session record path, L-doc ID(s), topic string, or latest-session default."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    inputs:
+      - "User invocation with optional --source parameter"
+      - "Default: latest-session (most recent sessions/SESSION_*.md)"
+    outputs:
+      - "Resolved list of 1+ KB artifact paths"
+    verification: "VT-BRF-001 (latest-session), VT-BRF-002 (multi L-doc). Each source type produces relevant content."
+
+  BRF-002:
+    domain: medium_adaptation
+    requirement: REQ-BRF-F-002
+    statement: "WHEN --medium is specified, the SKILL shall produce output structurally adapted to the target consumption format: notebooklm (prose-only, 1500-3000 words), slides (assertion-per-section, 15-25 sections), memo (exec summary + detail, 800-1500 words), or share-draft (watermarked, classification-checked)."
+    pattern: event-driven
+    trigger: medium_parameter
+    priority: critical
+    inputs:
+      - "--medium parameter: notebooklm | slides | memo | share-draft"
+      - "Default: notebooklm"
+    outputs:
+      - "Structurally distinct document in docs/briefings/"
+    verification: "VT-BRF-003. 4 outputs from same source are structurally distinct: (a) notebooklm has 0 tables, prose-only; (b) slides has 15+ sections with bullets; (c) memo has exec summary; (d) share-draft has watermark."
+
+  BRF-003:
+    domain: content_extraction
+    requirement: REQ-BRF-F-003
+    statement: "WHEN producing output for audience=principal or audience=external, the SKILL shall strip all governance ceremony — gate references, spec IDs (CAP-xxx, R-xxx), EARS patterns (SHALL/WHEN/WHERE), conformance scores, V-test results, deliverable checklists — while preserving substantive claims, evidence assessments, and open questions."
+    pattern: event-driven
+    trigger: audience_principal_or_external
+    priority: critical
+    inputs:
+      - "Source artifacts containing governance notation"
+    outputs:
+      - "Narrative with zero governance tokens, substance preserved"
+    verification: "VT-BRF-004. Source with 16 governance tokens produces output with 0 governance tokens. Substance claims present."
+
+  BRF-004:
+    domain: voice_register
+    requirement: REQ-BRF-F-004
+    statement: "WHEN --register is specified, the SKILL shall adapt voice register to cognitive (reflective/exploratory), formal (professional/neutral), or conversational (accessible/engaging). WHERE .aget/config.json contains a briefing: block, agent-specific defaults shall be used."
+    pattern: event-driven
+    trigger: register_parameter
+    priority: high
+    inputs:
+      - "--register parameter: cognitive | formal | conversational"
+      - "Default: per .aget/config.json or conversational"
+    outputs:
+      - "Document with register-appropriate tone"
+    verification: "Manual review: absence of register-inappropriate markers (e.g., no informal contractions in formal register)."
+    notes:
+      - "memo medium always uses formal register regardless of --register parameter"
+
+  BRF-005:
+    domain: content_fidelity
+    requirement: REQ-BRF-Q-001
+    statement: "The SKILL shall faithfully represent source material — no fabricated claims, no omission of key findings, no misrepresentation of evidence quality. Evidence quality qualifiers (established, tentative, contested) shall match source assessment."
+    pattern: ubiquitous
+    priority: critical
+    inputs:
+      - "Source artifacts with mixed-confidence findings"
+    outputs:
+      - "Narrative preserving evidence quality qualifiers"
+    verification: "VT-BRF-006. Source with established + tentative findings produces output where tentative findings are not presented as confirmed. Uncertainty markers preserved."
+
+  BRF-006:
+    domain: classification_safety
+    requirement: REQ-BRF-Q-002
+    statement: "WHEN audience=external or medium=share-draft, the SKILL shall run a classification safety check scanning for prohibited patterns (private agent names, private repo references, fleet size disclosures, internal project IDs, session references, internal L-doc references) and shall refuse to produce output if patterns persist after 2 sanitization passes."
+    pattern: event-driven
+    trigger: external_audience_or_share_draft
+    priority: critical
+    inputs:
+      - "Draft output text"
+      - "Prohibited pattern list (6 categories)"
+    outputs:
+      - "Sanitized output with Classification: PASS"
+      - "OR: Refusal with Classification: FAIL after 2 passes"
+    verification: "VT-BRF-005. Source containing private-*-aget, gmelli/*, fleet sizes, SESSION_* references produces output with 0 prohibited patterns after sanitization."
+    notes:
+      - "P0 requirement — only capability that can cause irreversible harm"
+      - "Skip for audience=self or audience=principal"
+
+  BRF-007:
+    domain: output
+    statement: "The SKILL shall write output to docs/briefings/ with naming convention BRIEFING_YYYY-MM-DD_{topic}[_{medium}].md and report: file path, medium, audience, register, source count, word count, estimated consumption time, and classification result."
+    pattern: ubiquitous
+    priority: high
+    outputs:
+      - "File in docs/briefings/"
+      - "Completion summary with metadata"
+    verification: "All V-tests: output file exists at expected path with expected naming convention."
+
+test_cases:
+  T-BRF-001:
+    capability: "BRF-001"
+    v_test: "VT-BRF-001"
+    scenario: "Default source resolution (latest-session)"
+    given: "sessions/SESSION_*.md files exist"
+    when: "User runs `/aget-create-briefing` with no arguments"
+    then: "Briefing created from most recent session file, content references session artifacts"
+    verification_method: "manual"
+
+  T-BRF-002:
+    capability: "BRF-001"
+    v_test: "VT-BRF-002"
+    scenario: "Multi L-doc source resolution"
+    given: "L758 and L771 exist in .aget/evolution/"
+    when: "User runs `/aget-create-briefing --source L758,L771`"
+    then: "Briefing synthesizes content from both L-docs, both topics represented"
+    verification_method: "manual"
+
+  T-BRF-003:
+    capability: "BRF-002"
+    v_test: "VT-BRF-003"
+    scenario: "4 media structural distinction"
+    given: "Same source artifact available"
+    when: "User runs skill 4 times with each --medium value"
+    then: "4 structurally distinct outputs: notebooklm (prose-only), slides (sections+bullets), memo (exec summary), share-draft (watermarked)"
+    verification_method: "manual"
+
+  T-BRF-004:
+    capability: "BRF-003"
+    v_test: "VT-BRF-004"
+    scenario: "Governance ceremony stripping"
+    given: "Source session with CAP-xxx, R-xxx, gate references, V-test results"
+    when: "User runs `/aget-create-briefing --audience principal`"
+    then: "Output contains 0 governance tokens. Substance preserved."
+    verification_method: "automated"
+    automation: "grep -ciE 'CAP-|R-[A-Z]+-[0-9]|SHALL|V-test|gate boundary|conformance' output.md == 0"
+
+  T-BRF-005:
+    capability: "BRF-006"
+    v_test: "VT-BRF-005"
+    scenario: "Classification safety — P0"
+    given: "Source containing private-*-aget, gmelli/*, fleet sizes, SESSION_* references"
+    when: "User runs `/aget-create-briefing --medium share-draft --audience external`"
+    then: "Output contains 0 prohibited patterns. Classification: PASS. Sanitization actions reported."
+    verification_method: "automated"
+    automation: "grep -ciE 'private-[a-z]+-aget|gmelli/|[0-9]+ agents|SESSION_[0-9]{4}' output.md == 0"
+
+  T-BRF-006:
+    capability: "BRF-005"
+    v_test: "VT-BRF-006"
+    scenario: "Content fidelity — mixed confidence"
+    given: "Source with established findings + tentative findings + open questions"
+    when: "User runs `/aget-create-briefing --medium memo`"
+    then: "Established findings presented without hedging. Tentative findings include uncertainty qualifiers. Open questions preserved."
+    verification_method: "manual"
+
+constraints:
+  C-BRF-001:
+    statement: "The SKILL shall NOT modify any source KB artifacts."
+    rationale: "Briefing creation is read-only on the KB. Output goes only to docs/briefings/."
+
+  C-BRF-002:
+    statement: "The SKILL shall NOT produce output for audience=external without completing the classification safety check."
+    rationale: "Zero tolerance for private pattern leaks — irreversible harm (P0)."
+
+  C-BRF-003:
+    statement: "The SKILL shall NOT include governance ceremony in principal/external output."
+    rationale: "CAP-xxx, R-xxx, EARS patterns, V-test results are meaningless to external audiences."
+
+  C-BRF-004:
+    statement: "The SKILL shall NOT fabricate claims not present in source artifacts."
+    rationale: "LLM synthesis can hallucinate. Every assertion must trace to source."
+
+  C-BRF-005:
+    statement: "The SKILL shall validate at least 1 source artifact resolves before proceeding."
+    rationale: "Prevents empty or off-topic output from unresolved sources."
+
+  C-BRF-006:
+    statement: "The SKILL shall use docs/briefings/ as the output directory."
+    rationale: "Standardized location with existing precedent."

@@ -70,6 +70,7 @@ For formal SKOS-compliant definitions, see `ONTOLOGY_skills.yaml`.
 | Governance | Proposal, review, approval workflows | aget-propose-skill |
 | Planning | Project creation, project review | aget-review-project |
 | Creation | Skill creation, artifact generation | aget-create-skill |
+| Creation | Output format adaptation, KB-to-narrative bridging | aget-create-briefing |
 
 **Related**: AGET_Skill
 

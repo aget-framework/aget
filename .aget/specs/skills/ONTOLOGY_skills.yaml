@@ -42,6 +42,7 @@ C001_AGET_Skill:
     - "aget-wake-up"
     - "aget-record-lesson"
     - "aget-file-issue"
+    - "aget-create-briefing"
 
 C002_Skill_Specification:
   skos:prefLabel: "Skill_Specification"
@@ -79,7 +80,7 @@ C004_Skill_Category:
     - "Learning: aget-record-lesson"
     - "Governance: aget-propose-skill, aget-file-issue"
     - "Planning: aget-review-project"
-    - "Creation: aget-create-skill"
+    - "Creation: aget-create-skill, aget-create-briefing"
 
 C005_Healthcheck_Skill:
   skos:prefLabel: "Healthcheck_Skill"

@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased] — v3.13.0
+
+### Added
+
+- **SKILL-043 aget-create-briefing**: New universal Creation skill — generates standalone narrative documents from session artifacts, optimized for target consumption media (NotebookLM audio, slides, memo, share-draft). First skill in the output-format-adapter family. Cross-agent origin (L758): CCB demand signal + framework-AGET spec formalization. 7 EARS capabilities, 6 V-tests (all PASS), 6 constraints including P0 classification safety gate. (#810)
+
+---
+
 ## [3.11.1] - 2026-04-04
 
 **Theme**: Script Rename Stabilization
