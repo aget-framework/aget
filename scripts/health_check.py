@@ -10,11 +10,11 @@ Implements: CAP-SESSION-002 (Sanity Check Protocol)
 Patterns: L038 (Agent-Agnostic), L021 (Verify-Before-Modify), L039 (Diagnostic Efficiency)
 
 Usage:
-    python3 aget_housekeeping_protocol.py                    # Human-readable output
-    python3 aget_housekeeping_protocol.py --json             # JSON output
-    python3 aget_housekeeping_protocol.py --json --pretty    # Pretty-printed JSON
-    python3 aget_housekeeping_protocol.py --dir /path/agent  # Run on specific agent
-    python3 aget_housekeeping_protocol.py --fix              # Attempt auto-fixes
+    python3 health_check.py                    # Human-readable output
+    python3 health_check.py --json             # JSON output
+    python3 health_check.py --json --pretty    # Pretty-printed JSON
+    python3 health_check.py --dir /path/agent  # Run on specific agent
+    python3 health_check.py --fix              # Attempt auto-fixes
 
 Exit codes:
     0: All checks passed
@@ -472,7 +472,7 @@ Exit codes:
     parser.add_argument(
         '--version',
         action='version',
-        version='aget_housekeeping_protocol.py 1.0.0 (AGET v3.1.0)'
+        version='health_check.py 1.0.0 (AGET v3.1.0)'
     )
 
     args = parser.parse_args()

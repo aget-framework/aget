@@ -38,11 +38,11 @@ def get_agent_root() -> Path:
 
 
 def run_healthcheck(agent_root: Path) -> dict:
-    """Run aget_housekeeping_protocol.py and parse results."""
+    """Run health_check.py and parse results."""
     # Try canonical location first, then legacy
     script_paths = [
-        agent_root / 'scripts' / 'aget_housekeeping_protocol.py',
-        agent_root / '.aget' / 'patterns' / 'session' / 'aget_housekeeping_protocol.py',
+        agent_root / 'scripts' / 'health_check.py',
+        agent_root / '.aget' / 'patterns' / 'session' / 'health_check.py',
     ]
 
     script_path = None

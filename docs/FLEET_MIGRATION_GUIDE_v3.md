@@ -334,7 +334,7 @@ Migration often copies new scripts (wake_up.py, wind_down.py, housekeeping) but 
 
 ```
 User: "sanity check"
-Agent: python3 scripts/aget_housekeeping_protocol.py sanity-check
+Agent: python3 scripts/health_check.py sanity-check
 Script: error: unrecognized arguments: sanity-check
 ```
 
@@ -350,7 +350,7 @@ AGENT_PATH="/path/to/agent"
 grep -q "\-\-json\|\-\-dir" $AGENT_PATH/AGENTS.md && echo "PASS" || echo "FAIL: v3.1 flags missing"
 
 # V-MIG-AGENTS.3: Documented commands actually work
-cd $AGENT_PATH && python3 scripts/aget_housekeeping_protocol.py --json > /dev/null && echo "PASS" || echo "FAIL"
+cd $AGENT_PATH && python3 scripts/health_check.py --json > /dev/null && echo "PASS" || echo "FAIL"
 ```
 
 ### Checklist Addition
@@ -367,7 +367,7 @@ Add to per-agent migration:
 |--------|------------|
 | wake_up.py | `python3 scripts/wake_up.py --json` |
 | wind_down.py | `python3 scripts/wind_down.py --json --notes "session notes"` |
-| housekeeping | `python3 scripts/aget_housekeeping_protocol.py --json` |
+| housekeeping | `python3 scripts/health_check.py --json` |
 
 See: L455 (Migration AGENTS.md Invocation Gap), R-MIG-AGENTS-001
 

@@ -1691,7 +1691,7 @@ python3 .aget/patterns/session/verify_session_protocols.py --protocol wake_up
 
 3. [ ] **Verify sanity_check**:
    ```bash
-   python3 .aget/patterns/session/aget_housekeeping_protocol.py
+   python3 .aget/patterns/session/health_check.py
    # Expected: ≥8/9 checks pass
    ```
 
@@ -2248,7 +2248,7 @@ python3 .aget/patterns/release/validation_logger.py \
 
 # Or wrap housekeeping sanity check:
 python3 .aget/patterns/release/validation_logger.py \
-    --wrap .aget/patterns/session/aget_housekeeping_protocol.py
+    --wrap .aget/patterns/session/health_check.py
 
 # Commit validation log:
 git add .aget/logs/validation_log.jsonl

@@ -88,7 +88,7 @@ The same sanity_check.py should work identically on:
 
 ```
 # Canonical template (in aget/ core)
-aget/scripts/aget_housekeeping_protocol.py
+aget/scripts/health_check.py
 
 # Instance override (in agent)
 .aget/patterns/session/sanity_check.py
@@ -233,7 +233,7 @@ The wind down protocol SHOULD include sanity check results in session metadata:
 
 ## References
 
-- `aget/scripts/aget_housekeeping_protocol.py` - Canonical template
+- `aget/scripts/health_check.py` - Canonical template
 - CAP-SESSION-002 - Sanity Check Protocol capability
 - L038 - Agent-Agnostic Infrastructure
 - L021 - Verify-Before-Modify Pattern

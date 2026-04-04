@@ -217,7 +217,7 @@ def check_universal_skills(agent_path):
 def check_session_scripts(agent_path):
     results = []
     scripts_dir = agent_path / "scripts"
-    REQUIRED = ["wake_up.py", "wind_down.py", "study_topic.py", "aget_housekeeping_protocol.py"]
+    REQUIRED = ["wake_up.py", "wind_down.py", "study_topic.py", "health_check.py"]
     for script in REQUIRED:
         if (scripts_dir / script).exists():
             results.append(("OK", f"scripts/{script}"))

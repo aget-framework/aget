@@ -275,7 +275,7 @@ Optional file for tracking session state:
 ## References
 
 - `aget/scripts/wind_down.py` - Canonical template
-- `aget/scripts/aget_housekeeping_protocol.py` - Sanity check script
+- `aget/scripts/health_check.py` - Sanity check script
 - CAP-SESSION-003 - Wind Down Protocol capability
 - L038 - Agent-Agnostic Infrastructure
 - L021 - Verify-Before-Modify Pattern

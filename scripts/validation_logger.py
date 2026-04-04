@@ -117,7 +117,7 @@ def parse_script_output(stdout: str, stderr: str) -> list:
 
     Recognizes multiple output formats:
     - Emoji: ✅ PASS: name / ❌ FAIL: name  (post_release_validation.py)
-    - Bracket: [+] Name: detail / [-] Name: detail  (aget_housekeeping_protocol.py)
+    - Bracket: [+] Name: detail / [-] Name: detail  (health_check.py)
     - Text: PASS: name / FAIL: name  (pre_release_validation.py)
     """
     check_details = []

@@ -23,7 +23,7 @@ Standard operating procedure for migrating fleet agents to new AGET framework ve
 **Covers**:
 - Version.json updates across fleet
 - AGENTS.md @aget-version updates
-- Session script deployment (wake_up.py, wind_down.py, aget_housekeeping_protocol.py)
+- Session script deployment (wake_up.py, wind_down.py, health_check.py)
 - L455 AGENTS.md Invocation Verification
 - FLEET_STATE.yaml updates
 
@@ -59,7 +59,7 @@ python3 -c "import json; print(json.load(open('~/github/aget-framework/aget/.age
 
 #### V0.2: Verify Script Availability
 ```bash
-ls ~/github/aget-framework/aget/scripts/{wake_up,wind_down,aget_housekeeping_protocol}.py
+ls ~/github/aget-framework/aget/scripts/{wake_up,wind_down,health_check}.py
 ```
 **Expected**: All three scripts present
 
@@ -164,7 +164,7 @@ mkdir -p $AGENT_PATH/scripts
 # 2. Deploy session scripts
 cp ~/github/aget-framework/aget/scripts/wake_up.py $AGENT_PATH/scripts/
 cp ~/github/aget-framework/aget/scripts/wind_down.py $AGENT_PATH/scripts/
-cp ~/github/aget-framework/aget/scripts/aget_housekeeping_protocol.py $AGENT_PATH/scripts/
+cp ~/github/aget-framework/aget/scripts/health_check.py $AGENT_PATH/scripts/
 
 # 3. Update version.json
 sed -i '' 's/"aget_version": "[^"]*"/"aget_version": "X.Y.Z"/' $AGENT_PATH/.aget/version.json
@@ -250,7 +250,7 @@ git -C $AGENT_PATH add -f .claude/skills/$SKILL_NAME/SKILL.md \
 grep -q "\-\-json\|\-\-dir" $AGENT_PATH/AGENTS.md && echo "PASS" || echo "FAIL: Missing --json docs"
 
 # V-MIG-AGENTS.3: Housekeeping script works
-python3 $AGENT_PATH/scripts/aget_housekeeping_protocol.py --json --dir $AGENT_PATH | jq -r '.status'
+python3 $AGENT_PATH/scripts/health_check.py --json --dir $AGENT_PATH | jq -r '.status'
 ```
 **Expected**: PASS, PASS, healthy/warning
 
@@ -260,7 +260,7 @@ python3 $AGENT_PATH/scripts/aget_housekeeping_protocol.py --json --dir $AGENT_PA
 git -C $AGENT_PATH add -A
 git -C $AGENT_PATH commit -m "feat: Migrate to AGET vX.Y.Z
 
-- Deploy session scripts (wake_up.py, wind_down.py, aget_housekeeping_protocol.py)
+- Deploy session scripts (wake_up.py, wind_down.py, health_check.py)
 - Update version.json to vX.Y.Z
 - Update AGENTS.md @aget-version
 
@@ -334,7 +334,7 @@ Update FLEET_STATE.yaml:
 
 ```bash
 for agent in ~/github/private-*-aget ~/github/GM-*/private-*-aget; do
-  result=$(python3 $agent/scripts/aget_housekeeping_protocol.py --json --dir $agent 2>&1)
+  result=$(python3 $agent/scripts/health_check.py --json --dir $agent 2>&1)
   status=$(echo "$result" | jq -r '.status')
   echo "$(basename $agent): $status"
 done
@@ -419,8 +419,8 @@ Create session log in `sessions/SESSION_YYYY-MM-DD_fleet_vX.Y.Z_migration.md`
 
 ### Sanity Check
 When user says "sanity check":
-- Run: `python3 scripts/aget_housekeeping_protocol.py` (human-readable output)
-- Or: `python3 scripts/aget_housekeeping_protocol.py --json` (JSON output)
+- Run: `python3 scripts/health_check.py` (human-readable output)
+- Or: `python3 scripts/health_check.py --json` (JSON output)
 ```
 
 ### Symlink Edge Case

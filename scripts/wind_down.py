@@ -175,9 +175,9 @@ def load_json_file(path: Path, default: Any = None) -> Any:
 def run_health_check(agent_path: Path, verbose: bool = False) -> Dict[str, Any]:
     """CAP-SESSION-012: Run housekeeping health check before wind-down."""
     script_locations = [
-        agent_path / 'scripts' / 'aget_housekeeping_protocol.py',
-        agent_path / '.aget' / 'patterns' / 'session' / 'aget_housekeeping_protocol.py',
-        Path(__file__).parent / 'aget_housekeeping_protocol.py',
+        agent_path / 'scripts' / 'health_check.py',
+        agent_path / '.aget' / 'patterns' / 'session' / 'health_check.py',
+        Path(__file__).parent / 'health_check.py',
     ]
 
     script_path = None
