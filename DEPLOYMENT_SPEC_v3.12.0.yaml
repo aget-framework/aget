@@ -1,0 +1,175 @@
+# DEPLOYMENT_SPEC_v3.12.0.yaml
+# Complete target state specification for v3.12.0 deployment
+#
+# Purpose: Define what a correctly-deployed v3.12.0 agent looks like.
+# Usage: Supervisors use this to verify fleet deployments.
+# Governance: R-DEP-002 (State-Based Deployment Requirement), R-REL-038
+#
+# Created: 2026-04-04
+# Origin: DEPLOYMENT_SPEC_v3.11.0.yaml
+# Release: Developer Surface & Governance Maturation
+
+version: "3.12.0"
+spec_version: "1.6.0"
+created: "2026-04-04"
+status: active
+supersedes: "DEPLOYMENT_SPEC_v3.11.0.yaml"
+
+# =============================================================================
+# VERIFICATION SCRIPT (REQ-REL-F-007, L754)
+# =============================================================================
+
+verification_script:
+  file: "scripts/verify_deployment.py"
+  usage: "python3 scripts/verify_deployment.py --version 3.12.0 --path /path/to/agent"
+  checks: 8
+  exit_codes:
+    0: "PASS (all checks OK, or OK with warnings)"
+    1: "FAIL (one or more checks failed)"
+
+# =============================================================================
+# VERSION INDICATORS
+# =============================================================================
+
+version_indicators:
+  version_json:
+    path: ".aget/version.json"
+    field: "aget_version"
+    value: "3.12.0"
+    verification: "jq -r .aget_version .aget/version.json"
+
+  agents_md:
+    path: "AGENTS.md"
+    pattern: "@aget-version: 3.12.0"
+    verification: "grep '@aget-version' AGENTS.md"
+
+  manifest_yaml:
+    path: "manifest.yaml"
+    field: "version"
+    value: "3.12.0"
+    verification: "yq -r .version manifest.yaml"
+
+  readme_md:
+    path: "README.md"
+    pattern: "**Version**: v3.12.0"
+    verification: "grep 'Version' README.md | head -1"
+
+# =============================================================================
+# WHAT'S NEW IN v3.12.0
+# =============================================================================
+
+whats_new:
+  summary: "Developer Surface & Governance Maturation"
+
+  highlights:
+    - title: "Issue Governance v2.1.0"
+      description: "3 new capabilities (Triage, Lifecycle, Issue Forms). 9 EARS requirements (R-ISSUE-015-023). 54 SKOS vocabulary terms. 26 faceted labels deployed."
+
+    - title: "Homepage Rewrite"
+      description: "README 169→104 lines. Quick Start at line 14. R-HOM-001 6/7 conformance. 3 sections relocated to docs/."
+
+    - title: "Epistemic Parameterization (study_topic.py)"
+      description: "--purpose and --domain-keywords flags. Agent-aware KB search. Config-driven via .aget/config.json study_topic block. CAP-SESSION-007-06/07."
+
+    - title: "First Deprecation Cycle Complete"
+      description: "3 items removed: capture verb, study-up script reference, record-nugget skill directory (POL-DEP-001)."
+
+    - title: "Release State Management"
+      description: "SOP state machine (L708), BLOCKING deployment_monitor, tag_release.py automation."
+
+# =============================================================================
+# NEW IN v3.12.0: STUDY_TOPIC EPISTEMIC PARAMS
+# =============================================================================
+
+study_topic_params:
+  description: "Epistemic parameterization for study_topic.py (CAP-SESSION-007-06/07)"
+  source: "aget/scripts/study_topic.py"
+  new_in: "3.12.0"
+
+  new_flags:
+    - flag: "--purpose"
+      values: ["pre-implementation", "pre-release", "exploration", "audit"]
+      description: "Weights results by KB area based on epistemic purpose"
+
+    - flag: "--domain-keywords"
+      description: "Domain keywords for relevance boosting"
+
+  config_block:
+    path: ".aget/config.json"
+    key: "study_topic"
+    optional: true
+    schema:
+      domain_keywords: "list of strings (agent domain terms)"
+      priority_areas: "dict of purpose -> list of glob patterns"
+      default_purpose: "string (fallback purpose, default: exploration)"
+
+  verification: "python3 scripts/study_topic.py --topic test --purpose exploration --json 2>/dev/null | python3 -c \"import sys,json; d=json.load(sys.stdin); print('PASS' if 'purpose' in d else 'FAIL')\""
+
+# =============================================================================
+# NEW IN v3.12.0: ISSUE FORMS
+# =============================================================================
+
+issue_forms:
+  description: "GitHub Issue Form templates for structured public filing"
+  source: "aget/.github/ISSUE_TEMPLATE/"
+  new_in: "3.12.0"
+  applies_to: "aget-framework/aget only (not templates or private repos)"
+
+  templates:
+    - file: "enhancement.yml"
+    - file: "bug.yml"
+    - file: "feature.yml"
+
+# =============================================================================
+# NEW IN v3.12.0: DOCS RELOCATIONS
+# =============================================================================
+
+docs_relocations:
+  description: "Reference sections moved from README to docs/"
+  new_in: "3.12.0"
+
+  files:
+    - file: "docs/STRATEGIC_CONTEXT.md"
+      moved_from: "README.md Strategic Context section"
+
+    - file: "docs/ARCHETYPE_ECOSYSTEM.md"
+      moved_from: "README.md Archetype Ecosystem section"
+
+    - file: "docs/ONTOLOGY_DESIGN.md"
+      moved_from: "README.md Ontology-Driven Design section"
+
+# =============================================================================
+# NEW IN v3.12.0: FLEET MIGRATION SOP UPDATE
+# =============================================================================
+
+sop_updates:
+  - file: "sops/SOP_fleet_migration.md"
+    version: "1.4.0"
+    change: "Added V0.1 gh release list discovery step (L723)"
+
+# =============================================================================
+# SCRIPT CHANGES
+# =============================================================================
+
+scripts:
+  study_topic:
+    path: "scripts/study_topic.py"
+    change: "Added --purpose and --domain-keywords flags"
+    verification: "grep -c '\\-\\-purpose' scripts/study_topic.py"
+    expected: ">= 1"
+
+# =============================================================================
+# UPGRADE STEPS (for fleet supervisors)
+# =============================================================================
+
+upgrade_steps:
+  - step: 1
+    action: "Update @aget-version to 3.12.0 in AGENTS.md/CLAUDE.md"
+  - step: 2
+    action: "Update .aget/version.json aget_version to 3.12.0"
+  - step: 3
+    action: "Copy scripts/study_topic.py from aget/ core (new flags)"
+  - step: 4
+    action: "Optional: Add study_topic block to .aget/config.json"
+  - step: 5
+    action: "Run python3 -m pytest tests/ -v"
