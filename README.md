@@ -33,7 +33,7 @@ See [GETTING_STARTED.md](GETTING_STARTED.md) for the full supervisor-first workf
 
 ## Key Features
 
-- **Persistent Knowledge**: Agents accumulate expertise across sessions ([L-docs](https://github.com/aget-framework/aget/tree/main/docs), [evolution/](https://github.com/aget-framework/aget/tree/main/.aget/evolution))
+- **Persistent Knowledge**: Agents accumulate expertise across sessions ([L-docs](https://github.com/aget-framework/aget/tree/main/docs))
 - **Shared Memory**: KB as collaboration substrate, not hidden AI state ([MEMORY_VISION](https://github.com/aget-framework/aget/blob/main/docs/MEMORY_VISION.md))
 - **Requirements-Driven**: Human-level requirements ground testable specifications ([requirements/](https://github.com/aget-framework/aget/tree/main/requirements))
 - **Gate Discipline**: Explicit decision points with human approval ([GOVERNANCE_PRINCIPLES](https://github.com/aget-framework/aget/blob/main/governance/GOVERNANCE_PRINCIPLES.md))
