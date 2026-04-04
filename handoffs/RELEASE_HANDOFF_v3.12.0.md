@@ -68,8 +68,15 @@ v3.12.0 is the largest-scope release since v3.3.0. It rewrites the developer-fac
 1. Update `@aget-version: 3.12.0` in AGENTS.md/CLAUDE.md
 2. Update `.aget/version.json` aget_version to "3.12.0"
 3. Copy `scripts/study_topic.py` from aget/ core (new --purpose and --domain-keywords flags)
-4. Optional: Add `study_topic` block to `.aget/config.json` for domain-aware search
-5. Run `python3 -m pytest tests/ -v` to verify
+4. Copy `scripts/health_check.py` from template (replaces aget_housekeeping_protocol.py)
+5. **Update `.claude/skills/` SKILL.md files** — replace old script names with new ones:
+   - `aget-study-topic/SKILL.md`: study_up.py -> study_topic.py
+   - `aget-check-health/SKILL.md`: aget_housekeeping_protocol.py -> health_check.py
+   - Note: `.claude/` is gitignored — these are filesystem-only changes
+6. **Delete old scripts**: `rm scripts/study_up.py scripts/aget_housekeeping_protocol.py`
+7. Optional: Add `study_topic` block to `.aget/config.json` for domain-aware search
+8. Run `python3 -m pytest tests/ -v` to verify
+9. **Functional V-test**: invoke `/aget-study-topic` and verify it calls `study_topic.py` (not `study_up.py`)
 
 ### For Template Users
 
