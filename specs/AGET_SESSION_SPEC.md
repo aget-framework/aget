@@ -115,10 +115,10 @@ vocabulary:
     Mandatory_Handoff_Trigger:
       skos:definition: "Condition requiring handoff note creation"
 
-  study_up:  # Study up phase (CAP-SESSION-007)
+  study_topic:  # Study up phase (CAP-SESSION-007)
     Study_Up_Protocol:
       skos:definition: "Focused topic research procedure"
-      aget:location: ".aget/patterns/session/study_up.py"
+      aget:location: ".aget/patterns/session/study_topic.py"
       skos:related: ["R-SESSION-007"]
     Topic_Research:
       skos:definition: "Deep dive into specific knowledge domain"
@@ -333,19 +333,19 @@ The SYSTEM shall use standard handoff note format.
 
 ### CAP-SESSION-007: Study Up Protocol
 
-The SYSTEM shall support focused topic research via study_up protocol.
+The SYSTEM shall support focused topic research via study_topic protocol.
 
 | ID | Pattern | Statement |
 |----|---------|-----------|
-| CAP-SESSION-007-01 | ubiquitous | The SYSTEM shall execute study_up.py with --topic argument |
+| CAP-SESSION-007-01 | ubiquitous | The SYSTEM shall execute study_topic.py with --topic argument |
 | CAP-SESSION-007-02 | ubiquitous | The SYSTEM shall search KB for topic-related artifacts |
 | CAP-SESSION-007-03 | ubiquitous | The SYSTEM shall report related L-docs and patterns |
 | CAP-SESSION-007-04 | ubiquitous | The SYSTEM shall support --json output mode |
 | CAP-SESSION-007-05 | ubiquitous | The SYSTEM shall support --verify flag for migration validation |
 
-**Enforcement**: study_up.py, contract tests
+**Enforcement**: study_topic.py, contract tests
 
-**Disambiguation**: study_up is for focused topic research. Differs from step_back (broad KB review).
+**Disambiguation**: study_topic is for focused topic research. Differs from step_back (broad KB review).
 
 ### CAP-SESSION-008: Sanity Check Protocol
 
@@ -544,7 +544,7 @@ structure:
       purpose: "KB review protocol implementation"
       requirements: ["CAP-SESSION-002"]
 
-    - path: ".aget/patterns/session/study_up.py"
+    - path: ".aget/patterns/session/study_topic.py"
       purpose: "Topic research protocol implementation"
       requirements: ["CAP-SESSION-007"]
 
@@ -667,7 +667,7 @@ python3 scripts/wake_up.py
 python3 scripts/wind_down.py
 
 # Test study-up protocol (V-SESSION-003, V-SESSION-006)
-python3 scripts/study_up.py --topic "release"
+python3 scripts/study_topic.py --topic "release"
 
 # Test sanity check (V-SESSION-008)
 python3 scripts/aget_housekeeping_protocol.py --json

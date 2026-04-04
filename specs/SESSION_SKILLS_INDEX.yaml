@@ -139,10 +139,10 @@ skills:
     verify_flag: true
     disambiguation: >
       step_back reviews KB BEFORE proposing changes. Use for governance
-      decisions or substantial changes. Differs from study_up (focused
+      decisions or substantial changes. Differs from study_topic (focused
       topic research) and wake_up (session initialization).
 
-  study_up:
+  study_topic:
     id: CAP-SESSION-007  # NEW capability
     category: mid_session
     trigger_phrase: "study up [topic]"
@@ -151,7 +151,7 @@ skills:
       - "research"
       - "deep dive"
       - "investigate"
-    script: ".aget/patterns/session/study_up.py"
+    script: ".aget/patterns/session/study_topic.py"
     tests: "tests/test_session_protocol.py::TestStudyUpProtocol"
     requirements:
       - R-SESSION-007-01  # Accept topic argument
@@ -163,7 +163,7 @@ skills:
       - L187  # Silent execution
     verify_flag: true
     disambiguation: >
-      study_up does focused research on a SPECIFIC topic. Use when you
+      study_topic does focused research on a SPECIFIC topic. Use when you
       need deep knowledge on one subject. Differs from step_back (broad
       KB review) and wake_up (session initialization).
 
@@ -238,7 +238,7 @@ relationships:
     flow:
       - wake_up           # Session start
       - step_back         # Optional: Context recovery
-      - study_up          # Optional: Topic research
+      - study_topic          # Optional: Topic research
       - sanity_check      # Optional: Health verification
       - wind_down         # Session end
 
@@ -251,9 +251,9 @@ relationships:
         resolution: "wind_down.py for end, aget_housekeeping_protocol.py for health"
 
       - skill_a: step_back
-        skill_b: study_up
+        skill_b: study_topic
         confusion: "Both involve KB research"
-        resolution: "step_back is broad review, study_up is topic-focused"
+        resolution: "step_back is broad review, study_topic is topic-focused"
 
       - skill_a: wake_up
         skill_b: sanity_check

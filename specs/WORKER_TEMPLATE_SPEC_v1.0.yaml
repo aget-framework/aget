@@ -80,7 +80,7 @@ capabilities:
     trigger: "User says 'study up'"
     inputs: ["Study_Up_Command"]
     outputs: ["Deep context summary"]
-    enforcement: "Contract test test_study_up_protocol"
+    enforcement: "Contract test test_study_topic_protocol"
 
   CAP-007:
     domain: session_protocol
@@ -464,7 +464,7 @@ contract_tests:
     - test_instance_type_valid
 
   recommended:
-    - test_study_up_protocol
+    - test_study_topic_protocol
     - test_wind_down_protocol
     - test_sign_off_protocol
     - test_action_capabilities

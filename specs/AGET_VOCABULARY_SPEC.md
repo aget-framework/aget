@@ -2482,7 +2482,7 @@ On_Demand_Protocol:
   skos:altLabel: ["Invocable_Protocol"]
   skos:broader: "Session_Protocol"
   skos:related: ["Agent_Skill"]
-  skos:example: ["study_up", "sanity_check", "step_back"]
+  skos:example: ["study_topic", "sanity_check", "step_back"]
   aget:source: "L536, L557"
   aget:test_coverage: ["TestStudyUpProtocol (6)", "TestSanityCheckProtocol (7)", "TestStepBackProtocol (6)"]
 ```
@@ -2876,7 +2876,7 @@ grep -E "^    [a-z]" aget/specs/AGET_VOCABULARY_SPEC.md | grep -v "skos:\|aget:\
   - Agent_Hook: Platform-specific lifecycle event handler
   - Session_Protocol: AGET-specific hybrid of hooks and skills
   - Lifecycle_Protocol: Session start/end protocols (wake_up, wind_down)
-  - On_Demand_Protocol: User-invoked protocols (study_up, sanity_check)
+  - On_Demand_Protocol: User-invoked protocols (study_topic, sanity_check)
   - CLI_Support_Level: Support classification (Baseline, Validated, Compatible, Experimental, Unsupported)
 - Documented L536 ontological correction: peers not hierarchy
 - Added test coverage mapping for all protocol terms

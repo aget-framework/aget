@@ -105,7 +105,7 @@ def check_canonical_scripts(repo_path: Path) -> dict:
     These are Framework_Artifacts that must be present in every template.
     Per L598/L599: scripts/ is the canonical deployment target.
     """
-    canonical = ['wake_up.py', 'wind_down.py', 'study_up.py']
+    canonical = ['wake_up.py', 'wind_down.py', 'study_topic.py']
     scripts_dir = repo_path / 'scripts'
     present = []
     missing = []
@@ -251,7 +251,7 @@ def run_self_test() -> bool:
         (t1 / 'ontology').mkdir()
         (t1 / 'ontology' / 'ONTOLOGY_worker.yaml').write_text('kind: OntologySpec\n')
         (t1 / 'scripts').mkdir()
-        for s in ['wake_up.py', 'wind_down.py', 'study_up.py']:
+        for s in ['wake_up.py', 'wind_down.py', 'study_topic.py']:
             (t1 / 'scripts' / s).write_text(f'# {s}\n')
 
         t2 = test_dir / 'template-advisor-aget'
@@ -294,13 +294,13 @@ def run_self_test() -> bool:
         (t3_scripts / 'scripts').mkdir()
         (t3_scripts / 'scripts' / 'wake_up.py').write_text('# wake up\n')
         (t3_scripts / 'scripts' / 'wind_down.py').write_text('# wind down\n')
-        # Missing study_up.py
+        # Missing study_topic.py
         sc = check_canonical_scripts(t3_scripts)
-        if not sc['complete'] and 'study_up.py' in sc['missing']:
+        if not sc['complete'] and 'study_topic.py' in sc['missing']:
             print("  [+] T4 PASS: Missing canonical script detected")
             passed += 1
         else:
-            print(f"  [-] T4 FAIL: Expected missing study_up.py; missing={sc['missing']}")
+            print(f"  [-] T4 FAIL: Expected missing study_topic.py; missing={sc['missing']}")
             failed += 1
 
         # T5: Skill→script referential integrity

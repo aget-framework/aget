@@ -491,7 +491,7 @@ scripts:
     spec: AGET_RELEASE_SPEC.md
     implements: CAP-REL-025
 
-  - path: scripts/study_up.py
+  - path: scripts/study_topic.py
     description: Focused KB research on a specific topic before proposing changes
     category: tool
     version: 1.0.0

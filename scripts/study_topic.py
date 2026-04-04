@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Study Up Protocol - Focused Topic Research
+Study Topic Protocol - Focused Topic Research
 
 Search KB for topic-related artifacts and report findings.
 Use before diving into implementation to understand existing patterns.
 
-Implements: CAP-SESSION-007 (Study Up)
+Implements: CAP-SESSION-007 (Study Topic)
 - R-SESSION-007-01: Accept topic argument
 - R-SESSION-007-02: Search KB for topic
 - R-SESSION-007-03: Report related artifacts
@@ -14,13 +14,13 @@ Implements: CAP-SESSION-007 (Study Up)
 
 See: aget/specs/AGET_SESSION_SPEC.md (CAP-SESSION-007)
 Index: aget/specs/SESSION_SKILLS_INDEX.yaml
-Tests: tests/test_session_protocol.py::TestStudyUpProtocol
+Tests: tests/test_session_protocol.py::TestStudyTopicProtocol
 Related: L187 (Silent execution), L335 (Memory Architecture)
 
 Usage:
-    python3 study_up.py --topic "wind down"       # Research wind down
-    python3 study_up.py --topic "release" --json  # JSON output
-    python3 study_up.py --verify                  # Migration verification
+    python3 study_topic.py --topic "wind down"       # Research wind down
+    python3 study_topic.py --topic "release" --json  # JSON output
+    python3 study_topic.py --verify                  # Migration verification
 
 Exit Codes:
     0: Success
@@ -41,10 +41,10 @@ def get_agent_root():
     Works from both canonical (scripts/) and legacy (.aget/patterns/session/) locations.
     """
     current = Path(__file__).resolve()
-    # Canonical: scripts/study_up.py → parent.parent
+    # Canonical: scripts/study_topic.py → parent.parent
     if current.parent.name == 'scripts':
         return current.parent.parent
-    # Legacy: .aget/patterns/session/study_up.py → parent^4
+    # Legacy: .aget/patterns/session/study_topic.py → parent^4
     return current.parent.parent.parent.parent
 
 
@@ -383,14 +383,14 @@ def generate_report(topic: str, findings: dict) -> str:
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Study Up Protocol - Focused Topic Research',
+        description='Study Topic Protocol - Focused Topic Research',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='''
 Examples:
-  python3 study_up.py --topic "wind down"       # Research wind down protocol
-  python3 study_up.py --topic "release" --json  # JSON output
-  python3 study_up.py --topic "L477"            # Find L477 references
-  python3 study_up.py --verify                  # Migration verification
+  python3 study_topic.py --topic "wind down"       # Research wind down protocol
+  python3 study_topic.py --topic "release" --json  # JSON output
+  python3 study_topic.py --topic "L477"            # Find L477 references
+  python3 study_topic.py --verify                  # Migration verification
         '''
     )
     parser.add_argument('--topic', '-t', type=str, help='Topic to research')
@@ -402,7 +402,7 @@ Examples:
 
     # Verification mode for migration testing
     if args.verify:
-        print("VERIFY: study_up protocol (study_up.py)")
+        print("VERIFY: study_topic protocol (study_topic.py)")
         return 0
 
     # Topic is required for actual research

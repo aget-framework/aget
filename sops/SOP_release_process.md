@@ -1642,7 +1642,7 @@ python3 .aget/patterns/session/verify_session_protocols.py
 # [PASS] **wind_down** (CAP-SESSION-004)
 # [PASS] **sanity_check** (CAP-SESSION-008)
 # [PASS] **step_back** (CAP-SESSION-002)
-# [PASS] **study_up** (CAP-SESSION-007)
+# [PASS] **study_topic** (CAP-SESSION-007)
 # ============================================================
 
 # 2. If any protocol fails, investigate before proceeding

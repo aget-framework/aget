@@ -425,9 +425,9 @@ cat /path/to/aget-framework/aget/.aget/version.json | grep aget_version
    cp -r $TEMPLATE/.claude/skills/aget-studyup $AGENT/.claude/skills/
    ```
 
-4. **Deploy study_up.py script**:
+4. **Deploy study_topic.py script**:
    ```bash
-   cp $TEMPLATE/scripts/study_up.py $AGENT/scripts/
+   cp $TEMPLATE/scripts/study_topic.py $AGENT/scripts/
    ```
 
 5. **Add migration_history entry** to `.aget/version.json`:
