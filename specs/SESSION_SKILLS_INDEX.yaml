@@ -88,7 +88,7 @@ skills:
       - "end session"
       - "finalize"
     script: ".aget/patterns/session/wind_down.py"
-    NOT_script: ".aget/patterns/session/aget_housekeeping_protocol.py"  # L491
+    NOT_script: ".aget/patterns/session/health_check.py"  # L491
     fallback: "Manual: Check pending work, create session file"
     tests: "tests/test_session_protocol.py::TestWindDownProtocol"
     requirements:
@@ -108,7 +108,7 @@ skills:
     disambiguation: >
       wind_down ends session and creates handoff if required.
       Do NOT confuse with sanity_check (health verification).
-      The aget_housekeeping_protocol.py is for sanity_check, NOT wind_down.
+      The health_check.py is for sanity_check, NOT wind_down.
       This is a common mistake documented in L491.
 
   # ============================================================
@@ -179,7 +179,7 @@ skills:
       - "health check"
       - "housekeeping"
       - "diagnostics"
-    script: ".aget/patterns/session/aget_housekeeping_protocol.py"
+    script: ".aget/patterns/session/health_check.py"
     NOT_trigger:
       - "wind down"
       - "wind_down"
@@ -199,7 +199,7 @@ skills:
     verify_flag: true
     disambiguation: >
       sanity_check verifies agent health and configuration.
-      The script is aget_housekeeping_protocol.py.
+      The script is health_check.py.
       Do NOT run this for "wind down" - wind_down has its own script.
       This is the "housekeeping" script but it is NOT for session end.
 
@@ -248,7 +248,7 @@ relationships:
       - skill_a: wind_down
         skill_b: sanity_check
         confusion: "Both involve 'housekeeping' concept"
-        resolution: "wind_down.py for end, aget_housekeeping_protocol.py for health"
+        resolution: "wind_down.py for end, health_check.py for health"
 
       - skill_a: step_back
         skill_b: study_topic

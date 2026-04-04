@@ -716,7 +716,7 @@ grep -q "Context for External" "handoffs/RELEASE_HANDOFF_v${VERSION}.md" && echo
 ```bash
 # After running any validation script, log should have new entry
 BEFORE=$(wc -l < .aget/logs/validation_log.jsonl 2>/dev/null || echo 0)
-python3 .aget/patterns/session/aget_housekeeping_protocol.py --json
+python3 .aget/patterns/session/health_check.py --json
 AFTER=$(wc -l < .aget/logs/validation_log.jsonl 2>/dev/null || echo 0)
 [ "$AFTER" -gt "$BEFORE" ] && echo "PASS: Validation logged" || echo "FAIL: No log entry created"
 ```

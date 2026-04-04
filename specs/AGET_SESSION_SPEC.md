@@ -127,7 +127,7 @@ vocabulary:
   sanity_check:  # Sanity check phase (CAP-SESSION-008)
     Sanity_Check_Protocol:
       skos:definition: "Agent health verification procedure"
-      aget:location: ".aget/patterns/session/aget_housekeeping_protocol.py"
+      aget:location: ".aget/patterns/session/health_check.py"
       skos:related: ["R-SESSION-008"]
     Health_Verification:
       skos:definition: "Diagnostic checks for agent configuration"
@@ -353,15 +353,15 @@ The SYSTEM shall support agent health verification via sanity check.
 
 | ID | Pattern | Statement |
 |----|---------|-----------|
-| CAP-SESSION-008-01 | ubiquitous | The SYSTEM shall execute aget_housekeeping_protocol.py for health checks |
+| CAP-SESSION-008-01 | ubiquitous | The SYSTEM shall execute health_check.py for health checks |
 | CAP-SESSION-008-02 | ubiquitous | The SYSTEM shall report health status with 8 diagnostic checks |
 | CAP-SESSION-008-03 | ubiquitous | The SYSTEM shall support --json output mode |
 | CAP-SESSION-008-04 | prohibited | The SYSTEM shall NOT execute sanity_check script for "wind down" trigger |
 | CAP-SESSION-008-05 | ubiquitous | The SYSTEM shall support --verify flag for migration validation |
 
-**Enforcement**: aget_housekeeping_protocol.py, contract tests
+**Enforcement**: health_check.py, contract tests
 
-**Disambiguation (L491)**: The aget_housekeeping_protocol.py script is for sanity_check, NOT wind_down. This is a common mistake documented in L491 (Script-Level Semantic Slippage).
+**Disambiguation (L491)**: The health_check.py script is for sanity_check, NOT wind_down. This is a common mistake documented in L491 (Script-Level Semantic Slippage).
 
 ### CAP-SESSION-009: Protocol Verification
 
@@ -548,7 +548,7 @@ structure:
       purpose: "Topic research protocol implementation"
       requirements: ["CAP-SESSION-007"]
 
-    - path: ".aget/patterns/session/aget_housekeeping_protocol.py"
+    - path: ".aget/patterns/session/health_check.py"
       purpose: "Sanity check protocol implementation"
       requirements: ["CAP-SESSION-008"]
 
@@ -670,7 +670,7 @@ python3 scripts/wind_down.py
 python3 scripts/study_topic.py --topic "release"
 
 # Test sanity check (V-SESSION-008)
-python3 scripts/aget_housekeeping_protocol.py --json
+python3 scripts/health_check.py --json
 
 # Contract tests (automated, covers V-SESSION-001 through V-SESSION-008)
 python3 -m pytest tests/test_session_protocol.py -v
