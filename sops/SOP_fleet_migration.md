@@ -1,9 +1,9 @@
 # SOP: Fleet Migration
 
-**Version**: 1.3.0
+**Version**: 1.4.0
 **Status**: Active
 **Created**: 2026-01-05
-**Updated**: 2026-01-11
+**Updated**: 2026-04-04
 **Owner**: aget-framework
 **Implements**: CAP-MIG-017 (Remote Supervisor Upgrade)
 **Related**: L455 (AGENTS.md Invocation Verification), L457 (Cross-Machine Pre-Flight), AGET_RELEASE_SPEC, PROJECT_PLAN_fleet_v3.2_migration.md
@@ -51,11 +51,18 @@ Before starting Fleet_Migration:
 
 **Objective**: Confirm framework and fleet readiness
 
-#### V0.1: Verify Framework Version
+#### V0.1: Discover Latest Release
+```bash
+# Check latest release on GitHub (L723, L755)
+gh release list --repo aget-framework/aget --limit 3
+```
+**Purpose**: Remote fleet supervisors should discover the target version from the release list, not from commit inference. Per L723: release discovery must be explicit, not inferred.
+
+#### V0.2: Verify Framework Version
 ```bash
 python3 -c "import json; print(json.load(open('~/github/aget-framework/aget/.aget/version.json'))['aget_version'])"
 ```
-**Expected**: Target version (e.g., 3.2.1)
+**Expected**: Target version matching the latest release from V0.1
 
 #### V0.2: Verify Script Availability
 ```bash
