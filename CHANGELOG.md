@@ -9,6 +9,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.11.1] - 2026-04-04
+
+**Theme**: Script Rename Stabilization
+
+### Changed
+
+- **Script rename**: `aget_housekeeping_protocol.py` → `health_check.py` across core + 12 templates (HCNA-001). Spec amendments: AGET_SESSION_SPEC CAP-SESSION-008, AGET_RELEASE_SPEC, SESSION_SKILLS_INDEX.yaml.
+- **Script rename**: `study_up.py` → `study_topic.py` across core + 12 templates (SSNA #805).
+- **Config key**: `skip_sanity` → `skip_health_check` in wind_down configuration.
+- **SOP_release_process.md** v1.33 → v1.37: VERSION_SCOPE state machine (L708), Phase 3.5 BLOCKING deployment_monitor --init (L772), Phase 4 structural invocation requirement (#738), repo count 13→14, tag_release.py preferred method.
+
+### Added
+
+- **tag_release.py**: Automated tag + push + GitHub Release for all 14 repos. Dynamic repo discovery, ADR-004 three-tier degradation, --dry-run support. (#739)
+- **verify_deployment.py**: Version-parameterized deployment verification script (REQ-REL-F-007, #744).
+- **REQ-REL-F-008**: Remote Fleet Notification requirement + AGET_RELEASE_SPEC v1.13.0 (L755, #754).
+
+### Fixed
+
+- **Homepage**: Aligned to principal's voice (L733). Conformance fixes (R-HOM-001-03/04/05).
+- **Public handoff**: Sanitized per R-ISSUE-011 (HFX-004).
+- **verify_deployment.py**: Multiple fixes — manifest format, migration_history support, self-exclusion, framework core detection.
+
+---
+
 ## [3.11.0] - 2026-03-28
 
 **Theme**: Skill Conformance, Configuration & Requirements Formalization
