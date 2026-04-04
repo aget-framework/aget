@@ -3,7 +3,7 @@
 **Version**: 3.12.0
 **Released**: 2026-04-04
 **Type**: MINOR (Developer Surface & Governance Maturation)
-**Prepared By**: private-aget-framework-AGET
+**Prepared By**: aget-framework
 **Tracking**: REL-042
 
 ---
@@ -22,7 +22,7 @@ v3.12.0 is the largest-scope release since v3.3.0. It rewrites the developer-fac
 - **9 new EARS requirements**: R-ISSUE-015 through R-ISSUE-023
 - **54 new SKOS vocabulary terms** across triage, lifecycle, labeling, promotion_workflow
 - **3 Issue Form templates** deployed to aget/.github/ISSUE_TEMPLATE/
-- **26 faceted labels** deployed to gmelli/aget-aget (type/priority/domain/status/owner)
+- **26 faceted labels** deployed to issue tracker (type/priority/domain/status/owner)
 - **ISSUE_FILING_GUIDE v2.1** with triage and lifecycle sections
 
 ### Homepage Rewrite
@@ -81,9 +81,9 @@ Templates are already at v3.12.0. Clone fresh or pull main.
 
 | Agent/Fleet | Version | Confirmed | Date | Notes |
 |-------------|---------|:---------:|------|-------|
-| private-aget-framework-AGET | 3.12.0 | Yes | 2026-04-04 | Release agent |
-| private-supervisor-AGET | — | — | — | Pending |
-| Workco fleet (8) | — | — | — | Pending |
+| aget-framework | 3.12.0 | Yes | 2026-04-04 | Release agent |
+| Supervisor | — | — | — | Pending |
+| Remote fleets | — | — | — | Pending |
 
 ---
 
