@@ -50,7 +50,7 @@ See [CLI Support Matrix](docs/AGET_CLI_SUPPORT_MATRIX.md) for detailed validatio
 - **Memory Architecture**: KB as shared collaboration substrate ([MEMORY_VISION](https://github.com/aget-framework/aget/blob/main/docs/MEMORY_VISION.md))
 - **Requirements-Driven**: Human-level requirements ground testable specifications ([requirements/](https://github.com/aget-framework/aget/tree/main/requirements))
 - **Platform Portability**: Three-tier degradation ensures functionality across environments
-- **Gate Discipline**: Explicit decision points with human approval ([GOVERNANCE_PRINCIPLES](https://github.com/aget-framework/aget/blob/main/docs/GOVERNANCE_PRINCIPLES.md))
+- **Gate Discipline**: Explicit decision points with human approval ([GOVERNANCE_PRINCIPLES](https://github.com/aget-framework/aget/blob/main/governance/GOVERNANCE_PRINCIPLES.md))
 - **Fleet Patterns**: Multi-agent coordination with clear authority
 - **Evidence-First Design**: Audit before architecture, validate before shipping
 
