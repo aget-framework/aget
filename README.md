@@ -1,168 +1,104 @@
 # AGET Framework
 
 [![Latest Release](https://img.shields.io/github/v/release/aget-framework/aget?style=flat-square)](https://github.com/aget-framework/aget/releases/latest)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg?style=flat-square)](LICENSE)
 
 > Persistent domain intelligence for governed agentic work
 
-## What is AGET?
+## The Problem
 
-**Solve**: Lost context between sessions, knowledge that resets daily, agents that can't learn from each other, deployment confidence across your fleet.
+Your CLI agents lose context between sessions. Knowledge resets daily. Agents in the same fleet can't learn from each other. You have no confidence that what worked yesterday still works today.
 
-AGET provides persistent domain knowledge, shared memory architecture, fleet coordination, and human-supervised autonomy patterns across CLI agent platforms. Governance ensures knowledge accumulates reliably. Works with Claude Code, Codex CLI, and Gemini CLI ([support matrix](docs/AGET_CLI_SUPPORT_MATRIX.md)).
-
-## Philosophy
-
-**Human-AI collaboration quality over autonomous agent speed**
-
-- **Domain Intelligence First**: Agent value is measured by domain knowledge that serves human decisions
-- **Governed Autonomy**: Agents act autonomously within explicit boundaries
-- **Portable Memory**: Knowledge persists across sessions and platforms
-- **Platform Agnostic**: Patterns work across CLI agent platforms
-- **Human Oversight**: Humans remain decision authorities at key points
-- **Evidence-First**: Design to reality, not theory
-
-## What AGET is NOT
-
-- **A specific AI model or runtime** — AGET is a governance layer that works with any LLM backend
-- **A replacement for Claude Code, Codex CLI, or Gemini CLI** — AGET sits above these platforms as a governance substrate
-- **An autonomous AI system** — AGET explicitly requires human supervision and gate discipline
-- **A coding-only framework** — AGET supports advisory, consulting, supervision, and general knowledge work
-- **A vendor lock-in solution** — Three-tier degradation ensures portability (gh → git → filesystem)
-
-## Supported Platforms
-
-AGET is designed to be platform-agnostic. Validated platforms:
-
-| Platform | Type | Integration | Status |
-|----------|------|-------------|--------|
-| **Claude Code** | CLI | `CLAUDE.md, .claude/` | **Baseline** — primary development target |
-| **Codex CLI** | CLI | `AGENTS.md, .codex/` | **Compatible** — validated |
-| **Gemini CLI** | CLI | `AGENTS.md` | **Compatible** — validated |
-| Cursor | IDE | `.cursor/rules, .cursorrules` | Experimental — not validated |
-| Aider | CLI | `.aider.conf.yml, CONVENTIONS.md` | Experimental — not validated |
-| Windsurf | IDE | `TBD` | Experimental — not validated |
-
-See [CLI Support Matrix](docs/AGET_CLI_SUPPORT_MATRIX.md) for detailed validation status.
-
-## Key Features
-
-- **Persistent Domain Knowledge**: Agents accumulate expertise that compounds across sessions ([evolution/](https://github.com/aget-framework/aget/tree/main/docs) L-docs)
-- **Memory Architecture**: KB as shared collaboration substrate ([MEMORY_VISION](https://github.com/aget-framework/aget/blob/main/docs/MEMORY_VISION.md))
-- **Requirements-Driven**: Human-level requirements ground testable specifications ([requirements/](https://github.com/aget-framework/aget/tree/main/requirements))
-- **Platform Portability**: Three-tier degradation ensures functionality across environments
-- **Gate Discipline**: Explicit decision points with human approval ([GOVERNANCE_PRINCIPLES](https://github.com/aget-framework/aget/blob/main/governance/GOVERNANCE_PRINCIPLES.md))
-- **Fleet Patterns**: Multi-agent coordination with clear authority
-- **Evidence-First Design**: Audit before architecture, validate before shipping
-
-## Strategic Context
-
-| Era | Term | Scope |
-|-----|------|-------|
-| 2024 | **Coding Agent** | Domain-specific (code tasks) |
-| 2025 | **CLI Agent** | Interface-specific (terminal-based) |
-| 2026 | **Governed Agent** | Governance-centric (human-supervised autonomy) |
-
-> The progression abstracts away from domain (coding) and interface (CLI)
-to relationship (governed) and capability (autonomous work within bounds).
-
-## Archetype Ecosystem
-
-AGET provides **12 specialized archetypes**, each with purpose-built skills and formal ontology:
-
-| Category | Archetypes | Focus |
-|----------|------------|-------|
-| **Execution** | Worker, Developer, Operator | Task completion, code, operations |
-| **Analysis** | Analyst, Researcher, Reviewer | Data, literature, quality |
-| **Design** | Architect, Spec-Engineer | Systems, requirements |
-| **Advisory** | Advisor, Consultant, Executive | Guidance, engagements, decisions |
-| **Coordination** | Supervisor | Fleet management |
-
-Each archetype includes:
-- **2-3 specialized skills** for archetype-specific workflows
-- **15 universal skills** shared across all agents (session, health, learning, governance)
-- **Formal ontology** defining domain vocabulary
-
-See [GETTING_STARTED.md](GETTING_STARTED.md) for archetype selection guidance.
-
-## Ontology-Driven Design
-
-AGET uses **ontology-driven agent customization**:
-
-```
-Vocabulary → Specification → Implementation
-```
-
-| Layer | Artifact | Purpose |
-|-------|----------|---------|
-| **Vocabulary** | `ontology/ONTOLOGY_{archetype}.yaml` | Domain concepts (SKOS-compliant) |
-| **Specification** | `specs/SKILL_{name}_SPEC.md` | Formal requirements (EARS patterns) |
-| **Implementation** | `.claude/skills/{name}/` | Skill execution |
-
-**Benefits**:
-- **Precision**: Formal vocabulary prevents ambiguity
-- **Consistency**: Same concepts across all archetype instances
-- **Extensibility**: Add domain-specific terms to ontology
+AGET fixes this. It gives your agents persistent knowledge, shared memory, fleet coordination, and human-supervised governance. Your agents accumulate domain expertise that compounds across sessions.
 
 ## Quick Start
 
-> **Recommended Starting Point**: Start with the [Supervisor template](https://github.com/aget-framework/template-supervisor-aget). It coordinates your agent fleet and can create new agents using `/aget-create-aget`. See [GETTING_STARTED.md](GETTING_STARTED.md) for the supervisor-first workflow.
+Start with the [Supervisor template](https://github.com/aget-framework/template-supervisor-aget). It coordinates your fleet and can create new agents.
 
-1. Clone a template from [aget-framework](https://github.com/aget-framework)
-2. Configure `.aget/version.json` and `AGENTS.md` for your agent
-3. Run `python3 -m pytest tests/ -v` to verify setup
-4. Start with `wake up` protocol
+```bash
+# 1. Clone the supervisor template
+git clone https://github.com/aget-framework/template-supervisor-aget my-supervisor
+
+# 2. Open in your CLI agent (Claude Code, Codex CLI, or Gemini CLI)
+cd my-supervisor
+
+# 3. Start your first session
+# Tell your agent: "wake up"
+
+# 4. Create a new agent from a template
+# Tell your agent: "/aget-create-aget worker my-first-worker"
+```
+
+See [GETTING_STARTED.md](GETTING_STARTED.md) for the full supervisor-first workflow.
+
+## Key Features
+
+- **Persistent Knowledge**: Agents accumulate expertise across sessions ([L-docs](https://github.com/aget-framework/aget/tree/main/docs), [evolution/](https://github.com/aget-framework/aget/tree/main/.aget/evolution))
+- **Shared Memory**: KB as collaboration substrate, not hidden AI state ([MEMORY_VISION](https://github.com/aget-framework/aget/blob/main/docs/MEMORY_VISION.md))
+- **Requirements-Driven**: Human-level requirements ground testable specifications ([requirements/](https://github.com/aget-framework/aget/tree/main/requirements))
+- **Gate Discipline**: Explicit decision points with human approval ([GOVERNANCE_PRINCIPLES](https://github.com/aget-framework/aget/blob/main/governance/GOVERNANCE_PRINCIPLES.md))
+- **Fleet Coordination**: Multi-agent patterns with clear authority boundaries
+- **Evidence-First**: Audit before architecture. Validate before shipping.
+
+## Supported Platforms
+
+| Platform | Status | Integration |
+|----------|--------|-------------|
+| **Claude Code** | Baseline | `CLAUDE.md`, `.claude/` |
+| **Codex CLI** | Compatible | `AGENTS.md`, `.codex/` |
+| **Gemini CLI** | Compatible | `AGENTS.md` |
+| Cursor | Experimental | `.cursor/rules` |
+| Aider | Experimental | `CONVENTIONS.md` |
+
+See [CLI Support Matrix](docs/AGET_CLI_SUPPORT_MATRIX.md) for details.
+
+## What AGET is NOT
+
+- **Not an AI model or runtime.** AGET is a governance layer that works with any LLM backend.
+- **Not a replacement for Claude Code or Codex CLI.** AGET sits above these platforms.
+- **Not an autonomous system.** AGET requires human supervision and gate discipline.
+- **Not coding-only.** AGET supports advisory, consulting, research, and general knowledge work.
 
 ## Templates
 
-**12 Archetypes** with specialized skills and ontologies:
+12 archetypes, each with specialized skills and formal ontology:
 
-| Template | Archetype | Key Skills | Use Case |
-|----------|-----------|------------|----------|
-| [**template-supervisor-aget**](https://github.com/aget-framework/template-supervisor-aget) | supervisor | broadcast-fleet, review-agent, escalate-issue, create-aget | Fleet coordination (**recommended start**) |
-| [template-worker-aget](https://github.com/aget-framework/template-worker-aget) | worker | execute-task, report-progress | Task execution, foundation |
-| [template-developer-aget](https://github.com/aget-framework/template-developer-aget) | developer | run-tests, lint-code, review-pr | Development workflows |
-| [template-advisor-aget](https://github.com/aget-framework/template-advisor-aget) | advisor | assess-risk, recommend-action | Advisory with personas |
-| [template-consultant-aget](https://github.com/aget-framework/template-consultant-aget) | consultant | assess-client, propose-engagement | Consulting engagements |
-| [template-analyst-aget](https://github.com/aget-framework/template-analyst-aget) | analyst | analyze-data, generate-report | Data analysis |
-| [template-architect-aget](https://github.com/aget-framework/template-architect-aget) | architect | design-architecture, assess-tradeoffs | System design |
-| [template-researcher-aget](https://github.com/aget-framework/template-researcher-aget) | researcher | search-literature, document-finding | Research workflows |
-| [template-operator-aget](https://github.com/aget-framework/template-operator-aget) | operator | handle-incident, run-playbook | Operations/DevOps |
-| [template-executive-aget](https://github.com/aget-framework/template-executive-aget) | executive | make-decision, review-budget | Executive advisory |
-| [template-reviewer-aget](https://github.com/aget-framework/template-reviewer-aget) | reviewer | review-artifact, provide-feedback | Quality review |
-| [template-spec-engineer-aget](https://github.com/aget-framework/template-spec-engineer-aget) | spec-engineer | validate-spec, generate-requirement | Specification authoring |
+| Template | Use Case |
+|----------|----------|
+| [**template-supervisor-aget**](https://github.com/aget-framework/template-supervisor-aget) | Fleet coordination (**start here**) |
+| [template-worker-aget](https://github.com/aget-framework/template-worker-aget) | Task execution |
+| [template-developer-aget](https://github.com/aget-framework/template-developer-aget) | Development workflows |
+| [template-advisor-aget](https://github.com/aget-framework/template-advisor-aget) | Advisory with personas |
+| [template-analyst-aget](https://github.com/aget-framework/template-analyst-aget) | Data analysis |
+| [template-architect-aget](https://github.com/aget-framework/template-architect-aget) | System design |
+| [template-researcher-aget](https://github.com/aget-framework/template-researcher-aget) | Research workflows |
+| [template-consultant-aget](https://github.com/aget-framework/template-consultant-aget) | Consulting engagements |
+| [template-operator-aget](https://github.com/aget-framework/template-operator-aget) | Operations/DevOps |
+| [template-executive-aget](https://github.com/aget-framework/template-executive-aget) | Executive advisory |
+| [template-reviewer-aget](https://github.com/aget-framework/template-reviewer-aget) | Quality review |
+| [template-spec-engineer-aget](https://github.com/aget-framework/template-spec-engineer-aget) | Specification authoring |
 
-**All templates include**: 15 universal skills + archetype-specific skills.
-See [GETTING_STARTED.md](GETTING_STARTED.md) for archetype selection guidance.
+All templates include 15 universal skills. See [Archetype Ecosystem](docs/ARCHETYPE_ECOSYSTEM.md) for details.
 
 ## Session Protocols
 
-| Command | Protocol | Purpose |
-|---------|----------|---------|
-| `wake up` | Wake_Protocol | Initialize session, load context |
-| `study up [topic]` | Study_Up_Protocol | Deep dive on specific topic |
-| `step back` | Step_Back_Protocol | Review KB before proposing |
-| `health check` | Health_Check_Protocol | Verify agent health |
-| `wind down` | Wind_Down_Protocol | End session, create handoff |
+| Command | What it does |
+|---------|-------------|
+| `wake up` | Initialize session, load context |
+| `study up [topic]` | Research a topic across the KB |
+| `health check` | Verify agent health |
+| `wind down` | End session, create handoff |
 
-## What's Next
+## Learn More
 
-**v3.12.0** — Homepage Rewrite, Configuration Enhancement & Issue Management
-
-- **Homepage rewrite**: Principal's voice, pain-point framing, quick-start experience
-- **Configuration enhancement**: `/aget-enhance-config` tiered configuration system
-- **Issue management**: Ontology expansion, governance spec v2.1.0, triage automation
-
-See the [Issues page](https://github.com/aget-framework/aget/issues) for the full backlog.
+- [Strategic Context](docs/STRATEGIC_CONTEXT.md): The governed agent paradigm
+- [Ontology-Driven Design](docs/ONTOLOGY_DESIGN.md): Vocabulary-first agent customization
+- [Philosophy](docs/COMPOSITION_GUIDE.md): Human-AI collaboration quality over autonomous speed
 
 ## Contributing
 
-Contributions welcome! See the [Issues page](https://github.com/aget-framework/aget/issues) to report bugs or suggest features.
+Contributions welcome. See the [Issues page](https://github.com/aget-framework/aget/issues) to report bugs or suggest features.
 
 ## License
 
-Apache License 2.0 - See [LICENSE](LICENSE)
-
----
-
-*Generated from specifications on 2026-02-22*
-*See: [AGET_IDENTITY_SPEC.yaml](specs/AGET_IDENTITY_SPEC.yaml), [AGET_POSITIONING_SPEC.yaml](specs/AGET_POSITIONING_SPEC.yaml)*
+Apache License 2.0. See [LICENSE](LICENSE).

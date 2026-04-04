@@ -47,7 +47,7 @@ This document provides an index of all AGET framework specifications with their 
 | AGET-COMP-001 | COMPOSITION_SPEC_v1.0 | Approved | Active | Capability composition mechanism |
 | AGET-ID-001 | AGET_IDENTITY_SPEC | Active | Active | Agent identity structure and requirements |
 | AGET-ID-002 | AGET_IDENTITY_JSON_SCHEMA | Active | Active | Identity JSON schema definition |
-| AGET-ISS-001 | AGET_ISSUE_GOVERNANCE_SPEC | Active | Active | Issue filing governance and routing |
+| AGET-ISS-001 | AGET_ISSUE_GOVERNANCE_SPEC | Active | Active | Issue governance: routing, triage, lifecycle, Issue Forms (v2.1.0) |
 | AGET-POS-001 | AGET_POSITIONING_SPEC | Active | Active | Strategic positioning requirements |
 | AGET-SUP-001 | AGET_SUPERVISOR_NOTIFICATION_SPEC | Active | Active | Supervisor notification protocols |
 | AGET-CIV-001 | AGET_CONTENT_INTEGRITY_SPEC | Active | Active | Content integrity validation |
@@ -146,7 +146,7 @@ AGET-{DOMAIN}-{NNN}
 | AGET-LIC-001 | AGET_LICENSE_SPEC | Apache 2.0 requirements |
 | AGET-ORG-001 | AGET_ORGANIZATION_SPEC | GitHub org requirements |
 | AGET-SEC-001 | AGET_SECURITY_SPEC | Content security |
-| AGET-ISS-001 | AGET_ISSUE_GOVERNANCE_SPEC | Issue filing and routing |
+| AGET-ISS-001 | AGET_ISSUE_GOVERNANCE_SPEC | Issue filing, routing, triage (CAP-ISSUE-006), lifecycle (CAP-ISSUE-007), Issue Forms (CAP-ISSUE-008) |
 | AGET-CIV-001 | AGET_CONTENT_INTEGRITY_SPEC | Content integrity validation |
 
 ### Lifecycle

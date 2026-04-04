@@ -1,0 +1,71 @@
+name: Feature Request
+description: Propose a new feature for the AGET framework
+title: "[feature] "
+labels: ["type:feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for proposing a new feature. New features go through the AGET governance process:
+        proposal, review, and approval before implementation.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Feature Description
+      description: What new capability would you like to add?
+      placeholder: Describe the feature clearly and concisely.
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation & Use Case
+      description: Why is this feature needed? What use case does it enable?
+      placeholder: Describe the problem this feature solves or the capability it adds.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: domain
+    attributes:
+      label: Framework Domain
+      description: Which area of the AGET framework would this feature affect?
+      options:
+        - Core framework (aget/)
+        - Templates (template-*)
+        - Governance & specs
+        - Release process
+        - Session protocol (wake-up, wind-down, etc.)
+        - Skills
+        - Ontology & vocabulary
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-design
+    attributes:
+      label: Proposed Design
+      description: How would you design this feature?
+      placeholder: Describe your proposed approach, API surface, or configuration.
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Have you considered any alternative approaches?
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other context, references, or prior art?
+    validations:
+      required: false

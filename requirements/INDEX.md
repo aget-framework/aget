@@ -11,6 +11,7 @@
 | Domain | File | Requirements | Status | Date |
 |--------|------|:----------:|--------|------|
 | REL | [REQ-REL_release_quality.md](REQ-REL_release_quality.md) | 6F + 3Q | proposed | 2026-03-28 |
+| HOM | [REQ-HOM_homepage_quality.md](REQ-HOM_homepage_quality.md) | 6F + 3Q | proposed | 2026-04-04 |
 
 ---
 
