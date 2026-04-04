@@ -288,7 +288,10 @@ def check_sessions_directory(agent_path: Path) -> CheckResult:
             fixable=True
         )
 
-    session_files = list(sessions_dir.glob('session_*.md'))
+    # SC-011: Use correct SESSION_*.md convention with legacy fallback
+    session_files = list(sessions_dir.glob('SESSION_*.md'))
+    if not session_files:
+        session_files = list(sessions_dir.glob('session_*.md'))  # legacy fallback
     return CheckResult(
         name="sessions_directory",
         passed=True,
