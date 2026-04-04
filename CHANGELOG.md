@@ -17,6 +17,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.12.0] - 2026-04-04
+
+**Theme**: Developer Surface & Governance Maturation
+
+### Added
+
+- **AGET_ISSUE_GOVERNANCE_SPEC v2.1.0**: 3 new capabilities — CAP-ISSUE-006 (Issue Triage), CAP-ISSUE-007 (Issue Lifecycle), CAP-ISSUE-008 (Issue Forms). 9 new EARS requirements (R-ISSUE-015 through R-ISSUE-023). 54 new SKOS vocabulary terms across 4 concept groups (triage, lifecycle, labeling, promotion_workflow). 3 new anti-patterns.
+- **Issue Forms**: 3 GitHub Issue Form templates (enhancement, bug, feature) for structured public filing on aget-framework/aget.
+- **Faceted label taxonomy**: 26 governed labels across 5 categories (type, priority, domain, status, owner) deployed to issue tracker.
+- **REQ-HOM requirements**: 6 functional + 3 quality requirements for homepage messaging quality.
+- **study_topic.py epistemic parameterization**: `--purpose` (4 values) and `--domain-keywords` flags for agent-aware KB search. Purpose weighting via config priority_areas, domain boosting via config domain_keywords. CAP-SESSION-007-06/07.
+- **SOP_fleet_migration v1.4**: `gh release list` discovery step (L723).
+
+### Changed
+
+- **README.md rewritten**: 169 → 104 lines. Quick Start at line 14 (was 106). Pain-point framing. Platform claims corrected (Codex/Gemini: Compatible, not Validated). R-HOM-001 conformance 1/7 → 6/7.
+- **ISSUE_FILING_GUIDE v2.1**: Added triage, lifecycle, and faceted label sections.
+- **3 sections relocated to docs/**: STRATEGIC_CONTEXT.md, ARCHETYPE_ECOSYSTEM.md, ONTOLOGY_DESIGN.md (from README.md per REQ-HOM-F-005).
+
+### Deprecated
+
+- First deprecation cycle COMPLETE: `capture` verb, `study-up` script reference, `record-nugget` skill directory — all removed (POL-DEP-001).
+
+---
+
 ## [3.11.1] - 2026-04-04
 
 **Theme**: Script Rename Stabilization
