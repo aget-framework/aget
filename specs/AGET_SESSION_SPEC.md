@@ -342,8 +342,10 @@ The SYSTEM shall support focused topic research via study_topic protocol.
 | CAP-SESSION-007-03 | ubiquitous | The SYSTEM shall report related L-docs and patterns |
 | CAP-SESSION-007-04 | ubiquitous | The SYSTEM shall support --json output mode |
 | CAP-SESSION-007-05 | ubiquitous | The SYSTEM shall support --verify flag for migration validation |
+| CAP-SESSION-007-06 | optional | WHERE `.aget/config.json` contains `study_topic.priority_areas`, the SYSTEM shall accept a `--purpose` parameter (values: `pre-implementation`, `pre-release`, `exploration`, `audit`) and weight search results from KB areas associated with that purpose higher than results from other areas |
+| CAP-SESSION-007-07 | optional | WHERE `.aget/config.json` contains `study_topic.domain_keywords`, the SYSTEM shall boost ranking scores for search results that match one or more configured domain keywords |
 
-**Enforcement**: study_topic.py, contract tests
+**Enforcement**: study_topic.py `--purpose` and `--domain-keywords` flags, contract tests
 
 **Disambiguation**: study_topic is for focused topic research. Differs from step_back (broad KB review).
 
@@ -656,6 +658,8 @@ session_naming_standard:
 | V-SESSION-006 | CAP-SESSION-007 | automated | Study-up multi-word topics return results (L637, #466) |
 | V-SESSION-007 | CAP-SESSION-010 | manual | Wind-down re-entrancy guard prevents double execution |
 | V-SESSION-008 | CAP-SESSION-012 | automated | Sanity gate runs housekeeping checks (9/9 expected) |
+| V-SESSION-009 | CAP-SESSION-007-06 | automated | Purpose parameter weights results from priority_areas globs higher |
+| V-SESSION-010 | CAP-SESSION-007-07 | automated | Domain keywords boost ranking for matching results |
 
 ### Validation Commands
 

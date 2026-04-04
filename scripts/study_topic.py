@@ -5,26 +5,27 @@ Study Topic Protocol - Focused Topic Research
 Search KB for topic-related artifacts and report findings.
 Use before diving into implementation to understand existing patterns.
 
+Renamed from study_up.py in v3.12.0 (L762: Script-Skill Name Alignment Debt).
+Aligns script name with skill name: /aget-study-topic (SNR2, #480).
+
 Implements: CAP-SESSION-007 (Study Topic)
 - R-SESSION-007-01: Accept topic argument
 - R-SESSION-007-02: Search KB for topic
 - R-SESSION-007-03: Report related artifacts
 - R-SESSION-007-04: JSON output mode
 - R-SESSION-007-05: Verify mode
+- R-SESSION-007-06: Epistemic purpose parameter (CAP-SESSION-007-06)
+- R-SESSION-007-07: Domain relevance weighting (CAP-SESSION-007-07)
 
 See: aget/specs/AGET_SESSION_SPEC.md (CAP-SESSION-007)
 Index: aget/specs/SESSION_SKILLS_INDEX.yaml
 Tests: tests/test_session_protocol.py::TestStudyTopicProtocol
-Related: L187 (Silent execution), L335 (Memory Architecture)
+Related: L187 (Silent execution), L335 (Memory Architecture), L761, L762
 
 Usage:
     python3 study_topic.py --topic "wind down"       # Research wind down
     python3 study_topic.py --topic "release" --json  # JSON output
     python3 study_topic.py --verify                  # Migration verification
-
-Exit Codes:
-    0: Success
-    1: Failure or no topic provided
 """
 
 import argparse
@@ -36,44 +37,133 @@ from pathlib import Path
 
 
 def get_agent_root():
-    """Get the agent root directory.
-
-    Works from both canonical (scripts/) and legacy (.aget/patterns/session/) locations.
-    """
+    """Get the agent root directory."""
     current = Path(__file__).resolve()
-    # Canonical: scripts/study_topic.py → parent.parent
-    if current.parent.name == 'scripts':
-        return current.parent.parent
-    # Legacy: .aget/patterns/session/study_topic.py → parent^4
-    return current.parent.parent.parent.parent
+    return current.parent.parent
 
 
-def search_file_for_topic(file_path: Path, topic: str, case_insensitive: bool = True) -> dict:
+def load_study_topic_config():
+    """Load study_topic config from .aget/config.json.
+
+    Returns config dict or empty dict if not configured.
+    Three-tier degradation (ADR-004):
+      Tier 1: Full config with priority_areas + domain_keywords
+      Tier 2: Partial config (domain_keywords only)
+      Tier 3: No config — default behavior (backward-compatible)
+
+    Implements: CAP-SESSION-007-06 (config fallback), CAP-SESSION-007-07 (domain config)
+    """
+    config_path = get_agent_root() / '.aget' / 'config.json'
+    if not config_path.exists():
+        return {}
+    try:
+        config = json.loads(config_path.read_text())
+        return config.get('study_topic', {})
+    except (json.JSONDecodeError, OSError):
+        return {}
+
+
+def resolve_purpose(explicit_purpose, config):
+    """Resolve epistemic purpose from flag or config default.
+
+    Priority: explicit --purpose flag > config default_purpose > 'exploration'
+
+    Implements: CAP-SESSION-007-06 (purpose resolution)
+    """
+    if explicit_purpose:
+        return explicit_purpose
+    return config.get('default_purpose', 'exploration')
+
+
+def get_purpose_globs(purpose, config):
+    """Get file glob patterns for a purpose from config.
+
+    Returns list of glob patterns that should be boosted for this purpose.
+
+    Implements: CAP-SESSION-007-06 (priority_areas)
+    """
+    priority_areas = config.get('priority_areas', {})
+    return priority_areas.get(purpose, [])
+
+
+def compute_purpose_boost(file_path_str, purpose_globs):
+    """Compute purpose boost for a file based on glob matching.
+
+    Returns 2.0 if file matches any purpose glob, 1.0 otherwise.
+
+    Implements: CAP-SESSION-007-06 (purpose weighting)
+    """
+    if not purpose_globs:
+        return 1.0
+    from fnmatch import fnmatch
+    for glob_pattern in purpose_globs:
+        if fnmatch(file_path_str, glob_pattern) or fnmatch(file_path_str, '*/' + glob_pattern):
+            return 2.0
+    return 1.0
+
+
+def compute_domain_boost(content, domain_keywords):
+    """Compute domain relevance boost based on keyword presence.
+
+    Returns 1.0 + 0.25 per matching keyword (max 2.0).
+
+    Implements: CAP-SESSION-007-07 (domain relevance weighting)
+    """
+    if not domain_keywords:
+        return 1.0
+    matches = sum(1 for kw in domain_keywords if kw.lower() in content.lower())
+    return min(2.0, 1.0 + matches * 0.25)
+
+
+def search_file_for_topic(file_path: Path, topic: str, case_insensitive: bool = True,
+                          domain_keywords: list = None) -> dict:
     """Search a file for topic matches.
 
     Args:
         file_path: Path to search
         topic: Topic string to search for
         case_insensitive: Whether to ignore case
+        domain_keywords: Optional list of domain keywords for relevance boosting (CAP-SESSION-007-07)
 
     Returns:
         Dict with match info or None if no match
     """
     try:
         content = file_path.read_text()
-        pattern = re.escape(topic)
         flags = re.IGNORECASE if case_insensitive else 0
 
-        matches = list(re.finditer(pattern, content, flags))
+        # Tokenize multi-word topics into keywords, filtering punctuation-only tokens
+        keywords = [kw for kw in topic.split() if re.search(r'\w', kw)]
+        if len(keywords) <= 1:
+            # Single keyword: original behavior
+            matches = list(re.finditer(re.escape(topic), content, flags))
+        else:
+            # Multi-keyword: search each independently, require majority coverage
+            keyword_matches = {}
+            all_matches = []
+            for kw in keywords:
+                kw_matches = list(re.finditer(re.escape(kw), content, flags))
+                if kw_matches:
+                    keyword_matches[kw] = len(kw_matches)
+                    all_matches.extend(kw_matches)
+            # Require at least 50% of keywords present (min 1 for 2-keyword, min 2 for 3+)
+            min_required = max(1, (len(keywords) + 1) // 2) if len(keywords) >= 2 else 1
+            if len(keyword_matches) < min(min_required, len(keywords)):
+                return None
+            matches = all_matches
+
         if not matches:
             return None
 
         # Extract context lines for first few matches
         lines = content.split('\n')
         contexts = []
-        for match in matches[:3]:  # First 3 matches
-            # Find line number
+        seen_lines = set()
+        for match in matches:
             line_start = content.count('\n', 0, match.start())
+            if line_start in seen_lines:
+                continue
+            seen_lines.add(line_start)
             if line_start < len(lines):
                 context_line = lines[line_start].strip()
                 if len(context_line) > 100:
@@ -82,26 +172,38 @@ def search_file_for_topic(file_path: Path, topic: str, case_insensitive: bool = 
                     'line': line_start + 1,
                     'context': context_line
                 })
+            if len(contexts) >= 3:
+                break
 
-        return {
+        result = {
             'file': str(file_path.relative_to(get_agent_root())),
             'match_count': len(matches),
             'contexts': contexts
         }
-    except Exception:
+        # Add keyword coverage for multi-word ranking
+        if len(keywords) > 1:
+            result['keyword_coverage'] = len(keyword_matches) / len(keywords)
+        # Add domain boost if keywords provided (CAP-SESSION-007-07)
+        if domain_keywords:
+            result['domain_boost'] = compute_domain_boost(content, domain_keywords)
+        return result
+    except (OSError, UnicodeDecodeError):
         return None
 
 
-def search_directory(path: Path, topic: str, extensions: list = None) -> list:
+def search_directory(path: Path, topic: str, extensions: list = None,
+                     purpose_globs: list = None, domain_keywords: list = None) -> list:
     """Search a directory for topic-related files.
 
     Args:
         path: Directory to search
         topic: Topic to search for
         extensions: File extensions to include (default: .md, .yaml, .json)
+        purpose_globs: Glob patterns for purpose-based boosting (CAP-SESSION-007-06)
+        domain_keywords: Domain keywords for relevance boosting (CAP-SESSION-007-07)
 
     Returns:
-        List of dicts with file match info
+        List of dicts with file match info, sorted by composite score
     """
     if extensions is None:
         extensions = ['.md', '.yaml', '.json', '.py']
@@ -113,20 +215,30 @@ def search_directory(path: Path, topic: str, extensions: list = None) -> list:
     # Recursive search
     for file in path.rglob('*'):
         if file.is_file() and file.suffix in extensions:
-            match = search_file_for_topic(file, topic)
+            match = search_file_for_topic(file, topic, domain_keywords=domain_keywords)
             if match:
+                # Add purpose boost (CAP-SESSION-007-06)
+                if purpose_globs:
+                    match['purpose_boost'] = compute_purpose_boost(match['file'], purpose_globs)
                 results.append(match)
 
-    # Sort by match count (most relevant first)
-    results.sort(key=lambda x: x['match_count'], reverse=True)
+    # Sort by composite score: keyword_coverage * purpose_boost * domain_boost * match_count
+    def sort_key(x):
+        coverage = x.get('keyword_coverage', 1.0)
+        purpose = x.get('purpose_boost', 1.0)
+        domain = x.get('domain_boost', 1.0)
+        return coverage * purpose * domain * x['match_count']
+
+    results.sort(key=sort_key, reverse=True)
     return results
 
 
-def find_ldocs(topic: str) -> list:
+def find_ldocs(topic: str, domain_keywords: list = None) -> list:
     """Find L-docs related to topic.
 
     Args:
         topic: Topic to search for
+        domain_keywords: Optional domain keywords for boosting (CAP-SESSION-007-07)
 
     Returns:
         List of matching L-doc info
@@ -139,7 +251,7 @@ def find_ldocs(topic: str) -> list:
         return results
 
     for file in evolution_path.glob('L*.md'):
-        match = search_file_for_topic(file, topic)
+        match = search_file_for_topic(file, topic, domain_keywords=domain_keywords)
         if match:
             # Extract L-doc title from first heading
             try:
@@ -153,18 +265,20 @@ def find_ldocs(topic: str) -> list:
                 'ldoc': file.stem,
                 'title': title,
                 'file': match['file'],
-                'match_count': match['match_count']
+                'match_count': match['match_count'],
+                'domain_boost': match.get('domain_boost', 1.0)
             })
 
-    results.sort(key=lambda x: x['match_count'], reverse=True)
+    results.sort(key=lambda x: x['domain_boost'] * x['match_count'], reverse=True)
     return results
 
 
-def find_patterns(topic: str) -> list:
+def find_patterns(topic: str, domain_keywords: list = None) -> list:
     """Find pattern documents related to topic.
 
     Args:
         topic: Topic to search for
+        domain_keywords: Optional domain keywords for boosting
 
     Returns:
         List of matching pattern info
@@ -177,7 +291,7 @@ def find_patterns(topic: str) -> list:
         return results
 
     for file in patterns_path.glob('PATTERN_*.md'):
-        match = search_file_for_topic(file, topic)
+        match = search_file_for_topic(file, topic, domain_keywords=domain_keywords)
         if match:
             results.append({
                 'pattern': file.stem,
@@ -189,11 +303,12 @@ def find_patterns(topic: str) -> list:
     return results
 
 
-def find_project_plans(topic: str) -> list:
+def find_project_plans(topic: str, domain_keywords: list = None) -> list:
     """Find PROJECT_PLANs related to topic.
 
     Args:
         topic: Topic to search for
+        domain_keywords: Optional domain keywords for boosting
 
     Returns:
         List of matching plan info
@@ -206,7 +321,7 @@ def find_project_plans(topic: str) -> list:
         return results
 
     for file in planning_path.glob('PROJECT_PLAN*.md'):
-        match = search_file_for_topic(file, topic)
+        match = search_file_for_topic(file, topic, domain_keywords=domain_keywords)
         if match:
             # Check if active
             try:
@@ -226,11 +341,12 @@ def find_project_plans(topic: str) -> list:
     return results
 
 
-def find_sops(topic: str) -> list:
+def find_sops(topic: str, domain_keywords: list = None) -> list:
     """Find SOPs related to topic.
 
     Args:
         topic: Topic to search for
+        domain_keywords: Optional domain keywords for boosting
 
     Returns:
         List of matching SOP info
@@ -243,7 +359,7 @@ def find_sops(topic: str) -> list:
         return results
 
     for file in sops_path.glob('SOP_*.md'):
-        match = search_file_for_topic(file, topic)
+        match = search_file_for_topic(file, topic, domain_keywords=domain_keywords)
         if match:
             results.append({
                 'sop': file.name,
@@ -255,11 +371,12 @@ def find_sops(topic: str) -> list:
     return results
 
 
-def find_governance(topic: str) -> list:
+def find_governance(topic: str, domain_keywords: list = None) -> list:
     """Find governance docs related to topic.
 
     Args:
         topic: Topic to search for
+        domain_keywords: Optional domain keywords for boosting
 
     Returns:
         List of matching governance doc info
@@ -272,7 +389,7 @@ def find_governance(topic: str) -> list:
         return results
 
     for file in governance_path.glob('*.md'):
-        match = search_file_for_topic(file, topic)
+        match = search_file_for_topic(file, topic, domain_keywords=domain_keywords)
         if match:
             results.append({
                 'doc': file.name,
@@ -296,7 +413,7 @@ def generate_report(topic: str, findings: dict) -> str:
     """
     lines = []
     lines.append("=" * 60)
-    lines.append(f"STUDY UP: {topic}")
+    lines.append(f"STUDY TOPIC: {topic}")
     lines.append("=" * 60)
     lines.append("")
     lines.append(f"**Search Date**: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
@@ -394,6 +511,10 @@ Examples:
         '''
     )
     parser.add_argument('--topic', '-t', type=str, help='Topic to research')
+    parser.add_argument('--purpose', choices=['pre-implementation', 'pre-release', 'exploration', 'audit'],
+                        help='Epistemic purpose — weights results by KB area (CAP-SESSION-007-06)')
+    parser.add_argument('--domain-keywords', nargs='*', metavar='KEYWORD',
+                        help='Domain keywords for relevance boosting (CAP-SESSION-007-07)')
     parser.add_argument('--json', action='store_true', help='Output in JSON format')
     parser.add_argument('--verify', action='store_true', help='Verification mode for migration')
     parser.add_argument('--quiet', '-q', action='store_true', help='Minimal output')
@@ -412,13 +533,21 @@ Examples:
         parser.print_help()
         return 1
 
-    # Perform focused research
+    # Load config and resolve epistemic parameters (CAP-SESSION-007-06/07)
+    config = load_study_topic_config()
+    purpose = resolve_purpose(args.purpose, config)
+    purpose_globs = get_purpose_globs(purpose, config)
+
+    # Domain keywords: explicit flag > config > none
+    domain_keywords = args.domain_keywords or config.get('domain_keywords')
+
+    # Perform focused research with epistemic parameters
     findings = {
-        'ldocs': find_ldocs(args.topic),
-        'patterns': find_patterns(args.topic),
-        'project_plans': find_project_plans(args.topic),
-        'sops': find_sops(args.topic),
-        'governance': find_governance(args.topic)
+        'ldocs': find_ldocs(args.topic, domain_keywords=domain_keywords),
+        'patterns': find_patterns(args.topic, domain_keywords=domain_keywords),
+        'project_plans': find_project_plans(args.topic, domain_keywords=domain_keywords),
+        'sops': find_sops(args.topic, domain_keywords=domain_keywords),
+        'governance': find_governance(args.topic, domain_keywords=domain_keywords)
     }
 
     # JSON output
@@ -427,6 +556,8 @@ Examples:
             'timestamp': datetime.now().isoformat(),
             'agent_path': str(get_agent_root()),
             'topic': args.topic,
+            'purpose': purpose,
+            'domain_keywords': domain_keywords,
             'findings': findings,
             'total_artifacts': sum(len(v) for v in findings.values() if isinstance(v, list))
         }
