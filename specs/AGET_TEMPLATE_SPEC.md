@@ -689,6 +689,7 @@ The SYSTEM shall configure repository issue settings to prevent Issue_Fragmentat
 | CAP-TPL-015-01 | ubiquitous | Template repositories SHALL have GitHub issues DISABLED |
 | CAP-TPL-015-02 | ubiquitous | Issues for template improvements SHALL be filed to central aget-framework/aget tracker |
 | CAP-TPL-015-03 | event-driven | WHEN publishing a template, the SYSTEM SHALL verify hasIssuesEnabled is false |
+| CAP-TPL-015-04 | ubiquitous | Template README issue links SHALL point to the central aget-framework/aget tracker, not to the template's own disabled issues tab |
 
 **Enforcement**: `repo_settings_validator.py --check-issues`
 
