@@ -4,7 +4,7 @@
 **Released**: 2026-03-15
 **Theme**: Governance Enforcement
 **Breaking Changes**: None
-**Framework Manager**: private-aget-framework-AGET
+**Framework Manager**: aget-framework
 **Status**: READY
 
 ---
@@ -188,10 +188,10 @@ A BLOCKING validation mode that verifies all 27 version-bearing files across 13 
 
 | Fleet | Supervisor | Agents | Status | Date | Notes |
 |-------|-----------|--------|--------|------|-------|
-| main | private-supervisor-AGET | 32/32 | COMPLETE | 2026-03-14 | 1 SKIP (framework-AGET self-managed). 0 rollbacks, 0 failures. L583 filed, #438 filed. |
-| workco | private-workco-supervisor-AGET | 0/8 | PENDING | — | — |
+| main | [supervisor] | [N/N] | COMPLETE | 2026-03-14 | 0 rollbacks, 0 failures. |
+| remote | [supervisor] | [N/N] | PENDING | — | — |
 
-**Total**: 32/40 agents at v3.9.0.
+**Total**: All fleets tracked.
 
 ---
 
@@ -230,18 +230,18 @@ A BLOCKING validation mode that verifies all 27 version-bearing files across 13 
 
 ## Handoff Protocol
 
-**From**: private-aget-framework-AGET
-**To**: private-supervisor-AGET
+**From**: framework-manager
+**To**: fleet-supervisor
 **Date**: 2026-03-15
 
 ### Acknowledgment
 
 - [x] Governance Checklist completed
-- [x] Acknowledged by: private-supervisor-AGET (FLEET-UPG-006)
+- [x] Acknowledged by: fleet-supervisor
 - [x] Date: 2026-03-14
 - [ ] Fleet broadcast sent: ___
-- [x] Main fleet: 32/32 at v3.9.0 (2026-03-14)
-- [ ] Remote fleet: 0/8 (pending)
+- [x] Main fleet: deployed (2026-03-14)
+- [ ] Remote fleet: pending
 
 ---
 

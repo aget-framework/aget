@@ -292,7 +292,7 @@ CLAUDE.md directives that structurally require skill invocation for specific ope
 
 | # | v3.9.0 Observation | v3.10.0 Status |
 |---|-------------------|----------------|
-| 1 | 4 human step-back interventions in FLEET-UPG-006 | **Addressed** — D71 3-layer enforcement targets root cause |
+| 1 | 4 human step-back interventions in [internal-project] | **Addressed** — D71 3-layer enforcement targets root cause |
 | 2 | Content sync ungoverned between private/public | **Resolved** — D69 SOP Phase -0.5 + validators |
 | 3 | Skill naming inconsistency (CS-002 violation) | **Resolved** — #480 renames + `capture` verb retired |
 | 4 | SKILL_SPEC_TEMPLATE.yaml not in templates | **Resolved** — #439 deployed to 12 templates |

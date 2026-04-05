@@ -146,7 +146,7 @@ No new deprecations in v3.11.0.
 
 ## Remote Fleet Announcement (L723, L724)
 
-**For remote fleet supervisors** (e.g., Workco):
+**For remote fleet supervisors** (e.g., remote fleets):
 
 v3.11.0 is available. Key items for your fleet:
 - **New directories**: `requirements/` and `.claude/hooks/` — scaffold only, no agent-specific content yet
