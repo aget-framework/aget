@@ -232,7 +232,7 @@ During my (John Doe, john@company.com) work on ClientX...
 ❌ ANTI-PATTERN: User paths in examples
 
 ```bash
-cd /Users/gabormelli/github/aget-framework/aget
+cd $AGET_FRAMEWORK_DIR/aget
 ```
 ```
 

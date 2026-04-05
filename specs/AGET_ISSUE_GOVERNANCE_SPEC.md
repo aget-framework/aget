@@ -530,7 +530,7 @@ PRIVATE_PATTERNS = [
     r'gmelli/\w+',                 # Private repo references
     r'\d+ agents? (in|across) fleet', # Fleet size disclosure
     r'SESSION_\d{4}-\d{2}-\d{2}',  # Session file references
-    r'vp_of_ai-aget',              # Known private agent
+    r'vp_of_ai-aget',              # Known cross-fleet agent pattern
     r'law_insider-aget',           # Known private agent
     # Added per L583:
     r'[Ll]egal[Oo]n',              # Proprietary company name
