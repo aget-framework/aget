@@ -663,9 +663,9 @@ Issue_Destination:
 
 Private_Issue_Destination:
   skos:prefLabel: "Private_Issue_Destination"
-  skos:definition: "Default issue destination for all agents (gmelli/aget-aget). Private-first routing per L638."
+  skos:definition: "Default issue destination for all agents ({private-tracker}). Private-first routing per L638."
   skos:broader: "Issue_Destination"
-  aget:value: "gmelli/aget-aget"
+  aget:value: "{private-tracker}"
 
 Public_Issue_Destination:
   skos:prefLabel: "Public_Issue_Destination"
@@ -712,7 +712,7 @@ Issue_Fragmentation:
 | Term | Definition |
 |------|------------|
 | `Issue_Destination` | Target repository for issue filing |
-| `Private_Issue_Destination` | Default issue destination for all agents (gmelli/aget-aget) |
+| `Private_Issue_Destination` | Default issue destination for all agents ({private-tracker}) |
 | `Public_Issue_Destination` | Promotion-only destination for principal-approved public issues (aget-framework/aget) |
 | `Private_Fleet_Agent` | Agent in private fleet, may include private details |
 | `Public_Remote_Agent` | Agent outside private fleet, content must be sanitized |

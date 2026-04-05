@@ -172,7 +172,7 @@ Classification: {PASS | N/A (internal audience)}
 |------|-----------|
 | Proposal | SP-005 (`planning/skill-proposals/PROPOSAL_aget-create-briefing.md`) |
 | Requirements | REQ-BRF v0.1.0 (`docs/drafts/REQ-BRF_briefing_creation.md`) |
-| Tracking | gmelli/aget-aget#810 |
+| Tracking | {private-tracker}#810 |
 | L-docs | L384 (Spec Narrative Pattern), L733 (Voice as Composition), L745 (Multi-Modal Effectiveness), L758 (Cross-Agent Convergence), L771 (Proposal Discovery Gap) |
 | Cross-agent | CCB P-005 (demand signal + parameter design + working exemplar) |
 

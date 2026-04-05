@@ -233,7 +233,7 @@ cd ../..
 **Why This Matters**:
 - Validators enable self-validation without full framework repo
 - Agents can verify compliance independently
-- Follows L027 precedent from vp-of-ai-aget migration
+- Follows L027 precedent from external agent migration
 
 ### Step 7: Validate Migration (BLOCKING GATE)
 

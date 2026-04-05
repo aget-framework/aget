@@ -22,7 +22,7 @@ This specification defines the `.aget/evolution/` directory structure, entry typ
 
 Prior to this specification:
 
-1. **Entry type divergence**: gmelli/aget-aget used subdirectories (`decisions/`, `discoveries/`, `extractions/`); aget-framework used prefixed flat files (`L###_`, `D###_`, `DISC###_`)
+1. **Entry type divergence**: {private-tracker} used subdirectories (`decisions/`, `discoveries/`, `extractions/`); aget-framework used prefixed flat files (`L###_`, `D###_`, `DISC###_`)
 2. **Content misplacement**: 158 PROJECT_PLAN files found in `.aget/evolution/` (wrong location)
 3. **Incomplete specification**: AGET_LDOC_SPEC covered L-docs only, not D-docs or DISC-docs
 4. **Semantic confusion**: Prospective documents (PROJECT_PLANs) mixed with retrospective documents (learnings)

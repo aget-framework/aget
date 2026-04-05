@@ -665,7 +665,7 @@ The SYSTEM shall classify artifacts by lineage before drift analysis during migr
 └──────────────────────────────────────────────────────────┘
 ```
 
-**Rationale**: L592 documented a pattern during v3.5.0 fleet upgrades: skills adopted from a different source lineage (e.g., VP-of-AI spec format vs POC-017 template format) are extensions by definition — the agent adopted them before the template existed. Without lineage classification, these require unnecessary drift analysis.
+**Rationale**: L592 documented a pattern during v3.5.0 fleet upgrades: skills adopted from a different source lineage (e.g., external spec format vs POC-017 template format) are extensions by definition — the agent adopted them before the template existed. Without lineage classification, these require unnecessary drift analysis.
 
 **References**: L592 (Lineage-Based Extension Classification), L582 (Skill Customization Preservation), L588 (Mechanical vs Judgment Migration Distinction)
 

@@ -41,7 +41,7 @@ scope_routing:
 # For sensitive contexts, issues go to private staging first
 privacy_staging:
   enabled: false
-  private_repo: null  # e.g., "gmelli/aget-aget"
+  private_repo: null  # e.g., "{private-tracker}"
   staging_labels:
     - "needs-review"
     - "private-staging"

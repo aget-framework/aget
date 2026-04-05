@@ -414,7 +414,7 @@ NEW_VERSION="3.1.0"  # New version
 # Find all files still containing old version
 grep -rn "v${OLD_VERSION}\|${OLD_VERSION}" \
   --include="*.md" --include="*.yaml" --include="*.json" \
-  /Users/gabormelli/github/aget-framework/template-*-aget/ \
+  $AGET_FRAMEWORK_DIR/template-*-aget/ \
   | grep -v CHANGELOG  # CHANGELOG legitimately contains history
 ```
 
@@ -428,7 +428,7 @@ grep -rn "v${OLD_VERSION}\|${OLD_VERSION}" \
 # Verify new version appears in all expected places
 grep -rn "${NEW_VERSION}" \
   --include="*.md" --include="*.yaml" --include="*.json" \
-  /Users/gabormelli/github/aget-framework/template-*-aget/
+  $AGET_FRAMEWORK_DIR/template-*-aget/
 ```
 
 ### Red Flags
@@ -516,7 +516,7 @@ echo "=== VERSION COHERENCE CHECK (L444) ==="
 
 for repo in aget template-*-aget; do
   echo "--- $repo ---"
-  cd /Users/gabormelli/github/aget-framework/$repo
+  cd $AGET_FRAMEWORK_DIR/$repo
 
   # Check version.json (PRIMARY)
   grep "\"aget_version\": \"$VERSION\"" .aget/version.json > /dev/null && echo "✅ version.json" || echo "❌ version.json"
@@ -592,7 +592,7 @@ See: `docs/VERSION_BEARING_FILES.md` for the complete enumeration.
 ```bash
 # Create releases for all repos (not just push tags)
 for repo in aget template-*-aget; do
-  cd /Users/gabormelli/github/aget-framework/$repo
+  cd $AGET_FRAMEWORK_DIR/$repo
   gh release create vX.Y.Z --title "vX.Y.Z: Release Title" --notes "Release notes"
 done
 ```
@@ -612,7 +612,7 @@ done
 ```bash
 # Verify all templates have CHANGELOG entry
 for repo in template-*-aget; do
-  grep -q "## \[X.Y.Z\]" /Users/gabormelli/github/aget-framework/$repo/CHANGELOG.md && \
+  grep -q "## \[X.Y.Z\]" $AGET_FRAMEWORK_DIR/$repo/CHANGELOG.md && \
     echo "✅ $repo" || echo "❌ $repo MISSING CHANGELOG entry"
 done
 ```
@@ -633,7 +633,7 @@ done
 
 **Verification**:
 ```bash
-cd /Users/gabormelli/github/aget-framework/aget
+cd $AGET_FRAMEWORK_DIR/aget
 jq '.version' codemeta.json  # Should show "X.Y.Z"
 grep "^version:" CITATION.cff  # Should show version: "X.Y.Z"
 ```
@@ -1083,16 +1083,16 @@ During v3.3.0 planning, assessment revealed:
 
 ```bash
 # List all published templates
-ls -d /Users/gabormelli/github/aget-framework/template-*-aget/ | wc -l
+ls -d $AGET_FRAMEWORK_DIR/template-*-aget/ | wc -l
 # Expected: Count matches plan coverage
 
 # Verify all have specs/
-for t in /Users/gabormelli/github/aget-framework/template-*-aget; do
+for t in $AGET_FRAMEWORK_DIR/template-*-aget; do
   [ -d "$t/specs" ] && echo "✅ $(basename $t)" || echo "❌ $(basename $t) MISSING specs/"
 done
 
 # Verify all have vocabularies
-for t in /Users/gabormelli/github/aget-framework/template-*-aget; do
+for t in $AGET_FRAMEWORK_DIR/template-*-aget; do
   ls "$t/specs/"*_VOCABULARY.md >/dev/null 2>&1 && \
     echo "✅ $(basename $t)" || echo "❌ $(basename $t) MISSING vocabulary"
 done
@@ -1133,8 +1133,8 @@ Before ANY release, verify template conformance:
 
 ```bash
 VERSION="X.Y.Z"
-TEMPLATES=$(ls -d /Users/gabormelli/github/aget-framework/template-*-aget/ 2>/dev/null | wc -l)
-DEPRECATED=$(find /Users/gabormelli/github/aget-framework/template-*-aget -name "DEPRECATED.md" 2>/dev/null | wc -l)
+TEMPLATES=$(ls -d $AGET_FRAMEWORK_DIR/template-*-aget/ 2>/dev/null | wc -l)
+DEPRECATED=$(find $AGET_FRAMEWORK_DIR/template-*-aget -name "DEPRECATED.md" 2>/dev/null | wc -l)
 ACTIVE=$((TEMPLATES - DEPRECATED))
 
 echo "=== TEMPLATE CONFORMANCE CHECK (R-REL-015) ==="
@@ -1144,7 +1144,7 @@ echo "Active (must conform): $ACTIVE"
 
 # Verify all active have ontologies
 PASS=0; FAIL=0
-for t in /Users/gabormelli/github/aget-framework/template-*-aget; do
+for t in $AGET_FRAMEWORK_DIR/template-*-aget; do
   if [ -f "$t/DEPRECATED.md" ]; then
     echo "⏭️ $(basename $t) (deprecated)"
     continue
@@ -1200,7 +1200,7 @@ While enabling branch protection, discovered template-supervisor-aget was PRIVAT
 
 ```bash
 # Verify all repos on main branch
-for dir in /Users/gabormelli/github/aget-framework/*/; do
+for dir in $AGET_FRAMEWORK_DIR/*/; do
   branch=$(git -C "$dir" branch --show-current 2>/dev/null)
   [ "$branch" = "main" ] && echo "✅ $(basename $dir)" || echo "❌ $(basename $dir): $branch"
 done
@@ -1266,7 +1266,7 @@ python3 .aget/patterns/validation/repo_settings_validator.py
 ### Lesson Learned (L520)
 
 During issue filing, private agent filed internal issue to `aget-framework/template-supervisor-aget`, exposing:
-- Private agent names (`vp_of_ai-aget`, `private-work-supervisor-AGET`)
+- Private agent names (`private-work-supervisor-AGET`)
 - Fleet size and internal incident details
 
 **Root Cause**: Template repos had GitHub issues enabled by default. No governance requiring issues be disabled on template repos.
@@ -1310,15 +1310,15 @@ issues=$(gh repo view "aget-framework/aget" --json hasIssuesEnabled --jq '.hasIs
 | `aget-framework/aget` | **ENABLED** | Central public issue tracker |
 | `aget-framework/.github` | DISABLED | Org config only |
 | `aget-framework/template-*` | DISABLED | Code templates, not issue targets |
-| `gmelli/aget-aget` | ENABLED | Private fleet issue tracker |
+| `{private-tracker}` | ENABLED | Private fleet issue tracker |
 
 ### Private-First Issue Routing (L638)
 
-**All agents file to `gmelli/aget-aget`.** Public issues on `aget-framework/aget` require explicit promotion with principal approval.
+**All agents file to `{private-tracker}`.** Public issues on `aget-framework/aget` require explicit promotion with principal approval.
 
 | Stage | Destination | Content Rules |
 |-------|-------------|---------------|
-| Filing (all agents) | `gmelli/aget-aget` | No sanitization needed — private repo |
+| Filing (all agents) | `{private-tracker}` | No sanitization needed — private repo |
 | Promotion (optional) | `aget-framework/aget` | Principal-approved, sanitized content only |
 
 ### Red Flags
@@ -1326,7 +1326,7 @@ issues=$(gh repo view "aget-framework/aget" --json hasIssuesEnabled --jq '.hasIs
 | Red Flag | Consequence | Fix |
 |----------|-------------|-----|
 | Template repo with issues enabled | Issue_Fragmentation | `gh repo edit --enable-issues=false` |
-| Any agent filing directly to `aget-framework/aget` | Bypasses private-first routing | File to `gmelli/aget-aget` instead |
+| Any agent filing directly to `aget-framework/aget` | Bypasses private-first routing | File to `{private-tracker}` instead |
 | Promoted issue contains private agent names | Exposure risk | Sanitize before promotion |
 
 ### References
@@ -1342,7 +1342,7 @@ issues=$(gh repo view "aget-framework/aget" --json hasIssuesEnabled --jq '.hasIs
 ### 1. Verify Clean State
 
 ```bash
-cd /Users/gabormelli/github/aget-framework/[template-name]
+cd $AGET_FRAMEWORK_DIR/[template-name]
 git status  # Should be clean or only release changes
 ```
 
@@ -1598,7 +1598,7 @@ Obtain explicit principal authorization to proceed with release execution.
 
 ```bash
 # 1. Update managing agent version
-cd /Users/gabormelli/github/aget-framework/private-aget-framework-AGET
+cd $AGET_FRAMEWORK_DIR/private-aget-framework-AGET
 
 # Edit .aget/version.json:
 # - Change "aget_version": "X.Y.Z-old" → "X.Y.Z"
@@ -1730,9 +1730,9 @@ python3 .aget/patterns/session/verify_session_protocols.py --protocol wake_up
 1. [ ] **Run deep conformance on ALL templates**:
    ```bash
    # Run from managing agent directory
-   cd /Users/gabormelli/github/aget-framework/private-aget-framework-AGET
+   cd $AGET_FRAMEWORK_DIR/private-aget-framework-AGET
 
-   for template in /Users/gabormelli/github/aget-framework/template-*-aget; do
+   for template in $AGET_FRAMEWORK_DIR/template-*-aget; do
      echo "=== $(basename $template) ==="
      python3 .aget/patterns/conformance/aget_conformance_report.py \
        --version X.Y.Z --depth deep --target "$template"
@@ -1853,7 +1853,7 @@ python3 .aget/patterns/session/verify_session_protocols.py --protocol wake_up
    ```bash
    # Run conformance on existing private instance
    python3 .aget/patterns/conformance/validate_conformance.py \
-     /Users/gabormelli/github/aget-framework/private-aget-framework-AGET \
+     $AGET_FRAMEWORK_DIR/private-aget-framework-AGET \
      --verbose
 
    # Expected: L2+ score (60%+ compliance)
@@ -1921,7 +1921,7 @@ python3 .aget/patterns/session/verify_session_protocols.py --protocol wake_up
 **Checklist**:
 - [ ] Run validator on all template repos:
 ```bash
-FRAMEWORK_DIR="/Users/gabormelli/github/aget-framework"
+FRAMEWORK_DIR="$AGET_FRAMEWORK_DIR"
 for repo in $FRAMEWORK_DIR/template-*-aget; do
   RESULT=$(python3 $FRAMEWORK_DIR/aget/validation/validate_skill_dependencies.py \
     --base-dir "$repo" --check 2>&1 | tail -1)
@@ -1981,15 +1981,15 @@ python3 scripts/public_surface_audit.py --version X.Y.Z
 for repo in aget template-supervisor-aget template-worker-aget \
             template-advisor-aget template-consultant-aget \
             template-developer-aget template-spec-engineer-aget; do
-  cd /Users/gabormelli/github/aget-framework/$repo
+  cd $AGET_FRAMEWORK_DIR/$repo
   git add . && git commit -m "Release vX.Y.Z: description"
 done
 
 # 2. Verify version consistency
-grep '"aget_version"' /Users/gabormelli/github/aget-framework/*/.aget/version.json
+grep '"aget_version"' $AGET_FRAMEWORK_DIR/*/.aget/version.json
 
 # 3. Run contract tests
-cd /Users/gabormelli/github/aget-framework/private-aget-framework-AGET
+cd $AGET_FRAMEWORK_DIR/private-aget-framework-AGET
 python3 -m pytest tests/ -v
 ```
 
@@ -1999,21 +1999,21 @@ python3 -m pytest tests/ -v
 
 ```bash
 # 1. Push aget/ core first (dependency root)
-cd /Users/gabormelli/github/aget-framework/aget
+cd $AGET_FRAMEWORK_DIR/aget
 git push origin main
 
 # 2. Push templates alphabetically
 for repo in template-advisor-aget template-consultant-aget \
             template-developer-aget template-spec-engineer-aget \
             template-supervisor-aget template-worker-aget; do
-  cd /Users/gabormelli/github/aget-framework/$repo
+  cd $AGET_FRAMEWORK_DIR/$repo
   git push origin main
 done
 
 # 3. Verify all pushes succeeded
 for repo in aget template-*-aget; do
   echo "=== $repo ==="
-  cd /Users/gabormelli/github/aget-framework/$repo
+  cd $AGET_FRAMEWORK_DIR/$repo
   git status
 done
 ```
@@ -2029,7 +2029,7 @@ done
 #### 3.1. Create Tags (All Repos)
 
 ```bash
-cd /Users/gabormelli/github/aget-framework
+cd $AGET_FRAMEWORK_DIR
 
 # Tag all repos (core + 6 templates)
 for repo in aget template-supervisor-aget template-worker-aget template-advisor-aget template-consultant-aget template-developer-aget template-spec-engineer-aget; do
@@ -2119,7 +2119,7 @@ done
 Run post-release validation script:
 
 ```bash
-cd /Users/gabormelli/github/aget-framework/private-aget-framework-AGET
+cd $AGET_FRAMEWORK_DIR/private-aget-framework-AGET
 
 python3 .aget/patterns/release/post_release_validation.py --version X.Y.Z
 ```
@@ -2190,7 +2190,7 @@ open sops/PUBLIC_RELEASE_VALIDATION.md
 If automated script shows homepage outdated:
 
 ```bash
-cd /Users/gabormelli/github/aget-framework/.github
+cd $AGET_FRAMEWORK_DIR/.github
 
 # Update profile/README.md
 # Change version badge: version-OLD → version-X.Y.Z
@@ -2236,7 +2236,7 @@ Critical Requirements (auto-fail to L0):
 
 **Tooling** (v3.6.0):
 ```bash
-cd /Users/gabormelli/github/aget-framework/private-aget-framework-AGET
+cd $AGET_FRAMEWORK_DIR/private-aget-framework-AGET
 
 # Wrap any validation script with persistent logging:
 python3 .aget/patterns/release/validation_logger.py \
@@ -2277,8 +2277,8 @@ VERSION="X.Y.Z"
 
 # Verify each template repo received the version update
 for repo in template-{supervisor,worker,advisor,consultant,developer,spec-engineer}-aget; do
-  REPO_VERSION=$(python3 -c "import json; print(json.load(open('/Users/gabormelli/github/aget-framework/$repo/.aget/version.json'))['aget_version'])" 2>/dev/null || echo "MISSING")
-  CHANGELOG=$(grep -c "\[$VERSION\]" "/Users/gabormelli/github/aget-framework/$repo/CHANGELOG.md" 2>/dev/null || echo "0")
+  REPO_VERSION=$(python3 -c "import json; print(json.load(open('$AGET_FRAMEWORK_DIR/$repo/.aget/version.json'))['aget_version'])" 2>/dev/null || echo "MISSING")
+  CHANGELOG=$(grep -c "\[$VERSION\]" "$AGET_FRAMEWORK_DIR/$repo/CHANGELOG.md" 2>/dev/null || echo "0")
   echo "$repo: version.json=$REPO_VERSION, CHANGELOG=$([[ $CHANGELOG -gt 0 ]] && echo 'present' || echo 'MISSING')"
 done
 ```
@@ -2295,7 +2295,7 @@ done
 ```bash
 # For each file path claimed in CHANGELOG.md or DEPLOYMENT_SPEC:
 for claimed_path in <list_of_claimed_paths>; do
-  if [ -f "/Users/gabormelli/github/aget-framework/$claimed_path" ]; then
+  if [ -f "$AGET_FRAMEWORK_DIR/$claimed_path" ]; then
     echo "PASS: $claimed_path"
   else
     echo "FAIL: $claimed_path — does not exist in public repo"

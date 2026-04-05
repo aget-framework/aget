@@ -18,14 +18,14 @@ related_specs:
 
 ## Description
 
-File issues with private-first routing governance (L638). ALL agents route to `gmelli/aget-aget` by default. Public issues on `aget-framework/aget` require explicit promotion with principal approval (R-ISSUE-011 through R-ISSUE-014).
+File issues with private-first routing governance (L638). ALL agents route to `{private-tracker}` by default. Public issues on `aget-framework/aget` require explicit promotion with principal approval (R-ISSUE-011 through R-ISSUE-014).
 
 ## Capabilities
 
 | ID | Pattern | Statement |
 |----|---------|-----------|
 | CAP-SKILL-040-01 | ubiquitous | The SYSTEM shall determine agent type (private fleet vs public/remote) |
-| CAP-SKILL-040-02 | ubiquitous | The SYSTEM shall route ALL issues to `gmelli/aget-aget` (private-first routing per L638) |
+| CAP-SKILL-040-02 | ubiquitous | The SYSTEM shall route ALL issues to `{private-tracker}` (private-first routing per L638) |
 | CAP-SKILL-040-03 | conditional | IF an issue requires public visibility THEN the SYSTEM shall require promotion via CAP-ISSUE-005 |
 | CAP-SKILL-040-04 | ubiquitous | The SYSTEM shall validate content for private patterns at the promotion boundary |
 | CAP-SKILL-040-05 | ubiquitous | The SYSTEM shall support issue types: enhancement, bug, feature |
@@ -51,7 +51,7 @@ Agent Detection:
 3. Check git remote for gmelli/*
 
 Routing (L638 Private-First):
-- ALL agents → gmelli/aget-aget (no sanitization needed at filing time)
+- ALL agents → {private-tracker} (no sanitization needed at filing time)
 
 Promotion (requires principal approval):
 - Private issue → aget-framework/aget (with sanitization per R-ISSUE-012)
@@ -66,7 +66,7 @@ Patterns to detect/redact WHEN promoting to public (not at filing time):
 |---------|-------------|---------|
 | `private-*-aget` | `[PRIVATE-AGENT]` | `private-work-supervisor-AGET` |
 | `private-*-AGET` | `[PRIVATE-AGENT]` | `private-aget-framework-AGET` |
-| `gmelli/*` | `[INTERNAL-REPO]` | `gmelli/aget-aget` |
+| `gmelli/*` | `[INTERNAL-REPO]` | `{private-tracker}` |
 | Fleet size numbers | `[N agents]` | `28 agents in fleet` |
 | Session references | `[SESSION]` | `SESSION_2026-01-11` |
 | Internal project IDs | `[PROJECT-ID]` | `FLEET-UPG-004` |
@@ -79,15 +79,15 @@ Patterns to detect/redact WHEN promoting to public (not at filing time):
 | C2 | prohibitive | NEVER include private agent names in promoted public issues |
 | C3 | prohibitive | NEVER include fleet size in promoted public issues |
 | C4 | prohibitive | NEVER include internal repo references in promoted public issues |
-| C5 | mandatory | ALWAYS route to `gmelli/aget-aget` by default |
+| C5 | mandatory | ALWAYS route to `{private-tracker}` by default |
 | C6 | mandatory | ALWAYS validate destination before filing |
 
 ## Test Cases
 
 | ID | Test | Expected |
 |----|------|----------|
-| T1 | Private agent files issue | Routes to gmelli/aget-aget |
-| T2 | Public agent files issue | Routes to gmelli/aget-aget (same — L638) |
+| T1 | Private agent files issue | Routes to {private-tracker} |
+| T2 | Public agent files issue | Routes to {private-tracker} (same — L638) |
 | T3 | Issue promoted without approval | Blocked — R-ISSUE-011 |
 | T4 | Promoted issue contains private-*-aget | Blocked — R-ISSUE-014 |
 | T5 | Missing required fields | Validation error, no filing |
@@ -114,7 +114,7 @@ Patterns to detect/redact WHEN promoting to public (not at filing time):
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0.0 | 2026-02-14 | Initial: agent-type routing + sanitization |
-| 1.1.0 | 2026-03-23 | **Private-first routing** (L638): ALL agents → gmelli/aget-aget. Sanitization moved to promotion boundary only. R-ISSUE-011 through R-ISSUE-014 added. CAP-SKILL-040-02/03/04 rewritten. |
+| 1.1.0 | 2026-03-23 | **Private-first routing** (L638): ALL agents → {private-tracker}. Sanitization moved to promotion boundary only. R-ISSUE-011 through R-ISSUE-014 added. CAP-SKILL-040-02/03/04 rewritten. |
 
 ---
 

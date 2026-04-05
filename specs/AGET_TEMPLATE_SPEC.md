@@ -694,7 +694,7 @@ The SYSTEM shall configure repository issue settings to prevent Issue_Fragmentat
 **Enforcement**: `repo_settings_validator.py --check-issues`
 
 **Rationale**: Issue_Fragmentation occurs when issues are scattered across individual template repos instead of the central tracker. This complicates issue discovery, cross-template coordination, and release planning. Per AGET_ISSUE_GOVERNANCE_SPEC, issues should flow to:
-- Private agents → `gmelli/aget-aget`
+- Private agents → `{private-tracker}`
 - Public/remote agents → `aget-framework/aget`
 
 #### Repository Issue Matrix

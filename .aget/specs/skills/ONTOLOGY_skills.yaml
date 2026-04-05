@@ -342,7 +342,7 @@ C029_Issue_Routing:
   skos:prefLabel: "Issue_Routing"
   skos:definition: "Determining correct destination repository for an issue based on agent type."
   skos:scopeNote: |
-    Private fleet agents route to gmelli/aget-aget.
+    Private fleet agents route to {private-tracker}.
     Public/remote agents route to aget-framework/aget.
     Based on path, version.json, or git remote detection.
   skos:related:

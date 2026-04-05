@@ -23,7 +23,7 @@ spec:
     skill_md: ".claude/skills/aget-create-briefing/SKILL.md"
     requirements: "docs/drafts/REQ-BRF_briefing_creation.md"
     proposal: "planning/skill-proposals/PROPOSAL_aget-create-briefing.md"
-    tracking_issue: "gmelli/aget-aget#810"
+    tracking_issue: "{private-tracker}#810"
     l_docs:
       - "L384: Specification Narrative Pattern"
       - "L733: Voice as Composition Driver"

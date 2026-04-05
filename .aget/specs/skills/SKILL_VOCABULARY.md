@@ -348,7 +348,7 @@ For formal SKOS-compliant definitions, see `ONTOLOGY_skills.yaml`.
 **Definition**: Determining correct destination repository for an issue based on agent type.
 
 **Characteristics**:
-- Private fleet agents → `gmelli/aget-aget`
+- Private fleet agents → `{private-tracker}`
 - Public/remote agents → `aget-framework/aget`
 - Based on path, version.json, or git remote detection
 

@@ -371,7 +371,7 @@ originator: operational-evidence
 | Saturday push window | L735 | All public pushes on Saturday only |
 | Semantic versioning | ADR-005 | MAJOR.MINOR.PATCH, gates = release points |
 | 13-repo coordination | Architecture | aget/ core + 12 templates must be version-consistent |
-| Private-first routing | L638 | Release issues filed to gmelli/aget-aget |
+| Private-first routing | L638 | Release issues filed to {private-tracker} |
 | No breaking changes without escalation | L42 | Breaking changes require principal approval |
 
 ---

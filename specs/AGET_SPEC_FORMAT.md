@@ -278,7 +278,7 @@ authority:
     - action: "Breaking_Change"
       approver: "supervisor"
     - action: "Fleet_Migration"
-      approver: "vp-of-ai"
+      approver: "domain-lead"
 
   manages:
     - entity: "template-*-aget"

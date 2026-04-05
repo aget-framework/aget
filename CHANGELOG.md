@@ -369,7 +369,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Issue Governance Skill** (L520):
   - `aget-file-issue`: Universal skill for filing issues with L520 compliance
-  - Automatic destination routing (private → gmelli/aget-aget, public → aget-framework/aget)
+  - Automatic destination routing (private → {private-tracker}, public → aget-framework/aget)
   - Content sanitization for private patterns
 
 - **Archetype Ontologies** (12 YAML files):

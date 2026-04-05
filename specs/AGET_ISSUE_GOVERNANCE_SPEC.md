@@ -15,7 +15,7 @@
 
 ## Abstract
 
-This specification defines issue management governance for the AGET framework. All issues are filed to the private tracker (`gmelli/aget-aget`) by default. Public issues on `aget-framework/aget` are created only via explicit promotion with principal approval. This private-first routing eliminates the need for content sanitization at filing time — sanitization applies only at the promotion boundary.
+This specification defines issue management governance for the AGET framework. All issues are filed to the private tracker (`{private-tracker}`) by default. Public issues on `aget-framework/aget` are created only via explicit promotion with principal approval. This private-first routing eliminates the need for content sanitization at filing time — sanitization applies only at the promotion boundary.
 
 v2.1.0 adds triage, lifecycle management, and structured filing capabilities (CAP-ISSUE-006 through CAP-ISSUE-008) grounded in Kubernetes triage patterns, faceted classification, and GitHub Issue Forms.
 
@@ -79,7 +79,7 @@ vocabulary:
     Private_Issue_Destination:
       skos:prefLabel: "Private_Issue_Destination"
       skos:definition: "Default issue destination for all agents"
-      aget:value: "gmelli/aget-aget"
+      aget:value: "{private-tracker}"
       skos:related: ["R-ISSUE-001"]
 
     Public_Issue_Destination:
@@ -386,7 +386,7 @@ vocabulary:
 
     Standard_Label_Set:
       skos:prefLabel: "Standard_Label_Set"
-      skos:definition: "Complete governed label set for gmelli/aget-aget"
+      skos:definition: "Complete governed label set for {private-tracker}"
       skos:broader: "Issue_Label_Taxonomy"
       aget:consequence: "Non-standard labels flagged during grooming"
 
@@ -500,7 +500,7 @@ vocabulary:
 
 | ID | Pattern | Statement |
 |----|---------|-----------|
-| R-ISSUE-001 | ubiquitous | ALL agents SHALL file issues to `gmelli/aget-aget` |
+| R-ISSUE-001 | ubiquitous | ALL agents SHALL file issues to `{private-tracker}` |
 | R-ISSUE-002 | conditional | IF an issue is promoted to public THEN the SYSTEM shall file it to `aget-framework/aget` via the promotion process (CAP-ISSUE-005) |
 
 **Enforcement**: `validate_issue_destination.py`
@@ -555,7 +555,7 @@ PRIVATE_PATTERNS = [
 
 | ID | Pattern | Statement |
 |----|---------|-----------|
-| R-ISSUE-005 | event-driven | WHEN filing issues, the SYSTEM shall verify destination is `gmelli/aget-aget` |
+| R-ISSUE-005 | event-driven | WHEN filing issues, the SYSTEM shall verify destination is `{private-tracker}` |
 | R-ISSUE-006 | event-driven | WHEN promoting to public destination, the SYSTEM shall validate content for private patterns |
 
 **Enforcement**: `create_issue.py --governance-check`
@@ -572,7 +572,7 @@ PRIVATE_PATTERNS = [
 |----|---------|-----------|
 | R-ISSUE-007 | ubiquitous | Template repositories SHALL have GitHub issues DISABLED |
 | R-ISSUE-008 | ubiquitous | Organization config repositories (.github) SHALL have issues DISABLED |
-| R-ISSUE-009 | ubiquitous | `aget-framework/aget` SHALL accept issues only via promotion from `gmelli/aget-aget` |
+| R-ISSUE-009 | ubiquitous | `aget-framework/aget` SHALL accept issues only via promotion from `{private-tracker}` |
 | R-ISSUE-010 | optional | WHERE GitHub supports organization issue types, the organization MAY define standard issue types |
 
 **Enforcement**: `repo_settings_validator.py --check-issues`
@@ -608,7 +608,7 @@ PRIVATE_PATTERNS = [
 
 | ID | Pattern | Statement |
 |----|---------|-----------|
-| R-ISSUE-015 | event-driven | WHEN a new issue is filed to `gmelli/aget-aget`, the SYSTEM shall assign Triage_State `Needs_Triage` by default |
+| R-ISSUE-015 | event-driven | WHEN a new issue is filed to `{private-tracker}`, the SYSTEM shall assign Triage_State `Needs_Triage` by default |
 | R-ISSUE-016 | event-driven | WHEN performing backlog grooming (SOP_backlog_grooming), the SYSTEM shall assign each issue exactly ONE Triage_Classification (Release_Scoped, Supervisor_Owned, External, Deferred, or Closeable) and ONE Triage_Priority (Critical, High, Medium, Low, or Awaiting_Evidence) for release-scoped issues |
 | R-ISSUE-017 | conditional | IF an issue is classified as Classification_Closeable THEN the SYSTEM shall close it with a rationale comment and cross-reference, subject to principal approval for batch closes |
 
@@ -668,7 +668,7 @@ PRIVATE_PATTERNS = [
 | Frozen | Open | Dependency resolved | Resolution evidence |
 | Frozen | Closed | Dependency unresolvable | Closing rationale |
 
-**Enforcement**: Label-based tracking on `gmelli/aget-aget`. SOP_backlog_grooming Phase 3 (staleness detection).
+**Enforcement**: Label-based tracking on `{private-tracker}`. SOP_backlog_grooming Phase 3 (staleness detection).
 
 ---
 
@@ -686,7 +686,7 @@ PRIVATE_PATTERNS = [
 | R-ISSUE-022 | ubiquitous | Each Issue Form SHALL include required fields: title, description, and issue type |
 | R-ISSUE-023 | event-driven | WHEN a user submits an Issue Form, the SYSTEM shall auto-assign the corresponding `type:` label |
 
-**Note**: Issue Forms apply to the public tracker (`aget-framework/aget`) only. The private tracker (`gmelli/aget-aget`) uses agent-generated issues via `/aget-file-issue` which already has governed structure.
+**Note**: Issue Forms apply to the public tracker (`aget-framework/aget`) only. The private tracker (`{private-tracker}`) uses agent-generated issues via `/aget-file-issue` which already has governed structure.
 
 **Enforcement**: GitHub repository settings. Presence check: `.github/ISSUE_TEMPLATE/*.yml`
 
@@ -696,7 +696,7 @@ PRIVATE_PATTERNS = [
 
 | Repository | Issues | Visibility | Rationale |
 |------------|--------|------------|-----------|
-| `gmelli/aget-aget` | **enabled** | private | Default filing destination for all agents |
+| `{private-tracker}` | **enabled** | private | Default filing destination for all agents |
 | `aget-framework/aget` | **enabled** | public | Promotion-only public issue tracker. Issue Forms deployed (v2.1.0). |
 | `aget-framework/.github` | disabled | public | Org config only |
 | `aget-framework/template-*` | disabled | public | Code templates, not issue targets |
@@ -712,7 +712,7 @@ def detect_agent_type(agent_root: Path) -> str:
     """Detect whether agent is private fleet or public/remote.
 
     Note: Under private-first routing (v2.0.0), agent type no longer
-    determines filing destination — all agents file to gmelli/aget-aget.
+    determines filing destination — all agents file to {private-tracker}.
     This detection remains useful for other governance purposes.
     """
 
@@ -757,7 +757,7 @@ authority:
 
   agent_authority:
     can_autonomously:
-      - "File issues to gmelli/aget-aget (private tracker)"
+      - "File issues to {private-tracker} (private tracker)"
       - "Run content sanitization checks on issue content"
       - "Validate issue destination before filing"
       - "Verify repository issue settings"
@@ -785,16 +785,16 @@ authority:
 
 | V-test ID | Requirement | Method | Description |
 |-----------|-------------|--------|-------------|
-| V-ISSUE-001 | CAP-ISSUE-001 | automated | Verify default issue destination resolves to gmelli/aget-aget for all agents |
+| V-ISSUE-001 | CAP-ISSUE-001 | automated | Verify default issue destination resolves to {private-tracker} for all agents |
 | V-ISSUE-002 | CAP-ISSUE-002 | automated | Verify promoted issue content does not match PRIVATE_PATTERNS |
-| V-ISSUE-003 | CAP-ISSUE-003 | automated | Verify pre-filing validation confirms destination is gmelli/aget-aget |
+| V-ISSUE-003 | CAP-ISSUE-003 | automated | Verify pre-filing validation confirms destination is {private-tracker} |
 | V-ISSUE-004 | CAP-ISSUE-004 | automated | Verify template repositories have GitHub issues disabled |
 | V-ISSUE-005 | CAP-ISSUE-005 | manual | Verify promoted issues have principal approval and reference private source |
 | V-ISSUE-006 | CAP-ISSUE-002 | automated | Verify sanitize_issue_content.py detects all PRIVATE_PATTERNS at promotion boundary |
 | V-ISSUE-007 | CAP-ISSUE-004 | automated | Verify organization config repository (.github) has issues disabled |
 | V-ISSUE-008 | CAP-ISSUE-001 | inspection | Verify private-first routing eliminates content sanitization requirement at filing time |
 | V-ISSUE-009 | CAP-ISSUE-006 | inspection | Verify ISSUE_TRIAGE artifact assigns Triage_Classification and Triage_Priority to all issues |
-| V-ISSUE-010 | CAP-ISSUE-006 | automated | Verify `status:needs-triage` label exists on `gmelli/aget-aget` label set |
+| V-ISSUE-010 | CAP-ISSUE-006 | automated | Verify `status:needs-triage` label exists on `{private-tracker}` label set |
 | V-ISSUE-011 | CAP-ISSUE-007 | inspection | Verify lifecycle transitions follow valid state machine (no invalid transitions in issue history) |
 | V-ISSUE-012 | CAP-ISSUE-007 | automated | Verify staleness detection flags issues with no activity >= 90 days |
 | V-ISSUE-013 | CAP-ISSUE-008 | automated | Verify `aget-framework/aget` has Issue Form YAML files in `.github/ISSUE_TEMPLATE/` |
@@ -819,7 +819,7 @@ python3 .aget/patterns/validation/repo_settings_validator.py --check-issues
 ls aget-framework/aget/.github/ISSUE_TEMPLATE/*.yml 2>/dev/null | wc -l  # expect >= 3
 
 # Verify labels deployed (V-ISSUE-010)
-gh label list --repo gmelli/aget-aget --search "status:needs-triage" --json name | python3 -c "import json,sys; print('PASS' if json.load(sys.stdin) else 'FAIL')"
+gh label list --repo {private-tracker} --search "status:needs-triage" --json name | python3 -c "import json,sys; print('PASS' if json.load(sys.stdin) else 'FAIL')"
 ```
 
 ---
@@ -933,7 +933,7 @@ graduation:
 |---------|------|---------|
 | 1.0.0 | 2026-01-11 | Initial specification: routing, sanitization, repo settings |
 | 1.1.0 | 2026-02-14 | Added WorkCo, VP-of-AI, WorkCo patterns per L583 |
-| 2.0.0 | 2026-03-02 | **Private-first routing**: R-ISSUE-001 rewritten (all agents -> gmelli/aget-aget), R-ISSUE-002 rewritten (promotion-only), R-ISSUE-009 revised (promotion target), CAP-ISSUE-005 added (R-ISSUE-011 through R-ISSUE-014: promotion requirements), vocabulary updated, Exhaustive_Pattern_List anti-pattern added. Per L638. |
+| 2.0.0 | 2026-03-02 | **Private-first routing**: R-ISSUE-001 rewritten (all agents -> {private-tracker}), R-ISSUE-002 rewritten (promotion-only), R-ISSUE-009 revised (promotion target), CAP-ISSUE-005 added (R-ISSUE-011 through R-ISSUE-014: promotion requirements), vocabulary updated, Exhaustive_Pattern_List anti-pattern added. Per L638. |
 | 2.1.0 | 2026-04-04 | **Triage, lifecycle, structured filing**: CAP-ISSUE-006 (Triage: R-ISSUE-015 through R-ISSUE-017), CAP-ISSUE-007 (Lifecycle: R-ISSUE-018 through R-ISSUE-020), CAP-ISSUE-008 (Issue Forms: R-ISSUE-021 through R-ISSUE-023). 54 new SKOS vocabulary terms across 4 concept groups (triage, lifecycle, labeling, promotion_workflow). 3 new anti-patterns. 6 new V-tests (V-ISSUE-009 through V-ISSUE-014). Per L750, L671, L498. |
 
 ---

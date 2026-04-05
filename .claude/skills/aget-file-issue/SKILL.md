@@ -1,6 +1,6 @@
 ---
 name: aget-file-issue
-description: File GitHub issues with private-first routing (L638). ALL agents route to gmelli/aget-aget. Public issues require promotion with principal approval.
+description: File GitHub issues with private-first routing (L638). ALL agents route to {private-tracker}. Public issues require promotion with principal approval.
 archetype: universal
 allowed-tools:
   - Bash
@@ -10,12 +10,12 @@ allowed-tools:
 
 # /aget-file-issue
 
-File issues with private-first routing governance (L638). ALL issues go to `gmelli/aget-aget`. Public issues on `aget-framework/aget` require explicit promotion.
+File issues with private-first routing governance (L638). ALL issues go to `{private-tracker}`. Public issues on `aget-framework/aget` require explicit promotion.
 
 ## Purpose
 
 Structured issue filing with:
-- Private-first routing: ALL agents → `gmelli/aget-aget` (L638)
+- Private-first routing: ALL agents → `{private-tracker}` (L638)
 - Content sanitization at promotion boundary only
 - Template selection (enhancement, bug, feature)
 
@@ -50,7 +50,7 @@ fi
 
 ### Step 2: Route to Private Tracker
 
-**ALL agents route to `gmelli/aget-aget`** (L638 private-first routing).
+**ALL agents route to `{private-tracker}`** (L638 private-first routing).
 
 Agent type detection is retained for metadata tagging, but does NOT affect routing destination. Under the v2.0.0 policy, all agents — private fleet and public/remote — file to the private tracker.
 
@@ -66,7 +66,7 @@ Check required fields:
 ```bash
 # ALL agents — private-first routing (L638)
 gh issue create \
-  --repo gmelli/aget-aget \
+  --repo {private-tracker} \
   --title "$TITLE" \
   --body "$BODY" \
   --label "type:$TYPE"
@@ -77,7 +77,7 @@ gh issue create \
 Output:
 ```
 Issue filed: <URL>
-Destination: gmelli/aget-aget
+Destination: {private-tracker}
 Type: <type>
 ```
 
@@ -88,8 +88,8 @@ Type: <type>
 
 | Field | Value |
 |-------|-------|
-| URL | https://github.com/gmelli/aget-aget/issues/456 |
-| Destination | gmelli/aget-aget |
+| URL | https://github.com/{private-tracker}/issues/456 |
+| Destination | {private-tracker} |
 | Type | enhancement |
 ```
 
@@ -120,11 +120,11 @@ To make a private issue publicly visible on `aget-framework/aget`:
 
 These are INVIOLABLE:
 
-- **C1**: NEVER file directly to `aget-framework/aget` — ALL issues go to `gmelli/aget-aget`
+- **C1**: NEVER file directly to `aget-framework/aget` — ALL issues go to `{private-tracker}`
 - **C2**: NEVER include private agent names in promoted public issues
 - **C3**: NEVER include fleet size disclosures in promoted public issues
 - **C4**: NEVER include internal repo references in promoted public issues
-- **C5**: ALWAYS route to `gmelli/aget-aget` regardless of agent type
+- **C5**: ALWAYS route to `{private-tracker}` regardless of agent type
 - **C6**: ALWAYS validate destination before filing
 
 ## Examples
@@ -135,7 +135,7 @@ These are INVIOLABLE:
 /aget-file-issue enhancement Add skill validation
 ```
 
-**Result**: Files to `gmelli/aget-aget` (no sanitization needed)
+**Result**: Files to `{private-tracker}` (no sanitization needed)
 
 ### Example 2: Public Agent Filing Bug
 
@@ -143,11 +143,11 @@ These are INVIOLABLE:
 /aget-file-issue bug Template fails on Windows
 ```
 
-**Result**: Files to `gmelli/aget-aget` (same destination — L638 private-first)
+**Result**: Files to `{private-tracker}` (same destination — L638 private-first)
 
 ### Example 3: Promoting a Private Issue
 
-After principal approval, sanitized content filed to `aget-framework/aget` with reference to source issue in `gmelli/aget-aget`.
+After principal approval, sanitized content filed to `aget-framework/aget` with reference to source issue in `{private-tracker}`.
 
 ## Error Handling
 
