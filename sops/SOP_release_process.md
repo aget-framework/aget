@@ -851,7 +851,7 @@ grep -ri "PATTERNS_TO_CHECK" repo/ \
 |----------|----------|--------|
 | Client names | Company names, project codenames | BLOCK |
 | Internal URLs | Internal domains, staging URLs | BLOCK |
-| Portfolio names | workco, workco, predictionworks | REVIEW |
+| Portfolio names | (redacted — see SOP_boundary_hygiene.md) | REVIEW |
 | Private repos | private-*, gmelli/* (except LICENSE) | REVIEW |
 | Credentials | API keys, tokens, passwords | BLOCK |
 | Personal info | Email addresses (except LICENSE) | REVIEW |

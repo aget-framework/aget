@@ -341,7 +341,7 @@ description: >
   discover releases for hours or days, leading to planning
   against wrong assumptions.
 rationale: >
-  v3.11.0 released 2026-03-28. Workco remote supervisor
+  v3.11.0 released 2026-03-28. remote fleet supervisor
   was still planning for "v3.11 likely theme: Ontology
   Coherence" 6+ hours later. No push notification exists
   for remote fleets, only pull (GitHub Release page).
