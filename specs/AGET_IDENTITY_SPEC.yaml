@@ -31,9 +31,11 @@ identity:
   full_name: "AGET Framework"
   short_name: "AGET"
 
-  # Note: AGET is not an acronym - it's simply "Agent" without the 'n'
-  # This follows the pattern of framework names that are memorable words
-  name_origin: "Agent → Aget (memorable, distinct)"
+  # The name originated from the first repo: aget-cli-agent-template (Sep 21, 2025).
+  # Initially "Agent Template", then "Agent Evolution Template" hours later.
+  # A Sep 25, 2025 governance decision declared the multi-faceted meaning intentional.
+  # See: docs/ORIGIN_STORY.md for the full provenance.
+  name_origin: "aget-cli-agent-template → Agent Template → Agent Evolution Template (deliberately multi-faceted)"
 
   # -----------------------------------------------------------------------------
   # Definition
