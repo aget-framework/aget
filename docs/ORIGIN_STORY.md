@@ -1,8 +1,9 @@
 # AGET Origin Story
 
-**Version**: 1.0.0
+**Version**: 1.1.0
 **Created**: 2026-04-07
-**Sources**: template-worker-aget git history, CCB AGET_RELATIONSHIP.md, supervisor DEC 2025-09-25, COGNITIVE_SPECTRUM.md
+**Updated**: 2026-04-07
+**Sources**: template-worker-aget git history, CCB AGET_RELATIONSHIP.md and journal, supervisor DEC 2025-09-25, COGNITIVE_SPECTRUM.md, L35 (capability signaling)
 
 ## The Name
 
@@ -12,9 +13,17 @@ Three days later (Sep 25), a naming convention decision formalized the ambiguity
 
 The later public description — "Agent without the 'n'" — is a mnemonic simplification, not the full origin.
 
-## The Problem
+## The Config File Problem
 
-Every AI coding session required re-explaining project context. Every tool (Claude Code, Cursor, Aider, Windsurf) needed different config files with duplicate content. The breakthrough insight (Sep 24, 2025): AI agents follow conversational commands well — so instead of complex configuration files, give them natural language protocols ("wake up", "wind down", "tidy up"). This became AGET's core innovation.
+Every AI coding session required re-explaining project context. Every tool (Claude Code, Cursor, Aider, Windsurf) needed different config files with duplicate content.
+
+The first commit (Sep 21, 16:19) created a `CLAUDE.md` file. Twenty-nine minutes later, it was renamed to `AGENT.md` for universal compatibility — the template should work with any CLI agent, not just Claude Code. Seventy-three minutes after that, it became `AGENTS.md` (plural) to align with the emerging industry standard. Three renames in two hours, all on day one. The core tension — platform-specific vs. universal — was resolved immediately in favor of universality.
+
+## The Conversational Command Insight
+
+The breakthrough insight (recorded in the CCB journal, Sep 24, 23:42): AI agents are excellent at following conversational commands. Instead of complex configuration files, give them natural language protocols. "Wake up" could initialize a session. "Wind down" could save work. "Tidy up" could clean temporary files.
+
+These phrases were present in the very first commit — the insight preceded the formal articulation by three days. The journal entry captured why it worked: "not as static files but as living conversations, not as isolated tools but as community-driven evolution, not as theoretical design but as patterns proven through real usage."
 
 ## The Vision
 
@@ -24,14 +33,19 @@ COGNITIVE_SPECTRUM.md (Sep 25, 2025) described five modalities — from standalo
 
 | Date | Milestone |
 |------|-----------|
+| 2024-09-20 | RKB content enhancer created (pre-AGET, later retrofitted) |
 | 2025-06-14 | Earliest known CLAUDE.md in the org |
 | 2025-07-09 | Claude Code installed |
-| 2025-09-21 16:19 | First commit: "Initial CLI Agent Template repository" |
+| 2025-09-21 16:19 | First commit: "Initial CLI Agent Template repository" with CLAUDE.md |
+| 2025-09-21 16:48 | CLAUDE.md renamed to AGENT.md (universal compatibility) |
+| 2025-09-21 18:01 | AGENT.md renamed to AGENTS.md (industry standard, plural) |
 | 2025-09-21 21:13 | "AGET (Agent Template)" formalized |
-| 2025-09-22 00:08 | "Agent Evolution Template" — born in conversation |
-| 2025-09-24 14:13 | `.aget/evolution/` directory created |
-| 2025-09-25 | Naming convention + COGNITIVE_SPECTRUM.md |
-| 2025-09-27 | First fleet agent commit |
+| 2025-09-22 00:08 | "Agent Evolution Template" — born in late-night conversation |
+| 2025-09-24 14:13 | `.aget/evolution/` directory created (4 entry types) |
+| 2025-09-24 23:42 | Origin narrative captured in CCB journal |
+| 2025-09-25 | Naming convention DEC + COGNITIVE_SPECTRUM.md |
+| 2025-09-27 | First fleet agent commit (`my-AGET-aget`) |
+| 2025-10-03 | Case distinction (-AGET/-aget) formalized (L35) |
 | 2025-10-13 | First batch deployment (6 agents) |
 
 ## Naming Conventions
@@ -45,6 +59,10 @@ Established Sep 25, 2025 — the naming hierarchy carries structural meaning:
 | `-aget` suffix | Information-only agent (read-only) |
 | `aget-aget` | Governance layer (self-referential: AGET managing AGET) |
 | `X-aget` | Instance pattern (e.g., `healthcare-aget`) |
+
+### Case Distinction Origin
+
+The `-AGET` vs `-aget` capability signaling appeared in practice from the very first fleet commit (`my-AGET-aget`, Sep 27) but was formalized later. During v2.4 planning (Oct 3, L35), the founder asked: "How about if the -aget indicates? -AGET vs -aget?" Moving the capability signal from the domain name to the suffix resolved ambiguity — acronym domains (CCB, RKB) no longer conflicted with capability casing. The pattern: suffix position is always consistent, visually clear, and independent of domain naming.
 
 ## See Also
 
