@@ -189,16 +189,18 @@ gh repo clone aget-framework/template-worker-aget worker-agent-1
 
 #### Step 3: Fleet Configuration
 
-In each agent's `.aget/version.json`, set fleet reference:
+In each worker agent's `.aget/version.json`, set the supervisor reference:
 
 ```json
 {
-  "fleet": {
-    "supervisor": "fleet-supervisor",
-    "position": "worker"
-  }
+  "agent_name": "my-worker-aget",
+  "instance_type": "aget",
+  "archetype": "worker",
+  "managed_by": "fleet-supervisor"
 }
 ```
+
+> **Note**: The `managed_by` field identifies this agent's supervisor. The supervisor agent sets `"managed_by": "none"` (top-level) or references its own supervisor.
 
 ### Fleet Coordination Patterns
 
