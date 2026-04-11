@@ -331,22 +331,53 @@ The recommended way to build an AGET fleet:
 ### 1. Start with a Supervisor
 
 ```bash
-# Clone the supervisor template
-gh repo clone aget-framework/template-supervisor-aget my-supervisor
-cd my-supervisor
+# Create your supervisor repo from the template
+gh repo create my-fleet-supervisor-AGET \
+  --template aget-framework/template-supervisor-aget \
+  --private \
+  --clone
+cd my-fleet-supervisor-AGET
+```
 
-# Configure identity
-vim .aget/version.json  # Set agent_name, domain
+> **Important**: Use `gh repo create --template` (not `gh repo clone`). This creates a new repository you own, rather than a read-only clone of the template.
 
-# Verify setup
+Configure `.aget/version.json` with your fleet's identity:
+
+```json
+{
+  "aget_version": "3.12.0",
+  "aget_agent_name": "my-fleet-supervisor-AGET",
+  "aget_short_name": "SUP",
+  "aget_instance_type": "aget",
+  "aget_archetype": "supervisor",
+  "aget_domain": "my-domain",
+  "aget_portfolio": "main",
+  "aget_managed_by": "none",
+  "template_origin": "template-supervisor-aget",
+  "created_date": "2026-04-11"
+}
+```
+
+Create the fleet registry so workers can be registered later:
+
+```bash
+mkdir -p .aget/fleet
+# Create .aget/fleet/FLEET_STATE.yaml with your supervisor as the first entry
+```
+
+Verify your setup:
+
+```bash
 python3 -m pytest tests/ -v
+python3 scripts/health_check.py
 ```
 
 ### 2. Use the Supervisor to Create Agents
 
-```bash
-# In your CLI agent (Claude Code, Codex CLI, etc.)
-/aget-create-aget worker my-first-worker-AGET
+In your CLI tool (Claude Code, Codex CLI, Gemini CLI, etc.), start a session with the supervisor and use the creation skill:
+
+```
+/aget-create-aget worker my-first-worker-aget
 ```
 
 The `/aget-create-aget` skill guides you through a 9-gate creation process:
@@ -356,13 +387,24 @@ The `/aget-create-aget` skill guides you through a 9-gate creation process:
 - **G5**: Validation (contract tests)
 - **G7**: Supervisor handoff (fleet registration)
 
+Each worker's `.aget/version.json` references the supervisor via `managed_by`:
+
+```json
+{
+  "aget_agent_name": "my-first-worker-aget",
+  "aget_managed_by": "my-fleet-supervisor-AGET"
+}
+```
+
 ### 3. Grow Your Fleet
 
 Each new agent is created through the supervisor, ensuring:
 - Consistent configuration across your fleet
-- Fleet registry tracking
+- Fleet registry tracking (`.aget/fleet/FLEET_STATE.yaml`)
 - Shared learning propagation
 - Coordinated version upgrades
+
+**Fleet sizes**: Start with a supervisor and one worker (MVF-1). Add agents as your domain requires more specialization. See [ADOPTION_GUIDE Part 3](../ADOPTION_GUIDE.md) for fleet coordination patterns.
 
 ### When to Start Without a Supervisor
 
