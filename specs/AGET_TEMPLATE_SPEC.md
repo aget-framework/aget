@@ -1009,7 +1009,7 @@ The SYSTEM shall support archetype-specific ontologies and skills.
 | CAP-TPL-016-01 | ubiquitous | The SYSTEM shall include ontology/ directory in each template |
 | CAP-TPL-016-02 | ubiquitous | The SYSTEM shall include ONTOLOGY_{archetype}.yaml in ontology/ |
 | CAP-TPL-016-03 | ubiquitous | The SYSTEM shall include .claude/skills/ directory with AGET skills |
-| CAP-TPL-016-04 | ubiquitous | The SYSTEM shall include 15 universal skills in all templates |
+| CAP-TPL-016-04 | ubiquitous | The SYSTEM shall include 31 universal skills in all templates (updated v3.13.0) |
 | CAP-TPL-016-05 | ubiquitous | The SYSTEM shall include archetype-specific skills per archetype |
 | CAP-TPL-016-06 | conditional | IF SKILL.md exists THEN it shall have valid YAML frontmatter |
 
@@ -1040,40 +1040,56 @@ ontology:
 
 | Archetype | Universal | Archetype Skills | Total |
 |-----------|:---------:|:----------------:|:-----:|
-| worker | 15 | execute-task, report-progress | 17 |
-| supervisor | 15 | broadcast-fleet, review-agent, escalate-issue | 18 |
-| developer | 15 | run-tests, lint-code, review-pr | 18 |
-| consultant | 15 | assess-client, propose-engagement | 17 |
-| advisor | 15 | assess-risk, recommend-action | 17 |
-| analyst | 15 | analyze-data, generate-report | 17 |
-| architect | 15 | design-architecture, assess-tradeoffs | 17 |
-| researcher | 15 | search-literature, document-finding | 17 |
-| operator | 15 | handle-incident, run-playbook | 17 |
-| executive | 15 | make-decision, review-budget | 17 |
-| reviewer | 15 | review-artifact, provide-feedback | 17 |
-| spec-engineer | 15 | validate-spec, generate-requirement | 17 |
+| worker | 31 | — | 31 |
+| supervisor | 31 | broadcast-fleet, check-fleet, create-aget, escalate-issue, review-agent, review-handoff | 37 |
+| developer | 31 | run-tests, lint-code, review-pr | 34 |
+| consultant | 31 | assess-client, propose-engagement | 33 |
+| advisor | 31 | assess-risk, recommend-action | 33 |
+| analyst | 31 | analyze-data, generate-report | 33 |
+| architect | 31 | design-architecture, assess-tradeoffs | 33 |
+| researcher | 31 | search-literature, document-finding | 33 |
+| operator | 31 | handle-incident, run-playbook | 33 |
+| executive | 31 | make-decision, review-budget | 33 |
+| reviewer | 31 | review-artifact, provide-feedback | 33 |
+| spec-engineer | 31 | validate-spec, generate-requirement | 33 |
 
-#### Universal Skills (v3.5.0)
+#### Universal Skills (v3.13.0)
 
-All templates include these 15 universal skills:
+All templates include these 31 universal skills:
 
-| Skill | Category | Purpose |
-|-------|----------|---------|
-| aget-wake-up | Session | Initialize session |
-| aget-wind-down | Session | End session with handoff |
-| aget-check-health | Session | Run health inspection |
-| aget-check-kb | Session | Validate KB health |
-| aget-check-evolution | Session | Monitor evolution directory |
-| aget-check-sessions | Session | Monitor sessions directory |
-| aget-save-state | Session | Save workflow state |
-| aget-record-lesson | Evolution | Record lessons learned |
-| aget-record-observation | Evolution | Record research observations |
-| aget-study-topic | Research | Focused KB research |
-| aget-create-project | Planning | Create research projects |
-| aget-review-project | Planning | Review project progress |
-| aget-propose-skill | Governance | Propose new skills |
-| aget-file-issue | Governance | File issues with routing governance |
-| aget-create-skill | Development | Create new skill with spec |
+| Skill | Category | Purpose | Since |
+|-------|----------|---------|:-----:|
+| aget-wake-up | Session | Initialize session | v3.5 |
+| aget-wind-down | Session | End session with handoff | v3.5 |
+| aget-open-session | Session | Context-aware session open | v3.13 |
+| aget-close-session | Session | Orchestrate wind-down with enrichment | v3.13 |
+| aget-describe-session | Session | Narrative summary from session data | v3.13 |
+| aget-check-health | Health | Run health inspection | v3.5 |
+| aget-check-kb | Health | Validate KB health | v3.5 |
+| aget-check-evolution | Health | Monitor evolution directory | v3.5 |
+| aget-check-sessions | Health | Monitor sessions directory | v3.5 |
+| aget-check-facts | Quality | 3-pass fact verification | v3.13 |
+| aget-check-initiative | Governance | Cross-system initiative coherence | v3.13 |
+| aget-save-state | Session | Save workflow state | v3.5 |
+| aget-record-lesson | Evolution | Record lessons learned | v3.5 |
+| aget-record-observation | Evolution | Record research observations | v3.5 |
+| aget-process-observation | Knowledge | Route observations to artifact types | v3.13 |
+| aget-study-topic | Research | Focused KB research | v3.5 |
+| aget-propose-actions | Research | Ranked next-best actions | v3.13 |
+| aget-create-project | Planning | Create research projects | v3.5 |
+| aget-review-project | Planning | Review project progress | v3.5 |
+| aget-propose-skill | Governance | Propose new skills | v3.5 |
+| aget-create-skill | Development | Create new skill with spec | v3.5 |
+| aget-create-rubric | Governance | ADR-008 Generator for rubrics | v3.13 |
+| aget-create-briefing | Creation | Generate narrative documents | v3.13 |
+| aget-enhance-spec | Governance | 7-phase spec enhancement | v3.11 |
+| aget-expand-ontology | Knowledge | SKOS ontology expansion | v3.6 |
+| aget-analyze-ontology | Knowledge | Ontology health analysis | v3.6 |
+| aget-file-issue | Governance | File issues with routing governance | v3.5 |
+| aget-promote-issue | Governance | Promote private to public issues | v3.13 |
+| aget-release-build | Release | Builder perspective (triad) | v3.13 |
+| aget-release-audit-specs | Release | Spec Auditor perspective (triad) | v3.13 |
+| aget-release-critique | Release | Critic perspective (triad) | v3.13 |
 
 #### Directory Layout (v3.5.0)
 
