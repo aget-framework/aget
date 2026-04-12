@@ -67,7 +67,7 @@ python3 -c "import json; v=json.load(open('.aget/version.json')); print('PASS' i
 
 | Fleet | Supervisor | Status | Date | Notes |
 |-------|-----------|:------:|------|-------|
-| Main | private-supervisor-AGET | Pending | — | — |
+| Main | private-supervisor-AGET | **In Progress** | 2026-04-12 | G1 self ✅, G2 3 pilots ✅, G3 29/29 fleet ✅, G4 pending |
 | WorkCo | legalon-supervisor | Pending | — | — |
 
 ---
