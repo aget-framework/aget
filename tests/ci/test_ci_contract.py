@@ -51,7 +51,7 @@ setup(
     name='template-name',
     packages=find_packages(where='src'),
     package_dir={'': 'src'},
-    python_requires='>=3.8',
+    python_requires='>=3.10',
 )
 """
         Path(tmpdir, 'setup.py').write_text(setup_content)
@@ -71,7 +71,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+        python-version: ['3.10', '3.11', '3.12', '3.13']
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -269,7 +269,7 @@ class TestCIWorkflowStructure:
     - CAP-CI-003-01: Include Test_Job in CI_Workflow
     - CAP-CI-003-02: Include Lint_Job in CI_Workflow
     - CAP-CI-003-03: Include Security_Job in CI_Workflow
-    - CAP-CI-003-04: Test against Python_Version_Matrix [3.8-3.12]
+    - CAP-CI-003-04: Test against Python_Version_Matrix [3.10-3.13]
     - CAP-CI-003-05: Use pytest for Test_Job
 
     Reference: AGET_CI_SPEC.md#cap-ci-003-ci-workflow-structure
@@ -291,7 +291,7 @@ class TestCIWorkflowStructure:
 
     def test_ci_workflow_structure_python_matrix(self, temp_template_dir):
         """
-        CAP-CI-003-04: Test job shall test against Python 3.8-3.12.
+        CAP-CI-003-04: Test job shall test against Python 3.10-3.13.
         """
         ci_file = Path(temp_template_dir, '.github/workflows/ci.yml')
         workflow = yaml.safe_load(ci_file.read_text())
@@ -301,7 +301,7 @@ class TestCIWorkflowStructure:
         matrix = strategy.get('matrix', {})
         python_versions = matrix.get('python-version', [])
 
-        required_versions = {'3.8', '3.9', '3.10', '3.11', '3.12'}
+        required_versions = {'3.10', '3.11', '3.12', '3.13'}
         actual_versions = set(str(v) for v in python_versions)
 
         assert required_versions.issubset(actual_versions), \
