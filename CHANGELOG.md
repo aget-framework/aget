@@ -9,11 +9,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased] — v3.13.0
+## [3.13.0] - 2026-04-12
+
+**Theme**: Operational Maturation & Fleet Automation
 
 ### Added
 
-- **SKILL-043 aget-create-briefing**: New universal Creation skill — generates standalone narrative documents from session artifacts, optimized for target consumption media (NotebookLM audio, slides, memo, share-draft). First skill in the output-format-adapter family. Cross-agent origin (L758): CCB demand signal + framework-AGET spec formalization. 7 EARS capabilities, 6 V-tests (all PASS), 6 constraints including P0 classification safety gate. (#810)
+- **validate_release_gate.py**: Structural exit-code enforcement — orchestrates 7 validators, gates on combined result, logs to gate_log.jsonl. Fixes L784 (Observation Without Consequence). (#823)
+- **fleet_upgrade.py**: Single-script fleet migration across 14 repos. Reduces permission prompts from 25-40 to ≤5. Dry-run mode, JSON output, per-repo error handling. (#829)
+- **Release Delivery Triad v0.2.0**: Builder (SP-012), Spec Auditor (SP-013), Critic (SP-014) — three-perspective quality assessment at every gate boundary. Requirements sections, tool integration, telemetry logging. (L818, #933)
+- **8 new skills** (24→31): aget-promote-issue (SP-004), aget-describe-session (SP-009), aget-propose-actions (SP-011), aget-create-rubric (SP-003), aget-check-initiative (SP-004b), aget-process-observation (SP-002), aget-open-session (SP-010), aget-check-facts (SP-007)
+- **Skill Telemetry Infrastructure**: Mandatory `## Requirements` section in SKILL.template.md. Invocation logger (log_skill_invocation.py → skill_invocations.jsonl).
+- **HEALTH_CHECK_ORCHESTRATION_SPEC v0.1.0**: 3-tier health check definition (Quick/Standard/Full). Resolves L787 interpretation divergence. (#834)
+- **WIND_DOWN_DISPLAY_SPEC v0.1.0**: Formal wind-down output format with section markers, ordering, content requirements. Unblocks SP-008 close-session. (#831)
+- **GOVERNED_DISCOURSE_BOUNDARY_SPEC v0.1.0**: Governed vs Informal artifact classification. 3 high-impact terms defined. (#852)
+- **check_script_divergence.py**: Tracks health_check.py, study_topic.py, wake_up.py, wind_down.py divergence across 13 templates by hash groups. (#845)
+- **MIGRATION_COMPLETION_REPORT template**: Structured format for supervisor fleet upgrade reporting. (#843)
+- **Catch-Up Guide**: Conditional handoff section for agents skipping versions. (#844)
+- **SKILL-043 aget-create-briefing**: Universal Creation skill for narrative documents. (#810)
+
+### Changed
+
+- **validate_release_gate.py** (public): Added missing `import os`, updated template list from 12 (3 phantom) to 13 (actual). Critic subagent finding.
+- **Handoff template**: Self-contained for remote fleets — DEPLOYMENT_SPEC access note added. (#846)
+
+### Fixed
+
+- **ADOPTION_GUIDE**: Removed fabricated `"fleet"` object from version.json example. (#914)
+- **fleet_upgrade.py**: Removed hardcoded path fallback, replaced with environment variable. Critic subagent finding.
 
 ---
 
