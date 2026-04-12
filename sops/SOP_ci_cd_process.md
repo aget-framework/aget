@@ -1,11 +1,12 @@
 # SOP: CI/CD Process
 
-**Version**: 1.0
+**Version**: 1.1
 **Status**: Active
 **Created**: 2025-12-28
+**Updated**: 2026-04-11
 **Owner**: aget-framework
-**Reference Spec**: AGET_CI_SPEC.md
-**Change Origin**: L404 (CI Test Isolation Requirements)
+**Reference Spec**: AGET_CI_SPEC.md v1.1.0
+**Change Origin**: L404 (CI Test Isolation Requirements), L821 (CI Spec Staleness + Feedback Loop Gap)
 
 ---
 
@@ -20,14 +21,22 @@ Define standard operating procedures for CI/CD configuration, maintenance, and t
 **Applies to**: All AGET templates with CI workflows.
 
 **Templates with CI**:
-| Template | CI Status | Reference |
-|----------|-----------|-----------|
-| template-worker-aget | Active | Standard CI |
-| template-developer-aget | Active | Standard CI |
-| template-advisor-aget | Active | Standard CI |
-| template-spec-engineer-aget | Active | Standard CI |
-| template-consultant-aget | Active | Enhanced CI |
-| template-supervisor-aget | Active | Standard CI |
+| Template | CI Status | Python Matrix | Reference |
+|----------|-----------|---------------|-----------|
+| template-advisor-aget | Active | 3.8-3.12 | Standard CI |
+| template-analyst-aget | Active | 3.8-3.12 | Standard CI |
+| template-architect-aget | Active | 3.8-3.12 | Standard CI |
+| template-consultant-aget | Active | 3.9-3.12 | Enhanced CI |
+| template-developer-aget | Active | 3.8-3.12 | Standard CI |
+| template-executive-aget | Active | 3.8-3.12 | Standard CI |
+| template-operator-aget | Active | 3.8-3.12 | Standard CI |
+| template-researcher-aget | Active | 3.8-3.12 | Standard CI |
+| template-reviewer-aget | Active | 3.8-3.12 | Standard CI |
+| template-spec-engineer-aget | Active | 3.8-3.12 | Standard CI |
+| template-supervisor-aget | Active | 3.8-3.12 | Standard CI |
+| template-worker-aget | Active | 3.8-3.12 | Standard CI |
+
+**Note**: Template CI matrices are at 3.8-3.12 pending v3.13 update to match AGET_CI_SPEC v1.1.0 (3.10-3.13). Python 3.8 and 3.9 are EOL. See VERSION_SCOPE v3.13 for coordinated template CI update.
 
 ---
 
@@ -46,12 +55,13 @@ Every CI workflow must include:
 
 ### Python Version Matrix (CAP-CI-003-04)
 
-All test jobs must test against:
-- Python 3.8
-- Python 3.9
+All test jobs must test against (per AGET_CI_SPEC v1.1.0):
 - Python 3.10
 - Python 3.11
 - Python 3.12
+- Python 3.13
+
+**Note**: Python 3.8 (EOL 2024-10-07) and 3.9 (EOL 2025-10-05) dropped in AGET_CI_SPEC v1.1.0.
 
 ---
 
@@ -81,7 +91,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+        python-version: ['3.10', '3.11', '3.12', '3.13']
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -118,7 +128,7 @@ setup(
     version='1.0.0',
     packages=find_packages(where='src'),
     package_dir={'': 'src'},
-    python_requires='>=3.8',
+    python_requires='>=3.10',
     install_requires=[
         'pytest>=7.0.0',
     ],
@@ -255,7 +265,7 @@ Expected: 15 tests passing
 - [ ] CI workflow file exists at `.github/workflows/ci.yml`
 - [ ] Workflow triggers on push to main and develop
 - [ ] Workflow triggers on PR to main
-- [ ] Test job uses Python version matrix (3.8-3.12)
+- [ ] Test job uses Python version matrix (3.10-3.13 per AGET_CI_SPEC v1.1.0)
 - [ ] Test job uses pytest
 - [ ] Lint job present
 - [ ] Security job present
@@ -272,5 +282,5 @@ Expected: 15 tests passing
 
 ---
 
-*SOP_ci_cd_process.md v1.0*
-*Reference: AGET_CI_SPEC.md | L404*
+*SOP_ci_cd_process.md v1.1*
+*Reference: AGET_CI_SPEC.md v1.1.0 | L404, L821*

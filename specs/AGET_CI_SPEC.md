@@ -1,11 +1,11 @@
 # AGET CI Specification
 
-**Version**: 1.0.0
+**Version**: 1.1.0
 **Status**: Active
 **Category**: Standards (Quality Assurance)
 **Format Version**: 1.2
 **Created**: 2025-12-28
-**Updated**: 2025-12-28
+**Updated**: 2026-04-11
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_CI_SPEC.md`
 **Change Origin**: L404 (CI Test Isolation Requirements)
@@ -71,7 +71,7 @@ vocabulary:
       aget:location: "setup.py or pyproject.toml"
     Test_Matrix:
       skos:definition: "Set of Python versions for testing"
-      skos:example: "['3.8', '3.9', '3.10', '3.11', '3.12']"
+      skos:example: "['3.10', '3.11', '3.12', '3.13']"
     Init_File:
       skos:definition: "__init__.py file marking directory as Python package"
 
@@ -166,7 +166,7 @@ setup(
     name='template-name',
     packages=find_packages(where='src'),
     package_dir={'': 'src'},
-    python_requires='>=3.8',
+    python_requires='>=3.10',
     ...
 )
 ```
@@ -180,7 +180,7 @@ WHEN CI_Trigger occurs, the SYSTEM shall execute CI_Workflow.
 | CAP-CI-003-01 | ubiquitous | The SYSTEM shall include Test_Job in CI_Workflow |
 | CAP-CI-003-02 | ubiquitous | The SYSTEM shall include Lint_Job in CI_Workflow |
 | CAP-CI-003-03 | ubiquitous | The SYSTEM shall include Security_Job in CI_Workflow |
-| CAP-CI-003-04 | ubiquitous | The SYSTEM shall test against Python_Version_Matrix [3.8, 3.9, 3.10, 3.11, 3.12] |
+| CAP-CI-003-04 | ubiquitous | The SYSTEM shall test against Python_Version_Matrix [3.10, 3.11, 3.12, 3.13] |
 | CAP-CI-003-05 | ubiquitous | The SYSTEM shall use pytest for Test_Job |
 | CAP-CI-003-06 | optional | WHERE template has integration tests, the SYSTEM shall include Integration_Test_Job |
 
@@ -201,7 +201,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+        python-version: ['3.10', '3.11', '3.12', '3.13']
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -372,6 +372,7 @@ print('pull_request:', 'PASS' if 'pull_request' in on else 'FAIL')"
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.1.0 | 2026-04-11 | Update Python matrix to 3.10-3.13 (drop EOL 3.8/3.9, add 3.13). L821 CI spec staleness gap. |
 | 1.0.0 | 2025-12-28 | Initial release (L404 remediation) |
 
 ---
