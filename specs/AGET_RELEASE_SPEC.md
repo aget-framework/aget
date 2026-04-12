@@ -1,6 +1,6 @@
 # AGET Release Specification
 
-**Version**: 1.13.0
+**Version**: 1.14.0
 **Status**: Active
 **Category**: Process (Release Management)
 **Format Version**: 1.2
@@ -946,6 +946,38 @@ python3 scripts/deployment_monitor.py --check --version X.Y.Z --json | python3 -
 
 **Implementing Script**: `scripts/deployment_monitor.py` (SCRIPT_REGISTRY.yaml)
 
+### CAP-REL-028: Upstream Deployment Feedback (REQ-REL-F-009, L825, L826)
+
+After completing a fleet upgrade, fleet supervisors SHOULD file an upstream enhancement issue capturing deployment retrospective findings — ensuring that friction events, tool effectiveness, and improvement recommendations flow back to the framework agent for next-release planning.
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| R-REL-028-01 | event-driven | WHEN a fleet supervisor completes a fleet upgrade using the MIGRATION_COMPLETION_REPORT, the supervisor SHOULD file an enhancement issue to `gmelli/aget-aget` containing friction events, tool effectiveness, and improvement recommendations | Deployment learnings embedded in local plans are invisible to the framework agent (L825, FLEET-UPG-011 evidence) |
+| R-REL-028-02 | ubiquitous | The MIGRATION_COMPLETION_REPORT template SHALL include an "Upstream Enhancement Issue" section with guidance on what to include in the feedback issue | Template-driven prompting ensures consistent feedback content |
+| R-REL-028-03 | conditional | IF the framework agent receives an upstream feedback issue THEN the framework agent SHOULD reference it in the next VERSION_SCOPE grooming | Closes the feedback loop — deployment learnings inform next release planning |
+
+**Design Principles:**
+
+- **SHOULD, not SHALL**: Supervisor feedback is advisory, not blocking. Fleet supervisors own their upgrade cadence (CAP-REL-027 covers the framework agent's deployment monitoring obligation; this covers the reverse flow).
+- **Issue as handoff artifact**: The GitHub issue is the cross-agent boundary object — discoverable via `study_topic.py`, searchable, and naturally incorporated into VERSION_SCOPE grooming.
+- **Private-first routing** (L638): Feedback issues go to `gmelli/aget-aget` like all other issues.
+
+**V-Test for Template Section:**
+
+```bash
+grep -c "Upstream Enhancement Issue" templates/MIGRATION_COMPLETION_REPORT.template.md | grep -qv "^0$" && echo "PASS" || echo "FAIL"
+```
+
+**V-Test for Feedback Loop:**
+
+```bash
+# After fleet upgrade, check if supervisor filed feedback
+gh issue list --repo gmelli/aget-aget --search "Fleet upgrade retro: vX.Y.Z" --json number --jq length
+# Expected: >= 1 for recent releases
+```
+
+**Prevents**: Deployment Feedback Gap — the release lifecycle ends at "deployment verified" (CAP-REL-027) with no structured path for deployment learnings to return upstream. Supervisor retros with actionable findings (friction taxonomy, tool recommendations, convergent invention) stay buried in local plans. (L825, L826)
+
 ---
 
 ## Release Gate Structure
@@ -980,6 +1012,7 @@ Standard release gates per PROJECT_PLAN:
 | CAP-REL-024-* | propagation_audit.py (target verification) | **v3.6.0** |
 | CAP-REL-025-* | health_logger.py (wraps healthcheck skills) | **v3.6.0** |
 | CAP-REL-027-* | deployment_monitor.py (deployment tracking + VERSION_SCOPE gate) | **v3.9.0** |
+| CAP-REL-028-* | MIGRATION_COMPLETION_REPORT template (upstream feedback section) | **v3.13.0** |
 
 ---
 
@@ -1174,6 +1207,7 @@ Per the two-level model (L742): requirements define principal intent (human leve
 | REQ-REL-Q-001 | Release Predictability | CAP-REL-011 (timing), SOP velocity tracking |
 | REQ-REL-Q-002 | Downstream Executability | CAP-REL-020, CAP-REL-007 |
 | REQ-REL-Q-003 | Zero-Hotfix Release Target | CAP-REL-009, CAP-REL-021-025 (observability) |
+| REQ-REL-F-009 | Upstream Deployment Feedback | CAP-REL-028 |
 
 **Uncovered CAP-RELs** (no upward requirement yet — candidates for REQ-REL v1.1):
 - CAP-REL-002 (Version Numbering) — SemVer is an industry standard, not a principal requirement
@@ -1211,6 +1245,15 @@ Per the two-level model (L742): requirements define principal intent (human leve
 ---
 
 ## Changelog
+
+### v1.14.0 (2026-04-12)
+
+- Added CAP-REL-028: Upstream Deployment Feedback (REQ-REL-F-009, L825, L826)
+- 3 EARS requirements for supervisor feedback flow after fleet upgrades
+- Added enforcement table entry: MIGRATION_COMPLETION_REPORT template (v3.13.0)
+- Added Requirements Grounding entry: REQ-REL-F-009 → CAP-REL-028
+- Closes the deployment feedback gap: release lifecycle now extends past "deployment verified" to include deployment learnings return
+- See: L825, L826, FLEET-UPG-011, #955
 
 ### v1.11.0 (2026-03-28)
 
