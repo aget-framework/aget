@@ -32,28 +32,28 @@ Changelog:
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
 from typing import List, Dict, Tuple, Optional
 
 
-# Template repositories to check (all 12 - L517 expansion)
+# Template repositories to check (all 13 - updated v3.13.0)
 TEMPLATE_REPOS = [
-    # Published templates (6)
-    "template-supervisor-aget",
-    "template-worker-aget",
     "template-advisor-aget",
-    "template-consultant-aget",
-    "template-developer-aget",
-    "template-spec-engineer-aget",
-    # Additional templates (6) - discovered in L517
     "template-analyst-aget",
     "template-architect-aget",
-    "template-qa-aget",
-    "template-devops-aget",
-    "template-documenter-aget",
+    "template-consultant-aget",
+    "template-developer-aget",
+    "template-document-processor-AGET",
+    "template-executive-aget",
+    "template-operator-aget",
     "template-researcher-aget",
+    "template-reviewer-aget",
+    "template-spec-engineer-aget",
+    "template-supervisor-aget",
+    "template-worker-aget",
 ]
 
 
