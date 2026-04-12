@@ -372,7 +372,7 @@ print('pull_request:', 'PASS' if 'pull_request' in on else 'FAIL')"
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.1.0 | 2026-04-11 | Update Python matrix to 3.10-3.13 (drop EOL 3.8/3.9, add 3.13). L821 CI spec staleness gap. |
+| 1.1.0 | 2026-04-11 | Update Python matrix to 3.10-3.13 (drop EOL 3.8/3.9, add 3.13). L822 CI spec staleness gap. |
 | 1.0.0 | 2025-12-28 | Initial release (L404 remediation) |
 
 ---

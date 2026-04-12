@@ -6,7 +6,7 @@
 **Updated**: 2026-04-11
 **Owner**: aget-framework
 **Reference Spec**: AGET_CI_SPEC.md v1.1.0
-**Change Origin**: L404 (CI Test Isolation Requirements), L821 (CI Spec Staleness + Feedback Loop Gap)
+**Change Origin**: L404 (CI Test Isolation Requirements), L822 (CI Spec Staleness + Feedback Loop Gap)
 
 ---
 
@@ -283,4 +283,4 @@ Expected: 15 tests passing
 ---
 
 *SOP_ci_cd_process.md v1.1*
-*Reference: AGET_CI_SPEC.md v1.1.0 | L404, L821*
+*Reference: AGET_CI_SPEC.md v1.1.0 | L404, L822*
