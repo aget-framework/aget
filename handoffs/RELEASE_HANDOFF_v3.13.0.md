@@ -2,7 +2,7 @@
 
 **Date**: 2026-04-12
 **Theme**: Operational Maturation & Fleet Automation
-**From**: private-aget-framework-AGET
+**From**: aget-framework manager
 **To**: Fleet supervisors
 
 ---
@@ -67,7 +67,7 @@ python3 -c "import json; v=json.load(open('.aget/version.json')); print('PASS' i
 
 | Fleet | Supervisor | Status | Date | Notes |
 |-------|-----------|:------:|------|-------|
-| Main | private-supervisor-AGET | **COMPLETE** | 2026-04-12 | 34/34 upgraded + hotfix + baseline gap fix. 31 skills/agent. |
+| Main | fleet supervisor | **COMPLETE** | 2026-04-12 | 34/34 upgraded + hotfix + baseline gap fix. 31 skills/agent. |
 | WorkCo | legalon-supervisor | Pending | — | See "Lessons from Main Fleet" below |
 
 ---
@@ -111,4 +111,4 @@ When deploying `aget-expand-ontology` v2.1.0, check `project_prefix` in the exis
 
 *RELEASE_HANDOFF_v3.13.0.md*
 *Updated: 2026-04-12 (post main fleet upgrade + hotfix)*
-*Created by private-aget-framework-AGET*
+*Created by aget-framework manager*
