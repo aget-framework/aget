@@ -28,6 +28,8 @@ None. All changes are additive.
 
 None new in this release.
 
+**Deployment Spec**: [`specs/DEPLOYMENT_SPEC_v3.13.0.yaml`](../specs/DEPLOYMENT_SPEC_v3.13.0.yaml) — authoritative target state with skill conflict resolution guide.
+
 ---
 
 ## Upgrade Guide
@@ -38,7 +40,20 @@ None new in this release.
 |------|-----------|--------|---------------|----------|
 | 1 | MUST | Update `.aget/version.json`: set `aget_version` to "3.13.0" | `jq -r .aget_version .aget/version.json` | "3.13.0" |
 | 2 | MUST | Update `AGENTS.md` header: `@aget-version: 3.13.0` | `grep '@aget-version: 3.13.0' AGENTS.md` | Match |
-| 3 | SHOULD | Run `python3 scripts/health_check.py` | Exit code | 0 |
+| 3 | SHOULD | Deploy 13 new/upgraded skills from `template-worker-aget/.claude/skills/` | `ls .claude/skills/aget-check-facts/SKILL.md` | Exists |
+| 4 | SHOULD | Run `python3 scripts/health_check.py` | Exit code | 0 |
+
+### Skill Deployment (Step 3 Detail)
+
+**Canonical source**: `template-worker-aget/.claude/skills/` (31 skills total)
+
+**8 new skills** (copy directory from template if agent doesn't have it):
+`aget-promote-issue`, `aget-describe-session`, `aget-propose-actions`, `aget-create-rubric`, `aget-check-initiative`, `aget-process-observation`, `aget-open-session`, `aget-check-facts`
+
+**3 upgraded skills** (replace with template version):
+`aget-release-build` (v0.2.0), `aget-release-audit-specs` (v0.2.0), `aget-release-critique` (v0.2.0)
+
+**Conflict resolution**: If an agent has an organic (locally-modified) version of a skill, compare with the template version. If template is a superset, adopt it. If organic has domain-specific additions, merge. See DEPLOYMENT_SPEC `conflict_resolution_guide` for details.
 
 ### End-State Validation
 
