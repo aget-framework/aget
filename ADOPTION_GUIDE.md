@@ -20,9 +20,8 @@ This guide covers:
 
 New to AGET? Start with the audio introduction — a narrated walkthrough covering session rhythm, key skills, fleet creation, and the knowledge base.
 
-<!-- TODO: Replace with YouTube/NotebookLM link once channel is created -->
-- **Audio briefing**: Coming soon
-- **Infographic**: See `docs/briefings/BRIEFING_2026-04-12_aget_new_user_introduction.png` (in aget-framework repo)
+- **Audio briefing**: [AGET Intro: Memory and Mission for CLI AI Agents](https://youtu.be/zLSFeT9TF8E)
+- **Channel**: [@AGETFramework on YouTube](https://www.youtube.com/@AGETFramework)
 
 ---
 

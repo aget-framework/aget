@@ -11,7 +11,7 @@ Your CLI agents lose context between sessions. Knowledge resets daily. Agents in
 
 AGET fixes this. It gives your agents persistent knowledge, shared memory, fleet coordination, and human-supervised governance. Your agents accumulate domain expertise that compounds across sessions.
 
-**New to AGET?** Listen to the [audio introduction](ADOPTION_GUIDE.md#listen-to-the-introduction) — a narrated walkthrough of session rhythm, key skills, and fleet creation.
+**New to AGET?** Listen to the [audio introduction](https://youtu.be/zLSFeT9TF8E) — a narrated walkthrough of session rhythm, key skills, and fleet creation.
 
 ## Quick Start
 
