@@ -1,11 +1,11 @@
 # SKILL_NAMING_CONVENTION_SPEC
 
-**Version**: 1.3.0
+**Version**: 1.4.0
 **Status**: Active
 **Category**: Specification (Skills)
 **Format Version**: 1.3
 **Created**: 2026-02-15
-**Updated**: 2026-03-18
+**Updated**: 2026-04-18
 **Author**: aget-framework
 **Location**: `aget/specs/SKILL_NAMING_CONVENTION_SPEC.md`
 **Related Specs**: AGET_SESSION_SPEC, AGET_SKILL_SPEC
@@ -107,6 +107,7 @@ vocabulary:
 | CAP-SNAME-001-03 | ubiquitous | The SYSTEM shall ensure verb is a single word describing the action |
 | CAP-SNAME-001-04 | ubiquitous | The SYSTEM shall ensure noun is a single word (or hyphenated compound) describing the target |
 | CAP-SNAME-001-05 | ubiquitous | The SYSTEM shall ensure all components are lowercase |
+| CAP-SNAME-001-06 | event-driven | WHEN a verb's action is intrinsically unambiguous AND variants are expressed via command-line flags (not separate skills), THE SYSTEM shall permit the single-verb form `aget-{verb}` for names listed in the Single-Verb Exception Registry (§ below) |
 
 **Canonical Pattern**:
 ```
@@ -132,6 +133,19 @@ aget-{verb}-{noun}
 | `aget-wake-up` | wake | up | Session initialization |
 | `aget-wind-down` | wind | down | Session termination |
 | `aget-file-issue` | file | issue | File GitHub issue |
+
+---
+
+### Single-Verb Exception Registry (CAP-SNAME-001-06)
+
+Per CAP-SNAME-001-06, the following single-verb skill names are approved exceptions to the `aget-{verb}-{noun}` pattern. Each exception requires principal approval, a rationale for why the verb is intrinsically unambiguous, and a flag-based variant scheme that replaces the noun-suffix namespace.
+
+| Skill Name | Verb | Rationale | Flag-Based Variants | Approved |
+|------------|------|-----------|---------------------|----------|
+| `aget-name` | name | Action is self-contained (generate structured entity name); target is always an identifier string | `--session`, `--agent`, `--l-doc` | SP-015, 2026-04-13 |
+| `aget-ask` | ask | Action is self-contained (clarifying question generation); entropy-reduction outcome is the measurable product | `--clarification` (default), `--followup` | SP-018, 2026-04-18 |
+
+**Adding new single-verb exceptions**: Requires (a) SP-NNN proposal documenting rationale, (b) principal approval recorded by date, (c) spec version bump, (d) corresponding test fixture update. Any new single-verb skill that bypasses this registry is a governance bypass.
 
 ---
 

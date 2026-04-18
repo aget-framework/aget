@@ -9,6 +9,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.14.0] - 2026-04-18
+
+**Theme**: v3.13 Loop Closure + Scope-Lock Discipline
+
+### Added
+
+- **CAP-REL-028 Upstream Deployment Feedback spec** (REQ-REL-F-009): Formalizes the feedback channel from fleet agents back to the framework owner when deployment reveals gaps (L827 runtime dependency). Closes the deployment→framework feedback loop.
+- **DEPLOYMENT_SPEC_v3.13.0.yaml**: Template baseline + reconciliation steps for fleet upgrade. Pairs with SOP Phase 2.5 deployment artifact sync.
+- **`log_skill_invocation.py`**: Skill telemetry logger. Appends structured JSONL entries to `skill_invocations.jsonl` when skills are invoked. Substrate for principal-facing skill-usage analytics.
+- **CAP-SNAME-001-06 (Single-Verb Exception Registry)** in `SKILL_NAMING_CONVENTION_SPEC` v1.4.0: Permits `aget-{verb}` form for approved single-verb skills (`aget-ask` SP-018, `aget-name` SP-015). Caught as governance-debt during this release's Gate 0 test remediation.
+- **Version-bump script coverage** (`.aget/patterns/release/version_bump.py`): Added `template-document-processor-AGET` to apply/check enumerations. Previously silently skipped.
+
+### Changed
+
+- **AGET_TEMPLATE_SPEC**: Universal skills 15 → 31. Supervisor skills 18 → 37. Reflects skill-creation work completed this cycle; template conformance now tracks the expanded set.
+- **v3.13.0 handoff artifact** enriched with lessons-from-main-fleet content for WorkCo (cross-fleet pattern transfer) and DEPLOYMENT_SPEC reference + skill-deployment guide. Handoff artifacts are now self-contained for remote fleets.
+- **Version bump**: 3.13.0 → 3.14.0 across aget/ core and 13 templates (29 version-bearing files updated atomically; L429 compliance).
+
+### Fixed
+
+- **R-ISSUE-011 sanitization**: 3 `private-*` references removed from public v3.13 handoff. Pattern generalized into `/aget-file-issue` sanitization path (L638 private-first routing).
+- **SESSION_SKILLS_INDEX canonical paths**: `.aget/patterns/session/` → `scripts/` per DEPLOYMENT_SPEC v1.1.0.
+
+### Deprecated
+
+Per POL-DEP-001 (2 minor-version grace per R-DEP-011):
+
+- `scripts/wake_up.py` → `scripts/aget_open_session.py` (removal v3.16.0)
+- `scripts/wind_down.py` → `scripts/aget_close_session.py` (removal v3.16.0)
+- `scripts/wake_up_ext.py` → `scripts/aget_open_session_ext.py` (removal v3.16.0)
+- `scripts/wind_down_ext.py` → `scripts/aget_close_session_ext.py` (removal v3.16.0)
+
+v3.14 and v3.15 accept both old and new names.
+
+### Governance
+
+- **v3.14 scope-locked** at v1.0.0 (2026-04-18). 56 items across 6 committed themes: prefix normalization, fleet tooling, triad generalization, requirements publication, framework transparency, fleet economics. Execution through v3.14.x patches and v3.15 — this release does not claim delivery of the 56 items.
+
+### Notes
+
+This CHANGELOG entry is retrospective-dominant: v3.14.0's content is primarily what the v3.13 cycle finally landed, plus governance-debt repayment caught during release-day verification.
+
+---
+
 ## [3.13.0] - 2026-04-12
 
 **Theme**: Operational Maturation & Fleet Automation
