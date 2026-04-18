@@ -1,0 +1,348 @@
+# DEPLOYMENT_SPEC_v3.14.1.yaml
+# Complete target state specification for v3.14.1 deployment
+#
+# Purpose: Define what a correctly-deployed v3.14.1 agent looks like.
+# Usage: Supervisors use this to verify fleet deployments against a complete
+#        enumerated baseline (NOT delta-only) per L623 structural fix.
+# Governance: R-DEP-002 (State-Based Deployment Requirement), R-REL-038,
+#             VERSION_SCOPE_v3.14.0 #23 (DEPLOYMENT_SPEC structural fix — L623)
+#
+# Created: 2026-04-18 (post-hoc for v3.14.1 tag; filed to aget/main following tag)
+# Origin: DEPLOYMENT_SPEC_v3.12.0.yaml (v3.13.0 spec shipped as 0-byte — corrected
+#         in this spec by including v3.13.0 content retroactively as baseline)
+# Release: v3.14.1 (#979 installer partial-propagation hotfix for 3 templates;
+#          v3.14.0 cycle content carried forward)
+# Note on L623: This spec enumerates the FULL expected template baseline, not
+#               just the delta from the prior version. An agent is "correctly
+#               v3.14.1-deployed" IFF every listed artifact below is present
+#               with the specified version/content.
+
+version: "3.14.1"
+spec_version: "2.0.0"
+created: "2026-04-18"
+status: active
+supersedes: "DEPLOYMENT_SPEC_v3.13.0.yaml (empty — this spec carries v3.13.0 baseline forward)"
+
+# =============================================================================
+# VERIFICATION SCRIPT
+# =============================================================================
+
+verification_script:
+  file: "scripts/verify_deployment.py"
+  usage: "python3 scripts/verify_deployment.py --version 3.14.1 --path /path/to/agent"
+  exit_codes:
+    0: "PASS (all enumerated artifacts present at expected version)"
+    1: "FAIL (one or more enumerated artifacts missing or stale)"
+  fallback: "Manual: iterate every enumerated artifact below; agent is v3.14.1-correct only if all checks pass."
+
+# =============================================================================
+# VERSION INDICATORS (what identifies an agent as v3.14.1)
+# =============================================================================
+
+version_indicators:
+  version_json:
+    path: ".aget/version.json"
+    field: "aget_version"
+    value: "3.14.1"
+    verification: "jq -r .aget_version .aget/version.json"
+
+  agents_md:
+    path: "AGENTS.md"
+    pattern: "@aget-version: 3.14.1"
+    verification: "grep -c '@aget-version: 3.14.1' AGENTS.md"
+
+  claude_md:
+    path: "CLAUDE.md"
+    pattern: "@aget-version: 3.14.1"
+    optional: true
+    verification: "grep -c '@aget-version: 3.14.1' CLAUDE.md"
+
+  codemeta_json:
+    path: "codemeta.json"
+    field: "version"
+    value: "3.14.1"
+    optional: true
+    applies_to: "aget-framework/aget only"
+
+  citation_cff:
+    path: "CITATION.cff"
+    field: "version"
+    value: "3.14.1"
+    optional: true
+    applies_to: "aget-framework/aget only"
+
+# =============================================================================
+# WHAT'S IN v3.14.1 (retrospective summary of the v3.14 cycle)
+# =============================================================================
+
+whats_in:
+  cycle_theme: "v3.13 Loop Closure + Scope-Lock Discipline (v3.14.0) + #979 installer partial-propagation hotfix (v3.14.1)"
+
+  v3_14_1_hotfix:
+    scope: "4 public repos bumped (aget/ core + template-advisor-aget + template-developer-aget + template-spec-engineer-aget); 10 other templates remain at v3.14.0"
+    fix: "installer/install.py references scripts/health_check.py (was scripts/housekeeping_protocol.py — stale reference from partial #979 propagation in v3.11.1)"
+    restores: "test_enhanced_installer.py::test_standard_install and test_advanced_install CI green on the 3 affected templates"
+
+  v3_14_0_highlights:
+    - title: "CAP-REL-028 Upstream Deployment Feedback spec"
+      description: "REQ-REL-F-009 formalizes fleet→framework feedback channel for deployment gaps (L827)."
+
+    - title: "AGET_TEMPLATE_SPEC universal skills expansion"
+      description: "15→31 universal skills; 18→37 supervisor skills. Templates track the expanded set."
+
+    - title: "SKILL_NAMING_CONVENTION_SPEC v1.4.0 (CAP-SNAME-001-06)"
+      description: "Single-Verb Exception Registry permits aget-{verb} form for approved self-contained verbs (aget-ask, aget-name)."
+
+    - title: "version_bump.py template coverage fix"
+      description: "Added template-document-processor-AGET (capital-AGET suffix was silently skipped)."
+
+    - title: "R-ISSUE-011 sanitization generalization initiated"
+      description: "Applied to public handoff. Generalization to all public-promoted artifact classes tracked as v3.15 scope candidate."
+
+# =============================================================================
+# L623 FULL TEMPLATE BASELINE — NOT DELTA-ONLY (structural fix, VERSION_SCOPE #23)
+# =============================================================================
+# An agent correctly deployed at v3.14.1 SHALL have every artifact below.
+# This is the complete enumerated set, not just what changed in v3.14.1.
+# Supervisors verifying fleet agents check against this full list, not a diff.
+
+template_baseline:
+
+  # ---------------------------------------------------------------------------
+  # UNIVERSAL SKILLS (31 total — applies to every template/agent)
+  # ---------------------------------------------------------------------------
+  universal_skills:
+    count: 31
+    canonical_source: "template-worker-aget/.claude/skills/"
+    location_in_agent: ".claude/skills/"
+    names:
+      - aget-analyze-ontology
+      - aget-check-evolution
+      - aget-check-facts
+      - aget-check-health
+      - aget-check-initiative
+      - aget-check-kb
+      - aget-check-sessions
+      - aget-close-session
+      - aget-create-briefing
+      - aget-create-project
+      - aget-create-rubric
+      - aget-create-skill
+      - aget-describe-session
+      - aget-enhance-spec
+      - aget-expand-ontology
+      - aget-file-issue
+      - aget-open-session
+      - aget-process-observation
+      - aget-promote-issue
+      - aget-propose-actions
+      - aget-propose-skill
+      - aget-record-lesson
+      - aget-record-observation
+      - aget-release-audit-specs
+      - aget-release-build
+      - aget-release-critique
+      - aget-review-project
+      - aget-save-state
+      - aget-study-topic
+      - aget-wake-up
+      - aget-wind-down
+    verification: "ls .claude/skills/ | grep -c '^aget-'  # expect 31"
+
+  # ---------------------------------------------------------------------------
+  # SUPERVISOR-SPECIFIC SKILLS (6 additional — applies only to supervisor-class)
+  # ---------------------------------------------------------------------------
+  supervisor_skills:
+    count: 6
+    total_including_universal: 37
+    canonical_source: "template-supervisor-aget/.claude/skills/"
+    applies_to: "agents with supervisor role (per identity.json or version.json)"
+    names:
+      - aget-broadcast-fleet
+      - aget-check-fleet
+      - aget-create-aget
+      - aget-escalate-issue
+      - aget-review-agent
+      - aget-review-handoff
+    verification_supervisor: "ls .claude/skills/ | grep -c '^aget-'  # expect 37 for supervisor-class agents"
+
+  # ---------------------------------------------------------------------------
+  # SCRIPTS (21 — common to all templates)
+  # ---------------------------------------------------------------------------
+  scripts:
+    count: 21
+    canonical_source: "template-worker-aget/scripts/"
+    location_in_agent: "scripts/"
+    names:
+      - aget_check_permissions.py
+      - aget_release_hygiene.py
+      - aget_session_protocol.py
+      - aget_v21_migration.py
+      - check_compatibility.py
+      - health_check.py
+      - housekeeping_protocol.py  # retained for backward compat through v3.15
+      - install_hooks.py
+      - install_pattern.py
+      - install_verify.py
+      - log_skill_invocation.py
+      - security_check.py
+      - session_protocol.py
+      - study_topic.py
+      - sync_checker.py
+      - track_claude_costs.py
+      - v2_project_scanner.py
+      - validate_patterns.py
+      - verify_dependencies.py
+      - wake_up.py  # deprecated in v3.14.0, removal v3.16.0 (POL-DEP-001)
+      - wind_down.py  # deprecated in v3.14.0, removal v3.16.0 (POL-DEP-001)
+    notes:
+      - "wake_up.py and wind_down.py are deprecated per POL-DEP-001. New canonical names aget_open_session.py / aget_close_session.py are accepted in v3.14.x; both forms work. Removal of old names in v3.16.0."
+      - "housekeeping_protocol.py retained alongside health_check.py for backward compatibility; scripts that reference either should work. v3.11.1 introduced the rename."
+
+  # ---------------------------------------------------------------------------
+  # INSTALLER (per-template)
+  # ---------------------------------------------------------------------------
+  installer:
+    path: "installer/install.py"
+    required_references:
+      - "scripts/health_check.py"   # v3.14.1 hotfix: fixed in all 5 #979-affected templates (advisor/consultant/developer/spec-engineer/worker — except consultant has no test, see #1033)
+      - "scripts/session_protocol.py"
+      - "AGENTS.md"
+    verification: "grep -c 'scripts/health_check.py' installer/install.py  # expect >= 1"
+
+  # ---------------------------------------------------------------------------
+  # TESTS
+  # ---------------------------------------------------------------------------
+  tests:
+    canonical_tests:
+      - path: "tests/test_enhanced_installer.py"
+        asserts: "installed agent has scripts/health_check.py"
+        present_in: ["template-advisor-aget", "template-developer-aget", "template-spec-engineer-aget", "template-worker-aget"]
+        missing_in: ["template-consultant-aget"]  # coverage gap tracked in internal tracker (v3.15 scope candidate)
+    verification: "pytest tests/ -v  # all templates should have green CI on v3.14.1 HEAD"
+
+  # ---------------------------------------------------------------------------
+  # VERSION-BEARING FILES (per agent/repo)
+  # ---------------------------------------------------------------------------
+  version_bearing_files:
+    required:
+      - ".aget/version.json"       # aget_version field
+      - "AGENTS.md"                # @aget-version header
+    optional:
+      - "CLAUDE.md"                # @aget-version header (if present, must match)
+      - "codemeta.json"            # version field (aget/ core only)
+      - "CITATION.cff"             # version field (aget/ core only)
+      - "README.md"                # Version string (templates only)
+    verification: "python3 .aget/patterns/release/version_bump.py --check 3.14.1"
+
+  # ---------------------------------------------------------------------------
+  # KEY SPECS (aget/ core reference; templates follow these)
+  # ---------------------------------------------------------------------------
+  key_specs:
+    canonical_source: "aget-framework/aget/specs/"
+    required_at_v3_14_1:
+      - AGET_TEMPLATE_SPEC.md            # universal 31, supervisor 37
+      - AGET_PROJECT_PLAN_SPEC.md        # v1.2.1
+      - AGET_RELEASE_SPEC.md             # CAP-REL-028 added in v3.14.0
+      - SKILL_NAMING_CONVENTION_SPEC.md  # v1.4.0 (CAP-SNAME-001-06)
+      - AGET_ISSUE_GOVERNANCE_SPEC.md    # v2.1.0
+      - AGET_SESSION_SPEC.md
+      - AGET_VERSIONING_CONVENTIONS.md
+      - AGET_EVOLUTION_SPEC.md
+      - AGET_IDENTITY_JSON_SCHEMA.md
+      - AGET_INSTANCE_SPEC.md
+
+# =============================================================================
+# UPGRADE STEPS (for fleet supervisors, v3.13.0 or v3.14.0 → v3.14.1)
+# =============================================================================
+
+upgrade_steps:
+  from_v3_13_0:
+    - step: 1
+      action: "Update @aget-version to 3.14.1 in AGENTS.md and CLAUDE.md (if present)"
+    - step: 2
+      action: "Update .aget/version.json: set aget_version to '3.14.1'; append migration_history entry"
+    - step: 3
+      action: "Sync .claude/skills/ directory to match the 31 (or 37 for supervisor-class) enumerated names above. Remove any deprecated skill names not on the list."
+    - step: 4
+      action: "Sync scripts/ directory: copy from canonical template source. Both wake_up.py/wind_down.py (deprecated) and aget_open_session.py/aget_close_session.py (new canonical) accepted through v3.15."
+    - step: 5
+      action: "Verify installer/install.py references scripts/health_check.py (not housekeeping_protocol.py) if installer test is present."
+    - step: 6
+      action: "Run health_check: `python3 scripts/health_check.py` — expect exit 0."
+    - step: 7
+      action: "Run contract tests if available: `python3 -m pytest tests/`"
+    - step: 8
+      action: "Report deployment back to supervisor for pilot tracking (closes L656 loop)."
+
+  from_v3_14_0:
+    - step: 1
+      action: "Bump version indicators to 3.14.1 (all files listed in version_bearing_files)"
+    - step: 2
+      action: "If this agent uses template-advisor/developer/spec-engineer as base: sync installer/install.py with the v3.14.1 fix (line 97 comment + lines 99-100 health_check.py references)"
+    - step: 3
+      action: "Other templates (10 unaffected) need version indicator bump only"
+    - step: 4
+      action: "Report deployment back to supervisor"
+
+# =============================================================================
+# RECONCILIATION NOTES (for agents with partial v3.14.0 state)
+# =============================================================================
+
+reconciliation:
+  partial_v3_14_0_state:
+    problem: "Some agents may have cloned from templates before #979 was complete in their base template. They have stale installer/install.py referencing housekeeping_protocol.py."
+    fix: "Apply the v3.14.1 installer/install.py patch (lines 97 + 99-100) OR re-clone from the v3.14.1-tagged template source."
+    verification: "grep -c 'scripts/health_check.py' installer/install.py  # expect >= 1; grep -c 'scripts/housekeeping_protocol.py' installer/install.py should return 0 in the fixed templates"
+
+  known_gap_consultant:
+    problem: "template-consultant-aget does NOT have test_enhanced_installer.py, so its installer lack of health_check.py reference was never CI-detected."
+    issue: "Filed in internal tracker for v3.15 scope triage"
+    workaround: "Consultant-based agents should manually verify scripts/health_check.py presence after install."
+
+# =============================================================================
+# GOVERNANCE REFERENCES
+# =============================================================================
+
+governance:
+  l_docs:
+    L623: "Enumerated-delta-only DEPLOYMENT_SPEC misses pre-existing skills. This spec addresses by enumerating FULL baseline."
+    L735: "Public push window (Saturday; Sunday with approval)."
+    L656: "Loading Dock — IMPLEMENTED ≠ DEPLOYED. Pilot tracking closes the loop."
+    L822: "CI feedback loop — framework responds to fleet-surfaced CI failures."
+    L818: "Release Delivery Triad — Builder/Spec Auditor/Critic."
+
+  specs:
+    AGET_RELEASE_SPEC: "R-REL-006 (manager version coherence), R-REL-019 (handoff), R-REL-035 (GitHub release required), R-REL-036 (per-template CHANGELOG), R-REL-038 (DEPLOYMENT_SPEC required), CAP-REL-028 (upstream deployment feedback)"
+    AGET_TEMPLATE_SPEC: "CAP-TPL-016 (skill deployment; 31 universal / 37 supervisor counts at v3.14.1)"
+    POL-DEP-001: "Deprecation policy (R-DEP-010/011/013). Session-script shims registered; removal in v3.16.0."
+
+  release_artifacts:
+    github_releases:
+      - "https://github.com/aget-framework/aget/releases/tag/v3.14.1"
+      - "https://github.com/aget-framework/template-advisor-aget/releases/tag/v3.14.1"
+      - "https://github.com/aget-framework/template-developer-aget/releases/tag/v3.14.1"
+      - "https://github.com/aget-framework/template-spec-engineer-aget/releases/tag/v3.14.1"
+    handoff: "aget-framework/aget/handoffs/RELEASE_HANDOFF_v3.14.0.md (v3.14.1 content filed as follow-up)"
+
+# =============================================================================
+# CHANGELOG SUMMARY (for supervisor reference)
+# =============================================================================
+
+changelog_summary:
+  v3_14_1:
+    type: "hotfix"
+    date: "2026-04-18"
+    scope: "4-repo surgical (aget/ + 3 templates)"
+    fix: "#979 installer partial-propagation in advisor/developer/spec-engineer"
+
+  v3_14_0:
+    type: "minor"
+    date: "2026-04-18"
+    theme: "v3.13 Loop Closure + Scope-Lock Discipline"
+    scope: "14-repo (aget/ + 13 templates)"
+    highlights:
+      - "CAP-REL-028 Upstream Deployment Feedback spec"
+      - "SKILL_NAMING_CONVENTION_SPEC v1.4.0 (CAP-SNAME-001-06)"
+      - "Scope-lock state machine exercised"
+      - "Session-script deprecations announced (shim cycle through v3.15.x)"
