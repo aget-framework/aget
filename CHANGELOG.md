@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.14.1] - 2026-04-18
+
+**Theme**: #979 Installer Partial-Propagation Hotfix
+
+### Fixed
+
+- `installer/install.py` in `template-advisor-aget`, `template-developer-aget`, and `template-spec-engineer-aget` now references `scripts/health_check.py` (was `scripts/housekeeping_protocol.py` — stale reference from partial #979 propagation in v3.11.1). Restores CI green on the 3 affected templates; `test_enhanced_installer.py::test_standard_install` and `test_advanced_install` assertions satisfied.
+
+### Scope
+
+- 4 repos bumped to v3.14.1: aget/ core (coordination) + 3 fixed templates. Other 10 templates unchanged and remain at v3.14.0. Surgical scope matches the asymmetric fix footprint.
+- No breaking changes. No new deprecations.
+
+### Notes
+
+Hotfix driven by supervisor's pre-upgrade CI gate. Framework shipped v3.14.0 onto CI-red in these 3 templates because `validate_release_gate.py` does not query downstream fleet CI (see v3.15 candidate enhancement for pre-release fleet-readiness gate). v3.14.1 restores fleet deployability.
+
+---
 ## [3.14.0] - 2026-04-18
 
 **Theme**: v3.13 Loop Closure + Scope-Lock Discipline
