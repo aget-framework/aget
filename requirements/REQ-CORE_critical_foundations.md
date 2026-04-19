@@ -217,7 +217,7 @@ fit_criterion: >
   Implementation section.
 priority: P0
 specifications:
-  - "CAP-DEGRADE-001 (proposed — see PROPOSAL_cap_framework_degradation.md; spec authoring deferred to v3.15)"
+  - "CAP-DEGRADE-001 (Three-Tier Capability Degradation — authored 2026-04-19 in AGET_FRAMEWORK_SPEC.md, 8 sub-requirements)"
 constraints:
   - "ADR-004 (Three-tier degradation: gh → git → filesystem) — the architectural decision this REQ operationalizes"
 status: proposed
@@ -399,7 +399,7 @@ The following non-negotiable boundaries apply across all REQ-CORE-* requirements
 | REQ-CORE-F-003 | CAP-SESSION-001-03/04 | Session lifecycle |
 | REQ-CORE-F-004 | CAP-SESSION-002 + CAP-SESSION-013 (PROPOSED) | Session lifecycle |
 | REQ-CORE-F-005 | SKILL-024 (aget-propose-actions) | Action proposal |
-| REQ-CORE-F-006 | CAP-DEGRADE-001 (PROPOSED) | All skills/commands |
+| REQ-CORE-F-006 | CAP-DEGRADE-001 (authored 2026-04-19) | All skills/commands |
 | REQ-CORE-F-007 | CAP-REL-022 (Gate Execution Enforcement); CAP-GATE-001 PROPOSED | All gated work |
 | REQ-CORE-Q-008 | AGET_FLEET_SPEC (PROPOSED), RUBRIC_reconstructability (PROPOSED) | Public framework |
 | REQ-CORE-Q-009 | AGET_ISSUE_GOVERNANCE_SPEC v2.1.0, R-ISSUE-011, SKILL-040 | All issue filing |

@@ -972,6 +972,47 @@ The organization homepage shall maintain required sections.
 
 **Enforcement**: Organization homepage validation
 
+### CAP-DEGRADE: Three-Tier Capability Degradation Requirements
+
+#### CAP-DEGRADE-001: Three-Tier Degradation Path
+
+Every framework capability that depends on external tooling SHALL implement a three-tier degradation path so that the capability remains functional in degraded environments. The tiers degrade from richest to most basic: `tier_full` (gh CLI + remote APIs) → `tier_intermediate` (local git) → `tier_basic` (filesystem-only).
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-DEGRADE-001-01 | ubiquitous | The SYSTEM shall implement `tier_basic` (filesystem-only path) for every capability that has any external-tooling dependency |
+| CAP-DEGRADE-001-02 | conditional | IF `gh` CLI is available AND authenticated, THEN the SYSTEM may use `tier_full` (gh + remote APIs) for richer functionality |
+| CAP-DEGRADE-001-03 | conditional | IF `tier_full` is unavailable AND local git is available, THEN the SYSTEM shall fall back to `tier_intermediate` (git CLI + local refs) |
+| CAP-DEGRADE-001-04 | conditional | IF `tier_intermediate` is unavailable, THEN the SYSTEM shall fall back to `tier_basic` (filesystem read of `.git/` refs, manifest files, or local cache) |
+| CAP-DEGRADE-001-05 | ubiquitous | Tier fallback shall be silent and automatic — the capability returns the best result the available tier can provide; the principal is not interrupted with tier errors |
+| CAP-DEGRADE-001-06 | ubiquitous | The SYSTEM shall annotate the result with the tier used (e.g., `source: gh|git|filesystem`) so downstream consumers can assess freshness |
+| CAP-DEGRADE-001-07 | conditional | IF a capability cannot complete at `tier_basic`, THEN the capability shall return a structured "external system unavailable" result with the last-known KB state, NOT raise an exception |
+| CAP-DEGRADE-001-08 | ubiquitous | Each capability that implements degradation shall document its tier mapping in a Tiers section of its own spec |
+
+**Enforcement**: Skill-level conformance — every capability with external dependencies (`gh`, `git`, network APIs) must include a Tiers section documenting `tier_basic` invocation. Validator: future enhancement to `scripts/score_specifications.py` to detect missing Tiers sections in specs that reference external tooling.
+
+**Source**:
+- ADR-004 (Three-Tier Degradation: gh → git → filesystem)
+- L185 (Environmental Grounding)
+- L759 (System-of-Record Consumer Pattern — applies degradation at the cross-system integration layer)
+- Operational evidence: `.aget/patterns/release/post_release_validation.py` `tier_basic` filesystem implementation; `tag_release.py` `tier_full → tier_basic` fallback per CHANGELOG; SKILL-020 (`/aget-check-initiative`) and SKILL-026 (`/aget-promote-issue`) explicit ADR-004 compliance lines
+
+**Inherits-from REQ**:
+- REQ-CORE-F-006 (Three-Tier Degradation) — the human-level requirement this spec implements
+
+**Tiers** (this spec's own implementation):
+
+| Tier | Source | Capability degradation |
+|------|--------|------------------------|
+| `tier_full` | gh CLI + GitHub API | Full conformance check across remote repos; live release/tag/issue queries |
+| `tier_intermediate` | local git CLI | Conformance check against local working tree + `.git/` refs |
+| `tier_basic` | filesystem only | Conformance check against `aget/specs/` directory listing + spec frontmatter |
+
+**Anti-patterns prohibited**:
+- Hard exception on `gh` failure (tier_full only) — violates CAP-DEGRADE-001-07
+- Silent dropping of tier provenance from result — violates CAP-DEGRADE-001-06
+- Capability that has no `tier_basic` path documented — violates CAP-DEGRADE-001-01
+
 ---
 
 ## Conformance Levels
