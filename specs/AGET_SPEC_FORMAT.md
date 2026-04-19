@@ -184,6 +184,34 @@ CAP-MEMORY-003        # Memory spec requirement
 CAP-REASON-002-05     # Reasoning sub-requirement
 ```
 
+### ID Naming Constraints (added v1.4 — 2026-04-19)
+
+The `DOMAIN` segment MUST be a **single contiguous uppercase segment** with no hyphens within. Multi-word domain names use concatenation or short codes, not hyphenation.
+
+**Conformant** (single-segment DOMAIN):
+- `CAP-SESSION-001`, `CAP-REL-022`, `CAP-PP-001`, `CAP-GOV-001`
+- `CAP-DEGRADE-001` (concatenated multi-word concept)
+- `CAP-SAFETY-001`, `CAP-FLEET-001`
+
+**NON-conformant** (multi-segment DOMAIN — rejected by tooling):
+- `CAP-FRAMEWORK-DEGRADATION-001` (DOMAIN spans two segments)
+- `CAP-HOM-PRESERVATION-001` (likewise)
+- `CAP-REL-STABILITY-001` (likewise)
+
+**Tooling enforcement**: This convention is enforced by the regex `\b(?:CAP|R)-[A-Z]+(?:-\d+)+\b` used by:
+- `RUBRIC_requirement_quality_v1.0.md` D2/CR4 (acceptable-types check for REQ-* `specifications:` field)
+- Spec-graph extractors and traceability validators
+
+**Why single-segment**: Disambiguates DOMAIN from NNN parsing. `CAP-A-B-001` is ambiguous (is `A` the domain and `B-001` the sub-requirement? Or is `A-B` the domain and `001` the requirement?). Single-segment DOMAIN removes the ambiguity.
+
+**Naming guidance for new domains**:
+1. Prefer existing domain codes when applicable (extend the SOP for the domain)
+2. For new concepts, choose a short single-segment name (≤10 chars typical)
+3. Concatenate multi-word concepts: `DEGRADE` (not `FRAMEWORK-DEGRADATION`), `SAFETY` (not `AGENT-SAFETY`), `RELSTAB` (not `REL-STABILITY`) — though prefer using an existing domain like `REL` with a free `NNN` over inventing a new short name
+4. Avoid abbreviating to fewer than 3 chars (PP is the minimum bar; PR is too short)
+
+**Pattern reference**: AGET_PROJECT_PLAN_SPEC uses `PP`, AGET_RELEASE_SPEC uses `REL`, AGET_SESSION_SPEC uses `SESSION`, AGET_GOVERNANCE_HIERARCHY_SPEC uses `GOV`, AGET_ISSUE_GOVERNANCE_SPEC uses `ISSUE`. All conform to the single-segment constraint.
+
 **Domain Abbreviations**:
 
 | Domain | Abbreviation |
