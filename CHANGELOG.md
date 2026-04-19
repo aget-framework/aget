@@ -9,6 +9,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased] - In flight toward v3.15
+
+**Theme**: Two-Level Model coherence — close L749 corners, tighten REQ↔SPEC discipline
+
+### Added
+
+- `requirements/REQUIREMENTS_FORMAT.md` v1.0 → **v1.1**
+  - Optional `constraints:` per-REQ field for ADRs, governance docs, AGENTS.md sections, SOPs, and DESIGN_DIRECTION docs that bound a REQ but do not implement it
+  - Clarified acceptable `specifications:` types: **CAP-***, **R-***, **SKILL-***, **RUBRIC_*** (rubrics-as-spec per L749 duality)
+  - Added Field Selection Decision Tree to route citations to the correct field
+- `requirements/REQ-CORE_critical_foundations.md` — **published** (10 REQs, was uncommitted from 2026-04-18)
+- `requirements/REQ-GOV_agent_governance.md` — **published** (6 REQs, was uncommitted from 2026-04-18)
+- `specs/AGET_SESSION_SPEC.md` — added **CAP-SESSION-013** (Close-Session Protocol, 10 sub-requirements). Composes with CAP-SESSION-004 wind-down per the orchestrate-not-rename pattern (L562 lesson)
+
+### Changed
+
+- All 4 published REQ-* documents (CORE, GOV, HOM, REL) — Path A retrofit per REQUIREMENTS_FORMAT v1.1:
+  - Off-type citations routed: L-docs → `evidence:`; ADRs/governance/SOPs/META-DOCs → `constraints:`
+  - 35 displaced citations corrected
+  - REQ-CORE-F-001 description and fit_criterion updated to enforce v1.1 type discipline
+  - REQ-CORE-F-001 forward-traceability now enforced via RUBRIC_requirement_quality_v1.0 (rubric-as-spec)
+- `requirements/REQ-HOM_homepage_quality.md` v1.0.0 → **v1.1.0** — refactored from inline-prose to YAML+Markdown REQ blocks per REQUIREMENTS_FORMAT v1.0; now mechanically scorable
+
+### Surfaced (tracked in private planning)
+
+- 12 missing CAP-* / R-* / RUBRIC_* contracts referenced by REQ-* but not yet authored. These are now visible as L2 (Defined) regressions in mechanical rubric scoring rather than masked by off-type citations. Wave-1 authoring is a v3.15 P1 candidate.
+
+### Notes
+
+- This in-flight set continues the v3.14 cycle's foundational-coherence theme (REQ-CORE/REQ-GOV publication 2026-04-18; ontology FWRK-2026-004 grounding 2026-04-19; REQ retrofit + scoring rubric same day).
+- No breaking changes; REQUIREMENTS_FORMAT v1.1 is additive (new optional `constraints:` field, no removed fields). The acceptable-types clarification was already implied by L742 + L749; v1.1 just makes it explicit and enforceable via rubric.
+- Framework reconstructability (REQ-CORE-Q-008): v3.15-targeted P1 work to author the 12 surfaced contracts and close the L749 V-test corner via RUBRIC_verification_test_quality_v1.0.
+
+---
+
 ## [3.14.1] - 2026-04-18
 
 **Theme**: #979 Installer Partial-Propagation Hotfix

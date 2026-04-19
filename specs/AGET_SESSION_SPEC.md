@@ -427,6 +427,29 @@ The SYSTEM shall perform sanity validation before completing wind-down.
 **Enforcement**: wind_down.py sanity gate integration
 **Origin**: Issue #225 (Wind Down Sanity Gate Protocol)
 
+### CAP-SESSION-013: Close-Session Protocol
+
+The SYSTEM shall provide a close-session capability that orchestrates wind-down (CAP-SESSION-004) with three additional phases: pre-close triage, dual provenance recording, and session enrichment. Close-session COMPOSES wind-down — it does not replace it.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-SESSION-013-01 | ubiquitous | The SYSTEM shall provide a `/aget-close-session` skill that orchestrates wind-down with pre- and post- phases |
+| CAP-SESSION-013-02 | ubiquitous | The close-session protocol shall execute Phase 1 (Pre-Close Triage) BEFORE delegating to wind-down |
+| CAP-SESSION-013-03 | ubiquitous | The close-session protocol shall execute Phase 2 (Wind-Down Delegation) by calling CAP-SESSION-004 wind-down |
+| CAP-SESSION-013-04 | ubiquitous | The close-session protocol shall execute Phase 3 (Session Enrichment) AFTER wind-down completes |
+| CAP-SESSION-013-05 | ubiquitous | The SYSTEM shall record dual provenance: skill invocation log entry AND frontmatter `closed_by:` field on the session note |
+| CAP-SESSION-013-06 | conditional | IF mandatory handoff is triggered (pending work, uncommitted changes, suspended state) THEN the session note shall be created in `sessions/` per CAP-SESSION-005 |
+| CAP-SESSION-013-07 | ubiquitous | The session note shall include a Friction section enumerating events (Structural / Avoidable / Operational classification) collected during the session |
+| CAP-SESSION-013-08 | ubiquitous | The close-session output shall report: session theme, key decisions, artifacts created, friction events, retrospective (What Went Well / What We Learned / What Was Missing), pending work, resume hint |
+| CAP-SESSION-013-09 | optional | WHERE friction count exceeds budget (configurable, default 5) the SYSTEM may surface a structural-friction warning to the principal |
+| CAP-SESSION-013-10 | ubiquitous | Selective-commit rule (R-CLOSE-033): close-session shall not commit other sessions' uncommitted files; only artifacts owned by the closing session are auto-staged |
+
+**Composition Architecture**: CAP-SESSION-013 EXTENDS CAP-SESSION-004 (Wind-Down Protocol). Wind-down requirements remain in force and are reused via Phase 2 delegation. This pattern (orchestrate-not-rename) prevents the L562 false-positive drift that scaled-rename would cause across 32+ fleet agents.
+
+**Enforcement**: `/aget-close-session` skill v1.0.0; `scripts/wind_down.py` (composition target). Full requirement set (46 sub-requirements) at `planning/artifacts/CAP-SESSION-013_close_session_requirements.md` v0.2.0.
+**Origin**: SP-008 proposal (2026-04-10); Legalon fleet v1.0-v1.3 evidence (8 scored sessions); main fleet SP-004.
+**Inherits from REQ**: REQ-CORE-F-004 (KB Net-Positive Sessions) — close-session implements the wind-down delegation that detects KB contributions per the REQ.
+
 #### Handoff Note Template
 
 ```markdown
