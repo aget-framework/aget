@@ -10,8 +10,12 @@
 
 | Domain | File | Requirements | Status | Date |
 |--------|------|:----------:|--------|------|
+| **CORE** | [REQ-CORE_critical_foundations.md](REQ-CORE_critical_foundations.md) | 7F + 3Q | proposed | 2026-04-18 |
+| GOV | [REQ-GOV_agent_governance.md](REQ-GOV_agent_governance.md) | 4F + 2Q | proposed | 2026-04-18 |
 | REL | [REQ-REL_release_quality.md](REQ-REL_release_quality.md) | 6F + 3Q | proposed | 2026-03-28 |
 | HOM | [REQ-HOM_homepage_quality.md](REQ-HOM_homepage_quality.md) | 6F + 3Q | proposed | 2026-04-04 |
+
+**CORE** is the cross-cutting foundational domain — the ten requirements every other domain inherits from. Read first.
 
 ---
 

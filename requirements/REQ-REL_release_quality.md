@@ -46,8 +46,9 @@ fit_criterion: >
   defined, rollback plan documented.
 priority: P0
 specifications:
-  - R-REL-025 (Release Readiness)
-  - SOP Phase -1
+  - "R-REL-025 (Release Readiness — PROPOSED, see PROPOSAL_v315_missing_release_specs.md)"
+constraints:
+  - "SOP Phase -1 (the procedural wrapper enforcing this REQ at release boundary)"
 status: proposed
 originator: operational-evidence
 ```
@@ -75,10 +76,11 @@ fit_criterion: >
   RUBRIC_release_handoff_quality.
 priority: P0
 specifications:
-  - R-REL-019 (Release-to-Fleet Handoff)
-  - SOP Phase 5.3 (DEPLOYMENT_SPEC — BLOCKING)
-  - SOP Phase 6.3 (Handoff Template Conformance V-test)
-  - RUBRIC_release_handoff_quality_v1.0.md
+  - "R-REL-019 (Release-to-Fleet Handoff)"
+  - "RUBRIC_release_handoff_quality_v1.0 (rubric-as-spec for handoff completeness)"
+constraints:
+  - "SOP Phase 5.3 (DEPLOYMENT_SPEC — BLOCKING) — procedural enforcement"
+  - "SOP Phase 6.3 (Handoff Template Conformance V-test) — procedural enforcement"
 status: proposed
 originator: operational-evidence
 ```
@@ -108,7 +110,9 @@ fit_criterion: >
   fleet state.
 priority: P0
 specifications:
-  - SOP Phase 7.4 (Stability Certification Gate)
+  - "CAP-REL-024 (PROPOSED — see PROPOSAL_v315_missing_release_specs.md; covers stability certification 3-evidence gate)"
+constraints:
+  - "SOP Phase 7.4 (Stability Certification Gate) — the procedure that operationalizes this REQ until CAP-REL-024 is authored"
 status: proposed
 originator: operational-evidence
 ```
@@ -138,8 +142,9 @@ fit_criterion: >
   release announcement.
 priority: P1
 specifications:
-  - R-SYNC-002 (Content Sync)
-  - SOP Phase -0.5 (Dual-Repo Sync)
+  - "R-SYNC-002 (Content Sync — PROPOSED, see PROPOSAL_v315_missing_release_specs.md)"
+constraints:
+  - "SOP Phase -0.5 (Dual-Repo Sync) — procedural enforcement"
 status: proposed
 originator: operational-evidence
 ```
@@ -169,8 +174,9 @@ fit_criterion: >
   template parity.
 priority: P1
 specifications:
-  - SOP Phase 4.3 (Post-Release Validation — BLOCKING)
-  - R-REL-025-029
+  - "R-REL-025 through R-REL-029 (Post-Release Validation contracts — PROPOSED batch in PROPOSAL_v315_missing_release_specs.md)"
+constraints:
+  - "SOP Phase 4.3 (Post-Release Validation — BLOCKING) — procedural enforcement"
 status: proposed
 originator: operational-evidence
 ```
@@ -200,8 +206,11 @@ fit_criterion: >
   from velocity estimates.
 priority: P2
 specifications:
-  - SOP Phase 0 (Scope Initialization)
-  - VERSION_SCOPE template
+  - "CAP-REL-013 (VERSION_SCOPE Content Requirements — covers the 'pre-release audit' gap)"
+  - "CAP-REL-018 (Historical VERSION_SCOPE Reconstruction — covers the calibration evidence)"
+constraints:
+  - "SOP Phase 0 (Scope Initialization) — procedural enforcement"
+  - "VERSION_SCOPE template (planning artifact format)"
 status: proposed
 originator: operational-evidence
 ```
@@ -232,7 +241,10 @@ fit_criterion: >
   tooling. Estimate accuracy improves across consecutive
   releases.
 priority: P2
-specifications: []
+specifications:
+  - "CAP-REL-026 (PROPOSED — see PROPOSAL_v315_missing_release_specs.md; covers velocity calibration as a release contract)"
+constraints:
+  - "L611 (Pre-Resolved Item Calibration — the operational evidence pattern)"
 status: proposed
 originator: operational-evidence
 ```
@@ -262,7 +274,7 @@ fit_criterion: >
   completion without clarification requests.
 priority: P1
 specifications:
-  - RUBRIC_release_handoff_quality D4 (Downstream Executability)
+  - "RUBRIC_release_handoff_quality_v1.0 (D4 Downstream Executability — rubric-as-spec for this REQ)"
 status: proposed
 originator: operational-evidence
 ```
@@ -292,7 +304,9 @@ fit_criterion: >
   cause addresses a quality gate gap.
 priority: P2
 specifications:
-  - SOP Phase 7.4 (Stability Certification)
+  - "CAP-REL-024 (PROPOSED — same as REQ-REL-F-003; this Q-* REQ shares the stability certification contract)"
+constraints:
+  - "SOP Phase 7.4 (Stability Certification) — procedural enforcement"
 status: proposed
 originator: operational-evidence
 ```
@@ -325,7 +339,7 @@ fit_criterion: >
   0 FAIL results.
 priority: P1
 specifications:
-  - R-REL-038 (DEPLOYMENT_SPEC Required)
+  - "R-REL-038 (DEPLOYMENT_SPEC Required)"
 status: proposed
 originator: operational-evidence
 ```
@@ -356,8 +370,9 @@ fit_criterion: >
   session. Delivery confirmation recorded in pilot tracking.
 priority: P1
 specifications:
-  - SOP Phase 7.3 (Remote Fleet Notification)
-  - R-REL-019 (Release-to-Fleet Handoff)
+  - "R-REL-019 (Release-to-Fleet Handoff)"
+constraints:
+  - "SOP Phase 7.3 (Remote Fleet Notification) — procedural enforcement"
 status: proposed
 originator: operational-evidence
 ```
@@ -378,19 +393,19 @@ originator: operational-evidence
 
 ## Traceability
 
-| Requirement | Specification(s) | CAP-REL Coverage | Rubric Dimension |
+| Requirement | Specification(s) | CAP-REL Coverage (related) | Rubric Dimension |
 |-------------|-------------------|-----------------|-----------------|
-| REQ-REL-F-001 | R-REL-025, SOP Phase -1 | CAP-REL-001, CAP-REL-009, CAP-REL-012 | — |
-| REQ-REL-F-002 | R-REL-019, SOP Phase 5.3/6.3 | CAP-REL-020, CAP-REL-007 | RUBRIC_release_handoff D1-D4 |
-| REQ-REL-F-003 | SOP Phase 7.4 | CAP-REL-027, CAP-REL-016 | — |
-| REQ-REL-F-004 | R-SYNC-002, SOP Phase -0.5 | CAP-REL-004, CAP-REL-024 | — |
-| REQ-REL-F-005 | SOP Phase 4.3, R-REL-025-029 | CAP-REL-009, CAP-REL-021, CAP-REL-025 | — |
-| REQ-REL-F-006 | SOP Phase 0, VERSION_SCOPE | CAP-REL-012, CAP-REL-013, CAP-REL-014 | — |
-| REQ-REL-F-007 | R-REL-038, verify_deployment.py | R-REL-038 | — |
-| REQ-REL-F-008 | SOP Phase 7.3, R-REL-019 | R-REL-019 | — |
-| REQ-REL-Q-001 | RELEASE_BRIDGE velocity | CAP-REL-011 | — |
-| REQ-REL-Q-002 | RUBRIC D4 | CAP-REL-020, CAP-REL-007 | RUBRIC_release_handoff D4 |
-| REQ-REL-Q-003 | SOP Phase 7.4 | CAP-REL-009, CAP-REL-021—025 | — |
+| REQ-REL-F-001 | R-REL-025 (PROPOSED) | CAP-REL-001, CAP-REL-009, CAP-REL-012 | — |
+| REQ-REL-F-002 | R-REL-019, RUBRIC_release_handoff_quality_v1.0 | CAP-REL-020, CAP-REL-007 | RUBRIC_release_handoff D1-D4 |
+| REQ-REL-F-003 | CAP-REL-024 (PROPOSED) | CAP-REL-027, CAP-REL-016 | — |
+| REQ-REL-F-004 | R-SYNC-002 (PROPOSED) | CAP-REL-004, CAP-REL-024 | — |
+| REQ-REL-F-005 | R-REL-025—029 (PROPOSED batch) | CAP-REL-009, CAP-REL-021, CAP-REL-025 | — |
+| REQ-REL-F-006 | CAP-REL-013, CAP-REL-018 | CAP-REL-012, CAP-REL-013, CAP-REL-014 | — |
+| REQ-REL-F-007 | R-REL-038 | R-REL-038 | — |
+| REQ-REL-F-008 | R-REL-019 | R-REL-019 | — |
+| REQ-REL-Q-001 | CAP-REL-026 (PROPOSED) | CAP-REL-011 | — |
+| REQ-REL-Q-002 | RUBRIC_release_handoff_quality_v1.0 (D4) | CAP-REL-020, CAP-REL-007 | RUBRIC_release_handoff D4 |
+| REQ-REL-Q-003 | CAP-REL-024 (PROPOSED) | CAP-REL-009, CAP-REL-021—025 | — |
 
 ---
 

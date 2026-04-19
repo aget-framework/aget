@@ -1,13 +1,14 @@
-# AGET Requirements Format v1.0
+# AGET Requirements Format v1.1
 
-**Version**: 1.0.0
-**Date**: 2026-03-27
+**Version**: 1.1.0
+**Date**: 2026-04-19
 **Status**: Active
 **Authority**: Active (normative, minor/patch allowed)
 **Author**: private-aget-framework-AGET
 **Parallel to**: AGET_SPEC_FORMAT.md v1.3.0 (specification-level meta-doc)
-**Evidence**: L748, ISO/IEC/IEEE 29148:2018, Volere, ISO/IEC 25010:2023
+**Evidence**: L748, L749, ISO/IEC/IEEE 29148:2018, Volere, ISO/IEC 25010:2023, C298 (Software System Requirement, ISO/IEC/IEEE 29148:2018 — added FWRK-2026-004)
 **Tracking**: #725
+**v1.1 changes** (2026-04-19): (a) Added optional `constraints:` per-REQ field for ADRs/governance/meta-docs that bound the REQ but do not implement it; (b) Clarified acceptable `specifications:` types: CAP-*, R-*, SKILL-*, RUBRIC-* (rubrics-as-spec per L749 duality). Motivated by 2026-04-19 audit which found 35/64 `specifications:` citations were category errors (L-docs belong in `evidence:`; ADRs/governance/meta-docs belong in `constraints:`).
 
 ---
 
@@ -104,7 +105,9 @@ fit_criterion: >
    Must be verifiable without reading the specification.}
 priority: P0 | P1 | P2 | P3
 specifications:
-  - "{CAP-xxx or R-xxx — forward traceability to EARS specs}"
+  - "{CAP-xxx, R-xxx, SKILL-xxx, or RUBRIC_xxx — forward traceability to contracts}"
+constraints:                    # OPTIONAL (added v1.1)
+  - "{ADR-xxx, governance/X.md, AGENTS.md section, or SOP_X — non-implementing boundaries that bound this REQ}"
 status: draft | proposed | validated | published
 originator: principal | operational-evidence | community
 ```
@@ -119,12 +122,43 @@ originator: principal | operational-evidence | community
 | `category` | Quality only | ISO 25010:2023 characteristic (see NFR Taxonomy) |
 | `description` | Yes | Stakeholder-language requirement statement |
 | `rationale` | Yes | Why this matters (connects to mission/goals) |
-| `evidence` | Yes | L-docs, data, research grounding this requirement (L700) |
+| `evidence` | Yes | L-docs, data, research grounding this requirement (L700). **NOT for ADRs/governance docs (those go in `constraints:`).** |
 | `fit_criterion` | Yes | Testable condition — the bridge to EARS |
 | `priority` | Yes | P0 (critical) through P3 (stretch) |
-| `specifications` | No | Forward traceability to EARS specs (populated as specs are created) |
+| `specifications` | No | Forward traceability to **contracts that implement this REQ**. Acceptable types: **CAP-xxx, R-xxx, SKILL-xxx, RUBRIC_xxx** (rubrics-as-spec per L749 duality). NOT for L-docs (use `evidence:`), ADRs (use `constraints:`), or meta-docs/SOPs (use `constraints:`). |
+| `constraints` | **No (added v1.1)** | Non-implementing boundaries: ADR-xxx, governance/X.md, AGENTS.md sections, SOP_X procedures, DESIGN_DIRECTION_X docs. These bound the REQ but do not implement it. |
 | `status` | Yes | Lifecycle state |
 | `originator` | Yes | Source: principal directive, operational evidence, or community |
+
+### Field Selection Decision Tree (added v1.1)
+
+When citing an artifact, route it to the correct field:
+
+```
+Is the artifact a CAP-xxx, R-xxx, SKILL-xxx, or RUBRIC_xxx that
+implements/contracts this REQ?
+   YES → specifications:
+   NO ↓
+
+Is the artifact an L-doc, operational data, web research, or
+prior incident that GROUNDED this REQ (bottom-up provenance)?
+   YES → evidence:
+   NO ↓
+
+Is the artifact an ADR, governance doc, AGENTS.md section, SOP,
+or DESIGN_DIRECTION that BOUNDS this REQ (non-implementing
+boundary)?
+   YES → constraints:
+   NO ↓
+
+Is it a META-DOC (REQUIREMENTS_FORMAT, AGET_SPEC_FORMAT) that
+DEFINES the format of this REQ?
+   YES → no per-REQ field (implicit; the doc-level header
+         already references the format)
+
+Is it a planning artifact (VERSION_SCOPE, PROJECT_PLAN)?
+   YES → no per-REQ field (these are not requirement attributes)
+```
 
 ### ID Convention
 
