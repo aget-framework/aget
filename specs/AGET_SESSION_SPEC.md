@@ -494,6 +494,31 @@ pending_work: {true|false}
 
 ---
 
+### CAP-SESSION-014: Health Remediation Protocol
+
+The SYSTEM shall provide a health remediation capability that consumes `/aget-check-health` (CAP-SESSION-008) output and applies severity-tiered remediation per DESIGN_DIRECTION_skill_verb_vocabulary §Principle 9 (Canonical verb pipeline: `check` → `enhance`). Enhance-health COMPOSES check-health — it requires check output and does not replace diagnosis.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-SESSION-014-01 | ubiquitous | The SYSTEM shall provide a `/aget-enhance-health` skill that remediates drift detected by CAP-SESSION-008 |
+| CAP-SESSION-014-02 | ubiquitous | The skill shall classify each finding into Tier-A (trivially fixable, applied in-skill), Tier-B (structural-bounded, routed to backlog), or Tier-C (scope-affecting, escalated via issue) per DESIGN_DIRECTION §enhance verb |
+| CAP-SESSION-014-03 | ubiquitous | The skill shall apply Tier-A remediations idempotently; each change shall be reversible via `git revert` |
+| CAP-SESSION-014-04 | ubiquitous | The skill shall route Tier-B findings to `planning/BACKLOG_health_*.md` with problem statement and proposed action |
+| CAP-SESSION-014-05 | event-driven | WHEN Tier-C findings exist THEN the skill shall escalate via `/aget-file-issue` (STRUCTURAL per D71) with evidence chain |
+| CAP-SESSION-014-06 | ubiquitous | The skill shall re-verify remediation by invoking CAP-SESSION-008 (check-health) after Tier-A application |
+| CAP-SESSION-014-07 | prohibited | The skill shall NOT modify public framework files (governance boundary — remediation touches only the invoking agent's tree) |
+| CAP-SESSION-014-08 | ubiquitous | The skill shall produce a Decision Log recording: findings, Tier classifications, actions taken, re-verification result |
+| CAP-SESSION-014-09 | conditional | IF the invoking agent has no recent check-health output THEN the skill shall run `/aget-check-health` inline before classification |
+| CAP-SESSION-014-10 | ubiquitous | The skill shall emit a Skill Completion Signal section (D71 Layer 3) as the last report section |
+
+**Composition Architecture**: CAP-SESSION-014 EXTENDS CAP-SESSION-008 (Sanity Check Protocol). Check-health detection remains in force; enhance-health consumes check output. The pair instantiates the canonical `check → enhance` pipeline codified in DESIGN_DIRECTION §Principle 9 (2026-04-19) for the health domain.
+
+**Enforcement**: `/aget-enhance-health` skill v1.0.0 (SKILL-049); consumes `scripts/health_check.py --json` (read-only).
+**Origin**: SP-023 (2026-04-20, self-scored 27/27); PP-006 (2026-04-20); AEH-001 PROJECT_PLAN Gate 0. Evidence: L867 (enhance-verb family), L656 (Loading Dock — replaces unimplemented `--fix` flag across 13 SKILL.md files), L671 (Classification Without Consequence).
+**Inherits from REQ**: TBD — REQ-OPS-* candidate for agent operational health. Current session spec inherits via sibling CAP-SESSION-008 chain.
+
+---
+
 ## Authority Model
 
 ```yaml
