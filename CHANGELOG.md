@@ -22,6 +22,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `requirements/REQ-CORE_critical_foundations.md` — **published** (10 REQs, was uncommitted from 2026-04-18)
 - `requirements/REQ-GOV_agent_governance.md` — **published** (6 REQs, was uncommitted from 2026-04-18)
 - `specs/AGET_SESSION_SPEC.md` — added **CAP-SESSION-013** (Close-Session Protocol, 10 sub-requirements). Composes with CAP-SESSION-004 wind-down per the orchestrate-not-rename pattern (L562 lesson)
+- `specs/AGET_SESSION_SPEC.md` — added **CAP-SESSION-014** (Health Remediation Protocol, 10 sub-requirements). Therapeutic sibling to CAP-SESSION-008 Sanity Check; implements canonical `check → enhance` pipeline per `DESIGN_DIRECTION_skill_verb_vocabulary` §Principle 9 (2026-04-19). Tier A/B/C routing; governance boundary (SHALL NOT modify public framework files); D71 STRUCTURAL routing for Tier-C escalations.
+- **`/aget-enhance-health` skill (SKILL-049 v1.0.0)**: Deploys to all 13 template agents + private fleet. Remediates drift detected by `/aget-check-health` through 7 phases (Diagnose, Classify, Census, Apply Tier-A, Route Tier-B, Escalate Tier-C, Re-verify). Generator layer per ADR-008; pair sibling to detect-only `/aget-check-health`. Fourth member of the `enhance-*` skill family (after enhance-spec SKILL-041, enhance-config in-dev, enhance-coherence proposed). Tracking: gmelli/aget-aget#1081. Implementation: AEH-001 PROJECT_PLAN (7 gates + Gate 0.5 triad quality scoring).
+
+### Changed
+
+- **`/aget-check-health` (SKILL-003) v1.0.0 → v1.1.0**: Now declares detect-only scope. Amended C-SC-001 to cite `/aget-enhance-health` for remediation. Removed SC-007 (`--fix` flag capability) per DEP-FIX-FLAG-001 — flag was documented 2026-02-10 but never implemented (L656 Loading Dock, L671 decorative classification). Deployed to this agent + 12 templates with md5 uniformity.
 
 ### Changed
 
@@ -32,9 +38,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - REQ-CORE-F-001 forward-traceability now enforced via RUBRIC_requirement_quality_v1.0 (rubric-as-spec)
 - `requirements/REQ-HOM_homepage_quality.md` v1.0.0 → **v1.1.0** — refactored from inline-prose to YAML+Markdown REQ blocks per REQUIREMENTS_FORMAT v1.0; now mechanically scorable
 
+### Deprecated
+
+- **`/aget-check-health --fix` flag** (DEP-FIX-FLAG-001). Was documented in 14 SKILL.md files + SKILL-003.yaml SC-007 since 2026-02-10 (10+ weeks) but never implemented. Removed same release — grace-period exemption per R-DEP-011 (decorative artifacts with no functional implementation have no consumer migration burden). **Replacement**: `/aget-enhance-health` (SKILL-049, CAP-SESSION-014). Registered in `governance/POLICY_deprecation.md`.
+
 ### Surfaced (tracked in private planning)
 
 - 12 missing CAP-* / R-* / RUBRIC_* contracts referenced by REQ-* but not yet authored. These are now visible as L2 (Defined) regressions in mechanical rubric scoring rather than masked by off-type citations. Wave-1 authoring is a v3.15 P1 candidate.
+- `REQ-OPS-F-001` (agent maintains operational health) — surfaced at AEH-001 Gate 0.5 triad scoring as the missing REQ-layer artifact for the health domain. Scheduled as post-v3.15 follow-on PP proposal (closes REQ corner of L749 triad for this domain).
 
 ### Notes
 
