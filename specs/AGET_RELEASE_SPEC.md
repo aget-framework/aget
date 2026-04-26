@@ -980,6 +980,135 @@ gh issue list --repo gmelli/aget-aget --search "Fleet upgrade retro: vX.Y.Z" --j
 
 ---
 
+### CAP-REL-029: Release Readiness Gate (R-REL-025) — Pre-Release Conformance Contract
+
+**Status**: LANDED (v0.2-equivalent for spec, 2026-04-25) — full EARS rigor; closes REQ-REL-F-001 (Pre-Release Validation procedure existed in SOP since v1.38, no R-REL-* contract). v3.15 P1 #4a Wave-1A first contract (1 of 5).
+
+**Threat-Class Anchor**: SOP Phase -1 Pre-Flight Conformance Audit (added v1.38 / refined v1.40) is the procedural pattern; without an R-REL-* level contract, the audit's PASS criteria are convention-based not spec-bound. L671 instance — procedure exists, contract missing.
+
+#### Requirement Set (EARS Ubiquitous + Conditional + State-Driven composite)
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| R-REL-029-01 | ubiquitous | The release manager SHALL execute the Pre-Release Conformance Gate before any version-bump activity | SOP Phase -1 (v1.38+) procedure must be spec-bound, not convention-bound (L671 closure) |
+| R-REL-029-02 | ubiquitous | The Pre-Release Conformance Gate SHALL invoke `aget/verification/validate_archetype_skills.py` (CAP-TPL-016-04 universal-skill conformance) | First concrete validator consumer landed in v3.15 P1 #10 (commit `dff5e47`) |
+| R-REL-029-03 | conditional | IF the validator reports drift between AGET_TEMPLATE_SPEC mandate and worker-baseline OR fewer than N-1 templates conformant (where N is total `-aget` template count, allowing 1 known-outlier per current document-processor exclusion), THEN the release SHALL HALT until either (a) the spec is updated, OR (b) templates are remediated | Release-blocker semantics formalized; aligns with SOP v1.40 Pre-Flight FAIL semantics |
+| R-REL-029-04 | ubiquitous | The Pre-Release Conformance Gate SHALL verify `aget/README.md` archetype count + universal-skill count match `AGET_TEMPLATE_SPEC.md` mandate | Catches documentation drift before release ships rhetoric (#1116 evidence; staleness since v3.13.0 was caught only by external review) |
+| R-REL-029-05 | ubiquitous | The Pre-Release Conformance Gate SHALL verify VERSION_SCOPE_v{VERSION}.md exists at `LOCKED` status | R-REL-020 dependency; release without locked scope is structurally premature (L850) |
+| R-REL-029-06 | conditional | IF an active PROJECT_PLAN_v{VERSION}_release_v{N}.md exists AND that plan declares Gate 1 (or equivalent build-phase gate) IN PROGRESS THEN the Pre-Release Conformance Gate SHALL surface "Gate 1 not complete; release-build phase artifacts incomplete" as advisory | L894 plan-driven discipline; warns against premature release execution while build phase still has open Work Streams |
+| R-REL-029-07 | conditional | IF release is `breaking` per current `BREAKING_CHANGES_v{VERSION}.md` AND no ADR has ratified the breaking-change policy for this cycle THEN the Pre-Release Conformance Gate SHALL HALT until ADR ratified | ADR-022 precedent (v3.15); breaking change without ADR = ungoverned scope |
+| R-REL-029-08 | ubiquitous | The Pre-Release Conformance Gate SHALL emit a structured PASS/FAIL summary to `sessions/release_readiness_audit_{DATE}.md` with per-check status + remediation links for any FAIL | Audit trail for release retrospective; consumed by Phase 7.1.5 PIR scoring (R-REL-024) |
+
+#### Definitions
+
+| Term | Definition |
+|------|------------|
+| Pre-Release Conformance Gate | The structural verification gate at SOP Phase -1, before any version-bump activity, contracted by this CAP |
+| N-1 conformance allowance | Acceptance threshold permitting 1 known-outlier template per cycle (current: template-document-processor-AGET pending #1121 lifecycle decision); may tighten to N/N in future versions |
+| Active PROJECT_PLAN | A `planning/PROJECT_PLAN_v{VERSION}_release_v{N}.md` with status not equal to COMPLETE |
+| Breaking release | A release containing at least one breaking change per `BREAKING_CHANGES_v{VERSION}.md` manifest (v3.15 precedent) |
+| Release Readiness Audit | The structured PASS/FAIL summary emitted by R-REL-029-08 |
+
+#### Mechanism (concrete)
+
+1. **Gate invocation script** at `scripts/release_readiness_gate.py` (or extend existing `scripts/validate_release_gate.py`):
+   ```python
+   from dataclasses import dataclass
+   from typing import Literal, List, Optional
+   from pathlib import Path
+
+   CheckStatus = Literal["PASS", "FAIL", "WARN"]
+
+   @dataclass(frozen=True)
+   class ReadinessCheck:
+       requirement_id: str  # e.g., "R-REL-029-02"
+       check_name: str
+       status: CheckStatus
+       detail: str
+       remediation_link: Optional[str] = None
+
+   def run_release_readiness_gate(version: str) -> List[ReadinessCheck]:
+       checks = []
+       checks.append(check_validator_conformance())  # R-REL-029-02/03
+       checks.append(check_readme_consistency())      # R-REL-029-04
+       checks.append(check_version_scope_locked(version))  # R-REL-029-05
+       checks.append(check_active_release_plan(version))  # R-REL-029-06
+       checks.append(check_breaking_change_adr(version))  # R-REL-029-07
+       return checks
+
+   def emit_audit(checks: List[ReadinessCheck], date: str) -> Path:
+       """Write sessions/release_readiness_audit_{date}.md per R-REL-029-08."""
+   ```
+
+2. **SOP integration**: SOP_release_process.md Pre-Flight Conformance Audit section (lines 366+, v1.40) cites this CAP. The current text at line 374 invokes `validate_archetype_skills.py` directly; per this CAP, future iteration wraps invocation in `release_readiness_gate.py` orchestration that runs all R-REL-029-* checks.
+
+3. **Audit artifact** at `sessions/release_readiness_audit_{YYYY-MM-DD}.md`: structured PASS/FAIL per check; consumed by Phase 7.1.5 PIR scoring; archived per L605 release observability discipline.
+
+4. **Cross-CAP relationships**:
+   - **CAP-REL-021** (Persistent Validation Logging) — release-readiness audit IS a validation log entry per CAP-REL-021's pattern
+   - **CAP-REL-022** (Gate Execution Enforcement) — this gate is one such structural gate; CAP-REL-022 enforces that all gates are executed
+   - **CAP-REL-024** (Post-Release Retrospective) — audit artifact feeds into retrospective input
+   - **CAP-TPL-016-04** (32 universal skills mandate) — R-REL-029-02 is the consumer of this mandate at release time
+
+#### Acceptance Criteria
+
+- AC-REL-029-1: Validator drift detected (e.g., spec says 32, baseline derives 33) → R-REL-029-03 HALT triggered with diagnostic naming both values
+- AC-REL-029-2: README count mismatch with spec (e.g., README says "12 archetypes" but filesystem shows 13) → R-REL-029-04 FAIL with diagnostic
+- AC-REL-029-3: VERSION_SCOPE not at LOCKED status → R-REL-029-05 HALT
+- AC-REL-029-4: Active PROJECT_PLAN with Gate 1 IN PROGRESS → R-REL-029-06 advisory (not HALT — informational only)
+- AC-REL-029-5: BREAKING_CHANGES manifest present + ADR-NN with `Status: Accepted` ratifying breaking policy → R-REL-029-07 PASS; missing ADR → HALT
+- AC-REL-029-6: Audit artifact emitted at `sessions/release_readiness_audit_{DATE}.md` with all 7 R-REL-029-NN checks recorded with PASS/FAIL + remediation links
+- AC-REL-029-7: All checks PASS → release manager may proceed to version-bump (Phase 0); any FAIL → HALT semantics enforced
+- AC-REL-029-8: Audit artifact persists across sessions; PIR (Phase 7.1.5) can reference it for post-release scoring
+
+#### Verification (V-REL-029)
+
+```bash
+# V-REL-029-A: Validator conformance check (R-REL-029-02/03)
+python3 scripts/release_readiness_gate.py --version 3.15.0 --check validator_conformance 2>&1 | grep -E "PASS|HALT" && \
+echo "V-REL-029-A: validator check exists" || echo "V-REL-029-A: FAIL"
+
+# V-REL-029-B: README consistency check (R-REL-029-04)
+python3 scripts/release_readiness_gate.py --version 3.15.0 --check readme_consistency 2>&1 | grep -E "PASS|FAIL" && \
+echo "V-REL-029-B PASS" || echo "V-REL-029-B FAIL"
+
+# V-REL-029-C: VERSION_SCOPE LOCKED check (R-REL-029-05)
+python3 scripts/release_readiness_gate.py --version 3.15.0 --check version_scope_locked 2>&1 | grep -E "PASS|HALT" && \
+echo "V-REL-029-C PASS" || echo "V-REL-029-C FAIL"
+
+# V-REL-029-D: Audit artifact emission (R-REL-029-08)
+python3 scripts/release_readiness_gate.py --version 3.15.0 && \
+test -f sessions/release_readiness_audit_$(date +%Y-%m-%d).md && \
+grep -qE "R-REL-029-0[1-8]" sessions/release_readiness_audit_$(date +%Y-%m-%d).md && \
+echo "V-REL-029-D PASS" || echo "V-REL-029-D FAIL"
+```
+
+V-test PASS criterion: all four sub-tests (A/B/C/D) exit 0; readiness gate is invocable + produces structured audit.
+
+#### Companion Implementation
+
+CAP-REL-029's `scripts/release_readiness_gate.py` is its implementation. **Companion VERSION_SCOPE work**: P1 #4a Wave-1A first contract (this CAP) — implementation script is part of the contract delivery scope. Implementation may extend existing `scripts/validate_release_gate.py` rather than create new module.
+
+#### REQ-REL-F-001 Closure
+
+This CAP closes REQ-REL-F-001 (Pre-Release Validation procedure exists in SOP since v1.38; needs R-REL-* level contract per `PROPOSAL_v315_missing_release_specs.md` 2026-04-19). The procedural pattern was implemented; this contract makes it spec-bound.
+
+#### v3.15 P1 #4a Progress
+
+| Wave-1A Contract | Status | Notes |
+|------------------|:------:|-------|
+| **R-REL-025 (this CAP, CAP-REL-029) — Release Readiness Gate** | **LANDED 2026-04-25** | First of 5 |
+| R-REL-026 — Post-Release CHANGELOG Validator | Not started | Wave-1A item 2 |
+| R-REL-027 — Post-Release Tag Validator | Not started | Wave-1A item 3 |
+| R-REL-028 — Post-Release Badge/Parity Validator | Not started | Wave-1A item 4 (note: collides with existing CAP-REL-028 number; will use CAP-REL-030+ when authored) |
+| R-REL-029 — Post-Release Contract-Test Validator | Not started | Wave-1A item 5 (note: this CAP uses the CAP-REL-029 number; future R-REL-029 covers different concern) |
+
+**Numbering note**: The proposal `PROPOSAL_v315_missing_release_specs.md` reserves R-REL-025 through R-REL-029 as the 5-contract Wave-1A. Existing AGET_RELEASE_SPEC.md uses CAP-REL-NNN format; this CAP claims CAP-REL-029 (next available) and treats `R-REL-025` as the proposal-facing label / requirement-set anchor. Subsequent Wave-1A contracts (proposal labels R-REL-026/027/028/029) will be authored as CAP-REL-030/031/032/033 to avoid further collision; the proposal-facing labels will be cross-referenced in each new CAP's header.
+
+**Evidence**: PROPOSAL_v315_missing_release_specs.md (2026-04-19); SOP_release_process.md v1.38+ Pre-Flight Conformance Audit; v1.40 governing-spec citation correction; #1116 (README count drift evidence); R-REL-020 (VERSION_SCOPE requirement); ADR-022 (breaking change policy precedent); L671 (parent pattern — procedure without contract).
+
+---
+
 ## Release Gate Structure
 
 Standard release gates per PROJECT_PLAN:
