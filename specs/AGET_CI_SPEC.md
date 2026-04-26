@@ -1,11 +1,11 @@
 # AGET CI Specification
 
-**Version**: 1.1.0
+**Version**: 1.2.0
 **Status**: Active
 **Category**: Standards (Quality Assurance)
 **Format Version**: 1.2
 **Created**: 2025-12-28
-**Updated**: 2026-04-11
+**Updated**: 2026-04-25
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_CI_SPEC.md`
 **Change Origin**: L404 (CI Test Isolation Requirements)
@@ -247,6 +247,32 @@ The SYSTEM shall validate CI configuration.
 | CAP-CI-005-04 | optional | WHERE lint errors exist, the SYSTEM may report as warning (non-blocking) |
 
 **Enforcement**: Contract test `test_ci_validation`
+
+---
+
+### CAP-CI-006: Standard Framework Validators
+
+The SYSTEM shall enumerate framework-level validators that consumer CI workflows MAY invoke.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-CI-006-01 | ubiquitous | The SYSTEM shall publish framework-level validators at canonical paths under `aget/verification/` |
+| CAP-CI-006-02 | optional | WHERE a consumer CI workflow exists, the SYSTEM may invoke `aget/verification/validate_archetype_skills.py` to verify universal-skill conformance per CAP-TPL-016-04 |
+| CAP-CI-006-03 | conditional | IF `aget/verification/validate_archetype_skills.py` reports drift between AGET_TEMPLATE_SPEC mandate and worker baseline, the consumer CI workflow SHALL fail the build (release-blocker semantics per SOP_release_process.md Pre-Flight Conformance Audit) |
+
+**Enumerated framework-level validators (v0.1 set, expanding)**:
+
+| Validator | Path | Governing Spec | Invocation |
+|-----------|------|----------------|------------|
+| `validate_archetype_skills.py` | `aget/verification/` | AGET_TEMPLATE_SPEC CAP-TPL-016-04 | `python3 aget/verification/validate_archetype_skills.py` (exit 0 = conformant) |
+| `validate_capability_spec.py` | `aget/verification/` | (spec-validation infrastructure) | (existing) |
+| `validate_release_gate.py` | `scripts/` (private) → candidate for canonical promotion | SOP_release_process.md | (existing — release-prep) |
+
+**Enforcement note**: aget/ core does not currently host its own `.github/workflows/` directory; framework-level validators are canonical-path-published and invoked from downstream consumer CI workflows (templates, fleet supervisor scripts) per CAP-CI-006-02 OPTIONAL pattern. **D-AGET-CI-INFRA** (whether aget/ core should establish its own CI workflow to self-validate framework-level validators) is a v3.16 principal decision; not landed in v3.15 to avoid scope expansion.
+
+**Origin**: v3.15 P1 #10 sub-plan Gate 3 G3.3 (closes the spec-citation dimension of L822 feedback-loop gap; infrastructure dimension G3.1/G3.2/G3.4 escalated as D-AGET-CI-INFRA).
+
+**Enforcement**: Existence-check at `aget/verification/validate_archetype_skills.py`; downstream CI invocations are CAP-CI-006-02 OPTIONAL (consumer adoption tracked in fleet pilot tables per L656 Loading Dock pattern).
 
 ---
 
