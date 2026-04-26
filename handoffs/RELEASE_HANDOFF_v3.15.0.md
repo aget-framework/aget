@@ -47,6 +47,19 @@ New in v3.15:
 
 ---
 
+## Deployment Spec
+
+**Target state document**: [`aget/DEPLOYMENT_SPEC_v3.15.0.yaml`](../DEPLOYMENT_SPEC_v3.15.0.yaml) (repo root)
+
+Defines the canonical deployment target — use this to verify correct upgrade state. Run the conformance report after upgrade:
+
+```bash
+python3 $FW/.aget/patterns/conformance/aget_conformance_report.py --version 3.15.0 --depth deep --target .
+```
+Expected: `CONFORMANT`
+
+---
+
 ## Upgrade Guide
 
 ### Before Upgrading — Pre-Flight Checks
@@ -98,7 +111,7 @@ python3 -c "import json; v=json.load(open('.aget/version.json')); print('PASS' i
 
 | Fleet | Supervisor | Status | Date | Notes |
 |-------|-----------|:------:|------|-------|
-| Main | fleet supervisor | Pending | — | BC-001/BC-002 pre-flight required |
+| Main | fleet supervisor | **Complete** | 2026-04-26 | 0 rollbacks, 0 BC violations |
 
 ---
 
