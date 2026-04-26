@@ -56,26 +56,10 @@ New in v3.15:
 python3 -c "import json; v=json.load(open('.aget/version.json')); print(v.get('aget_version','MISSING'))"
 # Expected: 3.14.0 or 3.14.1
 
-# 2. BC-001: Check for old version.json field names in scripts/skills
-grep -rE '"(agent_name|domain|portfolio|managed_by|manages|instance_type|archetype|specialization|template|identity_file|created|updated|intelligence_enabled|collaboration_enabled|capabilities|patterns|migration_history|knowledge_inheritance)"' .aget/ scripts/ .claude/
-# If matches found: update to aget_-prefixed names before upgrading
-
-# 2b. BC-001 EDGE CASE: Check if .aget/version.json ITSELF has old key names
-# (This is separate from step 2 — it checks the file's own keys, not references to them)
-python3 -c "
-import json
-old = ['agent_name','domain','portfolio','managed_by','manages',
-       'instance_type','archetype','specialization','template',
-       'identity_file','intelligence_enabled','collaboration_enabled',
-       'capabilities','patterns','knowledge_inheritance']
-v = json.load(open('.aget/version.json'))
-hits = [f for f in old if f in v]
-print('PASS: version.json keys clean' if not hits else 'FAIL: old key names in version.json: ' + str(hits))
-"
-# If FAIL: rename the keys in .aget/version.json FIRST (two-step process):
-#   Step A: rename old key names to aget_-prefixed names, commit
-#   Step B: then set aget_version to "3.15.0", commit
-# See docs/BREAKING_CHANGES_v3.15.md for full rename table
+# 2. BC-001: Check for aget_-prefixed field name reads in scripts/skills
+# (version.json keys are NOT renamed — shim was removed; code reading new names breaks)
+grep -rE '"(aget_agent_name|aget_domain|aget_portfolio|aget_managed_by|aget_manages|aget_instance_type|aget_archetype|aget_specialization|aget_template|aget_identity_file|aget_intelligence_enabled|aget_collaboration_enabled|aget_capabilities|aget_patterns|aget_knowledge_inheritance)"' scripts/ .claude/ 2>/dev/null
+# If matches found: update to use original key names (agent_name, domain, etc.) — the JSON was not renamed
 
 # 3. BC-002: Check for --fix flag usage
 grep -r -- '--fix' .claude/skills/ scripts/ 2>/dev/null

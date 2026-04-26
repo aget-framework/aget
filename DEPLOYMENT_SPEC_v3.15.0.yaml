@@ -85,67 +85,16 @@ breaking_changes:
       grep -rE '"(agent_name|domain|portfolio|managed_by|manages|instance_type|archetype|specialization|template|identity_file|created|updated|intelligence_enabled|collaboration_enabled|capabilities|patterns|migration_history|knowledge_inheritance)"' .aget/ scripts/ .claude/ 2>/dev/null
     detection_pass: "0 matches"
     remediation: >
-      Replace each old field name with its aget_-prefixed counterpart.
-      Full rename table: docs/BREAKING_CHANGES_v3.15.md#bc-001-field-rename-table
-
-    # Edge case: the version.json FILE ITSELF may contain old field names.
-    # This happens when the agent has not yet run the v3.14 prefix migration
-    # on its own version.json (e.g., ran the migration on scripts/skills but
-    # not the identity file). Detect and fix this FIRST before upgrading.
-    self_migration_edge_case:
-      description: >
-        If .aget/version.json itself contains old field names (e.g., 'agent_name'
-        instead of 'aget_agent_name'), the file must be migrated before upgrade.
-        This is required when the v3.14 aget_-prefix migration was not applied
-        to version.json itself.
-      detection: |
-        python3 -c "
-        import json
-        old = ['agent_name','domain','portfolio','managed_by','manages',
-               'instance_type','archetype','specialization','template',
-               'identity_file','intelligence_enabled','collaboration_enabled',
-               'capabilities','patterns','knowledge_inheritance']
-        v = json.load(open('.aget/version.json'))
-        hits = [f for f in old if f in v]
-        print('OLD FIELDS FOUND:', hits if hits else 'none')
-        "
-      remediation: >
-        If old fields found: manually rename each field in .aget/version.json
-        to its aget_-prefixed name, commit, then proceed with v3.15 upgrade.
-        This is a two-step process: (1) fix version.json field names, then
-        (2) upgrade aget_version to "3.15.0".
-
-    renamed_fields:
-      - old: "agent_name"
-        new: "aget_agent_name"
-      - old: "domain"
-        new: "aget_domain"
-      - old: "portfolio"
-        new: "aget_portfolio"
-      - old: "managed_by"
-        new: "aget_managed_by"
-      - old: "manages"
-        new: "aget_manages"
-      - old: "instance_type"
-        new: "aget_instance_type"
-      - old: "archetype"
-        new: "aget_archetype"
-      - old: "specialization"
-        new: "aget_specialization"
-      - old: "template"
-        new: "aget_template"
-      - old: "identity_file"
-        new: "aget_identity_file"
-      - old: "intelligence_enabled"
-        new: "aget_intelligence_enabled"
-      - old: "collaboration_enabled"
-        new: "aget_collaboration_enabled"
-      - old: "capabilities"
-        new: "aget_capabilities"
-      - old: "patterns"
-        new: "aget_patterns"
-      - old: "knowledge_inheritance"
-        new: "aget_knowledge_inheritance"
+      Update each old field name reference in scripts/skills to read the value
+      from the correct key. The version.json file's own key names are NOT
+      changed by BC-001 — the JSON structure itself is unchanged. Only code
+      that reads non-existent aget_-prefixed names (e.g. v['aget_agent_name'])
+      needs fixing. See docs/BREAKING_CHANGES_v3.15.md for full context.
+    note: >
+      SCOPE CLARIFICATION: BC-001 affects code that reads aget_-prefixed field
+      names from version.json that do not exist (the JSON still uses old names
+      like 'agent_name'). The version.json keys themselves are NOT renamed.
+      Confirmed by template-worker-aget canonical state at v3.15.0.
 
   # ---------------------------------------------------------------------------
   # BC-002: --fix flag removed
@@ -296,32 +245,6 @@ upgrade_steps:
       grep -rE '"(agent_name|domain|portfolio|managed_by|manages|instance_type|archetype|specialization|template|identity_file|created|updated|intelligence_enabled|collaboration_enabled|capabilities|patterns|migration_history|knowledge_inheritance)"' .aget/ scripts/ .claude/ 2>/dev/null
     pass_condition: "0 matches (or only matches in non-AGET files)"
 
-  bc_001_self_preflight:
-    step: "PRE-A2"
-    title: "BC-001 Pre-flight: check .aget/version.json FIELD NAMES themselves"
-    obligation: "MUST"
-    action: >
-      Separately check if the version.json file itself has old-named fields.
-      This is easy to miss because the detection grep above searches for
-      old names as *values* or in scripts — but the version.json may have
-      old names as *keys*. Run this check explicitly.
-    command: |
-      python3 -c "
-      import json
-      old = ['agent_name','domain','portfolio','managed_by','manages',
-             'instance_type','archetype','specialization','template',
-             'identity_file','intelligence_enabled','collaboration_enabled',
-             'capabilities','patterns','knowledge_inheritance']
-      v = json.load(open('.aget/version.json'))
-      hits = [f for f in old if f in v]
-      print('PASS: no old fields' if not hits else 'FAIL: old fields present: ' + str(hits))
-      "
-    pass_condition: "PASS: no old fields"
-    remediation: >
-      If FAIL: manually rename each key in .aget/version.json to its
-      aget_-prefixed name (see breaking_changes.bc_001.renamed_fields above).
-      Commit this change before proceeding to step 1.
-
   # --- Pre-flight (BC-002) ---
   bc_002_preflight:
     step: "PRE-B"
@@ -373,18 +296,7 @@ upgrade_steps:
 
 end_state_validation:
   quick_check: |
-    python3 -c "
-    import json
-    v = json.load(open('.aget/version.json'))
-    version_ok = v.get('aget_version') == '3.15.0'
-    old_keys = ['agent_name','domain','portfolio','managed_by','manages',
-                'instance_type','archetype','specialization','template',
-                'identity_file','intelligence_enabled','collaboration_enabled',
-                'capabilities','patterns','knowledge_inheritance']
-    bc001_ok = not any(k in v for k in old_keys)
-    status = 'PASS' if (version_ok and bc001_ok) else 'FAIL'
-    print(f'{status}: version={v.get(\"aget_version\",\"MISSING\")}, BC-001 clean={bc001_ok}')
-    "
+    python3 -c "import json; v=json.load(open('.aget/version.json')); print('PASS' if v.get('aget_version')=='3.15.0' else 'FAIL: '+str(v.get('aget_version','MISSING')))"
 
   full_check: |
     python3 scripts/verify_deployment.py --version 3.15.0 --path .

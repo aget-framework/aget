@@ -7,22 +7,26 @@ v3.15.0 contains two breaking changes: BC-001 and BC-002. Both have structured r
 
 ---
 
-## BC-001 — `version.json` Old Field Names Removed
+## BC-001 — Backward-Compat Shim Removed for `version.json` Field Reads
 
 ### What Changed
 
-19 fields in `.aget/version.json` were renamed in v3.14.0 as part of the `aget_`-prefix normalization (ADR-019). A dual-read backward-compatibility shim allowed both old and new names during the v3.14.x series. **The shim is removed in v3.15.0.** Any script, skill, or agent code reading old names will break.
+In v3.14.0, `aget_`-prefix normalization (ADR-019) was introduced. A dual-read backward-compatibility shim allowed scripts to reference either old names (`agent_name`) or new names (`aget_agent_name`) when reading `version.json`. **The shim is removed in v3.15.0.**
+
+**Scope clarification**: The `.aget/version.json` file's own key names are **not changed** — the JSON structure continues to use `agent_name`, `domain`, `portfolio`, etc. BC-001 only affects scripts or skills that attempt to read the *new* `aget_`-prefixed names from version.json (which don't exist in the JSON), relying on the shim to resolve them. With the shim removed, those reads now return None/KeyError.
+
+> Confirmed by template-worker-aget canonical state at v3.15.0: version.json retains `agent_name`, `domain`, `portfolio` as-is.
 
 ### Who is Affected
 
-Agents that:
-- Still have old field names in their `.aget/version.json` (the *keys* themselves)
-- Have scripts or skills that read old field names from `version.json`
+Agents that have scripts or skills referencing `aget_agent_name`, `aget_domain`, `aget_portfolio`, etc. when reading `version.json`. (Agents reading the original `agent_name`, `domain`, etc. directly are unaffected.)
 
-### Field Rename Table
+### Field Reference Table
 
-| Old Name | New Name (`aget_`-prefixed) |
-|----------|---------------------------|
+Scripts that read version.json should use these names (the actual JSON keys):
+
+| JSON Key (unchanged) | What v3.14 shim mapped from |
+|---------------------|----------------------------|
 | `agent_name` | `aget_agent_name` |
 | `domain` | `aget_domain` |
 | `portfolio` | `aget_portfolio` |
@@ -39,59 +43,20 @@ Agents that:
 | `patterns` | `aget_patterns` |
 | `knowledge_inheritance` | `aget_knowledge_inheritance` |
 
-> **Note**: Fields `created`, `updated`, `migration_history`, and `component` are NOT prefixed — they are generic metadata, not AGET-specific identity fields.
-
 ### Detection
 
-**Step 1 — Check scripts and skills for old-name reads:**
+Check scripts and skills for references to `aget_`-prefixed names that don't exist in the JSON:
 
 ```bash
-grep -rE '"(agent_name|domain|portfolio|managed_by|manages|instance_type|archetype|specialization|template|identity_file|intelligence_enabled|collaboration_enabled|capabilities|patterns|knowledge_inheritance)"' \
-  .aget/ scripts/ .claude/ 2>/dev/null
+grep -rE '"(aget_agent_name|aget_domain|aget_portfolio|aget_managed_by|aget_manages|aget_instance_type|aget_archetype|aget_specialization|aget_template|aget_identity_file|aget_intelligence_enabled|aget_collaboration_enabled|aget_capabilities|aget_patterns|aget_knowledge_inheritance)"' \
+  scripts/ .claude/ 2>/dev/null
 ```
 
-Expected: 0 matches (or only matches in non-AGET code).
-
-**Step 2 — Check if `.aget/version.json` itself has old-named keys:**
-
-```bash
-python3 -c "
-import json
-old = ['agent_name','domain','portfolio','managed_by','manages',
-       'instance_type','archetype','specialization','template',
-       'identity_file','intelligence_enabled','collaboration_enabled',
-       'capabilities','patterns','knowledge_inheritance']
-v = json.load(open('.aget/version.json'))
-hits = [f for f in old if f in v]
-print('PASS: no old fields' if not hits else 'FAIL: old fields present: ' + str(hits))
-"
-```
+Expected: 0 matches (or only in comments/documentation, not code paths).
 
 ### Remediation
 
-**If Step 1 finds matches** (scripts/skills reading old names):
-Update each occurrence to use the `aget_`-prefixed name from the table above.
-
-**If Step 2 finds old keys in `version.json`** (two-step process required):
-
-1. **First**: Rename the keys in `.aget/version.json`. Example:
-   ```bash
-   # Manual approach — edit .aget/version.json and rename keys in-place
-   # Or use jq:
-   jq '{
-     aget_agent_name: .agent_name,
-     aget_domain: .domain,
-     aget_portfolio: .portfolio,
-     aget_version: .aget_version,
-     created: .created,
-     updated: .updated
-   }' .aget/version.json > /tmp/version_new.json && mv /tmp/version_new.json .aget/version.json
-   ```
-   Adjust for the fields your agent actually uses.
-
-2. **Then**: Commit that change, then upgrade `aget_version` to `"3.15.0"`.
-
-> **Why two steps?** The field rename (step 1) is a v3.14 migration artifact. The version bump (step 2) is the v3.15 upgrade. Combining them loses traceability about which change was which.
+Update any code that reads `aget_`-prefixed names to read the original names from the table above. The version.json file itself requires no changes.
 
 ---
 
@@ -114,7 +79,7 @@ The `--fix` flag was documented in `/aget-check-health` (SKILL-003) and 13+ SKIL
 grep -r -- '--fix' .claude/skills/ scripts/ 2>/dev/null
 ```
 
-Expected: 0 matches.
+Expected: 0 matches (historical changelog references in comments are acceptable).
 
 ### Remediation
 
@@ -141,9 +106,9 @@ See: `RELEASE_HANDOFF_v3.15.0.md` Step 3 for deployment details.
 
 | Agent type | Estimated time |
 |-----------|---------------|
-| Agent with no old field names and no --fix usage | ~5 min (version bump only) |
-| Agent with old field names in scripts/skills only | ~20–30 min |
-| Agent with old field names in version.json AND scripts | ~45–60 min (two-step BC-001 + upgrade) |
+| Agent with no aget_-prefixed reads and no --fix usage | ~5 min (version bump only) |
+| Agent with aget_-prefixed reads in scripts/skills | ~15–25 min |
+| Agent with --fix surfaces to clean up | ~10–20 min |
 
 ---
 
