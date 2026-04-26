@@ -1,0 +1,390 @@
+# DEPLOYMENT_SPEC_v3.15.0.yaml
+# Complete target state specification for v3.15.0 deployment
+#
+# Purpose: Define what a correctly-deployed v3.15.0 agent looks like.
+# Usage: Supervisors use this to verify fleet deployments.
+# Governance: R-DEP-002 (State-Based Deployment Requirement), R-REL-038
+#
+# Created: 2026-04-25
+# Origin: DEPLOYMENT_SPEC_v3.12.0.yaml (v3.13.0 and v3.14.0 specs were not created)
+# Release: Two-Level Model Coherence + Security Hardening + Weekly Cadence Formalization
+#
+# NOTE: v3.15.0 is the first breaking release in the 3.x minor cycle.
+# Two breaking changes require pre-flight checks before upgrade.
+# See upgrade_steps.bc_001_preflight and upgrade_steps.bc_002_preflight.
+
+version: "3.15.0"
+spec_version: "2.0.0"
+created: "2026-04-25"
+status: active
+supersedes: "DEPLOYMENT_SPEC_v3.12.0.yaml"
+breaking_release: true
+
+# =============================================================================
+# VERIFICATION SCRIPT (REQ-REL-F-007, L754)
+# =============================================================================
+
+verification_script:
+  file: "scripts/verify_deployment.py"
+  usage: "python3 scripts/verify_deployment.py --version 3.15.0 --path /path/to/agent"
+  checks: 8
+  exit_codes:
+    0: "PASS (all checks OK, or OK with warnings)"
+    1: "FAIL (one or more checks failed)"
+
+# =============================================================================
+# VERSION INDICATORS
+# =============================================================================
+
+version_indicators:
+  version_json:
+    path: ".aget/version.json"
+    field: "aget_version"
+    value: "3.15.0"
+    verification: "jq -r .aget_version .aget/version.json"
+    note: "BC-001: field MUST be 'aget_version' (not legacy 'version' or 'agent_version')"
+
+  agents_md:
+    path: "AGENTS.md"
+    pattern: "@aget-version: 3.15.0"
+    verification: "grep '@aget-version: 3.15.0' AGENTS.md"
+    fallback: "grep '@aget-version: 3.15.0' CLAUDE.md"
+
+  manifest_yaml:
+    path: "manifest.yaml"
+    field: "version"
+    value: "3.15.0"
+    verification: "yq -r .version manifest.yaml"
+
+  readme_md:
+    path: "README.md"
+    pattern: "**Version**: v3.15.0"
+    verification: "grep 'Version' README.md | head -1"
+
+# =============================================================================
+# BREAKING CHANGES (BC-001, BC-002)
+# =============================================================================
+#
+# These MUST be resolved before upgrading.
+# See docs/BREAKING_CHANGES_v3.15.md for full migration guide.
+
+breaking_changes:
+
+  # ---------------------------------------------------------------------------
+  # BC-001: version.json old field names removed
+  # ---------------------------------------------------------------------------
+  bc_001:
+    id: "BC-001"
+    title: "version.json old field names removed"
+    description: >
+      19 fields were renamed in v3.14.0 (aget_-prefix normalization, ADR-019).
+      The dual-read backward-compat shim (which allowed both old and new names)
+      was removed in v3.15.0. Any script, skill, or agent code reading old
+      field names breaks at upgrade.
+    detection: |
+      grep -rE '"(agent_name|domain|portfolio|managed_by|manages|instance_type|archetype|specialization|template|identity_file|created|updated|intelligence_enabled|collaboration_enabled|capabilities|patterns|migration_history|knowledge_inheritance)"' .aget/ scripts/ .claude/ 2>/dev/null
+    detection_pass: "0 matches"
+    remediation: >
+      Replace each old field name with its aget_-prefixed counterpart.
+      Full rename table: docs/BREAKING_CHANGES_v3.15.md#bc-001-field-rename-table
+
+    # Edge case: the version.json FILE ITSELF may contain old field names.
+    # This happens when the agent has not yet run the v3.14 prefix migration
+    # on its own version.json (e.g., ran the migration on scripts/skills but
+    # not the identity file). Detect and fix this FIRST before upgrading.
+    self_migration_edge_case:
+      description: >
+        If .aget/version.json itself contains old field names (e.g., 'agent_name'
+        instead of 'aget_agent_name'), the file must be migrated before upgrade.
+        This is required when the v3.14 aget_-prefix migration was not applied
+        to version.json itself.
+      detection: |
+        python3 -c "
+        import json
+        old = ['agent_name','domain','portfolio','managed_by','manages',
+               'instance_type','archetype','specialization','template',
+               'identity_file','intelligence_enabled','collaboration_enabled',
+               'capabilities','patterns','knowledge_inheritance']
+        v = json.load(open('.aget/version.json'))
+        hits = [f for f in old if f in v]
+        print('OLD FIELDS FOUND:', hits if hits else 'none')
+        "
+      remediation: >
+        If old fields found: manually rename each field in .aget/version.json
+        to its aget_-prefixed name, commit, then proceed with v3.15 upgrade.
+        This is a two-step process: (1) fix version.json field names, then
+        (2) upgrade aget_version to "3.15.0".
+
+    renamed_fields:
+      - old: "agent_name"
+        new: "aget_agent_name"
+      - old: "domain"
+        new: "aget_domain"
+      - old: "portfolio"
+        new: "aget_portfolio"
+      - old: "managed_by"
+        new: "aget_managed_by"
+      - old: "manages"
+        new: "aget_manages"
+      - old: "instance_type"
+        new: "aget_instance_type"
+      - old: "archetype"
+        new: "aget_archetype"
+      - old: "specialization"
+        new: "aget_specialization"
+      - old: "template"
+        new: "aget_template"
+      - old: "identity_file"
+        new: "aget_identity_file"
+      - old: "intelligence_enabled"
+        new: "aget_intelligence_enabled"
+      - old: "collaboration_enabled"
+        new: "aget_collaboration_enabled"
+      - old: "capabilities"
+        new: "aget_capabilities"
+      - old: "patterns"
+        new: "aget_patterns"
+      - old: "knowledge_inheritance"
+        new: "aget_knowledge_inheritance"
+
+  # ---------------------------------------------------------------------------
+  # BC-002: --fix flag removed
+  # ---------------------------------------------------------------------------
+  bc_002:
+    id: "BC-002"
+    title: "--fix flag surfaces removed from /aget-check-health"
+    description: >
+      The --fix flag was documented in /aget-check-health (SKILL-003) and 13+
+      SKILL.md surfaces since 2026-02-10 but was never implemented (L671
+      decorative classification). Removed in v3.15.0. Any invocation of
+      --fix will error. Replacement: /aget-enhance-health (SKILL-049).
+    detection: |
+      grep -r -- '--fix' .claude/skills/ scripts/ 2>/dev/null
+    detection_pass: "0 matches"
+    remediation: >
+      Replace all --fix invocations with /aget-enhance-health.
+      New skill: template-worker-aget/.claude/skills/aget-enhance-health/
+    replacement_skill: "SKILL-049 (/aget-enhance-health v1.0.0)"
+
+# =============================================================================
+# WHAT'S NEW IN v3.15.0
+# =============================================================================
+
+whats_new:
+  summary: "Two-Level Model Coherence + Security Hardening + Weekly Cadence Formalization"
+
+  highlights:
+    - title: "/aget-enhance-health (SKILL-049 v1.0.0)"
+      description: >
+        7-phase health remediation. Pairs with /aget-check-health (detect-only)
+        as the canonical check→enhance pipeline. Fourth member of the enhance-*
+        skill family. Deploys to all 13 templates.
+
+    - title: "AGET_SECURITY_SPEC v0.2"
+      description: >
+        8 CAP-SEC contracts — 4 outside-threat (boundary enforcement, input
+        validation, information disclosure, dependency integrity) + 4
+        within-threat (authority overstep, scope creep, output contamination,
+        autonomous action bounds). First dedicated security spec.
+
+    - title: "AGET_BUDGET_GRAMMAR_SPEC v0.2"
+      description: >
+        4 CAP-BGG contracts formalizing budget grammar used across skills
+        and session protocols. CAP-BGG-001..004 at full EARS rigor.
+
+    - title: "validate_archetype_skills.py promoted to canonical"
+      description: >
+        Promoted to aget/verification/. Mechanically enforces CAP-TPL-016-04
+        universal-skill mandate. Closes L671 decorative-classification gap.
+
+    - title: "POL-REL-001 (Weekly Saturday Release Policy)"
+      description: >
+        Formalizes the Saturday release cadence from 6-release empirical
+        record (v3.10-v3.15 consecutive Saturdays). All public pushes to
+        aget-framework repos: Saturday only (Sunday requires principal approval).
+
+    - title: "ADR-022 (Breaking-Change Policy)"
+      description: >
+        Ratified 2026-04-25. Codifies Q3=(b) — honor stated deprecation
+        timelines. BC-001 and BC-002 are the only grace-period accelerations.
+
+    - title: "CAP-REL-029 (Release Readiness Gate)"
+      description: >
+        First Wave-1A spec contract. Formalizes pre-release gate checklist
+        as a testable EARS requirement.
+
+    - title: "PIR infrastructure"
+      description: >
+        SOP Phase 7.1.5 — Post-Implementation Review as a BLOCKING gate.
+        First dogfood application: this release (D5 score 2/3 pending fleet
+        deployment confirmation).
+
+    - title: "Requirements format v1.1 + Path A retrofit"
+      description: >
+        REQUIREMENTS_FORMAT v1.1 adds optional constraints: field per REQ.
+        All 4 published REQ-* docs (CORE, GOV, HOM, REL) retrofitted.
+        35 displaced citations corrected across REQ files.
+
+# =============================================================================
+# SKILL CHANGES
+# =============================================================================
+
+skill_changes:
+  new_skills:
+    - skill_id: "SKILL-049"
+      name: "aget-enhance-health"
+      version: "1.0.0"
+      source: "template-worker-aget/.claude/skills/aget-enhance-health/"
+      deploy_to: "all 13 templates"
+      description: "7-phase health remediation (replaces --fix pattern)"
+
+  updated_skills:
+    - skill_id: "SKILL-003"
+      name: "aget-check-health"
+      old_version: "1.0.0"
+      new_version: "1.1.0"
+      change: "Declare detect-only scope. SC-007 (--fix) removed per DEP-FIX-FLAG-001."
+      source: "template-worker-aget/.claude/skills/aget-check-health/"
+
+# =============================================================================
+# NEW ARTIFACTS
+# =============================================================================
+
+new_artifacts:
+  specs:
+    - path: "specs/AGET_SECURITY_SPEC.md"
+      version: "v0.2"
+      location: "drafts/ (D-SEC-CANONICAL deferral)"
+
+    - path: "specs/AGET_BUDGET_GRAMMAR_SPEC.md"
+      version: "v0.2"
+      location: "drafts/ (D-BGG-CANONICAL deferral)"
+
+  verification:
+    - path: "verification/validate_archetype_skills.py"
+      promoted_from: "development location"
+
+  governance:
+    - path: "governance/POLICY_release_cadence.md"
+      id: "POL-REL-001"
+
+    - path: "governance/ADR-022.md"
+      title: "Breaking-Change Policy"
+
+  requirements:
+    - path: "requirements/REQ-CORE_critical_foundations.md"
+      version: "published"
+
+    - path: "requirements/REQ-GOV_agent_governance.md"
+      version: "published"
+
+# =============================================================================
+# UPGRADE STEPS (for fleet supervisors)
+# =============================================================================
+
+upgrade_steps:
+
+  # --- Pre-flight (BC-001) ---
+  bc_001_preflight:
+    step: "PRE-A"
+    title: "BC-001 Pre-flight: verify no old version.json field names"
+    obligation: "MUST"
+    action: >
+      Run the BC-001 detection grep. If 0 matches: proceed.
+      If matches found: update all old field names to aget_-prefixed names first.
+    command: |
+      grep -rE '"(agent_name|domain|portfolio|managed_by|manages|instance_type|archetype|specialization|template|identity_file|created|updated|intelligence_enabled|collaboration_enabled|capabilities|patterns|migration_history|knowledge_inheritance)"' .aget/ scripts/ .claude/ 2>/dev/null
+    pass_condition: "0 matches (or only matches in non-AGET files)"
+
+  bc_001_self_preflight:
+    step: "PRE-A2"
+    title: "BC-001 Pre-flight: check .aget/version.json FIELD NAMES themselves"
+    obligation: "MUST"
+    action: >
+      Separately check if the version.json file itself has old-named fields.
+      This is easy to miss because the detection grep above searches for
+      old names as *values* or in scripts — but the version.json may have
+      old names as *keys*. Run this check explicitly.
+    command: |
+      python3 -c "
+      import json
+      old = ['agent_name','domain','portfolio','managed_by','manages',
+             'instance_type','archetype','specialization','template',
+             'identity_file','intelligence_enabled','collaboration_enabled',
+             'capabilities','patterns','knowledge_inheritance']
+      v = json.load(open('.aget/version.json'))
+      hits = [f for f in old if f in v]
+      print('PASS: no old fields' if not hits else 'FAIL: old fields present: ' + str(hits))
+      "
+    pass_condition: "PASS: no old fields"
+    remediation: >
+      If FAIL: manually rename each key in .aget/version.json to its
+      aget_-prefixed name (see breaking_changes.bc_001.renamed_fields above).
+      Commit this change before proceeding to step 1.
+
+  # --- Pre-flight (BC-002) ---
+  bc_002_preflight:
+    step: "PRE-B"
+    title: "BC-002 Pre-flight: verify no --fix flag usage"
+    obligation: "MUST"
+    action: "Run the BC-002 detection grep."
+    command: |
+      grep -r -- '--fix' .claude/skills/ scripts/ 2>/dev/null
+    pass_condition: "0 matches"
+
+  # --- Standard steps ---
+  - step: 1
+    action: "Update .aget/version.json: set aget_version to '3.15.0'"
+    obligation: "MUST"
+    verification: "jq -r .aget_version .aget/version.json"
+    expected: "3.15.0"
+
+  - step: 2
+    action: "Update AGENTS.md header: @aget-version: 3.15.0"
+    obligation: "MUST"
+    verification: "grep '@aget-version: 3.15.0' AGENTS.md"
+    expected: "match"
+
+  - step: 3
+    action: "Deploy /aget-enhance-health (SKILL-049 v1.0.0) from template-worker-aget"
+    obligation: "SHOULD"
+    verification: "ls .claude/skills/aget-enhance-health/SKILL.md"
+    expected: "file exists"
+
+  - step: 4
+    action: "Update /aget-check-health to v1.1.0 from template-worker-aget"
+    obligation: "SHOULD"
+    verification: "grep 'v1.1.0' .claude/skills/aget-check-health/SKILL.md"
+    expected: "match"
+
+  - step: 5
+    action: "Run python3 scripts/health_check.py"
+    obligation: "SHOULD"
+    verification: "exit code 0"
+
+  - step: 6
+    action: "Run contract tests if present: python3 -m pytest tests/ -q"
+    obligation: "SHOULD"
+    verification: "no failures"
+
+# =============================================================================
+# END-STATE VALIDATION
+# =============================================================================
+
+end_state_validation:
+  quick_check: |
+    python3 -c "
+    import json
+    v = json.load(open('.aget/version.json'))
+    version_ok = v.get('aget_version') == '3.15.0'
+    old_keys = ['agent_name','domain','portfolio','managed_by','manages',
+                'instance_type','archetype','specialization','template',
+                'identity_file','intelligence_enabled','collaboration_enabled',
+                'capabilities','patterns','knowledge_inheritance']
+    bc001_ok = not any(k in v for k in old_keys)
+    status = 'PASS' if (version_ok and bc001_ok) else 'FAIL'
+    print(f'{status}: version={v.get(\"aget_version\",\"MISSING\")}, BC-001 clean={bc001_ok}')
+    "
+
+  full_check: |
+    python3 scripts/verify_deployment.py --version 3.15.0 --path .

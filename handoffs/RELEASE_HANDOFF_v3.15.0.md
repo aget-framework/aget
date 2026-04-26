@@ -60,6 +60,23 @@ python3 -c "import json; v=json.load(open('.aget/version.json')); print(v.get('a
 grep -rE '"(agent_name|domain|portfolio|managed_by|manages|instance_type|archetype|specialization|template|identity_file|created|updated|intelligence_enabled|collaboration_enabled|capabilities|patterns|migration_history|knowledge_inheritance)"' .aget/ scripts/ .claude/
 # If matches found: update to aget_-prefixed names before upgrading
 
+# 2b. BC-001 EDGE CASE: Check if .aget/version.json ITSELF has old key names
+# (This is separate from step 2 — it checks the file's own keys, not references to them)
+python3 -c "
+import json
+old = ['agent_name','domain','portfolio','managed_by','manages',
+       'instance_type','archetype','specialization','template',
+       'identity_file','intelligence_enabled','collaboration_enabled',
+       'capabilities','patterns','knowledge_inheritance']
+v = json.load(open('.aget/version.json'))
+hits = [f for f in old if f in v]
+print('PASS: version.json keys clean' if not hits else 'FAIL: old key names in version.json: ' + str(hits))
+"
+# If FAIL: rename the keys in .aget/version.json FIRST (two-step process):
+#   Step A: rename old key names to aget_-prefixed names, commit
+#   Step B: then set aget_version to "3.15.0", commit
+# See docs/BREAKING_CHANGES_v3.15.md for full rename table
+
 # 3. BC-002: Check for --fix flag usage
 grep -r -- '--fix' .claude/skills/ scripts/ 2>/dev/null
 # If matches found: replace with /aget-enhance-health invocation
