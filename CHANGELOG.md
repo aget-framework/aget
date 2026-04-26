@@ -9,49 +9,63 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased] - In flight toward v3.15
+## [3.15.0] - 2026-04-25
 
-**Theme**: Two-Level Model coherence — close L749 corners, tighten REQ↔SPEC discipline
+**Theme**: Two-Level Model Coherence + Security Hardening + Weekly Release Cadence Formalization
+
+> **⚠️ Breaking Release**: v3.15 contains two breaking changes (BC-001, BC-002). See `docs/BREAKING_CHANGES_v3.15.md` and the Migration Guide below.
 
 ### Added
 
-- `requirements/REQUIREMENTS_FORMAT.md` v1.0 → **v1.1**
-  - Optional `constraints:` per-REQ field for ADRs, governance docs, AGENTS.md sections, SOPs, and DESIGN_DIRECTION docs that bound a REQ but do not implement it
-  - Clarified acceptable `specifications:` types: **CAP-***, **R-***, **SKILL-***, **RUBRIC_*** (rubrics-as-spec per L749 duality)
-  - Added Field Selection Decision Tree to route citations to the correct field
-- `requirements/REQ-CORE_critical_foundations.md` — **published** (10 REQs, was uncommitted from 2026-04-18)
-- `requirements/REQ-GOV_agent_governance.md` — **published** (6 REQs, was uncommitted from 2026-04-18)
-- `specs/AGET_SESSION_SPEC.md` — added **CAP-SESSION-013** (Close-Session Protocol, 10 sub-requirements). Composes with CAP-SESSION-004 wind-down per the orchestrate-not-rename pattern (L562 lesson)
-- `specs/AGET_SESSION_SPEC.md` — added **CAP-SESSION-014** (Health Remediation Protocol, 10 sub-requirements). Therapeutic sibling to CAP-SESSION-008 Sanity Check; implements canonical `check → enhance` pipeline per `DESIGN_DIRECTION_skill_verb_vocabulary` §Principle 9 (2026-04-19). Tier A/B/C routing; governance boundary (SHALL NOT modify public framework files); D71 STRUCTURAL routing for Tier-C escalations.
-- **`/aget-enhance-health` skill (SKILL-049 v1.0.0)**: Deploys to all 13 template agents + private fleet. Remediates drift detected by `/aget-check-health` through 7 phases (Diagnose, Classify, Census, Apply Tier-A, Route Tier-B, Escalate Tier-C, Re-verify). Generator layer per ADR-008; pair sibling to detect-only `/aget-check-health`. Fourth member of the `enhance-*` skill family (after enhance-spec SKILL-041, enhance-config in-dev, enhance-coherence proposed). Tracking: gmelli/aget-aget#1081. Implementation: AEH-001 PROJECT_PLAN (7 gates + Gate 0.5 triad quality scoring).
+- `requirements/REQUIREMENTS_FORMAT.md` v1.0 → **v1.1**: Optional `constraints:` per-REQ field for ADRs, governance docs, and SOPs that bound a requirement without implementing it. Clarified acceptable `specifications:` types (CAP-*, R-*, SKILL-*, RUBRIC_*). Added Field Selection Decision Tree.
+- `requirements/REQ-CORE_critical_foundations.md` — **published** (10 REQs)
+- `requirements/REQ-GOV_agent_governance.md` — **published** (6 REQs)
+- `specs/AGET_SESSION_SPEC.md` — **CAP-SESSION-013** (Close-Session Protocol, 10 sub-requirements). Orchestrates wind-down as a delegate phase; non-breaking composition pattern.
+- `specs/AGET_SESSION_SPEC.md` — **CAP-SESSION-014** (Health Remediation Protocol, 10 sub-requirements). Tier A/B/C routing; governance boundary (SHALL NOT modify public framework files).
+- **`/aget-enhance-health` skill (SKILL-049 v1.0.0)**: Remediates drift detected by `/aget-check-health` through 7 phases. Generator layer per ADR-008; fourth member of the `enhance-*` skill family. Deploys to all 13 template agents.
+- **`specs/AGET_BUDGET_GRAMMAR_SPEC.md` v0.2**: Four CAP-BGG-001..004 contracts at full EARS rigor. Formalizes the budget grammar used across skills and session protocols. Shipping in `drafts/` per D-BGG-CANONICAL deferral.
+- **`specs/AGET_SECURITY_SPEC.md` v0.2**: Eight CAP-SEC-001..008 contracts — four outside-threat (boundary enforcement, input validation, information disclosure, dependency integrity) and four within-threat (authority overstep, scope creep, output contamination, autonomous action bounds). First dedicated security spec in the framework. Shipping in `drafts/` per D-SEC-CANONICAL deferral.
+- **`verification/validate_archetype_skills.py`**: Promoted to canonical `aget/verification/` (from development location). Validates template conformance against AGET_TEMPLATE_SPEC universal-skill mandate. Closes L671 decorative-classification gap: AGET_TEMPLATE_SPEC CAP-TPL-016-04 mandate now mechanically enforced.
+- **CAP-REL-029 (Release Readiness Gate)**: First Wave-1A spec contract — formalizes the pre-release gate checklist as a testable EARS requirement.
+- **`governance/POLICY_release_cadence.md` (POL-REL-001)**: Formalizes the weekly Saturday release policy from empirical practice (6 consecutive Saturdays v3.10–v3.14). First release explicitly governed by this policy.
+- **ADR-022 (Breaking-Change Policy)**: Ratified 2026-04-25 — codifies Q3=(b) interpretation (honor stated deprecation timelines; BC-001 and BC-002 are the only accelerations).
+- **Ontology expansion**: 78 new concepts (C340–C417) across three clusters — Telos & Flourishing (C340–C369), External System Integration & Reflexive Coverage (C370–C393), Capability Portfolio Architecture (C394–C417). All Tier 1–2, 20%+ counter-perspective, 38+ unique peer-reviewed sources.
+- **PIR scoring infrastructure**: `sops/SOP_release_process.md` v1.39 Phase 7.1.5 — Post-Implementation Review as a BLOCKING gate in the release process. First dogfood application: this release.
 
 ### Changed
 
-- **`/aget-check-health` (SKILL-003) v1.0.0 → v1.1.0**: Now declares detect-only scope. Amended C-SC-001 to cite `/aget-enhance-health` for remediation. Removed SC-007 (`--fix` flag capability) per DEP-FIX-FLAG-001 — flag was documented 2026-02-10 but never implemented (L656 Loading Dock, L671 decorative classification). Deployed to this agent + 12 templates with md5 uniformity.
+- **`/aget-check-health` (SKILL-003) v1.0.0 → v1.1.0**: Declares detect-only scope. SC-007 (`--fix` flag) removed per DEP-FIX-FLAG-001 (documented but never implemented). Replacement: `/aget-enhance-health`.
+- All 4 published REQ-* documents (CORE, GOV, HOM, REL) — Path A retrofit per REQUIREMENTS_FORMAT v1.1: off-type citations routed to `evidence:` or `constraints:`, 35 displaced citations corrected.
+- `requirements/REQ-HOM_homepage_quality.md` v1.0.0 → **v1.1.0**: Refactored to YAML+Markdown REQ blocks; mechanically scorable.
 
-### Changed
+### Breaking Changes
 
-- All 4 published REQ-* documents (CORE, GOV, HOM, REL) — Path A retrofit per REQUIREMENTS_FORMAT v1.1:
-  - Off-type citations routed: L-docs → `evidence:`; ADRs/governance/SOPs/META-DOCs → `constraints:`
-  - 35 displaced citations corrected
-  - REQ-CORE-F-001 description and fit_criterion updated to enforce v1.1 type discipline
-  - REQ-CORE-F-001 forward-traceability now enforced via RUBRIC_requirement_quality_v1.0 (rubric-as-spec)
-- `requirements/REQ-HOM_homepage_quality.md` v1.0.0 → **v1.1.0** — refactored from inline-prose to YAML+Markdown REQ blocks per REQUIREMENTS_FORMAT v1.0; now mechanically scorable
+> See `docs/BREAKING_CHANGES_v3.15.md` for full migration guide.
 
-### Deprecated
+- **BC-001 — `version.json` old field names removed**: 19 fields renamed in v3.14 (e.g., `agent_name` → `aget_agent_name`, `domain` → `aget_domain`). Dual-read backward-compat shim removed in v3.15. Any script or skill reading old names breaks. Run migration grep: `grep -rE '"(agent_name|domain|portfolio|...)"' .aget/ scripts/ .claude/`
+- **BC-002 — `--fix` flag surfaces removed**: Flag documented across 13+ SKILL.md surfaces since 2026-02-10 but never implemented. Removed in this release; `--fix` invocations will error. Replacement: `/aget-enhance-health` (SKILL-049).
 
-- **`/aget-check-health --fix` flag** (DEP-FIX-FLAG-001). Was documented in 14 SKILL.md files + SKILL-003.yaml SC-007 since 2026-02-10 (10+ weeks) but never implemented. Removed same release — grace-period exemption per R-DEP-011 (decorative artifacts with no functional implementation have no consumer migration burden). **Replacement**: `/aget-enhance-health` (SKILL-049, CAP-SESSION-014). Registered in `governance/POLICY_deprecation.md`.
+### Deprecated (continuing from v3.14)
 
-### Surfaced (tracked in private planning)
+- `scripts/wake_up.py` → `scripts/aget_open_session.py` (removal v3.16 per POL-DEP-001)
+- `scripts/wind_down.py` → `scripts/aget_close_session.py` (removal v3.16 per POL-DEP-001)
 
-- 12 missing CAP-* / R-* / RUBRIC_* contracts referenced by REQ-* but not yet authored. These are now visible as L2 (Defined) regressions in mechanical rubric scoring rather than masked by off-type citations. Wave-1 authoring is a v3.15 P1 candidate.
-- `REQ-OPS-F-001` (agent maintains operational health) — surfaced at AEH-001 Gate 0.5 triad scoring as the missing REQ-layer artifact for the health domain. Scheduled as post-v3.15 follow-on PP proposal (closes REQ corner of L749 triad for this domain).
+Grace period honored per ADR-022 interpretation (b) — both shims remain active through v3.15.
+
+### Deprecated (new in v3.15)
+
+- **`/aget-check-health --fix` flag** (DEP-FIX-FLAG-001): Removed same release per R-DEP-011 grace-period exemption (decorative artifact, no consumers). Registered in `governance/POLICY_deprecation.md`.
+
+### Surfaced (v3.16 candidates)
+
+- 12 missing CAP-* / R-* / RUBRIC_* contracts referenced by REQ-* but not yet authored. Now visible as L2 (Defined) regressions in mechanical rubric scoring. Wave-1B authoring is a v3.16 candidate.
+- `REQ-OPS-F-001` (agent maintains operational health) — missing REQ-layer artifact for the health domain. Candidate for v3.16 authoring.
 
 ### Notes
 
-- This in-flight set continues the v3.14 cycle's foundational-coherence theme (REQ-CORE/REQ-GOV publication 2026-04-18; ontology FWRK-2026-004 grounding 2026-04-19; REQ retrofit + scoring rubric same day).
-- No breaking changes; REQUIREMENTS_FORMAT v1.1 is additive (new optional `constraints:` field, no removed fields). The acceptable-types clarification was already implied by L742 + L749; v1.1 just makes it explicit and enforceable via rubric.
-- Framework reconstructability (REQ-CORE-Q-008): v3.15-targeted P1 work to author the 12 surfaced contracts and close the L749 V-test corner via RUBRIC_verification_test_quality_v1.0.
+- First breaking release in the 3.x minor cycle (ADR-022). Migration cost estimate: 30–60 min per agent (vs 15–20 min for prior non-breaking releases).
+- REQUIREMENTS_FORMAT v1.1 `constraints:` field is additive (no removed fields). The breaking changes are in version.json field names (BC-001) and --fix flag removal (BC-002) — not in requirement format changes.
+- First release explicitly governed by POL-REL-001 (Weekly Saturday Release Policy). The empirical Saturday cadence has been formalized as a durable policy artifact.
 
 ---
 
