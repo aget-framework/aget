@@ -22,14 +22,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `requirements/REQ-GOV_agent_governance.md` — **published** (6 REQs)
 - `specs/AGET_SESSION_SPEC.md` — **CAP-SESSION-013** (Close-Session Protocol, 10 sub-requirements). Orchestrates wind-down as a delegate phase; non-breaking composition pattern.
 - `specs/AGET_SESSION_SPEC.md` — **CAP-SESSION-014** (Health Remediation Protocol, 10 sub-requirements). Tier A/B/C routing; governance boundary (SHALL NOT modify public framework files).
-- **`/aget-enhance-health` skill (SKILL-049 v1.0.0)**: Remediates drift detected by `/aget-check-health` through 7 phases. Generator layer per ADR-008; fourth member of the `enhance-*` skill family. Deploys to all 13 template agents.
+- **`/aget-enhance-health` skill (SKILL-049 v1.0.0)**: Remediates drift detected by `/aget-check-health` through 7 phases. Generator layer per ADR-008; fourth member of the `enhance-*` skill family (enhance-spec SKILL-041, enhance-config, enhance-coherence). Deploys to all 13 template agents.
 - **`specs/AGET_BUDGET_GRAMMAR_SPEC.md` v0.2**: Four CAP-BGG-001..004 contracts at full EARS rigor. Formalizes the budget grammar used across skills and session protocols. Shipping in `drafts/` per D-BGG-CANONICAL deferral.
 - **`specs/AGET_SECURITY_SPEC.md` v0.2**: Eight CAP-SEC-001..008 contracts — four outside-threat (boundary enforcement, input validation, information disclosure, dependency integrity) and four within-threat (authority overstep, scope creep, output contamination, autonomous action bounds). First dedicated security spec in the framework. Shipping in `drafts/` per D-SEC-CANONICAL deferral.
 - **`verification/validate_archetype_skills.py`**: Promoted to canonical `aget/verification/` (from development location). Validates template conformance against AGET_TEMPLATE_SPEC universal-skill mandate. Closes L671 decorative-classification gap: AGET_TEMPLATE_SPEC CAP-TPL-016-04 mandate now mechanically enforced.
 - **CAP-REL-029 (Release Readiness Gate)**: First Wave-1A spec contract — formalizes the pre-release gate checklist as a testable EARS requirement.
 - **`governance/POLICY_release_cadence.md` (POL-REL-001)**: Formalizes the weekly Saturday release policy from empirical practice (6 consecutive Saturdays v3.10–v3.14). First release explicitly governed by this policy.
 - **ADR-022 (Breaking-Change Policy)**: Ratified 2026-04-25 — codifies Q3=(b) interpretation (honor stated deprecation timelines; BC-001 and BC-002 are the only accelerations).
-- **Ontology expansion**: 78 new concepts (C340–C417) across three clusters — Telos & Flourishing (C340–C369), External System Integration & Reflexive Coverage (C370–C393), Capability Portfolio Architecture (C394–C417). All Tier 1–2, 20%+ counter-perspective, 38+ unique peer-reviewed sources.
 - **PIR scoring infrastructure**: `sops/SOP_release_process.md` v1.39 Phase 7.1.5 — Post-Implementation Review as a BLOCKING gate in the release process. First dogfood application: this release.
 
 ### Changed
@@ -43,7 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > See `docs/BREAKING_CHANGES_v3.15.md` for full migration guide.
 
 - **BC-001 — `version.json` old field names removed**: 19 fields renamed in v3.14 (e.g., `agent_name` → `aget_agent_name`, `domain` → `aget_domain`). Dual-read backward-compat shim removed in v3.15. Any script or skill reading old names breaks. Run migration grep: `grep -rE '"(agent_name|domain|portfolio|...)"' .aget/ scripts/ .claude/`
-- **BC-002 — `--fix` flag surfaces removed**: Flag documented across 13+ SKILL.md surfaces since 2026-02-10 but never implemented. Removed in this release; `--fix` invocations will error. Replacement: `/aget-enhance-health` (SKILL-049).
+- **BC-002 — `--fix` flag surfaces removed**: Flag documented across 13+ SKILL.md surfaces since 2026-02-10 but never implemented (L671 decorative classification). Removed in this release; `--fix` invocations will error. Replacement: `/aget-enhance-health` (SKILL-049). Note: R-DEP-011 grace-period exemption applies (no functional consumers); classified BC-002 because the documented surface creates adopter expectation.
 
 ### Deprecated (continuing from v3.14)
 
@@ -1202,9 +1201,9 @@ This version exists in migration_history but was never published as a GitHub Rel
 
 ## Version Support
 
-**Latest Stable**: v3.6.0
+**Latest Stable**: v3.15.0
 **Support Window**: Latest release receives full support (bug fixes, enhancements)
-**Previous Minor** (v3.3.x): Security fixes only
+**Previous Minor** (v3.14.x): Security fixes only
 **Older Versions**: No active support (upgrade recommended)
 
 ---
