@@ -1009,7 +1009,7 @@ The SYSTEM shall support archetype-specific ontologies and skills.
 | CAP-TPL-016-01 | ubiquitous | The SYSTEM shall include ontology/ directory in each template |
 | CAP-TPL-016-02 | ubiquitous | The SYSTEM shall include ONTOLOGY_{archetype}.yaml in ontology/ |
 | CAP-TPL-016-03 | ubiquitous | The SYSTEM shall include .claude/skills/ directory with AGET skills |
-| CAP-TPL-016-04 | ubiquitous | The SYSTEM shall include 31 universal skills in all templates (updated v3.13.0) |
+| CAP-TPL-016-04 | ubiquitous | The SYSTEM shall include 32 universal skills in all templates (updated v3.15.0) |
 | CAP-TPL-016-05 | ubiquitous | The SYSTEM shall include archetype-specific skills per archetype |
 | CAP-TPL-016-06 | conditional | IF SKILL.md exists THEN it shall have valid YAML frontmatter |
 
@@ -1053,9 +1053,9 @@ ontology:
 | reviewer | 31 | review-artifact, provide-feedback | 33 |
 | spec-engineer | 31 | validate-spec, generate-requirement | 33 |
 
-#### Universal Skills (v3.13.0)
+#### Universal Skills (v3.15.0)
 
-All templates include these 31 universal skills:
+All templates include these 32 universal skills:
 
 | Skill | Category | Purpose | Since |
 |-------|----------|---------|:-----:|
@@ -1065,6 +1065,7 @@ All templates include these 31 universal skills:
 | aget-close-session | Session | Orchestrate wind-down with enrichment | v3.13 |
 | aget-describe-session | Session | Narrative summary from session data | v3.13 |
 | aget-check-health | Health | Run health inspection | v3.5 |
+| aget-enhance-health | Health | Remediate health drift | v3.15 |
 | aget-check-kb | Health | Validate KB health | v3.5 |
 | aget-check-evolution | Health | Monitor evolution directory | v3.5 |
 | aget-check-sessions | Health | Monitor sessions directory | v3.5 |
