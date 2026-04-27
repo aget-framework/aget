@@ -1,9 +1,9 @@
 # SOP: Fleet Migration
 
-**Version**: 1.4.0
+**Version**: 1.5.0
 **Status**: Active
 **Created**: 2026-01-05
-**Updated**: 2026-04-04
+**Updated**: 2026-04-26
 **Owner**: aget-framework
 **Implements**: CAP-MIG-017 (Remote Supervisor Upgrade)
 **Related**: L455 (AGENTS.md Invocation Verification), L457 (Cross-Machine Pre-Flight), AGET_RELEASE_SPEC, PROJECT_PLAN_fleet_v3.2_migration.md
@@ -16,6 +16,30 @@ Standard operating procedure for migrating fleet agents to new AGET framework ve
 
 ---
 
+## Execution Model (Centralized by Default)
+
+Fleet migration is **centralized by default**: the supervisor executes all agent upgrades in a single coordinated session. Distributed execution (each agent self-upgrades) is used only when agent count or machine topology makes centralized execution impractical, and requires principal approval.
+
+| Model | When | Mechanism |
+|-------|------|-----------|
+| **Centralized** (default) | Fleet ≤ 40 agents, single supervisor machine | Supervisor iterates agents directly |
+| **Distributed** | Fleet > 40, multi-machine, or principal directed | Each agent receives REMOTE_MIGRATION_MESSAGE; supervisor coordinates |
+
+---
+
+## Mandatory vs Optional Change Classification
+
+Not all upgrade changes carry the same obligation. This classification determines which steps are blocking and which are contextual.
+
+| Class | Definition | V-test Requirement | Example |
+|-------|-----------|-------------------|---------|
+| **Mandatory** | Required for version compliance. Agent is non-compliant at target version without these changes. | BLOCKING — must PASS before declaring agent complete | `version.json` aget_version field, AGENTS.md @aget-version header, BC-NNN breaking change compliance |
+| **Optional** | Capabilities each agent adopts based on context. Non-adoption does not affect version compliance. | Recommended — WARN if missing, not FAIL | New universal skills, new PATTERN_*.md files, new AGENTS.md sections |
+
+**When a release includes breaking changes (BC-NNN)**: BC compliance is automatically Mandatory. Check DEPLOYMENT_SPEC_vX.Y.Z.yaml for the full classification table for each release.
+
+---
+
 ## Scope
 
 **Applies to**: Fleet-wide version migrations (minor and major releases)
@@ -25,12 +49,13 @@ Standard operating procedure for migrating fleet agents to new AGET framework ve
 - AGENTS.md @aget-version updates
 - Session script deployment (wake_up.py, wind_down.py, health_check.py)
 - L455 AGENTS.md Invocation Verification
-- FLEET_STATE.yaml updates
+- Mandatory change compliance verification
+- FLEET_STATE.yaml / FLEET_REGISTRY updates
 
 **Does NOT cover**:
 - Framework/template releases (see SOP_release_process.md)
-- Single-agent migrations
-- Breaking changes requiring code modifications
+- Single-agent migrations (use SOP_aget_migrate.md)
+- Breaking changes requiring code modifications (see DEPLOYMENT_SPEC_vX.Y.Z.yaml BC-NNN)
 
 ---
 
@@ -42,6 +67,14 @@ Before starting Fleet_Migration:
 2. **Scripts available**: Session scripts exist in framework at target version
 3. **Fleet state known**: FLEET_STATE.yaml reflects current fleet
 4. **Git access**: Push access to all fleet repositories
+5. **gh CLI auth verified**: `gh auth status` returns exit 0 (not keyring error)
+
+```bash
+# Pre-flight auth smoke-test — catch keyring failures before migration starts
+gh auth status && echo "PASS: gh auth" || echo "FAIL: gh auth — check keyring or re-authenticate (gh auth login)"
+```
+
+**Warning**: Cloud-hosted agents may return keyring errors on `gh auth status` even when auth is configured. If any agent shows a keyring error, resolve before migration (re-run `gh auth login` on that machine). Undetected auth failures cause silent gh CLI failures during migration.
 
 ---
 
@@ -408,7 +441,74 @@ Create session log in `sessions/SESSION_YYYY-MM-DD_fleet_vX.Y.Z_migration.md`
 - Add retrospective section
 - Record KR achievement
 
+#### Gate 5.4: FLEET_REGISTRY Update (BLOCKING Completion Criterion)
+
+FLEET_REGISTRY must be updated before declaring migration complete. This is a **BLOCKING** gate — a migration without FLEET_REGISTRY update is considered incomplete even if all agents are at target version.
+
+```bash
+# Update FLEET_REGISTRY with migration record
+# Location varies by supervisor; common paths:
+# - .aget/fleet/FLEET_REGISTRY.yaml
+# - .aget/fleet/FLEET_STATE.yaml (if consolidated)
+
+python3 -c "
+import json, yaml, datetime
+registry = yaml.safe_load(open('.aget/fleet/FLEET_REGISTRY.yaml'))
+registry['last_migration'] = {
+  'version': 'X.Y.Z',
+  'date': '$(date +%Y-%m-%d)',
+  'agent_count': 0,  # fill actual count
+  'method': 'centralized'
+}
+print(yaml.dump(registry))
+"
+```
+
+**V5.4.1: FLEET_REGISTRY records target version**
+```bash
+grep "version: X.Y.Z" .aget/fleet/FLEET_REGISTRY.yaml && echo "PASS" || echo "FAIL"
+```
+**Expected**: PASS
+**BLOCKING**: Do NOT mark migration COMPLETE if FAIL.
+
 **Decision_Point**: Project complete? [COMPLETE]
+
+---
+
+## Rollback Criteria
+
+Rollback is triggered when any of the following conditions occur and cannot be resolved within the session:
+
+| Trigger | Threshold | Action |
+|---------|-----------|--------|
+| V-MIG-AGENTS failures | >10% of fleet fails after remediation | Rollback affected agents to prior version |
+| BC-NNN compliance failure | Any agent non-compliant after 2 remediation attempts | Escalate to framework; do not mark complete |
+| Health check errors (not warnings) | >5% of fleet shows error | Rollback and investigate root cause |
+| gh auth failure (cloud agents) | Any agent cannot authenticate | Pause migration; resolve auth before continuing |
+
+**Rollback procedure** (per-agent):
+```bash
+AGENT_PATH=~/github/{agent-name}
+PRIOR_VERSION="X.Y.Z-1"
+
+# 1. Revert version.json
+sed -i '' "s/\"aget_version\": \"[^\"]*\"/\"aget_version\": \"$PRIOR_VERSION\"/" $AGENT_PATH/.aget/version.json
+
+# 2. Revert AGENTS.md
+sed -i '' "s/@aget-version: .*/@aget-version: $PRIOR_VERSION/" $AGENT_PATH/AGENTS.md
+
+# 3. Restore prior scripts (from framework git history)
+FRAMEWORK_PATH=~/github/aget-framework/aget
+git -C $FRAMEWORK_PATH show "v$PRIOR_VERSION:scripts/wake_up.py" > $AGENT_PATH/scripts/wake_up.py
+git -C $FRAMEWORK_PATH show "v$PRIOR_VERSION:scripts/wind_down.py" > $AGENT_PATH/scripts/wind_down.py
+git -C $FRAMEWORK_PATH show "v$PRIOR_VERSION:scripts/health_check.py" > $AGENT_PATH/scripts/health_check.py
+
+# 4. Commit rollback
+git -C $AGENT_PATH add .aget/version.json AGENTS.md scripts/
+git -C $AGENT_PATH commit -m "rollback: Revert to AGET v$PRIOR_VERSION (migration issue)"
+```
+
+**Partial migration**: If > 50% of agents migrated successfully, do not roll back the successful cohort — document partial state in session log and continue remediation in next session.
 
 ---
 
@@ -475,17 +575,49 @@ See: FLEET_MIGRATION_GUIDE_v3.md (Cross-Machine Pre-Flight), L457
 
 ---
 
+## Post-Migration: Ongoing Health Monitoring
+
+After fleet migration completes, supervisors are recommended to establish a weekly fleet health check routine. Two independent supervisors (main + legalon fleets) converged on the same design independently (L831 cross-fleet spec signal), indicating this is a framework-level best practice.
+
+**Recommended pattern**: Weekly RemoteTrigger agent running:
+1. `health_check.py --json` against each agent
+2. CORRECTION commit monitor (grep `\(CORRECTION\)` in recent git log)
+3. Summary report to supervisor
+
+See: `docs/patterns/PATTERN_weekly_fleet_health_monitor.md` (framework-recommended pattern)
+
+**Prerequisites before deploying the routine**:
+- Fix #1166: Remove `Write` tool from routine (not needed for read-only health checks)
+- Validate CORRECTION grep pattern: `\(CORRECTION\)` (parenthesized form, not plain `CORRECTION`)
+- Confirm auth smoke-test passes on target machine (keyring issue risk)
+
+---
+
 ## References
 
 - AGET_RELEASE_SPEC.md (version types, deployment scope)
 - SOP_release_process.md (framework releases - precedes fleet migration)
+- DEPLOYMENT_SPEC_vX.Y.Z.yaml (mandatory/optional change classification per release)
 - L455: AGENTS.md Invocation Verification
 - L457: Cross-Machine Pre-Flight
+- PATTERN_weekly_fleet_health_monitor.md (post-migration health routine)
 - PROJECT_PLAN_fleet_v3.2_migration.md (graduation source)
 
 ---
 
 ## Changelog
+
+### v1.5.0 (2026-04-26)
+
+- **Added**: Execution Model section — centralized by default (principal decision 2026-04-26); distributed requires explicit principal approval
+- **Added**: Mandatory vs Optional Change Classification section — Mandatory (BLOCKING V-tests), Optional (WARN, not FAIL); references DEPLOYMENT_SPEC_vX.Y.Z.yaml
+- **Added**: Prerequisites item 5 — gh auth smoke-test; addresses cloud-hosted keyring failure risk (FLEET-UPG-014 finding)
+- **Added**: Gate 5.4: FLEET_REGISTRY Update as BLOCKING completion criterion (FLEET-UPG-014 D1 gap)
+- **Added**: Rollback Criteria section — 4 triggers, per-agent rollback procedure, partial migration guidance
+- **Added**: Post-Migration: Ongoing Health Monitoring section — weekly fleet health monitor recommendation (SD-6; L831 cross-fleet convergence from main + legalon supervisors)
+- **Updated**: Scope section — added Mandatory change compliance and FLEET_REGISTRY to Covers; updated Does NOT cover
+- **Updated**: References section — added DEPLOYMENT_SPEC and PATTERN_weekly_fleet_health_monitor
+- Implements SD-3, SD-4 (VERSION_SCOPE_v3.16.0 directives 2026-04-26)
 
 ### v1.3.0 (2026-03-14)
 
