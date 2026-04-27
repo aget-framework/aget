@@ -338,39 +338,54 @@ originator: principal
 
 ```yaml
 id: REQ-CORE-Q-010
-title: "Collaboration-Quality Optimization"
+title: "Collaboration-Outcomes Optimization"
 type: quality
 category: Interaction Capability
 description: >
-  AGET optimizes for human-AI collaboration quality, not autonomous
-  agent speed. Design tradeoffs shall favor coherence, auditability,
-  and shared understanding over raw throughput or autonomous
-  decision velocity.
+  AGET optimizes for human-AI collaboration outcomes, managing
+  tradeoffs across five dimensions: OUTCOMES (fixed target),
+  TIME, BUDGET, RISK, and DISCOVERY. Design decisions shall favor
+  coherence, auditability, and shared understanding — not maximize
+  throughput, minimize cost, eliminate risk, or preempt the
+  principal's capacity to encounter their own domain.
 rationale: >
-  This is the foundational design philosophy that distinguishes AGET
-  from autonomous-agent frameworks. Without it, every other
-  requirement (gates, evidence, two-level model, principal authority)
-  becomes friction to be optimized away rather than feature to be
-  preserved.
+  This is the foundational design philosophy distinguishing AGET
+  from autonomous-agent frameworks. The tradeoff model is
+  five-dimensional: OUTCOMES is the fixed optimization target;
+  TIME, BUDGET, RISK, and DISCOVERY are managed variables.
+  DISCOVERY (L905, grounded in Atkinson 1999 organizational and
+  professional learning) captures the principal's encounter
+  capacity — the conditions under which latent wants form (L898).
+  Without this axis, every gate, evidence requirement, and
+  authority check risks being reframed as friction to optimize
+  away rather than a feature to preserve.
 evidence:
-  - "DESIGN_PHILOSOPHY (supervisor inherited): 'AGET optimizes for human-AI collaboration quality, not autonomous agent speed'"
+  - "DESIGN_PHILOSOPHY line 480: 'AGET optimizes for human-AI partnership quality'"
   - "L99 (Every agent is a worker; supervision is a capability)"
   - "L143 (AGET = Configuration & Lifecycle Management for CLI-Based Human-AI Collaborative Coding)"
+  - "L905 (Collaboration Optimization 5D Model — OUTCOMES + TIME/BUDGET/RISK/DISCOVERY; 3 grounded options)"
+  - "L904 (Requirements Execution-Formation Asymmetry — companion gap; all 10 most-aligned REQs are execution-layer)"
+  - "L898 (Desire-Discovery Erosion — DISCOVERY axis: automation preempts encounter, erodes latent-want formation)"
+  - "Atkinson 1999 Square Route — organizational learning + professional learning as explicit success criteria"
+  - "PRINCE2 hexagon — Benefits distinct from Quality (confirms OUTCOMES over quality as label)"
   - "governance/MISSION.md"
 fit_criterion: >
-  ADRs that propose performance, throughput, or autonomy
-  optimizations cite a coherence-or-collaboration tradeoff analysis
-  in their Consequences section. Optimization proposals that lack
-  this analysis are flagged at review. Verifiable by ADR review
-  pass at gate boundaries.
+  (1) ADRs that propose performance, throughput, or autonomy
+  optimizations cite a 5D tradeoff analysis (OUTCOMES / TIME /
+  BUDGET / RISK / DISCOVERY) in their Consequences section.
+  (2) Optimization proposals that lack this analysis are flagged
+  at review. (3) Features that reduce DISCOVERY without explicit
+  principal consent are escalated per L898 / L904.
+  Verifiable by ADR review pass at gate boundaries.
 priority: P0
 specifications:
-  - "RUBRIC_session_outcome_value_v1.0 (assessment view of collaboration quality per session)"
-  - "RUBRIC_cross_session_dialogue_depth_v1.0 (assessment view of collaboration quality across sessions)"
+  - "RUBRIC_session_outcome_value_v1.0 (assessment view of collaboration outcomes per session)"
+  - "RUBRIC_cross_session_dialogue_depth_v1.0 (assessment view of collaboration outcomes across sessions)"
 constraints:
   - "governance/MISSION.md (the mission this REQ operationalizes)"
   - "governance/CHARTER.md (charter scope boundary)"
-  - "DESIGN_PHILOSOPHY (supervisor inherited): 'AGET optimizes for human-AI collaboration quality, not autonomous agent speed'"
+  - "DESIGN_PHILOSOPHY line 480 (source of the partnership-quality principle; 5D model is the operationalization)"
+  - "L688 (Path A — sovereignty is individual; DISCOVERY axis is the formation-capacity corollary)"
 status: proposed
 originator: principal
 ```
@@ -437,7 +452,7 @@ The ten requirements above are grounded in operational evidence and architectura
 | F-007 | Git history audit for gate IDs in commits | PARTIAL (D71 enforcement in progress) |
 | Q-008 | Reconstructability rubric scoring | PENDING (rubric in development, #29j) |
 | Q-009 | `validate_issue_destination.py --check` + sanitizer | VERIFIED (tooling exists) |
-| Q-010 | ADR review for collaboration-quality rationale | PENDING |
+| Q-010 | ADR review for collaboration-outcomes 5D tradeoff analysis | PENDING |
 
 **Overall**: 2/10 VERIFIED, 4/10 PARTIAL, 4/10 PENDING. Verification gaps are tracked as input to future REQ-CORE versions.
 

@@ -13,7 +13,7 @@
 
 ## Overview
 
-Agent governance defines the boundaries, authorities, and safety constraints that ensure agents operate within their intended scope. These requirements are grounded in AGET's governance hierarchy (supervisor → agent → artifact), scope boundary enforcement, and the principle that agents optimize for human-AI collaboration quality, not autonomous speed.
+Agent governance defines the boundaries, authorities, and safety constraints that ensure agents operate within their intended scope. These requirements are grounded in AGET's governance hierarchy (supervisor → agent → artifact), scope boundary enforcement, and the principle that agents optimize for human-AI collaboration outcomes (REQ-CORE-Q-010: OUTCOMES / TIME / BUDGET / RISK / DISCOVERY).
 
 **Principal intent**: Agents should be predictable, bounded, and transparent — never surprising the principal with unauthorized scope expansion or ungoverned actions.
 
@@ -29,7 +29,7 @@ This document is the second domain-specific REQ-* document published in `aget/re
 | REQ-GOV-F-002 (Authority Model Clarity) | REQ-CORE-F-005 (Principal Authority Gradient) | Per-agent authority model that informs per-action gradient |
 | REQ-GOV-F-003 (Private-First Information Routing) | REQ-CORE-Q-009 (Private-First Routing) | Information-routing instance of the default-private rule |
 | REQ-GOV-F-004 (Governance Artifact Requirement) | REQ-CORE-F-002 (Evidence-Driven Graduation) + REQ-CORE-F-007 | Artifact precondition for gated execution |
-| REQ-GOV-Q-001 (Governance Transparency) | REQ-CORE-Q-010 (Collaboration-Quality Optimization) | Transparency as collaboration-quality enabler |
+| REQ-GOV-Q-001 (Governance Transparency) | REQ-CORE-Q-010 (Collaboration-Outcomes Optimization) | Transparency as collaboration-outcomes enabler |
 | REQ-GOV-Q-002 (Agent Safety Boundaries) | REQ-CORE-F-005 + REQ-CORE-Q-009 | Safety envelope spanning authority and routing |
 
 REQ-GOV does not introduce requirements that contradict REQ-CORE; every GOV requirement is a specialization. If conflict appears in future revisions, REQ-CORE wins (per REQ-CORE-F-001 mandatory inheritance).
@@ -188,11 +188,13 @@ description: >
   should always be able to trace why an agent took an action,
   what authority it exercised, and what alternatives existed.
 rationale: >
-  AGET optimizes for human-AI collaboration quality (REQ-CORE-Q-010).
-  Opaque governance erodes trust. L-docs, decision logs, and
-  gate records provide the transparency substrate.
+  AGET optimizes for human-AI collaboration outcomes (REQ-CORE-Q-010).
+  Opaque governance erodes trust and erodes the DISCOVERY dimension —
+  the principal cannot encounter or recognize patterns they cannot see.
+  L-docs, decision logs, and gate records provide the transparency substrate.
 evidence:
-  - "DESIGN_PHILOSOPHY: 'collaboration quality, not autonomous speed'"
+  - "DESIGN_PHILOSOPHY line 480: 'AGET optimizes for human-AI partnership quality'"
+  - "L905 (5D model — DISCOVERY axis requires transparent agent behavior)"
   - "L335 (Memory Architecture — shared human-AI artifact)"
   - "L706 (Incremental Progress Reporting)"
 fit_criterion: >

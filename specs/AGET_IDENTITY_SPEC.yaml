@@ -89,7 +89,9 @@ identity:
   # -----------------------------------------------------------------------------
   core_philosophy:
     # Primary statement - the North Star
-    primary: "Human-AI collaboration quality over autonomous agent speed"
+    primary: "Human-AI collaboration outcomes over autonomous agent throughput"
+    # Amendment: REQ-CORE-Q-010 (2026-04-26) — 5D model: OUTCOMES / TIME / BUDGET / RISK / DISCOVERY
+    # Prior text "quality over speed" was a false binary; see L905 for grounding.
 
     # Supporting principles
     principles:
