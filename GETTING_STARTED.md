@@ -13,7 +13,7 @@ AGET is a configuration and lifecycle management framework for CLI-based human-A
 
 ## Step 1: Choose Your Archetype
 
-AGET provides **13 archetypes**, each with specialized skills and domain concepts.
+AGET provides **12 archetypes**, each with specialized skills and domain concepts.
 
 ### Archetype Selection Guide
 
@@ -31,7 +31,6 @@ AGET provides **13 archetypes**, each with specialized skills and domain concept
 | Make decisions, review budgets | **executive** | make-decision, review-budget | Template |
 | Review artifacts, provide feedback | **reviewer** | review-artifact, provide-feedback | Template |
 | Write specifications, validate requirements | **spec-engineer** | validate-spec, generate-requirement | Template |
-| Process, extract, and transform documents | **document-processor** | extract-content, transform-document | Template |
 
 ### Decision Tree
 
@@ -59,8 +58,6 @@ Start Here
     ├── Reviewing work? → reviewer
     │
     ├── Writing specifications? → spec-engineer
-    │
-    ├── Processing/transforming documents? → document-processor
     │
     └── General tasks? → worker
 ```

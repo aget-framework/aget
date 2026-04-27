@@ -61,7 +61,7 @@ v3.15.0 includes two breaking changes. Read carefully before upgrading.
 
 #### BC-001: Backward-Compatibility Shim Removed
 
-The shim that allowed code to read legacy field names (e.g., `aget_agent_name`, `aget_instance_type`) from `version.json` has been removed. Code that accessed `aget_`-prefixed field names via this shim must be updated to read the canonical field names directly.
+In v3.14, `aget_`-prefix normalization introduced a shim allowing code to read new-style `aget_agent_name`, `aget_instance_type`, etc. from `version.json`. **The shim is removed in v3.15.** Code that reads `aget_`-prefixed field names now gets None/KeyError — revert to the canonical field names (`agent_name`, `instance_type`, etc.), which version.json has always used.
 
 **Detection**: Search your scripts and patterns for usages:
 ```bash
@@ -318,26 +318,36 @@ When filing issues:
 
 ## Changelog
 
-### v3.15.0 (2026-04-18)
+### v3.15.0 (2026-04-25)
 
-- **Breaking: BC-001** — Backward-compatibility shim for legacy `aget_`-prefixed field names removed; see migration guide above
-- **Breaking: BC-002** — See [docs/BREAKING_CHANGES_v3.15.md](docs/BREAKING_CHANGES_v3.15.md)
-- **Universal Skills**: 32 skills per conformant template (up from 15)
-- **Security Spec**: AGET_SECURITY_SPEC v0.2 (8 security capabilities)
-- **Budget Grammar**: AGET_BUDGET_GRAMMAR_SPEC v0.2 (4 capabilities)
-- **Fleet**: 34/34 agents confirmed at v3.15.0
+**Theme**: Two-Level Model Coherence + Security Hardening
 
-### v3.14.0 (2026-03-xx)
+> ⚠️ **Breaking release**: BC-001 and BC-002. See migration guide above.
 
-- **Requirements Publication**: First public R-* requirements documents
-- **Template**: 13th archetype added (document-processor)
-- **Spec scoring**: averaged across 38+ specifications
+- **Breaking BC-001** — Backward-compatibility shim removed; code reading old field names via shim must update
+- **Breaking BC-002** — See [docs/BREAKING_CHANGES_v3.15.md](docs/BREAKING_CHANGES_v3.15.md)
+- **Security**: AGET_SECURITY_SPEC v0.2 (8 security capabilities formalized)
+- **Budget Grammar**: AGET_BUDGET_GRAMMAR_SPEC v0.2
+- **Release Governance**: ADR-022 (Breaking-Change Policy), POL-REL-001 (weekly Saturday release cadence), CAP-REL-029 (Release Readiness Gate)
+- **Skill validator**: `verification/validate_archetype_skills.py` promoted to canonical path; closes L671 decorative-classification gap
 
-### v3.13.0 (2026-03-xx)
+### v3.14.0 (2026-04-18)
 
-- **Alias normalization**: Short-name identity layer (`aget_short_name` in version.json)
-- **`aget_` prefix**: All version.json fields normalized (19 renames)
-- **Triad pilot**: Release Builder/Auditor/Critic (SKILL-012/013/014) formal pilot
+**Theme**: v3.13 Loop Closure + Scope-Lock Discipline
+
+- **Universal skills**: AGET_TEMPLATE_SPEC updated to 31 universal skills (expanded from 15 via v3.13 work)
+- **Skill telemetry**: `log_skill_invocation.py` — skill usage analytics substrate
+- **Deployment spec**: `DEPLOYMENT_SPEC_v3.13.0.yaml` — template baseline for fleet upgrade verification
+- **Naming spec**: `SKILL_NAMING_CONVENTION_SPEC` v1.4.0 — Single-Verb Exception Registry (CAP-SNAME-001-06)
+
+### v3.13.0 (2026-04-12)
+
+**Theme**: Operational Maturation & Fleet Automation
+
+- **8 new universal skills** (total 31): `aget-promote-issue`, `aget-describe-session`, `aget-propose-actions`, `aget-create-rubric`, `aget-check-initiative`, `aget-process-observation`, `aget-open-session`, `aget-check-facts`
+- **Fleet automation**: `fleet_upgrade.py` — single-script migration across all repos (reduces permission prompts from 25-40 to ≤5)
+- **Release Delivery Triad**: Builder / Spec Auditor / Critic — three-perspective quality assessment at every gate (SKILL-012/013/014)
+- **Structural enforcement**: `validate_release_gate.py` — 7-validator gate orchestrator with exit-code enforcement
 
 ### v3.5.0 (2026-02-14)
 
