@@ -1,7 +1,7 @@
 # Getting Started with AGET
 
-**Version**: 3.5.0
-**Last Updated**: 2026-02-14
+**Version**: 3.15.0
+**Last Updated**: 2026-04-26
 
 ---
 
@@ -13,7 +13,7 @@ AGET is a configuration and lifecycle management framework for CLI-based human-A
 
 ## Step 1: Choose Your Archetype
 
-AGET provides **12 archetypes**, each with specialized skills and domain concepts.
+AGET provides **13 archetypes**, each with specialized skills and domain concepts.
 
 ### Archetype Selection Guide
 
@@ -31,6 +31,7 @@ AGET provides **12 archetypes**, each with specialized skills and domain concept
 | Make decisions, review budgets | **executive** | make-decision, review-budget | Template |
 | Review artifacts, provide feedback | **reviewer** | review-artifact, provide-feedback | Template |
 | Write specifications, validate requirements | **spec-engineer** | validate-spec, generate-requirement | Template |
+| Process, extract, and transform documents | **document-processor** | extract-content, transform-document | Template |
 
 ### Decision Tree
 
@@ -58,6 +59,8 @@ Start Here
     ├── Reviewing work? → reviewer
     │
     ├── Writing specifications? → spec-engineer
+    │
+    ├── Processing/transforming documents? → document-processor
     │
     └── General tasks? → worker
 ```
@@ -94,7 +97,7 @@ Edit `.aget/version.json`:
 ```json
 {
   "agent_name": "my-agent-name",
-  "aget_version": "3.5.0",
+  "aget_version": "3.15.0",
   "instance_type": "AGET",
   "archetype": "developer",
   "domain": "your-domain-here",
@@ -195,24 +198,59 @@ Once your agent is running, use these commands:
 
 ## What's Included
 
-### Universal Skills (15)
+### Universal Skills (32)
 
 All templates include these skills:
+
+**Session lifecycle**
 - `aget-wake-up` — Session initialization
+- `aget-open-session` — Context-aware session open with recovery
 - `aget-wind-down` — Session closure
-- `aget-check-health` — Health inspection
-- `aget-studyup` — KB research
-- `aget-record-lesson` — Capture learnings
-- `aget-create-project` — Project scaffolding
+- `aget-close-session` — Close session with pre-close triage and handoff
+- `aget-save-state` — State persistence checkpoint
+- `aget-describe-session` — Session narrative summary
+
+**Knowledge base**
+- `aget-study-topic` — KB research on a topic
+- `aget-record-lesson` — Capture learnings as L-docs
+- `aget-record-observation` — Record research observations
+- `aget-process-observation` — Classify and route observations
+- `aget-check-kb` — KB health validation
+- `aget-check-evolution` — Evolution directory health
+- `aget-check-sessions` — Session directory health
+
+**Ontology**
+- `aget-analyze-ontology` — Ontology health and coverage analysis
+- `aget-expand-ontology` — Expand vocabularies with web-researched concepts
+
+**Specifications and quality**
+- `aget-enhance-spec` — 7-phase specification enhancement lifecycle
+- `aget-create-rubric` — Create scoring rubrics
+- `aget-check-facts` — Stratified 3-pass fact verification
+- `aget-check-initiative` — Initiative coherence check
+- `aget-enhance-health` — Remediate health drift
+
+**Project management**
+- `aget-create-project` — Governed project scaffolding
 - `aget-review-project` — Project assessment
-- `aget-save-state` — State persistence
-- `aget-propose-skill` — Skill governance
-- `aget-record-observation` — Research observation recording
-- `aget-check-sessions` — Session health
-- `aget-check-evolution` — Evolution health
-- `aget-check-kb` — KB health
-- `aget-file-issue` — Issue filing with governance
+- `aget-propose-actions` — Ranked next-best actions with evidence
+
+**Governance**
+- `aget-propose-skill` — Skill governance and proposal
 - `aget-create-skill` — Skill creation with spec
+- `aget-file-issue` — Issue filing with private-first routing
+- `aget-promote-issue` — Issue promotion to public repos
+
+**Release**
+- `aget-release-build` — Release build execution
+- `aget-release-audit-specs` — Release specification audit
+- `aget-release-critique` — Release critique from reviewer perspective
+
+**Communication**
+- `aget-create-briefing` — Generate narrative briefing documents
+
+**Health**
+- `aget-check-health` — Agent health inspection
 
 ### Archetype Skills (2-3 per archetype)
 
@@ -233,29 +271,65 @@ Each template includes `ontology/ONTOLOGY_{archetype}.yaml` with domain concepts
 
 ---
 
-## Migration from v3.4.x
+## Supervisor-First Workflow
 
-If upgrading from v3.4.x:
+The recommended path for new users is to start with the **supervisor template** — it can coordinate a fleet and spin up new agents on demand.
+
+```bash
+# 1. Clone the supervisor template
+git clone https://github.com/aget-framework/template-supervisor-aget my-supervisor
+cd my-supervisor
+
+# 2. Configure identity
+# Edit .aget/version.json: set agent_name and domain
+
+# 3. Run tests
+python3 -m pytest tests/ -v
+
+# 4. Open in your CLI tool and start the first session
+# Tell your agent: "wake up"
+```
+
+Once the supervisor is running, create additional agents on demand:
+
+```
+# In your supervisor session:
+/aget-create-aget worker my-task-runner
+/aget-create-aget developer my-dev-assistant
+/aget-create-aget researcher my-research-agent
+```
+
+The supervisor handles identity configuration, fleet registry, and handoff coordination automatically.
+
+**Solo practitioner?** Skip the supervisor and clone any single template directly (Step 2 above). The supervisor adds value when you coordinate multiple agents.
+
+---
+
+## Migration from v3.14.x
+
+If upgrading from v3.14.x to v3.15.0:
 
 ```bash
 # Check current version
 cat .aget/version.json | jq '.aget_version'
 
-# Update version
-# Edit .aget/version.json: set aget_version to "3.5.0"
+# Update version number
+# Edit .aget/version.json: set aget_version to "3.15.0"
 
-# Verify ontology exists
-ls ontology/ONTOLOGY_*.yaml
+# BREAKING CHANGE BC-001: Backward-compatibility shim removed
+# Code that reads aget_-prefixed field names via the removed shim must be updated
+# Verify: grep -r "aget_agent_name\|aget_instance_type" scripts/ .aget/patterns/
 
-# Verify archetype skills exist
-ls .claude/skills/aget-*/SKILL.md | wc -l
-# Should be 17-18 (15 universal + 2-3 archetype)
+# BREAKING CHANGE BC-002: See ADOPTION_GUIDE.md for full details
+
+# Verify universal skills (32 expected for conformant templates)
+ls .claude/skills/ | wc -l
 
 # Run validation
 python3 -m pytest tests/ -v
 ```
 
-See [ADOPTION_GUIDE.md](ADOPTION_GUIDE.md) for detailed migration instructions.
+See [ADOPTION_GUIDE.md](ADOPTION_GUIDE.md) for detailed migration instructions and breaking change remediation.
 
 ---
 
@@ -267,4 +341,4 @@ See [ADOPTION_GUIDE.md](ADOPTION_GUIDE.md) for detailed migration instructions.
 
 ---
 
-*GETTING_STARTED.md — Quick start guide for AGET v3.5.0*
+*GETTING_STARTED.md — Quick start guide for AGET v3.15.0*
