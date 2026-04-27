@@ -1,16 +1,48 @@
 # AGET L-Doc Specification
 
 **Spec ID**: SPEC-LDOC-001
-**Version**: 2.1.0
+**Version**: 2.2.0
 **Status**: ACTIVE
 **Implements**: L419 (L-Doc Format v2)
-**Updated**: 2026-03-16
+**Updated**: 2026-04-26
 
 ---
 
 ## Purpose
 
 Learning Documents (L-docs) capture experiential knowledge gained during agent operation. This specification defines the format, structure, and metadata requirements for L-docs to enable cross-agent discovery and fleet-wide pattern sharing.
+
+---
+
+## Conformance Status (2026-04-26 audit)
+
+Empirical baseline from private-aget-framework-AGET fleet (568 L-docs):
+
+| Requirement | Conformant | Non-Conformant | Rate |
+|-------------|:----------:|:--------------:|:----:|
+| CAP-LDOC-001 (filename) | 568 | 0 | 100% |
+| CAP-LDOC-002 (v2 frontmatter) | 2 | 566 | 0.4% |
+| CAP-LDOC-005 (body sections — Context) | 323 | 245 | 57% |
+| CAP-LDOC-005 (body sections — Learning) | 104 | 464 | 18% |
+| CAP-LDOC-005 (body sections — Application) | 68 | 500 | 12% |
+| CAP-LDOC-005 (body sections — Evidence) | 187 | 381 | 33% |
+| CAP-LDOC-005 (body sections — Related) | 139 | 429 | 24% |
+| CAP-LDOC-003 (index freshness, ≤10 gap) | ✓ | — | 1 gap |
+
+**Root cause**: v2 format migration (CAP-LDOC-002) has not occurred for legacy L-docs. The spec is aspirational; enforcement is Advisory (E1). Six distinct format schemas observed in legacy files (S1–S6, see below).
+
+**Six observed format schemas (S1–S6)**:
+
+| Schema | Identifying pattern | Example | Count (approx.) |
+|--------|---------------------|---------|:---------------:|
+| S1 | No frontmatter; `**Date**: YYYY` + `**Type**: X` header | L148 | ~50 |
+| S2 | No frontmatter; `**Status**: X` + `**Created**: X` + `**Author**: X` | L462 | ~200 |
+| S3 | No frontmatter; `**Date**: X` + `**Type**: X` + `**Category**: X` | L901 | ~150 |
+| S4 | No frontmatter; S2 extended with `**Severity**: X` + `**Target**: X` | L735 | ~100 |
+| S5 | True v2 YAML frontmatter (`---\nid: L###\n...`) | L429, L521 | 2 |
+| S6 | Minimal — title only, free-form body | early L-docs | ~66 |
+
+**Migration posture**: S1–S4/S6 legacy L-docs are granted a migration grace period (see CAP-LDOC-009). All L-docs created on or after v3.16.0 release MUST use S5 format.
 
 ---
 
@@ -187,18 +219,16 @@ L-docs progress through enforcement levels:
     "observation": 5,
     "decision": 5
   },
-  "ldocs": [
-    {
-      "id": "L419",
-      "title": "L-Doc Format v2 Proposal",
-      "category": "pattern",
-      "scope": "fleet",
-      "created": "2026-01-04",
-      "enforcement": "recommendation"
-    }
-  ]
+  "L419": {
+    "title": "L-Doc Format v2 Proposal",
+    "date": "2026-01-04",
+    "category": "pattern",
+    "status": "active"
+  }
 }
 ```
+
+> **Implementation note (2026-04-26)**: The actual `index.json` uses flat top-level `L###` keys (not a `ldocs: []` array). The spec schema above reflects the actual implementation. Cross-agent discovery queries must iterate over keys matching `^L\d+$`.
 
 ### Index Generation
 
@@ -214,22 +244,28 @@ The index should be regenerated when:
 ### Query by Scope
 
 ```python
-# Find all fleet-wide learnings
-fleet_learnings = [l for l in index['ldocs'] if l.get('scope') == 'fleet']
+import json, re
+idx = json.load(open('.aget/evolution/index.json'))
+l_keys = [k for k in idx if re.match(r'^L\d+$', k)]
+fleet_learnings = [k for k in l_keys if idx[k].get('scope') == 'fleet']
 ```
 
 ### Query by Category
 
 ```python
-# Find all patterns
-patterns = [l for l in index['ldocs'] if l.get('category') == 'pattern']
+import json, re
+idx = json.load(open('.aget/evolution/index.json'))
+l_keys = [k for k in idx if re.match(r'^L\d+$', k)]
+patterns = [k for k in l_keys if idx[k].get('category') == 'pattern']
 ```
 
 ### Query by Enforcement
 
 ```python
-# Find all enforced learnings
-enforced = [l for l in index['ldocs'] if l.get('enforcement') == 'enforced']
+import json, re
+idx = json.load(open('.aget/evolution/index.json'))
+l_keys = [k for k in idx if re.match(r'^L\d+$', k)]
+enforced = [k for k in l_keys if idx[k].get('enforcement') == 'enforced']
 ```
 
 ---
@@ -271,10 +307,14 @@ python3 scripts/migrate_ldoc_to_v2.py --dry-run .aget/evolution/
 | CAP-LDOC-005 | ubiquitous | The SYSTEM shall include `Context`, `Learning`, `Application`, `Evidence`, and `Related` sections in every Learning_Document body. |
 | CAP-LDOC-006 | event-driven | WHEN a Learning_Document is created or updated, THEN the SYSTEM shall regenerate the Evolution_Index. |
 | CAP-LDOC-007 | ubiquitous | The SYSTEM shall track Enforcement_Status for each Learning_Document using one of: observation, recommendation, advisory, enforced. |
+| CAP-LDOC-008 | ubiquitous | The SYSTEM shall report Learning_Document v2 conformance statistics in health_check.py `evolution_directory` output, including: total count, v2-conformant count, and non-conformant count. |
+| CAP-LDOC-009 | event-driven | WHEN a Learning_Document is created on or after the v3.16.0 release date, THEN the SYSTEM shall enforce YAML frontmatter presence (CAP-LDOC-002) as a blocking check, not advisory. |
+
+**Evidence basis for CAP-LDOC-008/009**: 2026-04-26 conformance audit — 2/568 (0.35%) v2 conformance, 6 legacy schemas (S1–S6, see § Conformance Status). CAP-LDOC-008 surfaces the gap via health_check; CAP-LDOC-009 prevents further drift without requiring immediate bulk migration of 566 legacy L-docs.
 
 **Vocabulary**: Learning_Document, Evolution_Index, Enforcement_Status, Applicability_Scope
 
-**Migration**: R-LDOC-001→CAP-LDOC-001, R-LDOC-002→CAP-LDOC-002, R-LDOC-003→CAP-LDOC-003. CAP-LDOC-004 through CAP-LDOC-007 are new (codified from existing spec content).
+**Migration**: R-LDOC-001→CAP-LDOC-001, R-LDOC-002→CAP-LDOC-002, R-LDOC-003→CAP-LDOC-003. CAP-LDOC-004 through CAP-LDOC-007 are new (codified from existing spec content). CAP-LDOC-008/009 are new (evidence-driven, 2026-04-26 conformance audit).
 
 ---
 
@@ -349,12 +389,14 @@ vocabulary:
 | V-test ID | Requirement | Method | Description |
 |-----------|-------------|--------|-------------|
 | V-LDOC-001 | CAP-LDOC-001 | automated | All L-doc filenames match `L[0-9]+_[a-z0-9_]+.md` pattern |
-| V-LDOC-002 | CAP-LDOC-002 | automated | Required frontmatter fields present (id, title, format_version, created, summary) |
+| V-LDOC-002 | CAP-LDOC-002 | inspection | Required frontmatter fields present (id, title, format_version, created, summary) — *inspection until CAP-LDOC-008 health_check extension is implemented* |
 | V-LDOC-003 | CAP-LDOC-003 | automated | Index freshness: gap between actual L-docs and indexed count <= 10 |
 | V-LDOC-004 | CAP-LDOC-004 | inspection | L-doc categories match allowed taxonomy |
 | V-LDOC-005 | CAP-LDOC-005 | inspection | L-doc body contains required sections (Context, Learning, Application, Evidence, Related) |
 | V-LDOC-006 | CAP-LDOC-006 | automated | Evolution index regenerated when L-doc is created or updated |
 | V-LDOC-007 | CAP-LDOC-007 | automated | Index.json `next_id` is consistent with highest L-doc on filesystem |
+| V-LDOC-008 | CAP-LDOC-008 | automated | health_check.py `evolution_directory` output includes `v2_conformant` and `non_conformant` counts |
+| V-LDOC-009 | CAP-LDOC-009 | automated | L-docs created on or after v3.16.0 release without v2 frontmatter are flagged as ERROR (not WARNING) |
 
 ### Validation Commands
 
@@ -369,6 +411,24 @@ python3 scripts/validate_ldoc.py L419_example.md
 actual=$(ls .aget/evolution/L*.md | wc -l)
 indexed=$(python3 -c "import json; print(json.load(open('.aget/evolution/index.json'))['count'])")
 [ $((actual - indexed)) -le 10 ]
+
+# V-LDOC-008: V2 conformance statistics (pending health_check.py extension)
+python3 -c "
+import os, re
+docs = [f for f in os.listdir('.aget/evolution') if re.match(r'L\d+_.*\.md', f)]
+v2 = 0
+for f in docs:
+    with open(f'.aget/evolution/{f}') as fh:
+        first = fh.readline().strip()
+        if first == '---':
+            v2 += 1
+total = len(docs)
+print(f'V2 conformant: {v2}/{total} ({100*v2//total}%)')
+print(f'Non-conformant: {total-v2}/{total}')
+"
+
+# V-LDOC-009: New L-docs (post v3.16.0) must have frontmatter — manual check until enforcer built
+# Pass criterion: any L-doc with created >= 2026-05-10 must have --- on line 1
 ```
 
 ---
@@ -386,9 +446,10 @@ indexed=$(python3 -c "import json; print(json.load(open('.aget/evolution/index.j
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 2.2.0 | 2026-04-26 | Added § Conformance Status (empirical audit: 2/568 v2 conformant, 6 legacy schemas). Added CAP-LDOC-008 (health_check v2 reporting) + CAP-LDOC-009 (new-doc enforcement gate post v3.16.0). Fixed index.json schema to match actual flat `L###` key implementation. Updated V-LDOC-002 from automated→inspection (pending health_check extension). Added V-LDOC-008/009. Evidence: 2026-04-26 conformance audit (private-aget-framework-AGET fleet). |
 | 2.1.0 | 2026-03-16 | Added EARS-patterned requirements (CAP-LDOC-001 through 007). Migrated R-LDOC-* IDs to CAP-LDOC-*. Per L682 maturity uplift L0→L1. |
 | 2.0.0 | — | Initial v2 format with YAML frontmatter and cross-agent discovery. |
 
 ---
 
-*AGET_LDOC_SPEC.md - L-Doc Format Specification v2.1.0*
+*AGET_LDOC_SPEC.md - L-Doc Format Specification v2.2.0*
