@@ -545,6 +545,7 @@ CANCELLED (with rationale)
 |----|---------|-----------|-----------|
 | R-REL-024-01 | conditional | AFTER release completion, release manager SHOULD complete Retrospective section | Learning capture |
 | R-REL-024-02 | conditional | IF retrospective completed THEN it SHOULD be within 7 days of release | Context freshness |
+| R-REL-024-03 | conditional | FOR fleet upgrade close-outs (FLEET-UPG-NNN), the fleet supervisor SHALL author a rubric-scored Release_Outcome_Report using `aget/rubrics/RUBRIC_fleet_upgrade_outcome_v1.1.md` before setting `Plan_Status: COMPLETE`. The report SHALL record per-dimension scores (D1–D5) and reasoning (2–3 sentences each). A score of ≥10 (Compliant band) is required; scores below 10 SHALL be explicitly documented as gaps requiring remediation in the next cycle. | Closes the vibe-not-measurement gap (FLEET-UPG-013 retrospective finding, #1149); two-supervisor convergence (FLEET-UPG-013 = 13/15, FLEET-UPG-014 = 10/15) validates rubric applicability |
 
 ### CAP-REL-017: VERSION_SCOPE Template Compliance
 
@@ -1374,6 +1375,12 @@ Per the two-level model (L742): requirements define principal intent (human leve
 ---
 
 ## Changelog
+
+### v1.15.0 (2026-04-26)
+
+- Added R-REL-024-03 to CAP-REL-016: fleet upgrade close-outs SHALL include rubric-scored Release_Outcome_Report using `RUBRIC_fleet_upgrade_outcome_v1.1.md`. Score ≥10 required; below 10 must be documented as gaps.
+- Closes vibe-not-measurement gap identified in FLEET-UPG-013 (#1149); validated by two-supervisor convergence (FLEET-UPG-013 = 13/15, FLEET-UPG-014 = 10/15)
+- See: `aget/rubrics/RUBRIC_fleet_upgrade_outcome_v1.1.md`, #1149, #1165
 
 ### v1.14.0 (2026-04-12)
 

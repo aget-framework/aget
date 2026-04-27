@@ -1,7 +1,8 @@
 # AGET Rubrics — Quality Measurement at Three Layers
 
 **Created**: 2026-04-19
-**Purpose**: Front door for `aget/rubrics/` — explains why three rubrics exist, how they relate, and how to apply them.
+**Updated**: 2026-04-26 (v1.1 — fourth rubric added: fleet upgrade outcome)
+**Purpose**: Front door for `aget/rubrics/` — explains why rubrics exist, how they relate, and how to apply them.
 
 ---
 
@@ -15,7 +16,17 @@ This directory was established 2026-04-19 alongside the third rubric (verificati
 
 ---
 
-## The Three Rubrics
+## Rubric Categories
+
+This directory contains two categories of rubric:
+
+**Artifact quality rubrics** (the original triad): measure the quality of static artifacts — requirements, specifications, and verification tests. Applied mechanically by scorer scripts across the artifact portfolio.
+
+**Process/outcome rubrics**: measure the quality of executed processes and their outcomes. Applied manually by the executing agent as a self-check and by the principal as meta-assessment. Not portfolio-wide; applied per-instance.
+
+---
+
+## Artifact Quality Rubrics (The Triad)
 
 | File | Layer | What it measures | Sibling scorer |
 |---|---|---|---|
@@ -23,9 +34,15 @@ This directory was established 2026-04-19 alongside the third rubric (verificati
 | [`RUBRIC_specification_maturity_v1.0.md`](RUBRIC_specification_maturity_v1.0.md) | Specifications (`aget/specs/CAP-*`, `R-*`) | L0-L5 maturity ladder: Identified → Patterned → Verifiable → Grounded → Traceable → Governed | [`scripts/score_specifications.py`](../../private-aget-framework-AGET/scripts/score_specifications.py) |
 | [`RUBRIC_verification_test_quality_v1.0.md`](RUBRIC_verification_test_quality_v1.0.md) | Verification tests (`tests/test_*.py`, gate V-tests, validators) | Executability, conformance-claim specificity, failure discrimination, adequacy honesty (Dijkstra principle) | [`scripts/score_verification_tests.py`](../../private-aget-framework-AGET/scripts/score_verification_tests.py) |
 
+## Process/Outcome Rubrics
+
+| File | Process | What it measures | Application |
+|---|---|---|---|
+| [`RUBRIC_fleet_upgrade_outcome_v1.1.md`](RUBRIC_fleet_upgrade_outcome_v1.1.md) | Fleet upgrade (FLEET-UPG-NNN) | Coverage fidelity, BC management, residual capture, gate discipline, upstream value | Self-check before close-out; principal meta-assessment per release. Max 15. ≥10 required to declare complete. |
+
 ---
 
-## The Triad Relationship
+## The Artifact Quality Triad Relationship
 
 The three rubrics form a triad. Each corner is meaningfully independent (a high-quality requirement does not guarantee a high-quality specification; a high-quality specification does not guarantee a high-quality verification test), but the corners bind via traceability:
 

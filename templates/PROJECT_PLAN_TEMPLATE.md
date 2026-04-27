@@ -319,6 +319,7 @@ Per L515 (Template Coherence Gap) and Issue #247, this checklist MUST be complet
 - [ ] L-doc(s) created for significant learnings
 - [ ] Changes committed to repository
 - [ ] Related issues updated/closed
+- [ ] **FLEET-UPG only**: Release_Outcome_Report filed with rubric score ≥10 (`aget/rubrics/RUBRIC_fleet_upgrade_outcome_v1.1.md`, R-REL-024-03)
 
 ### Sign-off
 
