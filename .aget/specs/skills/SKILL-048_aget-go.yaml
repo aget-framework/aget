@@ -1,0 +1,309 @@
+# SKILL-048: aget-go
+# Purpose: Record principal authorization (GO) with Healthy Friction enforcement of principle-triad; release agent execution within authorized scope.
+# Created: 2026-04-18
+# Based on: L854, L466, L178, E1-E7 evidence bank (see SP-022)
+# Coupled artifact: governance/GOVERNANCE_PRINCIPLES.md Tier 2 #11 "Principled Execution"
+# Retires: espanso ;;g*pr* compensating control (grace v3.15 → v3.17)
+
+spec:
+  id: SKILL-048
+  name: aget-go
+  version: 1.0.0
+  status: production
+  created: 2026-04-18
+  promoted: 2026-05-02
+  format: "EARS with controlled vocabulary"
+  category: Governance / Authorization
+  scope: "Universal — all agents, all scopes (gate, action, goal, session)"
+
+  traceability:
+    skill_md: ".claude/skills/aget-go/SKILL.md"
+    proposal: "planning/skill-proposals/PROPOSAL_aget-go.md (SP-022)"
+    coupled_artifact: "governance/GOVERNANCE_PRINCIPLES.md §Tier 2 #11 Principled Execution"
+    predecessors:
+      - "espanso ;;g_pr_ (compensating control)"
+      - "espanso ;;g3pr_ (compensating control)"
+      - "espanso ;;g5pr_ (compensating control)"
+    delegates:
+      - "SKILL-024 aget-propose-actions (--shape actions)"
+      - "SP-017 aget-propose-goals (--shape goals; SKILL-NNN TBD)"
+      - "SKILL-015 aget-close-session (reads authorization records for retrospective)"
+    l_docs:
+      - "L854: Spec-First Applied Selectively (awareness-alone-insufficient evidence)"
+      - "L466: Question Is Not Approval Pattern (GO-signal semantics)"
+      - "L178: Human Override Principle (acknowledge-commit-execute pattern)"
+      - "L671: Classification Without Consequence (anti-pattern healthy friction prevents)"
+      - "L42: Stop At Gate Boundaries (GO boundary this skill formalizes)"
+    vocabulary_terms:
+      - "AGET_Skill"
+      - "Authorization_Record"
+      - "Healthy_Friction (new AGET_Term — defined in Tier 2 #11)"
+      - "Principled_Execution (Tier 2 #11)"
+      - "Principle_Triad (spec+verify-first, coherence-next, evidence-driven)"
+      - "Scope_Boundary"
+    fields_cited:
+      - "Human-in-the-loop calibration (Amodei et al. 2016 — Concrete Problems in AI Safety)"
+      - "Progressive enforcement (ADR-008 Advisory → Strict → Generator)"
+      - "Exception handling + escalation protocols (ITIL, software engineering)"
+
+capabilities:
+  CAP-GO-001:
+    domain: authorization_record
+    statement: "WHEN `/aget-go` is invoked, the SKILL shall write an authorization record (timestamp, session_id, scope, principle_triad, flags) to the active session file."
+    pattern: event-driven
+    trigger: slash_command_invocation
+    priority: critical
+    output: "One authorization record per invocation"
+    verification: "Session file contains record with all five fields after invocation"
+
+  CAP-GO-002:
+    domain: scope_resolution
+    statement: "WHEN `/aget-go` is invoked without `--scope`, the SKILL shall resolve scope from conversation context (active gate | active action proposal | active goal proposal | session); if ambiguous, the SKILL shall refuse and list candidate scopes."
+    pattern: event-driven
+    trigger: bare_invocation
+    priority: critical
+    verification: "Ambiguous context → skill refuses with candidate list; unambiguous context → scope recorded"
+
+  CAP-GO-003:
+    domain: principle_enforcement
+    statement: "WHEN `--principles <triad>` is supplied (default `svc-ed`), the SKILL shall verify each triad pre-condition against the authorized scope BEFORE releasing execution."
+    pattern: event-driven
+    trigger: principles_flag
+    priority: critical
+    preconditions:
+      - "spec-verify-first: active PROJECT_PLAN has a governing spec AND V-tests defined"
+      - "coherence-next: no vocabulary collisions, no conflicting active plans, no stale index entries in referenced scope"
+      - "evidence-driven: at least one L-doc or evidence-bank entry cited in the scope's rationale"
+    verification: "Each pre-condition produces PASS/UNMET with reference; UNMET items listed before release decision"
+
+  CAP-GO-004:
+    domain: healthy_friction
+    statement: "WHERE any pre-condition is UNMET, the SKILL shall surface the unmet conditions and require explicit principal acknowledge-or-remediate decision, recording the decision + reason in the authorization record."
+    pattern: state-driven
+    priority: critical
+    rationale: "Healthy Friction posture — distinct from Strict (hard-block) and Advisory (no-friction). Friction MUST occur (mandatory); blocking is principal-elected (override preserved)."
+    decision_options:
+      - "acknowledge: proceed with override, reason recorded"
+      - "remediate: pause, address unmet conditions, re-invoke"
+    verification: "UNMET pre-conditions → skill pauses for decision; both decision paths produce an audit-traceable record"
+
+  CAP-GO-005:
+    domain: composition
+    statement: "WHEN `--count N --shape {actions|goals}` is supplied, the SKILL shall invoke the delegate skill (propose-actions | propose-goals) with count=N, then authorize the delegate's output as a batch."
+    pattern: event-driven
+    trigger: shape_flag_present
+    priority: high
+    delegates:
+      - "--shape actions → /aget-propose-actions --count N"
+      - "--shape goals → /aget-propose-goals --count N"
+    verification: "Delegate skill invoked; its output referenced by the authorization record"
+
+  CAP-GO-006:
+    domain: release_boundary
+    statement: "The SKILL shall NOT execute the authorized work. Execution is a separate act performed by the agent under the released authorization."
+    pattern: prohibited
+    priority: critical
+    rationale: "Composition, not conflation. `go` authorizes and releases; `execute`/`run` performs. Separation preserves audit trail and Two-Level Model (L742)."
+    verification: "Post-invocation: no file writes beyond the authorization record itself"
+
+  CAP-GO-007:
+    domain: dry_run
+    statement: "WHEN `--dry-run` is supplied, the SKILL shall produce the authorization report without writing any session-file record."
+    pattern: event-driven
+    trigger: dry_run_flag
+    priority: high
+    verification: "Dry-run invocation: session file byte count unchanged"
+
+  CAP-GO-008:
+    domain: record_only
+    statement: "WHEN `--record-only` is supplied, the SKILL shall write the authorization record but shall NOT signal release-to-execute. Subsequent agent actions remain pending until a non-record-only GO."
+    pattern: event-driven
+    trigger: record_only_flag
+    priority: medium
+    rationale: "Supports audit-only GO (retrospective reconstruction, documentation) without releasing live execution."
+    verification: "Record-only invocation produces record but no execution signal in session state"
+
+  CAP-GO-009:
+    domain: espanso_compatibility
+    statement: "The SKILL shall accept espanso expansions `;;ago_` as `/aget-go` and `;;agoxy_` as `/aget-go --count X --shape Y` where Y ∈ {a=actions, g=goals}."
+    pattern: ubiquitous
+    priority: high
+    rationale: "Migration path from retired ;;g*pr* compensating controls to governed skill."
+    verification: "`;;ago_` → `/aget-go`; `;;ago5a_` → `/aget-go --count 5 --shape actions`; `;;ago3g_` → `/aget-go --count 3 --shape goals`"
+
+  CAP-GO-010:
+    domain: override_visibility
+    statement: "The SKILL shall record override decisions with reason text (free-form) and surface them in session summary per the Human Override Protocol (Tier 2 #6, L178)."
+    pattern: event-driven
+    trigger: override_invoked
+    priority: critical
+    verification: "Override records contain reason text; session summary lists override count and scopes"
+
+test_cases:
+  V-GO-001:
+    capability: "CAP-GO-001"
+    scenario: "Bare invocation writes authorization record"
+    given: "Active session with unambiguous scope"
+    when: "User invokes `/aget-go`"
+    then: "Session file contains new authorization record with timestamp, session_id, scope, principle_triad, flags"
+    verification_method: "automated"
+    verification: "grep authorization_record sessions/<active>.md | wc -l increments by 1"
+
+  V-GO-002:
+    capability: "CAP-GO-002"
+    scenario: "Ambiguous scope refuses"
+    given: "Conversation has both an active gate and an active action proposal"
+    when: "User invokes `/aget-go` bare"
+    then: "Skill refuses with list of candidate scopes; no record written"
+    verification_method: "manual"
+
+  V-GO-003:
+    capability: "CAP-GO-003"
+    scenario: "Principles enforcement surfaces unmet conditions"
+    given: "Active scope with no V-tests in referenced PROJECT_PLAN"
+    when: "User invokes `/aget-go --principles svc-ed`"
+    then: "Skill reports UNMET: spec+verify-first (V-tests absent), lists path to remediate"
+    verification_method: "manual"
+
+  V-GO-004:
+    capability: "CAP-GO-004"
+    scenario: "Healthy Friction: override with reason"
+    given: "Pre-condition UNMET (e.g., no L-doc cited)"
+    when: "User acknowledges override with reason 'research session, no implementation'"
+    then: "Authorization record includes override decision + reason; execution released"
+    verification_method: "manual"
+
+  V-GO-005:
+    capability: "CAP-GO-004"
+    scenario: "Healthy Friction: remediate path"
+    given: "Pre-condition UNMET"
+    when: "User chooses 'remediate' instead of acknowledge"
+    then: "Skill pauses, no release, no authorization record; user re-invokes after remediation"
+    verification_method: "manual"
+
+  V-GO-006:
+    capability: "CAP-GO-005"
+    scenario: "Composition with propose-actions"
+    given: "Active session, no pending proposal"
+    when: "User invokes `/aget-go --count 5 --shape actions`"
+    then: "/aget-propose-actions --count 5 invoked first; its output referenced in authorization record"
+    verification_method: "manual"
+
+  V-GO-007:
+    capability: "CAP-GO-006"
+    scenario: "Skill does not execute authorized work"
+    given: "Invocation authorizes a file-modification action"
+    when: "Skill completes"
+    then: "git status shows only the session-file authorization record; no other file modified"
+    verification_method: "automated"
+    verification: "git status --porcelain | grep -v 'sessions/' | wc -l  # expect 0"
+
+  V-GO-008:
+    capability: "CAP-GO-007"
+    scenario: "Dry-run produces no write"
+    given: "Active scope"
+    when: "User invokes `/aget-go --dry-run`"
+    then: "Report produced; session file byte count unchanged"
+    verification_method: "automated"
+    verification: "wc -c before and after equal"
+
+  V-GO-009:
+    capability: "CAP-GO-009"
+    scenario: "Espanso migration trigger works"
+    given: "Espanso config with `;;ago_` mapped to `/aget-go`"
+    when: "User types `;;ago_`"
+    then: "Skill invoked identically to typed `/aget-go`"
+    verification_method: "manual (espanso integration test)"
+
+  V-GO-010:
+    capability: "CAP-GO-001 + CAP-GO-010"
+    scenario: "Retrospective compensating-control retirement test"
+    given: "3+ sessions with /aget-go deployed"
+    when: "Session retrospectives audit espanso usage"
+    then: "`;;g_pr_` / `;;g3pr_` / `;;g5pr_` usage count trends toward 0; `;;ago*` usage replaces"
+    verification_method: "fleet-telemetry (longitudinal)"
+    verification: "Espanso usage log shows substitution over 30-day window"
+
+constraints:
+  C-GO-001:
+    statement: "The SKILL shall NOT execute the authorized work itself."
+    rationale: "Composition discipline. Authorization and execution are separate acts per Two-Level Model (L742)."
+
+  C-GO-002:
+    statement: "The SKILL shall NOT write outside the session file (authorization record is the only allowed write)."
+    rationale: "Governance boundary. Any artifact modification is the agent's next act under released authorization, not this skill's act."
+
+  C-GO-003:
+    statement: "Bare invocation MUST resolve scope unambiguously or refuse."
+    rationale: "Ambiguous GO is worse than no GO (L466: question ≠ approval — same class of failure)."
+
+  C-GO-004:
+    statement: "Override decisions MUST include free-form reason text."
+    rationale: "Healthy Friction without recorded reason is ceremony. Reason text is the audit value."
+
+  C-GO-005:
+    statement: "The SKILL MUST support --dry-run mode for every invocation shape."
+    rationale: "Pre-commit verification; spec+verify-first operational primitive."
+
+  C-GO-006:
+    statement: "The SKILL MUST NOT elevate its own enforcement to Strict without explicit ADR and principal approval."
+    rationale: "Healthy Friction is the principal-specified posture. Drift to Strict changes the override semantics; requires governance."
+
+enforcement:
+  level: "Healthy Friction (new — Tier 2 #11)"
+  adr_008_position: "Between Advisory and Strict"
+  friction_mandatory: true
+  block_mandatory: false
+  override_path: "acknowledge + reason → release"
+  remediate_path: "pause + fix + re-invoke"
+  audit_surface: "session file authorization record; retrospective surfaces override count"
+
+espanso_migration:
+  retiring:
+    - trigger: ";;g_pr_"
+      replacement: ";;ago_"
+      expansion_before: "GO. be diligent. ensure to follow our principles: spec+verify-first, coherence-next, evidence-driven."
+      expansion_after: "/aget-go"
+      grace_start: "v3.15"
+      removal: "v3.17"
+      policy: "POL-DEP-001"
+    - trigger: ";;g3pr_"
+      replacement: ";;ago3a_ (3 actions), ;;ago3g_ (3 goals)"
+      grace_start: "v3.15"
+      removal: "v3.17"
+    - trigger: ";;g5pr_"
+      replacement: ";;ago5a_ (5 actions), ;;ago5g_ (5 goals)"
+      grace_start: "v3.15"
+      removal: "v3.17"
+  grammar_alignment:
+    parsed_as: "a + go + {xy optional}"
+    xy_mapping:
+      "3a": "--count 3 --shape actions"
+      "5a": "--count 5 --shape actions"
+      "3g": "--count 3 --shape goals"
+      "5g": "--count 5 --shape goals"
+
+design_principles:
+  verb_vocabulary:
+    rule: "`go` is verb #33 (domain innovation). Carries authorization + release-to-execute semantics. No existing verb subsumes."
+    principle_refs: ["#1 transitivity", "#5 PowerShell reference", "#6 hierarchy", "#7 flag-as-graduation"]
+
+  healthy_friction:
+    rule: "Friction MUST occur (mandatory). Block is principal-elected (override preserved). New enforcement level between Advisory and Strict."
+    precedent: "L178 Human Override Protocol + L854 awareness-insufficient evidence"
+    anti_pattern_prevented: "L854 (spec-first selective application)"
+
+  composition_not_conflation:
+    rule: "`go` authorizes; `execute`/`run` performs. --shape flag delegates to sister skill then authorizes output. Does not merge roles."
+    precedent: "SKILL-015 close-session composes wind-down; SKILL-047 check-release composes requirements+verifications"
+
+  audit_surface:
+    rule: "Every GO produces a record. Every override includes a reason. Every record is retrospectively auditable."
+    precedent: "L854 says STRUCTURAL is the durable fix; the record IS the structure"
+
+---
+# SKILL-048_aget-go v1.0.0 — promoted to production 2026-05-02 (v3.16 G1.7).
+# Spec proposed 2026-04-18 alongside SP-022 and Tier 2 #11 coupling.
+# Production deployment: .claude/skills/aget-go/SKILL.md authored 2026-05-02.
+# Tier 2 #11 (Principled Execution) coupling preserved.
+# Espanso migration grace window: v3.15 → v3.17 per POL-DEP-001.

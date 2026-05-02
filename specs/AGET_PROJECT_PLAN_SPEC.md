@@ -1,6 +1,6 @@
 # AGET PROJECT_PLAN Specification
 
-**Version**: 1.2.2
+**Version**: 1.2.3
 **Status**: Active
 **Category**: Process (Planning)
 **Format Version**: 1.2
@@ -664,6 +664,7 @@ See: `templates/PROJECT_PLAN_TEMPLATE.md` (G2.9 deliverable)
 | CAP-PP-019-01 | ubiquitous | The SYSTEM shall validate all PROJECT_PLAN documents against CAP-PP-001 structural requirements before accepting them as governance artifacts. |
 | CAP-PP-019-02 | event-driven | WHEN all V-tests for a Gate pass, THEN the SYSTEM shall present the Gate's Decision_Point for principal approval. |
 | CAP-PP-019-03 | conditional | IF a Gate has 4 or more deliverables, THEN the SYSTEM shall insert a mid-gate checkpoint at the 50% mark (L002). |
+| CAP-PP-019-04 | event-driven | WHEN the principal authorizes a Gate Decision_Point (CAP-PP-019-02), the canonical authorization mechanism is `/aget-go` (SKILL-048 v1.0.0). The skill writes an authorization record to the active session file (CAP-GO-001), verifies the principle triad against the gate's referenced spec + V-tests + L-doc evidence (CAP-GO-003), and applies Healthy Friction (CAP-GO-004) when any pre-condition is UNMET. Free-text "go" / "yes" / "proceed" remains valid for backward compat but is non-auditable; `/aget-go` is preferred for any gate that involves spec amendment, fleet-wide change, or >1 SU work. |
 
 ---
 
