@@ -1,11 +1,11 @@
 # AGET PROJECT_PLAN Specification
 
-**Version**: 1.2.1
+**Version**: 1.2.2
 **Status**: Active
 **Category**: Process (Planning)
 **Format Version**: 1.2
 **Created**: 2026-01-04
-**Updated**: 2026-01-18
+**Updated**: 2026-05-02
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_PROJECT_PLAN_SPEC.md`
 **Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.7, Issue #30
@@ -677,7 +677,7 @@ See: `templates/PROJECT_PLAN_TEMPLATE.md` (G2.9 deliverable)
 | V-PP-004 | CAP-PP-011 | inspection | Gate completion includes V-test execution evidence |
 | V-PP-005 | CAP-PP-012 | automated | Artifact sizes within thresholds |
 | V-PP-006 | CAP-PP-018 | manual | Retrospective section present with minimum depth (not perfunctory) |
-| V-PP-007 | CAP-PP-019 | automated | Plan status field is valid enum (PROPOSED/IN_PROGRESS/COMPLETE/SUPERSEDED) |
+| V-PP-007 | CAP-PP-003 | automated | Plan status field is valid enum (Draft/In Progress/Complete/Abandoned) — aligned with CAP-PP-003-01 (v1.2.2 #1180 fix; semantic absorptions: Draft ⊇ PROPOSED, Abandoned ⊇ SUPERSEDED — see plan-body free-text for edge cases) |
 
 ## Enforcement
 
@@ -809,6 +809,12 @@ authority:
 ---
 
 ## Changelog
+
+### v1.2.2 (2026-05-02)
+
+- **V-PP-007 dual fix** (gmelli/aget-aget#1180): (a) enum value rewrite `{PROPOSED/IN_PROGRESS/COMPLETE/SUPERSEDED}` → `{Draft/In Progress/Complete/Abandoned}` to align with CAP-PP-003-01 (line 214 — the canonical status-enum requirement); (b) CAP binding correction `CAP-PP-019` → `CAP-PP-003` (CAP-PP-019 is "EARS System-Level Requirements," not status enum). The two defects were independent but discovered together; resolution is one V-test row edit.
+- Semantic absorption documented: `Draft` ⊇ both PROPOSED + Draft semantics; `Abandoned` ⊇ both SUPERSEDED + Abandoned semantics. Plans needing the distinction record it in plan-body free-text (e.g., "Status: Abandoned — superseded by `<other plan>`"). Premature 6-value enum violates L103.
+- See: gmelli/aget-aget#1180, MEMO_d_1179_1180_reconciliation_2026_05_02.md § Principal Disposition
 
 ### v1.2.1 (2026-03-17)
 
