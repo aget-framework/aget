@@ -1,0 +1,66 @@
+# .agetignore — Knowledge-Tier Isolation Skeleton
+#
+# Purpose: Restrict KB read access based on input trust tier (L805, #874)
+# Spec: aget/specs/AGET_SECURITY_SPEC.md CAP-SEC-007
+# Status: v0.1 SKELETON (hook enforcement out of v3.16 scope; contract documented)
+# Format: per-tier sections; gitignore-style path patterns within each section
+# Trust tier per session is determined by input source (see CAP-SEC-007-02)
+#
+# How it works (when hook lands):
+#   The active tier is set by the input-classifier (CAP-SEC-007-03).
+#   For tier T_n, all paths matching ANY pattern in [T0]..[T_n] are BLOCKED for read.
+#   Patterns are additive: T3 blocks include T2's blocks include T1's, etc.
+#   T0 (principal direct) is unrestricted by default.
+#
+# Pattern syntax: gitignore-compatible (glob, **, !negation, # comment)
+#
+# === Tier 3 (External / Untrusted Input) — MOST RESTRICTIVE ===
+# Triggered when: public Slack channels, external API webhooks, cron-triggered polls
+# Readable scope: task-specific context only
+[T3]
+.aget/
+inherited/
+sessions/
+governance/
+planning/
+handoffs/
+docs/
+private-*/
+workspace/personal/
+**/*.private*
+**/*.confidential*
+**/credentials*
+**/*secret*
+**/.env*
+
+# === Tier 2 (Shared / Cross-team) ===
+# Triggered when: cross-team Slack channels, Linear issues, GitHub issue webhooks
+# Readable scope: public-facing knowledge only
+[T2]
+inherited/
+sessions/
+governance/POLICY_*.md
+private-*/
+workspace/personal/
+**/*.private*
+**/.env*
+
+# === Tier 1 (Internal / Team) ===
+# Triggered when: meeting transcripts, 1:1 pastes from team members
+# Readable scope: KB minus personal
+[T1]
+workspace/personal/
+**/*.private*
+**/.env*
+
+# === Tier 0 (Confidential / Principal) — DEFAULT ===
+# Triggered when: direct principal conversation
+# Readable scope: full KB (no restrictions)
+[T0]
+# (intentionally empty — full access)
+
+# === Notes ===
+# - This file is a SKELETON. Replace tier patterns with agent-specific paths.
+# - Without a consuming hook (CAP-SEC-007-04 future), this file is documentation only.
+# - Do NOT add credentials or secrets to this file; it is a path filter, not a vault.
+# - For deny-by-default semantics, a future hook will treat unmatched paths as T0-allowed.

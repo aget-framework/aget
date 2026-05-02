@@ -1,11 +1,11 @@
 # AGET Security Specification
 
-**Version**: 1.0.1
+**Version**: 1.1.0
 **Status**: Active
 **Category**: Technical (Security)
 **Format Version**: 1.2
 **Created**: 2026-01-04
-**Updated**: 2026-01-04
+**Updated**: 2026-05-02
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_SECURITY_SPEC.md`
 **Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.6
@@ -194,6 +194,36 @@ path = path.replace("/home/username/", "/path/to/")
 # Replace internal references
 text = text.replace("private-supervisor-AGET", "supervisor-agent")
 ```
+
+### CAP-SEC-007: Knowledge-Tier Isolation (L805, #874)
+
+**Status**: v0.1 (contract spec; hook enforcement deferred to a future cycle)
+
+**SHALL** requirements for knowledge-tier read isolation:
+
+| ID | Requirement | Rationale |
+|----|-------------|-----------|
+| CAP-SEC-007-01 | Framework SHALL define a four-tier trust model for input sources | T0 (principal direct) → T1 (team internal) → T2 (cross-team shared) → T3 (external untrusted); maps to Bell-LaPadula "no read up" — higher-tier (more-restrictive) sessions cannot read lower-tier (more-confidential) paths |
+| CAP-SEC-007-02 | Framework SHALL provide `.agetignore` as the path-filter contract | Per-tier sections (`[T0]`..`[T3]`); gitignore-style patterns; additive blocking (T_n blocks include all T<n blocks); unmatched paths default-allowed at T0 |
+| CAP-SEC-007-03 | Input source SHALL determine active tier (NOT agent-chosen) | Mandatory Access Control principle: trust tier is assigned by input classifier, not selected by agent. Public Slack channel → T3; principal direct conversation → T0 |
+| CAP-SEC-007-04 | Hook (read-time path-filter) SHALL consume `.agetignore` to enforce isolation at read | Future enforcement (out of v3.16 scope); contract is the spec layer |
+
+**Trust Tier Reference**:
+
+| Tier | Trust Level | Input Source Examples | Readable Scope |
+|------|-------------|----------------------|----------------|
+| T0 | Confidential (Principal) | Direct conversation typed by principal | Full KB |
+| T1 | Internal (Team) | Meeting transcripts, 1:1 pastes from team | KB minus personal |
+| T2 | Shared (Cross-team) | Cross-team Slack channels, Linear issues | Public-facing knowledge only |
+| T3 | External (Untrusted) | Public channels, external API webhooks, cron polls | Task-specific context only |
+
+**Theoretical basis**: Least Privilege (Saltzer & Schroeder 1975), Bell-LaPadula (1973), Mandatory Access Control, Defense in Depth. See L805 for full grounding.
+
+**Why not just sandbox**: Code-execution sandboxes (E2B, K8s, gVisor, Claude Code's built-in sandbox) address `can the agent run arbitrary commands?` — they do NOT prevent the agent from reading confidential files into its context window and exfiltrating via response. Knowledge-tier isolation addresses information-access isolation, orthogonal to execution sandboxing. AGET needs both.
+
+**v3.16 deliverable**: `.agetignore` skeleton at `aget/.agetignore` (contract template; agent operators copy + customize). Hook enforcement is a future-cycle deliverable.
+
+---
 
 ### CAP-SEC-006: EARS System-Level Requirements
 
