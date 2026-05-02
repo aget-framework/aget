@@ -2536,7 +2536,7 @@ done
 
 | Perspective | Template | Norm | Spec |
 |-------------|----------|------|------|
-| **aget core** (`aget-framework/aget`) | `aget/sops/templates/RELEASE_BODY_TEMPLATE_core.md` | 1000-3000 bytes (depth-driven; up to ~9000 acceptable for sleeping-CAPs disclosure or substantive theme) | CAP-REL-032 R-REL-032-07a |
+| **aget core** (`aget-framework/aget`) | `aget/sops/templates/RELEASE_BODY_TEMPLATE_core.md` | 1000-2500 bytes (depth-driven; soft cap 3500 for substantive themed; bodies > 3500 indicate verbose-rationale-leakage from CHANGELOG) | CAP-REL-032 R-REL-032-07a |
 | **template-{archetype}-aget** (13 templates) | `aget/sops/templates/RELEASE_BODY_TEMPLATE_template.md` | 200-1000 bytes (alignment-driven; inverse-of-core principle — templates stay tight regardless of core release size) | CAP-REL-032 R-REL-032-07b |
 
 **Anti-pattern**: inline `--notes "see CHANGELOG"` (L671 at GitHub-Release surface — decorative redirect with substantive content elsewhere). v3.16.0 cycle evidence: 14/14 repos shipped 138-byte minimal redirect bodies because this anti-pattern was used.
@@ -2598,7 +2598,7 @@ done
 
 Trivial releases (pure-mechanical version bumps with no functional change) MAY ship at template-perspective floor (200 bytes) regardless of repo. WARN does NOT block release execution; surfaces for principal awareness.
 
-**Inverse-of-core invariant**: A 9000-byte aget core release body should NOT pull templates above their alignment-norm. WARN if a template release body exceeds 1000 bytes simultaneously with the same release's aget core body exceeding 5000 bytes — that's the "verbose-core-leaked-into-template" pattern.
+**Inverse-of-core invariant**: A verbose aget core release body (> 3500 bytes) should NOT pull templates above their alignment-norm. WARN if a template release body exceeds 1000 bytes simultaneously with the same release's aget core body exceeding 3500 bytes — that's the "verbose-core-leaked-into-template" pattern.
 
 **Verification Checklist**:
 - [ ] All repos show new release on GitHub Releases page

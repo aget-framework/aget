@@ -21,11 +21,13 @@ NOT for template-{archetype}-aget release bodies — those use `RELEASE_BODY_TEM
 |--------------|------:|---------:|----------------------|
 | Trivial-mechanical (version bump only) | ~500 | ~1000 | (avoid; usually has SOMETHING to highlight) |
 | Non-breaking minor | ~1000 | ~3000 | v3.7.0 (1141), v3.8.0 (1403), v3.10.0 (1434) |
-| Substantive minor (themed) | ~1500 | ~4000 | v3.14.0 (3000) |
+| Substantive minor (themed) | ~1500 | ~3500 | v3.14.0 (3000) |
 | Breaking minor | ~1500 | ~3000 | v3.15.0 (1922) |
-| Non-breaking minor with sleeping-CAPs disclosure | up to ~9000 | exception | v3.16.0 (8904) — disclosure depth justifies exceeding norm |
+| Non-breaking minor with sleeping-CAPs disclosure | ~1500 | ~2500 | v3.16.0 (1679 final, after 8904 over-correction was retightened) |
 
-**Rule of thumb**: depth-driven by what shipped. Sleeping-CAPs / breaking-changes / theme depth justify more bytes; pure-mechanical releases stay near the floor.
+**Rule of thumb**: depth-driven by what shipped, but density-bound regardless. Sleeping-CAPs / breaking-changes / theme depth justify a few extra bullets — NOT verbose multi-paragraph rationales (those go in CHANGELOG, not release body). Soft cap ~3000 even for substantive themed minors. Body should be at-a-glance scannable; full per-spec detail belongs in CHANGELOG (referenced from Compatibility section).
+
+**v3.16.0 calibration history (anti-pattern → corrected)**: First shipped 138 bytes (decorative redirect; L671 anti-pattern); R1 over-corrected to 8904 (pasted full CHANGELOG entry verbatim); recalibrated to 1679 after principal "It is still verbose" correction. Lesson: even with sleeping-CAPs disclosure exception, release body stays ≤~2500. The verbose-end exception is for THEMES, not bullet-density.
 
 ---
 
@@ -74,7 +76,7 @@ NOT for template-{archetype}-aget release bodies — those use `RELEASE_BODY_TEM
 
 Target: ~1000-1500 bytes.
 
-### Skeleton 2: Non-breaking minor with sleeping-CAPs disclosure (exception class)
+### Skeleton 2: Non-breaking minor with sleeping-CAPs disclosure
 
 Add this section between What's New and Compatibility:
 
@@ -84,7 +86,7 @@ Add this section between What's New and Compatibility:
 CAP-{group}-{NNN..NNN} ship at `SPEC-LANDED; IMPLEMENTATION DEFERRED v{target-version}`. {1-sentence note on what's missing}. R-DEP-010 grace; v{removal-threshold} removal threshold. {Optional: procedural enforcement that compensates meanwhile}.
 ```
 
-Target: up to ~9000 bytes acceptable (depth justified by disclosure honesty).
+Target: ~1500-2500 bytes total (sleeping-CAPs disclosure is 1 paragraph, not a section per CAP). Per-CAP detail belongs in CHANGELOG, NOT release body.
 
 ### Skeleton 3: Breaking minor
 

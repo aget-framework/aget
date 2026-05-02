@@ -21,8 +21,8 @@ Template release bodies are downstream-of-aget-core: they primarily signal align
 
 | Release type | Floor | Soft cap | Examples (historical) |
 |--------------|------:|---------:|----------------------|
-| Trivial alignment (version-bump only; no archetype-specific change) | ~200 | ~500 | typical for templates that get no archetype delta in the cycle |
-| Alignment with archetype-specific changes | ~400 | ~1000 | v3.16.0 archetype-templates (1155 — slight over; 800-900 would be tighter) |
+| Trivial alignment (version-bump only; no archetype-specific change) | ~200 | ~500 | supervisor/worker v3.16.0 (637-638) |
+| Alignment with archetype-specific changes | ~400 | ~1000 | v3.16.0 archetype-templates (766 final, after 1155 over-correction was retightened per skeleton 2) |
 | Alignment with breaking-change pass-through | ~500 | ~1200 | (no v3.16 example; v3.15.x templates) |
 
 **Rule of thumb**: alignment-driven by delta-from-canonical. Templates that get NO archetype-specific change in a release should stay near the floor. Templates with archetype-specific deltas (e.g., the v3.16.0 release-triad revert applied to 10 archetype templates) get a few extra bullets but should still stay tight.
@@ -153,7 +153,7 @@ echo "✅ L909 PASS"
 
 | Anti-pattern | Why wrong |
 |--------------|-----------|
-| Pasting the full aget core CHANGELOG entry verbatim into the template release body | Duplicates content; inflates body to core-norm bytes when template-norm is appropriate. v3.16.0 archetype-templates shipped 1155 bytes by pasting the full template-CHANGELOG entry; correct target was ~600-800. |
+| Pasting the full aget core CHANGELOG entry verbatim into the template release body | Duplicates content; inflates body to core-norm bytes when template-norm is appropriate. v3.16.0 archetype-templates first shipped 1155 bytes via this anti-pattern; retightened to 766 per skeleton 2 after principal "It is still verbose" correction. |
 | Omitting the cross-reference link to aget core CHANGELOG | Adopters need a path to full framework-level detail; the template body is the at-a-glance entry, not the full story. |
 | Reproducing sleeping-CAPs disclosure verbatim from aget core | Sleeping-CAPs are framework-level; templates should at most one-line acknowledge ("See aget core release notes for sleeping-CAPs disclosure"). Most templates don't need to mention. |
 | Treating template release body as another core release body | Different audience, different density. Inverse-of-core: templates stay tight regardless of core release size. |
@@ -172,4 +172,4 @@ echo "✅ L909 PASS"
 
 ---
 
-*RELEASE_BODY_TEMPLATE_template.md — authored 2026-05-02 to close the core-vs-template release-body distinction gap. v3.16.0 archetype-templates at 1155 bytes are the calibration-over example (correct floor, but core-pattern crept into template body via verbatim CHANGELOG paste).*
+*RELEASE_BODY_TEMPLATE_template.md — authored 2026-05-02 to close the core-vs-template release-body distinction gap. v3.16.0 archetype-templates calibration history: 138 (under-floor; original L671 anti-pattern) → 1155 (over-cap; verbatim CHANGELOG paste anti-pattern) → 766 (correct; skeleton 2 norm).*
