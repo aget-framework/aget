@@ -1,7 +1,7 @@
 # PROJECT_PLAN: {Title}
 
 **Version**: 1.0.0
-**Status**: Draft
+**Plan_Status**: Draft
 **Created**: {YYYY-MM-DD}
 **Updated**: {YYYY-MM-DD}
 **Author**: {agent-name}
@@ -22,7 +22,7 @@
 | `Complete` | All gates passed | **REQUIRES Closure Checklist** |
 | `Abandoned` | Work stopped | Any → Abandoned (document reason) |
 
-**Current Status**: Draft
+**Current Plan_Status**: Draft
 
 ---
 
@@ -135,7 +135,7 @@ Choose ONE pattern per plan. Selection guidance:
 ## Gate 0: Preparation
 
 **Objective:** {What this gate achieves}
-**Status:** Pending
+**Gate_Status:** Pending
 
 ### Deliverables
 
@@ -170,7 +170,7 @@ Choose ONE pattern per plan. Selection guidance:
 ## Gate 1: {Title}
 
 **Objective:** {What this gate achieves}
-**Status:** Pending
+**Gate_Status:** Pending
 
 ### Deliverables
 
@@ -198,7 +198,7 @@ Choose ONE pattern per plan. Selection guidance:
 ## Gate {N}: Release
 
 **Objective:** Execute release process
-**Status:** Pending
+**Gate_Status:** Pending
 
 ### Deliverables
 
@@ -243,7 +243,7 @@ gh release view v{VERSION} --repo aget-framework/aget && echo "PASS" || echo "FA
 ## Gate {M}: Retrospective (L435, CAP-REASON-008)
 
 **Objective:** Document learnings and close project
-**Status:** Pending
+**Gate_Status:** Pending
 
 **IMPORTANT**: This gate is REQUIRED for project closure. Do not mark plan as Complete without completing this gate.
 
@@ -304,7 +304,7 @@ grep -c "\[x\]" PROJECT_PLAN_{name}.md | awk '{if ($1 >= 5) print "PASS"; else p
 
 ## Project Closure Checklist (#247)
 
-**MANDATORY before setting Status to Complete**
+**MANDATORY before setting Plan_Status to Complete**
 
 Per L515 (Template Coherence Gap) and Issue #247, this checklist MUST be completed before marking the project as Complete. Fleet audit showed 44% of plans marked Complete without retrospectives.
 
@@ -325,7 +325,7 @@ Per L515 (Template Coherence Gap) and Issue #247, this checklist MUST be complet
 
 - [ ] **Plan Author**: {name} verified checklist complete on {date}
 
-**Status Transition**: Only after ALL items above are checked may Status change to `Complete`.
+**Plan_Status Transition**: Only after ALL items above are checked may Plan_Status change to `Complete`.
 
 ---
 
