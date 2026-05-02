@@ -25,9 +25,18 @@ spec:
       - "espanso ;;g3pr_ (compensating control)"
       - "espanso ;;g5pr_ (compensating control)"
     delegates:
-      - "SKILL-024 aget-propose-actions (--shape actions)"
+      - "SKILL-024 aget-propose-actions (--shape actions; producer→delegate composition)"
       - "SP-017 aget-propose-goals (--shape goals; SKILL-NNN TBD)"
-      - "SKILL-015 aget-close-session (reads authorization records for retrospective)"
+    consumers:
+      # Authorization record consumers — TBD. The record format is defined in
+      # this spec (CAP-GO-001) but no consumer reader exists at v3.16.0.
+      # Earlier draft of this spec claimed "SKILL-015 aget-close-session
+      # (reads authorization records for retrospective)" — this was an
+      # aspirational claim, NOT implemented; close-session SKILL.md does not
+      # parse authorization records as of v3.16.0. Consumer development
+      # tracked for v3.17. (L911: Spec-Claimed-Delegate-Without-Implementation;
+      # Auditor finding 2026-05-02 post-Gate-1-defects-pass.)
+      - "TBD v3.17 — close-session retrospective reader (planned, not implemented)"
     l_docs:
       - "L854: Spec-First Applied Selectively (awareness-alone-insufficient evidence)"
       - "L466: Question Is Not Approval Pattern (GO-signal semantics)"

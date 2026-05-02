@@ -1009,9 +1009,10 @@ The SYSTEM shall support archetype-specific ontologies and skills.
 | CAP-TPL-016-01 | ubiquitous | The SYSTEM shall include ontology/ directory in each template |
 | CAP-TPL-016-02 | ubiquitous | The SYSTEM shall include ONTOLOGY_{archetype}.yaml in ontology/ |
 | CAP-TPL-016-03 | ubiquitous | The SYSTEM shall include .claude/skills/ directory with AGET skills |
-| CAP-TPL-016-04 | ubiquitous | The SYSTEM shall include 32 universal skills in all templates (updated v3.15.0) |
+| CAP-TPL-016-04 | ubiquitous | The SYSTEM shall include 29 universal skills in all templates (v3.16.0; was 32 at v3.15.0; release-triad skills moved to release-execution archetype catalog per CAP-TPL-016-07 below) |
 | CAP-TPL-016-05 | ubiquitous | The SYSTEM shall include archetype-specific skills per archetype |
 | CAP-TPL-016-06 | conditional | IF SKILL.md exists THEN it shall have valid YAML frontmatter |
+| CAP-TPL-016-07 | conditional | IF a template's archetype is `release-execution` (worker, supervisor) THEN the template SHALL additionally include the release-triad skills: aget-release-build, aget-release-audit-specs, aget-release-critique. Other archetypes (advisor, analyst, architect, consultant, developer, executive, operator, researcher, reviewer, spec-engineer) SHALL NOT include release-triad skills as universal-baseline; if release-triad presence is required for a specific archetype, it SHALL be declared as archetype-specific in CAP-TPL-016-05 and motivated. |
 
 **Enforcement**: `validate_v3.5.0.py`, `validate_archetype_skills.py`
 
@@ -1055,7 +1056,7 @@ ontology:
 
 #### Universal Skills (v3.15.0)
 
-All templates include these 32 universal skills:
+All templates include these 29 universal skills (v3.16.0; was 32 at v3.15.0). Release-triad skills (aget-release-build, aget-release-audit-specs, aget-release-critique) moved to the release-execution archetype catalog per CAP-TPL-016-07; they are NOT part of the universal baseline.
 
 | Skill | Category | Purpose | Since |
 |-------|----------|---------|:-----:|
@@ -1088,9 +1089,23 @@ All templates include these 32 universal skills:
 | aget-analyze-ontology | Knowledge | Ontology health analysis | v3.6 |
 | aget-file-issue | Governance | File issues with routing governance | v3.5 |
 | aget-promote-issue | Governance | Promote private to public issues | v3.13 |
-| aget-release-build | Release | Builder perspective (triad) | v3.13 |
-| aget-release-audit-specs | Release | Spec Auditor perspective (triad) | v3.13 |
-| aget-release-critique | Release | Critic perspective (triad) | v3.13 |
+| ~~aget-release-build~~ | ~~Release~~ | **Moved out of universal baseline at v3.16.0** — see CAP-TPL-016-07 (release-execution archetype only) | v3.13 (universal until v3.15.0) |
+| ~~aget-release-audit-specs~~ | ~~Release~~ | **Moved out of universal baseline at v3.16.0** — see CAP-TPL-016-07 | v3.13 (universal until v3.15.0) |
+| ~~aget-release-critique~~ | ~~Release~~ | **Moved out of universal baseline at v3.16.0** — see CAP-TPL-016-07 | v3.13 (universal until v3.15.0) |
+
+#### Release-Execution Archetype Skills (v3.16.0 NEW)
+
+Per CAP-TPL-016-07, these skills are required ONLY for templates with archetype `release-execution`:
+
+| Skill | Category | Purpose | Archetypes |
+|-------|----------|---------|-----------|
+| aget-release-build | Release | Builder perspective (triad) | worker, supervisor |
+| aget-release-audit-specs | Release | Spec Auditor perspective (triad) | worker, supervisor |
+| aget-release-critique | Release | Critic perspective (triad) | worker, supervisor |
+
+**Rationale**: 2026-05-02 Gate 1 defects-audit (Auditor finding F-AUDIT-G1-DEF-008) confirmed that release-triad skills are misfit for non-release-execution archetypes (advisor, analyst, architect, consultant, executive, operator, researcher, reviewer). Bulk-deploying them under "universal" was a presence-check-without-fit-check error (L582 instance). Moving them to archetype-specific scope preserves their availability where they belong while removing semantic noise from advisory/analyst archetypes.
+
+**Per-archetype availability matrix**: Future revision to add explicit table per archetype × skill. Tracked as v3.17 grooming candidate.
 
 #### Directory Layout (v3.5.0)
 

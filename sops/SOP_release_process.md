@@ -2020,86 +2020,19 @@ done
 
 **Checkpoint**: All 7 repos pushed, no failures.
 
-### Phase 3: Tag & Release (⚠️ DEPRECATED LOCATION for v3.16+)
+### Phase 3: Tag & Release (HISTORICAL — v3.15 and earlier only)
 
-> **⚠️ POSITIONING NOTICE (v3.16+, #1154 Option A)**: The tag-cut commands below remain authoritative, but the **execution location moved to [Phase 6.4.5](#645-tag--release-authoritative-position-for-v316)** to fix the tag-vs-HEAD fleet artifact gap (#1154).
+> **⚠️ For v3.16+ releases**: Tag-cut and GitHub Release creation execute at **[Phase 6.4.5](#645-tag--release-authoritative-position-for-v316)** (after handoff artifacts are present in the working tree). Phase 3 is retained ONLY as historical context for v3.15 and earlier releases.
 >
-> **Why moved**: Tagging at this phase produced tags whose `git show vX.Y.Z:handoffs/RELEASE_HANDOFF_vX.Y.Z.md` returned "not found" because handoff artifacts did not yet exist in the working tree (created later at Phase 6.2). Remote fleet supervisors fetching the tag could not access tag-pinned handoff/DEPLOYMENT_SPEC/BREAKING_CHANGES — confirmed root cause for legalon supervisor #1152 incident.
+> **Why moved (#1154 Option A)**: Tagging at this phase produced tags whose `git show vX.Y.Z:handoffs/RELEASE_HANDOFF_vX.Y.Z.md` returned "not found" because handoff artifacts did not yet exist in the working tree (created later at Phase 6.2). Remote fleet supervisors fetching the tag could not access tag-pinned handoff/DEPLOYMENT_SPEC/BREAKING_CHANGES — confirmed root cause for legalon supervisor #1152 incident.
 >
-> **For v3.16+ releases**: Execute Phase 1 → Phase 2 → Phase 4 (validation of pushed commits — gh release commands deferred) → Phase 5 → Phase 6.1 → Phase 6.2 → Phase 6.3 → Phase 6.3.1 → Phase 6.4 → **Phase 6.4.5 (tag-cut here)** → Phase 6.5 → Phase 7.
+> **For v3.16+ canonical execution order**: Phase 1 → Phase 2 → Phase 4 (commit-level validation; tag-resolvable checks deferred) → Phase 5 → Phase 6.1 → Phase 6.2 → Phase 6.3 → Phase 6.3.1 → Phase 6.4 → **Phase 6.4.5 (tag + GitHub Release)** → Phase 6.5 → Phase 7.
 >
-> **For v3.15 and earlier**: Phase 3 was the canonical position; tags reflect that ordering. Do NOT retroactively re-tag historical releases.
+> **DO NOT execute commands here for v3.16+ releases.** The canonical commands now live at Phase 6.4.5 (sub-sections 6.4.5.1 through 6.4.5.4).
+>
+> **For v3.15 and earlier audits**: Tags were cut at this phase per the prior procedure. Do NOT retroactively re-tag historical releases.
 
-**Purpose**: Create git tags and GitHub Releases for all repos
-
-**Important**: Tags ≠ Releases on GitHub. Tags are git objects; Releases are GitHub UI features created separately.
-
-#### 3.1. Create Tags (All Repos)
-
-```bash
-cd $AGET_FRAMEWORK_DIR
-
-# Tag all repos (core + 6 templates)
-for repo in aget template-supervisor-aget template-worker-aget template-advisor-aget template-consultant-aget template-developer-aget template-spec-engineer-aget; do
-  echo "=== Tagging $repo ==="
-  cd "$repo"
-  git tag -a vX.Y.Z -m "Release vX.Y.Z: Brief description
-
-Full release notes at:
-https://github.com/aget-framework/aget/blob/main/specs/deltas/AGET_DELTA_vX.Y.md"
-  cd ..
-done
-```
-
-#### 3.2. Push Tags
-
-```bash
-# Push tags to remote
-for repo in aget template-supervisor-aget template-worker-aget template-advisor-aget template-consultant-aget template-developer-aget template-spec-engineer-aget; do
-  echo "=== Pushing tag for $repo ==="
-  cd "$repo"
-  git push origin vX.Y.Z
-  cd ..
-done
-```
-
-#### 3.3. Create GitHub Releases
-
-**Note**: Pushing tags does NOT create GitHub Releases. Use `gh` CLI:
-
-```bash
-# Create releases for all repos
-for repo in aget template-supervisor-aget template-worker-aget template-advisor-aget template-consultant-aget template-developer-aget template-spec-engineer-aget; do
-  echo "=== Creating release for $repo ==="
-  cd "$repo"
-  gh release create vX.Y.Z \
-    --title "vX.Y.Z - Brief Title" \
-    --notes "Release notes content here
-
-See https://github.com/aget-framework/aget/blob/main/specs/deltas/AGET_DELTA_vX.Y.md for complete changes."
-  cd ..
-done
-```
-
-**Release Notes Template**: Use standard release notes (see section below)
-
-#### 3.4. Verify Releases
-
-```bash
-# Check releases are visible
-for repo in aget template-supervisor-aget template-worker-aget template-advisor-aget template-consultant-aget template-developer-aget template-spec-engineer-aget; do
-  echo "=== $repo ==="
-  open "https://github.com/aget-framework/$repo/releases"
-done
-```
-
-**Verification Checklist**:
-- [ ] All 7 repos show new release on GitHub Releases page
-- [ ] Release marked as "Latest" (green badge)
-- [ ] Release notes display correctly
-- [ ] Delta spec link works
-
-**Checkpoint**: All 7 GitHub Releases visible and marked "Latest".
+This phase is intentionally empty of executable commands — see Phase 6.4.5 below for v3.16+ canonical commands.
 
 ---
 
@@ -2111,7 +2044,7 @@ done
 
 **Implements**: R-PUB-001 (Public Release Completeness)
 
-**When to Run**: AFTER Phase 3 complete, BEFORE announcing release
+**When to Run**: AFTER tag-cut complete, BEFORE announcing release. For v3.16+, tag-cut is at Phase 6.4.5 (per #1154 Option A); for v3.15 and earlier, tag-cut was at Phase 3.
 
 **Non-Negotiable**:
 - Validation MUST pass (exit code 0)
@@ -2566,13 +2499,66 @@ if grep -q "BC-[0-9]" CHANGELOG.md 2>/dev/null; then
 fi
 ```
 
-**Tag Creation**: Run the commands at [Phase 3.1](#31-create-tags-all-repos) — they remain authoritative and unchanged. Execute them here, after the precondition verification above passes.
+##### 6.4.5.1. Create Tags (All Repos)
 
-**Push Tags**: Run [Phase 3.2](#32-push-tags) commands.
+```bash
+cd $AGET_FRAMEWORK_DIR
 
-**Create GitHub Releases**: Run [Phase 3.3](#33-create-github-releases) commands.
+# Tag all repos (core + 6 templates)
+for repo in aget template-supervisor-aget template-worker-aget template-advisor-aget template-consultant-aget template-developer-aget template-spec-engineer-aget; do
+  echo "=== Tagging $repo ==="
+  cd "$repo"
+  git tag -a vX.Y.Z -m "Release vX.Y.Z: Brief description
 
-**Verify Releases**: Run [Phase 3.4](#34-verify-releases) commands.
+Full release notes at:
+https://github.com/aget-framework/aget/blob/main/specs/deltas/AGET_DELTA_vX.Y.md"
+  cd ..
+done
+```
+
+##### 6.4.5.2. Push Tags
+
+```bash
+# Push tags to remote
+for repo in aget template-supervisor-aget template-worker-aget template-advisor-aget template-consultant-aget template-developer-aget template-spec-engineer-aget; do
+  echo "=== Pushing tag for $repo ==="
+  cd "$repo"
+  git push origin vX.Y.Z
+  cd ..
+done
+```
+
+##### 6.4.5.3. Create GitHub Releases
+
+**Note**: Pushing tags does NOT create GitHub Releases. Use `gh` CLI:
+
+```bash
+for repo in aget template-supervisor-aget template-worker-aget template-advisor-aget template-consultant-aget template-developer-aget template-spec-engineer-aget; do
+  echo "=== Creating release for $repo ==="
+  cd "$repo"
+  gh release create vX.Y.Z \
+    --title "vX.Y.Z - Brief Title" \
+    --notes "Release notes content here
+
+See https://github.com/aget-framework/aget/blob/main/specs/deltas/AGET_DELTA_vX.Y.md for complete changes."
+  cd ..
+done
+```
+
+##### 6.4.5.4. Verify Releases
+
+```bash
+for repo in aget template-supervisor-aget template-worker-aget template-advisor-aget template-consultant-aget template-developer-aget template-spec-engineer-aget; do
+  echo "=== $repo ==="
+  open "https://github.com/aget-framework/$repo/releases"
+done
+```
+
+**Verification Checklist**:
+- [ ] All repos show new release on GitHub Releases page
+- [ ] Release marked as "Latest" (green badge)
+- [ ] Release notes display correctly
+- [ ] Delta spec link works
 
 **Post-Tag V-test (BLOCKING — fixes #1154)**: Verify handoff artifacts are tag-resolvable:
 

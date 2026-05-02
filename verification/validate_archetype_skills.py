@@ -34,14 +34,26 @@ import sys
 from pathlib import Path
 
 
-SPEC_MANDATE = 32  # CAP-TPL-016-04 (v3.15.0 update — aget-enhance-health added per AEH-001 ship 2026-04-25)
+SPEC_MANDATE = 29  # CAP-TPL-016-04 (v3.16.0: 32 → 29; release-triad moved to release-execution archetype catalog per CAP-TPL-016-07)
 DEFAULT_BASELINE = "template-worker-aget"
+
+# Skills moved from universal baseline to release-execution archetype at v3.16.0
+# (CAP-TPL-016-07). These are PRESENT in worker (release-execution archetype) but
+# are NOT counted as part of the universal baseline. Subtracted from worker's
+# skill set to derive the universal-29.
+RELEASE_EXECUTION_EXTRAS = [
+    "aget-release-build",
+    "aget-release-audit-specs",
+    "aget-release-critique",
+]
 
 # Archetype skill mapping (from validate_v3.5.0.py ARC-001).
 # Skills listed here are EXPECTED extras beyond the universal baseline.
+# At v3.16.0+ the worker archetype's release-triad is consolidated into
+# RELEASE_EXECUTION_EXTRAS above (worker IS a release-execution archetype).
 ARCHETYPE_EXTRAS = {
-    "worker": ["aget-execute-task", "aget-report-progress"],
-    "supervisor": ["aget-broadcast-fleet", "aget-review-agent", "aget-escalate-issue"],
+    "worker": ["aget-execute-task", "aget-report-progress"] + RELEASE_EXECUTION_EXTRAS,
+    "supervisor": ["aget-broadcast-fleet", "aget-review-agent", "aget-escalate-issue"] + RELEASE_EXECUTION_EXTRAS,
     "developer": ["aget-run-tests", "aget-lint-code", "aget-review-pr"],
     "consultant": ["aget-assess-client", "aget-propose-engagement"],
     "advisor": ["aget-assess-risk", "aget-recommend-action"],

@@ -3,8 +3,16 @@
 # Purpose: Restrict KB read access based on input trust tier (L805, #874)
 # Spec: aget/specs/AGET_SECURITY_SPEC.md CAP-SEC-007
 # Status: v0.1 SKELETON (hook enforcement out of v3.16 scope; contract documented)
-# Format: per-tier sections; gitignore-style path patterns within each section
-# Trust tier per session is determined by input source (see CAP-SEC-007-02)
+#
+# Format: CUSTOM (NOT gitignore-compatible at file level).
+#   - Section headers: INI-style `[T0]`..`[T3]` markers — NOT recognized by
+#     gitignore parsers (gitignore treats `[abc]` as a glob character class).
+#     Future hook MUST do custom parsing of section markers.
+#   - Patterns within each section: gitignore-syntax-compatible
+#     (glob, **, !negation, # comment) — these can be passed verbatim to
+#     gitignore-style matchers AFTER the parser strips section headers.
+#
+# Trust tier per session is determined by input source (see CAP-SEC-007-02).
 #
 # How it works (when hook lands):
 #   The active tier is set by the input-classifier (CAP-SEC-007-03).
@@ -12,7 +20,9 @@
 #   Patterns are additive: T3 blocks include T2's blocks include T1's, etc.
 #   T0 (principal direct) is unrestricted by default.
 #
-# Pattern syntax: gitignore-compatible (glob, **, !negation, # comment)
+# Why not pure gitignore: gitignore is a flat pattern list. We need per-tier
+# sections, which gitignore syntax does not express. Hence the custom file
+# format with gitignore-syntax patterns inside it.
 #
 # === Tier 3 (External / Untrusted Input) — MOST RESTRICTIVE ===
 # Triggered when: public Slack channels, external API webhooks, cron-triggered polls

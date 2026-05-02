@@ -1098,11 +1098,13 @@ This CAP closes REQ-REL-F-001 (Pre-Release Validation procedure exists in SOP si
 
 | Wave-1A Contract | Status | Notes |
 |------------------|:------:|-------|
-| **R-REL-025 (CAP-REL-029) — Release Readiness Gate** | **LANDED 2026-04-25** | First of 5 |
-| **R-REL-026 (CAP-REL-030) — Post-Release CHANGELOG Validator** | **LANDED 2026-05-02** | Wave-1A item 2; v3.16 G1.6; #1149/#1151 root cause |
-| **R-REL-027 (CAP-REL-031) — Post-Release Tag Validator** | **LANDED 2026-05-02** | Wave-1A item 3; v3.16 G1.6; #1154 spec-layer pair to SOP v1.30 fix |
-| **R-REL-028 (CAP-REL-032) — Post-Release Badge/Parity Validator** | **LANDED 2026-05-02** | Wave-1A item 4; v3.16 G1.6; org homepage discoverability |
-| **R-REL-029 (CAP-REL-033) — Post-Release Contract-Test Validator** | **LANDED 2026-05-02** | Wave-1A item 5; v3.16 G1.6; #1148 BC-detection scope |
+| **R-REL-025 (CAP-REL-029) — Release Readiness Gate** | **LANDED 2026-04-25** (spec + implementation) | First of 5; only CAP with shipped implementation |
+| **R-REL-026 (CAP-REL-030) — Post-Release CHANGELOG Validator** | **SPEC-LANDED 2026-05-02; impl-deferred v3.17** | Wave-1A item 2; v3.16 G1.6; #1149/#1151 root cause; **sleeping-requirement** |
+| **R-REL-027 (CAP-REL-031) — Post-Release Tag Validator** | **SPEC-LANDED 2026-05-02; impl-deferred v3.17** | Wave-1A item 3; v3.16 G1.6; #1154 spec-layer pair; **inline V-test in SOP v1.30 Phase 6.4.5 enforces invariant procedurally**; CAP closes L671 split when impl lands |
+| **R-REL-028 (CAP-REL-032) — Post-Release Badge/Parity Validator** | **SPEC-LANDED 2026-05-02; impl-deferred v3.17** | Wave-1A item 4; v3.16 G1.6; **sleeping-requirement** |
+| **R-REL-029 (CAP-REL-033) — Post-Release Contract-Test Validator** | **SPEC-LANDED 2026-05-02; impl-deferred v3.17** | Wave-1A item 5; v3.16 G1.6; #1148 BC-detection scope; **sleeping-requirement** |
+
+**Sleeping-requirement disclosure**: 4 of 5 Wave-1A CAPs ship requirements at v3.16 without implementation. Per R-DEP-010, grace period is 2 minor versions (v3.16 → v3.18). Implementation milestone targets v3.17. This disclosure is per principal direction post-Gate-1-defects-audit (2026-05-02): spec-truthfulness over spec-aspiration.
 
 **Numbering note**: The proposal `PROPOSAL_v315_missing_release_specs.md` reserves R-REL-025 through R-REL-029 as the 5-contract Wave-1A. Existing AGET_RELEASE_SPEC.md uses CAP-REL-NNN format; this CAP claims CAP-REL-029 (next available) and treats `R-REL-025` as the proposal-facing label / requirement-set anchor. Subsequent Wave-1A contracts (proposal labels R-REL-026/027/028/029) will be authored as CAP-REL-030/031/032/033 to avoid further collision; the proposal-facing labels will be cross-referenced in each new CAP's header.
 
@@ -1112,7 +1114,9 @@ This CAP closes REQ-REL-F-001 (Pre-Release Validation procedure exists in SOP si
 
 ### CAP-REL-030: Post-Release CHANGELOG Validator (R-REL-026) — Wave-1A Item 2
 
-**Status**: LANDED 2026-05-02 (v3.16 G1.6). Wave-1A second contract (2 of 5).
+**Status**: SPEC-LANDED 2026-05-02 (v3.16 G1.6); IMPLEMENTATION DEFERRED to v3.17 (no `scripts/post_release_changelog_validator.py` at v3.16.0 release; spec defines contract, implementation pending). R-DEP-010 grace-period annotation: 2-minor-version window (v3.16 → v3.18 removal if implementation does not land by v3.17). Wave-1A second contract (2 of 5).
+
+**⚠️ Sleeping-requirement disclaimer**: This CAP defines requirements (R-REL-030-01..05) but no enforcement code exists at v3.16. Consumers SHALL NOT treat this CAP as binding at runtime until the validator script lands. v3.17 implementation milestone tracks closure.
 
 **Threat-Class Anchor**: Post-release verification that CHANGELOG.md entries land correctly. v3.15 retro identified two L-doc-named gaps: L900 (CHANGELOG sanitization gap, #1151) and L909 (under-sanitization at write time, sibling to L900). Without contract enforcement, CHANGELOG entries can be missing, malformed, or contain unsanitized private-fleet references.
 
@@ -1157,7 +1161,9 @@ python3 scripts/post_release_changelog_validator.py --version 3.16.0 && \
 
 ### CAP-REL-031: Post-Release Tag Validator (R-REL-027) — Wave-1A Item 3
 
-**Status**: LANDED 2026-05-02 (v3.16 G1.6). Wave-1A third contract (3 of 5).
+**Status**: SPEC-LANDED 2026-05-02 (v3.16 G1.6); IMPLEMENTATION DEFERRED to v3.17 (no `scripts/post_release_tag_validator.py` at v3.16.0 release). R-DEP-010 grace-period annotation: v3.16 → v3.18. Wave-1A third contract (3 of 5).
+
+**⚠️ Sleeping-requirement disclaimer**: Same as CAP-REL-030 — requirements defined, no enforcement code at v3.16. **Note**: SOP_release_process.md v1.30 Phase 6.4.5 includes the tag-resolvability check inline (post-tag V-test) so the headline #1154 invariant IS enforced procedurally at release time; this CAP's value is making the invariant audit-script-bound rather than only SOP-step-bound. Implementation closure at v3.17 lifts the procedural-vs-spec L671 split.
 
 **Threat-Class Anchor**: Post-release verification that tags are correctly cut, pushed, and resolve handoff artifacts. #1154 (tag-vs-HEAD fleet artifact gap, root-caused from legalon #1152) confirmed that tags cut at SOP Phase 3 (pre-handoff) returned "not found" for `git show vX.Y.Z:handoffs/RELEASE_HANDOFF_vX.Y.Z.md`. SOP_release_process.md v1.30 (G1.3) moved tag-cut to Phase 6.4.5 procedurally; this CAP makes the tag-resolvability invariant spec-bound (procedure → contract per L671 progression).
 
@@ -1207,7 +1213,9 @@ git show v3.16.0:handoffs/RELEASE_HANDOFF_v3.16.0.md >/dev/null 2>&1 && \
 
 ### CAP-REL-032: Post-Release Badge/Parity Validator (R-REL-028) — Wave-1A Item 4
 
-**Status**: LANDED 2026-05-02 (v3.16 G1.6). Wave-1A fourth contract (4 of 5).
+**Status**: SPEC-LANDED 2026-05-02 (v3.16 G1.6); IMPLEMENTATION DEFERRED to v3.17 (no `scripts/post_release_parity_validator.py` at v3.16.0 release). R-DEP-010 grace-period annotation: v3.16 → v3.18. Wave-1A fourth contract (4 of 5).
+
+**⚠️ Sleeping-requirement disclaimer**: Same as CAP-REL-030.
 
 **Threat-Class Anchor**: Post-release verification of org homepage badge (`version: vX.Y.Z`) and parity across templates (README + AGENTS.md @aget-version). v3.15 retro identified silent staleness when badge was not updated despite tags landing — Definition of Done "Discoverable" requires user can find version at org homepage. Without contract, badge update is a discretionary SOP step.
 
@@ -1253,7 +1261,9 @@ python3 scripts/post_release_parity_validator.py --version 3.16.0 && \
 
 ### CAP-REL-033: Post-Release Contract-Test Validator (R-REL-029) — Wave-1A Item 5
 
-**Status**: LANDED 2026-05-02 (v3.16 G1.6). Wave-1A fifth contract (5 of 5).
+**Status**: SPEC-LANDED 2026-05-02 (v3.16 G1.6); IMPLEMENTATION DEFERRED to v3.17 (no `scripts/post_release_contract_validator.py` at v3.16.0 release). R-DEP-010 grace-period annotation: v3.16 → v3.18. Wave-1A fifth contract (5 of 5).
+
+**⚠️ Sleeping-requirement disclaimer**: Same as CAP-REL-030.
 
 **Threat-Class Anchor**: Post-release verification that contract tests run on the released tag and pass. v3.15 retro identified BC-002 detection scope gap (#1148): breaking changes were not consistently caught by contract tests, especially when test scope didn't align with the BC-NNN scope. Without spec-bound enforcement, contract tests can drift into theater (ADR-007 anti-pattern).
 

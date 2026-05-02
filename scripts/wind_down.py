@@ -270,7 +270,10 @@ def scan_pending_work(agent_path: Path) -> List[str]:
             for line in content.split('\n')[:30]:
                 line_stripped = line.strip().lower()
                 # Match patterns: "status: X", "**status**: X", "**Status**: X"
-                for prefix in ('status:', '**status**:', '**status:'):
+                # v3.16+ adds disambiguated **Plan_Status**: (plan-level) per CAP-PP-003
+                # (Gate_Status remains per-gate; not used for top-level pending detection)
+                for prefix in ('plan_status:', '**plan_status**:', '**plan_status:',
+                               'status:', '**status**:', '**status:'):
                     if line_stripped.startswith(prefix):
                         top_status = line_stripped.split(':', 1)[1].strip().strip('*').strip()
                         break

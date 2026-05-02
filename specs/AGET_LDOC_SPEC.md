@@ -318,12 +318,24 @@ See CAP-LDOC-010 (qualified-ID requirement for cross-agent citations).
 
 ## Cross-Agent Discovery
 
+**Regex compatibility note (v2.3.0)**: With qualified L-doc IDs (CAP-LDOC-010), index entries may be `L638` (local) OR `framework-L638` (qualified). Examples below use a regex that matches both forms. Pre-v2.3.0 code using `r'^L\d+$'` will silently filter out qualified IDs; updating to the pattern below preserves backward compat while supporting cross-fleet artifacts.
+
+```python
+# Canonical regex matching both unqualified and qualified L-doc IDs:
+LDOC_PATTERN = r'^([a-z][a-z0-9-]*-)?L\d+$'
+# Examples:
+#   "L638"           → match (local)
+#   "framework-L638" → match (qualified, agent: framework)
+#   "supervisor-L42" → match (qualified, agent: supervisor)
+#   "K123"           → no match (not an L-doc)
+```
+
 ### Query by Scope
 
 ```python
 import json, re
 idx = json.load(open('.aget/evolution/index.json'))
-l_keys = [k for k in idx if re.match(r'^L\d+$', k)]
+l_keys = [k for k in idx if re.match(r'^([a-z][a-z0-9-]*-)?L\d+$', k)]
 fleet_learnings = [k for k in l_keys if idx[k].get('scope') == 'fleet']
 ```
 
@@ -332,7 +344,7 @@ fleet_learnings = [k for k in l_keys if idx[k].get('scope') == 'fleet']
 ```python
 import json, re
 idx = json.load(open('.aget/evolution/index.json'))
-l_keys = [k for k in idx if re.match(r'^L\d+$', k)]
+l_keys = [k for k in idx if re.match(r'^([a-z][a-z0-9-]*-)?L\d+$', k)]
 patterns = [k for k in l_keys if idx[k].get('category') == 'pattern']
 ```
 
@@ -341,9 +353,19 @@ patterns = [k for k in l_keys if idx[k].get('category') == 'pattern']
 ```python
 import json, re
 idx = json.load(open('.aget/evolution/index.json'))
-l_keys = [k for k in idx if re.match(r'^L\d+$', k)]
+l_keys = [k for k in idx if re.match(r'^([a-z][a-z0-9-]*-)?L\d+$', k)]
 enforced = [k for k in l_keys if idx[k].get('enforcement') == 'enforced']
 ```
+
+### Filter to local-only (legacy behavior)
+
+If a consumer specifically wants only the agent's own L-docs:
+
+```python
+local_only = [k for k in idx if re.match(r'^L\d+$', k)]
+```
+
+This is the pre-v2.3.0 default and remains valid; just be explicit when this is the intent rather than implicit (which would silently exclude qualified entries when they appear).
 
 ---
 
