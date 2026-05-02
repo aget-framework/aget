@@ -9,6 +9,70 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.16.0] - 2026-05-02
+
+**Theme**: Framework-Discipline Closure + Wave-1A Spec Contracts + /aget-go Production + Knowledge-Tier Isolation Skeleton
+
+> **Sleeping-CAPs Disclosure (NEW)**: This release ships 4 spec contracts (CAP-REL-030/031/032/033) at `SPEC-LANDED; IMPLEMENTATION DEFERRED v3.17` status. Requirements are defined; enforcement scripts (`scripts/post_release_*_validator.py`) do NOT exist at v3.16.0. R-DEP-010 grace period: 2 minor versions (v3.18 removal if implementation does not land by v3.17). This is honest spec-truthfulness, surfaced by post-Gate-1 distributed defects audit (2026-05-02). Consumers SHALL NOT treat these CAPs as runtime-binding until implementation lands.
+
+> **No breaking changes** in v3.16. The `**Status**:` → `**Plan_Status**:` template field rename is documentation-vocabulary; `wind_down.py` extended to recognize both old and new prefixes (backward-compatible).
+
+### Added
+
+- **`sops/SOP_fleet_migration.md` v1.5.0 → v1.6.0**: New `Wave Sequencing` section. Wave 0 (supervisor self-upgrade) → Wave 1 (pilot agents) → Wave 2 (full fleet); wave-to-phase mapping; wave-boundary V-tests; wave-skip prohibition without principal approval; wave-boundary rollback procedure.
+- **`specs/AGET_LDOC_SPEC.md` v2.2.0 → v2.3.0**: Qualified L-doc IDs `{agent_short_name}-L{NNN}` for cross-fleet citation disambiguation. New `CAP-LDOC-010` (conditional EARS: cross-agent citation SHALL qualify). Backward-compat: unqualified IDs valid within agent scope. Cross-Agent Discovery example regex updated to match both forms (`r'^([a-z][a-z0-9-]*-)?L\d+$'`). Closes the L801/L807 cross-fleet collision class.
+- **`specs/AGET_RELEASE_SPEC.md` v1.16.1 → v1.17.0**: 4 NEW Wave-1A spec contracts (sleeping; see disclosure above):
+  - **CAP-REL-030 (R-REL-026)**: Post-Release CHANGELOG Validator — verifies entry presence + sanitization, BC-NNN coverage. Roots: #1149, #1151.
+  - **CAP-REL-031 (R-REL-027)**: Post-Release Tag Validator — `git show vX.Y.Z:handoffs/RELEASE_HANDOFF_vX.Y.Z.md` MUST resolve. Spec-layer pair to SOP_release_process v1.30 Phase 6.4.5 fix. Root: #1154.
+  - **CAP-REL-032 (R-REL-028)**: Post-Release Badge/Parity Validator — org homepage + per-repo version coherence. Definition of Done "Discoverable" enforcement.
+  - **CAP-REL-033 (R-REL-029)**: Post-Release Contract-Test Validator — tests run against released tag; BC-NNN coverage matrix. Root: #1148.
+- **`specs/AGET_PROJECT_PLAN_SPEC.md` v1.2.2 → v1.2.3**: New `CAP-PP-019-04` wires `/aget-go` (SKILL-048) as the canonical authorization mechanism for Gate Decision_Point (CAP-PP-019-02). Backward compat: free-text "go" remains valid for low-risk gates.
+- **`specs/AGET_SECURITY_SPEC.md` v1.0.1 → v1.1.0**: New `CAP-SEC-007` (Knowledge-Tier Isolation, L805 / #874). 4 SHALL requirements covering trust-tier model (T0..T3), `.agetignore` contract, MAC-style input classification, future hook enforcement. Theoretical basis: Least Privilege (Saltzer 1975), Bell-LaPadula (1973), MAC, Defense in Depth.
+- **`.agetignore` (NEW canonical file at aget/ root)**: Skeleton v0.1 for knowledge-tier isolation. Per-tier sections `[T0]..[T3]` (custom INI-style format; future hook will do custom parsing — gitignore parsers do NOT recognize section markers). Patterns within each section are gitignore-syntax-compatible. Hook enforcement deferred (CAP-SEC-007-04).
+- **`sops/SOP_release_process.md` v1.29 → v1.30**: New `Phase 6.4.5: Tag & Release (Authoritative Position for v3.16+)` after Phase 6.4. Tag-cut moves to AFTER handoff artifacts exist in working tree (#1154 Option A). Phase 3 reduced to historical pointer for v3.15-and-earlier audits. New BLOCKING post-tag V-test: `git show vX.Y.Z:handoffs/RELEASE_HANDOFF_vX.Y.Z.md` MUST resolve.
+- **SKILL-048 `/aget-go` v0.1.0 (proposed) → v1.0.0 (production)**: Records principal authorization with Healthy Friction enforcement of the principle-triad (spec+verify-first, coherence-next, evidence-driven). Composition discipline: authorizes only; does NOT execute the authorized work. 10 capabilities (CAP-GO-001..010), 10 V-tests, 6 constraints, espanso migration table (POL-DEP-001 grace `;;g*pr*` → `;;ago*`).
+- **Universal-skills migration**: 10 archetype templates (advisor through spec-engineer) brought to universal-skill conformance via validator-driven batch deployment from `template-worker-aget` baseline. 150 skill directories deployed.
+
+### Changed
+
+- **`specs/AGET_TEMPLATE_SPEC.md` CAP-TPL-016-04**: Universal-skill mandate **32 → 29**. Release-triad skills (`aget-release-build`, `aget-release-audit-specs`, `aget-release-critique`) moved from universal baseline to release-execution archetype catalog per new `CAP-TPL-016-07`. Worker + supervisor templates retain release-triad (release-execution archetype); 10 other archetype templates do NOT (advisor/analyst/architect/consultant/developer/executive/operator/researcher/reviewer/spec-engineer). Closes the "presence-not-fit" misfit surfaced by Gate 1 defects audit (L582 instance).
+- **`verification/validate_archetype_skills.py`**: SPEC_MANDATE 32 → 29; new `RELEASE_EXECUTION_EXTRAS` list extends worker + supervisor `ARCHETYPE_EXTRAS` to include the moved release-triad. Validator now reports 12/14 templates conformant (was 12/14 under old mandate; alignment preserved at the new boundary).
+- **`templates/PROJECT_PLAN_TEMPLATE.md`**: `**Status**:` → `**Plan_Status**:` (plan-level header) and `**Status:** Pending` → `**Gate_Status:** Pending` (per-gate). Closes D4 root (plan state declared by text editing, not verifiable assertions). Backward compat preserved: `wind_down.py` extended to recognize both old (`**status**:`) and new (`**plan_status**:`) prefixes.
+- **`scripts/wind_down.py`**: Extended pending-plan detection prefix list to recognize `plan_status:` / `**plan_status**:` / `**plan_status:` (in addition to legacy `status:` variants).
+
+### Sleeping Requirements (NEW disclosure mechanism)
+
+Per R-DEP-010 (sleeping-requirement annotation): 4 of 5 Wave-1A CAPs ship requirements without implementation at v3.16.0:
+
+| CAP | Status | Implementation Target |
+|-----|--------|----------------------|
+| CAP-REL-029 (R-REL-025) Release Readiness Gate | LANDED + IMPLEMENTED 2026-04-25 | (already shipped at v3.15.0) |
+| CAP-REL-030 (R-REL-026) Post-Release CHANGELOG Validator | SPEC-LANDED 2026-05-02 | v3.17 |
+| CAP-REL-031 (R-REL-027) Post-Release Tag Validator | SPEC-LANDED 2026-05-02 | v3.17 (procedural V-test in SOP v1.30 Phase 6.4.5 enforces invariant inline meanwhile) |
+| CAP-REL-032 (R-REL-028) Post-Release Badge/Parity Validator | SPEC-LANDED 2026-05-02 | v3.17 |
+| CAP-REL-033 (R-REL-029) Post-Release Contract-Test Validator | SPEC-LANDED 2026-05-02 | v3.17 |
+
+Removal threshold per R-DEP-011: 2 minor versions (v3.18) if implementations do not land by v3.17.
+
+### Discipline / Process Changes (post-Gate-1-defects-audit)
+
+- **L916 (NEW L-doc) Spec-Claimed-Delegate-Without-Implementation**: Anti-pattern documented. A spec asserts a *specific* delegate/consumer relationship that the named target does not implement. Stronger than L671 because the metadata actively misleads (vs. inert decorative metadata). Fixed instance in this release: SKILL-048 spec line 30 previously claimed `delegates: SKILL-015 aget-close-session (reads authorization records for retrospective)` — close-session does NOT read records. Removed false delegate claim; replaced with honest `consumers: TBD v3.17` stub.
+- **Distributed gating-Triad mechanism**: Post-Gate-1-close defects audit ran an independent Agent-tool subagent Auditor that confirmed 5/8 Builder-self-audit defects, refuted 1/8 (Builder over-correction), partially-confirmed 2/8, surfaced 2 NEW under-corrections, caught 1 Builder fabrication. Pattern: gating-Triad with full prior-gate-closure context catches what Builder rationalizes past. v3.17 will formalize this as CAP-PP-019 amendment.
+
+### Continuing Deprecations (from v3.14 / v3.15; no removal in v3.16)
+
+- `scripts/wake_up.py` → `scripts/aget_open_session.py` (POL-DEP-001; **removal target v3.17 OR v3.18** per R-DEP-011 grace; revisit at v3.17 grooming)
+- `scripts/wind_down.py` → `scripts/aget_close_session.py` (POL-DEP-001; same grace)
+
+### Migration Guide
+
+- **No breaking changes**: existing instances upgrade by version-bump only.
+- **Optional adoption**: agents that author PROJECT_PLAN files SHOULD migrate to `**Plan_Status**:` / `**Gate_Status:**` schema in new plans. Existing plans continue to work unchanged.
+- **Optional adoption**: agents that produce cross-fleet citations SHOULD use qualified L-doc IDs `{agent_short_name}-L{NNN}` (CAP-LDOC-010). Local-scope citations remain valid in unqualified form.
+- **`/aget-go` adoption**: optional v3.16; recommended for any gate involving spec amendment, fleet-wide change, or >1 SU work. Free-text "go" remains valid for low-risk gates.
+
+---
+
 ## [3.15.0] - 2026-04-25
 
 **Theme**: Two-Level Model Coherence + Security Hardening + Weekly Release Cadence Formalization
