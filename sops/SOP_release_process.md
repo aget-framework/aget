@@ -1,8 +1,8 @@
 # SOP: Release Process
 
-**Version**: 1.29
+**Version**: 1.30
 **Created**: 2025-11-30
-**Updated**: 2026-03-08
+**Updated**: 2026-05-02
 **Owner**: private-aget-framework-AGET
 
 **Implements**: R-REL-001-* (5 requirements), R-REL-006 through R-REL-020, R-REL-024, R-REL-025, R-REL-026, R-REL-027, R-REL-030 through R-REL-038, R-REL-042, R-REL-VER-001, R-LIC-001, R-SPEC-010, R-ISSUE-007, R-ISSUE-008, CAP-REL-021 (Persistent Validation Logging), CAP-REL-022 (Gate Execution Enforcement), CAP-REL-023 (Release State Snapshots), CAP-REL-024 (Propagation Audit), CAP-REL-025 (Healthcheck Persistence)
@@ -76,7 +76,7 @@ A release is DONE when ALL of these conditions are met:
 | Outcome | Verification | SOP Phase |
 |---------|--------------|-----------|
 | **Discoverable**: User can find version at org homepage | Badge shows vX.Y.Z at github.com/aget-framework | Phase 4.3 |
-| **Accessible**: User can download/clone tagged version | GitHub Release exists with "Latest" badge | Phase 3.3 |
+| **Accessible**: User can download/clone tagged version | GitHub Release exists with "Latest" badge | Phase 6.4.5 (v3.16+; was Phase 3.3) |
 | **Documented**: User can read what changed | CHANGELOG.md entry + release notes exist | Phase 2, Phase 3.2 |
 | **Consistent**: All repos show same version | version.json, AGENTS.md, manifest.yaml aligned | Phase 3.1 |
 | **Validated**: Automated checks pass | `post_release_validation.py` exit code 0 | Phase 4.1 |
@@ -2020,7 +2020,15 @@ done
 
 **Checkpoint**: All 7 repos pushed, no failures.
 
-### Phase 3: Tag & Release
+### Phase 3: Tag & Release (⚠️ DEPRECATED LOCATION for v3.16+)
+
+> **⚠️ POSITIONING NOTICE (v3.16+, #1154 Option A)**: The tag-cut commands below remain authoritative, but the **execution location moved to [Phase 6.4.5](#645-tag--release-authoritative-position-for-v316)** to fix the tag-vs-HEAD fleet artifact gap (#1154).
+>
+> **Why moved**: Tagging at this phase produced tags whose `git show vX.Y.Z:handoffs/RELEASE_HANDOFF_vX.Y.Z.md` returned "not found" because handoff artifacts did not yet exist in the working tree (created later at Phase 6.2). Remote fleet supervisors fetching the tag could not access tag-pinned handoff/DEPLOYMENT_SPEC/BREAKING_CHANGES — confirmed root cause for legalon supervisor #1152 incident.
+>
+> **For v3.16+ releases**: Execute Phase 1 → Phase 2 → Phase 4 (validation of pushed commits — gh release commands deferred) → Phase 5 → Phase 6.1 → Phase 6.2 → Phase 6.3 → Phase 6.3.1 → Phase 6.4 → **Phase 6.4.5 (tag-cut here)** → Phase 6.5 → Phase 7.
+>
+> **For v3.15 and earlier**: Phase 3 was the canonical position; tags reflect that ordering. Do NOT retroactively re-tag historical releases.
 
 **Purpose**: Create git tags and GitHub Releases for all repos
 
@@ -2530,6 +2538,65 @@ Handoff From: Framework Manager
 
 ---
 
+#### 6.4.5. Tag & Release (Authoritative Position for v3.16+)
+
+**⚠️ This is the authoritative tag-cut location for v3.16+ releases per #1154 Option A.** Phase 3 retains the tag-cut commands for reference, but execution happens HERE so handoff artifacts (RELEASE_HANDOFF, DEPLOYMENT_SPEC, BREAKING_CHANGES) are tag-resolvable.
+
+**Purpose**: Create git tags + GitHub Releases AFTER handoff artifacts exist in working tree.
+
+**Precondition Verification** (BLOCKING — run before tag commands):
+
+```bash
+VERSION=X.Y.Z
+
+# All three handoff artifacts must exist in working tree before tag
+test -f "handoffs/RELEASE_HANDOFF_v${VERSION}.md" && \
+  echo "✅ RELEASE_HANDOFF present" || \
+  { echo "❌ RELEASE_HANDOFF missing — return to Phase 6.2"; exit 1; }
+
+test -f "DEPLOYMENT_SPEC_v${VERSION}.yaml" -o -f "aget/DEPLOYMENT_SPEC_v${VERSION}.yaml" && \
+  echo "✅ DEPLOYMENT_SPEC present" || \
+  { echo "❌ DEPLOYMENT_SPEC missing — return to Phase 6.2"; exit 1; }
+
+# BREAKING_CHANGES only required if release has BC-NNN
+if grep -q "BC-[0-9]" CHANGELOG.md 2>/dev/null; then
+  test -f "docs/BREAKING_CHANGES_v${VERSION%.*}.md" && \
+    echo "✅ BREAKING_CHANGES present (BC release)" || \
+    { echo "❌ BREAKING_CHANGES missing for BC release"; exit 1; }
+fi
+```
+
+**Tag Creation**: Run the commands at [Phase 3.1](#31-create-tags-all-repos) — they remain authoritative and unchanged. Execute them here, after the precondition verification above passes.
+
+**Push Tags**: Run [Phase 3.2](#32-push-tags) commands.
+
+**Create GitHub Releases**: Run [Phase 3.3](#33-create-github-releases) commands.
+
+**Verify Releases**: Run [Phase 3.4](#34-verify-releases) commands.
+
+**Post-Tag V-test (BLOCKING — fixes #1154)**: Verify handoff artifacts are tag-resolvable:
+
+```bash
+VERSION=X.Y.Z
+
+# CRITICAL: Verify tag resolves handoff artifacts (the #1154 gap closure)
+git show "v${VERSION}:handoffs/RELEASE_HANDOFF_v${VERSION}.md" >/dev/null 2>&1 && \
+  echo "✅ git show v${VERSION}:handoffs/RELEASE_HANDOFF_v${VERSION}.md resolves" || \
+  { echo "❌ #1154 REGRESSION: tag does not resolve RELEASE_HANDOFF — tag was cut before Phase 6.2"; exit 1; }
+
+# Same check for DEPLOYMENT_SPEC (canonical at aget/ root per L910 update path)
+git show "v${VERSION}:aget/DEPLOYMENT_SPEC_v${VERSION}.yaml" >/dev/null 2>&1 || \
+  git show "v${VERSION}:DEPLOYMENT_SPEC_v${VERSION}.yaml" >/dev/null 2>&1 && \
+  echo "✅ DEPLOYMENT_SPEC tag-resolvable" || \
+  { echo "⚠️ DEPLOYMENT_SPEC not tag-resolvable (verify path)"; }
+```
+
+**Implements**: #1154 (tag-vs-HEAD fleet artifact gap), root-caused from legalon #1152 (FLEET-UPG-014). v3.15 was the last release with the deprecated ordering; v3.16 is the first release exercising the corrected ordering.
+
+**Rationale**: Tags are immutable references. Remote fleet supervisors checking out vX.Y.Z must be able to read the handoff/spec from the tagged commit, not from a moving HEAD that may have advanced. Cutting tag AFTER Phase 6.4 ensures all handoff state is captured in the tag commit.
+
+---
+
 #### 6.5. Handoff Verification
 
 ```bash
@@ -2816,4 +2883,4 @@ git push origin main
 
 ---
 
-*SOP_release_process.md v1.29 — Phase 4.5.1: Publication Integrity Verification + Phase 6.3.1: L658/L660 guards (D60, L659)*
+*SOP_release_process.md v1.30 — Phase 6.4.5: Tag & Release authoritative position post-handoff (#1154 Option A); Phase 3 deprecated location with cross-reference. Tag-resolvability V-test BLOCKING.*
