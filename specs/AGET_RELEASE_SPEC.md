@@ -1,6 +1,6 @@
 # AGET Release Specification
 
-**Version**: 1.16.0
+**Version**: 1.16.1
 **Status**: Active
 **Category**: Process (Release Management)
 **Format Version**: 1.2
@@ -523,7 +523,7 @@ fi
 **Status Transitions:**
 
 ```
-PLANNING → READY FOR RELEASE → RELEASED
+PLANNING → SCOPE_LOCKED → READY FOR RELEASE → RELEASED
     ↓
 CANCELLED (with rationale)
 ```
@@ -1055,7 +1055,7 @@ gh issue list --repo gmelli/aget-aget --search "Fleet upgrade retro: vX.Y.Z" --j
 
 - AC-REL-029-1: Validator drift detected (e.g., spec says 32, baseline derives 33) → R-REL-029-03 HALT triggered with diagnostic naming both values
 - AC-REL-029-2: README count mismatch with spec (e.g., README says "12 archetypes" but filesystem shows 13) → R-REL-029-04 FAIL with diagnostic
-- AC-REL-029-3: VERSION_SCOPE not at LOCKED status → R-REL-029-05 HALT
+- AC-REL-029-3: VERSION_SCOPE status ∉ {SCOPE_LOCKED, READY FOR RELEASE} → R-REL-029-05 HALT
 - AC-REL-029-4: Active PROJECT_PLAN with Gate 1 IN PROGRESS → R-REL-029-06 advisory (not HALT — informational only)
 - AC-REL-029-5: BREAKING_CHANGES manifest present + ADR-NN with `Status: Accepted` ratifying breaking policy → R-REL-029-07 PASS; missing ADR → HALT
 - AC-REL-029-6: Audit artifact emitted at `sessions/release_readiness_audit_{DATE}.md` with all 7 R-REL-029-NN checks recorded with PASS/FAIL + remediation links
@@ -1073,7 +1073,7 @@ echo "V-REL-029-A: validator check exists" || echo "V-REL-029-A: FAIL"
 python3 scripts/release_readiness_gate.py --version 3.15.0 --check readme_consistency 2>&1 | grep -E "PASS|FAIL" && \
 echo "V-REL-029-B PASS" || echo "V-REL-029-B FAIL"
 
-# V-REL-029-C: VERSION_SCOPE LOCKED check (R-REL-029-05)
+# V-REL-029-C: VERSION_SCOPE status ∈ {SCOPE_LOCKED, READY FOR RELEASE} check (R-REL-029-05)
 python3 scripts/release_readiness_gate.py --version 3.15.0 --check version_scope_locked 2>&1 | grep -E "PASS|HALT" && \
 echo "V-REL-029-C PASS" || echo "V-REL-029-C FAIL"
 
@@ -1375,6 +1375,11 @@ Per the two-level model (L742): requirements define principal intent (human leve
 ---
 
 ## Changelog
+
+### v1.16.1 (2026-05-02)
+
+- **R-REL-022-01 cascade completion**: v1.16.0 amendment landed enum extension at line 519 + R-REL-029-05 line 998, but missed 3 downstream references that still cited the old `LOCKED` value: status-flow diagram (line 526 — `PLANNING → READY FOR RELEASE → RELEASED` lacked SCOPE_LOCKED), AC-REL-029-3 acceptance criterion (line 1058), V-REL-029-C V-test name (line 1076). All three updated to use the canonical 5-value enum or `status ∈ {SCOPE_LOCKED, READY FOR RELEASE}` predicate. Surfaced by distributed-Auditor pass 2026-05-02 13:45 (F-AUDIT-REL-030); incomplete-cascade was effectively L671 at the cross-reference layer.
+- See: gmelli/aget-aget#1179 (parent fix), F-AUDIT-REL-030
 
 ### v1.16.0 (2026-05-02)
 
