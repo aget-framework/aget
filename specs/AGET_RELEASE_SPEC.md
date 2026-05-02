@@ -1,11 +1,11 @@
 # AGET Release Specification
 
-**Version**: 1.14.0
+**Version**: 1.16.0
 **Status**: Active
 **Category**: Process (Release Management)
 **Format Version**: 1.2
 **Created**: 2026-01-04
-**Updated**: 2026-02-20
+**Updated**: 2026-05-02
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_RELEASE_SPEC.md`
 **Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.2
@@ -516,7 +516,7 @@ fi
 
 | ID | Pattern | Statement | Rationale |
 |----|---------|-----------|-----------|
-| R-REL-022-01 | ubiquitous | VERSION_SCOPE status SHALL be one of: PLANNING, READY FOR RELEASE, RELEASED, CANCELLED | Status clarity |
+| R-REL-022-01 | ubiquitous | VERSION_SCOPE status SHALL be one of: PLANNING, SCOPE_LOCKED, READY FOR RELEASE, RELEASED, CANCELLED | Status clarity (SCOPE_LOCKED added v1.16.0 per #1179 + L708 vocabulary) |
 | R-REL-022-02 | conditional | IF status is PLANNING THEN release SHALL NOT proceed | Gate enforcement |
 | R-REL-022-03 | conditional | IF release cancelled THEN VERSION_SCOPE SHALL include cancellation rationale | Decision audit |
 
@@ -995,7 +995,7 @@ gh issue list --repo gmelli/aget-aget --search "Fleet upgrade retro: vX.Y.Z" --j
 | R-REL-029-02 | ubiquitous | The Pre-Release Conformance Gate SHALL invoke `aget/verification/validate_archetype_skills.py` (CAP-TPL-016-04 universal-skill conformance) | First concrete validator consumer landed in v3.15 P1 #10 (commit `dff5e47`) |
 | R-REL-029-03 | conditional | IF the validator reports drift between AGET_TEMPLATE_SPEC mandate and worker-baseline OR fewer than N-1 templates conformant (where N is total `-aget` template count, allowing 1 known-outlier per current document-processor exclusion), THEN the release SHALL HALT until either (a) the spec is updated, OR (b) templates are remediated | Release-blocker semantics formalized; aligns with SOP v1.40 Pre-Flight FAIL semantics |
 | R-REL-029-04 | ubiquitous | The Pre-Release Conformance Gate SHALL verify `aget/README.md` archetype count + universal-skill count match `AGET_TEMPLATE_SPEC.md` mandate | Catches documentation drift before release ships rhetoric (#1116 evidence; staleness since v3.13.0 was caught only by external review) |
-| R-REL-029-05 | ubiquitous | The Pre-Release Conformance Gate SHALL verify VERSION_SCOPE_v{VERSION}.md exists at `LOCKED` status | R-REL-020 dependency; release without locked scope is structurally premature (L850) |
+| R-REL-029-05 | ubiquitous | The Pre-Release Conformance Gate SHALL verify VERSION_SCOPE_v{VERSION}.md status ∈ {SCOPE_LOCKED, READY FOR RELEASE} | R-REL-020 dependency; release without locked scope is structurally premature (L850); enum aligned with R-REL-022-01 (v1.16.0 #1179 fix) |
 | R-REL-029-06 | conditional | IF an active PROJECT_PLAN_v{VERSION}_release_v{N}.md exists AND that plan declares Gate 1 (or equivalent build-phase gate) IN PROGRESS THEN the Pre-Release Conformance Gate SHALL surface "Gate 1 not complete; release-build phase artifacts incomplete" as advisory | L894 plan-driven discipline; warns against premature release execution while build phase still has open Work Streams |
 | R-REL-029-07 | conditional | IF release is `breaking` per current `BREAKING_CHANGES_v{VERSION}.md` AND no ADR has ratified the breaking-change policy for this cycle THEN the Pre-Release Conformance Gate SHALL HALT until ADR ratified | ADR-022 precedent (v3.15); breaking change without ADR = ungoverned scope |
 | R-REL-029-08 | ubiquitous | The Pre-Release Conformance Gate SHALL emit a structured PASS/FAIL summary to `sessions/release_readiness_audit_{DATE}.md` with per-check status + remediation links for any FAIL | Audit trail for release retrospective; consumed by Phase 7.1.5 PIR scoring (R-REL-024) |
@@ -1375,6 +1375,13 @@ Per the two-level model (L742): requirements define principal intent (human leve
 ---
 
 ## Changelog
+
+### v1.16.0 (2026-05-02)
+
+- **R-REL-022-01 enum extension**: added `SCOPE_LOCKED` to VERSION_SCOPE status enum. Now `{PLANNING, SCOPE_LOCKED, READY FOR RELEASE, RELEASED, CANCELLED}`. Closes 3-way vocabulary collision flagged in gmelli/aget-aget#1179: spec text used `LOCKED`/`READY FOR RELEASE` in different requirements; canonical now aligned with L708 vocabulary verbatim
+- **R-REL-029-05 cascade**: Pre-Release Conformance Gate now verifies `status ∈ {SCOPE_LOCKED, READY FOR RELEASE}` (was: `exists at LOCKED status` — a value never in the R-REL-022-01 enum); enum coherence restored
+- **Header version drift correction**: prior release amendment 457387a (2026-04-26) added v1.15.0 changelog entry but did not bump the **Version** header (left at v1.14.0). v1.16.0 bumps from latest changelog-marked version + this amendment. L671 instance at version-bump layer recorded
+- See: gmelli/aget-aget#1179, L708, L914 (path-resolution discipline note from 2026-05-02 session)
 
 ### v1.15.0 (2026-04-26)
 
