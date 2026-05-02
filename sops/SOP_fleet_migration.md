@@ -1,11 +1,11 @@
 # SOP: Fleet Migration
 
-**Version**: 1.5.0
+**Version**: 1.6.0
 **Status**: Active
 **Created**: 2026-01-05
-**Updated**: 2026-04-26
+**Updated**: 2026-05-02
 **Owner**: aget-framework
-**Implements**: CAP-MIG-017 (Remote Supervisor Upgrade)
+**Implements**: CAP-MIG-017 (Remote Supervisor Upgrade), SD-3 wave-sequencing (v1.6.0)
 **Related**: L455 (AGENTS.md Invocation Verification), L457 (Cross-Machine Pre-Flight), AGET_RELEASE_SPEC, PROJECT_PLAN_fleet_v3.2_migration.md
 
 ---
@@ -24,6 +24,39 @@ Fleet migration is **centralized by default**: the supervisor executes all agent
 |-------|------|-----------|
 | **Centralized** (default) | Fleet ≤ 40 agents, single supervisor machine | Supervisor iterates agents directly |
 | **Distributed** | Fleet > 40, multi-machine, or principal directed | Each agent receives REMOTE_MIGRATION_MESSAGE; supervisor coordinates |
+
+---
+
+## Wave Sequencing
+
+Fleet migration proceeds in three sequential waves. Each wave SHALL complete before the next begins; wave-boundary V-tests are blocking gates.
+
+| Wave | Scope | Purpose | Sequencing Rule |
+|------|-------|---------|-----------------|
+| **Wave 0** | Supervisor self-upgrade | Validate target version on the agent that will execute the rest of the migration | MUST land before any Wave 1 work; supervisor cannot orchestrate an upgrade it has not itself completed |
+| **Wave 1** | Pilot agent(s) — typically 1-3 representative agents | Risk validation: surface BC-NNN violations, V-test gaps, or framework-defects before full-fleet exposure | MUST land + soak ≥ 1 session before Wave 2; rollback at this stage is bounded to the pilot set |
+| **Wave 2** | Remainder of fleet (main + secondary portfolios) | Full-fleet propagation | Proceeds only after Wave 1 success; portfolio batches sequenced per Phase 2-3 |
+
+### Wave-to-Phase Mapping
+
+| Wave | Phases (this SOP) | Boundary V-test |
+|------|-------------------|-----------------|
+| Wave 0 | Phase 0.5 (Remote Supervisor Pre-Flight) + supervisor's own version-bump | V0.5.3 (Version Verification on supervisor) |
+| Wave 1 | Phase 1 (Gate 1.1 → Gate 1.4) | Gate 1.4 (Pilot Commit) |
+| Wave 2 | Phase 2 + Phase 3 + Phase 4 | Gate 4.2 (Version Consistency Check across remaining fleet) |
+
+### Why Sequenced (Not Parallel)
+
+- **Wave 0 before Wave 1**: A supervisor running v(N-1) cannot reliably orchestrate v(N) on its workers — it lacks the target version's specs, scripts, and V-tests. Self-upgrade first is the bootstrapping invariant.
+- **Wave 1 before Wave 2**: Pilots surface release-defects at bounded blast radius (1-3 agents). Skipping Wave 1 trades observability for speed; the trade is rarely worth it once fleet > 5 agents. Past cycles show 60-80% of release-defects surface in Wave 1.
+- **No Wave-skip without principal approval**: An "experienced" release where Wave 1 feels redundant is exactly when L92 (Premature Victory) is most likely. Document any wave-skip in the migration session log with explicit principal approval citation.
+
+### Wave-Boundary Rollback
+
+If a wave fails its boundary V-test:
+- **Wave 0 fail**: Halt migration; supervisor cannot proceed. Triage on supervisor itself.
+- **Wave 1 fail**: Rollback pilot(s) per Rollback Criteria (see below); file release-blocking issue; do NOT enter Wave 2.
+- **Wave 2 fail (per-portfolio batch)**: Halt batch; complete in-flight agents; rollback failed agents; surface to principal for triage decision (continue with other batches vs. halt all of Wave 2).
 
 ---
 
@@ -606,6 +639,12 @@ See: `docs/patterns/PATTERN_weekly_fleet_health_monitor.md` (framework-recommend
 ---
 
 ## Changelog
+
+### v1.6.0 (2026-05-02)
+
+- **Added**: Wave Sequencing section — Wave 0 (supervisor self) → Wave 1 (pilots) → Wave 2 (full fleet); wave-to-phase mapping; wave-boundary V-tests; wave-skip prohibition without principal approval; wave-boundary rollback procedure
+- **Rationale**: Closes SD-3 wave-sequencing residual surfaced by Gate 1 entry-time scope re-check (F-AUDIT-REL-G1-001, plan v1.0.11). v1.5.0 covered 5/6 SD-3 required sections; wave sequencing was the absent 6th. Sequencing was implicit in Phase 0.5/Phase 1 ordering but not named or constraint-bound.
+- **Sources**: VERSION_SCOPE_v3.16.0 row #2 SD-3, plan G1.1 deliverable (PROJECT_PLAN_v3.16.0_release_v1.0.md v1.0.11)
 
 ### v1.5.0 (2026-04-26)
 
