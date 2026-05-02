@@ -1,0 +1,172 @@
+# DEPLOYMENT_SPEC_v3.16.0.yaml
+# Complete target state specification for v3.16.0 deployment
+#
+# Purpose: Define what a correctly-deployed v3.16.0 agent looks like.
+# Usage: Supervisors use this to verify fleet deployments.
+# Governance: R-DEP-002 (State-Based Deployment Requirement), R-REL-038
+#
+# Created: 2026-05-02
+# Origin: DEPLOYMENT_SPEC_v3.15.0.yaml
+# Release: Framework-Discipline Closure + Wave-1A Spec Contracts + /aget-go Production
+#
+# NOTE: v3.16.0 is NON-BREAKING. The Plan_Status template field rename is
+# documentation-vocabulary; wind_down.py extended for backward compat.
+
+version: "3.16.0"
+spec_version: "2.0.0"
+created: "2026-05-02"
+status: active
+supersedes: "DEPLOYMENT_SPEC_v3.15.0.yaml"
+breaking_release: false
+
+# =============================================================================
+# VERIFICATION SCRIPT
+# =============================================================================
+
+verification_script:
+  file: "scripts/verify_deployment.py"
+  usage: "python3 scripts/verify_deployment.py --version 3.16.0 --path /path/to/agent"
+  inherits: "v3.15.0 verification surface (no v3.16-specific checks added)"
+
+# =============================================================================
+# TARGET STATE
+# =============================================================================
+
+mandatory_changes:
+  - id: "M-3.16-1"
+    description: "version.json aget_version field set to '3.16.0'"
+    blocking: true
+    detection: "test $(jq -r .aget_version .aget/version.json) = '3.16.0'"
+
+  - id: "M-3.16-2"
+    description: "AGENTS.md @aget-version header set to '3.16.0'"
+    blocking: true
+    detection: "grep -q '^@aget-version: 3.16.0' AGENTS.md"
+
+optional_changes:
+  - id: "O-3.16-1"
+    description: "Plan_Status / Gate_Status schema in NEW PROJECT_PLAN files (CAP-PP-003)"
+    blocking: false
+    note: "Backward-compat preserved; old plans continue to work; wind_down.py reads both prefixes"
+
+  - id: "O-3.16-2"
+    description: "Qualified L-doc IDs {agent_short_name}-L{NNN} in cross-fleet citations (CAP-LDOC-010)"
+    blocking: false
+    note: "Local-scope citations remain valid as unqualified L{NNN}"
+
+  - id: "O-3.16-3"
+    description: "Adopt /aget-go (SKILL-048) for spec-amending or fleet-wide gates"
+    blocking: false
+    note: "Free-text 'go' remains valid for low-risk gates"
+
+  - id: "O-3.16-4"
+    description: "Wave 0/1/2 sequencing in fleet migration plans (SOP_fleet_migration v1.6.0)"
+    blocking: false
+    applicability: "supervisor templates"
+
+# =============================================================================
+# ARCHETYPE-SPECIFIC CHANGES (CAP-TPL-016-07 NEW)
+# =============================================================================
+
+archetype_specific:
+  release_execution_archetypes: ["worker", "supervisor"]
+  release_triad_skills:
+    - "aget-release-build"
+    - "aget-release-audit-specs"
+    - "aget-release-critique"
+
+  per_archetype_action:
+    advisor:
+      action: "Verify release-triad skills NOT present (or remove if migrated up from v3.15)"
+      rationale: "advisor archetype is NOT in release-execution catalog per CAP-TPL-016-07"
+    analyst:
+      action: "Same as advisor"
+    architect:
+      action: "Same as advisor"
+    consultant:
+      action: "Same as advisor"
+    developer:
+      action: "Same as advisor (per Auditor strict reading; revisit v3.17 if release work emerges)"
+    executive:
+      action: "Same as advisor"
+    operator:
+      action: "Same as advisor"
+    researcher:
+      action: "Same as advisor"
+    reviewer:
+      action: "Same as advisor"
+    spec-engineer:
+      action: "Same as advisor (per Auditor strict reading; revisit v3.17 if spec-gating release work emerges)"
+    worker:
+      action: "Retain release-triad (release-execution archetype)"
+    supervisor:
+      action: "Retain release-triad (release-execution archetype)"
+    document-processor:
+      action: "Dormant per #1121; no skills baseline; v3.17 lifecycle decision pending"
+
+# =============================================================================
+# UNIVERSAL-SKILL MANDATE
+# =============================================================================
+
+universal_skills:
+  count: 29
+  source: "CAP-TPL-016-04 (v3.16 update from 32 → 29; release-triad moved to archetype-specific)"
+  validator: "aget/verification/validate_archetype_skills.py"
+  expected_validator_output:
+    spec_mandate: 29
+    derived_universal: 29
+    aligned: true
+
+# =============================================================================
+# SLEEPING REQUIREMENTS DISCLOSURE (R-DEP-010)
+# =============================================================================
+
+sleeping_requirements:
+  disclosure_in_changelog: true
+  disclosure_in_release_notes: true
+  affected_caps:
+    - id: "CAP-REL-030"
+      description: "Post-Release CHANGELOG Validator"
+      implementation_target: "v3.17"
+      removal_threshold: "v3.18"
+    - id: "CAP-REL-031"
+      description: "Post-Release Tag Validator"
+      implementation_target: "v3.17"
+      removal_threshold: "v3.18"
+      note: "Headline #1154 invariant enforced procedurally via SOP v1.30 Phase 6.4.5 inline V-test meanwhile"
+    - id: "CAP-REL-032"
+      description: "Post-Release Badge/Parity Validator"
+      implementation_target: "v3.17"
+      removal_threshold: "v3.18"
+    - id: "CAP-REL-033"
+      description: "Post-Release Contract-Test Validator"
+      implementation_target: "v3.17"
+      removal_threshold: "v3.18"
+
+# =============================================================================
+# COMPLETION RESPONSE (per RUBRIC_fleet_upgrade_outcome v1.1)
+# =============================================================================
+
+completion_response:
+  release_outcome_report_required: true
+  rubric: "aget/rubrics/RUBRIC_fleet_upgrade_outcome_v1.1.md"
+  minimum_score: 10
+  fields_required:
+    - fleet_coverage
+    - bc_compliance  # NONE for v3.16 (non-breaking)
+    - time_to_productive
+    - friction_index
+    - plan_revision_count
+    - handoff_completeness
+
+# =============================================================================
+# REFERENCES
+# =============================================================================
+
+references:
+  changelog: "aget/CHANGELOG.md (v3.16.0 entry)"
+  release_handoff: "aget/handoffs/RELEASE_HANDOFF_v3.16.0.md"
+  tag_resolvable_invariant: "SOP_release_process v1.30 Phase 6.4.5 (#1154 closure)"
+  process_changes:
+    - "L916 (NEW): Spec-Claimed-Delegate-Without-Implementation pattern"
+    - "Gating-Triad mechanism formalization v3.17 (CAP-PP-019 amendment candidate)"
