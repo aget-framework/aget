@@ -1,6 +1,6 @@
 # SOP: Release Process
 
-**Version**: 1.30
+**Version**: 1.31
 **Created**: 2025-11-30
 **Updated**: 2026-05-02
 **Owner**: private-aget-framework-AGET
@@ -2530,29 +2530,58 @@ done
 
 ##### 6.4.5.3. Create GitHub Releases
 
-**Note**: Pushing tags does NOT create GitHub Releases. Use `gh` CLI:
+**Note**: Pushing tags does NOT create GitHub Releases. Use `gh` CLI.
+
+**Body content requirement (v3.16.1+ post-defect)**: GitHub Release body SHALL be sourced from each repo's `CHANGELOG.md` v{VERSION} entry via `--notes-file`, NOT inline `--notes "see CHANGELOG"`. The release page is the canonical public-facing surface; redirect-only release bodies are an L671 instance at the GitHub-Release surface (decorative redirect with substantive content elsewhere). The CHANGELOG entry is already L909-sanitized at G3.4 — reusing it preserves both content density AND sanitization discipline.
+
+**Per-repo CHANGELOG extraction** (one-shot per repo):
 
 ```bash
-for repo in aget template-supervisor-aget template-worker-aget template-advisor-aget template-consultant-aget template-developer-aget template-spec-engineer-aget; do
-  echo "=== Creating release for $repo ==="
+VERSION=X.Y.Z
+for repo in $RELEASED_REPOS; do
   cd "$repo"
-  gh release create vX.Y.Z \
-    --title "vX.Y.Z - Brief Title" \
-    --notes "Release notes content here
-
-See https://github.com/aget-framework/aget/blob/main/specs/deltas/AGET_DELTA_vX.Y.md for complete changes."
+  # Extract the [VERSION] block from CHANGELOG.md (between this version's heading and the next)
+  awk "/^## \\[$VERSION\\]/,/^## \\[/" CHANGELOG.md | sed '$d' > /tmp/${repo}_v${VERSION}_body.md
+  # L909 re-verify (defense in depth; CHANGELOG was sanitized at G3.4 but verify before public push)
+  for pat in 'private-[a-z]+-(aget|AGET)' 'gmelli/' '[0-9]+ agents( in| across)?' 'FLEET-[A-Z]+-[0-9]+' 'SESSION_2026-[0-9]' 'legalon'; do
+    grep -qiE "$pat" /tmp/${repo}_v${VERSION}_body.md && { echo "❌ L909 FAIL ($repo): $pat"; exit 1; }
+  done
+  gh release create "v$VERSION" \
+    --title "v$VERSION - <Theme from CHANGELOG header>" \
+    --notes-file /tmp/${repo}_v${VERSION}_body.md \
+    --latest
   cd ..
 done
 ```
 
-##### 6.4.5.4. Verify Releases
+**Anti-pattern (DO NOT)**:
 
 ```bash
-for repo in aget template-supervisor-aget template-worker-aget template-advisor-aget template-consultant-aget template-developer-aget template-spec-engineer-aget; do
+# WRONG (L671 at release-body surface — produces ~138-byte decorative redirect)
+gh release create v$VERSION --notes "Non-breaking minor release. See CHANGELOG.md."
+```
+
+**Rationale**: Casual users landing on the GitHub Release page should see the substantive change list inline, not a redirect. Sleeping-CAPs disclosure (when present) MUST be visible at the release-body level, not gated behind a click to the CHANGELOG.
+
+##### 6.4.5.4. Verify Releases (with body-content V-test)
+
+```bash
+VERSION=X.Y.Z
+for repo in $RELEASED_REPOS; do
   echo "=== $repo ==="
+  # Existing: open in browser for visual check
   open "https://github.com/aget-framework/$repo/releases"
+  # NEW (v3.16.1+ post-defect): body-content non-trivial check
+  body_bytes=$(gh release view "v$VERSION" --repo aget-framework/$repo --json body -q .body | wc -c | tr -d ' ')
+  if [ "$body_bytes" -lt 500 ]; then
+    echo "⚠️ WARN: $repo release body $body_bytes bytes (< 500 minimum for non-trivial release; potential L671-at-release-surface)"
+  else
+    echo "✅ $repo: $body_bytes bytes"
+  fi
 done
 ```
+
+**WARN-tier threshold**: 500 bytes for non-trivial releases. Trivial releases (pure-mechanical version bumps with no functional change) MAY ship below threshold but SHOULD declare so explicitly in CHANGELOG. WARN does NOT block release execution; surfaces for principal awareness.
 
 **Verification Checklist**:
 - [ ] All repos show new release on GitHub Releases page
@@ -2869,4 +2898,4 @@ git push origin main
 
 ---
 
-*SOP_release_process.md v1.30 — Phase 6.4.5: Tag & Release authoritative position post-handoff (#1154 Option A); Phase 3 deprecated location with cross-reference. Tag-resolvability V-test BLOCKING.*
+*SOP_release_process.md v1.31 — Phase 6.4.5.3: GitHub Release body SHALL be sourced from CHANGELOG entry via --notes-file (not inline --notes "see CHANGELOG"). Phase 6.4.5.4: WARN-tier body-length V-test (500 byte minimum for non-trivial releases). Closes L671-at-release-surface defect surfaced post-v3.16.0 release.*
