@@ -1,6 +1,6 @@
 # SOP: Release Process
 
-**Version**: 1.31
+**Version**: 1.32
 **Created**: 2025-11-30
 **Updated**: 2026-05-02
 **Owner**: private-aget-framework-AGET
@@ -2532,7 +2532,18 @@ done
 
 **Note**: Pushing tags does NOT create GitHub Releases. Use `gh` CLI.
 
-**Body content requirement (v3.16.1+ post-defect)**: GitHub Release body SHALL be sourced from each repo's `CHANGELOG.md` v{VERSION} entry via `--notes-file`, NOT inline `--notes "see CHANGELOG"`. The release page is the canonical public-facing surface; redirect-only release bodies are an L671 instance at the GitHub-Release surface (decorative redirect with substantive content elsewhere). The CHANGELOG entry is already L909-sanitized at G3.4 — reusing it preserves both content density AND sanitization discipline.
+**Body content requirement (v3.16.1+ post-defect; v1.32 two-perspective split)**: GitHub Release body SHALL be sourced from a body file constructed per ONE of two templates depending on perspective:
+
+| Perspective | Template | Norm | Spec |
+|-------------|----------|------|------|
+| **aget core** (`aget-framework/aget`) | `aget/sops/templates/RELEASE_BODY_TEMPLATE_core.md` | 1000-3000 bytes (depth-driven; up to ~9000 acceptable for sleeping-CAPs disclosure or substantive theme) | CAP-REL-032 R-REL-032-07a |
+| **template-{archetype}-aget** (13 templates) | `aget/sops/templates/RELEASE_BODY_TEMPLATE_template.md` | 200-1000 bytes (alignment-driven; inverse-of-core principle — templates stay tight regardless of core release size) | CAP-REL-032 R-REL-032-07b |
+
+**Anti-pattern**: inline `--notes "see CHANGELOG"` (L671 at GitHub-Release surface — decorative redirect with substantive content elsewhere). v3.16.0 cycle evidence: 14/14 repos shipped 138-byte minimal redirect bodies because this anti-pattern was used.
+
+**Anti-pattern (v1.32 NEW)**: pasting full aget core CHANGELOG entry verbatim into a template release body. Inflates template body to core-norm bytes; v3.16.0 archetype-templates shipped 1155 bytes via this pattern when ~600-800 was appropriate. Templates should reference (link to aget core CHANGELOG), not duplicate.
+
+**Construction**: For each repo, construct body per appropriate template, then commit body file path to `--notes-file`. The CHANGELOG entry is already L909-sanitized at G3.4 — when reused (core perspective), preserve both content density AND sanitization discipline. Template perspective: use the template's CHANGELOG entry as input but trim per `RELEASE_BODY_TEMPLATE_template.md` skeleton 1/2/3/4 selection.
 
 **Per-repo CHANGELOG extraction** (one-shot per repo):
 
@@ -2581,7 +2592,13 @@ for repo in $RELEASED_REPOS; do
 done
 ```
 
-**WARN-tier threshold**: 500 bytes for non-trivial releases. Trivial releases (pure-mechanical version bumps with no functional change) MAY ship below threshold but SHOULD declare so explicitly in CHANGELOG. WARN does NOT block release execution; surfaces for principal awareness.
+**WARN-tier thresholds (v1.32 two-perspective split)**:
+- **aget core**: floor 1000 bytes for non-trivial releases (per `RELEASE_BODY_TEMPLATE_core.md` byte-norm calibration); below 1000 = WARN. Sleeping-CAPs disclosure or substantive theme can justify above-norm without WARN.
+- **template-{archetype}-aget**: floor 200 bytes for trivial alignment releases; floor 400 bytes when archetype-specific changes shipped (per `RELEASE_BODY_TEMPLATE_template.md` byte-norm calibration); below floor = WARN. Above 1000 also WARN (likely core-content inflation per anti-pattern).
+
+Trivial releases (pure-mechanical version bumps with no functional change) MAY ship at template-perspective floor (200 bytes) regardless of repo. WARN does NOT block release execution; surfaces for principal awareness.
+
+**Inverse-of-core invariant**: A 9000-byte aget core release body should NOT pull templates above their alignment-norm. WARN if a template release body exceeds 1000 bytes simultaneously with the same release's aget core body exceeding 5000 bytes — that's the "verbose-core-leaked-into-template" pattern.
 
 **Verification Checklist**:
 - [ ] All repos show new release on GitHub Releases page
@@ -2898,4 +2915,4 @@ git push origin main
 
 ---
 
-*SOP_release_process.md v1.31 — Phase 6.4.5.3: GitHub Release body SHALL be sourced from CHANGELOG entry via --notes-file (not inline --notes "see CHANGELOG"). Phase 6.4.5.4: WARN-tier body-length V-test (500 byte minimum for non-trivial releases). Closes L671-at-release-surface defect surfaced post-v3.16.0 release.*
+*SOP_release_process.md v1.32 — Phase 6.4.5.3 split into two perspectives (aget core vs template-{archetype}-aget) per RELEASE_BODY_TEMPLATE_{core,template}.md companion templates at sops/templates/. Phase 6.4.5.4 WARN-tier thresholds calibrated per perspective (core 1000 floor; template 200/400 floor + 1000 ceiling) + inverse-of-core invariant (verbose core MUST NOT inflate templates). Closes core-vs-template-distinction gap surfaced 2026-05-02 by principal recalibration ("do we have requirements and templates for these two perspectives?").*
