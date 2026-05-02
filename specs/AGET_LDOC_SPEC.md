@@ -1,10 +1,10 @@
 # AGET L-Doc Specification
 
 **Spec ID**: SPEC-LDOC-001
-**Version**: 2.2.0
+**Version**: 2.3.0
 **Status**: ACTIVE
-**Implements**: L419 (L-Doc Format v2)
-**Updated**: 2026-04-26
+**Implements**: L419 (L-Doc Format v2), SD-2 Stream 5 Qualified L-Doc IDs (v2.3.0; L801, L807)
+**Updated**: 2026-05-02
 
 ---
 
@@ -239,6 +239,83 @@ The index should be regenerated when:
 
 ---
 
+## Qualified L-Doc IDs (v2.3.0 — SD-2 Stream 5)
+
+### Problem (L801, L807)
+
+L-Doc IDs are integer-suffixed within a single agent (`L638`). When agents cite each other's learnings cross-fleet, the same numeric ID resolves to different content per agent: `L638` in framework-AGET ≠ `L638` in supervisor-AGET. Cross-fleet citations produce **false positives** when an agent verifies another fleet's L-doc IDs against its own index. Three such false positives occurred in a single session despite agent awareness (L807 incident-density signal).
+
+### Format
+
+Qualified L-Doc IDs are prefixed with the agent's short name from `version.json` `aget_short_name`:
+
+```
+{agent_short_name}-L{NNN}
+```
+
+Examples:
+- `framework-L638` — L638 in private-aget-framework-AGET
+- `supervisor-L638` — L638 in private-supervisor-AGET
+- `legalon-L638` — L638 in legalon-vp-AGET
+
+### Backward Compatibility
+
+Unqualified IDs (`L638`) remain valid **within a single agent's scope**. Agents reading their own L-docs continue to use unqualified IDs without change.
+
+| Citation Context | Format | Example |
+|------------------|--------|---------|
+| Agent's own L-doc, internal reference | Unqualified (legacy) | `See L638` |
+| Cross-agent / cross-fleet reference | Qualified (NEW) | `See framework-L638` |
+| Cross-fleet table or citation index | Qualified | `[supervisor-L807, legalon-L394]` |
+| Authored by THIS agent for OTHER agents | Qualified | "We file as `framework-L805`..." |
+
+### When Qualification Is Required
+
+Qualification is **REQUIRED** in these contexts:
+- Cross-agent citations in any artifact (memos, plans, retrospectives, briefings)
+- Cross-fleet tables (e.g., `key_patterns.md` rows referencing other agents' learnings)
+- Public communications where multiple fleet sources are referenced
+- L-doc-to-L-doc cross-references where the target L-doc is in another agent
+
+Qualification is **OPTIONAL** in these contexts:
+- Body of an L-doc citing other learnings within the same agent
+- Local plans/SOPs citing the agent's own L-docs
+- Conversational references where the agent context is clear
+
+### Atomic Assignment
+
+L-doc ID assignment is atomic per agent (using `next_id` in each agent's `index.json`). Cross-session races are prevented by per-agent atomicity. Qualified format does not change assignment semantics — the prefix is derived at citation time from `aget_short_name`.
+
+### Index Lookup
+
+Cross-agent lookup requires reading the foreign agent's `index.json`:
+
+```python
+import json, pathlib
+
+def lookup_qualified_l_doc(qualified_id: str, fleet_root: pathlib.Path) -> dict:
+    """Resolve qualified L-doc ID to its index entry.
+
+    Format: {agent_short_name}-L{NNN}
+    Example: 'framework-L638' resolves to private-aget-framework-AGET/.aget/evolution/L638...
+    """
+    short_name, l_id = qualified_id.split('-', 1)
+    # Map short_name → agent directory via FLEET_REGISTRY (fleet-level; or convention)
+    # Read agent's .aget/evolution/index.json
+    # Return entry for l_id
+    ...
+```
+
+### Migration Note
+
+Existing L-docs do NOT need to be rewritten with qualified IDs. The qualification convention applies at citation time (forward-looking). Bulk re-citation of historical artifacts is out of scope; only new authoring SHALL use qualified IDs in cross-agent contexts.
+
+### Conformance
+
+See CAP-LDOC-010 (qualified-ID requirement for cross-agent citations).
+
+---
+
 ## Cross-Agent Discovery
 
 ### Query by Scope
@@ -309,8 +386,11 @@ python3 scripts/migrate_ldoc_to_v2.py --dry-run .aget/evolution/
 | CAP-LDOC-007 | ubiquitous | The SYSTEM shall track Enforcement_Status for each Learning_Document using one of: observation, recommendation, advisory, enforced. |
 | CAP-LDOC-008 | ubiquitous | The SYSTEM shall report Learning_Document v2 conformance statistics in health_check.py `evolution_directory` output, including: total count, v2-conformant count, and non-conformant count. |
 | CAP-LDOC-009 | event-driven | WHEN a Learning_Document is created on or after the v3.16.0 release date, THEN the SYSTEM shall enforce YAML frontmatter presence (CAP-LDOC-002) as a blocking check, not advisory. |
+| CAP-LDOC-010 | conditional | IF an artifact cites a Learning_Document authored in another agent's evolution directory, THEN the citation SHALL use the qualified format `{agent_short_name}-L{NNN}` to disambiguate cross-fleet references. Unqualified `L{NNN}` remains valid within a single agent's own artifacts. |
 
 **Evidence basis for CAP-LDOC-008/009**: 2026-04-26 conformance audit — 2/568 (0.35%) v2 conformance, 6 legacy schemas (S1–S6, see § Conformance Status). CAP-LDOC-008 surfaces the gap via health_check; CAP-LDOC-009 prevents further drift without requiring immediate bulk migration of 566 legacy L-docs.
+
+**Evidence basis for CAP-LDOC-010**: L801 (cross-fleet false-positive verification: 3 instances in single session despite awareness) + L807 (incident-density threshold: 3+ recurrences = structural fix required). FLEET-UPG-013 vs FLEET-UPG-014 collision class confirmed at project ID layer; same root cause class as L-doc IDs. Backward-compatible: unqualified IDs valid within agent scope; qualification mandatory only for cross-agent reference points.
 
 **Vocabulary**: Learning_Document, Evolution_Index, Enforcement_Status, Applicability_Scope
 

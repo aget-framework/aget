@@ -1,6 +1,6 @@
 # AGET Release Specification
 
-**Version**: 1.16.1
+**Version**: 1.17.0
 **Status**: Active
 **Category**: Process (Release Management)
 **Format Version**: 1.2
@@ -1098,15 +1098,200 @@ This CAP closes REQ-REL-F-001 (Pre-Release Validation procedure exists in SOP si
 
 | Wave-1A Contract | Status | Notes |
 |------------------|:------:|-------|
-| **R-REL-025 (this CAP, CAP-REL-029) — Release Readiness Gate** | **LANDED 2026-04-25** | First of 5 |
-| R-REL-026 — Post-Release CHANGELOG Validator | Not started | Wave-1A item 2 |
-| R-REL-027 — Post-Release Tag Validator | Not started | Wave-1A item 3 |
-| R-REL-028 — Post-Release Badge/Parity Validator | Not started | Wave-1A item 4 (note: collides with existing CAP-REL-028 number; will use CAP-REL-030+ when authored) |
-| R-REL-029 — Post-Release Contract-Test Validator | Not started | Wave-1A item 5 (note: this CAP uses the CAP-REL-029 number; future R-REL-029 covers different concern) |
+| **R-REL-025 (CAP-REL-029) — Release Readiness Gate** | **LANDED 2026-04-25** | First of 5 |
+| **R-REL-026 (CAP-REL-030) — Post-Release CHANGELOG Validator** | **LANDED 2026-05-02** | Wave-1A item 2; v3.16 G1.6; #1149/#1151 root cause |
+| **R-REL-027 (CAP-REL-031) — Post-Release Tag Validator** | **LANDED 2026-05-02** | Wave-1A item 3; v3.16 G1.6; #1154 spec-layer pair to SOP v1.30 fix |
+| **R-REL-028 (CAP-REL-032) — Post-Release Badge/Parity Validator** | **LANDED 2026-05-02** | Wave-1A item 4; v3.16 G1.6; org homepage discoverability |
+| **R-REL-029 (CAP-REL-033) — Post-Release Contract-Test Validator** | **LANDED 2026-05-02** | Wave-1A item 5; v3.16 G1.6; #1148 BC-detection scope |
 
 **Numbering note**: The proposal `PROPOSAL_v315_missing_release_specs.md` reserves R-REL-025 through R-REL-029 as the 5-contract Wave-1A. Existing AGET_RELEASE_SPEC.md uses CAP-REL-NNN format; this CAP claims CAP-REL-029 (next available) and treats `R-REL-025` as the proposal-facing label / requirement-set anchor. Subsequent Wave-1A contracts (proposal labels R-REL-026/027/028/029) will be authored as CAP-REL-030/031/032/033 to avoid further collision; the proposal-facing labels will be cross-referenced in each new CAP's header.
 
 **Evidence**: PROPOSAL_v315_missing_release_specs.md (2026-04-19); SOP_release_process.md v1.38+ Pre-Flight Conformance Audit; v1.40 governing-spec citation correction; #1116 (README count drift evidence); R-REL-020 (VERSION_SCOPE requirement); ADR-022 (breaking change policy precedent); L671 (parent pattern — procedure without contract).
+
+---
+
+### CAP-REL-030: Post-Release CHANGELOG Validator (R-REL-026) — Wave-1A Item 2
+
+**Status**: LANDED 2026-05-02 (v3.16 G1.6). Wave-1A second contract (2 of 5).
+
+**Threat-Class Anchor**: Post-release verification that CHANGELOG.md entries land correctly. v3.15 retro identified two L-doc-named gaps: L900 (CHANGELOG sanitization gap, #1151) and L909 (under-sanitization at write time, sibling to L900). Without contract enforcement, CHANGELOG entries can be missing, malformed, or contain unsanitized private-fleet references.
+
+#### Requirement Set
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| R-REL-030-01 | ubiquitous | The release manager SHALL verify, post-release, that the released version has a corresponding entry in `CHANGELOG.md` for every released repo (aget/ + N templates) | Per-repo CHANGELOG required by R-REL-011 + R-REL-036; post-release check confirms compliance |
+| R-REL-030-02 | ubiquitous | Each CHANGELOG entry SHALL include version header, date, and a non-empty summary section | Empty or template-placeholder entries indicate incomplete release execution |
+| R-REL-030-03 | conditional | IF the release is breaking per `BREAKING_CHANGES_v{VERSION}.md` THEN the CHANGELOG entry SHALL include a "Breaking Changes" subsection with at least one BC-NNN reference | ADR-022 + #1148 BC-detection scope traceability |
+| R-REL-030-04 | conditional | IF a CHANGELOG entry references private agent names (`private-*-aget`), private repo paths (`gmelli/*`), or fleet size disclosures THEN the validator SHALL FAIL with sanitization findings | L909 closure (sanitization gate at write-time → audit at post-release as backstop) + L900 #1151 root cause |
+| R-REL-030-05 | ubiquitous | The validator SHALL emit per-repo PASS/FAIL results to `sessions/post_release_changelog_audit_{VERSION}_{DATE}.md` | Audit trail consumed by Phase 8 retrospective + PIR scoring |
+
+#### Mechanism
+
+Implementation script: `scripts/post_release_changelog_validator.py`. Iterates released repos via FLEET_REGISTRY or the release's repo list, reads CHANGELOG.md, applies R-REL-030-01..04 checks, emits structured audit per R-REL-030-05.
+
+#### Acceptance Criteria
+
+- AC-REL-030-1: Repo missing CHANGELOG entry for released version → R-REL-030-01 FAIL with diagnostic
+- AC-REL-030-2: CHANGELOG entry present but body empty/placeholder → R-REL-030-02 FAIL
+- AC-REL-030-3: Breaking release without BC-NNN reference in CHANGELOG → R-REL-030-03 FAIL
+- AC-REL-030-4: CHANGELOG contains `private-supervisor-AGET` or `gmelli/aget-aget` → R-REL-030-04 FAIL with line numbers
+- AC-REL-030-5: All checks PASS → audit artifact emits at `sessions/post_release_changelog_audit_{VERSION}_{DATE}.md`
+
+#### Verification (V-REL-030)
+
+```bash
+# V-REL-030: Validator invocable + audit artifact emitted
+python3 scripts/post_release_changelog_validator.py --version 3.16.0 && \
+  test -f "sessions/post_release_changelog_audit_3.16.0_$(date +%Y-%m-%d).md" && \
+  echo "V-REL-030 PASS" || echo "V-REL-030 FAIL"
+```
+
+#### Cross-CAP Relationships
+
+- **R-REL-011 + R-REL-036**: This CAP is the post-release audit pair to the pre-release CHANGELOG-required contracts
+- **CAP-SEC-001/004** (Content Security + Public/Private Boundary): R-REL-030-04 is the CHANGELOG-specific instance of CAP-SEC sanitization
+- **L900 + L909**: Sibling-of-L909 sanitization gate at write time + this contract as audit backstop
+
+---
+
+### CAP-REL-031: Post-Release Tag Validator (R-REL-027) — Wave-1A Item 3
+
+**Status**: LANDED 2026-05-02 (v3.16 G1.6). Wave-1A third contract (3 of 5).
+
+**Threat-Class Anchor**: Post-release verification that tags are correctly cut, pushed, and resolve handoff artifacts. #1154 (tag-vs-HEAD fleet artifact gap, root-caused from legalon #1152) confirmed that tags cut at SOP Phase 3 (pre-handoff) returned "not found" for `git show vX.Y.Z:handoffs/RELEASE_HANDOFF_vX.Y.Z.md`. SOP_release_process.md v1.30 (G1.3) moved tag-cut to Phase 6.4.5 procedurally; this CAP makes the tag-resolvability invariant spec-bound (procedure → contract per L671 progression).
+
+#### Requirement Set
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| R-REL-031-01 | ubiquitous | The release manager SHALL verify, post-tag-push, that `git ls-remote origin v{VERSION}` returns the tag for every released repo | Verifies tag is reachable on remote; not just locally created |
+| R-REL-031-02 | ubiquitous | The validator SHALL verify that `git show v{VERSION}:handoffs/RELEASE_HANDOFF_v{VERSION}.md` resolves for the framework repo (aget/) | #1154 closure: tag-pinned handoff must be readable; closes the legalon #1152 root cause class |
+| R-REL-031-03 | conditional | IF the release publishes `DEPLOYMENT_SPEC_v{VERSION}.yaml` THEN the validator SHALL verify `git show v{VERSION}:DEPLOYMENT_SPEC_v{VERSION}.yaml` (or `git show v{VERSION}:aget/DEPLOYMENT_SPEC_v{VERSION}.yaml` per L910 path canonicalization) resolves | Tag-pinned deployment spec required for remote fleet supervisors checking out tag |
+| R-REL-031-04 | ubiquitous | The validator SHALL verify that tag annotation message includes the version string and a non-empty release-notes pointer | R-REL-035 GitHub Release pair: tag without annotation degrades discoverability |
+| R-REL-031-05 | ubiquitous | The validator SHALL emit per-repo tag-resolvability PASS/FAIL to `sessions/post_release_tag_audit_{VERSION}_{DATE}.md` | Audit trail; pair with CAP-REL-030's CHANGELOG audit |
+
+#### Mechanism
+
+Implementation: `scripts/post_release_tag_validator.py`. Uses `git ls-remote` + `git show {tag}:{path}` to verify reachability and tag-pinned content resolution. Sibling to SOP_release_process.md v1.30 Phase 6.4.5 BLOCKING V-test (the SOP runs the check at tag time; this CAP runs it as standalone audit + provides spec backing).
+
+#### Acceptance Criteria
+
+- AC-REL-031-1: Tag missing on remote → R-REL-031-01 FAIL with diagnostic
+- AC-REL-031-2: `git show v3.16.0:handoffs/RELEASE_HANDOFF_v3.16.0.md` returns "not found" → R-REL-031-02 FAIL (this is the #1154 regression detection)
+- AC-REL-031-3: DEPLOYMENT_SPEC published but not tag-resolvable → R-REL-031-03 FAIL
+- AC-REL-031-4: Tag annotation empty or version-string-mismatched → R-REL-031-04 FAIL
+- AC-REL-031-5: All checks PASS → audit artifact emits
+
+#### Verification (V-REL-031)
+
+```bash
+# V-REL-031: tag-resolvability invariant per #1154
+python3 scripts/post_release_tag_validator.py --version 3.16.0 && \
+  test -f "sessions/post_release_tag_audit_3.16.0_$(date +%Y-%m-%d).md" && \
+  echo "V-REL-031 PASS" || echo "V-REL-031 FAIL"
+
+# V-REL-031-handoff: explicit tag-resolution check (the headline #1154 invariant)
+git show v3.16.0:handoffs/RELEASE_HANDOFF_v3.16.0.md >/dev/null 2>&1 && \
+  echo "V-REL-031-handoff PASS" || echo "V-REL-031-handoff FAIL — #1154 regression"
+```
+
+#### Cross-CAP Relationships
+
+- **R-REL-035**: GitHub Release pair (Releases require tags; this CAP audits tag side, R-REL-035 audits Release side)
+- **R-REL-038**: DEPLOYMENT_SPEC pair (spec must exist before tag; this CAP verifies tag resolves it)
+- **SOP_release_process.md v1.30 Phase 6.4.5**: This CAP is the spec-layer pair to the SOP-layer fix; SOP enforces ordering at release time, this CAP audits invariant post-release
+- **#1154 + legalon #1152**: Root cause class spec-bound here
+
+---
+
+### CAP-REL-032: Post-Release Badge/Parity Validator (R-REL-028) — Wave-1A Item 4
+
+**Status**: LANDED 2026-05-02 (v3.16 G1.6). Wave-1A fourth contract (4 of 5).
+
+**Threat-Class Anchor**: Post-release verification of org homepage badge (`version: vX.Y.Z`) and parity across templates (README + AGENTS.md @aget-version). v3.15 retro identified silent staleness when badge was not updated despite tags landing — Definition of Done "Discoverable" requires user can find version at org homepage. Without contract, badge update is a discretionary SOP step.
+
+#### Requirement Set
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| R-REL-032-01 | ubiquitous | The validator SHALL verify, post-release, that the organization homepage (`.github` profile/README.md) displays the released version in a "Latest Release" badge or equivalent visible marker | Definition of Done "Discoverable" criterion (L553) |
+| R-REL-032-02 | ubiquitous | The validator SHALL verify that aget/README.md displays the released version in its header | Per-repo README parity |
+| R-REL-032-03 | ubiquitous | The validator SHALL verify that every released template's `version.json` `aget_version` field equals the released version | R-REL-VER-001 + R-REL-008 post-release check |
+| R-REL-032-04 | ubiquitous | The validator SHALL verify that every released template's AGENTS.md `@aget-version` header equals the released version | Catches AGENTS.md drift independent of version.json (L429 lineage) |
+| R-REL-032-05 | conditional | IF parity check fails THEN the validator SHALL classify the failure: (a) badge-missing (org homepage stale), (b) version-drift (intra-repo inconsistency), (c) cross-repo-drift (templates inconsistent) | Diagnostic structure for remediation routing |
+| R-REL-032-06 | ubiquitous | The validator SHALL emit per-repo + cross-repo parity PASS/FAIL to `sessions/post_release_parity_audit_{VERSION}_{DATE}.md` | Audit trail; complements CAP-REL-030/031 |
+
+#### Mechanism
+
+Implementation: `scripts/post_release_parity_validator.py`. Reads org homepage README via `gh api repos/aget-framework/.github/contents/profile/README.md`, parses version badge; for each released repo reads `version.json` and AGENTS.md `@aget-version`; computes parity matrix.
+
+#### Acceptance Criteria
+
+- AC-REL-032-1: Org homepage badge stale (v3.15) after v3.16 release → R-REL-032-01 FAIL classified as `badge-missing`
+- AC-REL-032-2: aget/README.md missing version header → R-REL-032-02 FAIL
+- AC-REL-032-3: One template's version.json shows old version → R-REL-032-03 FAIL classified as `version-drift`
+- AC-REL-032-4: AGENTS.md @aget-version stale on a template → R-REL-032-04 FAIL
+- AC-REL-032-5: Two templates show different versions → R-REL-032-03 FAIL classified as `cross-repo-drift`
+- AC-REL-032-6: All checks PASS → audit artifact emits
+
+#### Verification (V-REL-032)
+
+```bash
+python3 scripts/post_release_parity_validator.py --version 3.16.0 && \
+  test -f "sessions/post_release_parity_audit_3.16.0_$(date +%Y-%m-%d).md" && \
+  echo "V-REL-032 PASS" || echo "V-REL-032 FAIL"
+```
+
+#### Cross-CAP Relationships
+
+- **R-REL-010** (Organization Homepage Update): Pre-release contract; R-REL-032-01 is the post-release audit pair
+- **R-REL-008 + R-REL-VER-001**: Version inventory + coherence; this CAP audits at post-release
+- **L553 (Definition of Done)**: "Discoverable" outcome criterion; R-REL-032-01 is the spec-bound enforcement
+
+---
+
+### CAP-REL-033: Post-Release Contract-Test Validator (R-REL-029) — Wave-1A Item 5
+
+**Status**: LANDED 2026-05-02 (v3.16 G1.6). Wave-1A fifth contract (5 of 5).
+
+**Threat-Class Anchor**: Post-release verification that contract tests run on the released tag and pass. v3.15 retro identified BC-002 detection scope gap (#1148): breaking changes were not consistently caught by contract tests, especially when test scope didn't align with the BC-NNN scope. Without spec-bound enforcement, contract tests can drift into theater (ADR-007 anti-pattern).
+
+#### Requirement Set
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| R-REL-033-01 | ubiquitous | The validator SHALL verify, post-release, that `pytest tests/` (or equivalent test harness) runs against the released tag and exits 0 | Tag must be testable at the released state, not just at HEAD |
+| R-REL-033-02 | conditional | IF the release contains BC-NNN entries THEN the validator SHALL verify that at least one contract test exists per BC-NNN with a test name or docstring referencing the BC ID | #1148 closure: BC detection scope must be spec-bound, not implicit |
+| R-REL-033-03 | ubiquitous | The validator SHALL verify that test count against the tag does not regress more than 5% from the prior released version (warn) or 10% (FAIL) | ADR-007 No Test Theater; sudden test-count drop indicates skipped/deleted tests masquerading as compliance |
+| R-REL-033-04 | conditional | IF any test is `pytest.mark.skip` or `@unittest.skip` THEN the validator SHALL collect and report skip-reasons; skip-reasons containing "TODO" or empty SHALL FAIL | Skip-without-reason is L671 decorative metadata; skip-with-TODO is unfinished work shipped |
+| R-REL-033-05 | ubiquitous | The validator SHALL emit per-repo test results + BC-coverage matrix to `sessions/post_release_contract_audit_{VERSION}_{DATE}.md` | Audit trail; consumed by Phase 8 retrospective |
+
+#### Mechanism
+
+Implementation: `scripts/post_release_contract_validator.py`. Checks out released tag in temporary worktree, runs test harness, parses results, computes BC coverage matrix by mapping BC-NNN identifiers to test name/docstring matches. Worktree avoids polluting working tree.
+
+#### Acceptance Criteria
+
+- AC-REL-033-1: Tests on released tag exit non-zero → R-REL-033-01 FAIL
+- AC-REL-033-2: BC-002 declared but no test references "BC-002" → R-REL-033-02 FAIL with BC-NNN-without-test diagnostic (#1148 closure)
+- AC-REL-033-3: Test count drops from 160 → 130 between releases → R-REL-033-03 FAIL (>10% regression)
+- AC-REL-033-4: Skipped test with reason "TODO: fix this" → R-REL-033-04 FAIL
+- AC-REL-033-5: All checks PASS → audit artifact emits with full BC-coverage matrix
+
+#### Verification (V-REL-033)
+
+```bash
+python3 scripts/post_release_contract_validator.py --version 3.16.0 && \
+  test -f "sessions/post_release_contract_audit_3.16.0_$(date +%Y-%m-%d).md" && \
+  echo "V-REL-033 PASS" || echo "V-REL-033 FAIL"
+```
+
+#### Cross-CAP Relationships
+
+- **ADR-007** (No Test Theater): Parent precedent; R-REL-033-03/04 enforce no-theater post-release
+- **#1148 (BC-002 detection scope)**: Root cause spec-bound here via R-REL-033-02
+- **CAP-REL-030 (CHANGELOG)**: BC-NNN must appear in CHANGELOG (R-REL-030-03); this CAP verifies BC-NNN has test coverage; together they bind BC declarations end-to-end
 
 ---
 
