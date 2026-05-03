@@ -31,6 +31,14 @@ History:
         (/aget-go SKILL-048, .agetignore CAP-SEC-007, Plan_Status CAP-PP-003
         template), and sleeping CAPs disclosure (R-DEP-010). Falls back to
         legacy hardcoded check for pre-v3.16 versions or when spec absent.
+    v1.3.1 (2026-05-02): Asymmetric-fallback fix surfaced by supervisor test.
+        derive_universal_skills_from_baseline now tries the same home-fallback
+        path that load_deployment_spec uses (~/github/aget-framework/...), so
+        agents outside the aget-framework checkout (e.g., supervisor in its
+        own git tree) get spec-derived 29-skill verification instead of silent
+        fallback to legacy 18-skill check. Fallback WARN is now preserved
+        (prepended to legacy results) so users know the verification surface
+        is incomplete when baseline is unreachable.
 
 Motivation:
     DEPLOYMENT_SPEC_v3.10.0 included verify_v3.10.0.sh (100+ lines, 7 check
@@ -146,12 +154,20 @@ def derive_universal_skills_from_baseline(framework_root):
     the v3.16 universal-skill count is 29, with release-triad moved to
     archetype-specific per CAP-TPL-016-07.
 
-    Returns sorted list of skill names, or None if baseline unreachable.
+    Tries candidate paths in order:
+      1. framework_root / template-worker-aget / .claude / skills (when found via walk-up)
+      2. ~/github/aget-framework/template-worker-aget/.claude/skills (home fallback;
+         supports agents outside the aget-framework checkout, e.g., supervisor in
+         its own git tree)
+
+    Returns sorted list of skill names, or None if no baseline reachable.
     """
-    if framework_root is None:
-        return None
-    baseline_dir = framework_root / "template-worker-aget" / ".claude" / "skills"
-    if not baseline_dir.is_dir():
+    candidates = []
+    if framework_root is not None:
+        candidates.append(framework_root / "template-worker-aget" / ".claude" / "skills")
+    candidates.append(Path.home() / "github" / "aget-framework" / "template-worker-aget" / ".claude" / "skills")
+    baseline_dir = next((c for c in candidates if c.is_dir()), None)
+    if baseline_dir is None:
         return None
     archetype_specific = {
         "aget-execute-task", "aget-track-deliverable",
@@ -404,8 +420,8 @@ def check_universal_skills_v316(agent_path, framework_root):
         return results
     spec_skills = derive_universal_skills_from_baseline(framework_root)
     if not spec_skills:
-        results.append(("WARN", "skills: cannot locate template-worker-aget baseline; falling back to legacy hardcoded check"))
-        return check_universal_skills(agent_path)
+        legacy_results = check_universal_skills(agent_path)
+        return [("WARN", "skills: cannot locate template-worker-aget baseline (tried framework_root + ~/github/aget-framework); falling back to legacy 18-skill hardcoded check — verification is INCOMPLETE for v3.16+ skill mandate")] + legacy_results
     spec_count = len(spec_skills)
     missing = [s for s in spec_skills if not (skills_dir / s).is_dir()]
     if not missing:
