@@ -2,7 +2,7 @@
 
 **Version**: 0.1.0
 **Date**: 2026-05-03
-**Status**: DRAFT
+**Status**: REVIEWED (Auditor lens executed 2026-05-03 ~14:35 PT, H-RHSC-001 G2 GO; 3 implementation findings captured in validator script header — no spec amendments required)
 **Location**: `aget/specs/AGET_RELEASE_HANDOFF_SELF_CONTAINMENT_SPEC.md`
 **Extends**: `AGET_RELEASE_SPEC.md` v1.17.0 (CAP-REL-020 Release Handoff Requirements)
 **Format**: AGET_SPEC_FORMAT v1.3
@@ -273,7 +273,13 @@ This spec is owned by `private-aget-framework-AGET` (manager of public `aget-fra
 | REVIEWED | Auditor lens executed; findings addressed | → ACTIVE |
 | ACTIVE | Spec published; validator implemented; SOP wired | → SUPERSEDED (when v0.2 lands) |
 
-**Current**: DRAFT (2026-05-03; Auditor self-review pending at PP-022 G1 close).
+**Current**: REVIEWED (2026-05-03 ~14:35 PT; Auditor lens executed during H-RHSC-001 G2 GO under principle triad svc-ed; 3 implementation findings captured in `aget/verification/validate_handoff_self_containment.py` script header — no spec text amendments required).
+
+### Audit Trail
+
+| Date | Status Transition | Auditor | Findings | Resolution |
+|------|-------------------|---------|----------|------------|
+| 2026-05-03 ~14:35 PT | DRAFT → REVIEWED | Self (private-aget-framework-AGET) under principle triad spec+verify-first / coherence-next / evidence-driven | 3 implementation contract clarifications (CAP-RHSC-003 publication-time semantics, V-RHSC-008 dual-pass mode, V-RHSC-010 git-diff baseline) | Captured in validator script header; no spec amendments required |
 
 ---
 
