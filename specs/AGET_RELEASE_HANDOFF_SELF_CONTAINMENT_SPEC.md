@@ -236,7 +236,7 @@ This V-test SUPERSEDES the v1.42 private-only `test -f handoffs/REMOTE_MIGRATION
 
 ## Authority Model
 
-This spec is owned by `private-aget-framework-AGET` (manager of public `aget-framework/`). Amendments to invariants follow standard spec amendment process per AGET_GOVERNANCE_HIERARCHY_SPEC.
+This spec is owned by the aget-framework manager. Amendments to invariants follow standard spec amendment process per AGET_GOVERNANCE_HIERARCHY_SPEC.
 
 ---
 
@@ -259,7 +259,7 @@ This spec is owned by `private-aget-framework-AGET` (manager of public `aget-fra
 | Related specs | `AGET_VOCABULARY_SPEC` (CAP-VOC-002 grounding); `AGET_ISSUE_GOVERNANCE_SPEC` (R-ISSUE-011..014 sanitization patterns) |
 | L-docs | L901 (revised by this spec); L910 (CAP-RHSC-003 closure); L916 (CAP-RHSC-006 closure); L917 (CAP-RHSC-007 motivation); L919 (CAP-RHSC-003 secondary); L723, L755 (parent CAP-REL-020 prior art); L671 (parent anti-pattern); supervisor-L644 (CAP-RHSC-001 motivation, qualified per CAP-LDOC-010) |
 | Predecessor work | H-RHSE-001 (COMPLETE 2026-02-15 — content sections); H-PRHR-001 (G4 COMPLETE / G5 reframed-as-coordination 2026-02-22 — publication discipline) |
-| Issues | gmelli/aget-aget#1221 (template-spec drift surfaced during this spec's drafting) |
+| Issues | Internal issue #1221 (template-spec drift surfaced during this spec's drafting) |
 | Wiring SOP | `aget/sops/SOP_release_process.md` (v1.32 → planned v1.33 amendment, PP-022 G3) |
 | Validator | `aget/verification/validate_handoff_self_containment.py` (PP-022 G2 deliverable) |
 
@@ -279,9 +279,10 @@ This spec is owned by `private-aget-framework-AGET` (manager of public `aget-fra
 
 | Date | Status Transition | Auditor | Findings | Resolution |
 |------|-------------------|---------|----------|------------|
-| 2026-05-03 ~14:35 PT | DRAFT → REVIEWED | Self (private-aget-framework-AGET) under principle triad spec+verify-first / coherence-next / evidence-driven | 3 implementation contract clarifications (CAP-RHSC-003 publication-time semantics, V-RHSC-008 dual-pass mode, V-RHSC-010 git-diff baseline) | Captured in validator script header; no spec amendments required |
+| 2026-05-03 ~14:35 PT | DRAFT → REVIEWED | aget-framework manager (self-Auditor) under principle triad spec+verify-first / coherence-next / evidence-driven | 3 implementation contract clarifications (CAP-RHSC-003 publication-time semantics, V-RHSC-008 dual-pass mode, V-RHSC-010 git-diff baseline) | Captured in validator script header; no spec amendments required |
+| 2026-05-03 ~15:00 PT | sanitization sweep (no version bump; semantic-preserving) | aget-framework manager | 4 private-identifier leaks at lines 239, 262, 282, 287 (Authority Model, Traceability, Audit Trail, footer); pre-push #1 check per CAP-RHSC-002 spirit | Replaced private-* identifiers with public-facing equivalents ("aget-framework manager"); no SHALL/V-test changes |
 
 ---
 
 *AGET_RELEASE_HANDOFF_SELF_CONTAINMENT_SPEC v0.1 — DRAFT*
-*Authored 2026-05-03 by private-aget-framework-AGET as Gate 1 deliverable of H-RHSC-001*
+*Authored 2026-05-03 by aget-framework manager as Gate 1 deliverable of H-RHSC-001*
