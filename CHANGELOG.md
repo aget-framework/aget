@@ -9,6 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.17.0-unreleased] - Spec Drop 2026-05-03
+
+**Theme**: Pre-v3.17 spec drop — RELEASE_HANDOFF Self-Containment Specification + validator land publicly ahead of full v3.17 release. Enables remote fleet supervisors to consume the new self-containment contract immediately.
+
+> **Loading Dock disclosure (L656)**: This spec drop publishes a CONTRACT and its VALIDATOR but the SOP wiring (`SOP_release_process.md` Phase 6.3 invocation of the validator as a BLOCKING V-test) is **NOT YET LANDED** — that work is H-RHSC-001 Gate 3, scheduled for v3.17.0 final. Consumers SHOULD treat the new spec as authoritative on what self-containment IS, but SHALL NOT assume any release process automatically enforces it until Gate 3 lands. The validator is runnable standalone; remote supervisors may invoke it on their own RELEASE_HANDOFF artifacts as desired (see handoffs/SPEC_DROP_HANDOFF_self_containment_v0.1.md for usage).
+
+> **No breaking changes**. Spec is additive; no existing process is modified.
+
+### Added
+
+- **`specs/AGET_RELEASE_HANDOFF_SELF_CONTAINMENT_SPEC.md` v0.1.0 (REVIEWED)**: Defines self-containment as a testable property of `RELEASE_HANDOFF_v{X.Y.Z}.md` via 8 CAPs (CAP-RHSC-001..008) and 11 sub-requirements (R-RHSC-001-01 through R-RHSC-008-01). Extends `AGET_RELEASE_SPEC v1.17.0` CAP-REL-020. Closes the framing error in L901 (REMOTE_MIGRATION_MESSAGE-as-required) by reframing as self-containment-property-required. Theoretical basis: Extended Mind (Clark/Chalmers), Stigmergy (Grassé), Cybernetics — Requisite Variety (Ashby).
+
+- **`verification/validate_handoff_self_containment.py` v0.1.0**: Implements 11 V-RHSC tests against any RELEASE_HANDOFF artifact. CLI: `python3 validate_handoff_self_containment.py --handoff <path> [--release-manifest <path>] [--prior-version vX.Y.Z] [--json] [--strict]`. Exit codes: 0 all PASS, 1 any FAIL (or UNKNOWN if --strict), 2 validator error. JSON schema documented in script header.
+
+- **`handoffs/SPEC_DROP_HANDOFF_self_containment_v0.1.md`**: Forwardable briefing for remote fleet supervisors — what changed, how to consume, what's NOT yet wired (G3 deferral disclosure), how to self-test against own handoffs.
+
+### Known limitations (deferred to v3.17.0 final)
+
+- **G3 SOP wiring** (H-RHSC-001 Gate 3): Phase 6.3 of `sops/SOP_release_process.md` will be amended to invoke the validator as a BLOCKING V-test. Until then, validator runs are advisory.
+- **G4 Backfill audit** (H-RHSC-001 Gate 4): v3.10–v3.16 handoffs have not yet been scored against the new V-tests. v3.16 self-test surfaced 1 FAIL (V-RHSC-008 archetype enumeration) which IS preserved as falsifiability evidence per H-RHSC-001 PF-2 disposition (NOT a sign of broken validator or broken handoff).
+- **G5 L901 re-grading**: L901 will be re-graded from "complete" to "revised" once Gates 3 + 4 land.
+
+---
+
 ## [3.16.0] - 2026-05-02
 
 **Theme**: Framework-Discipline Closure + Wave-1A Spec Contracts + /aget-go Production + Knowledge-Tier Isolation Skeleton
