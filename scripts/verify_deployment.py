@@ -23,6 +23,14 @@ History:
     v1.2.0 (2026-03-28): Fixed false positives from supervisor FLEET-UPG-009 G1:
         manifest.yaml comment format, migration_history object format.
         Skill count corrected 16 -> 18. History/motivation docstring added.
+    v1.3.0 (2026-05-02): v3.16-aware enhancement (release-completeness fix).
+        Reads DEPLOYMENT_SPEC_v{version}.yaml dynamically. Spec-derived universal
+        skill list replaces hardcoded 18-skill list (which was 11 behind the
+        29-count CAP-TPL-016-04 mandate). Adds checks for archetype-conditional
+        release-triad placement (CAP-TPL-016-07), optional v3.16 adoptions
+        (/aget-go SKILL-048, .agetignore CAP-SEC-007, Plan_Status CAP-PP-003
+        template), and sleeping CAPs disclosure (R-DEP-010). Falls back to
+        legacy hardcoded check for pre-v3.16 versions or when spec absent.
 
 Motivation:
     DEPLOYMENT_SPEC_v3.10.0 included verify_v3.10.0.sh (100+ lines, 7 check
@@ -37,6 +45,18 @@ Motivation:
     because they lack DEPLOYMENT_SPEC context to distinguish "required for all"
     from "required for release-managing only" from "scaffold only (future use)".
 
+    v1.3.0 (2026-05-02) addresses the v3.16 instance of the same pattern.
+    DEPLOYMENT_SPEC_v3.16.0.yaml line 29 explicitly disclosed "inherits: v3.15.0
+    verification surface (no v3.16-specific checks added)" — meaning self-migrating
+    agents had no automated verification of v3.16-specific changes (universal-skill
+    32 -> 29 reconciliation, archetype-conditional release-triad placement,
+    /aget-go primitive, .agetignore skeleton, Plan_Status template rename,
+    sleeping CAPs). The script returned "OK" for v3.5-era agents passing
+    --version 3.16.0 because it was behaviorally version-blind. v1.3.0 makes
+    it version-aware via dynamic spec loading. Closes the gap surfaced by
+    the principal 2026-05-02 ("how are agents supposed to verify
+    self-migrations beyond manually?").
+
 Exit Codes:
     0: All checks PASS (or PASS with warnings)
     1: One or more checks FAIL
@@ -47,6 +67,126 @@ import json
 import re
 import sys
 from pathlib import Path
+
+try:
+    import yaml
+    YAML_AVAILABLE = True
+except ImportError:
+    YAML_AVAILABLE = False
+
+
+# ============================================================================
+# v3.16+ helpers (spec-driven verification)
+# ============================================================================
+
+def _version_ge(a, b):
+    """Compare semver strings; return True if a >= b. Falls back to False on parse error."""
+    try:
+        a_parts = [int(p) for p in a.split('.')[:3]]
+        b_parts = [int(p) for p in b.split('.')[:3]]
+        while len(a_parts) < 3:
+            a_parts.append(0)
+        while len(b_parts) < 3:
+            b_parts.append(0)
+        return a_parts >= b_parts
+    except (ValueError, AttributeError):
+        return False
+
+
+def find_aget_root_from_agent(agent_path):
+    """Walk up from agent_path to find an aget-framework checkout root.
+
+    Identified by the conjunction of (a) aget/specs/ directory AND (b) at least
+    one template-*-aget sibling. The template-sibling check disambiguates from
+    a private agent's own aget/ drafts directory (which lacks template siblings).
+    Returns Path or None.
+    """
+    cur = agent_path
+    template_indicators = ["template-worker-aget", "template-supervisor-aget", "template-advisor-aget"]
+    for _ in range(6):
+        has_specs = (cur / "aget" / "specs").is_dir()
+        has_templates = any((cur / t).is_dir() for t in template_indicators)
+        if has_specs and has_templates:
+            return cur
+        if cur.parent == cur:
+            break
+        cur = cur.parent
+    return None
+
+
+def load_deployment_spec(version, agent_path, framework_root):
+    """Load DEPLOYMENT_SPEC_v{version}.yaml from canonical aget/ path.
+    Returns (spec_dict, path) or (None, None)."""
+    if not YAML_AVAILABLE:
+        return None, None
+    candidates = []
+    if framework_root:
+        candidates.append(framework_root / "aget" / f"DEPLOYMENT_SPEC_v{version}.yaml")
+    candidates.append(agent_path / "aget" / f"DEPLOYMENT_SPEC_v{version}.yaml")
+    candidates.append(Path.home() / "github" / "aget-framework" / "aget" / f"DEPLOYMENT_SPEC_v{version}.yaml")
+    seen = set()
+    for p in candidates:
+        if p in seen:
+            continue
+        seen.add(p)
+        if p.exists():
+            try:
+                with open(p) as f:
+                    return yaml.safe_load(f), p
+            except (yaml.YAMLError, OSError):
+                continue
+    return None, None
+
+
+def derive_universal_skills_from_baseline(framework_root):
+    """Derive canonical universal-skill list from template-worker-aget baseline.
+
+    Excludes worker-archetype skills (aget-execute-task, aget-track-deliverable)
+    and release-execution-archetype extras (release-triad). Per CAP-TPL-016-04
+    the v3.16 universal-skill count is 29, with release-triad moved to
+    archetype-specific per CAP-TPL-016-07.
+
+    Returns sorted list of skill names, or None if baseline unreachable.
+    """
+    if framework_root is None:
+        return None
+    baseline_dir = framework_root / "template-worker-aget" / ".claude" / "skills"
+    if not baseline_dir.is_dir():
+        return None
+    archetype_specific = {
+        "aget-execute-task", "aget-track-deliverable",
+        "aget-release-build", "aget-release-audit-specs", "aget-release-critique",
+    }
+    skills = []
+    for d in sorted(baseline_dir.iterdir()):
+        if d.is_dir() and (d / "SKILL.md").exists() and d.name not in archetype_specific:
+            skills.append(d.name)
+    return skills if skills else None
+
+
+def _read_archetype(agent_path):
+    """Read agent archetype from .aget/identity.json. Returns lowercase
+    canonicalized archetype or None.
+
+    Per gmelli/aget-aget#1200: archetype is OPTIONAL with vocabulary mismatch
+    across IDENTITY_JSON_SCHEMA / IDENTITY_SPEC / DEPLOYMENT_SPEC. Many agents
+    lack the field entirely; some carry capitalized non-canonical values."""
+    identity_path = agent_path / ".aget" / "identity.json"
+    if not identity_path.exists():
+        return None
+    try:
+        with open(identity_path) as f:
+            data = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return None
+    arch_field = data.get("archetype")
+    if not arch_field:
+        dims = data.get("identity_dimensions") or {}
+        if isinstance(dims, dict):
+            arch_field = dims.get("archetype")
+    if not isinstance(arch_field, str):
+        return None
+    return arch_field.lower().replace("_", "-").strip()
 
 
 def check_version_indicators(agent_path, version, is_framework=False):
@@ -173,7 +313,11 @@ def check_terminology(agent_path):
         for py_file in scripts_dir.glob("*.py"):
             if py_file.name == "verify_deployment.py":
                 continue
-            content = py_file.read_text()
+            try:
+                content = py_file.read_text()
+            except (OSError, FileNotFoundError):
+                # Broken symlink or unreadable file; skip silently
+                continue
             matches = len(re.findall(r"sanity.check", content, re.IGNORECASE))
             if matches:
                 count += matches
@@ -247,9 +391,142 @@ def check_structural_enforcement(agent_path):
     return results
 
 
+# ============================================================================
+# v3.16+ check functions (spec-driven)
+# ============================================================================
+
+def check_universal_skills_v316(agent_path, framework_root):
+    """v3.16+ : spec-derived universal skill list from template-worker-aget baseline."""
+    results = []
+    skills_dir = agent_path / ".claude" / "skills"
+    if not skills_dir.is_dir():
+        results.append(("FAIL", "skills: .claude/skills/ directory not found"))
+        return results
+    spec_skills = derive_universal_skills_from_baseline(framework_root)
+    if not spec_skills:
+        results.append(("WARN", "skills: cannot locate template-worker-aget baseline; falling back to legacy hardcoded check"))
+        return check_universal_skills(agent_path)
+    spec_count = len(spec_skills)
+    missing = [s for s in spec_skills if not (skills_dir / s).is_dir()]
+    if not missing:
+        results.append(("OK", f"skills: all {spec_count} universal skills present (spec-derived from template-worker-aget baseline)"))
+    else:
+        msg = f"skills: {len(missing)}/{spec_count} missing - {', '.join(missing[:5])}"
+        if len(missing) > 5:
+            msg += f" + {len(missing) - 5} more"
+        results.append(("FAIL", msg))
+    RETIRED = ["aget-capture-observation", "aget-capture-nugget", "aget-study-up"]
+    for old_name in RETIRED:
+        if (skills_dir / old_name).is_dir():
+            results.append(("WARN", f"skills: retired name '{old_name}' still exists"))
+    return results
+
+
+def check_archetype_action(agent_path, spec):
+    """v3.16+ CAP-TPL-016-07: archetype-conditional release-triad placement."""
+    results = []
+    if not spec or "archetype_specific" not in spec:
+        return results
+    arch_spec = spec["archetype_specific"]
+    release_archetypes = set(arch_spec.get("release_execution_archetypes", []))
+    triad_skills = arch_spec.get("release_triad_skills", [])
+    per_archetype = arch_spec.get("per_archetype_action", {})
+
+    archetype = _read_archetype(agent_path)
+    skills_dir = agent_path / ".claude" / "skills"
+    triad_present = [s for s in triad_skills if (skills_dir / s).is_dir()]
+    triad_count = len(triad_present)
+
+    if not archetype:
+        msg = (f"archetype: identity.json archetype field absent or unreadable "
+               f"(per gmelli/aget-aget#1200 spec-fault); "
+               f"diagnostic-only: {triad_count}/{len(triad_skills)} release-triad skills present")
+        results.append(("WARN", msg))
+        return results
+
+    if archetype not in per_archetype:
+        canonical = ", ".join(sorted(per_archetype.keys()))
+        results.append(("WARN", f"archetype: '{archetype}' not in DEPLOYMENT_SPEC catalog (canonical: {canonical}); cannot verify CAP-TPL-016-07"))
+        return results
+
+    if archetype == "document-processor":
+        results.append(("OK", f"archetype: '{archetype}' (dormant per #1121); no triad check"))
+        return results
+
+    if archetype in release_archetypes:
+        if triad_count == len(triad_skills):
+            results.append(("OK", f"archetype: '{archetype}' (release-execution) has all {triad_count}/{len(triad_skills)} release-triad skills (CAP-TPL-016-07)"))
+        else:
+            missing = [s for s in triad_skills if s not in triad_present]
+            results.append(("FAIL", f"archetype: '{archetype}' (release-execution) missing {len(missing)} release-triad skill(s): {', '.join(missing)}"))
+    else:
+        if triad_count == 0:
+            results.append(("OK", f"archetype: '{archetype}' (non-release) correctly has no release-triad skills (CAP-TPL-016-07)"))
+        else:
+            results.append(("WARN", f"archetype: '{archetype}' (non-release per CAP-TPL-016-07) has unexpected release-triad skill(s): {', '.join(triad_present)}"))
+    return results
+
+
+def check_optional_adoptions_v316(agent_path):
+    """v3.16 optional adoptions O-3.16-1..4 — WARN-tier when absent (non-blocking)."""
+    results = []
+    skills_dir = agent_path / ".claude" / "skills"
+
+    # O-3.16-3: /aget-go (SKILL-048; CAP-PP-019-04)
+    if (skills_dir / "aget-go").is_dir() and (skills_dir / "aget-go" / "SKILL.md").exists():
+        results.append(("OK", "O-3.16-3: /aget-go skill present (SKILL-048)"))
+    else:
+        results.append(("WARN", "O-3.16-3: /aget-go skill not present (optional; free-text 'go' remains valid)"))
+
+    # CAP-SEC-007 .agetignore (v3.16 NEW; hook deferred to v3.17)
+    if (agent_path / ".agetignore").exists():
+        results.append(("OK", ".agetignore: present (CAP-SEC-007 knowledge-tier isolation skeleton)"))
+    else:
+        results.append(("WARN", ".agetignore: not present (CAP-SEC-007 v3.16 NEW; hook enforcement deferred to v3.17)"))
+
+    # O-3.16-1: Plan_Status / Gate_Status template adoption (CAP-PP-003)
+    template_path = agent_path / "templates" / "PROJECT_PLAN_TEMPLATE.md"
+    alt_template = agent_path / ".aget" / "templates" / "PROJECT_PLAN_TEMPLATE.md"
+    template = template_path if template_path.exists() else (alt_template if alt_template.exists() else None)
+    if template:
+        content = template.read_text()
+        has_plan = "**Plan_Status**:" in content
+        has_gate = "**Gate_Status:**" in content
+        rel = template.relative_to(agent_path) if str(template).startswith(str(agent_path)) else template.name
+        if has_plan and has_gate:
+            results.append(("OK", f"O-3.16-1: PROJECT_PLAN_TEMPLATE adopts Plan_Status + Gate_Status schema (CAP-PP-003) — {rel}"))
+        elif has_plan or has_gate:
+            results.append(("WARN", f"O-3.16-1: PROJECT_PLAN_TEMPLATE partial schema adoption (Plan_Status={has_plan}, Gate_Status={has_gate})"))
+        else:
+            results.append(("WARN", "O-3.16-1: PROJECT_PLAN_TEMPLATE uses legacy **Status**: schema (CAP-PP-003 not adopted; old schema remains valid)"))
+    else:
+        results.append(("WARN", "O-3.16-1: no PROJECT_PLAN_TEMPLATE.md found at templates/ or .aget/templates/"))
+
+    return results
+
+
+def check_sleeping_caps_disclosure(spec):
+    """v3.16: sleeping CAP-REL-030/031/032/033 disclosed (R-DEP-010 grace); informational reminder."""
+    results = []
+    if not spec or "sleeping_requirements" not in spec:
+        return results
+    sleep = spec["sleeping_requirements"]
+    affected = sleep.get("affected_caps", [])
+    if affected:
+        ids = [c.get("id", "?") for c in affected]
+        impl = affected[0].get("implementation_target", "v3.17")
+        rem = affected[0].get("removal_threshold", "v3.18")
+        results.append(("WARN", f"Sleeping CAPs disclosed (R-DEP-010 grace): {', '.join(ids)} — impl target {impl}, removal threshold {rem}"))
+    return results
+
+
+# ============================================================================
+# main
+# ============================================================================
+
 def main():
     parser = argparse.ArgumentParser(description="AGET Deployment Verification")
-    parser.add_argument("--version", required=True, help="Target version (e.g., 3.11.0)")
+    parser.add_argument("--version", required=True, help="Target version (e.g., 3.16.0)")
     parser.add_argument("--path", default=".", help="Agent directory path (default: .)")
     parser.add_argument("--json", action="store_true", help="JSON output")
     args = parser.parse_args()
@@ -263,6 +540,20 @@ def main():
 
     print(f"=== AGET Deployment Verification: v{version} ===")
     print(f"Agent: {agent_path.name}" + (" (framework core)" if is_framework else ""))
+
+    # v3.16+ : spec-driven verification (load DEPLOYMENT_SPEC_v{version}.yaml)
+    framework_root = find_aget_root_from_agent(agent_path)
+    spec, spec_path = load_deployment_spec(version, agent_path, framework_root)
+    use_v316_surface = bool(spec) and _version_ge(version, "3.16.0") and not is_framework
+    if spec:
+        ucount = (spec.get("universal_skills") or {}).get("count", "?")
+        archs = (spec.get("archetype_specific") or {}).get("per_archetype_action") or {}
+        print(f"Spec: {spec_path.name} (v3.16+ surface; {ucount} universal skills; {len(archs)} archetypes)")
+    elif _version_ge(version, "3.16.0"):
+        if not YAML_AVAILABLE:
+            print(f"Spec: pyyaml NOT INSTALLED — falling back to legacy v3.15 surface (install: pip install pyyaml)")
+        else:
+            print(f"Spec: DEPLOYMENT_SPEC_v{version}.yaml NOT FOUND — falling back to legacy v3.15 surface")
     print()
 
     if is_framework:
@@ -279,10 +570,17 @@ def main():
             ("Required Directories (v3.11+)", check_required_directories(agent_path)),
             ("Governance Intensity (v3.11+)", check_governance_intensity(agent_path)),
             ("Terminology (v3.11+)", check_terminology(agent_path)),
-            ("Universal Skills", check_universal_skills(agent_path)),
-            ("Session Scripts", check_session_scripts(agent_path)),
-            ("Structural Enforcement (v3.10+)", check_structural_enforcement(agent_path)),
         ]
+        if use_v316_surface:
+            categories.append(("Universal Skills (v3.16 spec-derived)", check_universal_skills_v316(agent_path, framework_root)))
+        else:
+            categories.append(("Universal Skills (legacy v3.5-era hardcoded)", check_universal_skills(agent_path)))
+        categories.append(("Session Scripts", check_session_scripts(agent_path)))
+        categories.append(("Structural Enforcement (v3.10+)", check_structural_enforcement(agent_path)))
+        if use_v316_surface:
+            categories.append(("Archetype Action (CAP-TPL-016-07 v3.16)", check_archetype_action(agent_path, spec)))
+            categories.append(("Optional Adoptions (O-3.16-1..4)", check_optional_adoptions_v316(agent_path)))
+            categories.append(("Sleeping Requirements (R-DEP-010)", check_sleeping_caps_disclosure(spec)))
 
     errors = 0
     warnings = 0
