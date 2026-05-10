@@ -48,6 +48,13 @@ Supervisors SHALL: review this handoff; acknowledge receipt; broadcast v3.16 ava
 
 ## Acknowledgment & References
 
-Receiving supervisors acknowledge in this section once upgrade is initiated; pilot tracking per supervisor in their own scope. References: `aget/CHANGELOG.md` v3.16.0; `aget/sops/SOP_release_process.md` v1.30; `aget/sops/SOP_fleet_migration.md` v1.6.0; `https://github.com/aget-framework/aget/releases/tag/v3.16.0`.
+Receiving supervisors acknowledge in this section once upgrade is initiated; pilot tracking per supervisor in their own scope.
 
-*Public handoff per SOP v1.30 Phase 6.3.1. 2026-05-02.*
+### Acknowledgments
+
+- ✅ Main supervisor: main fleet upgrade complete 2026-05-02; experience report filed (see issue tracker).
+- ✅ External fleet supervisor: external fleet upgrade complete 2026-05-03; 7-agent fleet upgraded; Wave 0/1/2 sequencing applied (supervisor self → 2 representative pilots → 4 remainder); experience report filed (see issue tracker).
+
+References: `aget/CHANGELOG.md` v3.16.0; `aget/sops/SOP_release_process.md` v1.30; `aget/sops/SOP_fleet_migration.md` v1.6.0; `https://github.com/aget-framework/aget/releases/tag/v3.16.0`.
+
+*Public handoff per SOP v1.30 Phase 6.3.1. 2026-05-02; ack section updated 2026-05-03.*
