@@ -1,9 +1,11 @@
 # SOP: Release Process
 
-**Version**: 1.32
+**Version**: 1.33
 **Created**: 2025-11-30
-**Updated**: 2026-05-02
+**Updated**: 2026-05-09
 **Owner**: private-aget-framework-AGET
+
+**Changelog**: **v1.33** V-G7.x slice canonical sync from private SOP — V-G7.5 added (Org Homepage Badge, was private-only since v1.41) + V-G7.1..V-G7.4 broadened (multi-condition correctness per AUDIT_validator_synecdoche_2026-05-08; closes Synecdoche-HIGH on V-G7.1/V-G7.2 and Synecdoche-MEDIUM on V-G7.3/V-G7.4) + repo enumeration drift fix (explicit RELEASE_REPOS array — case-sensitive bash glob `template-*-aget` silently skipped `template-document-processor-AGET`). v3.17 G1.T1.6 (homepage sub-plan G4 V-test slice; closes L910 V-test sub-slice; full L910 canonical sync remains OUT OF SCOPE per homepage sub-plan G4.2 deferral). Both pin-sites updated atomically (table + script) per L935 multi-site discipline. Canonical now at parity with private V-G7.x section as of private SOP v1.45. 2026-05-09.
 
 **Implements**: R-REL-001-* (5 requirements), R-REL-006 through R-REL-020, R-REL-024, R-REL-025, R-REL-026, R-REL-027, R-REL-030 through R-REL-038, R-REL-042, R-REL-VER-001, R-LIC-001, R-SPEC-010, R-ISSUE-007, R-ISSUE-008, CAP-REL-021 (Persistent Validation Logging), CAP-REL-022 (Gate Execution Enforcement), CAP-REL-023 (Release State Snapshots), CAP-REL-024 (Propagation Audit), CAP-REL-025 (Healthcheck Persistence)
 - R-REL-001-01: Commit all repos locally before pushing
@@ -1404,54 +1406,129 @@ git push origin main --tags
 
 | ID | Test | Command | Pass Criteria |
 |----|------|---------|---------------|
-| V-G7.1 | GitHub releases exist | `gh release view vX.Y.Z` (all 13 repos) | Release exists for each repo |
-| V-G7.2 | Template CHANGELOGs updated | `grep "## \[X.Y.Z\]" CHANGELOG.md` (12 templates) | Entry exists in each |
-| V-G7.3 | Metadata files updated | `jq .version codemeta.json` + `yq .version CITATION.cff` | Both show X.Y.Z |
-| V-G7.4 | migration_history updated | `jq '.migration_history | last' .aget/version.json` (12 templates) | Last entry contains X.Y.Z |
+| V-G7.1 | GitHub releases exist + non-trivial | `gh release view vX.Y.Z --json name,body` (14 repos: aget + 13 templates) | Release exists; `name` non-empty; `body` length ≥ 50 chars (broadened v3.17 G3.4 — was presence-only; closed Synecdoche-HIGH per AUDIT_validator_synecdoche_2026-05-08) |
+| V-G7.2 | Template CHANGELOGs updated + dated + non-stub | `grep "## \[X.Y.Z\]" CHANGELOG.md` + heading-date pattern check + ≥3 non-blank content lines (13 templates) | Entry exists with `## [X.Y.Z] - YYYY-MM-DD` heading; ≥3 content lines under heading (broadened v3.17 G3.4 — was heading-only; closed Synecdoche-HIGH) |
+| V-G7.3 | Metadata files version + date | `jq .version,.datePublished codemeta.json` + `yq .version,.\"date-released\" CITATION.cff` | All four fields present + version=X.Y.Z + dates match release date (broadened v3.17 G3.4 — was version-only; closed Synecdoche-MEDIUM) |
+| V-G7.4 | migration_history updated + format-valid + monotonic | `jq '.migration_history\|last' .aget/version.json` + format regex `vP.Q.R -> vX.Y.Z: YYYY-MM-DD` + monotonic-semver check (13 templates) | Last entry matches format regex AND target version = X.Y.Z AND date is valid YYYY-MM-DD AND array is semver-monotonic (broadened v3.17 G3.4 — was substring-presence; closed Synecdoche-MEDIUM) |
+| V-G7.5 | Org homepage badge updated | `grep "version-X.Y.Z" .github/profile/README.md` | Badge shows vX.Y.Z (NOTE: still Synecdoche-HIGH per AUDIT — full broadening tracked at homepage sub-plan G2) |
 
-**Quick Validation Script**:
+**Quick Validation Script** (broadened v3.17 G3.4 per AUDIT_validator_synecdoche_2026-05-08; multi-condition correctness per F5 falsifier):
 
 ```bash
 # Run from aget-framework/ directory
-VERSION="X.Y.Z"  # Replace with actual version
+VERSION="X.Y.Z"        # Replace with actual version
+RELEASE_DATE="YYYY-MM-DD"  # Replace with actual release date (used by V-G7.2/3/4)
 
-echo "=== V-G7.1: GitHub Releases ==="
-for repo in aget template-{advisor,analyst,architect,consultant,developer,executive,operator,researcher,reviewer,spec-engineer,supervisor,worker}-aget; do
-    result=$(cd $repo && gh release view "v$VERSION" --json tagName -q '.tagName' 2>/dev/null)
-    if [ "$result" = "v$VERSION" ]; then
-        echo "[OK] $repo"
+# Repo enumeration — explicit 14-repo list (aget + 13 templates).
+# Cannot use brace expansion `template-*-aget` glob alone because
+# template-document-processor-AGET ends in uppercase AGET (case-sensitive).
+# Per AGENTS.md repo structure: aget/ + 13 templates (12 lowercase + 1 uppercase).
+RELEASE_REPOS=(
+    aget
+    template-advisor-aget template-analyst-aget template-architect-aget
+    template-consultant-aget template-developer-aget template-executive-aget
+    template-operator-aget template-researcher-aget template-reviewer-aget
+    template-spec-engineer-aget template-supervisor-aget template-worker-aget
+    template-document-processor-AGET
+)
+TEMPLATE_REPOS=("${RELEASE_REPOS[@]:1}")  # 13 templates (drop aget at index 0)
+
+echo "=== V-G7.1 (broadened): GitHub Releases exist + non-trivial ==="
+for repo in "${RELEASE_REPOS[@]}"; do
+    json=$(cd $repo && gh release view "v$VERSION" --json tagName,name,body 2>/dev/null)
+    if [ -z "$json" ]; then
+        echo "[FAIL] $repo (release missing)"
+        continue
+    fi
+    tag=$(echo "$json" | jq -r '.tagName')
+    name=$(echo "$json" | jq -r '.name // ""')
+    body_len=$(echo "$json" | jq -r '.body // ""' | wc -c)
+    if [ "$tag" = "v$VERSION" ] && [ -n "$name" ] && [ "$body_len" -ge 50 ]; then
+        echo "[OK] $repo (name=$name, body=${body_len}c)"
     else
-        echo "[FAIL] $repo"
+        echo "[FAIL] $repo (tag=$tag name=$name body_chars=$body_len; require name non-empty AND body ≥50c)"
     fi
 done
 
 echo ""
-echo "=== V-G7.2: Template CHANGELOGs ==="
-for repo in template-*-aget; do
-    if grep -q "## \[$VERSION\]" "$repo/CHANGELOG.md" 2>/dev/null; then
-        echo "[OK] $repo"
+echo "=== V-G7.2 (broadened): Template CHANGELOGs heading + date + ≥3 content lines ==="
+for repo in "${TEMPLATE_REPOS[@]}"; do
+    cl="$repo/CHANGELOG.md"
+    [ -f "$cl" ] || { echo "[FAIL] $repo (CHANGELOG missing)"; continue; }
+    # Extract block from "## [X.Y.Z]" through next "## [" or EOF
+    block=$(awk -v ver="$VERSION" '
+        $0 ~ "^## \\[" ver "\\]" {flag=1; print; next}
+        flag && /^## \[/ {exit}
+        flag {print}
+    ' "$cl")
+    if [ -z "$block" ]; then echo "[FAIL] $repo (no [$VERSION] heading)"; continue; fi
+    heading=$(echo "$block" | head -1)
+    # Heading must include date pattern YYYY-MM-DD
+    if ! echo "$heading" | grep -qE '\[[0-9]+\.[0-9]+\.[0-9]+\][[:space:]]*-[[:space:]]*[0-9]{4}-[0-9]{2}-[0-9]{2}'; then
+        echo "[FAIL] $repo (heading missing YYYY-MM-DD: $heading)"; continue
+    fi
+    # Content lines (non-blank, non-heading) ≥3
+    content=$(echo "$block" | tail -n +2 | grep -cv '^[[:space:]]*$')
+    if [ "$content" -lt 3 ]; then
+        echo "[FAIL] $repo (only $content content lines under heading; require ≥3)"
     else
-        echo "[FAIL] $repo"
+        echo "[OK] $repo (heading dated; $content content lines)"
     fi
 done
 
 echo ""
-echo "=== V-G7.3: Metadata Files ==="
-CM=$(jq -r .version aget/codemeta.json 2>/dev/null)
-CF=$(yq -r .version aget/CITATION.cff 2>/dev/null)
-[ "$CM" = "$VERSION" ] && echo "[OK] codemeta.json: $CM" || echo "[FAIL] codemeta.json: $CM"
-[ "$CF" = "$VERSION" ] && echo "[OK] CITATION.cff: $CF" || echo "[FAIL] CITATION.cff: $CF"
+echo "=== V-G7.3 (broadened): Metadata version + date fields ==="
+CM_V=$(jq -r '.version // ""' aget/codemeta.json 2>/dev/null)
+CM_D=$(jq -r '.datePublished // ""' aget/codemeta.json 2>/dev/null)
+CF_V=$(yq -r '.version // ""' aget/CITATION.cff 2>/dev/null)
+CF_D=$(yq -r '."date-released" // ""' aget/CITATION.cff 2>/dev/null)
+fail=0
+[ "$CM_V" = "$VERSION" ] && echo "[OK] codemeta.json version=$CM_V" || { echo "[FAIL] codemeta.json version=$CM_V (want $VERSION)"; fail=1; }
+[ "$CM_D" = "$RELEASE_DATE" ] && echo "[OK] codemeta.json datePublished=$CM_D" || { echo "[FAIL] codemeta.json datePublished=$CM_D (want $RELEASE_DATE)"; fail=1; }
+[ "$CF_V" = "$VERSION" ] && echo "[OK] CITATION.cff version=$CF_V" || { echo "[FAIL] CITATION.cff version=$CF_V (want $VERSION)"; fail=1; }
+[ "$CF_D" = "$RELEASE_DATE" ] && echo "[OK] CITATION.cff date-released=$CF_D" || { echo "[FAIL] CITATION.cff date-released=$CF_D (want $RELEASE_DATE)"; fail=1; }
 
 echo ""
-echo "=== V-G7.4: migration_history ==="
-for repo in template-*-aget; do
-    MH=$(jq -r '.migration_history | last' "$repo/.aget/version.json" 2>/dev/null)
-    if echo "$MH" | grep -q "$VERSION"; then
-        echo "[OK] $repo"
+echo "=== V-G7.4 (broadened): migration_history format + date + monotonicity ==="
+for repo in "${TEMPLATE_REPOS[@]}"; do
+    vj="$repo/.aget/version.json"
+    [ -f "$vj" ] || { echo "[FAIL] $repo (version.json missing)"; continue; }
+    last=$(jq -r '.migration_history | last // ""' "$vj" 2>/dev/null)
+    # Format: vP.Q.R -> vX.Y.Z: YYYY-MM-DD
+    if ! echo "$last" | grep -qE "^v[0-9]+\.[0-9]+\.[0-9]+ -> v${VERSION}: ${RELEASE_DATE}$"; then
+        echo "[FAIL] $repo (last entry malformed: '$last'; want 'vP.Q.R -> v${VERSION}: ${RELEASE_DATE}')"
+        continue
+    fi
+    # Monotonicity: each entry's target version > predecessor's source
+    mono=$(jq -r '.migration_history' "$vj" 2>/dev/null | python3 -c "
+import sys, json, re
+arr = json.load(sys.stdin)
+prev_target = None
+for entry in arr:
+    m = re.match(r'^v(\d+)\.(\d+)\.(\d+) -> v(\d+)\.(\d+)\.(\d+):', entry)
+    if not m: print('FAIL non-matching', entry); sys.exit(1)
+    src = tuple(int(x) for x in m.group(1,2,3))
+    tgt = tuple(int(x) for x in m.group(4,5,6))
+    if src >= tgt: print('FAIL non-monotonic in entry', entry); sys.exit(1)
+    if prev_target and src != prev_target: print('FAIL gap', prev_target, '->', src); sys.exit(1)
+    prev_target = tgt
+print('OK')
+" 2>&1)
+    if echo "$mono" | grep -q '^OK'; then
+        echo "[OK] $repo (last=$last; monotonic)"
     else
-        echo "[FAIL] $repo (last: $MH)"
+        echo "[FAIL] $repo ($mono)"
     fi
 done
+
+echo ""
+echo "=== V-G7.5: Org Homepage Badge (NOTE: still Synecdoche-HIGH; full broadening at homepage sub-plan G2) ==="
+if grep -q "version-${VERSION}-blue" ../.github/profile/README.md 2>/dev/null; then
+    echo "[OK] .github/profile/README.md badge shows v$VERSION"
+else
+    CURRENT=$(grep -o 'version-[0-9.]*-blue' ../.github/profile/README.md 2>/dev/null | head -1)
+    echo "[FAIL] .github/profile/README.md badge not updated (found: $CURRENT)"
+fi
 ```
 
 **See**: `docs/VERSION_BEARING_FILES.md` for complete enumeration and pre-release validation script.

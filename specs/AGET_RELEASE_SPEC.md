@@ -1099,7 +1099,7 @@ This CAP closes REQ-REL-F-001 (Pre-Release Validation procedure exists in SOP si
 | Wave-1A Contract | Status | Notes |
 |------------------|:------:|-------|
 | **R-REL-025 (CAP-REL-029) — Release Readiness Gate** | **LANDED 2026-04-25** (spec + implementation) | First of 5; only CAP with shipped implementation |
-| **R-REL-026 (CAP-REL-030) — Post-Release CHANGELOG Validator** | **SPEC-LANDED 2026-05-02; impl-deferred v3.17** | Wave-1A item 2; v3.16 G1.6; #1149/#1151 root cause; **sleeping-requirement** |
+| **R-REL-026 (CAP-REL-030) — Post-Release CHANGELOG Validator** | **LANDED 2026-05-09 (spec + implementation)** | Wave-1A item 2; v3.16 G1.6 spec; v3.17 G1.T1.1 impl; #1149/#1151 root cause; `scripts/post_release_changelog_validator.py` iterates 14-repo RELEASE_REPOS_DEFAULT (or `--repos` override) per F-V317-G1-CRITIC-013 lesson; sanitization gate at write-time + this contract as audit backstop |
 | **R-REL-027 (CAP-REL-031) — Post-Release Tag Validator** | **LANDED 2026-05-09 (spec + implementation)** | Wave-1A item 3; v3.16 G1.6 spec; v3.17 G1.T1.2 impl; #1154 spec-layer pair; SOP v1.30 Phase 6.4.5 procedural V-test paired with `scripts/post_release_tag_validator.py` standalone audit; L671 procedural-vs-spec split closed |
 | **R-REL-028 (CAP-REL-032) — Post-Release Badge/Parity Validator** | **SPEC-LANDED 2026-05-02; impl-deferred v3.17** | Wave-1A item 4; v3.16 G1.6; **sleeping-requirement** |
 | **R-REL-029 (CAP-REL-033) — Post-Release Contract-Test Validator** | **SPEC-LANDED 2026-05-02; impl-deferred v3.17** | Wave-1A item 5; v3.16 G1.6; #1148 BC-detection scope; **sleeping-requirement** |
@@ -1114,9 +1114,9 @@ This CAP closes REQ-REL-F-001 (Pre-Release Validation procedure exists in SOP si
 
 ### CAP-REL-030: Post-Release CHANGELOG Validator (R-REL-026) — Wave-1A Item 2
 
-**Status**: SPEC-LANDED 2026-05-02 (v3.16 G1.6); IMPLEMENTATION DEFERRED to v3.17 (no `scripts/post_release_changelog_validator.py` at v3.16.0 release; spec defines contract, implementation pending). R-DEP-010 grace-period annotation: 2-minor-version window (v3.16 → v3.18 removal if implementation does not land by v3.17). Wave-1A second contract (2 of 5).
+**Status**: LANDED 2026-05-09 (spec + implementation). Spec landed v3.16 G1.6 (2026-05-02); IMPLEMENTATION LANDED v3.17 G1.T1.1 (2026-05-09) at `scripts/post_release_changelog_validator.py`. R-DEP-010 grace-period annotation closed (impl landed within 2-minor-version window). Wave-1A second contract (2 of 5).
 
-**⚠️ Sleeping-requirement disclaimer**: This CAP defines requirements (R-REL-030-01..05) but no enforcement code exists at v3.16. Consumers SHALL NOT treat this CAP as binding at runtime until the validator script lands. v3.17 implementation milestone tracks closure.
+**Implementation**: `scripts/post_release_changelog_validator.py` — multi-repo audit script with `--version` CLI + `--repos` override; iterates the 14-repo `RELEASE_REPOS_DEFAULT` list (aget + 13 templates including uppercase `template-document-processor-AGET`) per F-V317-G1-CRITIC-013 lesson (case-sensitive glob is drift-vector). Implements R-REL-030-01..05: CHANGELOG `## [X.Y.Z]` heading + dated heading + ≥3 content lines + Breaking Changes + BC-NNN consistency (when BREAKING_CHANGES_v{V}.md present) + sanitization (private agent names, gmelli/* paths, fleet-size disclosures) + audit emission to `sessions/post_release_changelog_audit_{VERSION}_{DATE}.md`.
 
 **Threat-Class Anchor**: Post-release verification that CHANGELOG.md entries land correctly. v3.15 retro identified two L-doc-named gaps: L900 (CHANGELOG sanitization gap, #1151) and L909 (under-sanitization at write time, sibling to L900). Without contract enforcement, CHANGELOG entries can be missing, malformed, or contain unsanitized private-fleet references.
 
