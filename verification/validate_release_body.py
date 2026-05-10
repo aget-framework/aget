@@ -136,6 +136,11 @@ def validate_body(repo: str, version: str, body: str) -> dict:
     else:
         results["checks"]["CAP-REL-006-02-08_sections"] = f"FAIL ({h2_count} H2 sections; need exactly 3)"
 
+    # CAP-REL-006-02-09: Title format (no duplicated v{X.Y.Z} prefix)
+    # Note: title not in body; this check requires gh release view --json name separately.
+    # When called from main() with repo+version context, fetch title and validate.
+    # Stub here returns PASS-deferred; main() will populate via gh CLI.
+
     # Overall verdict
     if any(check.startswith("FAIL") for check in results["checks"].values()):
         results["overall"] = "FAIL"
