@@ -61,12 +61,20 @@ def log_diagnostic(msg: str) -> None:
 # =============================================================================
 
 TEMPLATE_REPOS = [
-    'template-supervisor-aget',
-    'template-worker-aget',
+    # 13 templates per AGENTS.md repository structure (gh#1287 fix 2026-05-10)
     'template-advisor-aget',
+    'template-analyst-aget',
+    'template-architect-aget',
     'template-consultant-aget',
     'template-developer-aget',
+    'template-document-processor-AGET',  # uppercase suffix; DORMANT v2.7.0 (per CLAUDE.md)
+    'template-executive-aget',
+    'template-operator-aget',
+    'template-researcher-aget',
+    'template-reviewer-aget',
     'template-spec-engineer-aget',
+    'template-supervisor-aget',
+    'template-worker-aget',
 ]
 
 CORE_REPO = 'aget'

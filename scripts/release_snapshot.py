@@ -51,13 +51,18 @@ def get_framework_root() -> Path:
 
 
 def find_repos(framework_root: Path) -> list:
-    """Find all repos (aget/ + template-*-aget/)."""
+    """Find all repos (aget/ + template-*-aget/ + template-*-AGET/).
+
+    gh#1287 fix 2026-05-10: glob is case-insensitive on suffix to catch
+    template-document-processor-AGET (uppercase suffix per CLAUDE.md).
+    """
     repos = []
     aget_dir = framework_root / 'aget'
     if aget_dir.is_dir():
         repos.append(aget_dir)
     for d in sorted(framework_root.iterdir()):
-        if d.is_dir() and d.name.startswith('template-') and d.name.endswith('-aget'):
+        name_lower = d.name.lower()
+        if d.is_dir() and name_lower.startswith('template-') and name_lower.endswith('-aget'):
             repos.append(d)
     return repos
 
