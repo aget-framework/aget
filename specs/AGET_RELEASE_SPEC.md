@@ -342,7 +342,14 @@ python3 -c "import json; v=json.load(open('.aget/version.json')); print('PASS' i
 |----|-------------|-----------|
 | CAP-REL-006-01 | Every tag SHALL have corresponding GitHub Release | User visibility |
 | CAP-REL-006-02 | Release notes SHALL summarize CHANGELOG | Accessibility |
+| CAP-REL-006-02-01 | Release body SHALL include `**Theme**:` line summarizing the cycle's theme/title | Headline accessibility |
+| CAP-REL-006-02-02 | Release body SHALL include `## What's New` section with ≥3 bullet items summarizing CHANGELOG `### Added` and/or `### Changed` sections | Substantive summarization (presence-only link to CHANGELOG REJECTED — see L742 + L935 multi-condition correctness) |
+| CAP-REL-006-02-03 | Release body SHALL include `## Compatibility` section stating either "No breaking changes" or referencing BREAKING_CHANGES_v{X.Y}.md | Migration clarity |
+| CAP-REL-006-02-04 | If release ships any SPEC-LANDED-IMPL-DEFERRED capabilities OR sleeping requirements, release body SHALL include `## Sleeping-CAPs Disclosure` (or equivalent) section | Honest spec-truthfulness per ADR-007 |
+| CAP-REL-006-02-05 | Release body SHALL reference the canonical CHANGELOG entry with a resolvable link (verified to return HTTP 200 at publication time) | Avoids broken links (closes 17-cycle AGET_DELTA chronic) |
+| ~~CAP-REL-006-02-06~~ | ~~Release body length SHALL be ≥ 30 lines~~ | **WITHDRAWN at authoring time**: length-as-proxy is presence-not-correctness; CAP-REL-006-02-01..05 multi-condition correctness already establishes substance. Removed to avoid L935 self-instance (length-presence vs substance-correctness). |
 | CAP-REL-006-03 | Pre-releases SHALL be marked as such | Stability signaling |
+| **V-CAP-REL-006-02** | **paired V-test** | **`aget/verification/validate_release_body.py`** fetches each repo's `gh release view --json body` post-publication AND validates conformance to CAP-REL-006-02-01..06; FAIL on any non-conforming release. Closes 17-cycle chronic gap. |
 
 ### CAP-REL-007: Release Documentation
 
@@ -400,6 +407,36 @@ python3 aget/validation/validate_version_inventory.py --all-files
 | R-REL-010-01 | Homepage SHALL show current version | User information |
 | R-REL-010-02 | Roadmap SHALL reflect release status | Planning visibility |
 | R-REL-010-03 | Next version SHALL be documented | Roadmap clarity |
+| R-REL-010-04 | Homepage `version` badge SHALL display the current released version (`v{X.Y.Z}`) verifiable via shields.io URL or static markdown | Eliminates 5+ cycle chronic stale-badge pattern |
+| R-REL-010-05 | Homepage `released` badge SHALL display the release date (`YYYY-MM-DD`) of the current version | Same chronic-fix |
+| R-REL-010-06 | Homepage Roadmap section SHALL have exactly ONE entry tagged `(Current)` and that entry SHALL match the released version | Prevents Roadmap-Current vs badge-current divergence |
+| R-REL-010-07 | Homepage migration_history sample SHALL include the current version → next-anticipated-version line OR latest historical entry SHALL include the released version | Sample data currency |
+| **V-CAP-REL-008** | **paired V-test** | **`aget/verification/validate_homepage_currency.py`** fetches `.github/profile/README.md` post-publication AND validates R-REL-010-04..07; FAIL on stale homepage. Closes 5+ cycle principal-manual-cleanup pattern. |
+
+### CAP-REL-008b: Template README Currency (NEW v3.18)
+
+**SHALL** requirements for per-template README currency:
+
+| ID | Requirement | Rationale |
+|----|-------------|-----------|
+| R-REL-010b-01 | Each template's `README.md` line ≤10 SHALL display `**Version**: v{X.Y.Z}` matching released version | Closes 5-cycle chronic stale-template-README pattern (template READMEs were silent at v3.12.0 across v3.13-v3.17 = 5 cycles) |
+| R-REL-010b-02 | Each template's `README.md` `**Framework**` reference line SHALL display `[AGET v{X.Y.Z}]` matching released version | Same chronic-fix |
+| R-REL-010b-03 | Updates SHALL be applied atomically across all 13 templates per `version_bump.py` extension | Coherence |
+| **V-CAP-REL-008b** | **paired V-test** | **`aget/verification/validate_template_readme_currency.py`** scans 13 template READMEs post-publication AND validates R-REL-010b-01..03; FAIL on any stale template README. |
+
+### CAP-REL-008c: Release-Surface Coverage Manifest (NEW v3.18)
+
+**SHALL** requirements for documenting the full set of release-describing surfaces:
+
+| ID | Requirement | Rationale |
+|----|-------------|-----------|
+| R-REL-010c-01 | Framework SHALL maintain a `RELEASE_SURFACES_MANIFEST.md` enumerating every public-visible surface that describes a release (`aget/CHANGELOG`, `aget/release-notes`, GitHub Release bodies, org-profile, template READMEs, AGET_DELTA, etc.) | Closes "I keep discovering more" pattern |
+| R-REL-010c-02 | Manifest SHALL record per surface: spec authority (CAP-NNN-MM), V-test ID (V-NNN-MM), update mechanism (auto-script / agent-action / principal-manual / unspecified), and last-updated cycle | Audit trail |
+| R-REL-010c-03 | New surfaces discovered post-release SHALL be added to manifest in a v3.18+ retrospective | Continuous coverage |
+| R-REL-010c-04 | Surface coverage gap (any surface with `update_mechanism: unspecified`) SHALL be flagged at release-readiness check | Pre-release gate |
+| **V-CAP-REL-008c** | **paired V-test** | **`aget/verification/validate_release_surfaces_manifest.py`** verifies manifest covers known surfaces (filesystem walk for *.md files matching version-bearing patterns) and flags `unspecified` rows. |
+
+**Reference**: `private-aget-framework-AGET/docs/RELEASE_SURFACES_AUDIT_v3.17.md` (initial audit; promote to canonical `aget/RELEASE_SURFACES_MANIFEST.md` at v3.18).
 
 ### CAP-REL-009: Release Verification (L517)
 

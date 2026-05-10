@@ -2380,6 +2380,60 @@ See: `docs/COMMUNICATION_STANDARDS.md` for full template
 
 ---
 
+### Phase 5.5: Compose Release Body (CAP-REL-006-02-NN per v3.18; NEW)
+
+**Purpose**: Author release-body markdown content conforming to CAP-REL-006-02-01..05 BEFORE `tag_release.py --release-only` runs.
+
+**When**: AFTER tag cut (Phase 5) AND BEFORE GitHub Release creation.
+
+**Rationale** (v3.17 audit; closes 17-cycle CAP-REL-006-02 chronic violation): The `tag_release.py:create_release()` legacy 2-line template emitted "summarize CHANGELOG" violations across v3.1.0 through v3.16.0 (17 cycles). Principal-manual-cleanup via `gh release edit` had been the de-facto enforcement; v3.17 audit confirmed this as L284 Delegation Theater at multi-cycle granularity. v3.18 onward MAKES THIS A REQUIRED STEP.
+
+#### 5.5.1. Author release-body content
+
+For aget/ canonical: rich body matching CAP-REL-006-02-01..05 — Theme line + What's New section with ≥3 bullets summarizing CHANGELOG Added/Changed + Compatibility section + Sleeping-CAPs Disclosure (if applicable) + resolvable CHANGELOG/AGET_DELTA link.
+
+For 13 templates: slim body matching same schema with ≥3 bullets framework-aligned (each template's CHANGELOG entry is shorter than aget/'s; bullets summarize the template-specific changes per template-CHANGELOG.md `## [X.Y.Z]` section).
+
+Author location (private workspace; NOT committed canonical):
+- `release-notes/v{X.Y.Z}_release_body_aget.md` — rich body
+- `release-notes/v{X.Y.Z}_release_body_template.md` — slim body
+
+#### 5.5.2. Pre-release validation
+
+Run `aget/verification/validate_release_body.py` against drafts BEFORE `gh release create`:
+
+```bash
+python3 -c "
+import sys; sys.path.insert(0, 'aget/verification')
+from validate_release_body import validate_body
+for path, label in [('release-notes/vX.Y.Z_release_body_aget.md', 'aget'), ('release-notes/vX.Y.Z_release_body_template.md', 'template')]:
+    body = open(path).read()
+    result = validate_body(label, 'X.Y.Z', body)
+    assert result['overall'] == 'PASS', f'{label} FAIL: {result}'
+print('Drafts PASS V-CAP-REL-006-02')
+"
+```
+
+If V-test fails: revise drafts before proceeding to Phase 5.6 release creation.
+
+#### 5.5.3. Invoke release creation with --notes-file
+
+```bash
+# Aget rich body
+python3 scripts/tag_release.py --version X.Y.Z --description "Theme: ..." \
+  --notes-file release-notes/vX.Y.Z_release_body_aget.md \
+  --release-only --repos aget
+
+# 13 templates slim body
+python3 scripts/tag_release.py --version X.Y.Z --description "..." \
+  --notes-file release-notes/vX.Y.Z_release_body_template.md \
+  --release-only --repos template-advisor-aget template-... (13 explicit)
+```
+
+If `--notes-file` not supplied, `tag_release.py:create_release()` auto-extracts the `## [X.Y.Z]` section from each repo's CHANGELOG.md as fallback (per v3.18 amendment). Auto-extraction works for compliant repos; failure mode is V-CAP-REL-006-02 detection at Phase 7.5 post-publication audit.
+
+---
+
 ### Phase 6: Fleet Handoff (R-REL-019)
 
 **Purpose**: Bridge the gap between "release exists" and "fleet has adopted"
@@ -2728,6 +2782,52 @@ grep -q "Pilot.*Status\|private-supervisor-AGET" \
 **Checkpoint**: Handoff artifact created, supervisor notified
 
 **Decision Point**: Proceed to Phase 7 (Release Knowledge Transfer)? [GO/NO-GO]
+
+---
+
+### Phase 6.5: Post-Publication V-test Verification (NEW v3.18)
+
+**Purpose**: Verify public-visible release artifacts conform to spec via automated V-tests AFTER public push completes.
+
+**When**: AFTER Phase 6 (handoff delivered) AND BEFORE Phase 7 (knowledge transfer).
+
+**Rationale** (v3.17 audit; closes 5+ to 17+ cycle chronic gaps): The framework has been operating with multiple sleeping spec violations at the public-visibility layer for many cycles. Per L284 + L671 5-whys analysis, principal vigilance has been load-bearing for these violations because no automated V-test fetched public artifacts post-publication. This phase formalizes the V-test fetching pattern as the structural defense.
+
+#### 6.5.1. Run V-CAP-REL-006-02 — release-body conformance
+
+```bash
+python3 aget/verification/validate_release_body.py --version X.Y.Z --all-repos
+```
+
+Validates: Theme line + What's New ≥3 bullets + Compatibility section + Sleeping-CAPs Disclosure (if applicable) + resolvable CHANGELOG link, across 14 repos.
+
+**Failure**: BLOCKING — Phase 7 SHALL NOT proceed if any repo fails. Remediation: revise release-body content via `gh release edit --notes-file <revised>` until V-test PASSes.
+
+#### 6.5.2. Run V-CAP-REL-008 — homepage currency
+
+```bash
+python3 aget/verification/validate_homepage_currency.py --version X.Y.Z
+```
+
+Validates R-REL-010-04..07: version badge current + release-date badge current + Roadmap (Current) entry matches version + migration_history sample includes current version.
+
+**Failure**: BLOCKING — required to update `.github/profile/README.md` to spec compliance. Closes 5+ cycle principal-manual-cleanup pattern.
+
+#### 6.5.3. Run V-CAP-REL-008b — template README currency
+
+```bash
+python3 aget/verification/validate_template_readme_currency.py --version X.Y.Z
+```
+
+Validates R-REL-010b-01..02: each of 13 templates' `README.md` has `**Version**: vX.Y.Z` + `[AGET vX.Y.Z]` framework reference at current version.
+
+**Failure**: BLOCKING — closes 5-cycle chronic stale-template-README pattern (v3.13-v3.17 silently shipped at v3.12.0).
+
+#### 6.5.4. Aggregate post-publication audit report
+
+If all 3 V-tests PASS: emit Release_Bridge entry "Public-visibility V-test audit: 14/14 repos + homepage + 13 template READMEs PASS at vX.Y.Z release-day."
+
+If any V-test FAILS: do not advance to Phase 7. Document failure in Release_Bridge as recurrence (with cycle-depth annotation) and remediate.
 
 ---
 
