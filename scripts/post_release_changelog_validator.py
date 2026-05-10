@@ -115,17 +115,43 @@ def check_entry_complete(repo_root: Path, version: str) -> tuple[bool, str]:
 
 
 def check_breaking_consistency(repo_root: Path, version: str) -> tuple[Optional[bool], str]:
-    """R-REL-030-03: IF BREAKING_CHANGES_v{V}.md exists THEN entry has Breaking Changes + BC-NNN."""
-    bc_path = repo_root / "docs" / f"BREAKING_CHANGES_v{version}.md"
-    if not bc_path.exists():
-        # Try repo-root location too
-        bc_path = repo_root / f"BREAKING_CHANGES_v{version}.md"
-    if not bc_path.exists():
-        return None, f"BREAKING_CHANGES_v{version}.md not present (N/A — non-breaking release)"
+    """R-REL-030-03: IF release IS breaking THEN entry has Breaking Changes + BC-NNN.
+
+    "Release IS breaking" detection signals (closes F-V317-G1-CRITIC-015):
+      (1) BREAKING_CHANGES_v{V}.md present (versioned file at docs/ or repo root)
+      (2) BREAKING_CHANGES.md present (unsuffixed file at docs/ or repo root)
+      (3) `## [X.Y.Z]` block contains a "Breaking Changes" subsection
+    Any of (1)/(2)/(3) → release is breaking → require BC-NNN reference.
+    """
+    # Signal (1): versioned BREAKING_CHANGES_v{V}.md
+    versioned_paths = [
+        repo_root / "docs" / f"BREAKING_CHANGES_v{version}.md",
+        repo_root / f"BREAKING_CHANGES_v{version}.md",
+    ]
+    # Signal (2): unsuffixed BREAKING_CHANGES.md (catches releases that don't
+    # follow the versioned-file convention — F-015 closure)
+    unsuffixed_paths = [
+        repo_root / "docs" / "BREAKING_CHANGES.md",
+        repo_root / "BREAKING_CHANGES.md",
+    ]
+    bc_file_present = any(p.exists() for p in versioned_paths + unsuffixed_paths)
+
     cl_path = repo_root / "CHANGELOG.md"
+    block = None
+    if cl_path.exists():
+        block = extract_changelog_block(cl_path.read_text(), version)
+
+    # Signal (3): Breaking Changes subsection in changelog block itself
+    bc_in_changelog = bool(
+        block
+        and re.search(r"###\s*Breaking Changes\b|^\s*\*?\*?Breaking Changes\*?\*?", block, re.M)
+    )
+
+    is_breaking = bc_file_present or bc_in_changelog
+    if not is_breaking:
+        return None, f"no breaking-change signal detected (N/A — non-breaking release)"
     if not cl_path.exists():
-        return False, "CHANGELOG.md missing while BREAKING_CHANGES present"
-    block = extract_changelog_block(cl_path.read_text(), version)
+        return False, "CHANGELOG.md missing while breaking-change signal present"
     if block is None:
         return False, f"breaking release but no `## [{version}]` block"
     if not re.search(r"###\s*Breaking Changes\b|^\s*\*?\*?Breaking Changes\*?\*?", block, re.M):
@@ -268,7 +294,27 @@ def main() -> int:
         if any(s is False for s, _ in per_repo[repo].values()):
             failed_overall = True
 
-    sessions_dir = framework_root / args.sessions_dir
+    # Audit emission path resolution. Closes F-V317-G1-B3-CRITIC-001 (sessions/
+    # pollution at framework-root): when --cwd points to a directory without
+    # .aget/ marker, require explicit --sessions-dir.
+    cwd_has_aget = (framework_root / ".aget").exists()
+    sessions_dir_path = Path(args.sessions_dir)
+    if sessions_dir_path.is_absolute():
+        sessions_dir = sessions_dir_path
+    elif cwd_has_aget:
+        sessions_dir = framework_root / sessions_dir_path
+    elif args.sessions_dir != "sessions":
+        sessions_dir = framework_root / sessions_dir_path
+    else:
+        print(
+            "ERROR: --cwd points to a path without .aget/ (framework-root level) "
+            "and --sessions-dir defaulted to 'sessions'. This would create "
+            f"'{framework_root}/sessions/' which is outside any agent's session tree. "
+            "Specify --sessions-dir explicitly (absolute path OR a path you intend "
+            "to live under framework_root).",
+            file=sys.stderr,
+        )
+        return 2
     audit_path = sessions_dir / f"post_release_changelog_audit_{version}_{datetime.date.today().isoformat()}.md"
     emit_audit(version, per_repo, audit_path)
 
