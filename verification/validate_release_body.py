@@ -75,12 +75,25 @@ def validate_body(repo: str, version: str, body: str) -> dict:
     has_theme = bool(re.search(r'\*\*Theme\*\*:', body))
     results["checks"]["CAP-REL-006-02-01_theme"] = "PASS" if has_theme else "FAIL"
 
-    # CAP-REL-006-02-02: What's New section with ≥3 bullets
+    # CAP-REL-006-02-02: What's New section with 5-10 bullets, each ≤2 lines (precedent-grounded)
     whats_new_section = re.search(r'##\s+What\'s New\s*\n((?:.|\n)+?)(?=\n##\s|\Z)', body, re.IGNORECASE)
-    bullets = 0
+    bullets = []
     if whats_new_section:
-        bullets = len(re.findall(r'^\s*[-*]\s+', whats_new_section.group(1), re.MULTILINE))
-    results["checks"]["CAP-REL-006-02-02_whats_new"] = "PASS" if bullets >= 3 else f"FAIL (found {bullets} bullets in What's New section; need ≥3)"
+        # Extract each bullet's full content (until next bullet or section end)
+        section_text = whats_new_section.group(1)
+        bullet_blocks = re.findall(r'^\s*[-*]\s+(.+?)(?=\n\s*[-*]\s|\Z)', section_text, re.MULTILINE | re.DOTALL)
+        bullets = bullet_blocks
+    bullet_count = len(bullets)
+    bullets_under_2_lines = all(b.count('\n') <= 1 for b in bullets) if bullets else False
+    if 5 <= bullet_count <= 10 and bullets_under_2_lines:
+        results["checks"]["CAP-REL-006-02-02_whats_new"] = "PASS"
+    elif bullet_count < 5:
+        results["checks"]["CAP-REL-006-02-02_whats_new"] = f"FAIL (found {bullet_count} bullets; need 5-10)"
+    elif bullet_count > 10:
+        results["checks"]["CAP-REL-006-02-02_whats_new"] = f"FAIL (found {bullet_count} bullets; need 5-10 — too verbose)"
+    else:
+        long_bullets = sum(1 for b in bullets if b.count('\n') > 1)
+        results["checks"]["CAP-REL-006-02-02_whats_new"] = f"FAIL ({bullet_count} bullets but {long_bullets} exceed 2 lines)"
 
     # CAP-REL-006-02-03: Compatibility section
     has_compat = bool(re.search(r'##\s+Compatibility|##\s+No\s+breaking\s+changes|No breaking changes\.', body, re.IGNORECASE))
@@ -103,10 +116,25 @@ def validate_body(repo: str, version: str, body: str) -> dict:
     else:
         results["checks"]["CAP-REL-006-02-05_link_resolves"] = "FAIL (no CHANGELOG/AGET_DELTA/release-notes link found)"
 
-    # CAP-REL-006-02-06: WITHDRAWN at authoring time
-    # Length-as-proxy was redundant with CAP-REL-006-02-01..05 multi-condition correctness;
-    # avoiding L935 self-instance (length-presence vs substance-correctness).
-    # Substance is verified by the 5 checks above, not by line count.
+    # CAP-REL-006-02-06: WITHDRAWN at authoring (replaced by 02-07 precedent-grounded)
+
+    # CAP-REL-006-02-07: Body length 12-25 non-blank lines (precedent v3.15+v3.16 range)
+    nonblank = len([line for line in body.split('\n') if line.strip()])
+    byte_size = len(body.encode('utf-8'))
+    if 12 <= nonblank <= 25:
+        results["checks"]["CAP-REL-006-02-07_length"] = f"PASS ({nonblank} nonblank lines, {byte_size} bytes within precedent 12-25/1500-2500)"
+    elif nonblank < 12:
+        results["checks"]["CAP-REL-006-02-07_length"] = f"FAIL ({nonblank} nonblank lines; need 12-25 — too thin)"
+    else:
+        results["checks"]["CAP-REL-006-02-07_length"] = f"FAIL ({nonblank} nonblank lines; need 12-25 — too verbose, exceeds precedent)"
+
+    # CAP-REL-006-02-08: Exactly 3 H2 sections
+    h2_sections = re.findall(r'^##\s+', body, re.MULTILINE)
+    h2_count = len(h2_sections)
+    if h2_count == 3:
+        results["checks"]["CAP-REL-006-02-08_sections"] = "PASS (3 H2 sections per precedent)"
+    else:
+        results["checks"]["CAP-REL-006-02-08_sections"] = f"FAIL ({h2_count} H2 sections; need exactly 3)"
 
     # Overall verdict
     if any(check.startswith("FAIL") for check in results["checks"].values()):
