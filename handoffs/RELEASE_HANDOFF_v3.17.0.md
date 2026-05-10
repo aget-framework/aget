@@ -74,13 +74,17 @@ T2.19 ships LANDED at full V-test rigor (Q-G1.5-2=B principal Decide rejected v3
 3. **Bump `AGENTS.md` `@aget-version`**: 3.16.0 → 3.17.0.
 4. **Optional adoption**: if your agent is a framework-management agent, consider adopting `archetype: "framework-manager"` in `.aget/identity.json` (closes self-classification gap).
 5. **Run health check**: `python3 scripts/health_check.py` — verify substance-aware evolution check passes (new in T1.8).
-6. **Run pytest**: 160/160 expected (post-test-registration parity per F-V317-G2-FIX-003 inline remediation).
+6. **Run pytest**: should pass at your agent's pre-migration baseline + any newly-bundled framework tests (post-test-registration parity per F-V317-G2-FIX-003 inline remediation). 160/160 is the framework-manager agent's count; your count varies by archetype role (e.g., supervisor adds session-specific tests; worker varies by domain). Treat the migration as PASS if pytest count matches your previous baseline plus any expected new tests, with no regressions — not by literal 160 match.
 
 ### For Templates (downstream of aget-framework)
 
 1. Pull `template-<archetype>-aget` v3.17.0 from `aget-framework/template-<archetype>-aget`.
 2. Sync framework artifacts per AGENTS.md template-sync section.
 3. CAP-REL-032 + CAP-REL-033 grace-extended; no implementation required at v3.17.0.
+
+### DEPLOYMENT_SPEC Note
+
+**No `DEPLOYMENT_SPEC_v3.17.0.yaml` ships** — explicit policy per principal Decide (closure of cross-session-Critic findings F-R2-A + F-R2-B). v3.17.0 inherits v3.16.0's DEPLOYMENT_SPEC contract semantically (no breaking changes). Fleet-upgrade tooling SHALL use the latest available `DEPLOYMENT_SPEC_v{X.Y.Z}.yaml` (currently `v3.16.0`) as the contractual artifact set. Formal `aget/specs/AGET_DEPLOYMENT_SPEC_FORMAT.md` standardization is routed to v3.18. See `aget/CHANGELOG.md` line 76 for full rationale. **This is intentional, not oversight** — do not file `where-is-DEPLOYMENT_SPEC` issues.
 
 ### Migration
 
@@ -101,6 +105,8 @@ This release applies uniformly across all 13 archetype templates: **no per-arche
 | (additional pilot agents) | ⏳ Pending | — | Per supervisor disposition |
 
 **L656 Loading Dock guard**: This handoff documents what landed; deployment verification confirms it is running. Self-deployment confirmed at framework-manager (this agent) post-Gate-6 push. Cross-fleet verification deferred to supervisor-coordinated pilot pass.
+
+**Self-tick prevention (L656 + L908)**: Receiving agents SHALL NOT mark their own row ✅ on self-deploy alone. L656 requires cross-AGENT deployment evidence; self-confirmation instantiates the L908 self-application gap. v3.17.0 caught two paired same-week recurrences of this pattern: framework-manager scored PIR D6=2/3 with `self ✅` (corrected to 1/3 post-Critic; commit `ab12440`); a sibling fleet agent proposed migration-prep NBAs without proposing its own self-migration as NBA #0. Supervisor coordinates pilot pass and updates this table; receiving agents update only their own *handoff-consumed* + *upgrade-guide-executed* status, not pilot-confirmed deployment status.
 
 ---
 
