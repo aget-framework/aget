@@ -162,6 +162,70 @@ def get_calendar_context(config: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def compute_active_agents_from_fleet_state(agent_path: Path) -> Optional[Dict[str, Any]]:
+    """Read `.aget/fleet/FLEET_STATE.yaml` and return live filesystem-based active count per gh#1288.
+
+    Closes structural-not-discipline gap (L644 substrate; L648 cross-instance state coherence):
+    fleet-count surfacing at wake-up SHOULD prefer FLEET_STATE.yaml live read over MEMORY-cached
+    parrot or metadata-asserted numbers. Detects drift between filesystem reality
+    (sum of agents with status==active) and asserted metadata.active_agents.
+
+    Returns None if no FLEET_STATE.yaml found at agent_path (most agents don't have one;
+    only supervisor-class agents). Returns dict with keys:
+        - filesystem_count: int — count of agents with status==active across all portfolios
+        - metadata_count: Optional[int] — value of metadata.active_agents (None if absent)
+        - drift: bool — True if filesystem_count != metadata_count
+        - drift_warning: Optional[str] — human-readable warning if drift detected
+        - portfolios: list of portfolio names with active counts
+
+    Designed to be called from extension hooks (`scripts/wake_up_ext.py`) that surface
+    fleet counts; framework-canonical helper, instance artifact opt-in. PyYAML dependency
+    fails gracefully (returns None) if not installed.
+    """
+    fleet_state_path = agent_path / '.aget' / 'fleet' / 'FLEET_STATE.yaml'
+    if not fleet_state_path.exists():
+        return None
+    try:
+        import yaml  # type: ignore[import-untyped]
+    except ImportError:
+        return None
+    try:
+        with open(fleet_state_path) as f:
+            data = yaml.safe_load(f) or {}
+    except (yaml.YAMLError, IOError):
+        return None
+
+    fleet = data.get('fleet') or {}
+    metadata = data.get('metadata') or {}
+
+    portfolios = []
+    filesystem_count = 0
+    for pf_name, pf_data in fleet.items():
+        if not isinstance(pf_data, dict):
+            continue
+        agents = pf_data.get('agents') or []
+        pf_active = sum(1 for a in agents if isinstance(a, dict) and a.get('status') == 'active')
+        portfolios.append({'name': pf_name, 'active': pf_active})
+        filesystem_count += pf_active
+
+    metadata_count = metadata.get('active_agents')
+    drift = (metadata_count is not None) and (metadata_count != filesystem_count)
+    drift_warning = None
+    if drift:
+        drift_warning = (
+            f"FLEET_STATE drift: metadata.active_agents={metadata_count} "
+            f"!= filesystem count={filesystem_count}. Filesystem wins per L644 + AGENTS.md precedence rule."
+        )
+
+    return {
+        'filesystem_count': filesystem_count,
+        'metadata_count': metadata_count,
+        'drift': drift,
+        'drift_warning': drift_warning,
+        'portfolios': portfolios,
+    }
+
+
 def get_pending_work(agent_path: Path, max_items: int = 10) -> Dict[str, Any]:
     """Surface most recent session note's `## Pending Work` section per gh#1285.
 
