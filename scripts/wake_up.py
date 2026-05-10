@@ -73,6 +73,7 @@ DEFAULT_CONFIG = {
     'show_git_status': True,
     'show_structure': False,
     'show_calendar': True,
+    'show_pending_work': True,  # gh#1285: surface prior session-note Pending Work
 }
 
 
@@ -161,6 +162,62 @@ def get_calendar_context(config: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def get_pending_work(agent_path: Path, max_items: int = 10) -> Dict[str, Any]:
+    """Surface most recent session note's `## Pending Work` section per gh#1285.
+
+    Closes structural-not-discipline gap (L490/L563): fresh sessions inherit
+    MEMORY + plan but historically did NOT auto-read prior session-note's
+    Pending Work, creating a discovery lottery.
+
+    Returns dict with keys:
+        - source: relative path of session file (or None if not found)
+        - items: list of bullet lines under `## Pending Work` header
+        - truncated: bool — True if more items existed than max_items
+    """
+    result = {'source': None, 'items': [], 'truncated': False}
+    sessions_dir = agent_path / 'sessions'
+    if not sessions_dir.is_dir():
+        return result
+    session_files = sorted(
+        sessions_dir.glob('session_*.md'),
+        key=lambda p: p.stat().st_mtime,
+        reverse=True,
+    )
+    if not session_files:
+        return result
+    most_recent = session_files[0]
+    try:
+        result['source'] = str(most_recent.relative_to(agent_path))
+    except ValueError:
+        result['source'] = str(most_recent)
+    try:
+        text = most_recent.read_text(encoding='utf-8')
+    except Exception:
+        return result
+
+    in_section = False
+    items: list = []
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped.startswith('## '):
+            if in_section:
+                break
+            if 'Pending Work' in stripped:
+                in_section = True
+            continue
+        if in_section:
+            if stripped.startswith(('- ', '* ', '+ ')):
+                items.append(stripped[2:].strip())
+            elif stripped and not stripped.startswith('#') and not items:
+                items.append(stripped)
+
+    if len(items) > max_items:
+        result['truncated'] = True
+        items = items[:max_items]
+    result['items'] = items
+    return result
+
+
 def get_wake_data(agent_path: Path) -> Dict[str, Any]:
     """Gather all data needed for wake output."""
     data = {
@@ -229,6 +286,10 @@ def get_wake_data(agent_path: Path) -> Dict[str, Any]:
     # Calendar awareness (CAP-SESSION-011)
     if data['config'].get('show_calendar', True):
         data['calendar'] = get_calendar_context(wake_config)
+
+    # Pending Work surfacing (gh#1285 — structural-not-discipline)
+    if data['config'].get('show_pending_work', True):
+        data['pending_work'] = get_pending_work(agent_path)
 
     return data
 
@@ -325,6 +386,17 @@ def format_human_output(data: Dict[str, Any]) -> str:
         lines.append(f"Date: {cal['date']} ({cal['day']})")
         if cal.get('in_release_window'):
             lines.append(f"Release Window: {cal['release_window']}")
+
+    # Pending Work surfacing (toggle: show_pending_work, gh#1285)
+    if config.get('show_pending_work', True) and 'pending_work' in data:
+        pw = data['pending_work']
+        if pw.get('items'):
+            lines.append("")
+            lines.append(f"Pending Work (from {pw.get('source', 'prior session')}):")
+            for item in pw['items']:
+                lines.append(f"  - {item}")
+            if pw.get('truncated'):
+                lines.append("  ... (truncated; see session note for full list)")
 
     lines.append("")
 
