@@ -71,6 +71,18 @@ Candidate v3.18 L-doc: "V-test scope-of-validation as second axis of correctness
 
 v3.17 closes substantial framework-discipline scope (Tier 1 9/9 + Tier 2 4/4) within the Saturday push window per L735. Theme C3 self-demonstrated multiple times — at lock event (post-lock closure remediation per H-V317-LOCK-001 falsification clauses), at T1.7 build (V-T1.7 → V-T1.7-EXT), at T2.18 LANDED (SOP codifies its own ceremony), at Gate 2 CITATION.cff (script spec at fault for own behavior).
 
+### Deployment-Spec-Optional Disclosure (post-publication; per gh#1274 supervisor-side audit)
+
+v3.17.0 ships **deployment-spec-optional** by explicit policy. Unlike prior releases (v3.6.0, v3.7.0, v3.8.0, v3.9.0, v3.12.0, v3.15.0, v3.16.0 each shipped with a per-release `DEPLOYMENT_SPEC_v{X.Y.Z}.yaml`), v3.17.0 does not ship with `DEPLOYMENT_SPEC_v3.17.0.yaml`. Rationale: the DEPLOYMENT_SPEC convention has been inconsistently applied across releases (5 of ~17 cycles missing per `RELEASE_SURFACES_AUDIT_v3.17.md`); v3.17 makes the inconsistency explicit policy and routes formal `aget/specs/AGET_DEPLOYMENT_SPEC_FORMAT.md` standardization to v3.18. Fleet-upgrade tooling SHALL use the latest available `DEPLOYMENT_SPEC_v{X.Y.Z}.yaml` (currently `v3.16.0`) as the contractual artifact set; v3.17.0 inherits v3.16.0's DEPLOYMENT_SPEC contract semantically (no breaking changes).
+
+### Tag-vs-HEAD Policy (post-publication; per gh#1274 supervisor-side audit)
+
+v3.17.0 release tag `bb2f688` is **frozen at release-publication moment**; subsequent commits (`a09c66c` AGET_DELTA_v3.17.md + `cdde067` spec-debt closure CAP-REL-006-02-NN + V-tests + SOP wiring + `330cd05` precedent-grounded spec v2 + `42b8a41` title-format spec v3) are **post-tag spec polish**, not v3.17.0 deliverables. Fleet-upgrade tooling MAY pin to either:
+- **`v3.17.0` tag** (canonical-frozen): instances upgrade from a stable, immutable reference matching the publication moment
+- **`main` HEAD** (best-known-good): instances upgrade from current state with all post-tag spec polish applied
+
+**Recommendation**: pin to `v3.17.0` tag for production fleet-upgrade unless post-tag spec amendments are operationally required. If pinning HEAD, document the specific commit SHA in the upgrade record. v3.18 SOP_release_process amendment (already landed Phase 6.5 BLOCKING V-test gate) ensures future releases retire the tag-vs-HEAD ambiguity by closing all release-day spec-debt before tag cut.
+
 ---
 
 ## [3.16.0] - 2026-05-02
