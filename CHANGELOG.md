@@ -9,27 +9,67 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [3.17.0-unreleased] - Spec Drop 2026-05-03
+## [3.17.0] - 2026-05-09
 
-**Theme**: Pre-v3.17 spec drop — RELEASE_HANDOFF Self-Containment Specification + validator land publicly ahead of full v3.17 release. Enables remote fleet supervisors to consume the new self-containment contract immediately.
+**Theme**: **C3 — Canonical Coherence + Structural Self-Conformance**. Framework self-conforms to its own canonical artifacts at every gate boundary. v3.16's #1 lesson hardened: V-tests must verify correctness, not presence — extended in v3.17 to a SECOND axis (scope-of-validation: V-test must cover the actual canonical-artifact universe, not the assumed universe).
 
-> **Loading Dock disclosure (L656)**: This spec drop publishes a CONTRACT and its VALIDATOR but the SOP wiring (`SOP_release_process.md` Phase 6.3 invocation of the validator as a BLOCKING V-test) is **NOT YET LANDED** — that work is H-RHSC-001 Gate 3, scheduled for v3.17.0 final. Consumers SHOULD treat the new spec as authoritative on what self-containment IS, but SHALL NOT assume any release process automatically enforces it until Gate 3 lands. The validator is runnable standalone; remote supervisors may invoke it on their own RELEASE_HANDOFF artifacts as desired (see handoffs/SPEC_DROP_HANDOFF_self_containment_v0.1.md for usage).
+> **No breaking changes** in v3.17. The framework-manager archetype field addition is additive (existing `archetype: "operator"` instances continue to function; new `archetype: "framework-manager"` is the formalization for framework-AGETs that previously had no archetype slot).
 
-> **No breaking changes**. Spec is additive; no existing process is modified.
+> **Spec-fault carry**: gh#1179 (R-REL-022-01 enum vs R-REL-029-05 'LOCKED' status, 3-way vocabulary collision) and gh#1180 (V-PP-007 enum vs CAP-PP-001/003-01 enum, 3-way collision) remain OPEN. Disposition: best-effort artifact + L708 annotation per v3.16 precedent. No release-blocking impact.
 
-### Added
+> **Sleeping CAPs from v3.16 — status update**: CAP-REL-030/031/032/033 SPEC-LANDED-IMPLEMENTATION-DEFERRED were committed for v3.17 implementation. Status: CAP-REL-030 + CAP-REL-031 IMPLEMENTED (T1.1 + T1.2 closed Gate 1); CAP-REL-032 + CAP-REL-033 grace-extended to v3.18.0 (T1.3 + T1.4 GRACE-EXTEND per Q1=B disposition; R-DEP-011 grace-period rationale recorded).
 
-- **`specs/AGET_RELEASE_HANDOFF_SELF_CONTAINMENT_SPEC.md` v0.1.0 (REVIEWED)**: Defines self-containment as a testable property of `RELEASE_HANDOFF_v{X.Y.Z}.md` via 8 CAPs (CAP-RHSC-001..008) and 11 sub-requirements (R-RHSC-001-01 through R-RHSC-008-01). Extends `AGET_RELEASE_SPEC v1.17.0` CAP-REL-020. Closes the framing error in L901 (REMOTE_MIGRATION_MESSAGE-as-required) by reframing as self-containment-property-required. Theoretical basis: Extended Mind (Clark/Chalmers), Stigmergy (Grassé), Cybernetics — Requisite Variety (Ashby).
+### Added — Tier 1 (Implementation)
 
-- **`verification/validate_handoff_self_containment.py` v0.1.0**: Implements 11 V-RHSC tests against any RELEASE_HANDOFF artifact. CLI: `python3 validate_handoff_self_containment.py --handoff <path> [--release-manifest <path>] [--prior-version vX.Y.Z] [--json] [--strict]`. Exit codes: 0 all PASS, 1 any FAIL (or UNKNOWN if --strict), 2 validator error. JSON schema documented in script header.
+- **CAP-REL-030 Post-Release CHANGELOG Validator** (T1.1): Implementation script + multi-site equality V-test against v3.16.0 reference (14/14 PASS). Closes the post-release CHANGELOG-quality-validation gap.
 
-- **`handoffs/SPEC_DROP_HANDOFF_self_containment_v0.1.md`**: Forwardable briefing for remote fleet supervisors — what changed, how to consume, what's NOT yet wired (G3 deferral disclosure), how to self-test against own handoffs.
+- **CAP-REL-031 Post-Release Tag Validator** (T1.2): Implementation script + 5-site PASS against v3.16.0 reference. Closes the tag-monotonicity + tag-message-presence gap.
 
-### Known limitations (deferred to v3.17.0 final)
+- **`scripts/health_check.py` substance-aware evolution check** (T1.8, gh#1211): New `check_evolution_directory_substance(agent_path)` returning (file_count, byte_size, non_ldoc_count) substance metrics. Thresholds: WARN at non_ldoc_count > 2× l_doc_count; CRITICAL at non_ldoc_count > 10× l_doc_count OR byte_size > 100 MB. Closes the L656 check-by-shape vs check-by-substance gap surfaced at a fleet-upgrade readiness review (one agent had 192k *-EXT.md hoarded files invisible to L-doc-only glob).
 
-- **G3 SOP wiring** (H-RHSC-001 Gate 3): Phase 6.3 of `sops/SOP_release_process.md` will be amended to invoke the validator as a BLOCKING V-test. Until then, validator runs are advisory.
-- **G4 Backfill audit** (H-RHSC-001 Gate 4): v3.10–v3.16 handoffs have not yet been scored against the new V-tests. v3.16 self-test surfaced 1 FAIL (V-RHSC-008 archetype enumeration) which IS preserved as falsifiability evidence per H-RHSC-001 PF-2 disposition (NOT a sign of broken validator or broken handoff).
-- **G5 L901 re-grading**: L901 will be re-graded from "complete" to "revised" once Gates 3 + 4 land.
+- **`sops/SOP_release_process.md` v1.32 → v1.45** (T1.5 + T1.6): H-RHSC-001 G3 + G4 SOP wiring — Phase 6.3 + Phase 7 amendments invoke the self-containment validator as BLOCKING V-tests; V-G7.1..V-G7.5 broadened from presence-style to multi-condition correctness; explicit RELEASE_REPOS array (14-element including `template-document-processor-AGET` uppercase suffix that case-sensitive bash glob silently skipped). Closes Synecdoche-HIGH/MEDIUM gaps from `docs/AUDIT_validator_synecdoche_2026-05-08.md`.
+
+- **`framework-manager` agent archetype** (T1.7, per VERSION_SCOPE Q4=A.2): Coined the new archetype for framework public-repo management; closes self-classification gap surfaced via L908 self-application audit. 6-site amendment: `.aget/identity.json` + `.aget/version.json` + `governance/CHARTER.md` + `governance/SCOPE_BOUNDARIES.md` + `AGENTS.md`/`CLAUDE.md` + ontology C610 FrameworkManagerArchetype (full SKOS structure). Multi-site equality V-T1.7-EXT (11 conditions) PASS empirically. Theoretical basis: Stewardship Theory of Management (Davis/Schoorman/Donaldson 1997).
+
+### Added — Tier 2 (Specification Authoring)
+
+- **`sops/SOP_scope_lock_ceremony.md` v1.0.0 LANDED** (T2.18): Standard operating procedure for the scope-lock ceremony — structured 4-gate ritual transitioning `VERSION_SCOPE_vX.Y.Z.md` from PLANNING to READY FOR RELEASE. Empirically grounded by v3.16 (commit `91c5871`) and v3.17 (commit `e50a182`) lock events. Theme C3 self-conformance: this SOP codifies the very ceremony executed at the v3.17 lock event.
+
+- **`specs/AGET_SKILL_LIFECYCLE_SPEC.md` v1.0.0 LANDED** (T2.19): Codifies the AGET skill artifact model — 6 distinct artifact attributes (Skill executable / Proposal / Private SKILL.md / Private Spec / Canonical SKILL.md / Canonical Spec) + Promotion State enum (Private-Only / Yaml-Promoted / Mirrored / Drifted / ID-Conflict) + canonical-vs-private governance discipline (per L910). 7 CAPs at LANDED rigor with 14 EARS-formalized requirement IDs (2 sub-requirements per CAP) + 7 V-tests authored as multi-condition correctness checks + Conformance Matrix. Closes ADR-008 progression gap (L-doc → SOP → Spec → Skill) at the skill governance layer. NO sleeping CAPs (rejected v3.16 SPEC-LANDED-IMPL-DEFERRED precedent in favor of full V-test authoring).
+
+- **`specs/drafts/AGET_FLEET_UPGRADE_SPEC_v0.1.md` v0.1.0 DRAFT** (T2.20): Codifies supervisor cross-agent modification authority + fleet upgrade modes (centralized vs distributed) + required gate ceremony for fleet-wide version bumps + L826 friction taxonomy F1-F4 defense. 4 CAPs at SKELETON rigor grounded in `scripts/fleet_upgrade.py` operational substrate (multiple historical fleet-upgrade executions). LANDED + V-test authoring + canonical promotion deferred to v3.18 P1 per L103 Premature Abstraction discipline.
+
+- **`specs/drafts/AGET_TASK_ROUTING_SPEC_v0.1.md` v0.1.0 DRAFT** (T2.23): Codifies SOP-before-skill precedence rule + procedure-selection grammar (4-candidate enumeration) + D71 STRUCTURAL routing extension. 3 CAPs at SKELETON rigor + Routing Decision Matrix. LANDED + V-test authoring + canonical promotion + operational tool deferred to v3.18 P1.
+
+### Changed
+
+- **`AGET_RELEASE_SPEC` v1.16.1 → v1.17.0**: Pre-Release Conformance Gate (R-REL-029-05) status enum amended. Spec-fault carry per gh#1179 (3-way vocabulary collision; L708 annotation, not blocking).
+- **`AGET_PROJECT_PLAN_SPEC` v1.2.2 → v1.2.3**: V-PP-007 enum amended. Spec-fault carry per gh#1180 (3-way collision; L708 annotation).
+- **`POLICY_deprecation.md` Active Grace Extensions**: CAP-REL-032 + CAP-REL-033 entries added (Q1=B GRACE-EXTEND); v3.18.0 removal threshold; R-DEP-011 grace-period rationale.
+- **`POLICY_deprecation.md` Active Deprecations**: 4 wake/wind shim entries (`wake_up.py`, `wind_down.py`, `wake_up_ext.py`, `wind_down_ext.py`) earliest-removal extended v3.17.0 → v3.18.0 per Q9=B grace extension.
+
+### Inherited (from spec drop, 2026-05-03)
+
+- **`specs/AGET_RELEASE_HANDOFF_SELF_CONTAINMENT_SPEC.md` v0.1.0** (REVIEWED): Defines self-containment as a testable property of `RELEASE_HANDOFF_v{X.Y.Z}.md` via 8 CAPs (CAP-RHSC-001..008) and 11 sub-requirements. Extends `AGET_RELEASE_SPEC v1.17.0` CAP-REL-020. Theoretical basis: Extended Mind (Clark/Chalmers), Stigmergy (Grassé), Cybernetics — Requisite Variety (Ashby).
+- **`verification/validate_handoff_self_containment.py` v0.1.0**: Implements 11 V-RHSC tests against any RELEASE_HANDOFF artifact. v3.17 G3+G4 wiring: Phase 6.3 BLOCKING invocation; v3.10–v3.16 backfill audit deferred to G5 L901 re-grading.
+- **`handoffs/SPEC_DROP_HANDOFF_self_containment_v0.1.md`**: Forwardable briefing for remote fleet supervisors.
+
+### Theme C3 Lesson — V-test Scope-of-Validation as Second Axis of Correctness
+
+v3.17's empirical learning, ratified at multiple gate boundaries: V-test correctness has TWO axes —
+1. **Assertion correctness** (defended by multi-condition equality / set-membership / cross-site equality) — v3.16's #1 lesson
+2. **Scope correctness** (defended by Critic review of declared scope vs canonical-artifact universe) — v3.17 ratification
+
+Multiple recurrence instances:
+- T1.7 framework-manager archetype: V-T1.7 v0 (4-site declared scope) PASSED but Critic-at-exit caught L908 self-application gaps requiring scope extension to V-T1.7-EXT (6 sites). Pattern: declared scope ≠ canonical artifact universe.
+- Gate 2 CITATION.cff: V-2.1 declared 5 sites including AGENTS.md; aget/ canonical does not have AGENTS.md (script artifact_types listing showed only 3 sites for aget/); V-test corrected at execution.
+- Gate 2 CITATION.cff drift: V-2.1 + V-2.6 multi-site equality CAUGHT 3-cycle drift (v3.14.1 stale through v3.15+v3.16) that script's `[OK]` output had masked. Presence-only check would have missed it.
+
+Candidate v3.18 L-doc: "V-test scope-of-validation as second axis of correctness."
+
+### Acknowledgments
+
+v3.17 closes substantial framework-discipline scope (Tier 1 9/9 + Tier 2 4/4) within the Saturday push window per L735. Theme C3 self-demonstrated multiple times — at lock event (post-lock closure remediation per H-V317-LOCK-001 falsification clauses), at T1.7 build (V-T1.7 → V-T1.7-EXT), at T2.18 LANDED (SOP codifies its own ceremony), at Gate 2 CITATION.cff (script spec at fault for own behavior).
 
 ---
 

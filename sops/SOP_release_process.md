@@ -278,6 +278,8 @@ python3 .aget/patterns/upgrade/validate_vX.Y.Z.py --json  # For automation
 | RELEASED | Release execution complete |
 | CANCELLED | Release abandoned (rationale documented) |
 
+The transition `PLANNING → READY FOR RELEASE` is governed by the **Scope-Lock Ceremony** SOP. See `aget/sops/SOP_scope_lock_ceremony.md` v1.0.0 LANDED (T2.18; landed via v3.17.0 release plan G1.5.1) for the canonical 4-gate ceremony — grooming + critic-amendment + absorption + lock event with principal-GO capture. The ceremony implements R-REL-022-01 (Lock-Event Status Transition) and CAP-REL-029 (Lock-Event Protocol). Empirically grounded by v3.16 (commit `91c5871`) and v3.17 (commit `e50a182`) lock events.
+
 ### VERSION_SCOPE Verification
 
 ```bash
