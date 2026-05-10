@@ -1100,7 +1100,7 @@ This CAP closes REQ-REL-F-001 (Pre-Release Validation procedure exists in SOP si
 |------------------|:------:|-------|
 | **R-REL-025 (CAP-REL-029) — Release Readiness Gate** | **LANDED 2026-04-25** (spec + implementation) | First of 5; only CAP with shipped implementation |
 | **R-REL-026 (CAP-REL-030) — Post-Release CHANGELOG Validator** | **SPEC-LANDED 2026-05-02; impl-deferred v3.17** | Wave-1A item 2; v3.16 G1.6; #1149/#1151 root cause; **sleeping-requirement** |
-| **R-REL-027 (CAP-REL-031) — Post-Release Tag Validator** | **SPEC-LANDED 2026-05-02; impl-deferred v3.17** | Wave-1A item 3; v3.16 G1.6; #1154 spec-layer pair; **inline V-test in SOP v1.30 Phase 6.4.5 enforces invariant procedurally**; CAP closes L671 split when impl lands |
+| **R-REL-027 (CAP-REL-031) — Post-Release Tag Validator** | **LANDED 2026-05-09 (spec + implementation)** | Wave-1A item 3; v3.16 G1.6 spec; v3.17 G1.T1.2 impl; #1154 spec-layer pair; SOP v1.30 Phase 6.4.5 procedural V-test paired with `scripts/post_release_tag_validator.py` standalone audit; L671 procedural-vs-spec split closed |
 | **R-REL-028 (CAP-REL-032) — Post-Release Badge/Parity Validator** | **SPEC-LANDED 2026-05-02; impl-deferred v3.17** | Wave-1A item 4; v3.16 G1.6; **sleeping-requirement** |
 | **R-REL-029 (CAP-REL-033) — Post-Release Contract-Test Validator** | **SPEC-LANDED 2026-05-02; impl-deferred v3.17** | Wave-1A item 5; v3.16 G1.6; #1148 BC-detection scope; **sleeping-requirement** |
 
@@ -1161,9 +1161,9 @@ python3 scripts/post_release_changelog_validator.py --version 3.16.0 && \
 
 ### CAP-REL-031: Post-Release Tag Validator (R-REL-027) — Wave-1A Item 3
 
-**Status**: SPEC-LANDED 2026-05-02 (v3.16 G1.6); IMPLEMENTATION DEFERRED to v3.17 (no `scripts/post_release_tag_validator.py` at v3.16.0 release). R-DEP-010 grace-period annotation: v3.16 → v3.18. Wave-1A third contract (3 of 5).
+**Status**: LANDED 2026-05-09 (spec + implementation). Spec landed v3.16 G1.6 (2026-05-02); IMPLEMENTATION LANDED v3.17 G1.T1.2 (2026-05-09) at `scripts/post_release_tag_validator.py`. R-DEP-010 grace-period annotation closed (impl lifted procedural-vs-spec L671 split). Wave-1A third contract (3 of 5).
 
-**⚠️ Sleeping-requirement disclaimer**: Same as CAP-REL-030 — requirements defined, no enforcement code at v3.16. **Note**: SOP_release_process.md v1.30 Phase 6.4.5 includes the tag-resolvability check inline (post-tag V-test) so the headline #1154 invariant IS enforced procedurally at release time; this CAP's value is making the invariant audit-script-bound rather than only SOP-step-bound. Implementation closure at v3.17 lifts the procedural-vs-spec L671 split.
+**Implementation**: `scripts/post_release_tag_validator.py` — standalone audit script with `--version` CLI; implements R-REL-031-01..05 (`git ls-remote` + `git show {tag}:{path}` + `git cat-file -p {tag}` + audit emission to `sessions/post_release_tag_audit_{VERSION}_{DATE}.md`). Sibling to SOP_release_process.md v1.30 Phase 6.4.5 BLOCKING V-test (the SOP runs the check at tag time; this script runs it as standalone audit + closes the spec-vs-procedure L671 split).
 
 **Threat-Class Anchor**: Post-release verification that tags are correctly cut, pushed, and resolve handoff artifacts. #1154 (tag-vs-HEAD fleet artifact gap, root-caused from legalon #1152) confirmed that tags cut at SOP Phase 3 (pre-handoff) returned "not found" for `git show vX.Y.Z:handoffs/RELEASE_HANDOFF_vX.Y.Z.md`. SOP_release_process.md v1.30 (G1.3) moved tag-cut to Phase 6.4.5 procedurally; this CAP makes the tag-resolvability invariant spec-bound (procedure → contract per L671 progression).
 
