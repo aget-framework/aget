@@ -2390,6 +2390,8 @@ See: `docs/COMMUNICATION_STANDARDS.md` for full template
 
 #### 5.5.1. Author release-body content
 
+**Starting point**: copy [`templates/TEMPLATE_RELEASE_BODY.md`](../templates/TEMPLATE_RELEASE_BODY.md) (effective v3.18+; first worked example v3.17.0 refresh 2026-05-10). The template encodes the enhanced structure derived from L941-L944 lessons: lead-with-outcome bullet pattern, trailing `*Traceability:*` IDs, mandatory "What This Release Doesn't Change" section for honest gap recording. Voice requirement: REQ-HOM-Q-001 (no em-dash compounds; majority ≤15-word sentences).
+
 For aget/ canonical: rich body matching CAP-REL-006-02-01..05 — Theme line + What's New section with ≥3 bullets summarizing CHANGELOG Added/Changed + Compatibility section + Sleeping-CAPs Disclosure (if applicable) + resolvable CHANGELOG/AGET_DELTA link.
 
 For 13 templates: slim body matching same schema with ≥3 bullets framework-aligned (each template's CHANGELOG entry is shorter than aget/'s; bullets summarize the template-specific changes per template-CHANGELOG.md `## [X.Y.Z]` section).
