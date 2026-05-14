@@ -1,6 +1,6 @@
 # AGET INITIATIVE Specification
 
-**Version**: 1.0.1
+**Version**: 1.1.0
 **Status**: Active
 **Category**: Process (Planning / Governance)
 **Created**: 2026-05-14
@@ -9,6 +9,7 @@
 **Location**: `aget/specs/AGET_INITIATIVE_SPEC.md`
 **Change Origin**: 2026-05-14 session — `/aget-propose-initiative` design request; principal GO 2026-05-14
 **v1.0.1 Patch**: Fix §4 vocabulary anti-pattern stale count (6 → 7) per Gate -1 Auditor finding in PROJECT_PLAN_aget_propose_initiative_v1.0 / `planning/triad_findings.jsonl` line 35.
+**v1.1.0 Minor (additive — no behavioral / R-INIT-PROP / V-INIT-PROP changes)**: SKOS uplift per PP-028 (PROPOSAL_spec_aget_initiative_v1.1_skos_uplift.md, principal Approve 2026-05-14 PM). §4 vocabulary table extends `Initiative` / `Initiative_Proposal` / `Initiative_Manifest` / `Stream` SKOS links to Meta-Ontological cluster (C404-C408); §4 anti-patterns add `Decorative_Initiative_Reference → skos:narrower: C408 PortfolioTheater`, `Direct_Initiative_Authoring → skos:related: C544`, `Project_Template_Reuse → skos:related: C547`; `Channel` and `Contributor_Role` add `skos:candidate` annotations naming ontology gaps (InitiativeChannelRegistry per L813, ContributorValueProfile); §10 traceability adds 5 rows. **First-instance dogfood** of INIT-ONTOLOGY-SPEC-BINDING discipline (gh#1241) applied to canonical spec landed 2026-05-14 — closes recursive C544 self-application gap assessed in same session at 5/10 grounding score. Pairs with `docs/FINDING_per_agent_ontology_grounding_gap_2026-05-14.md` Evidence 4 + `docs/MEMO_ontology_grounding_initiative_overlap_2026-05-14.md` Finding M-1.
 **Related Specs**: AGET_PROJECT_PLAN_SPEC (sibling structural pattern), AGET_SOP_SPEC, AGET_ISSUE_GOVERNANCE_SPEC (#916 channel registry source)
 **Related SOP**: `sops/SOP_initiative.md` v1.2.0 (procedural canon — this spec promotes its rules to contract level)
 
@@ -76,7 +77,7 @@ vocabulary:
       skos:definition: "Multi-version, multi-project work container grouped by initiative_id (a scope modifier per L760, not a first-class entity)"
       aget:naming: "INIT-{UPPER-KEBAB-CASE}"
       skos:example: "INIT-CORE-ARTIFACT-MATURATION"
-      skos:related: ["L760", "C227-InitiativeScope"]
+      skos:related: ["L760", "C227-InitiativeScope", "C404-InitiativeCoverageCriterion", "C405-DemandDrivenInitiativeGraduation"]
 
     Initiative_Proposal:
       skos:definition: "Lightweight proposal artifact filed before initiative manifest creation; produced by /aget-propose-initiative"
@@ -84,27 +85,30 @@ vocabulary:
       aget:location: "planning/project-proposals/"
       aget:id_format: "PP-{NNN}"
       skos:example: "PROPOSAL_init_public_surface_enhancement.md (PP-027)"
-      skos:related: ["CAP-INIT-PROP-001"]
+      skos:related: ["CAP-INIT-PROP-001", "C405-DemandDrivenInitiativeGraduation"]
 
     Initiative_Manifest:
       skos:definition: "Initiative scaffold authored after proposal approval; the canonical file representing an initiative in flight"
       aget:naming: "INIT-{UPPER-KEBAB-CASE}.md"
       aget:location: "planning/initiatives/"
-      skos:related: ["sops/SOP_initiative.md §Template"]
+      skos:related: ["sops/SOP_initiative.md §Template", "C406-StrategicAlignmentFramework"]
 
     Stream:
-      skos:definition: "Parallel work track within an initiative; analogous to a Gate in PROJECT_PLAN but with no strict ordering across streams"
+      skos:definition: "Parallel work track within an initiative; analogous to a Gate in PROJECT_PLAN but with no strict ordering across streams. Formally the third stratum of governance per C407."
+      skos:broader: "C407-PortfolioProjectStreamTriStratum"
       aget:related: ["L760"]
 
     Channel:
       skos:definition: "External communication or coordination surface registered to an initiative (Slack, Linear, GitHub milestone, KB-only)"
       aget:format: "{name} / {ID} / {purpose} / {priority}"
       skos:related: ["#916", "REQ-CHKI-005"]
+      skos:candidate: "InitiativeChannelRegistry [proposed L813 2026-04-09, not landed in ontology as of 2026-05-14]"
 
     Contributor_Role:
       skos:definition: "Role archetype contributing to an initiative; descriptive (value supplied) not evaluative (performance)"
       aget:format: "{role} / {value_dimensions} / {availability}"
       skos:related: ["#910", "L572"]
+      skos:candidate: "ContributorValueProfile [no canonical concept exists as of 2026-05-14; ontology gap]"
 
   proposal_lifecycle:
     Proposal_Status:
@@ -121,17 +125,18 @@ vocabulary:
     Direct_Initiative_Authoring:
       skos:definition: "Creating INIT-*.md via direct Write/Edit, bypassing the proposal stage"
       aget:anti_pattern: true
-      skos:related: ["L867", "2026-04-19 INIT-REQ-SPEC-TEST-DEFINED incident"]
+      skos:related: ["L867", "C544-MetaSpecificationGap", "2026-04-19 INIT-REQ-SPEC-TEST-DEFINED incident"]
 
     Decorative_Initiative_Reference:
       skos:definition: "Citing an INIT-NAME in scope tables, plans, or commits without a corresponding INIT-*.md file"
       aget:anti_pattern: true
+      skos:narrower: "C408-PortfolioTheater (alt: Initiative Theater) — this anti-pattern is a narrower instance of the canonical theater pattern"
       skos:related: ["L671", "INIT-PRINCIPLED-EXECUTION / gh#1193"]
 
     Project_Template_Reuse:
       skos:definition: "Filing an initiative proposal using the /aget-propose-project template — initiative-specific sections (Channels, Contributors, Overlap) missing"
       aget:anti_pattern: true
-      skos:related: ["PP-014, PP-016, PP-017, PP-018, PP-019, PP-020, PP-027 — all 7 currently filed in this pattern"]
+      skos:related: ["C547-VocabularyFirstNamingDiscipline", "PP-014, PP-016, PP-017, PP-018, PP-019, PP-020, PP-027 — all 7 currently filed in this pattern"]
 ```
 
 ---
@@ -422,6 +427,11 @@ python3 -c "import sys; sys.exit(0 if tuple(map(int, '$START'.split('.'))) > tup
 | Evidence-driven design | L289, ADR-008 |
 | Substantial Change Protocol | CLAUDE.md §"Substantial Change Protocol" |
 | Verb registry | `ontology/DESIGN_DIRECTION_skill_verb_vocabulary.md` v3.16 — `propose` is verb #18 (Governance category, approved). Verified 2026-05-14. |
+| **Governance-cluster grounding** (added v1.1.0) | C404 InitiativeCoverageCriterion (graduation threshold ≥2 plans OR ≥5 issues OR ≥3 cycles), C405 DemandDrivenInitiativeGraduation (chartering principle), C406 StrategicAlignmentFramework (mission↔capability↔initiative bridge — overlap classification), C407 PortfolioProjectStreamTriStratum (Stream is third stratum), C408 PortfolioTheater (alt: Initiative Theater — anti-pattern parent of Decorative_Initiative_Reference) |
+| **Self-application gap (named pattern)** (added v1.1.0) | C544 MetaSpecificationGap — formal vocabulary exists but contract layer doesn't bind; recursive instance: this spec was the first canonical spec landed after INIT-ONTOLOGY-SPEC-BINDING charter (gh#1241) and v1.0.1 itself failed to bind, requiring v1.1.0 patch |
+| **Vocabulary discipline** (added v1.1.0) | C547 VocabularyFirstNamingDiscipline — naming SHALL check ontology before coining; Project_Template_Reuse anti-pattern is its failure mode |
+| **Per-agent grounding context** (added v1.1.0) | `docs/FINDING_per_agent_ontology_grounding_gap_2026-05-14.md` — names the structural gap surfaced by 2026-05-14 PM principal probe; this v1.1.0 patch is Evidence 4 of that finding |
+| **Cross-initiative cluster** (added v1.1.0) | `docs/MEMO_ontology_grounding_initiative_overlap_2026-05-14.md` — 21-pair classification (CAP-INIT-PROP-004 self-applied to 7-artifact ontology-grounding cluster); this spec sits at Producer position relative to INIT-REQ-SPEC-TEST-DEFINED + PP-017 |
 
 ---
 
@@ -447,5 +457,6 @@ python3 -c "import sys; sys.exit(0 if tuple(map(int, '$START'.split('.'))) > tup
 
 ---
 
-*AGET_INITIATIVE_SPEC v1.0.0*
+*AGET_INITIATIVE_SPEC v1.1.0*
 *Authored under principle-triad: spec+verify-first, coherence-next, evidence-driven (2026-05-14)*
+*v1.1.0 SKOS uplift via PP-028 — first-instance dogfood of INIT-ONTOLOGY-SPEC-BINDING discipline (2026-05-14 PM)*
