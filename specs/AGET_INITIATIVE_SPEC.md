@@ -1,6 +1,6 @@
 # AGET INITIATIVE Specification
 
-**Version**: 1.1.0
+**Version**: 1.1.1
 **Status**: Active
 **Category**: Process (Planning / Governance)
 **Created**: 2026-05-14
@@ -9,6 +9,7 @@
 **Location**: `aget/specs/AGET_INITIATIVE_SPEC.md`
 **Change Origin**: 2026-05-14 session — `/aget-propose-initiative` design request; principal GO 2026-05-14
 **v1.0.1 Patch**: Fix §4 vocabulary anti-pattern stale count (6 → 7) per Gate -1 Auditor finding in PROJECT_PLAN_aget_propose_initiative_v1.0 / `planning/triad_findings.jsonl` line 35.
+**v1.1.1 Patch**: Split V-INIT-PROP-003 into creation-mode + revalidation-mode per Gate 2 Auditor finding in PROJECT_PLAN_aget_propose_initiative_v1.0 / `planning/triad_findings.jsonl` line 36. Resolves creation-time-only semantics gap.
 **v1.1.0 Minor (additive — no behavioral / R-INIT-PROP / V-INIT-PROP changes)**: SKOS uplift per PP-028 (PROPOSAL_spec_aget_initiative_v1.1_skos_uplift.md, principal Approve 2026-05-14 PM). §4 vocabulary table extends `Initiative` / `Initiative_Proposal` / `Initiative_Manifest` / `Stream` SKOS links to Meta-Ontological cluster (C404-C408); §4 anti-patterns add `Decorative_Initiative_Reference → skos:narrower: C408 PortfolioTheater`, `Direct_Initiative_Authoring → skos:related: C544`, `Project_Template_Reuse → skos:related: C547`; `Channel` and `Contributor_Role` add `skos:candidate` annotations naming ontology gaps (InitiativeChannelRegistry per L813, ContributorValueProfile); §10 traceability adds 5 rows. **First-instance dogfood** of INIT-ONTOLOGY-SPEC-BINDING discipline (gh#1241) applied to canonical spec landed 2026-05-14 — closes recursive C544 self-application gap assessed in same session at 5/10 grounding score. Pairs with `docs/FINDING_per_agent_ontology_grounding_gap_2026-05-14.md` Evidence 4 + `docs/MEMO_ontology_grounding_initiative_overlap_2026-05-14.md` Finding M-1.
 **Related Specs**: AGET_PROJECT_PLAN_SPEC (sibling structural pattern), AGET_SOP_SPEC, AGET_ISSUE_GOVERNANCE_SPEC (#916 channel registry source)
 **Related SOP**: `sops/SOP_initiative.md` v1.2.0 (procedural canon — this spec promotes its rules to contract level)
@@ -283,13 +284,27 @@ done
 ```
 **Expected**: all sections found, exit 0. **Verifies**: CAP-INIT-PROP-001-03.
 
-### V-INIT-PROP-003: PP-### unique + monotonic
+### V-INIT-PROP-003: PP-### unique + monotonic (split-mode per v1.1.1)
+
+**Creation-mode** (verifies at file-creation time that PP-### was monotonically assigned):
 ```bash
 PP=$(grep -oE '^\*\*Proposal ID\*\*: PP-[0-9]+' "$FILE" | grep -oE '[0-9]+')
 LAST=$(grep -oE 'PP-[0-9]+' planning/project-proposals/INDEX.md | grep -oE '[0-9]+' | sort -n | tail -1)
 test "$PP" -gt "$LAST" || test "$PP" -eq $((LAST + 1))
 ```
-**Expected**: exit 0. **Verifies**: CAP-INIT-PROP-002-01.
+
+**Revalidation-mode** (verifies PP-### exists in INDEX exactly once; for re-running V-tests against existing proposals):
+```bash
+PP=$(grep -oE '^\*\*Proposal ID\*\*: PP-[0-9]+' "$FILE" | grep -oE '[0-9]+')
+COUNT=$(grep -oE "PP-0*${PP}\b" planning/project-proposals/INDEX.md | wc -l)
+test "$COUNT" -eq 1
+```
+
+**Mode selection**: runners SHALL try creation-mode first; if it fails, SHALL fall through to revalidation-mode. A proposal that passes either mode satisfies CAP-INIT-PROP-002-01 (the monotonicity invariant holds either at creation or in INDEX presence).
+
+**Expected**: exit 0 in at least one mode. **Verifies**: CAP-INIT-PROP-002-01.
+
+**Discovery**: `planning/triad_findings.jsonl` line 36 (Gate 2 Auditor finding 2026-05-14) — original single-mode V-test failed PP-027 on re-validation because PP-028 was filed later in the shared sequence; creation-time-only semantics not stated in v1.0.0 / v1.0.1 / v1.1.0.
 
 ### V-INIT-PROP-004: Proposed INIT-ID uniqueness
 ```bash
@@ -457,6 +472,7 @@ python3 -c "import sys; sys.exit(0 if tuple(map(int, '$START'.split('.'))) > tup
 
 ---
 
-*AGET_INITIATIVE_SPEC v1.1.0*
+*AGET_INITIATIVE_SPEC v1.1.1*
 *Authored under principle-triad: spec+verify-first, coherence-next, evidence-driven (2026-05-14)*
 *v1.1.0 SKOS uplift via PP-028 — first-instance dogfood of INIT-ONTOLOGY-SPEC-BINDING discipline (2026-05-14 PM)*
+*v1.1.1 V-003 split — creation-mode vs revalidation-mode per Gate 2 Auditor finding (2026-05-14 PM)*
