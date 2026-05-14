@@ -1,6 +1,6 @@
 # AGET INITIATIVE Specification
 
-**Version**: 1.0.0
+**Version**: 1.0.1
 **Status**: Active
 **Category**: Process (Planning / Governance)
 **Created**: 2026-05-14
@@ -8,6 +8,7 @@
 **Author**: private-aget-framework-AGET
 **Location**: `aget/specs/AGET_INITIATIVE_SPEC.md`
 **Change Origin**: 2026-05-14 session — `/aget-propose-initiative` design request; principal GO 2026-05-14
+**v1.0.1 Patch**: Fix §4 vocabulary anti-pattern stale count (6 → 7) per Gate -1 Auditor finding in PROJECT_PLAN_aget_propose_initiative_v1.0 / `planning/triad_findings.jsonl` line 35.
 **Related Specs**: AGET_PROJECT_PLAN_SPEC (sibling structural pattern), AGET_SOP_SPEC, AGET_ISSUE_GOVERNANCE_SPEC (#916 channel registry source)
 **Related SOP**: `sops/SOP_initiative.md` v1.2.0 (procedural canon — this spec promotes its rules to contract level)
 
@@ -130,7 +131,7 @@ vocabulary:
     Project_Template_Reuse:
       skos:definition: "Filing an initiative proposal using the /aget-propose-project template — initiative-specific sections (Channels, Contributors, Overlap) missing"
       aget:anti_pattern: true
-      skos:related: ["PP-014, PP-017..020, PP-027 — all 6 currently filed in this pattern"]
+      skos:related: ["PP-014, PP-016, PP-017, PP-018, PP-019, PP-020, PP-027 — all 7 currently filed in this pattern"]
 ```
 
 ---
