@@ -85,14 +85,22 @@
 
 ### Pilot Upgrade Tracking
 
-| Pilot | Portfolio | Status | Date | Notes |
-|-------|-----------|--------|------|-------|
-| private-supervisor-AGET | main | ⏳ Pending | | Fleet coordinator |
-| private-aget-framework-AGET | main | ✅ Complete | YYYY-MM-DD | Self (framework manager) |
-| private-impact-aget | main | ⏳ Pending | | |
-| private-workco-aget | workco | ⏳ Pending | | |
-| private-predictionworks-aget | predictionworks | ⏳ Pending | | |
-| [Add other pilots as needed] | | ⏳ Pending | | |
+| Pilot | Portfolio | Status | Date | Migration PR | Notes |
+|-------|-----------|--------|------|--------------|-------|
+| private-supervisor-AGET | main | ⏳ Pending | | | Fleet coordinator |
+| private-aget-framework-AGET | main | ✅ Complete | YYYY-MM-DD | | Self (framework manager) |
+| private-impact-aget | main | ⏳ Pending | | | |
+| private-workco-aget | workco | ⏳ Pending | | | |
+| private-predictionworks-aget | predictionworks | ⏳ Pending | | | |
+| [Add other pilots as needed] | | ⏳ Pending | | | |
+
+**Migration PR column semantics** (added PP-035 / gh#1392 closure):
+- **Purpose**: Records the PR# that shipped the migration to this agent. Closes L952 deployment-evidence-channel traceability axis (PR# was previously unrecorded at migration moment).
+- **Format (private/internal handoff)**: `gmelli/{repo}#NNN` for private agent migrations.
+- **Format (promoted/public handoff per R-REL-019-07)**: `aget-framework/{repo}#NNN` only — `gmelli/*` refs are sanitized per R-RHSC-002-02 / L631.
+- **`N/A (direct-commit)` permitted** when migration uses direct-commit path (no PR opened). Acceptable per current SOP_point_upgrade.md Phase 4.
+- **Value is forward-looking**: column populates non-N/A once branched-PR "heavyweight" route per gh#1392 is adopted; current default = `N/A (direct-commit)` for direct-commit migrations.
+- **V-test V-UPGRADE-004**: SOP_point_upgrade.md Phase 4 enforces PR# recording or N/A marking.
 
 ### Adoption Target
 
