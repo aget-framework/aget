@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+Items accumulated since the most-recent release (v3.17.0, 2026-05-09) that are confirmed in-flight for a future release. Per Keep a Changelog 1.1.0 forward-work convention. Adopted at v3.18 T1.12 Gate 5 (L944 closure).
+
+### Added (in-flight)
+
+- **Fork C Hybrid homepage surface architecture** (T1.12, in-flight v3.18 release): Org-profile inline release entries bounded to v3.10+ (14 pre-v3.10 entries archived to `release-notes/archive/HOMEPAGE_INLINE_RELEASES_v2.10_to_v3.9.md`); `## Roadmap` section renamed to `## Release History` (L943 closure); release-narrative authorship concentrated in Releases body + CHANGELOG.
+- **`release_homepage_update.py` ADR-008 Generator** (T1.12 Gate 3 = Generator Plan G0+G1+G2): 8-surface atomic update + `--check` mode powering the broadened V-G7.5; closes L935 V-G7.5 synecdoche + L941 6th-recurrence pattern.
+- **REQ-HOM v1.2.0 — Fork C bounding** (T1.12 Gate 2): REQ-HOM-Q-003 scope explicitly bounded to N=2 surfaces (1 coherence pair); REQ-HOM-F-006 retired with R-DEP-010 5-field block + v3.20 grace.
+
+### Changed (in-flight)
+
+- **SOP_release_process.md v1.45 → v1.48 (private working)**: V-G7.5 broadened from single-surface badge grep to 8-surface multi-condition correctness via `release_homepage_update.py --check`.
+
+> **In-flight disclosure**: This section is forward-state; entries may be edited, deferred, or removed before the next release ships. Final per-version contents land in the next `## [X.Y.Z]` section at release time per SOP Phase 7.5.
+
+---
+
 ## [3.17.0] - 2026-05-09
 
 **Theme**: **C3 — Canonical Coherence + Structural Self-Conformance**. Framework self-conforms to its own canonical artifacts at every gate boundary. v3.16's #1 lesson hardened: V-tests must verify correctness, not presence — extended in v3.17 to a SECOND axis (scope-of-validation: V-test must cover the actual canonical-artifact universe, not the assumed universe).

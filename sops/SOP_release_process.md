@@ -3024,6 +3024,12 @@ python3 scripts/deployment_monitor.py --confirm --version X.Y.Z --deployer "supe
    | VERSION_SCOPE seeded | ✅ | VERSION_SCOPE_v{NEXT}.md (DRAFT) |
    ```
 
+6. **Maintain `[Unreleased]` section in `aget-framework/aget/CHANGELOG.md`** (adopted v3.18 T1.12 G5; L944 closure):
+   - Confirm a `## [Unreleased]` section exists between the CHANGELOG header and the most-recent `## [X.Y.Z]` section
+   - As in-flight work lands during the cycle, the agent or principal MAY edit `[Unreleased]` to record the change provisionally (forward-state, subject to edit/defer/removal before release)
+   - At release time (Phase 7.6 or earlier in this Phase 7.5 chain), the current `[Unreleased]` body becomes the seed of the new `## [X.Y.Z]` section; replace `[Unreleased]` content with a stub for the next cycle's accumulation
+   - Per Keep a Changelog 1.1.0 — distinguishes confirmed in-flight from historical released content; structural enforcement of L657 institutional-memory preservation at the changelog layer (companion to org-profile Fork C archive pattern adopted v3.18 T1.12 G1)
+
 **Verification**:
 ```bash
 # VERSION_SCOPE for next version exists
