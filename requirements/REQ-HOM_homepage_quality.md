@@ -1,7 +1,7 @@
 # REQ-HOM: Homepage Quality
 
-**Version**: 1.1.0
-**Date**: 2026-04-19
+**Version**: 1.2.0
+**Date**: 2026-05-16
 **Status**: proposed
 **Domain**: HOM
 **Specifications**: [R-HOM-001_homepage_messaging_quality.md](../specs/requirements/R-HOM-001_homepage_messaging_quality.md), RUBRIC_voice_conformance_v1.0
@@ -183,8 +183,46 @@ specifications:
   - "CAP-HOM-001 (PROPOSED — see PROPOSAL_cap_hom_preservation_during_rewrites.md; spec authoring deferred to v3.15)"
 constraints:
   - "SOP_release_process.md homepage update procedure (the procedural wrapper around this REQ)"
-status: proposed
+status: retired
 originator: operational-evidence
+retirement:
+  what: "REQ-HOM-F-006 Content Preservation During Rewrites"
+  why: >
+    Fork C Hybrid (memo 2026-05-10) makes this REQ defend a non-canonical
+    pattern. Under Fork C, org-profile inline release entries are bounded
+    to v3.10+; pre-v3.10 entries are intentionally relocated to a
+    consolidated archive (Gate 1: aget-framework/aget/release-notes/archive/
+    HOMEPAGE_INLINE_RELEASES_v2.10_to_v3.9.md) + per-version GitHub Releases
+    pages. The fit_criterion ("pre-rewrite line count <= post-rewrite line
+    count of the release section") is now violated by design — v3.18 T1.12
+    Gate 1 reduced org-profile from 720 to ~588 lines as the canonical move.
+    The intent (preserve institutional memory) is satisfied structurally by
+    GitHub Releases (per-version canonical body) + the new archive file +
+    CHANGELOG.md, all linked from the trimmed org-profile section.
+  replacement: >
+    Structural preservation pattern: (1) GitHub Releases canonical per-version
+    body, (2) consolidated archive at release-notes/archive/, (3) CHANGELOG.md
+    Keep-a-Changelog history. All three linked from the org-profile "Earlier
+    Releases" subsection. L657 anti-pattern (content absorption) is now
+    detectable by archive-link presence in the homepage rather than line-count
+    monotonicity. No successor REQ is required — the multi-channel preservation
+    is structurally enforced by the archive's existence.
+  removal_timeline: >
+    Status=retired at v3.18 (2026-05-16). Per R-DEP-011 non-breaking grace
+    (2 minor versions), REQ block becomes eligible for full removal at v3.20.
+    Until then, the block remains in this file with status=retired for
+    discoverability and audit.
+  detection: >
+    Status field reads `retired`. Traceability table notes RETIRED with cite.
+    L657 absorption regression detected via archive-link-presence check in
+    org-profile README (any commit removing the "Earlier Releases" subsection
+    or its links surfaces as L657 sibling violation).
+  evidence:
+    - "Fork C Hybrid memo: docs/MEMO_homepage_surface_architecture_fork_2026-05-10.md (private)"
+    - "T1.12 Gate 1 execution evidence: 3 cross-repo commits 2026-05-16T~22:00Z (aget-framework/aget b35517d, aget-framework/.github f7f8cf3)"
+    - "Audit baseline: docs/AUDIT_homepage_fork_c_baseline_2026-05-16.md §6 (forward targets table)"
+  registry: "governance/POLICY_deprecation.md — added under Retired REQs section at v3.18"
+  retired_at: "2026-05-16 (private-aget-framework-AGET T1.12 Gate 2)"
 ```
 
 ---
@@ -251,25 +289,43 @@ title: "Coherent First Impression"
 type: quality
 category: "Functional Suitability"
 description: >
-  The homepage (README.md) and the organization profile
+  The homepage (aget/README.md) and the organization profile
   (.github/profile/README.md) shall present a coherent first
   impression — consistent terminology, aligned claims, and
-  complementary (not duplicative) content.
+  complementary (not duplicative) content. Scope is bounded to
+  these TWO surfaces only (N=2; 1 coherence pair). Release-narrative
+  coherence between GitHub Releases body ↔ CHANGELOG.md is governed
+  separately (AGET_RELEASE_SPEC CAP-REL-006-02-NN family) and is
+  explicitly OUT OF SCOPE for this REQ under Fork C Hybrid.
 rationale: >
   Developers may land on either surface first. Contradictions
-  between them undermine credibility before any technical
-  evaluation begins.
+  between the two homepage surfaces undermine credibility before
+  any technical evaluation begins. Under Fork C Hybrid (memo
+  2026-05-10), release-narrative authorship is concentrated in
+  Releases body + CHANGELOG.md; org-profile + aget/README carry
+  summary + identity only. Bounding REQ-HOM-Q-003 to N=2 surfaces
+  (1 coherence pair) matches the Fork C surface architecture and
+  prevents drift toward N=6 pairs (4-surface reality per L942) that
+  would require coherence enforcement across release-narrative
+  surfaces governed elsewhere.
 evidence:
   - "REL-042 Gate 2 (coordinated first impression validation)"
   - "Operational evidence: principal-driven coordination during 2026-04-04 release"
+  - "L942 (REQ-HOM-Q-003 coherence pairs unaccounted — 1 of 6 covered in 4-surface reality)"
+  - "Fork C Hybrid memo: docs/MEMO_homepage_surface_architecture_fork_2026-05-10.md (private; recommends bounding to 2 surfaces)"
+  - "T1.12 Gate 0 baseline: docs/AUDIT_homepage_fork_c_baseline_2026-05-16.md §2 coherence pair matrix"
 fit_criterion: >
   Diff of major-claim sentences between aget/README.md and
   .github/profile/README.md shows 0 contradictions; key
   terminology (AGET, agent, fleet, principal) is used identically
-  across both surfaces.
+  across both surfaces. Scope: exactly these 2 surfaces (1 pair).
+out_of_scope:
+  - "GitHub Releases body ↔ CHANGELOG.md coherence (governed by AGET_RELEASE_SPEC CAP-REL-006-02-NN)"
+  - "GitHub Releases body ↔ org-profile or aget/README coherence (Fork C concentrates release narrative in Releases + CHANGELOG; homepage surfaces link to them rather than duplicate)"
+  - "CHANGELOG.md ↔ org-profile or aget/README coherence (same Fork C rationale)"
 priority: P1
 specifications:
-  - "CAP-HOM-002 (PROPOSED — see PROPOSAL_cap_hom_coherence_first_impression.md; spec authoring deferred to v3.15)"
+  - "CAP-HOM-002 (PROPOSED — see PROPOSAL_cap_hom_coherence_first_impression.md; spec authoring deferred to v3.15; status preserved at PROPOSED per T1.12 F-G(-1)-2)"
 constraints:
   - "REL-042 Gate 2 procedure (operational instance demonstrating coordinated first impression validation)"
 status: proposed
@@ -298,10 +354,10 @@ originator: operational-evidence
 | REQ-HOM-F-003 | R-HOM-001-01, R-HOM-001-05 | L289, L92 |
 | REQ-HOM-F-004 | R-HOM-001-03, R-HOM-001-07 | L92 + Codex/Gemini incident |
 | REQ-HOM-F-005 | R-HOM-001-02 | L657 |
-| REQ-HOM-F-006 | CAP-HOM-001 (PROPOSED) | L657 + v3.7.0 absorption incident |
+| REQ-HOM-F-006 | **RETIRED v3.18** (was CAP-HOM-001 PROPOSED) | L657 + Fork C structural replacement (archive + Releases + CHANGELOG); see retirement block |
 | REQ-HOM-Q-001 | RUBRIC_voice_conformance_v1.0 | L733, L800 |
 | REQ-HOM-Q-002 | R-HOM-001-02 | LangChain/Standard Readme benchmarks |
-| REQ-HOM-Q-003 | CAP-HOM-002 (PROPOSED) | REL-042 Gate 2 + coordinated first impression validation |
+| REQ-HOM-Q-003 | CAP-HOM-002 (PROPOSED; **scope bounded to N=2 surfaces at v3.18**) | REL-042 Gate 2 + L942 + Fork C memo 2026-05-10 |
 
 Forward traceability is mandatory (REQ-CORE-F-001). The table above shall remain synchronized with each REQ block's `specifications:` field.
 
@@ -321,12 +377,42 @@ This document grounds in:
 
 ---
 
+## Amendment History
+
+### v1.2.0 (2026-05-16) — Fork C Hybrid Adoption
+
+**Driver**: `docs/MEMO_homepage_surface_architecture_fork_2026-05-10.md` (private; Fork C Hybrid release-narrative surface architecture decision) + T1.12 sub-plan execution.
+
+**Changes**:
+
+1. **REQ-HOM-Q-003 (Coherent First Impression) — scope bounded to N=2 surfaces**:
+   - Description now explicitly bounds scope to 2 surfaces (aget/README + org-profile README) = 1 coherence pair
+   - Added `out_of_scope:` field enumerating the 3 surface pairs explicitly excluded (Releases body ↔ CHANGELOG governed by AGET_RELEASE_SPEC; cross-pair coherence with homepage surfaces governed by Fork C link-rather-than-duplicate pattern)
+   - Rationale extended to cite Fork C concentration of release narrative + L942 4-surface drift prevention
+   - Status: preserved at `proposed` (PROPOSED CAP-HOM-002 unchanged per T1.12 F-G(-1)-2 carry)
+
+2. **REQ-HOM-F-006 (Content Preservation During Rewrites) — RETIRED**:
+   - Status: `proposed` → `retired`
+   - Added `retirement:` block with all 5 R-DEP-010 fields (what / why / replacement / removal_timeline / detection) + evidence + registry pointer
+   - Replacement = structural preservation pattern: GitHub Releases + archive (release-notes/archive/HOMEPAGE_INLINE_RELEASES_v2.10_to_v3.9.md, added by T1.12 Gate 1) + CHANGELOG.md, all linked from "Earlier Releases" subsection in org-profile
+   - Grace per R-DEP-011: 2 minor versions (v3.18 → v3.20 eligible for full block removal)
+   - L657 anti-pattern (absorption) is now detectable structurally via archive-link presence rather than via line-count monotonicity
+
+**Cross-repo evidence**:
+- This amendment: `aget-framework/aget` (commit added in same window as `b35517d` archive)
+- Org-profile execution: `aget-framework/.github` commit `f7f8cf3` (org-profile retirement)
+- Private audit trail: `gmelli/private-aget-framework-AGET` PROJECT_PLAN_v3.18_T1.12_homepage_fork_bundle_v1.0.md Gates 0, 1, 2
+
+**Verification**: T1.12 Gate 2 V-G2.1..V-G2.3 PASS (see private plan).
+
+---
+
 ## Format Refactor Note (2026-04-19)
 
 This document was refactored on 2026-04-19 from inline-prose format to YAML+Markdown REQ blocks per REQUIREMENTS_FORMAT.md v1.0. The refactor preserves all 9 original requirements with the same titles, rationales, and traceability. Added per-requirement: `evidence:`, `fit_criterion:`, `priority:`, `originator:`, and (for quality reqs) `category:`. Motivation: enable mechanical scoring against `RUBRIC_requirement_quality_v1.0.md`. Refactor surfaced as observation in scoring memo `docs/scoring/SCORING_2026-04-19_req_cap.md` (REQ-HOM was the one published REQ-* file unscorable in the original run).
 
 ---
 
-*REQ-HOM_homepage_quality.md v1.1.0*
+*REQ-HOM_homepage_quality.md v1.2.0*
 *"Developer landing page, not reference document. In the principal's voice."*
-*Refactored to REQUIREMENTS_FORMAT v1.0 — 2026-04-19*
+*Refactored to REQUIREMENTS_FORMAT v1.0 — 2026-04-19; Fork C Hybrid bounding — 2026-05-16*
