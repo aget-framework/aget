@@ -741,7 +741,7 @@ v3.0.0 was released but declared complete without running Phase 4 validation. Th
 - Organization homepage showing wrong version (2.12.0 instead of 3.0.0)
 - Release date badge incorrect
 - Example version.json snippets outdated
-- Roadmap section stale
+- Release History section stale (renamed from "Roadmap" at v3.18 T1.12 Gate 4 — L943 closure)
 
 **Root Cause**: PROJECT_PLAN Gate 6 performed spot checks instead of running the full RELEASE_VERIFICATION_CHECKLIST.md.
 
@@ -921,7 +921,7 @@ v3.1.0 was released but organization homepage still showed v3.0.0 as current. Th
 | Version badge | Line 9 | `version-X.Y.Z-blue` |
 | Release date badge | Line 11 | `released-YYYY--MM--DD-lightgrey` |
 | Badge link | Line 9 | `/releases/tag/vX.Y.Z` |
-| Roadmap section | ~Line 386 | New version as "Current" |
+| Release History section (renamed from Roadmap v3.18 T1.12 G4) | ~Line 419 | New version as "Current" |
 
 **File**: `.github/profile/README.md`
 
