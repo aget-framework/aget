@@ -11,19 +11,95 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Items accumulated since the most-recent release (v3.17.0, 2026-05-09) that are confirmed in-flight for a future release. Per Keep a Changelog 1.1.0 forward-work convention. Adopted at v3.18 T1.12 Gate 5 (L944 closure).
+Items accumulated since the most-recent release (v3.18.0, 2026-05-16) that are confirmed in-flight for a future release. Per Keep a Changelog 1.1.0 forward-work convention.
 
-### Added (in-flight)
+*No items in-flight yet for v3.19.*
 
-- **Fork C Hybrid homepage surface architecture** (T1.12, in-flight v3.18 release): Org-profile inline release entries bounded to v3.10+ (14 pre-v3.10 entries archived to `release-notes/archive/HOMEPAGE_INLINE_RELEASES_v2.10_to_v3.9.md`); `## Roadmap` section renamed to `## Release History` (L943 closure); release-narrative authorship concentrated in Releases body + CHANGELOG.
-- **`release_homepage_update.py` ADR-008 Generator** (T1.12 Gate 3 = Generator Plan G0+G1+G2): 8-surface atomic update + `--check` mode powering the broadened V-G7.5; closes L935 V-G7.5 synecdoche + L941 6th-recurrence pattern.
+---
+
+## [3.18.0] - 2026-05-16
+
+**Theme**: **Substrate Hygiene + Memory-Layer Self-Application** (Hybrid A primary + B-tagged streams). The L908 family closed at memory layer (L960 + L963 + L964 graduated); the agent caught its own confabulation patterns in-cycle; Gate 1.5 shipped PARTIAL by honest acknowledgment of LOCK-time composition defect rather than by inventing the 18-item composition.
+
+> **No breaking changes** in v3.18. Existing instances upgrade by version-bump only.
+
+> **Spec-fault carry**: gh#1179 + gh#1180 remain OPEN per L708 annotation precedent (best-effort artifact, not blocking).
+
+> **Sleeping CAPs from v3.17 — status update**: CAP-REL-032 + CAP-REL-033 GRACE-EXTENDED to v3.19.0 (second grace; R-DEP-4 explicit v3.19 IMPLEMENT commitment; T1.15 closure). R-DEP-3 RECLASSIFY (B.1): 4 wake/wind shim items moved from Active Deprecations to Active Aliases. v3.18 ships ZERO new sleeping CAPs at V-test layer.
+
+### Added — Tier 1 (Implementation)
+
+- **`AGET_MEMORY_SURFACE_SPEC` v0.2.0 canonical promotion** (T1.16): drafts/ → `specs/AGET_MEMORY_SURFACE_SPEC.md` at canonical path (canonical commit `596dea1`). Codifies harness-vs-KB taxonomy per L335. R-MS-001..007 + V-MS-001..008 + CAP-MS-001..003 at LANDED rigor. Keystones the L908 family memory-layer closure.
+
+- **Verb Registry Currency** (T1.9 = PP-021, gh#1204; 8-gate sub-plan): `aget/ontology/DESIGN_DIRECTION_skill_verb_vocabulary.md` refreshed to 37 Active + 4 Reserved verbs + 11 §Hierarchy Decisions pairs (incl. `analyze ⊂ check`, `scan ⊂ study`, `update ⊂ enhance`, `verify ⊂ validate`, `research ⊂ study`). `SOP_verb_registry_maintenance.md` v1.0.0 wired into `SOP_release_process` Phase 1. `scripts/audit_verb_registry.py` drift-detector ships. Closes INIT-FRAMEWORK-COHERENCE Stream 2 verify/validate boundary at G3.1. Canonical promotion `63ef568`.
+
+- **Fork C Hybrid homepage surface architecture** (T1.12, 8-gate sub-plan): Org-profile inline release entries bounded to v3.10+ (14 pre-v3.10 entries archived to `release-notes/archive/HOMEPAGE_INLINE_RELEASES_v2.10_to_v3.9.md`); `## Roadmap` section renamed to `## Release History` (L943 closure); release-narrative authorship concentrated in Releases body + CHANGELOG. Cross-repo evidence: `aget` `b35517d`/`6ae6724`/`ae7a3a5`/`95e5a2e` + `.github` `f7f8cf3`/`05d13d6`. L941-L944 anti-pattern cluster closed structurally.
+
+- **`release_homepage_update.py` ADR-008 Generator** (T1.12 Gate 3 = Generator Plan G0+G1+G2 folded inline): 8-surface atomic update + `--check` mode powering the broadened V-G7.5; closes L935 V-G7.5 synecdoche + L941 6th-recurrence pattern.
+
 - **REQ-HOM v1.2.0 — Fork C bounding** (T1.12 Gate 2): REQ-HOM-Q-003 scope explicitly bounded to N=2 surfaces (1 coherence pair); REQ-HOM-F-006 retired with R-DEP-010 5-field block + v3.20 grace.
 
-### Changed (in-flight)
+- **/aget-go capture wiring** (T1.8 + T1.10, INIT-PRINCIPLED-EXECUTION Stream 1): SKILL-024 (`/aget-propose-actions`) v1.3.0 amended with REQ-PA-006a (Step 4.5 Batch GO Capture). `scripts/extract_go_records.py` + `scripts/audit_pa_006a.py` (V-PA-006a falsifier) + `scripts/wind_down_ext.py` GO-telemetry surface ship. Empirical: 31 cumulative `/aget-go` records / 58% override rate visible at session-close. Closes gh#1267.
 
-- **SOP_release_process.md v1.45 → v1.48 (private working)**: V-G7.5 broadened from single-surface badge grep to 8-surface multi-condition correctness via `release_homepage_update.py --check`.
+- **SOP_release_process Phase 7.8 Cross-AGENT Pilot Pre-Flight Gate** (T1.7): Pilot Pair = framework-agent + supervisor-agent; failure-mode = hard-block with L178 override path. Implements L656 + L671 + L908 + L940 Mitigation 3 simultaneously. Closes gh#1281. Private working v1.47; canonical promotion deferred.
 
-> **In-flight disclosure**: This section is forward-state; entries may be edited, deferred, or removed before the next release ships. Final per-version contents land in the next `## [X.Y.Z]` section at release time per SOP Phase 7.5.
+- **`scripts/validate_release_body_conformance.py` canonical promotion** (T1.6, gh#1308): private → canonical with L909 header sanitization (private-context refs removed; CAP-REL-006-02-NN logic preserved verbatim). Canonical `9b3fcd9` (combined T1.4 + T1.6 commit).
+
+- **Canonical aget pytest collection fix** (T1.4, gh#1279): 4× `'validation'` → `'verification'` path corrections at `tests/capability_architecture/` + new `conftest.py` `collect_ignore_glob = ["templates/*"]`. `pytest --collect-only` returns 0 errors; 235 tests collected (delta +63 from prior 172). Canonical `9b3fcd9`.
+
+- **`/aget-close-session` v1.0.0 → v1.1.0** (T1.2, gh#1300): R-CLOSE-046 conditional invocation of `record_invocation.py` + V-CLOSE-046 V-test added. WARN text when record_invocation.py absent; changelog v1.1.0 entry.
+
+- **TEMPLATE_REPOS 3 stale pin sites canonical** (T1.1, gh#1287 CLOSED): code already at canonical `7929d4d` (2026-05-10); v3.18 administrative closure with issue close + state-verification audit (F-001 captured at V3_18_IMPROVEMENTS.md — agent caught the recency-state-verification gap during pre-build Critic).
+
+- **R-DEP-010 disposition registry update** (T1.15): `governance/POLICY_deprecation.md` §Active Grace Extensions (CAP-REL-032/033 v3.19 + R-DEP-4 commitment) + new §Active Aliases (4 wake/wind shim RECLASSIFIED per B.1). Closes the 4th/5th grace cycle L671 decorative-classification risk.
+
+### Added — Tier 2 (Specification Authoring; PARTIAL close)
+
+- **AGET_MEMORY_SURFACE_SPEC V-tests + cross-references wiring** (T2.37, PAIRED-AFTER T1.16): `aget/specs/AGET_MEMORY_SURFACE_SPEC.md` R-MS-003 path convention prelude + R-MS-005 Spec class row split + Outbound/Inbound subsections; `aget/specs/AGET_LDOC_SPEC.md` + `aget/specs/AGET_EVOLUTION_SPEC.md` cross-refs added. Canonical `0579a3a`. L908 family memory-layer closure keystone.
+
+- **PP-035 Migration PR-Recording Column + V-test + v3.17 backfill** (T2.44, closes gh#1392): Adds `Migration PR` column to `RELEASE_HANDOFF_TEMPLATE.md` (canonical + private mirror); wires V-UPGRADE-004 in `SOP_point_upgrade.md` Phase 4; backfills v3.17.0 handoff (3 confirmed agents). Predecessor substrate to T2.42 `/aget-document-migration` (v3.19). Canonical `7c0ea21..265813f`.
+
+- **`/aget-create-initiative` Strict skill promotion** (T2.46): D71 verb-pair gap closed. Direct authoring of `planning/initiatives/INIT-*.md` now PROHIBITED unless skill invoked. Mirrors `/aget-create-project` Strict precedent. Three Strict skills now: `/aget-create-project`, `/aget-create-initiative`, `/aget-file-issue`.
+
+### Changed
+
+- **`SOP_release_process.md` v1.45 → v1.49 (canonical)**: V-G7.5 broadened from single-surface badge grep to 8-surface multi-condition correctness via `release_homepage_update.py --check`; Keep-a-Changelog `[Unreleased]` adoption pattern documented (L944 closure).
+- **`POLICY_deprecation.md`**: CAP-REL-032 + CAP-REL-033 second grace extension recorded (v3.18 → v3.19; R-DEP-011 + R-DEP-4 IMPLEMENT commitment); §Active Aliases section added (4 wake/wind shim items reclassified from Active Deprecations per R-DEP-3 B.1).
+
+### Gate 1.5 PARTIAL Close — DEFECT-2/4 Acknowledgment
+
+v3.18 ships with **Tier 2 LANDED-rate = 3/18 (17%; ceiling-bound)** under explicit structural defect documentation:
+
+- **DEFECT-2**: VERSION_SCOPE Tier 2 catalog lacks per-row IN/OUT marker column.
+- **DEFECT-4**: LOCK ceremony at 2026-05-16T23:18:38Z captured aggregate counts (39 IN / 131 SU) but did not persist cohort composition. Structurally incomplete L908 self-instance at LOCK boundary.
+
+Agent-side path (b) enumeration produced 42 candidate items (not 18); the 24 trim decisions were not derivable from on-disk rules. Producing an 18-item list would have required inventing 24 trim decisions = direct L964 instance (*Fabricating Capture Data While Authoring Capture Discipline*). The agent **refused to confabulate** and re-routed to path (c) partial-close + structural defect documentation.
+
+Four forward-routables filed to v3.19:
+- F-G1.5-AUDIT-1: `AGET_PROJECT_PLAN_SPEC` amendment (per-row IN/OUT markers when aggregate-only counts claimed)
+- F-G1.5-AUDIT-2: `SCOPE_LOCK_SPEC` heading-uniqueness validator
+- F-G1.5-AUDIT-3: Lock-time markdown structural defect validator strengthening
+- F-G1.5-AUDIT-4: `SCOPE_LOCK_SPEC` lock-event MUST capture explicit IN-set, not only aggregate counts
+
+The honest acknowledgment is itself the deliverable.
+
+### Memory-Layer L-doc graduations (L960–L966)
+
+- **L960** Memory-Entry-as-Claim-Not-Premise — graduated 2026-05-16 per T1.11 (the L908 family memory-layer principle)
+- **L961** HANDOFF-Deferral-Not-Invitation cross-session L908
+- **L963** Verify-Before-Authorize Not-Only-Before-Recommend (`/aget-go` step extension of L960)
+- **L964** Fabricating Capture Data While Authoring Capture Discipline (L908 self-instance) — the cycle's defining pattern; fired correctly at Gate 1.5 path (b)
+- **L965** V-Test Regex Defect Cascade (macOS BSD sed vs GNU)
+- **L966** Scaffold-Only Discipline Subordinated to Velocity Opportunity (T1.12 G6 close)
+- **L962** L-doc candidate pending graduation — v3.19 scope
+
+### Cycle Metrics
+
+- Tier 1 LANDED-rate at Gate 1 close: **15/17 = 88%** — exceeds H-V318-RELEASE-001 target ≥11/17 (65%) by 23 percentage points.
+- Tier 2 LANDED-rate at Gate 1.5 close: 3/18 = 17% (ceiling-bound per DEFECT-4).
+- Gate 1 velocity: 11 LANDED / ~6 hr = ~9 SU/hr (~1.8× v3.17 baseline 5 SU/hr).
+- T1.9 PP-021: 15 SU est / ~2 hr actual = ~7.5× planned rate (baseline-credit cascades + execute-stop-commit discipline).
+- T1.12 Homepage Fork: ~10 SU est / ~75 min actual = ~8× planned rate.
 
 ---
 
