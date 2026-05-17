@@ -16,7 +16,7 @@ import yaml
 from pathlib import Path
 
 # Add parent directory to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / 'validation'))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / 'verification'))
 from validate_capability_spec import CapabilitySpecValidator, ValidationResult
 
 
