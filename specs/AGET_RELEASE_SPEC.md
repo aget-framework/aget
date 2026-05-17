@@ -1,6 +1,6 @@
 # AGET Release Specification
 
-**Version**: 1.17.0
+**Version**: 1.17.1
 **Status**: Active
 **Category**: Process (Release Management)
 **Format Version**: 1.2
@@ -412,7 +412,7 @@ python3 aget/validation/validate_version_inventory.py --all-files
 | R-REL-010-03 | Next version SHALL be documented | Roadmap clarity |
 | R-REL-010-04 | Homepage `version` badge SHALL display the current released version (`v{X.Y.Z}`) verifiable via shields.io URL or static markdown | Eliminates 5+ cycle chronic stale-badge pattern |
 | R-REL-010-05 | Homepage `released` badge SHALL display the release date (`YYYY-MM-DD`) of the current version | Same chronic-fix |
-| R-REL-010-06 | Homepage Roadmap section SHALL have exactly ONE entry tagged `(Current)` and that entry SHALL match the released version | Prevents Roadmap-Current vs badge-current divergence |
+| R-REL-010-06 | Homepage Release History section SHALL have exactly ONE entry tagged `(Current)` and that entry SHALL match the released version (renamed from "Roadmap section" at v3.18 T1.12 G4; L943 closure) | Prevents Release-History-Current vs badge-current divergence |
 | R-REL-010-07 | Homepage migration_history sample SHALL include the current version → next-anticipated-version line OR latest historical entry SHALL include the released version | Sample data currency |
 | **V-CAP-REL-008** | **paired V-test** | **`aget/verification/validate_homepage_currency.py`** fetches `.github/profile/README.md` post-publication AND validates R-REL-010-04..07; FAIL on stale homepage. Closes 5+ cycle principal-manual-cleanup pattern. |
 

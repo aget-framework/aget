@@ -1,6 +1,6 @@
 # AGET Organization Specification
 
-**Version**: 1.1.1
+**Version**: 1.1.2
 **Status**: Active
 **Category**: Process (Organization)
 **Format Version**: 1.2
@@ -74,15 +74,15 @@ L431 (Release Artifact Inventory) revealed organization-level gaps.
 | CAP-ORG-002-06 | Documentation | Links to specs, guides, resources |
 | CAP-ORG-002-07 | Contributing | Link to contribution guide |
 
-#### Roadmap Quality (L657)
+#### Release History Quality (L657) — renamed from "Roadmap Quality" at v3.18 T1.12 G4 (L943 closure)
 
-**SHALL** requirements for roadmap section content accuracy:
+**SHALL** requirements for release history section content accuracy:
 
 | ID | Requirement | Rationale |
 |----|-------------|-----------|
-| CAP-ORG-002-08 | Each roadmap entry SHALL attribute only deliverables from that specific release | Attribution accuracy — prevents Content Absorption (L657) |
-| CAP-ORG-002-09 | Each roadmap entry SHALL show accurate release date matching GitHub Release | Date accuracy — prevents stale date propagation |
-| CAP-ORG-002-10 | Roadmap updates SHALL preserve existing release entries (incremental update, not full replacement) | Prior entry preservation — prevents version erasure |
+| CAP-ORG-002-08 | Each release history entry SHALL attribute only deliverables from that specific release | Attribution accuracy — prevents Content Absorption (L657) |
+| CAP-ORG-002-09 | Each release history entry SHALL show accurate release date matching GitHub Release | Date accuracy — prevents stale date propagation |
+| CAP-ORG-002-10 | Release history updates SHALL preserve existing release entries (incremental update, not full replacement) | Prior entry preservation — prevents version erasure |
 
 **Badge Requirements:**
 
@@ -143,7 +143,7 @@ AGET is a configuration and lifecycle management framework...
 
 See [Getting Started Guide](link)
 
-## Roadmap
+## Release History
 
 ### vX.Y.Z (Current) - Theme Name
 **Released**: YYYY-MM-DD
@@ -184,7 +184,7 @@ Apache 2.0
 | ID | Pattern | Statement |
 |----|---------|-----------|
 | CAP-ORG-006-01 | ubiquitous | The SYSTEM shall validate homepage content against CAP-ORG-001 completeness requirements after every release. |
-| CAP-ORG-006-02 | event-driven | WHEN a new version is released, THEN the SYSTEM shall update the homepage roadmap entry for that version. |
+| CAP-ORG-006-02 | event-driven | WHEN a new version is released, THEN the SYSTEM shall update the homepage release history entry for that version (renamed from "roadmap entry" at v3.18 T1.12 G4; L943 closure). |
 | CAP-ORG-006-03 | prohibited | The SYSTEM shall NOT publish homepage content that references unreleased versions as current. |
 
 ---
@@ -271,7 +271,7 @@ vocabulary:
 | V-ORG-001 | CAP-ORG-001 | automated | Homepage shows current version badge matching latest GitHub release |
 | V-ORG-002 | CAP-ORG-001-06 | manual | Roadmap contains an entry for every publicly released version |
 | V-ORG-003 | CAP-ORG-002 | inspection | Homepage contains all 7 required content sections (Header, Overview, Quick Start, Roadmap, Repositories, Documentation, Contributing) |
-| V-ORG-004 | CAP-ORG-002-08 | manual | Each roadmap entry attributes only deliverables from that specific release (no Content Absorption) |
+| V-ORG-004 | CAP-ORG-002-08 | manual | Each release history entry attributes only deliverables from that specific release (no Content Absorption) |
 | V-ORG-005 | CAP-ORG-003-02 | automated | Template repositories follow `template-{archetype}-aget` naming convention |
 | V-ORG-006 | CAP-ORG-004 | inspection | Pinned repositories include aget (core) and total no more than 6 |
 | V-ORG-007 | CAP-ORG-005 | manual | Major releases are announced and roadmap shows migration version history |

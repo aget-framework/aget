@@ -1,6 +1,6 @@
 # AGET Framework Specification
 
-**Version**: 3.1.0
+**Version**: 3.1.1
 **Status**: Released
 **Category**: Standards (Framework)
 **Format Version**: 1.2
@@ -948,8 +948,8 @@ WHEN a new version is released, the SYSTEM shall update organization homepage ar
 | CAP-ORG-001-02 | ubiquitous | The homepage shall DISPLAY version badge with format `version-X.Y.Z-blue` |
 | CAP-ORG-001-03 | ubiquitous | The homepage shall DISPLAY release date badge with format `released-YYYY--MM--DD-lightgrey` |
 | CAP-ORG-001-04 | ubiquitous | The version badge shall LINK to `/releases/tag/vX.Y.Z` |
-| CAP-ORG-001-05 | ubiquitous | The homepage shall INCLUDE Roadmap section showing current version |
-| CAP-ORG-001-06 | event-driven | WHEN new version released, the SYSTEM shall MOVE previous version to roadmap history |
+| CAP-ORG-001-05 | ubiquitous | The homepage shall INCLUDE Release History section showing current version (renamed from "Roadmap section" at v3.18 T1.12 G4; L943 closure) |
+| CAP-ORG-001-06 | event-driven | WHEN new version released, the SYSTEM shall MOVE previous version to release history (renamed from "roadmap history" at v3.18 T1.12 G4) |
 | CAP-ORG-001-07 | ubiquitous | The homepage update shall COMPLETE within the release session |
 | CAP-ORG-001-08 | ubiquitous | The SYSTEM shall VERIFY homepage displays correctly after update |
 
@@ -967,7 +967,7 @@ The organization homepage shall maintain required sections.
 | CAP-ORG-002-02 | ubiquitous | The homepage shall INCLUDE framework description section |
 | CAP-ORG-002-03 | ubiquitous | The homepage shall INCLUDE "Getting Started" section |
 | CAP-ORG-002-04 | ubiquitous | The homepage shall INCLUDE repository listing |
-| CAP-ORG-002-05 | ubiquitous | The homepage shall INCLUDE Roadmap section |
+| CAP-ORG-002-05 | ubiquitous | The homepage shall INCLUDE Release History section (renamed from "Roadmap section" at v3.18 T1.12 G4; L943 closure) |
 | CAP-ORG-002-06 | ubiquitous | The homepage shall INCLUDE migration history examples |
 
 **Enforcement**: Organization homepage validation
