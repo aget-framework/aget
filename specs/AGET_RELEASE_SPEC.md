@@ -1346,6 +1346,34 @@ python3 scripts/post_release_contract_validator.py --version 3.16.0 && \
 - **#1148 (BC-002 detection scope)**: Root cause spec-bound here via R-REL-033-02
 - **CAP-REL-030 (CHANGELOG)**: BC-NNN must appear in CHANGELOG (R-REL-030-03); this CAP verifies BC-NNN has test coverage; together they bind BC declarations end-to-end
 
+### CAP-REL-034: KR1-Substance Separation (R-REL-043) (L968 substrate via LEARN-001)
+
+**SHALL** requirements distinguishing version-stamp coverage from substantive adoption-stream coverage in fleet-migration cycles:
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| R-REL-043-01 | ubiquitous | Fleet-migration plans SHALL define KR1 with explicit **substance specification** (what "agent at vX.Y.Z" means — version-stamp only, or full adoption-stream coverage) | Prevent metric-vs-spec drift |
+| R-REL-043-02 | conditional | IF release introduces adoption streams (spec ref / skill deploy / governance amendment / etc.) THEN migration mechanic SHALL cover ALL streams, not just version line | Prevent partial-adoption claim as completion |
+| R-REL-043-03 | ubiquitous | Fleet-migration plans SHALL track **KR1-version-stamp** and **KR1-substance** as separate metrics; both reported at gate close | Honest accounting prevents L644 conflation |
+| R-REL-043-04 | conditional | IF KR1-substance < KR1-version-stamp at G4 close THEN plan SHALL transition to COMPLETE-WITH-CARRIES (not COMPLETE) until remediation cycle planned | Status-honesty discipline (L969 sibling) |
+
+**Substrate evidence** (FLEET-UPG-016, 2026-05-17):
+
+KR1 reported 55% version-stamp coverage while effective adoption was 11% — the conflation surfaced at Gate 4 close after the cycle had stamped Plan_Status=Complete, triggering ~3h retroactive remediation cycle (FU016R). 4 of 5 adoption streams (MEMORY_SURFACE_SPEC ref / verb-registry awareness / L961 channel wiring / `/aget-create-initiative` STRICT deploy / R-DEP-3 RECLASSIFY) had no Generator coverage; only `@aget-version` line was migrated.
+
+**V-Test for KR1-substance separation**:
+
+```bash
+# At plan §Success Metrics, both KRs MUST appear:
+grep -q "KR1-version-stamp" planning/PROJECT_PLAN_fleet_*.md && \
+grep -q "KR1-substance" planning/PROJECT_PLAN_fleet_*.md && \
+  echo "PASS" || echo "FAIL: KR1-substance separation required (R-REL-043-03)"
+```
+
+**Prevents**: KR1_Conflation anti-pattern (version-stamp reported as effective adoption when adoption streams uncovered by migration mechanic).
+
+**Carry**: SOP_release_process amendment requires G4 ceremony-checklist verifies both KR1 metrics before stamp (L969 sibling discipline).
+
 ---
 
 ## Release Gate Structure
