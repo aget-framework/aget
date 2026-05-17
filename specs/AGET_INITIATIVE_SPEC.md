@@ -441,7 +441,7 @@ python3 -c "import sys; sys.exit(0 if tuple(map(int, '$START'.split('.'))) > tup
 | Two-Level Model | L742 (Requirements human-level, Specifications contract-level) |
 | Evidence-driven design | L289, ADR-008 |
 | Substantial Change Protocol | CLAUDE.md §"Substantial Change Protocol" |
-| Verb registry | `ontology/DESIGN_DIRECTION_skill_verb_vocabulary.md` v3.16 — `propose` is verb #18 (Governance category, approved). Verified 2026-05-14. |
+| Verb registry | `aget/ontology/DESIGN_DIRECTION_skill_verb_vocabulary.md` v3.16.0 (canonical post-PP-021 G5.6 promotion, 2026-05-16) — `propose` is verb #18 (Governance category, approved). Verified 2026-05-14. |
 | **Governance-cluster grounding** (added v1.1.0) | C404 InitiativeCoverageCriterion (graduation threshold ≥2 plans OR ≥5 issues OR ≥3 cycles), C405 DemandDrivenInitiativeGraduation (chartering principle), C406 StrategicAlignmentFramework (mission↔capability↔initiative bridge — overlap classification), C407 PortfolioProjectStreamTriStratum (Stream is third stratum), C408 PortfolioTheater (alt: Initiative Theater — anti-pattern parent of Decorative_Initiative_Reference) |
 | **Self-application gap (named pattern)** (added v1.1.0) | C544 MetaSpecificationGap — formal vocabulary exists but contract layer doesn't bind; recursive instance: this spec was the first canonical spec landed after INIT-ONTOLOGY-SPEC-BINDING charter (gh#1241) and v1.0.1 itself failed to bind, requiring v1.1.0 patch |
 | **Vocabulary discipline** (added v1.1.0) | C547 VocabularyFirstNamingDiscipline — naming SHALL check ontology before coining; Project_Template_Reuse anti-pattern is its failure mode |
