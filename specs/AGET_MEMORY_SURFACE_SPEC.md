@@ -73,15 +73,19 @@ This spec addresses **L742 spec-fault**: the AGET behavioral spec did not previo
 
 ### R-MS-003 — KB Substrate Content Scope
 
+**Path-notation convention (this section forward)**: Paths are stated **agent-repo-relative**. An agent's repo root contains `.aget/`, `aget/`, `docs/`, `governance/`, `planning/`, `sops/`. The canonical aget framework repo (`aget-framework/aget`) is the **publication destination** for spec-class artifacts that have been promoted from any agent's `aget/specs/drafts/` staging area; from inside the canonical repo, the same content lives at `aget/specs/`. Both surfaces are KB.
+
 **R-MS-003-01** (Ubiquitous): KB substrate SHALL contain:
-- **L-doc** class artifacts (`.aget/evolution/L*.md`)
-- **Pattern** class artifacts (`docs/patterns/PATTERN_*.md`)
-- **Spec** class artifacts (`aget/specs/` canonical + `aget/specs/drafts/` pre-canonical)
-- **SOP** class artifacts (`sops/SOP_*.md`)
-- **Governance** class artifacts (`governance/*.md`)
-- **Session-insight** docs (`docs/SESSION_PATTERN_*.md`, `docs/FINDING_*.md`, `docs/MEMO_*.md`, `docs/BRIEF_*.md`)
-- **Planning** class artifacts (`planning/PROJECT_PLAN_*.md`, `planning/initiatives/INIT-*.md`, `planning/project-proposals/PROPOSAL_*.md`)
-- **CANDIDATE** artifacts pre-promotion (`docs/CANDIDATE_LDOC_*.md`, `aget/specs/drafts/`)
+- **L-doc** class artifacts (`.aget/evolution/L*.md` in agent repos)
+- **Pattern** class artifacts (`docs/patterns/PATTERN_*.md` in agent repos)
+- **Spec** class artifacts:
+  - **Canonical specs** at `aget/specs/<NAME>.md` (in the canonical `aget-framework/aget` repo; bare filename convention)
+  - **Pre-canonical drafts** at `aget/specs/drafts/<NAME>_v<N.M>.md` (in agent repos; staging area before canonical promotion)
+- **SOP** class artifacts (`sops/SOP_*.md` in agent repos)
+- **Governance** class artifacts (`governance/*.md` in agent repos)
+- **Session-insight** docs (`docs/SESSION_PATTERN_*.md`, `docs/FINDING_*.md`, `docs/MEMO_*.md`, `docs/BRIEF_*.md` in agent repos)
+- **Planning** class artifacts (`planning/PROJECT_PLAN_*.md`, `planning/initiatives/INIT-*.md`, `planning/project-proposals/PROPOSAL_*.md` in agent repos)
+- **CANDIDATE** artifacts pre-promotion (`docs/CANDIDATE_LDOC_*.md` in agent repos; `aget/specs/drafts/` per above)
 
 ### R-MS-004 — Precedence Rule (AGENTS.md OVERRIDES Harness)
 
@@ -99,11 +103,12 @@ This is critical for AGETs that subscribe to L335 Memory Architecture principle 
 | Principal feedback (correction / confirmation / behavior rule) | Harness | `~/.claude/.../memory/feedback_<slug>.md` |
 | Session state pointer (NOT structural insight) | Harness (lightweight) | `~/.claude/.../memory/project_<slug>.md` |
 | External-system reference | Harness | `~/.claude/.../memory/reference_<slug>.md` |
-| Session structural insight (cross-agent value) | **KB** | `docs/SESSION_PATTERN_<topic>_<YYYY-MM-DD>.md` or `docs/FINDING_<topic>_<YYYY-MM-DD>.md` |
-| Methodology generalization (cross-session value) | **KB** | `.aget/evolution/L<NNN>_<slug>.md` |
-| Anti-pattern documentation | **KB** | `.aget/evolution/L<NNN>_<slug>.md` |
-| Pattern documentation | **KB** | `docs/patterns/PATTERN_<slug>.md` |
-| Spec class | **KB** | `aget/specs/drafts/<NAME>_v<N.M>.md` (pre-canonical) or `../aget/specs/<NAME>.md` (canonical) |
+| Session structural insight (cross-agent value) | **KB** (agent repo) | `docs/SESSION_PATTERN_<topic>_<YYYY-MM-DD>.md` or `docs/FINDING_<topic>_<YYYY-MM-DD>.md` |
+| Methodology generalization (cross-session value) | **KB** (agent repo) | `.aget/evolution/L<NNN>_<slug>.md` |
+| Anti-pattern documentation | **KB** (agent repo) | `.aget/evolution/L<NNN>_<slug>.md` |
+| Pattern documentation | **KB** (agent repo) | `docs/patterns/PATTERN_<slug>.md` |
+| Spec class — pre-canonical | **KB** (agent repo, staging) | `aget/specs/drafts/<NAME>_v<N.M>.md` |
+| Spec class — canonical | **KB** (canonical aget repo) | `aget/specs/<NAME>.md` (bare filename per convention) |
 
 ### R-MS-006 — Conflict Resolution
 
@@ -240,21 +245,48 @@ git log --since="2026-05-15" --pretty=format:"%h %s" | head -5 \
 
 ---
 
-## Cross-References (outbound only — inbound wiring deferred to v3.18 T2.37 per F-3 sequencing constraint)
+## Cross-References
+
+**Citation convention** (per F-010 / v3.18 T2.37): L-docs live in agent repos, not in this canonical repo. Citations below give the L-doc number + agent-repo-of-origin label; cross-fleet peer reviewers resolve via the L-doc index of the cited agent's repo. Issues are cited as `gmelli/aget-aget#NNNN` (private routing per AGET_ISSUE_GOVERNANCE_SPEC).
+
+### Outbound (this spec → other artifacts)
 
 | Anchor | Reference |
 |--------|-----------|
-| Tracking issue (canonical promotion path) | gmelli/aget-aget#1378 |
+| Tracking issue (canonical promotion path) | gmelli/aget-aget#1378 (CLOSED 2026-05-16, LANDED disposition) |
 | Empirical evidence (1st L908 instance) | gmelli/aget-aget#1374 |
-| Empirical evidence (2nd L908 instance — surfaces this spec) | 2026-05-15 session — proposed `~/.claude/` for AGET session-insight; principal "ouch" probe |
+| Empirical evidence (2nd L908 instance — surfaces this spec) | 2026-05-15 session record at agent repo private-aget-framework-AGET — proposed `~/.claude/` for AGET session-insight; principal "ouch" probe |
 | Empirical evidence (N=2 cross-validation) | gmelli/aget-aget#1378 (canonical path) + gmelli/aget-aget#1384 (in-repo vs harness boundary) |
-| L-doc anchor (apply-to-others-not-self) | L908 (private-aget-framework-AGET `.aget/evolution/L908_*.md`) |
-| L-doc anchor (memory-entry-as-claim) | L960 (private-aget-framework-AGET `.aget/evolution/L960_*.md`) — downstream sibling |
-| Sibling spec | L913 (Plan-Close → Plan-Create Handoff — closes adjacent surface-taxonomy gap at NBA-generation surface) |
-| Sibling skill | `/aget-file-issue` (D71 STRUCTURAL — codifies destination routing rule, this spec codifies destination routing for memory) |
-| Theoretical foundation | L331 (theoretical foundations), L335 (Memory Architecture Vision) |
-| Two-Level Model | L742 (this spec is spec-side; the agent following memory-routing rules is implementation-side) |
-| Paired item (v3.18) | T2.37 (V-test wiring + inbound cross-references; sequencing constraint T1.16-before-T2.37 per F-3) |
+| Anti-pattern parent | L908 (any agent repo `.aget/evolution/L908_*.md`) — self-application failure at boundaries |
+| Anti-pattern parent | L939 (any agent repo `.aget/evolution/L939_*.md`) — narrow-verify-broad-claim |
+| Memory-layer claim discipline | L960 (agent repo private-aget-framework-AGET `.aget/evolution/L960_*.md`) — verify-before-recommend at memory layer |
+| Authorization-layer claim discipline | L963 (agent repo private-aget-framework-AGET `.aget/evolution/L963_*.md`) — verify-before-authorize at /aget-go step; captured during this spec's canonical promotion |
+| Sibling structural finding | L913 (any agent repo) — Plan-Close → Plan-Create Handoff (closes adjacent surface-taxonomy gap at NBA-generation surface) |
+| Sibling skill (destination routing for issues) | AGET skill `/aget-file-issue` (D71 STRUCTURAL — routes issues; this spec routes memory writes by content class) |
+| Theoretical foundation | L331 (theoretical foundations of agency), L335 (Memory Architecture Vision) |
+| Two-Level Model | L742 (this spec is spec-side / contract-level; the agent following memory-routing rules is requirements-side / behavioral) |
+| Paired-item lineage | v3.18 T1.16 (this spec's canonical promotion, LANDED 2026-05-16 commit `596dea1`) ⇄ v3.18 T2.37 (this section's wiring, LANDED 2026-05-16 — sequencing constraint T1.16-before-T2.37 per F-3 satisfied) |
+
+### Inbound (other canonical specs → this spec)
+
+The following sibling canonical specs cite AGET_MEMORY_SURFACE_SPEC in their Related Specs / Cross-References sections (wired in v3.18 T2.37):
+
+| Citing spec | Citation context |
+|-------------|------------------|
+| `AGET_LDOC_SPEC.md` | L-docs are KB-substrate content class per R-MS-003-01; routing of methodology-generalization content to L-docs is governed by R-MS-005 |
+| `AGET_EVOLUTION_SPEC.md` | Evolution directory (`.aget/evolution/`) is the on-disk surface for L-doc content class per R-MS-003-01 / R-MS-005 |
+
+Further inbound wiring (e.g., AGET_SOP_SPEC, AGET_SESSION_SPEC) deferred — those specs do not currently have Related/Cross-References sections, so adding citations is a §structural amendment, not a §wiring amendment. Routed to v3.19 P2.
+
+---
+
+## Verification Tests
+
+**Execution convention**: V-MS-001..008 are bash-executable directly from an agent's repo root. They scan the agent's own KB substrate + the harness auto-memory dir for the running agent. Cross-fleet runs by changing CWD to each agent's repo root and re-running.
+
+The V-MS body itself (the bash commands) is kept in §V-tests below this section for editor accessibility; this §Verification Tests heading exists per AGET_VALIDATION_SPEC convention so V-test discovery tools that scan canonical specs by section heading find this spec.
+
+See §V-tests for the executable V-MS-001..008 block.
 
 ---
 
@@ -265,6 +297,7 @@ git log --since="2026-05-15" --pretty=format:"%h %s" | head -5 \
 | 0.1.0 | 2026-05-15 AM | Initial DRAFT. Authored as Action B of /aget-propose-actions --budget=2h --batch --go (GO 2026-05-15) framework-remediation cycle. Empirical grounding: 2 same-session L908 instances at memory-surface + claim-scope. Spec-fault root cause per 5-Whys analysis. |
 | 0.2.0 | 2026-05-15 PM | EARS-formalization of R-MS-001..007; V-MS-005 mechanical implementation; 3 NEW V-tests V-MS-006..008 (R-MS-005 exhaustiveness, R-MS-006 orphan audit, R-MS-007 self-application audit); Conformance Matrix added; N=2 empirical validation MET via this-batch evidence (gh#1378 + gh#1384). v3.18 T2.37 fold-in candidate per VERSION_SCOPE_v3.18.0 v0.2.0. Authored as Round 3 Action 3 of 6 of /aget-propose-actions --budget=4h --count=auto --batch --go 2026-05-15 PM. |
 | 0.2.0 (canonical) | 2026-05-16 | **Canonical promotion** (v3.18 G1.T1.16; gh#1378 closure). Source: `private-aget-framework-AGET/aget/specs/drafts/AGET_MEMORY_SURFACE_SPEC_v0.1.md` (header internally already at v0.2.0). Destination: `aget/specs/AGET_MEMORY_SURFACE_SPEC.md` (bare canonical convention per AGET_INITIATIVE_SPEC precedent). Status field updated `DRAFT (pre-canonical; drafts/ location)` → `DRAFT (canonical; pending cross-fleet review)`. Promotion criterion #4 MET. PAIRED with T2.37 under F-3 sequencing constraint (T1.16-before-T2.37): outbound cross-references only this gate; inbound cross-references (other specs/L-docs citing AGET_MEMORY_SURFACE_SPEC) deferred to T2.37. Authorization: `/aget-go` bare 2026-05-16T19:22Z (svc-ed triad; c=UNMET acknowledged-with-defaults; default-(a) corrected at execution from `_v0.2.0_DRAFT.md` → bare canonical per AskUserQuestion disambiguation). Session record: `sessions/session_2026-05-16_1921.md`. |
+| 0.2.0 (T2.37 wiring) | 2026-05-16 | **V-test wiring + cross-references + path-notation cleanup** (v3.18 G1.5.T2.37; PAIRED-AFTER T1.16). Three sub-scopes: **(1)** F-010 path-notation cleanup — R-MS-003 prelude added canonical-vs-agent-repo path convention; R-MS-005 "Spec class" row split into pre-canonical (agent repo drafts) + canonical (aget repo bare filename); Cross-References citation convention codified (L-doc number + agent-repo-of-origin label). **(2)** Inbound cross-references — Cross-References §"Inbound" subsection added enumerating sibling canonical specs that now cite this spec (AGET_LDOC_SPEC, AGET_EVOLUTION_SPEC); SOP/SESSION_SPEC inbound deferred to v3.19 (no existing Related sections → structural amendment, not wiring). **(3)** §Verification Tests heading added per AGET_VALIDATION_SPEC convention so V-test discovery tools find this spec; V-MS-001..008 body unchanged. Authorization: inline svc-ed re-check this session under principal directive "then T2.37"; L963 applied (default-premises verified before sub-scope execution). |
 
 ---
 

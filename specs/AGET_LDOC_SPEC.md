@@ -541,6 +541,7 @@ print(f'Non-conformant: {total-v2}/{total}')
 - Migration: `scripts/migrate_ldoc_to_v2.py`
 - Validation: `scripts/validate_ldoc.py`
 - Issue #23: L-Doc Format v2
+- **AGET_MEMORY_SURFACE_SPEC**: L-docs are KB-substrate content class (per R-MS-003-01); routing of methodology-generalization content to L-docs governed by R-MS-005 routing table (v3.18 T2.37 wiring)
 
 ---
 

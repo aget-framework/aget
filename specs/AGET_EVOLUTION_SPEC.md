@@ -604,6 +604,7 @@ authority:
 - **AGET_LDOC_SPEC.md**: L-doc format details
 - **AGET_TEMPLATE_SPEC.md CAP-TPL-013**: Evolution entry type requirements
 - **AGET_FILE_NAMING_CONVENTIONS.md Category K**: Evolution naming patterns
+- **AGET_MEMORY_SURFACE_SPEC.md**: `.aget/evolution/` is the on-disk surface for L-doc content class per R-MS-003-01 / R-MS-005 (v3.18 T2.37 wiring)
 - **L460**: Directory Semantics Reconciliation Gap
 - **L461**: Evolution Entry Type Standardization
 - **Issue #50**: Reconcile evolution entry types
