@@ -17,7 +17,7 @@ When the framework ships a release with **adoption streams** (per-agent structur
 4. Captures per-agent external-verification logs + an aggregate INDEX
 5. Reports cohort-wide outcome (pass / skip / fail per agent per stream)
 
-The reference implementation is `fleet_remediation_v318.py` at `~/github/private-supervisor-AGET/workspace/`.
+The reference implementation is `scripts/fleet_remediation_v318.py` at this repo (public canonical) — URL: https://github.com/aget-framework/aget/blob/main/scripts/fleet_remediation_v318.py
 
 ## Architecture (per L968 substrate)
 
@@ -147,7 +147,7 @@ The Generator pattern is best for **structural artifacts** (deterministic, idemp
 
 ## References
 
-- **Reference implementation**: `~/github/private-supervisor-AGET/workspace/fleet_remediation_v318.py` v1.0.0
+- **Reference implementation**: `scripts/fleet_remediation_v318.py` v1.0.0 at this repo (public canonical); URL: https://github.com/aget-framework/aget/blob/main/scripts/fleet_remediation_v318.py
 - **Cycle origin**: FU016R adoption-stream remediation + FU016F finalize-mode extension
 - **L-docs**: L968 (frame-anchoring; alternative mechanics), L967 (plan-body-as-spec; substrate discipline), L644 (verify-before-recommend)
 - **Specs**: AGET_RELEASE_SPEC R-REL-043 (KR1-substance requirement; this Generator is the mechanism)

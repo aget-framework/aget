@@ -33,7 +33,7 @@ These 7 rules each prevent a specific failure mode observed in that cycle. Cross
 
 | Substrate | Path |
 |---|---|
-| Reusable Generator | `~/github/private-supervisor-AGET/workspace/fleet_remediation_v318.py` v1.0.0 (private fleet; mirror to your own workspace per R3) |
+| Reusable Generator | `scripts/fleet_remediation_v318.py` v1.0.0 at this repo (public canonical) — copy to your own workspace per R3; URL: https://github.com/aget-framework/aget/blob/main/scripts/fleet_remediation_v318.py |
 | Cycle retrospective (substantive prose) | `~/github/private-supervisor-AGET/sessions/SESSION_2026-05-17_v318_migration_finalization.md` |
 | gh issue family (v3.19 ADR substrate) | gh#1430 DIRTYTREE-classification, gh#1431 STRICT-propagation, gh#1432 cycle-retrospective, gh#1433 wake_up-reporting-gaps, gh#1434 v3.19-intake |
 | Cycle plans | FLEET-UPG-016 v1.22 + FU016R v1.6 + FU016F v1.6 (private fleet) |
