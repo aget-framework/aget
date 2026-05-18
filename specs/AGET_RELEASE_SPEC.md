@@ -1346,6 +1346,33 @@ python3 scripts/post_release_contract_validator.py --version 3.16.0 && \
 - **#1148 (BC-002 detection scope)**: Root cause spec-bound here via R-REL-033-02
 - **CAP-REL-030 (CHANGELOG)**: BC-NNN must appear in CHANGELOG (R-REL-030-03); this CAP verifies BC-NNN has test coverage; together they bind BC declarations end-to-end
 
+### CAP-REL-035: Citation Resolution Gate (R-REL-044) (L967 family + L919 substrate via PCRV)
+
+**SHALL** requirements distinguishing cited-path artifacts in public release prose from artifacts that actually resolve at public canonical:
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| R-REL-044-01 | ubiquitous | Public release artifacts (CHANGELOG.md, RELEASE_HANDOFF_*.md, public SKILL.md) citing `scripts/*.py` paths SHALL have those paths resolve in `aget-framework/aget/scripts/` OR carry `[instance-only per L600]` annotation | Prevent cite-from-private-disk anti-pattern (90% baseline 404 rate at v3.18.0) |
+| R-REL-044-02 | ubiquitous | Public release artifacts citing `L###` references SHALL have those L-docs resolve at `aget-framework/aget/.aget/evolution/L###_*.md` OR be explicitly annotated as private-context-only | L-doc public/private classification policy needed (100% 404 universal at v3.18.0) |
+| R-REL-044-03 | ubiquitous | Public release artifacts citing `aget/specs/*.{yaml,md}` paths SHALL have those paths resolve at canonical OR be explicitly marked as in-flight/draft | Spec citation hygiene |
+| R-REL-044-04 | conditional | IF citation does not resolve AND has no annotation THEN release-publish SHALL fail | Enforcement clause |
+
+**Validator**: `scripts/validate_release_citation_resolution.py` v1.0.0 (at canonical `aget/scripts/`) implements the check. Exit 0 if all citations resolve OR are annotated; exit 1 with itemized failures otherwise. 6 pytest cover clean/404/annotated-exempt/mixed/multi-artifact/missing-public-root cases.
+
+**Substrate evidence** (v3.18.0, PCRV Gate 0+1 baseline 2026-05-17): **268 unannotated 404 citations across 298 cited paths (90% failure rate)**. Pattern is the baseline state of public release communication at v3.18.0, not one-off.
+
+**V-Test**:
+```bash
+python3 scripts/validate_release_citation_resolution.py aget/CHANGELOG.md aget/handoffs/RELEASE_HANDOFF_v$VERSION.md aget/.claude/skills/*/SKILL.md --public-root .
+# Exit 0 PASS / Exit 1 FAIL with itemized 404s
+```
+
+**Wiring**: Validator SHOULD be invoked at pre-release gate by `scripts/validate_release_gate.py --phase pre-release` once that validator exists at canonical (currently private-only — sibling L967 instance per PCRV carry).
+
+**Prevents**: Citation_404 anti-pattern.
+
+**Carry**: PCRV Gate 3 disposes L-doc public/private classification policy (3 options); PCRV Gate 4 remediates v3.18.0's 268 instances against chosen policy. **Sibling**: R-REL-019 authoring-discipline amendment (gh#1448 proposes upstream prevention).
+
 ### CAP-REL-034: KR1-Substance Separation (R-REL-043) (L968 substrate via LEARN-001)
 
 **SHALL** requirements distinguishing version-stamp coverage from substantive adoption-stream coverage in fleet-migration cycles:
@@ -1373,6 +1400,44 @@ grep -q "KR1-substance" planning/PROJECT_PLAN_fleet_*.md && \
 **Prevents**: KR1_Conflation anti-pattern (version-stamp reported as effective adoption when adoption streams uncovered by migration mechanic).
 
 **Carry**: SOP_release_process amendment requires G4 ceremony-checklist verifies both KR1 metrics before stamp (L969 sibling discipline).
+
+---
+
+### CAP-REL-035: Citation Resolution Gate (R-REL-044) (L919-family — drift-invisible-to-author)
+
+**SHALL** requirements ensuring public release artifacts cite paths that resolve in the public canonical tree:
+
+| ID | Pattern | Statement | Rationale |
+|----|---------|-----------|-----------|
+| R-REL-044-01 | ubiquitous | The pre-release validation chain SHALL verify all `scripts/*.py`, `L###`, and `aget/specs/*` citations in public release artifacts (`CHANGELOG.md`, `RELEASE_HANDOFF_*.md`, `.claude/skills/*/SKILL.md`) resolve in the public canonical tree | Prevent author-POV citations from 404-ing at reader-time (L919 Drift Invisible) |
+| R-REL-044-02 | conditional | IF a cited path is legitimately instance-only (e.g., `*_ext.py` per L600 C3/C1 Hybrid Extension Architecture) THEN the citing line SHALL carry `[instance-only per L600]` annotation | Preserve legitimate exceptions without false-positive blocking |
+| R-REL-044-03 | ubiquitous | The validator SHALL exit non-zero on unresolved-and-unannotated citations; the release-gate runner SHALL treat this as blocking | L671 prevention — classification without consequence is decorative |
+| R-REL-044-04 | ubiquitous | Failing citations SHALL be reported with `{kind, token, artifact, line}` so authors can locate and remediate without re-scanning | L289 evidence-first — reports without locations force re-discovery |
+
+**Substrate evidence** (PCRV baseline, 2026-05-17):
+
+Public v3.18.0 release surfaces (CHANGELOG.md, RELEASE_HANDOFF_v3.18.0.md, 4 public SKILL.md files) carried **268 unannotated 404s across 298 citations (10% resolution rate)** at discovery time. L-doc citations in public SKILL.md showed **0/14 resolution** across 4 different skills (aget-go, aget-create-briefing, aget-broadcast-fleet, aget-file-issue) — pattern is structural, not per-skill. Triggered by remote-supervisor probe asking why three named scripts 404'd from canonical; 5-whys traced to *cite-from-author-POV, never test-from-reader-POV* — author has both repos on disk (link not visibly broken); reader sees only public surface (link 404s). L919 family — Drift Invisible.
+
+**V-Test for citation resolution**:
+
+```bash
+python3 scripts/validate_release_citation_resolution.py \
+  aget/CHANGELOG.md \
+  aget/handoffs/RELEASE_HANDOFF_v${VERSION}.md \
+  aget/.claude/skills \
+  --public-root aget --quiet
+# exit 0 = PASS; exit 1 = unannotated 404s exist; exit 2 = configuration error
+```
+
+Wired into `scripts/validate_release_gate.py --phase pre-release` as blocking validator (registry entry `Citation Resolution`).
+
+**Prevents**: Citation_404_At_Reader anti-pattern (handoff/CHANGELOG/SKILL.md cite paths that exist only in author's private filesystem; remote consumers 404).
+
+**Annotation syntax**: `[instance-only per L600]` placed on the same line as the citation marks it exempt. Multi-citation lines: annotation applies to all citations on that line (typical case: a `*_ext.py` mention next to its non-ext sibling).
+
+**Composition with R-DEP-010 deprecation-discipline**: Citations to retired artifacts SHALL be removed from release artifacts at deprecation removal-date; they SHALL NOT be annotated as `[instance-only]` to silence the validator. The validator catches reach-through references; deprecation governance catches reach-back references.
+
+**Carry**: None — landed in same cycle as discovery (PCRV plan; private-aget-framework-AGET, 2026-05-17).
 
 ---
 
