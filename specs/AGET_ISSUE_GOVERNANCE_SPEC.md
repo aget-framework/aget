@@ -1,11 +1,11 @@
 # AGET Issue Governance Specification
 
-**Version**: 2.1.0
+**Version**: 2.2.0
 **Status**: Active
 **Category**: Process (Issue Management)
 **Format Version**: 1.3
 **Created**: 2026-01-11
-**Updated**: 2026-04-04
+**Updated**: 2026-05-23
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_ISSUE_GOVERNANCE_SPEC.md`
 **Change Origin**: PROJECT_PLAN_issue_governance_v1.0, PROJECT_PLAN_issue_content_sanitization_v1.0, PROJECT_PLAN_public_issue_migration_v1.0, PROJECT_PLAN_issue_management_remediation_v3.11_v1.0
@@ -692,6 +692,108 @@ PRIVATE_PATTERNS = [
 
 ---
 
+### CAP-ISSUE-009: Supervisor Intake (v2.2.0)
+
+**Statement**: The SYSTEM shall provide a supervisor-intake routing mode by which a supervisor agent receives issue filings from agents it manages before tracker submission.
+
+**Pattern**: event-driven
+
+**Theoretical Basis**: L99 (supervision is a capability, not a type) — intake is a relay capability, not a separate agent class. Hierarchical message-passing (Actor Model): managed agent → supervisor mailbox → tracker.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| R-ISSUE-024 | event-driven | WHEN a managed agent files an issue with `routing_mode: supervisor_intake`, the SYSTEM shall route the filing to the managing supervisor's intake queue rather than directly to `{private-tracker}` |
+| R-ISSUE-025 | conditional | IF a supervisor accepts a supervisor-intake filing THEN the SYSTEM shall submit it to `{private-tracker}` preserving attribution to the originating managed agent |
+
+**Enforcement**: `/aget-file-issue` mode-detect (Stream 2 follow-on); behavioral until skill wiring lands.
+
+**Rationale** (L638): Intake does not change the eventual destination (`{private-tracker}`); it inserts a supervisor relay step. Default routing (CAP-ISSUE-001) is unchanged — `direct` remains the default mode.
+
+---
+
+### CAP-ISSUE-010: Supervisor Editorial (v2.2.0)
+
+**Statement**: The SYSTEM shall provide a supervisor-editorial mode by which a supervisor may revise filing content against editorial standards before tracker submission.
+
+**Pattern**: event-driven
+
+**Theoretical Basis**: ADR-021 Option 5. L977 (lesson-as-substrate) — the editorial pause is Healthy Friction at the fleet→tracker boundary: a deliberate review step that surfaces UNMET quality conditions before a worker's filing reaches the tracker.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| R-ISSUE-026 | event-driven | WHEN a supervisor processes a `routing_mode: supervisor_editorial` filing, the SYSTEM shall permit the supervisor to edit title and body for clarity, scope, and sanitization before submission, preserving the originating agent's attribution and intent |
+| R-ISSUE-027 | conditional | IF a supervisor-editorial revision materially changes filing intent THEN the SYSTEM shall record the revision rationale and notify the originating agent |
+
+**Enforcement**: ADR-021 (governance decision); `/aget-file-issue` editorial mode (Stream 2 follow-on).
+
+**Rationale** (L671): The editorial capability has a documented consequence — material-intent changes require recorded rationale + originating-agent notification. Editorial revision without recorded rationale would be decorative; R-ISSUE-027 makes the consequence enforceable.
+
+---
+
+### CAP-ISSUE-011: Lesson-First Filing Precondition (v2.2.0)
+
+**Statement**: The SYSTEM shall require that issues derived from a session observation or pattern reference a captured L-doc lesson as substrate.
+
+**Pattern**: event-driven
+
+**Theoretical Basis**: L977 (lessons precede filings; filings precede issues). L908/L960 (verify-before-assert — the observation is a claim under test until captured as a lesson).
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| R-ISSUE-028 | event-driven | WHEN an agent files an issue derived from a session observation or pattern, the SYSTEM shall verify the underlying observation is captured as an L-doc lesson; IF absent, the agent SHALL capture the lesson (via `/aget-record-lesson`) before filing |
+
+**Enforcement**: `/aget-file-issue` lesson-first mode-detect (Stream 2 follow-on); behavioral until skill wiring lands.
+
+---
+
+### CAP-ISSUE-012: Lesson↔Issue Traceability (v2.2.0)
+
+**Statement**: The SYSTEM shall maintain bidirectional traceability between lesson-first issues and their originating L-doc lessons.
+
+**Pattern**: ubiquitous
+
+**Theoretical Basis**: L448 (bidirectional linking vision). Traceability surface enables L863 lift-rate measurement.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| R-ISSUE-029 | ubiquitous | Every lesson-first issue SHALL cite its originating L-doc identifier (`L###`) in the issue body, and the originating lesson SHOULD reference the resulting issue number |
+
+**Enforcement**: V-ISSUE-018 (automated body grep); behavioral on the lesson side.
+
+---
+
+### CAP-ISSUE-013: Filing-Mode Declaration (v2.2.0)
+
+**Statement**: The SYSTEM shall require every filed issue to declare its routing mode, defaulting to `direct` to preserve existing routing.
+
+**Pattern**: ubiquitous
+
+**Theoretical Basis**: PP-042 Q1=Option B (single-rev mode taxonomy). L638 (private-first routing preserved as the `direct` default).
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| R-ISSUE-030 | ubiquitous | Every filed issue SHALL declare a `routing_mode` ∈ {`direct`, `supervisor_intake`, `supervisor_editorial`, `lesson_first`}; absent an explicit mode, the SYSTEM shall apply `direct` (CAP-ISSUE-001 routing to `{private-tracker}`) |
+
+**Enforcement**: `/aget-file-issue` (mode parameter; Stream 2 follow-on). Default-direct preserves backward compatibility with all existing filings.
+
+---
+
+### CAP-ISSUE-014: Lift-Rate Instrumentation Hook (v2.2.0)
+
+**Statement**: The SYSTEM shall record a lift-rate marker on lesson-first issues enabling later issue→outcome conversion measurement.
+
+**Pattern**: event-driven
+
+**Theoretical Basis**: L863 (issue→outcome conversion not measured; can't tune filing-mode for impact). This capability lands the *hook*; instrumentation/measurement is deferred to Stream 3 (v3.20).
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| R-ISSUE-031 | event-driven | WHEN a lesson-first issue is filed, the SYSTEM shall record a lift-rate marker linking the issue to its originating lesson, sufficient for later issue→outcome conversion measurement (instrumentation deferred to Stream 3 per L863) |
+
+**Enforcement**: marker presence (V-ISSUE-020 inspection); measurement tooling is Stream 3 scope, explicitly out of this revision.
+
+---
+
 ## Repository Issue Matrix
 
 | Repository | Issues | Visibility | Rationale |
@@ -799,6 +901,12 @@ authority:
 | V-ISSUE-012 | CAP-ISSUE-007 | automated | Verify staleness detection flags issues with no activity >= 90 days |
 | V-ISSUE-013 | CAP-ISSUE-008 | automated | Verify `aget-framework/aget` has Issue Form YAML files in `.github/ISSUE_TEMPLATE/` |
 | V-ISSUE-014 | CAP-ISSUE-008 | automated | Verify each Issue Form includes required fields: title, description, type label |
+| V-ISSUE-015 | CAP-ISSUE-009 | inspection | Verify `supervisor_intake` filings route to the managing supervisor's intake queue with originating managed-agent attribution preserved |
+| V-ISSUE-016 | CAP-ISSUE-010 | inspection | Verify `supervisor_editorial` revisions preserve attribution and record a rationale when filing intent materially changes |
+| V-ISSUE-017 | CAP-ISSUE-011 | inspection | Verify observation-derived issues reference a captured L-doc lesson (no observation-derived issue filed without a lesson) |
+| V-ISSUE-018 | CAP-ISSUE-012 | automated | Verify each lesson-first issue body contains an `L###` lesson citation |
+| V-ISSUE-019 | CAP-ISSUE-013 | automated | Verify each filed issue declares a `routing_mode` from the allowed set; absent declaration resolves to `direct` |
+| V-ISSUE-020 | CAP-ISSUE-014 | inspection | Verify lesson-first issues carry a lift-rate marker linking issue→originating-lesson |
 
 ### Validation Commands
 
@@ -934,6 +1042,7 @@ graduation:
 | 1.0.0 | 2026-01-11 | Initial specification: routing, sanitization, repo settings |
 | 1.1.0 | 2026-02-14 | Added WorkCo, VP-of-AI, WorkCo patterns per L583 |
 | 2.0.0 | 2026-03-02 | **Private-first routing**: R-ISSUE-001 rewritten (all agents -> {private-tracker}), R-ISSUE-002 rewritten (promotion-only), R-ISSUE-009 revised (promotion target), CAP-ISSUE-005 added (R-ISSUE-011 through R-ISSUE-014: promotion requirements), vocabulary updated, Exhaustive_Pattern_List anti-pattern added. Per L638. |
+| 2.2.0 | 2026-05-23 | **Lesson-first filing + supervisor relay (PP-042 leapfrog)**: CAP-ISSUE-009 (Supervisor Intake: R-ISSUE-024..025), CAP-ISSUE-010 (Supervisor Editorial: R-ISSUE-026..027, ADR-021 Option 5), CAP-ISSUE-011 (Lesson-First Precondition: R-ISSUE-028), CAP-ISSUE-012 (Lesson↔Issue Traceability: R-ISSUE-029), CAP-ISSUE-013 (Filing-Mode Declaration: R-ISSUE-030, default `direct` preserves CAP-ISSUE-001), CAP-ISSUE-014 (Lift-Rate Hook: R-ISSUE-031, instrumentation deferred to Stream 3). 6 new V-tests (V-ISSUE-015..020). No changes to CAP-ISSUE-001..008. Per L977 (lesson-as-substrate), L863 (lift-rate gap), L671 (anti-decorative), L638 (routing preserved). PP-042 Stream 1 / INIT-ISSUE-INBOX-STEWARDSHIP Stream 8; v3.19 release T1.3. |
 | 2.1.0 | 2026-04-04 | **Triage, lifecycle, structured filing**: CAP-ISSUE-006 (Triage: R-ISSUE-015 through R-ISSUE-017), CAP-ISSUE-007 (Lifecycle: R-ISSUE-018 through R-ISSUE-020), CAP-ISSUE-008 (Issue Forms: R-ISSUE-021 through R-ISSUE-023). 54 new SKOS vocabulary terms across 4 concept groups (triage, lifecycle, labeling, promotion_workflow). 3 new anti-patterns. 6 new V-tests (V-ISSUE-009 through V-ISSUE-014). Per L750, L671, L498. |
 
 ---
