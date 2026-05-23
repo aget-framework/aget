@@ -11,9 +11,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Items accumulated since the most-recent release (v3.18.0, 2026-05-16) that are confirmed in-flight for a future release. Per Keep a Changelog 1.1.0 forward-work convention.
+Items accumulated since the most-recent release (v3.19.0, 2026-05-23) that are confirmed in-flight for a future release. Per Keep a Changelog 1.1.0 forward-work convention.
 
-*No items in-flight yet for v3.19.*
+*No items in-flight yet for v3.20.*
+
+---
+
+## [3.19.0] - 2026-05-23
+
+**Theme**: **Discipline + Healthy Friction Codification**. The cycle's defining contribution is the framework's anti-confabulation and authorization-shape disciplines landing as *enforced structure* rather than prose advice: the agent's NBA-fill refusal (L976/L979), audit-after-synthesis pairing (L980), and over-application scope discipline (L983) are now wired into the skills, specs, and SOPs that govern day-to-day operation. "Healthy Friction" — surfacing a decision rather than rolling past it — is treated as a first-class release quality.
+
+> **No breaking changes** in v3.19. Existing instances upgrade by version-bump only.
+
+> **Sleeping CAPs from v3.17**: CAP-REL-032 + CAP-REL-033 were GRACE-EXTENDED to v3.19.0 (R-DEP-4). Disposition tracked in the release handoff; no new sleeping CAPs introduced at the V-test layer in v3.19.
+
+> **Scope carry**: Tier 2 PCRV citation-resolution remediation (245 unannotated 404s on v3.18 surfaces) re-baselined to v3.20 as a priority carry — theme-orthogonal, and the citation validator is not yet auto-enforced in the pre-release chain (L131 transparency flag recorded).
+
+### Added — Tier 1 (Implementation)
+
+- **`/aget-propose-actions` Step 2.7 — Audit-After-Synthesis pre-check** (REQ-PA-013 + CAP-PA-013-01..04): when ≥2 proposed Next-Best-Actions write synthesis-class rows to the same governed artifact, at least one must classify as audit-class (re-derives quantities from primary sources). Reference classifier `propose_actions_classify.py`; replay suite `test_propose_actions_step_2_7.py` (7 tests). This is the **structural (Channel-5)** landing of the L980 audit-after-synthesis discipline and gh#1476 Healthy Friction codification.
+
+- **`/aget-propose-actions` Step 2.8 — Aspirational-Flag Authorization-Shape pre-check** (REQ-PA-014 + REQ-PA-015): distinguishes **agent-mode** self-issued aspirational flag-forms (`--count=auto`/`--batch`/`--go` not in the skill's documented parameter set) → **REFUSE** (closes the L976/L979 NBA-fill / 24h-recurrence vector), from **principal-mode** principal-typed flag-forms → **ACCEPT without ceremony** (the F1 friction-reduction default). Budget remains a ceiling; trigger-presence is the floor.
+
+- **`AGET_ISSUE_GOVERNANCE_SPEC` v2.1.0 → v2.2.0** (PP-042 Stream 1): introduces issue `routing_mode` ∈ {`direct`, `supervisor_intake`, `supervisor_editorial`, `lesson_first`} with CAP-ISSUE-009..014 + V-ISSUE-015..020 (CAP-001..008 intact). Lesson-first filings reference a captured L-doc as substrate (L977) for L-doc↔issue traceability. Paired with **ADR-021 Amendment 1** (supervisor relay modes).
+
+- **gh#1476 Healthy Friction codification — SOP point-of-use channel** (L467 Channel-2): `SOP_scope_lock_ceremony` gains a standing **§G1.AUDIT** step (generalizing the ad-hoc audit-counts pass into a reusable audit-after-synthesis gate); `SOP_release_process` gains an audit-after-synthesis note at the Version-Inventory synthesis surface. No new L-doc — L980 is the anchor (anti-banner-inflation).
+
+- **L983 over-application scope discipline** (in-cycle application): the L735 public-push-window banner now carries an explicit scope qualifier (`origin = aget-framework/*` only; private `gmelli/*` repos exempt), preventing restrictive-discipline citations from being applied out of scope.
 
 ---
 
