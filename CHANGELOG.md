@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Items accumulated since the most-recent release (v3.19.0, 2026-05-23) that are confirmed in-flight for a future release. Per Keep a Changelog 1.1.0 forward-work convention.
 
-*No items in-flight yet for v3.20.*
+- **Citation-resolution remediation (R-REL-044 / CAP-REL-035)** — re-baselined from v3.19 to v3.20: resolve the unannotated `L###` / `scripts/*` / `specs/*` citations the citation validator flags on published v3.18/v3.19 surfaces (annotate-instance-only, propagate-to-public, or rewrite), so cross-repo readers no longer hit 404s. Tracked as a v3.20 priority carry.
 
 ---
 
@@ -23,7 +23,7 @@ Items accumulated since the most-recent release (v3.19.0, 2026-05-23) that are c
 
 > **No breaking changes** in v3.19. Existing instances upgrade by version-bump only.
 
-> **Sleeping CAPs from v3.17**: CAP-REL-032 + CAP-REL-033 were GRACE-EXTENDED to v3.19.0 (R-DEP-4). Disposition tracked in the release handoff; no new sleeping CAPs introduced at the V-test layer in v3.19.
+> **Sleeping CAPs — CAP-REL-032 + CAP-REL-033** (R-REL-028/029 post-release validators): grace-extended to v3.19.0 under an R-DEP-4 structural commitment (implement OR explicitly reclassify by v3.19; *no further grace authorized*). v3.19 did **not** implement them — they remain **Sleeping**, so this release carries an **open deprecation-governance disposition** (implement in a v3.19.x, formal RECLASSIFY, or principal-authorized re-grace). No *operational* degradation (release-process tolerates their absence) and no *new* sleeping CAPs introduced in v3.19. Disposition surfaced in the release handoff.
 
 > **Scope carry**: Tier 2 PCRV citation-resolution remediation (245 unannotated 404s on v3.18 surfaces) re-baselined to v3.20 as a priority carry — theme-orthogonal, and the citation validator is not yet auto-enforced in the pre-release chain (L131 transparency flag recorded).
 
