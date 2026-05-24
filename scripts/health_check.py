@@ -324,6 +324,51 @@ def check_planning_directory(agent_path: Path) -> CheckResult:
 # Main Protocol
 # =============================================================================
 
+# D71-STRUCTURAL skills the agent MUST be able to model-invoke (AGENTS.md D71)
+D71_STRUCTURAL_SKILLS = (
+    "aget-create-project", "aget-close-project",
+    "aget-create-initiative", "aget-file-issue",
+)
+
+
+def check_structural_skill_frontmatter(agent_path: Path) -> CheckResult:
+    """D71 invariant: no D71-STRUCTURAL skill may carry `disable-model-invocation`.
+
+    The flag blocks model (agent) invocation, but D71 mandates the agent MUST
+    invoke these skills; a drifted flag makes D71 unsatisfiable on this instance.
+    Ref: gmelli/aget-aget#1489 (SGR remediation F2).
+    """
+    skills_dir = agent_path / ".claude" / "skills"
+    if not skills_dir.is_dir():
+        return CheckResult("structural_skill_frontmatter", True,
+                           "No .claude/skills/ — not applicable", "info")
+    offenders = []
+    for skill in D71_STRUCTURAL_SKILLS:
+        sk = skills_dir / skill / "SKILL.md"
+        if not sk.is_file():
+            continue
+        try:
+            text = sk.read_text(encoding="utf-8", errors="ignore")
+        except Exception:
+            continue
+        # inspect only the frontmatter (between the first two '---' markers)
+        parts = text.split("---", 2)
+        front = parts[1] if text.startswith("---") and len(parts) >= 3 else text
+        for line in front.splitlines():
+            s = line.strip().replace(" ", "")
+            if s.startswith("disable-model-invocation:true"):
+                offenders.append(skill)
+                break
+    if offenders:
+        return CheckResult(
+            "structural_skill_frontmatter", False,
+            "D71 violation: disable-model-invocation on STRUCTURAL skill(s): "
+            f"{', '.join(offenders)} — agent cannot model-invoke; remove the flag (ref #1489)",
+            severity="error", fixable=True)
+    return CheckResult("structural_skill_frontmatter", True,
+                       "No D71-STRUCTURAL skill carries disable-model-invocation", "info")
+
+
 def run_housekeeping(agent_path: Path, verbose: bool = False) -> Dict[str, Any]:
     """
     Run all housekeeping checks.
@@ -354,6 +399,7 @@ def run_housekeeping(agent_path: Path, verbose: bool = False) -> Dict[str, Any]:
         check_5d_structure,
         check_sessions_directory,
         check_planning_directory,
+        check_structural_skill_frontmatter,
     ]
 
     for check_fn in checks:
