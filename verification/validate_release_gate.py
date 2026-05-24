@@ -250,6 +250,55 @@ def validate_template_versions(
     return passed, failed, errors
 
 
+# D71-STRUCTURAL skills the agent MUST be able to model-invoke (AGENTS.md D71)
+D71_STRUCTURAL_SKILLS = (
+    "aget-create-project", "aget-close-project",
+    "aget-create-initiative", "aget-file-issue",
+)
+
+
+def validate_structural_skill_frontmatter(
+    framework_path: Path
+) -> Tuple[int, int, List[str]]:
+    """SGR-F3: no D71-STRUCTURAL skill in any shipped template may carry
+    `disable-model-invocation` (which blocks the agent model-invocation D71
+    mandates). Reconciliation gate for the dual-surface frontmatter root cause.
+
+    Ref: gmelli/aget-aget#1489 (SGR remediation F3).
+
+    Returns:
+        Tuple of (passed, failed, errors)
+    """
+    passed = 0
+    failed = 0
+    errors: List[str] = []
+    for template in TEMPLATE_REPOS:
+        skills_dir = framework_path / template / ".claude" / "skills"
+        for skill in D71_STRUCTURAL_SKILLS:
+            sk = skills_dir / skill / "SKILL.md"
+            if not sk.is_file():
+                continue
+            try:
+                text = sk.read_text(encoding="utf-8", errors="ignore")
+            except Exception:
+                continue
+            parts = text.split("---", 2)
+            front = parts[1] if text.startswith("---") and len(parts) >= 3 else text
+            flagged = any(
+                line.strip().replace(" ", "").startswith("disable-model-invocation:true")
+                for line in front.splitlines()
+            )
+            if flagged:
+                failed += 1
+                errors.append(
+                    f"SGR-F3: {template}/{skill} carries disable-model-invocation "
+                    "(D71 violation; remove the flag; ref #1489)"
+                )
+            else:
+                passed += 1
+    return passed, failed, errors
+
+
 def validate_release(
     version: str,
     aget_path: Path,
@@ -342,6 +391,19 @@ def validate_release(
             print("  [FAIL] Core git tag missing")
             for e in errors:
                 print(f"    - {e}")
+
+    # Check 6: D71-STRUCTURAL skill frontmatter (SGR-F3, #1489)
+    if verbose:
+        print("Checking SGR-F3: D71-STRUCTURAL skill frontmatter...")
+    passed, failed, errors = validate_structural_skill_frontmatter(framework_path)
+    total_passed += passed
+    total_failed += failed
+    if errors:
+        issues["structural_skill_frontmatter"] = errors
+    if verbose:
+        print(f"  [{'PASS' if failed == 0 else 'FAIL'}] STRUCTURAL frontmatter: {passed}/{passed + failed}")
+        for e in errors:
+            print(f"    - {e}")
 
     return total_passed, total_failed, issues
 

@@ -1849,6 +1849,28 @@ python3 .aget/patterns/session/verify_session_protocols.py --protocol wake_up
 **Implements**: R-REL-027 (Template Deep Conformance)
 **Related**: Fleet Conformance Spotcheck (PROJECT_PLAN_fleet_conformance_spotcheck_v1.0.md)
 
+### Phase 0.82: Structural-Rule Reconciliation Gate (SGR-F7)
+
+**Purpose**: When a release introduces or changes a D71-STRUCTURAL skill or a framework-structural rule, sweep all templates (and known instances) for pre-existing **organic features the new rule now contradicts** — BEFORE publishing. Closes the gap that let the `disable-model-invocation`/D71 collision survive ~2 months unreconciled (a preserved organic feature was contradicted 7 days later by D71, with nothing forcing the two governance tracks to be diffed). Ref: gmelli/aget-aget#1489.
+
+**Trigger** (any of):
+- A release adds a new D71-STRUCTURAL skill, or promotes a skill to STRUCTURAL enforcement.
+- A release changes the D71 structural-routing table (AGENTS.md) or skill-frontmatter conventions.
+- A release adds/changes any framework-structural rule constraining instance-organic surfaces (frontmatter fields, config keys, session-script hooks).
+
+**Procedure**:
+1. Identify the structural rule(s) introduced/changed this release.
+2. Run the release-gate structural check (`validate_release_gate.py` → `validate_structural_skill_frontmatter`, SGR-F3): no D71-STRUCTURAL skill across templates may carry `disable-model-invocation`.
+3. For rules beyond frontmatter, sweep templates + known instances for organic features that now conflict with the new rule (the rule's "negative space").
+4. Resolve each conflict before release: remove drift, grant an explicit registered exception, or rescope the rule.
+
+**V-test**: `python3 aget/verification/validate_release_gate.py <version> --verbose 2>&1 | grep -E "STRUCTURAL frontmatter"  # expect PASS`
+
+**Why structural, not behavioral** (L490/L563): this is a gate check, not a "remember to look" reminder — the collision survived precisely because nothing forced the instance-organic and framework-structural tracks to be diffed when the rule landed.
+
+**Implements**: SGR-F7 (candidate requirement R-REL-043 — pending AGET_RELEASE_SPEC amendment; ADR-008 ordering: SOP step lands now, spec requirement follows)
+**Related**: gmelli/aget-aget#1489; PROJECT_PLAN_structural_skill_governance_remediation_v1.0
+
 ### Phase 0.85: Deliverable Conformance Check (D40, L652)
 
 **Purpose**: Verify all new/modified deliverables conform to their governing specifications before release
