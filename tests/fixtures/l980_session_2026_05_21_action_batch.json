@@ -1,0 +1,20 @@
+[
+  {
+    "action": 1,
+    "text": "Fold NASCENT initiative INTO active table",
+    "artifact": "planning/initiatives/INDEX.md",
+    "class_expected": "synthesis"
+  },
+  {
+    "action": 2,
+    "text": "Update Q5 row: ACTIVE count 8->7 hits ceiling",
+    "artifact": "planning/initiatives/INDEX.md",
+    "class_expected": "synthesis"
+  },
+  {
+    "action": 3,
+    "text": "Audit stream-stamps across retained ACTIVE manifests",
+    "artifact": "planning/initiatives/INDEX.md",
+    "class_expected": "audit"
+  }
+]
