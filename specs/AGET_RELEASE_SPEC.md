@@ -1346,33 +1346,6 @@ python3 scripts/post_release_contract_validator.py --version 3.16.0 && \
 - **#1148 (BC-002 detection scope)**: Root cause spec-bound here via R-REL-033-02
 - **CAP-REL-030 (CHANGELOG)**: BC-NNN must appear in CHANGELOG (R-REL-030-03); this CAP verifies BC-NNN has test coverage; together they bind BC declarations end-to-end
 
-### CAP-REL-035: Citation Resolution Gate (R-REL-044) (L967 family + L919 substrate via PCRV)
-
-**SHALL** requirements distinguishing cited-path artifacts in public release prose from artifacts that actually resolve at public canonical:
-
-| ID | Pattern | Statement | Rationale |
-|----|---------|-----------|-----------|
-| R-REL-044-01 | ubiquitous | Public release artifacts (CHANGELOG.md, RELEASE_HANDOFF_*.md, public SKILL.md) citing `scripts/*.py` paths SHALL have those paths resolve in `aget-framework/aget/scripts/` OR carry `[instance-only per L600]` annotation | Prevent cite-from-private-disk anti-pattern (90% baseline 404 rate at v3.18.0) |
-| R-REL-044-02 | ubiquitous | Public release artifacts citing `L###` references SHALL have those L-docs resolve at `aget-framework/aget/.aget/evolution/L###_*.md` OR be explicitly annotated as private-context-only | L-doc public/private classification policy needed (100% 404 universal at v3.18.0) |
-| R-REL-044-03 | ubiquitous | Public release artifacts citing `aget/specs/*.{yaml,md}` paths SHALL have those paths resolve at canonical OR be explicitly marked as in-flight/draft | Spec citation hygiene |
-| R-REL-044-04 | conditional | IF citation does not resolve AND has no annotation THEN release-publish SHALL fail | Enforcement clause |
-
-**Validator**: `scripts/validate_release_citation_resolution.py` v1.0.0 (at canonical `aget/scripts/`) implements the check. Exit 0 if all citations resolve OR are annotated; exit 1 with itemized failures otherwise. 6 pytest cover clean/404/annotated-exempt/mixed/multi-artifact/missing-public-root cases.
-
-**Substrate evidence** (v3.18.0, PCRV Gate 0+1 baseline 2026-05-17): **268 unannotated 404 citations across 298 cited paths (90% failure rate)**. Pattern is the baseline state of public release communication at v3.18.0, not one-off.
-
-**V-Test**:
-```bash
-python3 scripts/validate_release_citation_resolution.py aget/CHANGELOG.md aget/handoffs/RELEASE_HANDOFF_v$VERSION.md aget/.claude/skills/*/SKILL.md --public-root .
-# Exit 0 PASS / Exit 1 FAIL with itemized 404s
-```
-
-**Wiring**: Validator SHOULD be invoked at pre-release gate by `scripts/validate_release_gate.py --phase pre-release` once that validator exists at canonical (currently private-only — sibling L967 instance per PCRV carry).
-
-**Prevents**: Citation_404 anti-pattern.
-
-**Carry**: PCRV Gate 3 disposes L-doc public/private classification policy (3 options); PCRV Gate 4 remediates v3.18.0's 268 instances against chosen policy. **Sibling**: R-REL-019 authoring-discipline amendment (gh#1448 proposes upstream prevention).
-
 ### CAP-REL-034: KR1-Substance Separation (R-REL-043) (L968 substrate via LEARN-001)
 
 **SHALL** requirements distinguishing version-stamp coverage from substantive adoption-stream coverage in fleet-migration cycles:
@@ -1437,7 +1410,9 @@ Wired into `scripts/validate_release_gate.py --phase pre-release` as blocking va
 
 **Composition with R-DEP-010 deprecation-discipline**: Citations to retired artifacts SHALL be removed from release artifacts at deprecation removal-date; they SHALL NOT be annotated as `[instance-only]` to silence the validator. The validator catches reach-through references; deprecation governance catches reach-back references.
 
-**Carry**: None — landed in same cycle as discovery (PCRV plan; private-aget-framework-AGET, 2026-05-17).
+**Carry**: PCRV Gate 3 disposes L-doc public/private classification policy (3 options); PCRV Gate 4 remediates v3.18.0's 268 instances against chosen policy — **open, tracked as v3.20 debt D2 (L131 no-further-slip)**. The validator itself landed same cycle as discovery (PCRV plan; private-aget-framework-AGET, 2026-05-17). **Sibling**: R-REL-019 authoring-discipline amendment (gh#1448 proposes upstream prevention).
+
+**Merge note (2026-05-26)**: CAP-REL-035 was declared twice — an L967-family authoring pass and this L919-family pass — producing a duplicate req-ID that scored AGET_RELEASE_SPEC `NONE` on `score_specifications.py` (declaration-uniqueness check, L0 gate). The two passes were the same capability (same ID, title, R-REL-044 family, validator); merged into this single block. The earlier pass's open PCRV Gate 3/4 carry is preserved above (it was mis-stated as "None" here pre-merge).
 
 ---
 
