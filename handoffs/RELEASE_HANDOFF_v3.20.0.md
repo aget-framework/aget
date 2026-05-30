@@ -55,7 +55,8 @@ No `specs/deltas/AGET_DELTA_v3.20.md` is shipped. v3.20.0's changes are additive
 | Agent | Version Confirmed | Date | Notes |
 |-------|:-----------------:|------|-------|
 | _(framework owner)_ | ✅ 3.20.0 deployed | 2026-05-30 | Self-migrated per R-REL-006; `wake_up.py` confirms v3.20.0 — first deployment confirmed |
-| _(fleet pilot)_ | ⏳ pending | — | Broader-fleet deploy coordinated by supervisor (notification filed) |
+| _(coordinator)_ | ✅ 3.20.0 deployed | 2026-05-30 | Second-agent confirmation — version stamps at 3.20.0, pushed, CI green. Independently verified by framework owner from primary sources (credible L656 evidence, not self-confirm). |
+| _(broader-fleet pilot)_ | ⏳ pending | — | Worker-agent rollout (Stage C), coordinated by supervisor. Coordinator + framework-owner confirmations do not substitute for a downstream worker pilot. |
 
 ## References
 
