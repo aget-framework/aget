@@ -17,7 +17,7 @@ Across the fleet, "GO" signals from the principal vary in clarity (`yes`, `proce
 
 ## Evidence
 
-L854 (Spec-First Applied Selectively — awareness alone is insufficient), L466 (Question Is Not Approval), L178 (Human Override Principle — acknowledge / commit / execute), L671 (Classification Without Consequence — anti-pattern Healthy Friction prevents), L42 (Stop At Gate Boundaries). Espanso compensating-control retirement: `;;g*pr*` triggers retired in favor of governed `;;ago*`.
+L854 (Spec-First Applied Selectively — awareness alone is insufficient), L466 (Question Is Not Approval), L178 (Human Override Principle — acknowledge / commit / execute), L671 (Classification Without Consequence — anti-pattern Healthy Friction prevents), L42 (Stop At Gate Boundaries). Espanso compensating-control retirement: `;;g*pr*` triggers retired in favor of governed `;;ago*`.  [instance-only per L600]
 
 ## Input
 
@@ -49,7 +49,7 @@ If `--scope` is supplied, use it directly. Otherwise, scan conversation context 
 - Active goal proposal (most recent `/aget-propose-goals` table)
 - Whole session (fallback)
 
-If multiple plausible scopes are active, REFUSE and list candidates. Ambiguous GO is worse than no GO (L466).
+If multiple plausible scopes are active, REFUSE and list candidates. Ambiguous GO is worse than no GO (L466).  [instance-only per L600]
 
 ### Step 2: Verify principles (CAP-GO-003)
 
@@ -136,10 +136,10 @@ Grammar: `a` (anchor) + `go` + `xy` optional, where `x` = count digit, `y` = sha
 
 | Anti-Pattern | Why Wrong |
 |--------------|-----------|
-| Free-text "go" / "proceed" / "yes" | No record, no scope, no principle check; auditable only via conversation log (L466) |
-| Skill executes the authorized work | Conflates authorization and execution; loses Two-Level Model separation (L742) |
+| Free-text "go" / "proceed" / "yes" | No record, no scope, no principle check; auditable only via conversation log (L466) |  [instance-only per L600]
+| Skill executes the authorized work | Conflates authorization and execution; loses Two-Level Model separation (L742) |  [instance-only per L600]
 | Override without reason | Healthy Friction without recorded reason is ceremony; reason is the audit value (C-GO-004) |
-| Skipping principle verification "because it's a small change" | L854 Selective Spec-First Application — the very anti-pattern Healthy Friction prevents |
+| Skipping principle verification "because it's a small change" | L854 Selective Spec-First Application — the very anti-pattern Healthy Friction prevents |  [instance-only per L600]
 
 ## Traceability
 
@@ -148,7 +148,7 @@ Grammar: `a` (anchor) + `go` + `xy` optional, where `x` = count digit, `y` = sha
 | Spec | `aget/.aget/specs/skills/SKILL-048_aget-go.yaml` v1.0.0 |
 | Proposal | SP-022 (`planning/skill-proposals/PROPOSAL_aget-go.md`) |
 | Coupled artifact | `governance/GOVERNANCE_PRINCIPLES.md` Tier 2 #11 (Principled Execution) |
-| L-docs | L854 (selective spec-first), L466 (question ≠ approval), L178 (human override), L671 (classification w/o consequence), L42 (gate boundaries) |
+| L-docs | L854 (selective spec-first), L466 (question ≠ approval), L178 (human override), L671 (classification w/o consequence), L42 (gate boundaries) |  [instance-only per L600]
 | Verb family | `propose` (propose-actions, propose-goals, propose-skill, propose-project) → `go` (this skill, authorizes) → execute (agent's next act, this skill does NOT do it) |
 | ADR position | Healthy Friction = between Advisory and Strict (ADR-008 progression); friction mandatory, block principal-elected |
 | Closes | #1136 (GO discipline), #1158 (SKILL-024 GO gate); part of v3.16 INIT-PRINCIPLED-EXECUTION |
