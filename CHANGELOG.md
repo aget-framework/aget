@@ -11,9 +11,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Items accumulated since the most-recent release (v3.19.0, 2026-05-23) that are confirmed in-flight for a future release. Per Keep a Changelog 1.1.0 forward-work convention.
+Items accumulated since the most-recent release (v3.20.0, 2026-05-30) that are confirmed in-flight for a future release. Per Keep a Changelog 1.1.0 forward-work convention.
 
-- **Citation-resolution remediation (R-REL-044 / CAP-REL-035)** — re-baselined from v3.19 to v3.20: resolve the unannotated `L###` / `scripts/*` / `specs/*` citations the citation validator flags on published v3.18/v3.19 surfaces (annotate-instance-only, propagate-to-public, or rewrite), so cross-repo readers no longer hit 404s. Tracked as a v3.20 priority carry.
+- _(none recorded yet)_
+
+---
+
+## [3.20.0] - 2026-05-30
+
+**Theme**: **Debt Paydown + Structural-Guard Deployment + Functional Capability**. The cycle spends an accumulated reliability dividend on three fronts: retiring carry-forward debt (the long-standing citation-resolution 404s and a spec-scoring fault), deploying structural guards that make release-and-close discipline enforced rather than advisory, and adding direct user-facing value on the highest-frequency session surface. The functional floor was raised mid-cycle so the release ships at least one high-reach capability improvement, not only internal hardening.
+
+> **No breaking changes** in v3.20. Existing instances upgrade by version-bump only.
+
+### Added
+
+- **`/aget-propose-actions` presentation enhancement (C-F1)** — the fleet's highest-frequency session command now surfaces, per proposed action, an **Evidence column** (the grounding citation, previously dropped from the table), a **▶ Recommendation line** (the agent's single lead pick + why), and a **⚠ Decisions-needed callout** that lifts judgment-call items out of the autonomous rows. Principals see a recommendation, not just a menu.
+- **Close-gate conformance guard (C-P1)** — a close-gate conformance check (`close_gate_check.py`) mechanically blocks marking a PROJECT_PLAN COMPLETE while V-test gates remain unchecked (replaces manual eyeballing of the prose gate). Wired into the close-project flow.
+- **Health/wind-down signal-class severity (C-P3)** — health and wind-down checks now classify findings by signal class so blocking conditions are distinguished from advisory ones.
+- **"Verify with the consumer's own check" rule (C-P4)** — codified in the release SOP: cross-repo/CI claims are verified by the consumer's actual check (e.g. the real GitHub CI run), not by a local proxy.
+
+### Fixed
+
+- **Duplicate `CAP-REL-035` declaration in `AGET_RELEASE_SPEC` (C-S1)** — the capability was declared twice, tripping the declaration-uniqueness gate and scoring the entire 224-requirement spec as NONE. Merged into the single mature block; spec now scores L5 (Governed).
+- **Citation-resolution remediation (R-REL-044 / CAP-REL-035) (C-D2)** — resolved the unannotated citations the release citation validator flagged on published v3.18/v3.19 surfaces; cross-repo readers no longer hit unexplained 404s.
+- **Citation validator `.aget/specs/` resolver** — the validator falsely 404'd correct `.aget/specs/...` citations (a leading-dot path-resolution bug); now resolves them against the canonical tree, with a regression test.
+- **Framework CI capability (C-I1)** — pre-push hook hardening; corrected a `--critical` mode that would have run hardcoded tests absent from templates.
+
+### Notes
+
+- This release carries internal anti-confabulation and audit-after-synthesis disciplines that govern how the cycle itself was built; those are documented in the framework's internal evolution record.  [instance-only per L600]
 
 ---
 
