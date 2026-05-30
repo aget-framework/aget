@@ -40,7 +40,7 @@ None. v3.20.0 is fully backward-compatible with v3.19.0.
 
 ### Fleet-Wide
 - [ ] One pilot agent confirms v3.20.0 deploys + runs (see Pilot Tracking below)
-- [ ] Coordinator records confirmation before declaring fleet-wide done (L656)
+- [ ] Coordinator records confirmation before declaring fleet-wide done (deployment-verification discipline: implemented ≠ running)
 
 ## DEPLOYMENT_SPEC Note (Option B)
 
@@ -55,7 +55,7 @@ No `specs/deltas/AGET_DELTA_v3.20.md` is shipped. v3.20.0's changes are additive
 | Agent | Version Confirmed | Date | Notes |
 |-------|:-----------------:|------|-------|
 | _(framework owner)_ | 3.20.0 (build) | 2026-05-30 | Built + version-coherence verified (14/14 repos) |
-| _(pilot 1)_ | ⏳ pending | — | Awaiting first downstream deploy + confirm (L656) |
+| _(pilot 1)_ | ⏳ pending | — | Awaiting first downstream deploy + confirm (deployment verification) |
 
 ## References
 
