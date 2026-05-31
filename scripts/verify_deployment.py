@@ -143,6 +143,50 @@ def load_deployment_spec(version, agent_path, framework_root):
                     return yaml.safe_load(f), p
             except (yaml.YAMLError, OSError):
                 continue
+
+    # clause-(b) inherit resolution (RUBRIC_fleet_upgrade_outcome C-A v1.2
+    # non-breaking proviso / RELEASE_HANDOFF Option-B): no exact-version spec
+    # exists, so resolve to the highest published DEPLOYMENT_SPEC with version
+    # <= requested (the "latest available" / explicitly-inherited governing
+    # contract — e.g. v3.20.0 → v3.16.0). Only the STRUCTURAL surface inherits;
+    # stamp validation stays keyed to the requested `version` in the caller.
+    def _spec_ver(name):
+        if not (name.startswith("DEPLOYMENT_SPEC_v") and name.endswith(".yaml")):
+            return None
+        parts = name[len("DEPLOYMENT_SPEC_v"):-len(".yaml")].split(".")
+        if len(parts) != 3 or not all(x.isdigit() for x in parts):
+            return None
+        return tuple(int(x) for x in parts)
+
+    try:
+        req = tuple(int(x) for x in (version.split(".") + ["0", "0", "0"])[:3])
+    except (ValueError, AttributeError):
+        return None, None
+    best = None  # (version_tuple, path)
+    search_dirs = [agent_path / "aget", Path.home() / "github" / "aget-framework" / "aget"]
+    if framework_root:
+        search_dirs.insert(0, framework_root / "aget")
+    seen_dirs = set()
+    for d in search_dirs:
+        try:
+            key = d.resolve()
+        except OSError:
+            key = d
+        if key in seen_dirs or not d.is_dir():
+            continue
+        seen_dirs.add(key)
+        for sp in d.glob("DEPLOYMENT_SPEC_v*.yaml"):
+            v = _spec_ver(sp.name)
+            if v is None or v > req:
+                continue
+            if best is None or v > best[0]:
+                best = (v, sp)
+    if best:
+        try:
+            with open(best[1]) as f:
+                return yaml.safe_load(f), best[1]
+        except (yaml.YAMLError, OSError):
+            pass
     return None, None
 
 
@@ -564,7 +608,9 @@ def main():
     if spec:
         ucount = (spec.get("universal_skills") or {}).get("count", "?")
         archs = (spec.get("archetype_specific") or {}).get("per_archetype_action") or {}
-        print(f"Spec: {spec_path.name} (v3.16+ surface; {ucount} universal skills; {len(archs)} archetypes)")
+        inherited = f"v{version}" not in spec_path.name
+        tag = f" [inherited: v{version} → {spec_path.name}; non-breaking Option-B, RUBRIC C-A v1.2]" if inherited else ""
+        print(f"Spec: {spec_path.name} (v3.16+ surface; {ucount} universal skills; {len(archs)} archetypes){tag}")
     elif _version_ge(version, "3.16.0"):
         if not YAML_AVAILABLE:
             print(f"Spec: pyyaml NOT INSTALLED — falling back to legacy v3.15 surface (install: pip install pyyaml)")

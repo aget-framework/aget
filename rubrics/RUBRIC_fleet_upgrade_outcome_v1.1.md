@@ -1,6 +1,6 @@
 # Fleet Upgrade Release Outcome Rubric
 
-**Version**: 1.1.0
+**Version**: 1.2.0
 **Created**: 2026-04-26
 **Updated**: 2026-04-26 (v1.1.0 — calibration from two scored instances)
 **Author**: private-aget-framework-AGET v3.15.0
@@ -40,6 +40,7 @@ Evaluate the quality and completeness of a fleet upgrade release outcome. Closes
 **Version history**:
 - v1.0.0 (2026-04-26): Initial draft; first scored instance FLEET-UPG-013. Draft status pending calibration.
 - v1.1.0 (2026-04-26): Active status after second scored instance. Five calibration fixes applied (C-A timing, C-D format-agnostic, D3.3 L100 vocabulary, D4.1 format-agnostic, D4.3 clarification). FLEET-UPG-NNN namespacing note added.
+- v1.2.0 (2026-05-30): C-A made conditional on `breaking_release` (#1517 D3 ruling R1, requested via private-supervisor-AGET reconciliation memo). Non-breaking releases satisfy C-A via an explicitly-inherited, origin/main-published spec (3-part proviso); breaking releases still require a version-specific spec; documenting absence still fails. Closes the text-vs-intent gap where Option-B-inherit (v3.20 → v3.16.0) failed C-A literally despite meeting its intent. Note: the prior #1517 ruling comment misattributed "13/15 Exemplary" to v3.16 — 13/15 is FLEET-UPG-013/v3.15.0 (main fleet) per the calibration table above; v3.16 (FLEET-UPG-014) is a distinct per-fleet id (§FLEET-UPG-NNN namespace note); immaterial to C-A (v3.16 passes either way).
 
 ## Scope
 
@@ -85,7 +86,7 @@ These pass/fail before the release is eligible for graduated scoring. **Any cons
 
 | ID | Constraint | Pass Criterion |
 |----|------------|----------------|
-| C-A | **DEPLOYMENT_SPEC published before rollout** | `aget/DEPLOYMENT_SPEC_vX.Y.Z.yaml` committed and pushed to `origin/main` before any agent upgraded. Note: satisfying C-A requires the artifact to be on `origin/main` before rollout begins — it need not be in the release tag. If the release tag was cut before the artifact was created (tag-vs-HEAD pattern), C-A is still PASS provided `origin/main` had the artifact before the adopter's upgrade started. |
+| C-A | **DEPLOYMENT_SPEC governing the release published before rollout** | **Conditional on release type** (keyed to the `breaking_release` field in the DEPLOYMENT_SPEC). **Breaking** (`breaking_release: true`): a version-specific `aget/DEPLOYMENT_SPEC_vX.Y.Z.yaml` (X.Y.Z = release version) committed + pushed to `origin/main` before any agent upgraded. **Non-breaking** (`breaking_release: false`): satisfied by the most-recent published DEPLOYMENT_SPEC the release **explicitly inherits**, PROVIDED **(1)** that inherited spec is committed + pushed to `origin/main` before rollout, **(2)** the release **names** the inherited source spec in its handoff/Gate-0, AND **(3)** the deployment contract is genuinely unchanged (no new install/verify/sleeping-requirement steps). Documenting the **absence** of any governing spec does **NOT** satisfy C-A (the declined β-path, #1517). Tag-vs-HEAD: the governing artifact need not be in the release tag — `origin/main` having it before the adopter's upgrade started suffices. (Amended v1.2.0 per #1517 D3 ruling R1, 2026-05-30.) |
 | C-B | **All known residuals filed before close-out** | Every identified issue has a GitHub issue number filed before `Plan_Status: COMPLETE` is set |
 | C-C | **Plan_Status field is COMPLETE** | The plan-level `**Plan_Status**:` field reads `COMPLETE` (distinct from per-gate `**Status**:` or `**Gate_Status**:` fields) |
 | C-D | **All V-test outcomes recorded at time of report** | All V-tests in each gate block have a recorded outcome at time this report is authored. For checkbox-format plans: zero unchecked `- [ ]` V-test rows. For execution-log-format plans: every V-test item has a prose outcome entry (PASS/FAIL/SKIP with rationale). Format determines representation; the constraint is outcome coverage, not checkbox state. |
