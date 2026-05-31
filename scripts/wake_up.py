@@ -110,7 +110,14 @@ def load_json_file(path: Path, default: Any = None) -> Any:
 
 
 def get_git_status(agent_path: Path) -> Dict[str, Any]:
-    """Get git status for the agent directory."""
+    """Get git status for the agent directory.
+
+    Returns the uncommitted-file list (`changes`), not just a clean/dirty
+    flag, so the agent reconciles the inherited working tree at boot rather
+    than glossing "(dirty)" and later asserting "nothing changed" without
+    having established a baseline. (Reconcile-dirty-tree-at-boot; promotes a
+    one-off session critique into the script per L467 single-channel gap.)
+    """
     try:
         result = subprocess.run(
             ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
@@ -124,11 +131,16 @@ def get_git_status(agent_path: Path) -> Dict[str, Any]:
             capture_output=True, text=True, timeout=5,
             cwd=str(agent_path),
         )
-        clean = len(result2.stdout.strip()) == 0 if result2.returncode == 0 else None
+        if result2.returncode == 0:
+            changes = [ln for ln in result2.stdout.splitlines() if ln.strip()]
+            clean = len(changes) == 0
+        else:
+            changes = []
+            clean = None
 
-        return {'branch': branch, 'clean': clean}
+        return {'branch': branch, 'clean': clean, 'changes': changes}
     except (subprocess.TimeoutExpired, FileNotFoundError):
-        return {'branch': 'unknown', 'clean': None}
+        return {'branch': 'unknown', 'clean': None, 'changes': []}
 
 
 def get_calendar_context(config: Dict[str, Any]) -> Dict[str, Any]:
@@ -436,6 +448,21 @@ def format_human_output(data: Dict[str, Any]) -> str:
             lines.append(f"Git: {git['branch']} ({status})")
         else:
             lines.append(f"Git: {git['branch']}")
+
+        # Reconcile-dirty-tree-at-boot: surface the actual uncommitted files
+        # so the inherited tree is reconciled (commit/stash/explain), not
+        # glossed, before any "nothing changed" claim. (L467 structural fix.)
+        changes = git.get('changes') or []
+        if changes:
+            max_show = config.get('git_dirty_max_files', 10)
+            lines.append(
+                f"  ⚠ Uncommitted ({len(changes)}) — reconcile before "
+                f"claiming a clean baseline:"
+            )
+            for ln in changes[:max_show]:
+                lines.append(f"    {ln}")
+            if len(changes) > max_show:
+                lines.append(f"    … +{len(changes) - max_show} more")
 
     # Structure (toggle: show_structure)
     if config.get('show_structure', False):
