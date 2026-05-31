@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Items accumulated since the most-recent release (v3.20.0, 2026-05-30) that are confirmed in-flight for a future release. Per Keep a Changelog 1.1.0 forward-work convention.
+Items accumulated since the most-recent release (v3.20.2, 2026-05-31) that are confirmed in-flight for a future release. Per Keep a Changelog 1.1.0 forward-work convention.
 
 - _(none recorded yet)_
 
