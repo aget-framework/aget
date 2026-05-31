@@ -17,6 +17,18 @@ Items accumulated since the most-recent release (v3.20.2, 2026-05-31) that are c
 
 ---
 
+## [3.20.3] - 2026-05-31
+
+**Theme**: C-P3 Correctness Fix
+
+> **No breaking changes.** Patch — corrects a verifier defect shipped in v3.20.2, before fleet rollout (fix-once-not-N).
+
+### Fixed
+
+- **C-P3 silent-skip → false-clean (gmelli/aget-aget#1553)** — `check_structural_skill_frontmatter` skipped any D71-STRUCTURAL skill whose `SKILL.md` was absent (`if not sk.is_file(): continue`) and then reported "clean," conflating *present-and-clean* with *absent, couldn't check*. It now emits a **warning** listing absent structural skills (`"N/4 present + clean; ABSENT: …"`) — a mandated-but-missing skill is surfaced, not hidden (an absent D71-STRUCTURAL skill is arguably the worse violation: the agent cannot model-invoke it). Propagated to all 13 templates. Surfaced during the v3.20.2 supervisor pilot; the C-P3 defect would have false-passed a run-and-check-clean rollout pilot, so it was fixed in canonical before any fleet dispatch.
+
+---
+
 ## [3.20.2] - 2026-05-31
 
 **Theme**: **Consumer-Surface Delivery**. v3.20.0 advertised three consumer-facing capabilities (C-F1/C-P1/C-P3) that were implemented and changelogged but **never reached the 13 template repositories consumers pull** (verified 0/13). v3.20.2 delivers them to the consumer surface — closing the author-surface/consumer-surface gap that let an advertised capability pass release green while absent from what consumers actually pull.

@@ -343,9 +343,11 @@ def check_structural_skill_frontmatter(agent_path: Path) -> CheckResult:
         return CheckResult("structural_skill_frontmatter", True,
                            "No .claude/skills/ — not applicable", "info")
     offenders = []
+    absent = []
     for skill in D71_STRUCTURAL_SKILLS:
         sk = skills_dir / skill / "SKILL.md"
         if not sk.is_file():
+            absent.append(skill)
             continue
         try:
             text = sk.read_text(encoding="utf-8", errors="ignore")
@@ -365,8 +367,17 @@ def check_structural_skill_frontmatter(agent_path: Path) -> CheckResult:
             "D71 violation: disable-model-invocation on STRUCTURAL skill(s): "
             f"{', '.join(offenders)} — agent cannot model-invoke; remove the flag (ref #1489)",
             severity="error", fixable=True)
+    if absent:
+        present = len(D71_STRUCTURAL_SKILLS) - len(absent)
+        return CheckResult(
+            "structural_skill_frontmatter", True,
+            f"{present}/{len(D71_STRUCTURAL_SKILLS)} D71-STRUCTURAL skills present + clean; "
+            f"ABSENT (not model-invocable; expected if unmigrated phantom, else drift): "
+            f"{', '.join(absent)} (ref #1553)",
+            severity="warning")
     return CheckResult("structural_skill_frontmatter", True,
-                       "No D71-STRUCTURAL skill carries disable-model-invocation", "info")
+                       f"All {len(D71_STRUCTURAL_SKILLS)} D71-STRUCTURAL skills present + "
+                       "carry no disable-model-invocation", "info")
 
 
 def run_housekeeping(agent_path: Path, verbose: bool = False) -> Dict[str, Any]:

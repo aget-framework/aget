@@ -1,5 +1,5 @@
 {
-  "aget_version": "3.20.2",
+  "aget_version": "3.20.3",
   "created": "2025-09-21",
   "updated": "2026-05-31",
   "component": "core",
@@ -38,7 +38,8 @@
     "v3.16.0 -> v3.17.0: 2026-05-09",
     "v3.18.0 -> v3.19.0: 2026-05-23 (version sync)",
     "v3.19.0 -> v3.20.0: 2026-05-30",
-    "v3.20.0 -> v3.20.2: 2026-05-31 (consumer-surface delivery: C-F1/C-P1/C-P3 to 13 templates; v3.20.1 tagged-not-released; gh#1551)"
+    "v3.20.0 -> v3.20.2: 2026-05-31 (consumer-surface delivery: C-F1/C-P1/C-P3 to 13 templates; v3.20.1 tagged-not-released; gh#1551)",
+    "v3.20.2 -> v3.20.3: 2026-05-31 (C-P3 #1553 fix: absent D71 skill -> warning, no false-clean)"
   ],
   "contents": {
     "specs/": "Canonical specifications (AGET_VERSIONING_CONVENTIONS, etc.)",
