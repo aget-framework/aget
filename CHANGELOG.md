@@ -17,6 +17,21 @@ Items accumulated since the most-recent release (v3.20.0, 2026-05-30) that are c
 
 ---
 
+## [3.20.1] - 2026-05-31
+
+**Patch — release-accuracy reachability (gh#1549).** No functional change beyond v3.20.0. The v3.20.0 release-quality corrections landed on `main` *after* the `v3.20.0` tag was cut, so they were unreachable to consumers pinning the tag (the tag-vs-HEAD 404 pattern, gh#1274 class). This patch tag makes them reachable.
+
+### Fixed
+
+- **C-P1 `scripts/close_gate_check.py` reachable at tag** — the close-gate conformance guard was promoted to canonical post-tag; now present at `v3.20.1` so tag-pinned consumers can adopt it.
+- **C-P3 CHANGELOG correction reachable at tag** — the `[3.20.0]` entry's prior "Health/wind-down signal-class severity" mischaracterization (corrected to the #1489 `check_structural_skill_frontmatter` D71 guard) is now reachable at a tag.
+
+### Notes
+
+- Tagged at the gh#1549 remediation commit, **excluding** later `main` work held for v3.21. Consumers who pinned `v3.20.0` should re-pin `v3.20.1` (or read `main`) for C-P1/C-P3; C-F1 presentation ships via the `template-*-aget` repos.
+
+---
+
 ## [3.20.0] - 2026-05-30
 
 **Theme**: **Debt Paydown + Structural-Guard Deployment + Functional Capability**. The cycle spends an accumulated reliability dividend on three fronts: retiring carry-forward debt (the long-standing citation-resolution 404s and a spec-scoring fault), deploying structural guards that make release-and-close discipline enforced rather than advisory, and adding direct user-facing value on the highest-frequency session surface. The functional floor was raised mid-cycle so the release ships at least one high-reach capability improvement, not only internal hardening.
