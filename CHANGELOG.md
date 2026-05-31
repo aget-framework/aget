@@ -27,7 +27,7 @@ Items accumulated since the most-recent release (v3.20.0, 2026-05-30) that are c
 
 - **`/aget-propose-actions` presentation enhancement (C-F1)** — the fleet's highest-frequency session command now surfaces, per proposed action, an **Evidence column** (the grounding citation, previously dropped from the table), a **▶ Recommendation line** (the agent's single lead pick + why), and a **⚠ Decisions-needed callout** that lifts judgment-call items out of the autonomous rows. Principals see a recommendation, not just a menu.
 - **Close-gate conformance guard (C-P1)** — a close-gate conformance check (`close_gate_check.py`) mechanically blocks marking a PROJECT_PLAN COMPLETE while V-test gates remain unchecked (replaces manual eyeballing of the prose gate). Wired into the close-project flow.
-- **Health/wind-down signal-class severity (C-P3)** — health and wind-down checks now classify findings by signal class so blocking conditions are distinguished from advisory ones.
+- **Structural-skill frontmatter guard (C-P3)** — `health_check.py` gains `check_structural_skill_frontmatter` (ref gmelli/aget-aget#1489): detects D71 structural skills carrying `disable-model-invocation: true` (which would leave the agent unable to model-invoke them) and flags them as errors. *(Corrected 2026-05-30: the prior entry described "health/wind-down signal-class severity," which did not match the shipped artifact — the v3.20 `health_check.py` change is the #1489 frontmatter guard, and `wind_down.py` was unchanged. Release-accuracy fix per gmelli/aget-aget#1549.)*
 - **"Verify with the consumer's own check" rule (C-P4)** — codified in the release SOP: cross-repo/CI claims are verified by the consumer's actual check (e.g. the real GitHub CI run), not by a local proxy.
 
 ### Fixed
