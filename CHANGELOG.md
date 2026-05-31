@@ -17,6 +17,35 @@ Items accumulated since the most-recent release (v3.20.0, 2026-05-30) that are c
 
 ---
 
+## [3.20.2] - 2026-05-31
+
+**Theme**: **Consumer-Surface Delivery**. v3.20.0 advertised three consumer-facing capabilities (C-F1/C-P1/C-P3) that were implemented and changelogged but **never reached the 13 template repositories consumers pull** (verified 0/13). v3.20.2 delivers them to the consumer surface — closing the author-surface/consumer-surface gap that let an advertised capability pass release green while absent from what consumers actually pull.
+
+> **No breaking changes.** Existing instances upgrade by version-bump only.
+
+### Added (delivered to consumer surface)
+
+- **C-F1 / C-P1 / C-P3 now present in all 13 templates** (verified 13/13 by the consumer's own check) — previously author-surface-only:
+  - **C-F1** `/aget-propose-actions` presentation (Evidence column · ▶ Recommendation · ⚠ Decisions) — synced into 12 templates; **created** in `template-document-processor-AGET` (which lacked the skill).
+  - **C-P1** `close_gate_check.py` close-gate conformance guard — added to all 13.
+  - **C-P3** `check_structural_skill_frontmatter` — added **additively** to each template's `health_check.py` (local checks preserved; not a wholesale replace).
+
+### Fixed
+
+- **Consumer-surface propagation gap (gmelli/aget-aget#1551)** — v3.20.0's "Functional Capability" theme reached the author surface but not the templates; v3.20.2 completes the delivery (0/13 → 13/13).
+
+### Deferred (NOT shipped in v3.20.2 — tracked for fast-follow)
+
+- **Blocking consumer-reachability release gate** (Tier 2) — the structural gate that resolves every advertised capability to the consumer surface at release time. **Priority fast-follow**; not built here (would be rushed).
+- **Canonical skill source-of-truth + skill divergence gating** (Tier 3) — pending a canonical-home decision.
+- **`template-document-processor-AGET` CI** — the template lacks `ci.yml` and standard v3.0 structure; adding CI would expose a pre-existing red. Structural completion deferred.
+
+### Notes
+
+- **v3.20.1** was tagged in canonical (tag-vs-HEAD reachability fix, gmelli/aget-aget#1549) but never released to the consumer surface; v3.20.2 is that consumer-surface completion. The 3 capabilities are verified present 13/13 by direct re-derivation, not by proxy.
+
+---
+
 ## [3.20.0] - 2026-05-30
 
 **Theme**: **Debt Paydown + Structural-Guard Deployment + Functional Capability**. The cycle spends an accumulated reliability dividend on three fronts: retiring carry-forward debt (the long-standing citation-resolution 404s and a spec-scoring fault), deploying structural guards that make release-and-close discipline enforced rather than advisory, and adding direct user-facing value on the highest-frequency session surface. The functional floor was raised mid-cycle so the release ships at least one high-reach capability improvement, not only internal hardening.
