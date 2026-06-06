@@ -38,7 +38,7 @@ This directory contains two categories of rubric:
 
 | File | Process | What it measures | Application |
 |---|---|---|---|
-| [`RUBRIC_fleet_upgrade_outcome_v1.1.md`](RUBRIC_fleet_upgrade_outcome_v1.1.md) | Fleet upgrade (FLEET-UPG-NNN) | Coverage fidelity, BC management, residual capture, gate discipline, upstream value | Self-check before close-out; principal meta-assessment per release. Max 15. ≥10 required to declare complete. |
+| [`RUBRIC_fleet_upgrade_outcome_v1.1.md`](RUBRIC_fleet_upgrade_outcome_v1.1.md) _(file `_v1.1.md`; content **v1.2.1** — amended in place; convention pending gh#1599)_ | Fleet upgrade (FLEET-UPG-NNN) | Coverage fidelity, BC management, residual capture, gate discipline, upstream value | Self-check before close-out; principal meta-assessment per release. Max 15. ≥10 required to declare complete. |
 | [`RUBRIC_minor_release_scope_v1.0.md`](RUBRIC_minor_release_scope_v1.0.md) | MINOR release scope-lock (vX.Y.0) | Per-item-type effective hours, cycle capacity, Tier sizing heuristic | Pre-cycle scope-lock; mid-cycle re-scope; post-cycle calibration. Replaces informal "1 SU = 1h" rule. v3.16.0 N=1 calibration; quarterly refresh. |
 
 ---
