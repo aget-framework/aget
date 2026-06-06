@@ -43,7 +43,7 @@ P1 Governed Autonomy had no unattended specialization. The gap surfaced 2026-06-
 
 **Statement**: The SYSTEM shall declare the autonomy envelope in the `.aget/config.json` `unattended_autonomy` block, and the SYSTEM shall NOT infer the envelope at runtime.
 
-**Pattern**: ubiquitous · **Enforcement**: V-UNATTEND-002 (runnable-now — schema presence + parseability). [Q1 resolved 2026-06-06, supervisor disposition: config.json block, not a dedicated `unattended_envelope.json`.]
+**Pattern**: ubiquitous · **Enforcement**: V-UNATTEND-002 (runtime-pending — no config block exists yet). [Q1 resolved 2026-06-06, supervisor disposition: config.json block, not a dedicated `unattended_envelope.json`.]
 
 ### CAP-UNATTEND-003: Public-surface escalation
 
@@ -73,7 +73,7 @@ P1 Governed Autonomy had no unattended specialization. The gap surfaced 2026-06-
 
 **Statement**: WHEN an unattended run completes, the SYSTEM shall leave an audit record naming what ran, what was in-envelope, and what escalated.
 
-**Pattern**: event-driven · **Enforcement**: V-UNATTEND-007 (runnable-now once C-21-16 ledger format lands); composes release-observability (C-21-16)
+**Pattern**: event-driven · **Enforcement**: V-UNATTEND-007 (runtime-pending — needs ledger format + an unattended run); composes release-observability (C-21-16)
 
 ### CAP-UNATTEND-008: Multi-tenant share (advisory)
 
@@ -103,17 +103,17 @@ P1 Governed Autonomy had no unattended specialization. The gap surfaced 2026-06-
 
 ## Validation
 
-One V-test per requirement (full CAP↔V-test coverage). **Runnable-now** = mechanically checkable against governed artifacts today; **Runtime-pending** = requires the unattended-host runtime (INIT-ALWAYS-ON-HOST) to exercise the behavior — authored as falsifiers, executed when the substrate exists (L622 Phase 5 wiring).
+One V-test per requirement (full CAP↔V-test coverage). **Runtime-pending** = requires the unattended-host runtime (INIT-ALWAYS-ON-HOST) and/or the `.aget/config.json` `unattended_autonomy` block to exercise the behavior — authored as falsifiers, executed when the substrate exists (L622 Phase 5 wiring). **Honest-testability note (2026-06-06)**: this spec governs a runtime that does not yet exist, so **all 8 behavioral V-tests are runtime-pending**; the only check runnable today is the **CAP↔V coverage-invariant meta-test** (the req↔test bijection over this spec body). No behavioral validator is labeled runnable-now until its target artifact exists — avoiding the L0/test-theater overclaim (ADR-007).
 
 | V-test ID | Requirement | Method | Falsifier | Class |
 |-----------|-------------|--------|-----------|-------|
 | V-UNATTEND-001 | CAP-UNATTEND-001 | runtime | An out-of-envelope action that proceeds instead of escalating (fail-safe inverted) | Runtime-pending |
-| V-UNATTEND-002 | CAP-UNATTEND-002 | automated | An envelope inferred at runtime rather than read from `.aget/config.json` `unattended_autonomy` | **Runnable-now** |
+| V-UNATTEND-002 | CAP-UNATTEND-002 | runtime | An envelope inferred at runtime rather than read from `.aget/config.json` `unattended_autonomy` | Runtime-pending (no config block exists yet — testing "presence + parseability" now is vacuous; exercised once the block schema + unattended runtime land) |
 | V-UNATTEND-003 | CAP-UNATTEND-003 | runtime | An unattended run mutating a public `aget-framework/*` surface without escalation | Runtime-pending |
 | V-UNATTEND-004 | CAP-UNATTEND-004 | runtime | An unattended write into another agent's repo without escalation; a cross-fleet read that escalates = false-positive (reads permitted) | Runtime-pending |
 | V-UNATTEND-005 | CAP-UNATTEND-005 | runtime | An unattended run executing a forgeable/unauthenticated dispatch without the trust-channel (read→judge→run) | Runtime-pending |
 | V-UNATTEND-006 | CAP-UNATTEND-006 | runtime | An unattended run performing open-ended self-modification beyond detect-propose-verify | Runtime-pending |
-| V-UNATTEND-007 | CAP-UNATTEND-007 | automated | An unattended run completing with no audit record (what ran / in-envelope / escalated) | **Runnable-now** (once ledger format lands) |
+| V-UNATTEND-007 | CAP-UNATTEND-007 | runtime | An unattended run completing with no audit record (what ran / in-envelope / escalated) | Runtime-pending (needs ledger format + an unattended run — "runnable-now once X lands" is not runnable now) |
 | V-UNATTEND-008 | CAP-UNATTEND-008 | runtime | A tenant-isolation breach; exceeding declared share at v1.0.0 = **advisory warn** (warn-emitted is PASS; hard-refuse is false-positive until the ≥2-tenant revisit trigger fires) | Runtime-pending |
 
 **Coverage invariant**: every `CAP-UNATTEND-00N` SHALL have a paired `V-UNATTEND-00N`. The private working draft (`private-aget-framework-AGET/aget/drafts/AGET_UNATTENDED_AUTONOMY_SPEC_v0.1.0.md`, IDs `REQ-UA-*`/`V-UA-*`) enforces the bijection mechanically via `tests/test_unattended_autonomy_spec.py` (5/5 PASS); canonical IDs map `REQ-UA-00N → CAP-UNATTEND-00N` and `V-UA-00N → V-UNATTEND-00N`.
