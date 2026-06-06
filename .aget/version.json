@@ -1,7 +1,7 @@
 {
-  "aget_version": "3.20.3",
+  "aget_version": "3.21.0",
   "created": "2025-09-21",
-  "updated": "2026-05-31",
+  "updated": "2026-06-06",
   "component": "core",
   "description": "AGET Framework Core - Specifications, templates, and validation",
   "repository": "aget-framework/aget",
@@ -39,7 +39,8 @@
     "v3.18.0 -> v3.19.0: 2026-05-23 (version sync)",
     "v3.19.0 -> v3.20.0: 2026-05-30",
     "v3.20.0 -> v3.20.2: 2026-05-31 (consumer-surface delivery: C-F1/C-P1/C-P3 to 13 templates; v3.20.1 tagged-not-released; gh#1551)",
-    "v3.20.2 -> v3.20.3: 2026-05-31 (C-P3 #1553 fix: absent D71 skill -> warning, no false-clean)"
+    "v3.20.2 -> v3.20.3: 2026-05-31 (C-P3 #1553 fix: absent D71 skill -> warning, no false-clean)",
+    "v3.20.3 -> v3.21.0: 2026-06-06 (Always-On Fleet Operations, governance-scoped: unattended-autonomy spec, IAC SOP, release-observability, create-initiative canonical deploy, check_initiatives engine)"
   ],
   "contents": {
     "specs/": "Canonical specifications (AGET_VERSIONING_CONVENTIONS, etc.)",

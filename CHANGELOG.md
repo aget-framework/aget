@@ -11,9 +11,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Items accumulated since the most-recent release (v3.20.3, 2026-05-31) that are confirmed in-flight for a future release. Per Keep a Changelog 1.1.0 forward-work convention.
+Items accumulated since v3.21.0 that are confirmed in-flight for a future release. Per Keep a Changelog 1.1.0 forward-work convention.
 
 - _(none recorded yet)_
+
+---
+
+## [3.21.0] - 2026-06-06
+
+**Theme**: Always-On Fleet Operations (governance-scoped)
+
+> **No breaking changes.** Minor — governance scaffolding for unattended/always-on operation. This release ships the **artifacts**; the operational runtime (24×7 host, cross-machine dispatch, fleet-cohort) is deferred to v3.22. This is a net governance-inflow release landing alongside an open fleet-wide inflow-governance gap (gmelli/aget-aget#1592); the first concrete *outflow* primitive (MEMORY.md compaction) landed in the same cycle.
+
+### Added
+- **Unattended-autonomy specification** (`aget/specs/AGET_UNATTENDED_AUTONOMY_SPEC.md` v1.0.0): 8 EARS requirements (CAP-UNATTEND-001..008) bounding what an agent MAY do unattended (scheduled/headless/always-on) vs MUST escalate — autonomy envelope (declared in `.aget/config.json`), fail-safe escalation default, dispatch trust-channel, bounded self-modification, audit-record, advisory multi-tenant share. Composes L480/L735/C861/L1011. All behavioral V-tests runtime-pending (governs a runtime not yet built — no test-theater).
+- **`check_initiatives.py`** — read-only portfolio rollup across `planning/initiatives/INIT-*.md` (inventory by status, 0-COMPLETE anomaly, past-target Loading-Dock, staleness, cohort clusters); 10 V-tests.
+- **`/aget-create-initiative`** deployed to canonical core (STRICT, D71 — closes the verb-pair gap with `/aget-propose-initiative`).
+
+### Changed
+- **IAC SOP** (`SOP_cross_aget_communication.md`) per-pattern maturity reconciliation (P1 Relay + P1.5 Read-at-Source → Implemented; cross-machine patterns honestly Pending).
+- **Release observability** (C-21-16): release-metrics ledger now live-captures real build-gate data; `deployment_monitor.py` outcome-record crash fixed (gh#1589).
 
 ---
 
