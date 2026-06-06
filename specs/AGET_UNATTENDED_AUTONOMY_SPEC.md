@@ -4,7 +4,7 @@
 **Status**: Active
 **Category**: Standards
 **Created**: 2026-06-06
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/AGET_UNATTENDED_AUTONOMY_SPEC.md`
 **Format**: AGET_SPEC_FORMAT v1.3
 **Change Proposal**: v3.21.0 (VERSION_SCOPE_v3.21.0 Tier-1 C-21-11)
@@ -116,7 +116,7 @@ One V-test per requirement (full CAP↔V-test coverage). **Runtime-pending** = r
 | V-UNATTEND-007 | CAP-UNATTEND-007 | runtime | An unattended run completing with no audit record (what ran / in-envelope / escalated) | Runtime-pending (needs ledger format + an unattended run — "runnable-now once X lands" is not runnable now) |
 | V-UNATTEND-008 | CAP-UNATTEND-008 | runtime | A tenant-isolation breach; exceeding declared share at v1.0.0 = **advisory warn** (warn-emitted is PASS; hard-refuse is false-positive until the ≥2-tenant revisit trigger fires) | Runtime-pending |
 
-**Coverage invariant**: every `CAP-UNATTEND-00N` SHALL have a paired `V-UNATTEND-00N`. The private working draft (`private-aget-framework-AGET/aget/drafts/AGET_UNATTENDED_AUTONOMY_SPEC_v0.1.0.md`, IDs `REQ-UA-*`/`V-UA-*`) enforces the bijection mechanically via `tests/test_unattended_autonomy_spec.py` (5/5 PASS); canonical IDs map `REQ-UA-00N → CAP-UNATTEND-00N` and `V-UA-00N → V-UNATTEND-00N`.
+**Coverage invariant**: every `CAP-UNATTEND-00N` SHALL have a paired `V-UNATTEND-00N`. The framework manager's working draft (`aget/specs/drafts/`, IDs `REQ-UA-*`/`V-UA-*`) enforces the bijection mechanically via `tests/test_unattended_autonomy_spec.py` (5/5 PASS); canonical IDs map `REQ-UA-00N → CAP-UNATTEND-00N` and `V-UA-00N → V-UNATTEND-00N`.
 
 ---
 

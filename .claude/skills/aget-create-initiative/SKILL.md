@@ -47,7 +47,7 @@ This skill SHALL be interpreted in terms of the following AGET ontology concepts
   matures (currently author-asserted).
 
 Vocabulary version: `ontology/ONTOLOGY_personal_ai_systems_v1.0.yaml` v1.0.0.
-Concept Editor (`aget:concept/ConceptEditorRole` C657): private-aget-framework-AGET.
+Concept Editor (`aget:concept/ConceptEditorRole` C657): aget-framework.
 
 ## Input
 
