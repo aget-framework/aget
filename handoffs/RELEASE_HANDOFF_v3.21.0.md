@@ -10,6 +10,30 @@
 
 v3.21.0 is a **net governance-inflow** release: it ships the bounding rules for unattended/always-on agent operation **before** the runtime that consumes them (artifact-now / operations-later — the 24×7 host, cross-machine dispatch, and fleet-cohort runtime are deferred to the next minor). The release also lands a read-only initiative portfolio rollup and promotes `/aget-create-initiative` to STRICT canonical core (closing its verb-pair gap with `/aget-propose-initiative`). Existing instances upgrade by version-bump only.
 
+## Context for External Fleets
+
+> **Per R-REL-019-02**: explains concepts that may not be obvious to fleets outside the managing organization.
+
+### What is `AGET_UNATTENDED_AUTONOMY_SPEC`?
+
+A governance contract for agents that run **without a human in the loop** (scheduled jobs, always-on hosts, headless dispatch).
+
+- **Problem it solves**: an unattended agent needs explicit, testable boundaries on what it may decide alone versus what it must pause and escalate — otherwise "autonomy" silently widens at the worst time.
+- **What it does**: 8 EARS requirements (`CAP-UNATTEND-001..008`) draw that line. It is *specification only* — no runtime ships this release.
+- **Deploy to**: any agent you intend to run unattended. If all your agents are interactive, this is informational; copy the spec but skip the config envelope.
+
+### What is `check_initiatives.py`?
+
+A read-only portfolio rollup over an agent's `planning/initiatives/INIT-*.md` files.
+
+- **Problem it solves**: long-running initiatives drift — some go past their target date, some get approved but never scaffolded, some go stale — and nothing surfaces the whole picture at once.
+- **What it does**: inventories initiatives by status and flags past-target, approved-but-unscaffolded, and stale items (it does not modify anything).
+- **If it fails**: it is non-blocking and read-only — a failure means you simply have no rollup, not a broken agent.
+
+### Why `/aget-create-initiative` went STRICT
+
+It mirrors the existing `/aget-propose-initiative` so the propose→create verb-pair is symmetric. STRICT (D71) means: once initiatives are part of your governance, the canonical skill is the required path to create one (direct file authoring bypasses spec-conformance and self-verification). External fleets not using initiatives are unaffected.
+
 ## What Changed
 
 ### Added
