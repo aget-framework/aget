@@ -27,6 +27,8 @@ python3 scripts/wake_up.py
 # Should display new version
 ```
 
+> **Verify SUBSTANCE, not just the version label.** The version reading the new number means the *label* is set — not that the release payload reached your source or the deployment contract is published. A version bump does **not** copy new artifacts. Before relying on the upgrade: (1) confirm `aget/DEPLOYMENT_SPEC_v<new>.yaml` exists and read it; (2) confirm your `template-{archetype}-aget` source actually contains the release's new files (an empty source pulls nothing); (3) post-upgrade, run the **full** `health_check` — *version-pass ≠ health-pass* — and check L444 coherence against the field your manifest actually uses (worker = top-level `version:`, researcher = `instance.version:`). Source: FLEET-UPG-023.
+
 **Time**: ~5 minutes
 
 **Risk**: Low (backwards compatible)

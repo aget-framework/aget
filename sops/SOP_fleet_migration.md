@@ -199,6 +199,21 @@ cat /path/to/your/aget-framework/aget/.aget/version.json | grep aget_version
 ```
 **Expected**: Target version (e.g., "3.3.0")
 
+#### V0.5.3b: SUBSTANCE Verification (version label ≠ payload present)
+
+The version reading X.Y.Z confirms the *label* is set — NOT that the deployment contract is published or your source contains the release payload. A version bump does **not** copy new artifacts. Verify substance before migrating (FLEET-UPG-023 lessons):
+
+```bash
+FW=/path/to/your/aget-framework
+# (a) Deployment contract published (read it — detection clauses + breaking_release):
+test -f $FW/aget/DEPLOYMENT_SPEC_vX.Y.Z.yaml && echo "PASS: spec" || echo "FAIL: no DEPLOYMENT_SPEC_vX.Y.Z — STOP, do NOT relabel 'no spec' as version.json"
+# (b) Your template source actually CONTAINS the release's new artifacts (list them per release notes):
+#     for each new artifact: test -f $FW/template-{archetype}-aget/<path> || echo "FAIL: empty source pulls nothing — STOP"
+```
+**Expected**: PASS on both. **If FAIL**: STOP — migrating from an empty source, or relabeling a missing contract as a "deviation," are real observed failures (FLEET-UPG-023). Pull/escalate first.
+
+Post-rollout, remember: **version-pass ≠ health-pass** — run the *full* `health_check`, expect pre-existing drift; and L444 coherence is **schema-aware** (manifests differ by archetype — worker top-level `version:` vs researcher `instance.version:`; a uniform grep false-flags).
+
 #### V0.5.4: State Verification (Re-Study)
 
 ```
