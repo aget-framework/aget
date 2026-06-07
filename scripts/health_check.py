@@ -38,6 +38,7 @@ Version: 1.0.0 (v3.1.0)
 import argparse
 import json
 import os
+import re
 import sys
 import time
 from datetime import datetime
@@ -320,6 +321,69 @@ def check_planning_directory(agent_path: Path) -> CheckResult:
     )
 
 
+def check_duplicate_ldoc_ids(agent_path: Path) -> CheckResult:
+    """L131: Detect duplicate L-doc IDs (two distinct lessons sharing one L###).
+
+    Presence/count checks cannot catch ID collisions. This check CAN fail on a
+    real, independently-detectable defect — the test L131/L671 demand of every
+    health check ("what real failure turns this RED?").
+    """
+    evolution_dir = agent_path / '.aget' / 'evolution'
+    if not evolution_dir.is_dir():
+        return CheckResult("duplicate_ldoc_ids", True,
+                           "No evolution/ directory", "info")
+
+    seen: Dict[str, int] = {}
+    for f in evolution_dir.glob('L*.md'):
+        m = re.match(r'(L\d+)_', f.name)
+        if m:
+            seen[m.group(1)] = seen.get(m.group(1), 0) + 1
+
+    dups = sorted(k for k, v in seen.items() if v > 1)
+    if dups:
+        return CheckResult(
+            name="duplicate_ldoc_ids",
+            passed=False,
+            message=(f"{len(dups)} duplicate L-doc ID(s): {', '.join(dups)} "
+                     "(two lessons share one ID; renumber per L131)"),
+            severity="warning"
+        )
+    return CheckResult(
+        name="duplicate_ldoc_ids",
+        passed=True,
+        message=f"{len(seen)} unique L-doc IDs, no collisions"
+    )
+
+
+def check_config_size(agent_path: Path) -> CheckResult:
+    """L146: AGENTS.md must stay under the 40k hard limit (30k recommended)."""
+    agents_md = agent_path / 'AGENTS.md'
+    if not agents_md.exists():
+        return CheckResult("config_size", True, "No AGENTS.md", "info")
+
+    size = agents_md.stat().st_size
+    if size > 40000:
+        return CheckResult(
+            name="config_size",
+            passed=False,
+            message=f"AGENTS.md {size} bytes exceeds 40k hard limit (L146)",
+            severity="error"
+        )
+    if size > 30000:
+        return CheckResult(
+            name="config_size",
+            passed=False,
+            message=(f"AGENTS.md {size} bytes over 30k recommended (L146); "
+                     "extract content to .aget/docs/"),
+            severity="warning"
+        )
+    return CheckResult(
+        name="config_size",
+        passed=True,
+        message=f"AGENTS.md {size} bytes (under 30k)"
+    )
+
+
 # =============================================================================
 # Main Protocol
 # =============================================================================
@@ -410,6 +474,8 @@ def run_housekeeping(agent_path: Path, verbose: bool = False) -> Dict[str, Any]:
         check_5d_structure,
         check_sessions_directory,
         check_planning_directory,
+        check_duplicate_ldoc_ids,
+        check_config_size,
         check_structural_skill_frontmatter,
     ]
 
