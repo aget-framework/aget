@@ -96,21 +96,22 @@ optional_changes:
 # (source from template-worker-aget) would find an EMPTY source. This block records
 # the true state so the migration does not assume the artifacts are reachable.
 propagation_gap:
-  status: "OPEN at v3.21.0 ship (2026-06-06)"
+  status: "CLOSED locally 2026-06-06 (PENDING PUSH to origin/main) — was OPEN at ship"
   tracking: "gh#1600 (root cause); PP-048 Stream 5 (remediation)"
   per_surface:
     canonical_aget:
       AGET_UNATTENDED_AUTONOMY_SPEC.md: present     # aget/specs/
       aget-create-initiative_skill: present         # aget/.claude/skills/
-      check_initiatives.py: ABSENT                  # only in framework-manager private repo — NOT canonical
+      check_initiatives.py: present                 # promoted private -> aget/scripts/ (sanitization-clean)
     templates_13:
-      AGET_UNATTENDED_AUTONOMY_SPEC.md: ABSENT
-      aget-create-initiative_skill: ABSENT
-      check_initiatives.py: ABSENT
-  required_before_fleet_rollout:
-    - "Promote check_initiatives.py private -> canonical aget/scripts/ (with sanitization check)"
-    - "Sync all 3 artifacts -> 13 templates (payload_sync, not just version_sync)"
-    - "Re-verify each detection clause above returns present at the L622 source"
+      AGET_UNATTENDED_AUTONOMY_SPEC.md: present     # 13/13
+      aget-create-initiative_skill: present         # 13/13
+      check_initiatives.py: present                 # 13/13
+  remediation_done:
+    - "DONE: check_initiatives.py promoted private -> canonical aget/scripts/ (sanitization-clean)"
+    - "DONE: all 3 artifacts synced -> 13/13 templates (committed per repo)"
+    - "DONE: detection clauses re-verified present at L622 source (template-worker-aget) + canonical"
+    - "PENDING: git push origin main across 14 repos (C-A requires pushed-to-origin before rollout; L735 weekend window)"
 
 # =============================================================================
 # BREAKING CHANGES
