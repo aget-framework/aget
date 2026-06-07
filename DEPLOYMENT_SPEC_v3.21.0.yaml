@@ -1,0 +1,153 @@
+# DEPLOYMENT_SPEC_v3.21.0.yaml
+# Complete target state specification for v3.21.0 deployment
+#
+# Purpose: Define what a correctly-deployed v3.21.0 agent looks like.
+# Usage: Supervisors use this to verify fleet deployments (FLEET-UPG-023).
+# Governance: R-DEP-002 (State-Based Deployment Requirement), R-REL-038
+#
+# Created: 2026-06-06
+# Origin: DEPLOYMENT_SPEC_v3.16.0.yaml (NOTE: 5-cycle gap — no DEPLOYMENT_SPEC was
+#   produced for v3.17/v3.18/v3.19/v3.20; practice lapsed per gh#1490. This spec
+#   resumes the practice and is the C-A artifact RUBRIC_fleet_upgrade_outcome requires.)
+# Release: Always-On Fleet Operations (governance-scoped)
+#
+# NOTE: v3.21.0 is NON-BREAKING, minor, net governance-inflow. It ships bounding
+#   rules for unattended autonomy before the runtime that consumes them, a read-only
+#   initiative rollup, and promotes /aget-create-initiative to STRICT canonical core.
+
+version: "3.21.0"
+spec_version: "2.0.0"
+created: "2026-06-06"
+status: active
+supersedes: "DEPLOYMENT_SPEC_v3.16.0.yaml"
+breaking_release: false
+
+# =============================================================================
+# VERIFICATION SCRIPT
+# =============================================================================
+
+verification_script:
+  file: "scripts/verify_deployment.py"
+  usage: "python3 scripts/verify_deployment.py --version 3.21.0 --path /path/to/agent"
+  inherits: "v3.16.0 verification surface"
+  known_defects: "verify_deployment.py skill baseline hardcoded (gh#1058/#1061); crashes on broken symlinks (gh#1229/#1230). Treat tooling output as claim-under-test, not premise (L908)."
+
+# =============================================================================
+# TARGET STATE
+# =============================================================================
+
+mandatory_changes:
+  - id: "M-3.21-1"
+    description: "version.json aget_version field set to '3.21.0'"
+    blocking: true
+    detection: "test $(jq -r .aget_version .aget/version.json) = '3.21.0'"
+
+  - id: "M-3.21-2"
+    description: "AGENTS.md @aget-version header set to '3.21.0'"
+    blocking: true
+    detection: "grep -q '^@aget-version: 3.21.0' AGENTS.md"
+
+  - id: "M-3.21-3"
+    description: "manifest.yaml version aligned to 3.21.0 (L444 coherence triplet: version.json == AGENTS.md == manifest.yaml)"
+    blocking: true
+    detection: "grep -q '3.21.0' manifest.yaml"
+
+# Additive payload — the 3 new artifacts. NON-BREAKING: absence does not break a
+# v3.20.3 agent, but a conformant v3.21.0 agent SHOULD carry them per role.
+additive_artifacts:
+  - id: "A-3.21-1"
+    description: "AGET_UNATTENDED_AUTONOMY_SPEC.md v1.0.0 (CAP-UNATTEND-001..008) present at specs/"
+    blocking: false
+    canonical_source: "aget/specs/AGET_UNATTENDED_AUTONOMY_SPEC.md"
+    detection: "test -f specs/AGET_UNATTENDED_AUTONOMY_SPEC.md"
+    note: "Straight copy. Behavioral V-tests runtime-pending (govern a runtime not yet built — ADR-007, no test-theater)."
+
+  - id: "A-3.21-2"
+    description: "check_initiatives.py present at scripts/ (read-only initiative portfolio rollup; 10 V-tests)"
+    blocking: false
+    canonical_source: "scripts/check_initiatives.py"
+    detection: "test -f scripts/check_initiatives.py"
+    note: "Copy only if the agent maintains planning/initiatives/."
+
+  - id: "A-3.21-3"
+    description: "/aget-create-initiative skill present at .claude/skills/ (STRICT D71 canonical core)"
+    blocking: false
+    canonical_source: "aget/.claude/skills/aget-create-initiative/SKILL.md"
+    detection: "test -f .claude/skills/aget-create-initiative/SKILL.md"
+    note: "Closes verb-pair gap with /aget-propose-initiative; remove AGENTS.md phantom-marker row once present."
+
+optional_changes:
+  - id: "O-3.21-1"
+    description: "unattended_autonomy envelope block in .aget/config.json (REQ-UA-002)"
+    blocking: false
+    note: "ONLY required if the agent runs unattended/headless/always-on. Governance-only otherwise."
+
+  - id: "O-3.21-2"
+    description: "Remove /aget-create-initiative phantom-marker row from AGENTS.md (L601) where the skill is now present"
+    blocking: false
+    note: "Phantom-marker is expected, not ERROR, until the skill is fleet-deployed (gh#1431)."
+
+# =============================================================================
+# !! PROPAGATION GAP DISCLOSURE (substance-over-symbol — gh#1600) !!
+# =============================================================================
+# Authored honestly: at v3.21.0 ship the payload was NOT fully propagated to the
+# distribution surfaces the migration pulls from. version_sync.py bumped the version
+# string in 13 templates but did NOT copy the payload. A consumer migrating per L622
+# (source from template-worker-aget) would find an EMPTY source. This block records
+# the true state so the migration does not assume the artifacts are reachable.
+propagation_gap:
+  status: "OPEN at v3.21.0 ship (2026-06-06)"
+  tracking: "gh#1600 (root cause); PP-048 Stream 5 (remediation)"
+  per_surface:
+    canonical_aget:
+      AGET_UNATTENDED_AUTONOMY_SPEC.md: present     # aget/specs/
+      aget-create-initiative_skill: present         # aget/.claude/skills/
+      check_initiatives.py: ABSENT                  # only in framework-manager private repo — NOT canonical
+    templates_13:
+      AGET_UNATTENDED_AUTONOMY_SPEC.md: ABSENT
+      aget-create-initiative_skill: ABSENT
+      check_initiatives.py: ABSENT
+  required_before_fleet_rollout:
+    - "Promote check_initiatives.py private -> canonical aget/scripts/ (with sanitization check)"
+    - "Sync all 3 artifacts -> 13 templates (payload_sync, not just version_sync)"
+    - "Re-verify each detection clause above returns present at the L622 source"
+
+# =============================================================================
+# BREAKING CHANGES
+# =============================================================================
+
+breaking_changes:
+  count: 0
+  note: "None. v3.21.0 is additive governance scaffolding. No pre-flight BC detection (BC-001/BC-002) required."
+
+# =============================================================================
+# COMPLETION RESPONSE (per RUBRIC_fleet_upgrade_outcome)
+# =============================================================================
+
+completion_response:
+  release_outcome_report_required: true
+  rubric: "aget/rubrics/RUBRIC_fleet_upgrade_outcome_v1.1.md"   # file _v1.1.md; content v1.2.1 (gh#1599)
+  minimum_score: 10
+  c_a_note: "C-A (non-breaking branch): satisfied by THIS spec being committed + pushed to origin/main before any agent upgrades. The 3 additive artifacts change the deploy contract, so v3.21 required its own spec (the inherit path did NOT apply) — this file is it."
+  fields_required:
+    - fleet_coverage
+    - bc_compliance  # NONE for v3.21 (non-breaking)
+    - time_to_productive
+    - friction_index
+    - plan_revision_count
+    - handoff_completeness
+
+# =============================================================================
+# REFERENCES
+# =============================================================================
+
+references:
+  changelog: "aget/CHANGELOG.md (v3.21.0 entry)"
+  release_handoff: "private-aget-framework-AGET/handoffs/RELEASE_HANDOFF_v3.21.0.md"
+  remote_migration_message: "private-aget-framework-AGET/handoffs/REMOTE_MIGRATION_MESSAGE_v3.21.0.md"
+  root_cause: "gh#1600 (release verification proves labels agree, not that they are true)"
+  remediation: "PP-048 (PROPOSAL_release_toolchain_continuous_validation_and_debt) Streams 5/6"
+  lapse_history: "gh#1490 (DEPLOYMENT_SPEC practice lapsed v3.17-v3.19; extended to v3.20/v3.21)"
+  process_changes:
+    - "Resumes DEPLOYMENT_SPEC practice after 5-cycle lapse (first since v3.16.0)"
+    - "Adds propagation_gap disclosure block (substance-over-symbol; gh#1600)"
