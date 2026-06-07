@@ -96,7 +96,7 @@ optional_changes:
 # (source from template-worker-aget) would find an EMPTY source. This block records
 # the true state so the migration does not assume the artifacts are reachable.
 propagation_gap:
-  status: "CLOSED locally 2026-06-06 (PENDING PUSH to origin/main) — was OPEN at ship"
+  status: "CLOSED 2026-06-06 — payload pushed to origin/main across 14 repos (aget + 13 templates), reachability verified"
   tracking: "gh#1600 (root cause); PP-048 Stream 5 (remediation)"
   per_surface:
     canonical_aget:
@@ -111,7 +111,7 @@ propagation_gap:
     - "DONE: check_initiatives.py promoted private -> canonical aget/scripts/ (sanitization-clean)"
     - "DONE: all 3 artifacts synced -> 13/13 templates (committed per repo)"
     - "DONE: detection clauses re-verified present at L622 source (template-worker-aget) + canonical"
-    - "PENDING: git push origin main across 14 repos (C-A requires pushed-to-origin before rollout; L735 weekend window)"
+    - "DONE: pushed to origin/main across 14 repos (aget + 13 templates) 2026-06-06 Sat (L735 window); reachability re-verified via git ls-tree origin/main"
 
 # =============================================================================
 # BREAKING CHANGES
