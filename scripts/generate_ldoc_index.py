@@ -31,7 +31,7 @@ from typing import Dict, List, Any, Optional, Set
 class LdocIndexGenerator:
     """Generates index.json for L-doc scaling."""
 
-    LDOC_PATTERN = re.compile(r'^L(\d{3})_(.+)\.md$')
+    LDOC_PATTERN = re.compile(r'^L(\d{3,})_(.+)\.md$')  # \d{3,} not \d{3}: 3-digit floor, no L1000+ drop (gh#1610)
     THRESHOLD = 50  # CAP-MEMORY-008-01: Required when count > 50
 
     def __init__(self, agent_path: Path):
