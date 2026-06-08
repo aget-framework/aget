@@ -26,7 +26,7 @@ Items accumulated since v3.21.0 that are confirmed in-flight for a future releas
 ### Added
 - **Unattended-autonomy specification** (`aget/specs/AGET_UNATTENDED_AUTONOMY_SPEC.md` v1.0.0): 8 EARS requirements (CAP-UNATTEND-001..008) bounding what an agent MAY do unattended (scheduled/headless/always-on) vs MUST escalate — autonomy envelope (declared in `.aget/config.json`), fail-safe escalation default, dispatch trust-channel, bounded self-modification, audit-record, advisory multi-tenant share. Composes existing cross-fleet, push-window, self-modification, and trust-channel disciplines. All behavioral V-tests runtime-pending (governs a runtime not yet built — no test-theater).
 - **`check_initiatives.py`** — read-only portfolio rollup across `planning/initiatives/INIT-*.md` (inventory by status, 0-COMPLETE anomaly, past-target Loading-Dock, staleness, cohort clusters); 10 V-tests.
-- **`/aget-create-initiative`** deployed to canonical core (STRICT, D71 — closes the verb-pair gap with `/aget-propose-initiative`).
+- **`/aget-create-initiative`** deployed to canonical core (STRICT, D71). **⚠️ Errata (2026-06-07, gh#1461):** this does **not** close the verb-pair gap as originally stated — the producer half (`/aget-propose-initiative` skill) and `SOP_initiative.md` are **not** shipped in canonical at this tag, so the STRICT route is **non-functional** (it refuses without an APPROVED `PROPOSAL_init_*.md` and `cat`s an absent SOP). The route is **gated (not enforced)** until the producer half ships. See gh#1461.
 
 ### Changed
 - **IAC SOP** (`SOP_cross_aget_communication.md`) per-pattern maturity reconciliation (P1 Relay + P1.5 Read-at-Source → Implemented; cross-machine patterns honestly Pending).
