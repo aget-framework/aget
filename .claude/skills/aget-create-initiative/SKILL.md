@@ -24,7 +24,7 @@ Per L867 (Coherence-Directed Investment) + D71 (Structural Skill Routing), each 
 - `planning/skill-proposals/PROPOSAL_aget-create-initiative.md` PROPOSED 2026-04-19; design complete; awaits implementation
 - Direct INIT-* authoring observed: INIT-REQ-SPEC-TEST-DEFINED (2026-04-19), INIT-FLEET-OBSERVABILITY (2026-05-16)
 
-**Governing Spec**: `sops/SOP_initiative.md` v1.2.0 (graduated procedure; serves as governing contract until `aget/specs/AGET_INITIATIVE_SPEC.md` is authored at v3.19+).
+**Governing Spec**: `sops/SOP_initiative.md` v1.3.0 (graduated procedure) + `aget/specs/AGET_INITIATIVE_SPEC.md` (shipped + Active since v3.21.0).
 
 ### Ontology Bindings (FWRK-2026-020 substrate)
 
@@ -294,8 +294,8 @@ The verb-pair is the canonical pattern per AGENTS.md §"Structural Skill Routing
 | Proposal | `planning/skill-proposals/PROPOSAL_aget-create-initiative.md` (PROPOSED 2026-04-19) |
 | Sibling skill (verb-pair) | `.claude/skills/aget-propose-initiative/SKILL.md` v1.0.0 |
 | Sibling skill (structural mirror) | `.claude/skills/aget-create-project/SKILL.md` |
-| Governing SOP (graduated procedure) | `sops/SOP_initiative.md` v1.2.0 |
-| Future Governing Spec | `aget/specs/AGET_INITIATIVE_SPEC.md` (CANDIDATE — v3.19+ per PROPOSAL §Dependencies) |
+| Governing SOP (graduated procedure) | `sops/SOP_initiative.md` v1.3.0 |
+| Governing Spec | `aget/specs/AGET_INITIATIVE_SPEC.md` (Active since v3.21.0) |
 | ADR | ADR-008 (Advisory → Strict → Generator progression — this skill graduates SOP_initiative to skill level Strict) |
 | D71 | AGENTS.md §"Structural Skill Routing" (Strict enforcement level) |
 | L-docs | L760 (Initiative as Scope Modifier), L867 (Coherence-Directed Investment as enhance-Verb-Family), L617 (Gate Ordering), L944 (Verb-Pair Discipline) |
