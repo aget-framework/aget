@@ -11,9 +11,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Items accumulated since v3.21.0 that are confirmed in-flight for a future release. Per Keep a Changelog 1.1.0 forward-work convention.
+Items accumulated since v3.22.0 that are confirmed in-flight for a future release. Per Keep a Changelog 1.1.0 forward-work convention.
 
 - _(none recorded yet)_
+
+---
+
+## [3.22.0] - 2026-06-13
+
+**Theme**: Skill-Support Delivery + Verify-at-Point-of-Use + Hygiene
+
+> **No breaking changes.** Minor — additive governed tooling. First deliberately-ambitious minor cycle (instrumented capacity experiment, H-AMB-322): scope locked over the conservative `RUBRIC_minor_release_scope` band by design, with per-item actuals fed back to recalibrate the rubric. Two organizing principles ship as runnable gates: **propagation SHALL carry a paired point-of-use verify** (the freshness/coherence gates *are* the verify half) and **distribute ≠ homogenize** (the deployer is per-skill surgical, not a blanket overwrite).
+
+### Added
+- **`scripts/deploy_skill.py`** — governed surgical skill deployer: per-skill filter, companion artifacts, dry-run default, audit log (`workspace/skill_deploy_audit.jsonl`), independent post-deploy verify, **push-window guard encoded in `--apply`** (refuses Mon–Fri per the public push-window discipline), and **live gap re-derivation** (computes the real skill gap rather than trusting a stale table). On its first live run it corrected a 3.4×-stale gap headline — dogfooding the verify-at-point-of-use theme.
+- **`scripts/check_claim_freshness.py`** — citation/claim freshness gate: parses governed artifacts for `#NNNN STATE` issue-citations, `--online` re-derives each via `gh`, `--strict` exits 1 for CI/release-gate.
+- **`scripts/check_skill_coherence.py`** — release-time skill-frontmatter↔tree coherence gate: detects declared-but-absent Governing-Spec/SOP and stale-"future" framing of shipped artifacts.
+- **`scripts/validate_spec_binding.py`** (+ `scripts/ground_artifact.py` loader dependency) — ONTOLOGY-SPEC-BINDING validator-half.
+- **+20 V-tests** across the new scripts (all passing in canonical).
+
+### Changed
+- **`/aget-propose-actions` → v1.8.0**: Step 3.5 Self-Critique (10-point checklist from L025 obs093–105) + REQ-PA-018/019/020 (named-person leverage and ≥1-non-artifact-action at ≥1-day budgets) + a **Type** column making action-type bias visible. Propagated to all 13 templates (v1.6.0 → v1.8.0, also clearing accumulated v1.7.x propagation lag).
+- **`scripts/validate_ontology_reciprocity.py`** — scope fix: dangling→whole-vocab, cross-cluster→non-defect (excluded from TOTAL DEFECTS).
+
+### Notes
+- The 5 pre-existing test failures (contract-test reference-rate + config tier-detection + skill-count map) are carried debt, disclosed not hidden — not introduced by this release.
 
 ---
 
