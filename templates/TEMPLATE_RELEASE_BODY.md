@@ -13,6 +13,8 @@ TEMPLATE INSTRUCTIONS:
 
 **Theme**: {Theme name — Concise capability or discipline shipped this release}
 
+**For**: {The reader this release is written for — e.g. "downstream agent maintainers upgrading from vX.Y". Naming the reader lifts D1 Intent Clarity in RUBRIC_documentation_content_intent and keeps the body adopter-facing, not internal-changelog.}
+
 ## What's New
 
 <!--
@@ -96,6 +98,7 @@ Victory) at the release-narrative layer.
 Before publishing a release body authored from this template:
 
 - [ ] Theme line present and starts with `**Theme**:` (case-sensitive)
+- [ ] For: reader line present — names the intended reader (lifts D1 Intent Clarity; advisory, not a hard validator marker)
 - [ ] What's New section has ≥1 bullet
 - [ ] Compatibility section present
 - [ ] If breaking changes declared, Migration section present
