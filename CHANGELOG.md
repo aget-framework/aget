@@ -19,19 +19,16 @@ Items accumulated since v3.22.0 that are confirmed in-flight for a future releas
 
 ## [3.23.0] - 2026-06-21
 
-**Theme**: Goal Tier & Integrity Hardening (thin release)
+**Theme**: Goal Tier (preview)
 
 ### Added
 - **Goal Tier (preview)**: `aget-create-goal` skill + `AGET_GOAL_SPEC` v0.2.0 (draft) — commit a selected candidate goal into a governed Goal artifact (North Star → Goal → Initiative). Canonical spec promotion follows in 3.23.1.
 - `aget-propose-goals` skill (SKILL-055): plural candidate-goal generator scored ex-ante by `RUBRIC_goal_selection`.
 
-### Fixed
-- #1654: scope-board generation against a locked VERSION_SCOPE.
-- #1656: homepage `--apply` MULTILINE no-op (S7/S8 silent skip).
-
 ### Notes
 - Reduced scope (REQ-9 time-protection): the self-oversight ratchet generalization and the interaction-channel rung deferred to 3.24.
 - Goal-Tier canonical promotion (ontology grounding) deferred to the 3.23.1 fast-follow.
+- A close-time authorization guard was built and exercised in the framework-manager instance this cycle; it is **not** part of this public release — it lands in canonical (with a pilot) in 3.23.1. (The earlier "Integrity Hardening" theme + a guard bullet were corrected post-release: those referenced a capability not present in canonical `aget/`. The two internal release-tooling fixes (#1654/#1656) likewise live in the manager instance, not canonical, and were removed from this public entry.)
 
 ---
 
