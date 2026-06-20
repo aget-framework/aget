@@ -31,6 +31,10 @@ v3.23.0 introduces the **Goal Tier** as a usable preview and hardens release-clo
 - Self-oversight ratchet generalization and interaction-channel rung → 3.24.
 - Goal-Tier canonical spec promotion (ontology grounding) → 3.23.1.
 
+## Context for External Fleets
+
+Adopters running their own AGET fleets can upgrade to 3.23.0 at will — it is a drop-in minor with no breaking changes. The Goal Tier ships as a preview, so external fleets can begin exercising `aget-propose-goals` and `aget-create-goal` now; the canonical `AGET_GOAL_SPEC` and template skill propagation arrive in 3.23.1 without requiring any rework of preview usage. No coordinated migration is needed.
+
 ## Pilot Tracking
 
 | Adopter | Version Confirmed | Notes |
