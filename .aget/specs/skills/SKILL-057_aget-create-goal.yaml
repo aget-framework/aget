@@ -1,0 +1,106 @@
+# SKILL-057: aget-create-goal
+# Purpose: Commit a selected candidate goal into a durable, governed Goal artifact (D71-Strict committer)
+# Created: 2026-06-20
+# Based on: AGET_GOAL_SPEC v0.2.0, L1067, L1085, MP#12, L656, L742
+
+spec:
+  id: SKILL-057
+  name: aget-create-goal
+  version: 0.1.0
+  status: active
+  created: 2026-06-20
+  format: "EARS with controlled vocabulary"
+  category: Planning
+  scope: "Commit a Goal (durable cross-session outcome, C926) via the D71-Strict singular committer of the propose-goals->create-goal verb pair; two-tier storage (committed section in governance/GOALS.md, aspirational agent-internal)"
+
+  traceability:
+    skill_md: ".claude/skills/aget-create-goal/SKILL.md"
+    governing_spec: "aget/drafts/AGET_GOAL_SPEC.md (v0.2.0, CAP-GOAL-001..011)"
+    engine: "scripts/create_goal.py"
+    tests: "tests/test_create_goal.py (11 falsifiers)"
+    rubric: "RUBRIC_goal_value (paired, build-pending — L1093)"
+    owning_initiative: "INIT-CORE-ARTIFACT-MATURATION Stream 9 (PP-051); v3.23 release C-23-01"
+    verb_pair: "/aget-propose-goals (SKILL-055 plural producer) -> /aget-create-goal (SKILL-057 singular committer)"
+    l_docs:
+      - "L1067: Two-propose semantics (plurality encodes pipeline)"
+      - "L1085: Plural-leads-singular (producer matures before committer)"
+      - "MP#12: A goal without a regulating loop is an orphan that decays (loop-required)"
+      - "L656: Lifecycle prevents Loading-Dock-by-construction"
+      - "L742: Requirements -> Specifications (REQ-GOAL -> CAP-GOAL)"
+    vocabulary_terms:
+      - "Goal_Artifact"
+      - "Goal_Loop_Ownership"
+      - "Commitment_Tag"
+      - "Goal_Type"
+
+capabilities:
+  CAP-GOAL-002:
+    domain: validation
+    statement: "WHEN a candidate Goal's definition enumerates workstreams/tasks and names no measurable end-state, the SKILL shall reject it (conflation guard, C930)."
+    pattern: event-driven
+    trigger: slash_command
+  CAP-GOAL-003:
+    domain: validation
+    statement: "The SKILL shall require a Goal type in {Achieve, Maintain, Soft} (KAOS, C963)."
+    pattern: ubiquitous
+  CAP-GOAL-004:
+    domain: validation
+    statement: "The SKILL shall require at least one bound loop (owner, trigger, review-action, consequence, cadence) at creation time (MP#12)."
+    pattern: ubiquitous
+  CAP-GOAL-006:
+    domain: storage
+    statement: "The SKILL shall write a committed Goal as a structured section in governance/GOALS.md, and an aspirational Goal to the agent-internal .aget/goals/aspirational.jsonl (two-tier, REQ-3)."
+    pattern: event-driven
+    trigger: slash_command
+  CAP-GOAL-008:
+    domain: enforcement
+    statement: "The SKILL shall be D71-Strict: direct authoring of a committed-Goal section without the skill's provenance is prohibited and flagged as a bypass."
+    pattern: ubiquitous
+  CAP-GOAL-011:
+    domain: lifecycle
+    statement: "The SKILL shall set status=active at creation and enforce type-differentiated terminal state: a Maintain Goal cannot transition to achieved."
+    pattern: state-driven
+
+test_cases:
+  T-GOAL-001:
+    capability: "CAP-GOAL-002"
+    scenario: "Conflation rejected"
+    given: "A candidate defined by workstreams/tasks with no measurable end-state"
+    when: "User runs `/aget-create-goal`"
+    then: "The skill rejects it and redirects to /aget-propose-project"
+    verification_method: "automated (tests/test_create_goal.py::test_v_goal_001_conflation_rejected)"
+  T-GOAL-002:
+    capability: "CAP-GOAL-004"
+    scenario: "Loop required at creation"
+    given: "A candidate Goal with zero bound loops"
+    when: "Commit is attempted"
+    then: "The skill refuses (MP#12)"
+    verification_method: "automated (test_v_goal_003_zero_loops_rejected)"
+  T-GOAL-003:
+    capability: "CAP-GOAL-006"
+    scenario: "Two-tier storage"
+    given: "A committed vs aspirational goal"
+    when: "Each is created"
+    then: "Committed -> structured section in governance/GOALS.md; aspirational -> .aget/goals/aspirational.jsonl"
+    verification_method: "automated (test_v_goal_004_*, test_v_goal_007_*)"
+  T-GOAL-004:
+    capability: "CAP-GOAL-011"
+    scenario: "Type-differentiated terminal"
+    given: "A Maintain Goal"
+    when: "Transition to achieved is attempted"
+    then: "Refused; Achieve goals may reach achieved"
+    verification_method: "automated (test_v_goal_008_*)"
+
+constraints:
+  C-GOAL-001:
+    statement: "The SKILL MUST NOT author a committed-Goal section without writing the provenance field (D71-Strict)."
+    rationale: "CAP-GOAL-008 — provenance is the bypass-detection surface"
+  C-GOAL-002:
+    statement: "The SKILL MUST NOT commit a Goal with zero bound loops."
+    rationale: "MP#12 — a loop-less goal is an orphan that decays"
+  C-GOAL-003:
+    statement: "The SKILL MUST NOT transition a Maintain Goal to achieved."
+    rationale: "CAP-GOAL-011 — Maintain goals persist; an achieved Maintain is a category error"
+  C-GOAL-004:
+    statement: "The SKILL shall write aspirational goals off the governance surface."
+    rationale: "CAP-GOAL-006b — keep governance/GOALS.md to genuinely-committed goals (REQ-3)"

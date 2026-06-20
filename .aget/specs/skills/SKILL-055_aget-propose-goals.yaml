@@ -1,0 +1,229 @@
+# SKILL-055: aget-propose-goals
+# Purpose: Propose N ranked candidate session-goals scored ex-ante by RUBRIC_goal_selection_v1.0
+# Created: 2026-06-15
+# Based on: SP-017, L845, L846, L1067, L677, L693, L671, L839
+
+spec:
+  id: SKILL-055
+  name: aget-propose-goals
+  version: 1.0.0
+  status: active
+  created: 2026-06-15
+  format: "EARS with controlled vocabulary"
+  category: Planning
+  scope: "Standardize goal-altitude divergent-proposal: candidate generation, mandatory rubric scoring, ranked presentation, and session-file recording for retrospective audit"
+
+  traceability:
+    skill_md: ".claude/skills/aget-propose-goals/SKILL.md"
+    proposal: "planning/skill-proposals/PROPOSAL_aget-propose-goals.md (SP-017)"
+    rubric: "rubrics/RUBRIC_goal_selection_v1.0.md"
+    owning_initiative: "INIT-CORE-ARTIFACT-MATURATION Stream 9 (PP-051)"
+    l_docs:
+      - "L845: Session-Pivot Goal-Selection Rubric Gap (parent)"
+      - "L846: Action-Within-Session Rubric Gap (companion)"
+      - "L1067: Two propose semantics — plurality encodes pipeline (plural candidate-set)"
+      - "L677: Divergent Proposal Mode"
+      - "L693: 5-Action Default (informs the 3-goal default)"
+      - "L671: Classification Without Consequence (anti-decorative)"
+      - "L839: Reflexive Expansion Validation (dogfood)"
+    vocabulary_terms:
+      - "Candidate_Set_Generator"
+      - "Goal_Altitude"
+      - "Beneficiary_Tag"
+      - "Divergent_Proposal_Mode"
+
+capabilities:
+  PG-001:
+    domain: invocation
+    statement: "WHEN the user invokes `/aget-propose-goals`, the SKILL shall include an identity header (agent name + restated session focus)."
+    pattern: event-driven
+    trigger: slash_command
+    priority: critical
+    verification: "Output begins with agent name and current-focus restatement"
+
+  PG-002:
+    domain: count
+    statement: "The SKILL shall produce the requested count of candidate goals, defaulting to 3 when unspecified."
+    pattern: ubiquitous
+    priority: high
+    verification: "Candidate count matches request, or defaults to 3"
+
+  PG-003:
+    domain: kb_review
+    statement: "The SKILL shall perform KB review (active plans, session state, git status, mandate) before generating candidates."
+    pattern: ubiquitous
+    priority: critical
+    verification: "Candidates reflect current PROJECT_PLAN state and session mandate"
+
+  PG-004:
+    domain: scoring
+    statement: "Each candidate goal SHALL be scored on all 5 dimensions of RUBRIC_goal_selection_v1.0 (D1-D5, L0-L3 each), with a total /15."
+    pattern: ubiquitous
+    priority: critical
+    outputs:
+      - "Per-candidate D1-D5 scores + total"
+      - "Dominant dimension per candidate"
+    verification: "Every candidate row carries D1-D5 + total in [0,15]; rubric named in output"
+    rationale: "C1 — an unscored goal is decorative (L671)"
+
+  PG-005:
+    domain: beneficiary_tag
+    statement: "Each candidate SHALL carry exactly one beneficiary tag from {principal, supervisor, framework-production, framework-learning, ecosystem}."
+    pattern: ubiquitous
+    priority: medium
+    verification: "Every candidate row has one valid beneficiary tag"
+
+  PG-006:
+    domain: presentation
+    statement: "The SKILL shall rank candidates by total score, surface the dominant dimension per candidate, and state a recommended pivot target."
+    pattern: ubiquitous
+    priority: high
+    verification: "Output is rank-ordered; a recommended target is named"
+
+  PG-007:
+    domain: tie_break
+    statement: "WHEN two or more candidates tie on total score, the SKILL SHALL break the tie explicitly (principal preference or documented beneficiary-tag heuristic)."
+    pattern: conditional
+    trigger: score_tie
+    priority: high
+    verification: "No tie is left ambiguous; tie-break basis stated"
+    rationale: "C5"
+
+  PG-008:
+    domain: recording
+    statement: "The SKILL shall append the scored candidate set to the current session file for retrospective audit."
+    pattern: ubiquitous
+    priority: critical
+    verification: "Scored set written to sessions/session_*.md"
+    rationale: "C2 — recording is the anti-decorative guard"
+
+  PG-009:
+    domain: cardinality
+    statement: "The SKILL shall enforce 2 <= N <= 7; below 2 it SHALL redirect to /aget-propose-project, above 7 it SHALL cluster first."
+    pattern: ubiquitous
+    priority: high
+    verification: "N outside [2,7] triggers redirect/cluster, not raw output"
+    rationale: "C3 (singleton) + C4 (Miller 1956)"
+
+  PG-010:
+    domain: no_execute_all
+    statement: "The SKILL shall NOT apply an execute-all default — candidate goals are SELECTED by the principal, not executed as a batch."
+    pattern: ubiquitous
+    priority: high
+    verification: "Output presents candidates for selection; no auto-execution of goals"
+    rationale: "Distinguishes plural candidate-set (select) from propose-actions execute-all"
+
+  PG-011:
+    domain: commitment_type
+    statement: "Each candidate SHALL carry exactly one commitment-type tag from {committed, aspirational}; an aspirational goal SHALL NOT be presented as committed."
+    pattern: ubiquitous
+    priority: high
+    verification: "Every candidate row has one valid commitment-type tag; no aspirational goal labeled committed"
+    rationale: "C6 (E7) — commitment-type honesty, folded from SOP_near_term_ambition_projection (L1090); OKR committed/aspirational axis, orthogonal to the /15 score"
+
+  PG-012:
+    domain: shape_it_gate
+    statement: "WHEN the recommended target is aspirational OR lacks a governed vehicle (no owning PROJECT_PLAN / initiative / spec), the SKILL SHALL route to a shape-it action (/aget-propose-project, /aget-propose-initiative, /aget-create-project) and SHALL NOT recommend direct execution."
+    pattern: conditional
+    trigger: recommended_target_unshaped
+    priority: high
+    verification: "An unshaped/aspirational recommended target yields a shape-it next action, never a do-it action"
+    rationale: "C7 (E8) — unshaped→shape-it gate importing L174 (ambition–governance inversion); the most ambitious candidate is often the least shaped"
+
+test_cases:
+  T-PG-001:
+    capability: "PG-002"
+    scenario: "Default 3 candidate goals"
+    given: "Active session with a stated mandate"
+    when: "User runs `/aget-propose-goals`"
+    then: "3 ranked candidate goals with identity header"
+    verification_method: "manual"
+
+  T-PG-002:
+    capability: "PG-004"
+    scenario: "Mandatory rubric scoring"
+    given: "Candidate goals generated"
+    when: "Output is rendered"
+    then: "Every candidate has D1-D5 scores + a /15 total; RUBRIC_goal_selection_v1.0 named"
+    verification_method: "manual"
+
+  T-PG-003:
+    capability: "PG-009"
+    scenario: "Singleton redirect"
+    given: "User requests 1 candidate goal"
+    when: "Skill parses count=1"
+    then: "Skill redirects to /aget-propose-project (N>=2 required), does not emit a 1-row set"
+    verification_method: "manual"
+
+  T-PG-004:
+    capability: "PG-007"
+    scenario: "Explicit tie-break"
+    given: "Two candidates tie at 12/15"
+    when: "Output is rendered"
+    then: "Tie is broken explicitly with a stated basis"
+    verification_method: "manual"
+
+  T-PG-005:
+    capability: "PG-008"
+    scenario: "Session-file recording"
+    given: "A scored candidate set"
+    when: "Skill completes"
+    then: "The scored set is appended to the current session file"
+    verification_method: "manual"
+
+  T-PG-006:
+    capability: "PG-010"
+    scenario: "No execute-all"
+    given: "3 candidate goals presented"
+    when: "Principal does not select"
+    then: "No goal auto-executes; skill waits for selection"
+    verification_method: "manual"
+
+  T-PG-007:
+    capability: "PG-011"
+    scenario: "Commitment-type honesty"
+    given: "A high-scoring candidate (D2/D5 high) with no governed vehicle"
+    when: "Output is rendered"
+    then: "The candidate carries commitment-type=aspirational, not committed"
+    verification_method: "manual"
+
+  T-PG-008:
+    capability: "PG-012"
+    scenario: "Unshaped recommended target routes to shape-it"
+    given: "The highest-scoring candidate is aspirational / has no owning PROJECT_PLAN or initiative"
+    when: "The recommendation is rendered"
+    then: "Next action is a shape-it action (/aget-propose-project | /aget-propose-initiative | /aget-create-project), not direct execution"
+    verification_method: "manual"
+
+constraints:
+  C-PG-001:
+    statement: "The SKILL MUST invoke RUBRIC_goal_selection_v1.0 for every candidate — unscored goals are prohibited."
+    rationale: "L671 — classification without consequence is decorative"
+
+  C-PG-002:
+    statement: "The SKILL MUST record the scored candidate set in the session file."
+    rationale: "Retrospective audit is the anti-decorative guard"
+
+  C-PG-003:
+    statement: "The SKILL shall NOT accept N < 2 — redirect to /aget-propose-project."
+    rationale: "A singleton is not a candidate set"
+
+  C-PG-004:
+    statement: "The SKILL shall NOT present N > 7 unclustered candidates."
+    rationale: "Miller 1956 — working-memory ceiling"
+
+  C-PG-005:
+    statement: "The SKILL shall NOT leave a score tie ambiguous — ties MUST be broken explicitly."
+    rationale: "Ambiguous pivot target defeats the rubric's purpose"
+
+  C-PG-006:
+    statement: "The SKILL shall NOT apply an execute-all default to candidate goals."
+    rationale: "Plural candidate-set semantics: goals are selected, not batch-executed (L1067)"
+
+  C-PG-007:
+    statement: "The SKILL MUST tag each candidate committed|aspirational and MUST NOT present an aspirational goal as committed."
+    rationale: "E7 commitment-type honesty — folded from SOP_near_term_ambition_projection (L1090); a high score is not a commitment"
+
+  C-PG-008:
+    statement: "The SKILL shall NOT recommend direct execution of an aspirational or ungoverned-vehicle target — it MUST route to a shape-it action."
+    rationale: "E8 unshaped→shape-it gate (L174 ambition–governance inversion); shaping is the progress"
