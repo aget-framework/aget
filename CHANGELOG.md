@@ -17,7 +17,7 @@ Items accumulated since v3.22.0 that are confirmed in-flight for a future releas
 
 ---
 
-## [3.23.0] - 2026-06-21
+## [3.23.0] - 2026-06-20
 
 **Theme**: Goal Tier (preview)
 
