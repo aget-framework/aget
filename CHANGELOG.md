@@ -17,6 +17,25 @@ Items accumulated since v3.22.0 that are confirmed in-flight for a future releas
 
 ---
 
+## [3.23.1] - 2026-06-20
+
+**Theme**: Goal Tier (canonical) + Close-Authorization Guard
+
+> The fast-follow the 3.23.0 preview promised: the Goal Tier lands in canonical, and the close-authorization guard (built but explicitly *not* shipped in 3.23.0) is now in `aget/` with template propagation.
+
+### Added
+- **Goal Tier — canonical**: `AGET_GOAL_SPEC` v0.2.0 promoted to `specs/`. Defines the Goal artifact (a durable cross-session **outcome**: North Star → Goal → Initiative → Action), KAOS goal typing (Achieve / Maintain / Soft), and the ≥1-loop requirement (a Goal owns a regulating loop, or it decays as an orphan).
+- **`aget-create-goal`** + **`aget-propose-goals`**: the propose→commit verb pair, now with the spec canonical. Committed Goals are a two-tier store (committed vs aspirational).
+- **`aget-close-project`** + **`close_authorization_guard.py`**: the close-time authorization guard (the 3.23.0-deferred capability), wired into close as Step 2.5 — blocks a project close that claims authorization without a linked event.
+
+### Changed
+- Version 3.23.0 → 3.23.1 across `aget/` + 13 templates; the three new skills synced to all templates dependency-aware (with their engine scripts).
+
+### Notes
+- The full Goal-Value scoring rubric is deferred to a future release; this cycle minimally grounds the value dimension.
+
+---
+
 ## [3.23.0] - 2026-06-20
 
 **Theme**: Goal Tier (preview)
