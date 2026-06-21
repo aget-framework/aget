@@ -24,12 +24,14 @@ v3.23.1 is the fast-follow the v3.23.0 preview promised: the **Goal Tier lands i
 
 ## Compatibility
 
-- **No breaking changes.** Additive only. Existing skills/specs/scripts unchanged.
+- **No breaking changes to existing artifacts.** Additive only — existing skills/specs/scripts unchanged.
+- **Caveat**: the close-authorization guard *changes close behavior* once active — additive presence is safe, but **activation needs a behavior pilot** (see Deployment Requirements). "No breaking changes" describes file deployment, not guard activation.
 - Python: stdlib-only engine scripts (import-smoke verified across archetypes).
 
 ## Deployment Requirements
 
-- No schema or data migration. Drop-in across `aget/` + 13 templates.
+- **File deployment is drop-in** — no schema or data migration; the skills + engine scripts are additive presence across `aget/` + 13 templates.
+- **⚠ Activation is NOT drop-in for the close-authorization guard.** `close_authorization_guard.py` is a *behavior-changing structural guard* — it blocks a project close that claims authorization without a linked event. Additive *presence* ≠ safe fleet-wide *activation*: a blocking guard can reject legitimate closes if a fleet's close-paths differ from the author's. This release shipped **without a cross-AGENT behavior pilot** (the file was synced, not behavior-validated across diverse close-paths). **Before fleet activation, pilot the guard's behavior** (does it fire correctly, and only correctly, across each archetype's close-paths?) — population-spanning, not presence-only. The Goal-Tier skills (create-goal/propose-goals) are genuinely drop-in; the close-guard is the one to pilot.
 
 ## Smoke Test
 
