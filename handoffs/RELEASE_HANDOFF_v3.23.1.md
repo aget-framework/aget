@@ -42,6 +42,10 @@ python3 .aget/patterns/release/version_bump.py --check 3.23.1   # version cohere
 
 Pre-deployment: no action. Post-deployment: pin to 3.23.0 (drop-in reverse; no schema migration).
 
+## Context for External Fleets
+
+For adopters outside the aget-framework organization: v3.23.1 introduces the **Goal Tier** as a first-class governance artifact — a durable, cross-session *outcome* that sits between an agent's permanent purpose (North Star) and its bodies of work (Initiatives). If your fleet uses the AGET templates, the upgrade is drop-in: pull the v3.23.1 template for each archetype and the Goal-Tier skills + engine scripts are present. No configuration, schema, or data migration is required. The Goal Tier is optional to adopt — existing workflows are unaffected until you invoke `/aget-propose-goals` / `/aget-create-goal`.
+
 ## Provenance
 
 Released 2026-06-20. Claim-path verification passed on the live release (every advertised capability resolves to a present-at-source canonical artifact).
