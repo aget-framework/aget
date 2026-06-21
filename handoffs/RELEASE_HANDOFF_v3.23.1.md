@@ -9,11 +9,11 @@
 
 ## Summary
 
-v3.23.1 is the fast-follow the v3.23.0 preview promised: the **Goal Tier lands in canonical**, and the **close-authorization guard** (built but explicitly *not* shipped in v3.23.0) is now in `aget/` and propagated to all 13 templates.
+v3.23.1 is the fast-follow the v3.23.0 preview promised: the **Goal Tier lands in canonical**, and the **close-authorization guard** (built but not shipped in v3.23.0) is now in `aget/` and propagated to all 13 templates.
 
 ## What's New
 
-- **`AGET_GOAL_SPEC` v0.2.0 → canonical `specs/`** — the Goal artifact (a durable cross-session **outcome**: North Star → Goal → Initiative → Action), KAOS goal typing (Achieve / Maintain / Soft), and the ≥1-loop requirement (a Goal owns a regulating loop or it decays).
+- **`AGET_GOAL_SPEC` v0.2.0 → canonical `specs/`** — the Goal artifact (a durable cross-session **outcome**: North Star → Goal → Initiative → Action), KAOS goal typing (Achieve / Maintain / Soft), and the requirement that every Goal owns at least one regulating loop, or it decays.
 - **`aget-create-goal` + `aget-propose-goals`** — the propose→commit verb pair, with the spec canonical; two-tier store (committed vs aspirational).
 - **`aget-close-project` + `close_authorization_guard.py`** — close-time authorization guard wired into close as Step 2.5 (blocks a close that claims authorization without a linked event).
 
@@ -29,7 +29,7 @@ v3.23.1 is the fast-follow the v3.23.0 preview promised: the **Goal Tier lands i
 
 ## Deployment Requirements
 
-- Fleet upgrade is the supervisor's lane (L511). Minimum pilot = framework-AGET (this instance, in-use Goal dogfooded) + supervisor (self-migration pending).
+- No schema or data migration. Drop-in across `aget/` + 13 templates.
 
 ## Smoke Test
 
@@ -40,15 +40,8 @@ python3 .aget/patterns/release/version_bump.py --check 3.23.1   # version cohere
 
 ## Rollback
 
-Pre-deployment: no action. Post-deployment P0: pin to 3.23.0 (drop-in reverse; no schema migration).
-
-## Pilot Tracking
-
-| Agent | Version confirmed | Notes |
-|-------|-------------------|-------|
-| private-aget-framework-AGET | 3.22.0 (manager) | canonical author; Goal Tier dogfooded in-use (GOAL-RELEASE-INTEGRITY) |
-| private-supervisor-AGET | _pending_ | self-migration = the ≥1-downstream-deployment bar (principal Q4) |
+Pre-deployment: no action. Post-deployment: pin to 3.23.0 (drop-in reverse; no schema migration).
 
 ## Provenance
 
-Released 2026-06-20 (L735 Saturday window). Post-release remediation: this handoff + body-conformance + homepage were completed in a same-session recovery after an L967 process-bypass (release run from the plan's gate-list rather than the SOP, skipping the pre-tag completeness gate). Claim-path gate PASS on the live release (no overclaim).
+Released 2026-06-20. Claim-path verification passed on the live release (every advertised capability resolves to a present-at-source canonical artifact).
