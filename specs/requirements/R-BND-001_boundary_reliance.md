@@ -32,7 +32,7 @@ Define how a **cross-boundary reliance** — anything a third party outside an A
 test -f ../aget/specs/requirements/R-BND-001_boundary_reliance.md
 ```
 
-**Implements**: GOAL-BOUNDARY-RELIANCE; L1129 (principal-owned reliance), L742 (requirements = human level)
+**Implements**: GOAL-BOUNDARY-RELIANCE (principal-owned reliance; requirements are human-level)
 
 ---
 
@@ -48,7 +48,7 @@ test -f ../aget/specs/requirements/R-BND-001_boundary_reliance.md
 grep -q 'as_of_version' .aget/skill_reliance_manifest.yaml   # first instance carries a release pin
 ```
 
-**Implements**: SemVer 2.0.0 (social contract); L646 (core-vs-optional)
+**Implements**: SemVer 2.0.0 (social contract; core-vs-optional tiers)
 
 ---
 
@@ -64,7 +64,7 @@ grep -q 'as_of_version' .aget/skill_reliance_manifest.yaml   # first instance ca
 python3 scripts/check_skill_reliance_manifest.py --json >/dev/null 2>&1
 ```
 
-**Implements**: L500 (detection-at-source); CAP-SESSION-001 (wake-up)
+**Implements**: detection-at-source; CAP-SESSION-001 (wake-up)
 
 ---
 
@@ -80,7 +80,7 @@ python3 scripts/check_skill_reliance_manifest.py --json >/dev/null 2>&1
 grep -q 'meets-declared-minimum\|declared minimum' ../aget/specs/requirements/R-BND-001_boundary_reliance.md
 ```
 
-**Implements**: L1129 (template ≠ contract)
+**Implements**: template ≠ contract
 
 ---
 
@@ -88,7 +88,7 @@ grep -q 'meets-declared-minimum\|declared minimum' ../aget/specs/requirements/R-
 
 **Statement**: WHEN deployed reality diverges from the declared minimum, the divergence SHALL be **detectable** — drift is not silent.
 
-**Rationale**: A contract no one can tell is broken is decorative (L671). Drift between declared and deployed must surface as a detectable signal.
+**Rationale**: A contract no one can tell is broken is decorative. Drift between declared and deployed must surface as a detectable signal.
 
 **Verification**:
 ```bash
@@ -96,7 +96,7 @@ grep -q 'meets-declared-minimum\|declared minimum' ../aget/specs/requirements/R-
 python3 scripts/check_skill_reliance_manifest.py 2>&1 | grep -qiE 'ERROR|WARN|coverage|missing' || true
 ```
 
-**Implements**: L671 (classification without consequence); L500 (drift detection)
+**Implements**: classification without consequence; drift detection
 
 ---
 
@@ -119,11 +119,11 @@ Other candidate boundary requirements (principal to triage, not agent-invented):
 
 | Sub-req | Evidence (L-doc) | Enforcement | Related |
 |---------|------------------|-------------|---------|
-| R-BND-001-01 | L1129, L742 | source-of-truth presence | GOAL-BOUNDARY-RELIANCE |
-| R-BND-001-02 | SemVer 2.0.0, L646 | `as_of_version` pin | #1748 manifest |
-| R-BND-001-03 | L500, CAP-SESSION-001 | wake-up checker | reliance manifest |
-| R-BND-001-04 | L1129 | declared-minimum check | AGET_TEMPLATE_SPEC (template = example) |
-| R-BND-001-05 | L671, L500 | drift detection | reliance manifest validator |
+| R-BND-001-01 | principal-owned, human-level | source-of-truth presence | GOAL-BOUNDARY-RELIANCE |
+| R-BND-001-02 | SemVer 2.0.0 | `as_of_version` pin | #1748 manifest |
+| R-BND-001-03 | CAP-SESSION-001 (wake-up) | wake-up checker | reliance manifest |
+| R-BND-001-04 | template-is-example | declared-minimum check | AGET_TEMPLATE_SPEC (template = example) |
+| R-BND-001-05 | drift detection | drift detection | reliance manifest validator |
 
 **Ratification**: principal, 2026-06-24 (4 D1 boxes disposed individually). **Promoted to canonical**: 2026-06-27 (v3.24.0 release, `/aget-enhance-spec NEW`, #725). **Drafted from**: `aget/drafts/REQ-BOUNDARY-RELIANCE_draft.md` (private substrate).
 

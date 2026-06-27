@@ -3,7 +3,7 @@
 **Spec ID**: AGET_HOST_RUNTIME_SPEC
 **Status**: **Active** (v1.0.0, canonical — graduated 2026-06-27 in v3.24.0 via `/aget-enhance-spec`, #1737). The **standard** is producer-complete and governing; behavioral conformance V-tests (V-HFL-001..007) are **runtime-pending** — they activate at first node deployment (operator lane), per ADR-007 honest-testability (no test theater). v1.0.0 labels the *standard*, not deployment-proof; adoption is tracked separately (INIT-ALWAYS-ON-HOST). The runnable-now gate — the CAP↔V bijection (7↔7) — PASSES.
 **Owner**: INIT-FRAMEWORK-COHERENCE Stream 7 (producer lane); deployed/operated by INIT-ALWAYS-ON-HOST Stream 1/3 (operator lane). Producer/Operator lane-split C1051.
-**Governing decisions** (principal, 2026-06-22, requirements-level L742): **tiered** telemetry · **fleet-wide** standard · **decoupled-required** ownership.
+**Governing decisions** (principal, 2026-06-22, requirements-level): **tiered** telemetry · **fleet-wide** standard · **decoupled-required** ownership.
 **Theoretical basis**: lifecycle-class separation convergent across XDG Base Directory, systemd (`StateDirectory`/`LogsDirectory`/`RuntimeDirectory`/`CacheDirectory`/`ConfigurationDirectory`), macOS launchd / `~/Library`, and structured-logging bounded-growth practice (web study 2026-06-22).
 **Ontology**: FWRK-2026-054 (C1045–C1054).
 
@@ -107,8 +107,8 @@ All behavioral V-tests are **runtime-pending** until the layout is deployed on a
 
 ## 9. Graduation path
 
-1. `/aget-enhance-spec` lifecycle (Phases 0–6, L622) → wire V-tests, ratify, promote to canonical `../aget/specs/AGET_HOST_RUNTIME_SPEC.md`.
-2. Weekend push (L735) to publish.
+1. `/aget-enhance-spec` lifecycle (Phases 0–6) → wire V-tests, ratify, promote to canonical `../aget/specs/AGET_HOST_RUNTIME_SPEC.md`.
+2. Weekend release window to publish.
 3. INIT-ALWAYS-ON-HOST consumes: deploys layout on node-1 (operator lane), runs conformance check via node monitor.
 
-**Open items**: ~~confirm record/exhaust tiering (RELAY Q1)~~ **ANSWERED** 2026-06-22 (§4, verified at source); ~~confirm migration set (RELAY Q2)~~ **ANSWERED** 2026-06-22 (§5, 2 daemons + non-daemon caveat). Remaining: per-row vs per-file boundary granularity is now *admitted* (CAP-HFL-005) — finalize the manifest record-predicate schema at graduation; CAP↔V bijection meta-test (7↔7, PASS) = the runnable-now gate; graduation via `/aget-enhance-spec` + weekend push (L735) is the only blocker to canonical.
+**Open items**: ~~confirm record/exhaust tiering (RELAY Q1)~~ **ANSWERED** 2026-06-22 (§4, verified at source); ~~confirm migration set (RELAY Q2)~~ **ANSWERED** 2026-06-22 (§5, 2 daemons + non-daemon caveat). Remaining: per-row vs per-file boundary granularity is now *admitted* (CAP-HFL-005) — finalize the manifest record-predicate schema at graduation; CAP↔V bijection meta-test (7↔7, PASS) = the runnable-now gate; graduation via `/aget-enhance-spec` + weekend release window is the only blocker to canonical.

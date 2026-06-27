@@ -12,13 +12,19 @@ This document provides a complete timeline of AGET Framework versions and their 
 
 ## Current Version
 
-**v3.9.0** (2026-03-15) - Governance Enforcement
+**v3.24.0** (2026-06-27) - Reliance & Boundaries
 
-All 13 repositories (aget + 12 templates) at v3.9.0: ✅
+Core `aget/` at v3.24.0: ✅ (GitHub Release live). Template fan-out is a deliberate follow-up (core-first, D-REL-3).
+
+> ⚠️ This timeline below is backfilled only through v3.9.0; v3.10.0–v3.23.1 entries are owed (VERSION_HISTORY currency gap, tracked separately). The authoritative per-release record is `CHANGELOG.md`.
 
 ---
 
 ## Version Timeline
+
+### v3.24.0 (2026-06-27) ✅
+
+**Theme**: Reliance & Boundaries — R-BND-001 boundary/reliance requirements + a release-pinned, checkable skill-reliance manifest framework feature (schema + validator) + AGET_HOST_RUNTIME_SPEC v1.0.0 (host-filesystem layout standard). Theme advanced-not-completed; friction-handling triage staged to a following cycle.
 
 ### v3.9.0 (2026-03-15) ✅
 
