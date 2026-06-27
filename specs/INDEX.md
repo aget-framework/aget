@@ -52,6 +52,8 @@ This document provides an index of all AGET framework specifications with their 
 | AGET-SUP-001 | AGET_SUPERVISOR_NOTIFICATION_SPEC | Active | Active | Supervisor notification protocols |
 | AGET-CIV-001 | AGET_CONTENT_INTEGRITY_SPEC | Active | Active | Content integrity validation |
 | AGET-SKILL-001 | SKILL_NAMING_CONVENTION_SPEC | Active | Active | Skill naming conventions |
+| AGET-HRT-001 | AGET_HOST_RUNTIME_SPEC | Active | CANONICAL | Host-runtime filesystem layout standard (lifecycle-class separation; conformance deploy-pending, ADR-007) |
+| AGET-BND-001 | R-BND-001 (requirements/) | Active | CANONICAL | Boundary & reliance requirements (principal-owned, version-pinned, meets-declared-minimum) |
 | AGET-WORK-001 | WORKER_TEMPLATE_SPEC | Active | Active | Worker template requirements |
 
 **Total: 40 specifications**

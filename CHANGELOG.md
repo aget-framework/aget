@@ -17,6 +17,24 @@ Items accumulated since v3.22.0 that are confirmed in-flight for a future releas
 
 ---
 
+## [3.24.0] - 2026-06-27
+
+**Theme**: Reliance & Boundaries
+
+> What can a principal *rely on* an AGET to provide at a release — and *where* do an always-on node's artifacts live? v3.24 makes both checkable. The theme is advanced, not completed: friction-handling triage is staged to a following release.
+
+### Added
+
+- **R-BND-001 — Boundary & Reliance Requirements** (`specs/requirements/`). A cross-boundary reliance (framework→downstream, supervisor→agent, agent→agent) SHALL be a **principal-owned, externally-verifiable requirement with a single source of truth** — version-pinned, verified *meets-declared-minimum* (not parity-to-template), with drift detectable.
+- **Skill-reliance manifest framework feature.** A release-pinned `{S}` core / `{O}` optional / `{D}` domain reliance contract any AGET can declare and **self-check**: a governed manifest schema (`schemas/skill_reliance_manifest.schema.yaml`) + a generic validator (`scripts/check_skill_reliance_manifest.py`). Resolves the gap where skill tiers were unspecified and uncheckable.
+- **AGET_HOST_RUNTIME_SPEC v1.0.0** (`specs/`) — host-runtime **filesystem-layout standard** for always-on nodes: lifecycle-class separation (config/data/state/cache/logs), a record/exhaust tier boundary, bounded-growth rotation, and deployed-copy decoupling. Behavioral conformance checks activate at first node deployment (honest-testability, ADR-007).
+
+### Notes
+
+- Theme framed honestly as **advanced, not fulfilled** — the reliance and boundary *contracts* land; friction-handling triage and host-node deployment continue in following cycles.
+
+---
+
 ## [3.23.1] - 2026-06-20
 
 **Theme**: Goal Tier (canonical) + Close-Authorization Guard
