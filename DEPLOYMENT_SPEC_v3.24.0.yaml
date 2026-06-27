@@ -1,0 +1,102 @@
+# DEPLOYMENT_SPEC_v3.24.0.yaml
+# Complete target state specification for v3.24.0 deployment
+#
+# Purpose: Define what a correctly-deployed v3.24.0 agent looks like.
+# Governance: R-DEP-002, R-REL-038
+#
+# Created: 2026-06-27 (RETROSPECTIVE BACK-FILL per principal /aget-ask Q2:B;
+#   PROJECT_PLAN_v3.24_fleet_completion_consumer_gate_v1.0 Gate 1.)
+# Origin: DEPLOYMENT_SPEC_v3.23.1.yaml
+# Release: Reliance & Boundaries (advanced, not completed)
+
+version: "3.24.0"
+spec_version: "2.0.0"
+created: "2026-06-27"
+status: active
+supersedes: "DEPLOYMENT_SPEC_v3.23.1.yaml"
+breaking_release: false
+backfill: true
+
+verification_script:
+  file: "scripts/verify_deployment.py"
+  usage: "python3 scripts/verify_deployment.py --version 3.24.0 --path /path/to/agent"
+  known_defects: "Treat tooling output as claim-under-test, not premise (L908)."
+
+mandatory_changes:
+  - id: "M-3.24-1"
+    description: "version.json aget_version field set to '3.24.0'"
+    blocking: true
+    detection: "test $(jq -r .aget_version .aget/version.json) = '3.24.0'"
+  - id: "M-3.24-2"
+    description: "AGENTS.md @aget-version header set to '3.24.0'"
+    blocking: true
+    detection: "grep -q '^@aget-version: 3.24.0' AGENTS.md"
+  - id: "M-3.24-3"
+    description: "manifest.yaml version aligned to 3.24.0 (L444 coherence triplet)"
+    blocking: true
+    detection: "grep -q '3.24.0' manifest.yaml"
+
+additive_artifacts:
+  - id: "A-3.24-1"
+    description: "R-BND-001 Boundary & Reliance Requirements present at specs/requirements/"
+    blocking: false
+    canonical_source: "aget/specs/requirements/R-BND-001_boundary_reliance.md"
+    detection: "test -f specs/requirements/R-BND-001_boundary_reliance.md"
+  - id: "A-3.24-2"
+    description: "Skill-reliance manifest schema + validator (schemas/skill_reliance_manifest.schema.yaml + scripts/check_skill_reliance_manifest.py)"
+    blocking: false
+    canonical_source: "aget/schemas/skill_reliance_manifest.schema.yaml"
+    detection: "test -f schemas/skill_reliance_manifest.schema.yaml && test -f scripts/check_skill_reliance_manifest.py"
+  - id: "A-3.24-3"
+    description: "AGET_HOST_RUNTIME_SPEC v1.0.0 present at specs/ (host-runtime filesystem-layout standard)"
+    blocking: false
+    canonical_source: "aget/specs/AGET_HOST_RUNTIME_SPEC.md"
+    detection: "test -f specs/AGET_HOST_RUNTIME_SPEC.md"
+    note: "Behavioral conformance V-tests activate at first node deployment (honest-testability, ADR-007)."
+
+optional_changes:
+  - id: "O-3.24-1"
+    description: "Author .aget/skill_reliance_manifest.yaml to adopt the reliance contract (self-check via validator)"
+    blocking: false
+    note: "Only if the agent declares a reliance contract."
+
+# =============================================================================
+# !! PROPAGATION GAP DISCLOSURE (substance-over-symbol) !!
+# =============================================================================
+# Authored honestly: at v3.24.0 ship the reliance payload landed aget/-canonical ONLY.
+# The 13-template fan-out (D-REL-3) was a DELIBERATE follow-up and is NOT yet shipped.
+# A consumer upgrading to 3.24.0 inherits a version bump with NO reachable reliance
+# feature until the fan-out lands. RELEASE_HANDOFF + REMOTE_MIGRATION_MESSAGE were
+# also not promoted to canonical at ship (produced-not-delivered, L713).
+propagation_gap:
+  status: "OPEN at back-fill date (2026-06-27) — fleet reach = 0 for the reliance feature."
+  per_surface:
+    canonical_aget:
+      R-BND-001: present
+      skill_reliance_manifest_schema+validator: present
+      AGET_HOST_RUNTIME_SPEC: present
+    templates_13:
+      reliance_validator: ABSENT          # D-REL-3 fan-out not shipped
+      starter_manifest: ABSENT            # D-REL-3 fan-out not shipped
+    delivery:
+      RELEASE_HANDOFF_v3.24.0_canonical: ABSENT   # L713 produced-not-delivered
+      REMOTE_MIGRATION_MESSAGE_v3.24.0: ABSENT
+  remediation_owner: "PROJECT_PLAN_v3.24_fleet_completion_consumer_gate_v1.0 — Gate 3 (fan-out, PUBLIC L735) + Gate 2 (canonical delivery, PUBLIC L735)"
+  tracking: "D-REL-3 (handoff §Owed follow-ups); principal Q1:A 2026-06-27 (ship fleet-reach this cycle)"
+
+breaking_changes:
+  count: 0
+  note: "None. Additive (new requirement + schema/validator + standard). Existing agents unaffected. Theme advanced, not completed — friction-handling triage staged to a following cycle."
+
+completion_response:
+  release_outcome_report_required: true
+  rubric: "aget/rubrics/RUBRIC_fleet_upgrade_outcome_v1.1.md"
+  minimum_score: 10
+  c_a_note: "This back-fill spec is the C-A artifact RUBRIC_fleet_upgrade_outcome requires; authored retrospectively because v3.24 shipped without it (the R-REL-038 lapse this plan remedies)."
+
+references:
+  changelog: "aget/CHANGELOG.md (v3.24.0 entry, 2026-06-27)"
+  release_handoff: "handoffs/RELEASE_HANDOFF_v3.24.0.md (canonical promotion owed — Gate 2)"
+  supervisor_notification: "handoffs/SUPERVISOR_NOTIFICATION_v3.24.0.md"
+  backfill_authority: "principal /aget-ask Q2:B 2026-06-27"
+  remediation: "PROJECT_PLAN_v3.24_fleet_completion_consumer_gate_v1.0 (Gates 2/3)"
