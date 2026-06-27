@@ -1,0 +1,50 @@
+# Skill Reliance Manifest — Schema & Starter Template
+#
+# Governed by: R-BND-001 (Boundary & Reliance Requirements). This file defines the
+# format of a per-agent `.aget/skill_reliance_manifest.yaml` — the release-pinned,
+# externally-verifiable reliance contract that makes "what can a principal rely on
+# this AGET to provide at release R?" CHECKABLE (#1748).
+#
+# Validate with: python3 scripts/check_skill_reliance_manifest.py [--json]
+#   C1 every declared skill exists in .claude/skills/
+#   C2 no skill in more than one tier
+#   C3 {S} core == authoritative universal_skills (../aget/specs/ARCHETYPE_SKILLS_INDEX.yaml; WARN if unreachable)
+#   C4 manifest carries a release pin (meta.as_of_version)  [R-BND-001-02]
+#   C5 skills on disk not declared in any tier are reported (WARN; drift — R-BND-001-05)
+#
+# Tier vocabulary (FODA — Kang/SEI 1990; SemVer 2.0.0 "social contract"):
+#   {S} core            — guaranteed-present at R, zero investment, framework-owned  (FODA mandatory)
+#   {O} optional-AGET   — adoptable with some investment, proposable                (FODA optional)
+#   {D} principal-domain — proposable AND creatable, principal-owned                (FODA alternative)
+#
+# Verification is MEETS-DECLARED-MINIMUM, not parity-to-template (R-BND-001-04):
+# this file is a STARTER, not a contract to be matched byte-for-byte. Each AGET
+# declares its own tiers; {S} is the only cross-agent guarantee.
+
+schema_version: "1.0.0"
+spec_basis: "R-BND-001 (canonical) — boundary reliance is principal-owned, single-source, version-pinned, drift-detectable"
+ontology_binding: "aget:concept/ReleaseSkillRelianceContract"   # C1075; theme genus aget:concept/AppropriateReliance (C759)
+
+# REQUIRED. The manifest is a claim under test until validated; meta.as_of_version
+# is the release pin that makes the contract version-precise (R-BND-001-02).
+meta:
+  agent: "<agent-name>"                 # REQUIRED — this AGET's identity
+  archetype: "<archetype>"              # REQUIRED — e.g. framework-manager, supervisor
+  as_of_version: "<X.Y.Z>"              # REQUIRED — the release this snapshot is pinned to
+  generated: "<YYYY-MM-DD>"             # REQUIRED — when this snapshot was taken
+  foda_grounding: "Kang/SEI 1990; SemVer 2.0.0; Agent Skills open standard"
+  tier_legend:
+    S: "core — guaranteed-present at this release, zero investment, framework-owned"
+    O: "optional-AGET — adoptable with some investment"
+    D: "principal-domain — principal-authored / domain-specific"
+
+# {S} CORE — the universal skills a principal can rely on in ANY conformant AGET at
+# this release. AUTHORITATIVE SOURCE = ../aget/specs/ARCHETYPE_SKILLS_INDEX.yaml
+# (universal_skills). Do NOT hand-edit divergently from that index (C3 enforces equality).
+core_S: []        # list[str] — declared {S} skills (must equal the authoritative universal set)
+
+# {O} OPTIONAL-AGET — framework-general skills present here, adoptable by other AGETs.
+optional_O: []    # list[str]
+
+# {D} PRINCIPAL-DOMAIN — domain skills specific to this AGET's archetype.
+domain_D: []      # list[str]
