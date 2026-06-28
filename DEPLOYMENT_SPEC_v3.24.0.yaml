@@ -63,24 +63,29 @@ optional_changes:
 # =============================================================================
 # !! PROPAGATION GAP DISCLOSURE (substance-over-symbol) !!
 # =============================================================================
-# Authored honestly: at v3.24.0 ship the reliance payload landed aget/-canonical ONLY.
-# The 13-template fan-out (D-REL-3) was a DELIBERATE follow-up and is NOT yet shipped.
-# A consumer upgrading to 3.24.0 inherits a version bump with NO reachable reliance
-# feature until the fan-out lands. RELEASE_HANDOFF + REMOTE_MIGRATION_MESSAGE were
-# also not promoted to canonical at ship (produced-not-delivered, L713).
+# Authored honestly; UPDATED 2026-06-27 from verified received-state (13/13-template audit).
+# At v3.24.0 ship the reliance payload landed aget/-canonical ONLY. The reliance FEATURE
+# (schema + validator) has since fanned out to 13/13 templates. Still pending (EC-5):
+# the template version-label bump (13/13 at 3.23.1), the starter manifest (0/13), and the
+# full v3.24 spec payload (R-BND-001 + AGET_HOST_RUNTIME_SPEC absent from templates).
+# Existing-agent point-upgrades are unaffected; clean NEW-agent template derivation awaits EC-5.
 propagation_gap:
-  status: "OPEN at back-fill date (2026-06-27) — fleet reach = 0 for the reliance feature."
+  status: "PARTIAL (2026-06-27) — reliance feature reaches 13/13; version-coherence + full-payload pending (EC-5)."
   per_surface:
     canonical_aget:
       R-BND-001: present
       skill_reliance_manifest_schema+validator: present
       AGET_HOST_RUNTIME_SPEC: present
     templates_13:
-      reliance_validator: ABSENT          # D-REL-3 fan-out not shipped
-      starter_manifest: ABSENT            # D-REL-3 fan-out not shipped
+      reliance_validator: present         # fan-out shipped 13/13 (eb022199)
+      reliance_schema: present            # fan-out shipped 13/13
+      starter_manifest: ABSENT            # 0/13 — pending
+      version_label: "3.23.1 (x13)"       # EC-5 — conformance-then-bump pending
+      R-BND-001: ABSENT                   # full-payload pending (0/13)
+      AGET_HOST_RUNTIME_SPEC: ABSENT      # full-payload pending (0/13)
     delivery:
-      RELEASE_HANDOFF_v3.24.0_canonical: ABSENT   # L713 produced-not-delivered
-      REMOTE_MIGRATION_MESSAGE_v3.24.0: ABSENT
+      RELEASE_HANDOFF_v3.24.0_canonical: present   # promoted 2026-06-27 (215e98b)
+      REMOTE_MIGRATION_MESSAGE_v3.24.0: "N/A — local-mode migration (not required)"
   remediation_owner: "PROJECT_PLAN_v3.24_fleet_completion_consumer_gate_v1.0 — Gate 3 (fan-out, PUBLIC L735) + Gate 2 (canonical delivery, PUBLIC L735)"
   tracking: "D-REL-3 (handoff §Owed follow-ups); principal Q1:A 2026-06-27 (ship fleet-reach this cycle)"
 

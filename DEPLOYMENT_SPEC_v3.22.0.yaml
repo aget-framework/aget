@@ -1,0 +1,91 @@
+# DEPLOYMENT_SPEC_v3.22.0.yaml
+# Complete target state specification for v3.22.0 deployment
+#
+# Purpose: Define what a correctly-deployed v3.22.0 agent looks like.
+# Governance: R-DEP-002 (State-Based Deployment Requirement), R-REL-038
+#
+# Created: 2026-06-27 (RETROSPECTIVE BACK-FILL — authored after the fact per principal
+#   /aget-ask Q2:B 2026-06-27: R-REL-038 STANDS, resume DEPLOYMENT_SPEC authoring.
+#   v3.22-v3.24 shipped WITHOUT a DEPLOYMENT_SPEC — this back-fills the obligation.
+#   PROJECT_PLAN_v3.24_fleet_completion_consumer_gate_v1.0 Gate 1.)
+# Origin: DEPLOYMENT_SPEC_v3.21.0.yaml
+# Release: Skill-Support Delivery + Verify-at-Point-of-Use + Hygiene
+
+version: "3.22.0"
+spec_version: "2.0.0"
+created: "2026-06-27"
+status: active
+supersedes: "DEPLOYMENT_SPEC_v3.21.0.yaml"
+breaking_release: false
+backfill: true   # authored retrospectively 2026-06-27; not present at v3.22.0 ship
+
+verification_script:
+  file: "scripts/verify_deployment.py"
+  usage: "python3 scripts/verify_deployment.py --version 3.22.0 --path /path/to/agent"
+  known_defects: "Treat tooling output as claim-under-test, not premise (L908)."
+
+mandatory_changes:
+  - id: "M-3.22-1"
+    description: "version.json aget_version field set to '3.22.0'"
+    blocking: true
+    detection: "test $(jq -r .aget_version .aget/version.json) = '3.22.0'"
+  - id: "M-3.22-2"
+    description: "AGENTS.md @aget-version header set to '3.22.0'"
+    blocking: true
+    detection: "grep -q '^@aget-version: 3.22.0' AGENTS.md"
+  - id: "M-3.22-3"
+    description: "manifest.yaml version aligned to 3.22.0 (L444 coherence triplet)"
+    blocking: true
+    detection: "grep -q '3.22.0' manifest.yaml"
+
+additive_artifacts:
+  - id: "A-3.22-1"
+    description: "scripts/deploy_skill.py (governed surgical skill deployer; push-window guard; live gap re-derivation)"
+    blocking: false
+    canonical_source: "aget/scripts/deploy_skill.py"
+    detection: "test -f scripts/deploy_skill.py"
+  - id: "A-3.22-2"
+    description: "scripts/check_claim_freshness.py (citation/claim freshness gate; --online/--strict)"
+    blocking: false
+    canonical_source: "aget/scripts/check_claim_freshness.py"
+    detection: "test -f scripts/check_claim_freshness.py"
+  - id: "A-3.22-3"
+    description: "scripts/check_skill_coherence.py (frontmatter↔tree coherence gate)"
+    blocking: false
+    canonical_source: "aget/scripts/check_skill_coherence.py"
+    detection: "test -f scripts/check_skill_coherence.py"
+  - id: "A-3.22-4"
+    description: "scripts/validate_spec_binding.py + scripts/ground_artifact.py (ontology-spec-binding validator + REQUIRED loader dependency)"
+    blocking: false
+    canonical_source: "aget/scripts/validate_spec_binding.py"
+    detection: "test -f scripts/validate_spec_binding.py && test -f scripts/ground_artifact.py"
+    note: "ground_artifact.py is a TRANSITIVE dependency — validate_spec_binding imports it. Copying one without the other => ModuleNotFoundError (the #1660 defect, below)."
+  - id: "A-3.22-5"
+    description: "/aget-propose-actions skill at v1.8.0 (Step 3.5 self-critique + REQ-PA-018/019/020 + Type column)"
+    blocking: false
+    canonical_source: "aget/.claude/skills/aget-propose-actions/SKILL.md"
+    detection: "grep -q 'v1.8.0' .claude/skills/aget-propose-actions/SKILL.md"
+
+optional_changes:
+  - id: "O-3.22-1"
+    description: "validate_ontology_reciprocity.py scope fix (dangling→whole-vocab; cross-cluster→non-defect)"
+    blocking: false
+
+propagation_gap:
+  status: "DEFECT at ship (#1660) — validate_spec_binding.py was propagated to most of the fleet WITHOUT its ground_artifact.py companion → ModuleNotFoundError on import. Pilot pair was non-representative (clean). Remediated v3.23 via import-smoke gate (SOP_release_process v1.51)."
+  tracking: "gh#1660 (transitive-companion copy gap); #1658 (lesson 2 non-representative pilots)"
+  lesson: "L1079 (version-axis ≠ operational-axis): a shipped script must IMPORT/RUN, not just version-match."
+
+breaking_changes:
+  count: 0
+  note: "None. Additive governed tooling. First deliberately-ambitious minor (H-AMB-322)."
+
+completion_response:
+  release_outcome_report_required: true
+  rubric: "aget/rubrics/RUBRIC_fleet_upgrade_outcome_v1.1.md"
+  minimum_score: 10
+
+references:
+  changelog: "aget/CHANGELOG.md (v3.22.0 entry, 2026-06-13)"
+  backfill_authority: "principal /aget-ask Q2:B 2026-06-27; PROJECT_PLAN_v3.24_fleet_completion_consumer_gate_v1.0 Gate 1"
+  defect: "gh#1660 (operational-axis propagation gap)"

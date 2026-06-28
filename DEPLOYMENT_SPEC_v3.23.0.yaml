@@ -1,0 +1,78 @@
+# DEPLOYMENT_SPEC_v3.23.0.yaml
+# Complete target state specification for v3.23.0 deployment
+#
+# Purpose: Define what a correctly-deployed v3.23.0 agent looks like.
+# Governance: R-DEP-002, R-REL-038
+#
+# Created: 2026-06-27 (RETROSPECTIVE BACK-FILL per principal /aget-ask Q2:B;
+#   PROJECT_PLAN_v3.24_fleet_completion_consumer_gate_v1.0 Gate 1.)
+# Origin: DEPLOYMENT_SPEC_v3.22.0.yaml
+# Release: Goal Tier (preview)
+
+version: "3.23.0"
+spec_version: "2.0.0"
+created: "2026-06-27"
+status: active
+supersedes: "DEPLOYMENT_SPEC_v3.22.0.yaml"
+breaking_release: false
+backfill: true
+
+verification_script:
+  file: "scripts/verify_deployment.py"
+  usage: "python3 scripts/verify_deployment.py --version 3.23.0 --path /path/to/agent"
+  known_defects: "Treat tooling output as claim-under-test, not premise (L908)."
+
+mandatory_changes:
+  - id: "M-3.23.0-1"
+    description: "version.json aget_version field set to '3.23.0'"
+    blocking: true
+    detection: "test $(jq -r .aget_version .aget/version.json) = '3.23.0'"
+  - id: "M-3.23.0-2"
+    description: "AGENTS.md @aget-version header set to '3.23.0'"
+    blocking: true
+    detection: "grep -q '^@aget-version: 3.23.0' AGENTS.md"
+  - id: "M-3.23.0-3"
+    description: "manifest.yaml version aligned to 3.23.0 (L444 coherence triplet)"
+    blocking: true
+    detection: "grep -q '3.23.0' manifest.yaml"
+
+additive_artifacts:
+  - id: "A-3.23.0-1"
+    description: "/aget-create-goal skill (commit a candidate goal into a governed Goal artifact)"
+    blocking: false
+    canonical_source: "aget/.claude/skills/aget-create-goal/SKILL.md"
+    detection: "test -f .claude/skills/aget-create-goal/SKILL.md"
+  - id: "A-3.23.0-2"
+    description: "/aget-propose-goals skill (SKILL-055; plural candidate-goal generator)"
+    blocking: false
+    canonical_source: "aget/.claude/skills/aget-propose-goals/SKILL.md"
+    detection: "test -f .claude/skills/aget-propose-goals/SKILL.md"
+  - id: "A-3.23.0-3"
+    description: "AGET_GOAL_SPEC v0.2.0 (DRAFT) present at specs/"
+    blocking: false
+    canonical_source: "aget/specs/AGET_GOAL_SPEC.md"
+    detection: "test -f specs/AGET_GOAL_SPEC.md"
+    note: "DRAFT at v3.23.0 (preview); canonical promotion lands in v3.23.1."
+
+optional_changes:
+  - id: "O-3.23.0-1"
+    description: "RUBRIC_goal_selection present (ex-ante candidate-goal scoring)"
+    blocking: false
+
+propagation_gap:
+  status: "PREVIEW release — Goal Tier intentionally minimal/preview in canonical; full canonical spec promotion + close-guard deferred to the v3.23.1 fast-follow."
+  corrected_post_release: "The post-release entry was corrected: an 'Integrity Hardening' theme + close-guard bullet referenced a capability NOT present in canonical aget/; internal release-tooling fixes #1654/#1656 live in the manager instance, not canonical, and were removed from the public entry. (Honest-disclosure precedent — substance over symbol.)"
+
+breaking_changes:
+  count: 0
+  note: "None. Additive preview. Reduced scope (REQ-9 time-protection): self-oversight ratchet + interaction-channel rung deferred to v3.24."
+
+completion_response:
+  release_outcome_report_required: true
+  rubric: "aget/rubrics/RUBRIC_fleet_upgrade_outcome_v1.1.md"
+  minimum_score: 10
+
+references:
+  changelog: "aget/CHANGELOG.md (v3.23.0 entry, 2026-06-20)"
+  backfill_authority: "principal /aget-ask Q2:B 2026-06-27; PROJECT_PLAN_v3.24_fleet_completion_consumer_gate_v1.0 Gate 1"
+  fast_follow: "v3.23.1 (Goal Tier canonical + close-authorization guard)"

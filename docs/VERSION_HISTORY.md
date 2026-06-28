@@ -14,7 +14,7 @@ This document provides a complete timeline of AGET Framework versions and their 
 
 **v3.24.0** (2026-06-27) - Reliance & Boundaries
 
-Core `aget/` at v3.24.0: ✅ (GitHub Release live). Template fan-out is a deliberate follow-up (core-first, D-REL-3).
+Core `aget/` at v3.24.0: ✅ (GitHub Release live). Reliance feature (schema + validator) has fanned out to 13/13 templates; template version-coherence + full-payload conformance pending (EC-5, 2026-06-27).
 
 > ⚠️ This timeline below is backfilled only through v3.9.0; v3.10.0–v3.23.1 entries are owed (VERSION_HISTORY currency gap, tracked separately). The authoritative per-release record is `CHANGELOG.md`.
 

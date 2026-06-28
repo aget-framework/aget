@@ -24,7 +24,7 @@ First public release since v3.22. Theme **Reliance & Boundaries** — advanced, 
 
 - **No breaking changes** — additive (new requirement, new schema+validator, new standard). Existing agents continue unaffected.
 - To adopt the reliance contract: author a `.aget/skill_reliance_manifest.yaml` against `schemas/skill_reliance_manifest.schema.yaml`; verify with `scripts/check_skill_reliance_manifest.py`.
-- **Scope note (D-REL-3, core-first)**: this release landed `aget/` canonical only. The **13-template fan-out is a deliberate follow-up** (validator + starter manifest into each template) — not yet shipped.
+- **Scope note (D-REL-3, core-first)**: this release landed `aget/` canonical at ship. The reliance **feature** (validator + schema) has since fanned out to **13/13 templates** (verified 2026-06-27). Still pending (EC-5): per-template version-label bump (13/13 at 3.23.1), the starter manifest (0/13), and the full v3.24 spec payload (R-BND-001 + AGET_HOST_RUNTIME_SPEC). Existing-agent point-upgrades are unaffected; clean NEW-agent template derivation awaits EC-5.
 
 ## Pilot tracking (D-REL-2 deploy-verify bar = supervisor + self)
 
@@ -39,7 +39,7 @@ First public release since v3.22. Theme **Reliance & Boundaries** — advanced, 
 
 ## Owed follow-ups
 
-1. **13-template fan-out** of the reliance validator + starter manifest (D-REL-3 deferred tail).
+1. **EC-5 template conformance** — validator + schema reached 13/13; remaining: per-template version bump (after full-payload conformance, not label-only), starter manifest (0/13), R-BND-001 + AGET_HOST_RUNTIME_SPEC into templates.
 2. **Supervisor deploy-verify** (D-REL-2 — second confirmed deployment; L656 loading-dock guard on next-cycle planning).
 3. **Friction forward-validation** (v3.25; supervisor Stream B — unblocks CAP-FRIC-006).
 4. **#1737 conformance** activates at first node deployment (operator lane, INIT-ALWAYS-ON-HOST).
