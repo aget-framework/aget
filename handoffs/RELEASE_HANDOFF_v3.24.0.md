@@ -23,6 +23,7 @@ First public release since v3.22. Theme **Reliance & Boundaries** — advanced, 
 ## Upgrade guide
 
 - **No breaking changes** — additive (new requirement, new schema+validator, new standard). Existing agents continue unaffected.
+- **Remote/external fleets**: see `handoffs/REMOTE_MIGRATION_MESSAGE_v3.24.0.md` — sanitized upgrade guide + an 8-point operational playbook from an executed v3.23.1→v3.24.0 fleet migration (triplet-vs-doublet, blocking-vs-additive layers, conformance-then-bump, verify-from-disk, pre-flight classification, one-owner).
 - To adopt the reliance contract: author a `.aget/skill_reliance_manifest.yaml` against `schemas/skill_reliance_manifest.schema.yaml`; verify with `scripts/check_skill_reliance_manifest.py`.
 - **Scope note (D-REL-3, core-first)**: this release landed `aget/` canonical at ship. The reliance **feature** (validator + schema) has since fanned out to **13/13 templates** (verified 2026-06-27). Still pending (EC-5): per-template version-label bump (13/13 at 3.23.1), the starter manifest (0/13), and the full v3.24 spec payload (R-BND-001 + AGET_HOST_RUNTIME_SPEC). Existing-agent point-upgrades are unaffected; clean NEW-agent template derivation awaits EC-5.
 
