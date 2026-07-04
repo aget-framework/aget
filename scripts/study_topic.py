@@ -326,7 +326,15 @@ def find_project_plans(topic: str, domain_keywords: list = None) -> list:
             # Check if active
             try:
                 content = file.read_text()
-                is_active = 'IN PROGRESS' in content or 'Status**: IN PROGRESS' in content
+                # v3.25 C-25-14 (gh#1809 + gh#1791): case-insensitive, Plan_Status-first.
+                # Plans write "In Progress" (title case) — the old upper-case-only probe
+                # rendered every live plan [inactive]. Prefer the disambiguated
+                # Plan_Status header (CAP-PP-003); fall back to legacy header Status,
+                # then to whole-content scan for pre-template-2.1 plans.
+                m = (re.search(r'\*\*Plan_Status\*\*:\s*([^\n]*)', content)
+                     or re.search(r'\*\*Status\*\*:\s*([^\n]*)', content))
+                probe = m.group(1) if m else content
+                is_active = 'IN PROGRESS' in probe.upper()
             except Exception:
                 is_active = False
 
@@ -367,6 +375,32 @@ def find_sops(topic: str, domain_keywords: list = None) -> list:
                 'match_count': match['match_count']
             })
 
+    results.sort(key=lambda x: x['match_count'], reverse=True)
+    return results
+
+
+def find_knowledge(topic: str, domain_keywords: list = None) -> list:
+    """Find knowledge-base notes related to topic (v3.25 C-25-14, gh#1809).
+
+    Scope decision (framework requirements-level, 2026-07-04): knowledge/ and
+    ontology/ join the search surface — they are curated KB areas an agent is
+    expected to consult. sessions/, workspace/, and data/ stay OUT: transient
+    or bulk surfaces whose hits are noise at study-time (revisit on evidence).
+    """
+    agent_root = get_agent_root()
+    results = []
+    for area in ('knowledge', 'ontology'):
+        base = agent_root / area
+        if not base.exists():
+            continue
+        for file in base.rglob('*.md'):
+            match = search_file_for_topic(file, topic, domain_keywords=domain_keywords)
+            if match:
+                results.append({
+                    'doc': str(file.relative_to(agent_root)),
+                    'file': match['file'],
+                    'match_count': match['match_count']
+                })
     results.sort(key=lambda x: x['match_count'], reverse=True)
     return results
 
@@ -481,6 +515,14 @@ def generate_report(topic: str, findings: dict) -> str:
             lines.append(f"- {item['doc']} ({item['match_count']} matches)")
         lines.append("")
 
+    # Knowledge section (v3.25 C-25-14)
+    if findings.get('knowledge'):
+        lines.append("### Related Knowledge/Ontology")
+        lines.append("")
+        for item in findings['knowledge'][:5]:
+            lines.append(f"- {item['doc']} ({item['match_count']} matches)")
+        lines.append("")
+
     # Recommendation
     lines.append("### Recommendation")
     lines.append("")
@@ -547,7 +589,8 @@ Examples:
         'patterns': find_patterns(args.topic, domain_keywords=domain_keywords),
         'project_plans': find_project_plans(args.topic, domain_keywords=domain_keywords),
         'sops': find_sops(args.topic, domain_keywords=domain_keywords),
-        'governance': find_governance(args.topic, domain_keywords=domain_keywords)
+        'governance': find_governance(args.topic, domain_keywords=domain_keywords),
+        'knowledge': find_knowledge(args.topic, domain_keywords=domain_keywords)
     }
 
     # JSON output
