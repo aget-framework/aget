@@ -11,9 +11,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Items accumulated since v3.22.0 that are confirmed in-flight for a future release. Per Keep a Changelog 1.1.0 forward-work convention.
+Items confirmed in-flight for a future release (latest released: **3.25.0**). Per Keep a Changelog 1.1.0 forward-work convention. *(Currency note: this section had gone stale at "since v3.22.0" through the 3.23.x/3.24.0 cycles — reset 2026-07-04; the gap itself is documented as a v3.24 residual in the v3.25.0 release notes.)*
 
 - _(none recorded yet)_
+
+## [3.25.0] - 2026-07-04
+
+**Theme**: Grounded Entities & Trusted Releases (balanced double-bill: capability + release-integrity)
+
+### Added
+- **AGET_ENTITY_DIMENSION_SPEC v0.1.0** (canonical) — first spec normatively binding vocabulary by `aget:concept/` URI; 7 entity-characterization dimensions; + `scripts/validate_entity_dimension.py` (V-ENTDIM-001..016 conformance validator, Advisory→Strict).
+- **AGET_FRICTION_SPEC v1.0.0 Active** — promoted from draft after non-author forward-validation (H-FPC-001b); capture surfaces now stamp a triage value-class (`owed` fail-safe default, CAP-FRIC-006).
+- **aget-ask production v1.0.0** (SKILL-045) — entropy-reducing clarification/followup skill with altitude filter; shipped to all 13 templates.
+- **Release-integrity mechanization**: computed Definition-of-Done wired into the close path (`release_close_guard.py` composes SOP-deliverable enumeration + binary DoD; close BLOCKS on RED); `close_gate_check.py` gains closure-substance detection; `health_check.py` gains reliance-manifest self-attestation (R-BND-001-03) + permission-accumulation gates; `wake_up.py` self-attests reliance conformance.
+
+### Fixed
+- `study_topic.py`: live plans no longer render `[inactive]` (case-insensitive, Plan_Status-first detection); knowledge/ + ontology/ join the search surface.
+- Release SOP: migration guide + deep release notes now required in the tagged tree (reachability-at-tag), received-state V-test rule, headless enforce-on-contradiction.
+
+### Changed
+- Template conformance model: **reliance-only** — templates carry an `@aget-canonical-specs` reference line and run the version's features; no spec copies shipped.
 
 ---
 

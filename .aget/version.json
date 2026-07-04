@@ -1,7 +1,7 @@
 {
-  "aget_version": "3.24.0",
+  "aget_version": "3.25.0",
   "created": "2025-09-21",
-  "updated": "2026-06-27",
+  "updated": "2026-07-04",
   "component": "core",
   "description": "AGET Framework Core - Specifications, templates, and validation",
   "repository": "aget-framework/aget",
@@ -43,7 +43,8 @@
     "v3.20.3 -> v3.21.0: 2026-06-06 (Always-On Fleet Operations, governance-scoped: unattended-autonomy spec, IAC SOP, release-observability, create-initiative canonical deploy, check_initiatives engine)",
     "v3.21.0 -> v3.22.0: 2026-06-13 (version sync)",
     "v3.22.0 -> v3.23.0: 2026-06-20",
-    "v3.23.0 -> v3.23.1: 2026-06-20"
+    "v3.23.0 -> v3.23.1: 2026-06-20",
+    "v3.24.0 -> v3.25.0: 2026-07-04 (Grounded Entities & Trusted Releases)"
   ],
   "contents": {
     "specs/": "Canonical specifications (AGET_VERSIONING_CONVENTIONS, etc.)",
