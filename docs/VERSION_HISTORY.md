@@ -12,6 +12,10 @@ This document provides a complete timeline of AGET Framework versions and their 
 
 ## Current Version
 
+**v3.25.0** (2026-07-04) - Grounded Entities & Trusted Releases
+
+Core `aget/` at v3.25.0: ✅ (GitHub Release live; 13/13 templates pushed + TAGGED v3.25.0, received-state verified — first tagged template release since v3.9). Capability: ENTITY_DIMENSION spec + validator, FRICTION_SPEC v1.0.0, aget-ask v1.0.0. Integrity: computed DoD close-guard, reliance self-attestation. Conformance model: reliance-only (D-1).
+
 **v3.24.0** (2026-06-27) - Reliance & Boundaries
 
 Core `aget/` at v3.24.0: ✅ (GitHub Release live). Reliance feature (schema + validator) has fanned out to 13/13 templates; template version-coherence + full-payload conformance pending (EC-5, 2026-06-27).
