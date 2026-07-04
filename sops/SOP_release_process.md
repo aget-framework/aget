@@ -69,6 +69,11 @@ This SOP covers releases for:
 
 ## Definition of Done (L553)
 
+### Computed DoD & Gate Integrity (v1.54 companion edit, 2026-07-04 — v3.25.0)
+
+"RELEASED" is **computed, never asserted**: the release Definition-of-Done is a binary script gate (exit 0 = GREEN), and the close path recomputes it, blocking release-class plan closes on RED (L1141: self-verification collapses under autonomous drive). Gate V-tests SHALL assert **received-state** (consumer-side observation: artifact present at destination, tag resolvable at each origin) rather than producer-action ("pushed", "fanned out") — a ship is a multi-site pin, each site verified. Migration guidance + deep release notes SHALL be committed to the canonical tree **before** the tag (reachability-at-tag). In headless runs, an intermediate gate transition contradicting previously-computed state triggers a recompute at that boundary. Informal concepts exercising gate authority SHALL be formally registered before they may pass/block a gate (#1766).
+
+
 **⚠️ A release is NOT complete when code is pushed. A release is complete when users can discover it.**
 
 ### User-Centric Completion Criteria
@@ -2011,7 +2016,7 @@ python3 .aget/patterns/session/verify_session_protocols.py --protocol wake_up
 **Implements**: R-REL-030 through R-REL-034 (Release Quality Validation)
 **Related**: L576 (Release Quality Validation Gap), PROJECT_PLAN_archetype_customization_v3.5_v1.0.md Gate 5.75
 
-### Phase 0.95: Skill Dependency Validation (R-REL-042)
+### Phase 0.95: Skill Dependency Validation *(spec-anchor RETIRED 2026-07-04 — prior "(R-REL-042)" citation collided with spec v1.17.1 CAP-REL-019 (Feature-Descriptive Content Review); spec is authority (L672); re-anchoring tracked #1766)*
 
 **Purpose**: Verify all skill dependencies exist in template repos before release
 
