@@ -36,11 +36,22 @@ _GATE_STATUS_PENDING_RE = re.compile(
 # A V-test mapping row marked PENDING (table row containing the token).
 _VTEST_PENDING_RE = re.compile(r'\|\s*Gate[^|]*\|[^|]*\|\s*PENDING\s*\|', re.IGNORECASE)
 
+# Substance check (#1568, v3.25 C-25-06): a closure-class section whose boxes are
+# all [x] but whose prose is placeholder text is a false-clean — detect the
+# placeholders, not just the checkbox state (L671: report-without-block is decorative).
+_SUBSTANCE_SECTION_RE = re.compile(
+    r'^#{1,4}\s*(Retrospective|What Worked|What Didn\'t Work|Closure Checklist|'
+    r'Finalization Checklist|Velocity Analysis)\b', re.IGNORECASE)
+_PLACEHOLDER_RE = re.compile(
+    r'^\s*(?:\d+\.\s*)?(?:[-*]\s*)?(\{TBD\}|TBD|_\(pending\)_|\(pending\)|\.\.\.|N/A — fill later)\s*$',
+    re.IGNORECASE)
+
 
 def scan(text: str):
     """Return a list of (kind, detail) conformance violations."""
     violations = []
     in_closure = False
+    in_substance = False
     for raw in text.splitlines():
         line = raw.rstrip('\n')
 
@@ -59,6 +70,11 @@ def scan(text: str):
         if _VTEST_PENDING_RE.search(line):
             violations.append(('vtest_pending', line.strip()[:100]))
 
+        if _ANY_SECTION_RE.match(line):
+            in_substance = bool(_SUBSTANCE_SECTION_RE.match(line))
+        if in_substance and _PLACEHOLDER_RE.match(line):
+            violations.append(('placeholder_substance', line.strip()[:100]))
+
     return violations
 
 
@@ -75,6 +91,23 @@ def main(argv=None):
 
     violations = scan(fp.read_text(encoding='utf-8', errors='replace'))
 
+    # Release-class BLOCKING guard (#1554, v3.25 C-25-06): when the instance
+    # carries scripts/release_close_guard.py and the plan is release-class,
+    # the guard's verdict joins the violation set (exit 2 => BLOCK). Absence
+    # of the guard is expected pre-adoption (L601) — no penalty.
+    guard = Path('scripts/release_close_guard.py')
+    if guard.is_file() and re.search(r'release', fp.name, re.IGNORECASE):
+        import subprocess
+        try:
+            r = subprocess.run([sys.executable, str(guard), str(fp)],
+                               capture_output=True, text=True, timeout=60)
+            if r.returncode == 2:
+                tail = (r.stdout or r.stderr).strip().splitlines()
+                violations.append(('release_close_guard_block',
+                                   tail[-1][:100] if tail else 'guard BLOCK (exit 2)'))
+        except Exception as e:
+            violations.append(('release_close_guard_error', str(e)[:100]))
+
     if not violations:
         print(f"close-gate: PASS — no unchecked conformance signals in {fp.name}")
         return 0
@@ -84,7 +117,10 @@ def main(argv=None):
     if not args.quiet:
         kinds = {'gate_status_pending': 'Gate still Pending/In-Progress',
                  'vtest_pending': 'V-test row PENDING',
-                 'unchecked_closure_item': 'Unchecked closure/finalization item'}
+                 'unchecked_closure_item': 'Unchecked closure/finalization item',
+                 'placeholder_substance': 'Closure-section placeholder prose (substance, #1568)',
+                 'release_close_guard_block': 'Release-completion guard BLOCK (#1554)',
+                 'release_close_guard_error': 'Release-completion guard error'}
         for kind, detail in violations[:30]:
             print(f"  - [{kinds.get(kind, kind)}] {detail}")
     return 2

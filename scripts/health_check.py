@@ -444,6 +444,34 @@ def check_structural_skill_frontmatter(agent_path: Path) -> CheckResult:
                        "carry no disable-model-invocation", "info")
 
 
+def check_permission_accumulation(agent_path: Path) -> CheckResult:
+    """L500/L027 (#1516, v3.25 C-25-06): permission-file accumulation gate.
+
+    WARN over 100 permissions or 30KB; ERROR over 200 or 50KB. Previously a
+    documented threshold with no failing check — HEALTHY-through (L671).
+    """
+    worst = None
+    for name in ('settings.local.json', 'settings.json'):
+        f = agent_path / '.claude' / name
+        if not f.exists():
+            continue
+        size = f.stat().st_size
+        try:
+            allow = json.loads(f.read_text()).get('permissions', {}).get('allow', [])
+        except Exception:
+            allow = []
+        n = len(allow)
+        if n > 200 or size > 50_000:
+            return CheckResult('permission_accumulation', False,
+                               f'{name}: {n} permissions / {size} bytes exceeds CRITICAL '
+                               f'(200 / 50KB) — run SOP_permission_cleanup', severity='error')
+        if n > 100 or size > 30_000:
+            worst = f'{name}: {n} permissions / {size} bytes over WARN (100 / 30KB)'
+    if worst:
+        return CheckResult('permission_accumulation', False, worst, severity='warning')
+    return CheckResult('permission_accumulation', True, 'within L500 thresholds')
+
+
 def check_reliance_manifest(agent_path: Path) -> CheckResult:
     """R-BND-001-03 (v3.25, gh#1787): self-attest reliance-manifest conformance.
 
@@ -508,6 +536,7 @@ def run_housekeeping(agent_path: Path, verbose: bool = False) -> Dict[str, Any]:
         check_config_size,
         check_structural_skill_frontmatter,
         check_reliance_manifest,
+        check_permission_accumulation,
     ]
 
     for check_fn in checks:
