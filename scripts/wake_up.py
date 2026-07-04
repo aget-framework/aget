@@ -367,6 +367,24 @@ def get_wake_data(agent_path: Path) -> Dict[str, Any]:
     if data['config'].get('show_pending_work', True):
         data['pending_work'] = get_pending_work(agent_path)
 
+    # R-BND-001-03 self-attestation (v3.25, gh#1787): when the reliance manifest
+    # and its validator are both present, attest conformance at wake-up. Absence
+    # is silent (pre-adoption agents; L601 expected lag, not an error).
+    manifest = agent_path / '.aget' / 'skill_reliance_manifest.yaml'
+    validator = agent_path / 'scripts' / 'check_skill_reliance_manifest.py'
+    if manifest.exists() and validator.exists():
+        import subprocess as _sp
+        try:
+            r = _sp.run([sys.executable, str(validator)], capture_output=True,
+                        text=True, timeout=15, cwd=str(agent_path))
+            tail = (r.stdout or r.stderr).strip().splitlines()
+            data['reliance_attestation'] = {
+                'ok': r.returncode == 0,
+                'summary': tail[-1] if tail else f'exit {r.returncode}',
+            }
+        except Exception as e:
+            data['reliance_attestation'] = {'ok': False, 'summary': f'validator error: {e}'}
+
     return data
 
 
@@ -490,6 +508,13 @@ def format_human_output(data: Dict[str, Any]) -> str:
                 lines.append("  ... (truncated; see session note for full list)")
 
     lines.append("")
+
+    # R-BND-001-03 self-attestation line (v3.25, gh#1787)
+    ra = data.get('reliance_attestation')
+    if ra:
+        mark = "OK" if ra.get('ok') else "ATTENTION"
+        lines.append(f"Reliance self-attestation: {mark} — {ra.get('summary', '')}")
+        lines.append("")
 
     # Extension output (from hook)
     ext_output = data.get('extension_output', '')
