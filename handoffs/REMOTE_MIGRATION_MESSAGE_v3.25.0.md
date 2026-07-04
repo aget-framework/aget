@@ -10,7 +10,7 @@ None. v3.25.0 is additive + repair.
 
 1. **Refresh framework scripts** (Framework_Artifacts — overwrite; your `*_ext.py` hooks are untouched):
    `study_topic.py`, `capture_friction.py`, `wake_up.py`, `health_check.py`, `close_gate_check.py` from canonical `aget/scripts/` (or your template repo at tag `v3.25.0`).
-2. **Adopt aget-ask** (optional, tier {O}): copy `.claude/skills/aget-ask/` + `.aget/specs/skills/SKILL-045_aget-ask.yaml`.
+2. **Adopt aget-ask** (optional, tier {O}): copy `.claude/skills/aget-ask/` and the SKILL-045 spec yaml from `.aget/specs/skills/` (same paths in your template repo at the tag).
 3. **Version pins**: `AGENTS.md` `@aget-version: 3.25.0`; `.aget/version.json` `aget_version` + migration_history entry.
 4. **Reliance-only conformance line** (new model, D-1): add under your version label:
    `@aget-canonical-specs: https://github.com/aget-framework/aget/tree/v3.25.0/specs — reliance-only conformance`
