@@ -29,6 +29,7 @@ Deployed to all 12 templates.
 | SKILL-042 | aget-study-topic | Research | Focused KB research on topic before implementation |
 | SKILL-040 | aget-file-issue | Governance | File issues with L520 governance compliance |
 | SKILL-043 | aget-create-briefing | Creation | Generate narrative documents from session artifacts for target consumption media |
+| SKILL-045 | aget-ask | Research | Entropy-reducing clarification/followup questions with altitude filter (production v1.0.0, v3.25) |
 
 ---
 
@@ -169,4 +170,4 @@ Deployed to specific archetypes only.
 ---
 
 *INDEX.md - AGET Skills Index*
-*Last Updated: 2026-02-28*
+*Last Updated: 2026-07-04 (v3.25 C-25-02: +SKILL-045 aget-ask production)*

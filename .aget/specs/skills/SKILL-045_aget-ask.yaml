@@ -1,0 +1,166 @@
+# SKILL-045: aget-ask
+# Purpose: Generate clarifying questions that maximally reduce agent entropy on the principal's next-action intent.
+# Created: 2026-04-18
+# Based on: SP-018 (PROPOSAL_aget-ask.md), SKILL_SPEC_TEMPLATE.yaml
+# Status: production (v1.0.0 — graduated 2026-07-03, PROJECT_PLAN_aget_ask_formalization Gate 1)
+
+spec:
+  id: SKILL-045
+  name: aget-ask
+  version: 1.0.0
+  status: production
+  created: 2026-04-18
+  updated: 2026-07-03
+  format: "EARS with controlled vocabulary"
+  category: Research
+  scope: "Generate 2-4 clarifying questions before an action; measure pre/post confidence delta for next-action prediction accuracy (#1019 rollup consumer)."
+  archetype: Universal
+
+  # Architecture: SKILL.md instruction set + local JSONL entropy log
+  # Canonical source: .claude/skills/aget-ask/SKILL.md
+  # Logging target: sessions/entropy_log/YYYY-MM-DD.jsonl (principal may override via --log-path)
+  # Naming: single-verb exception per SKILL_NAMING_CONVENTION_SPEC v1.4.0 CAP-SNAME-001-06
+
+  traceability:
+    skill_md: ".claude/skills/aget-ask/SKILL.md"
+    proposal: "planning/skill-proposals/PROPOSAL_aget-ask.md"
+    tracking_issues:
+      primary_spec: "gmelli/aget-aget#1020"
+      quality_metric_consumer: "gmelli/aget-aget#1019"
+    design_direction:
+      - "docs/DESIGN_DIRECTION_clarifying_questions.md"
+    l_docs:
+      - "L848: Clarifying-Question Quality Is Entropy Reduction, Not Thoroughness"
+      - "L345: Interactive Handoff Pattern (followup probe origin)"
+      - "L831: Cross-Agent Question Convergence as Specification Signal"
+      - "L693: 5-action default (count-cap analog)"
+      - "L756: Format-Driven Confabulation (fill-pressure sister pattern)"
+      - "L742: Two-Level Model (requirements vs specifications) — grounds the --altitude filter"
+    vocabulary_terms:
+      - "AGET_Skill"
+      - "Clarifying_Question"
+      - "Entropy_Reduction"
+      - "ask"  # Verb #32 in DESIGN_DIRECTION_skill_verb_vocabulary.md
+    verb_row: 32
+    principal_decision: "2026-04-18 — verb `ask` approved; single-verb form approved per CAP-SNAME-001-06"
+
+capabilities:
+  ASK-001:
+    domain: clarification
+    statement: "WHEN the SKILL is invoked with `--clarification` (default) or with no mode argument, the SKILL shall produce 2-4 clarifying questions ranked by load-bearing weight and present them with 2-3 concrete option examples per question."
+    pattern: event-driven
+    trigger: clarification_mode_invocation
+    priority: critical
+    inputs:
+      - "Principal's ambiguous request in conversation context"
+      - "Agent's top-1 interpretation of intent (pre-ask)"
+      - "Agent's confidence estimate on the top-1 (0.0-1.0)"
+    outputs:
+      - "Ranked list of 2-4 questions with concrete options"
+      - "JSONL entropy-log entry recording pre-ask and post-ask confidence"
+
+  ASK-002:
+    domain: entropy_threshold
+    statement: "WHEN the agent's pre-ask confidence on its top-1 interpretation is ≥ 0.70, the SKILL shall proceed with best-guess + verify rather than asking questions."
+    pattern: event-driven
+    trigger: high_confidence
+    priority: high
+
+  ASK-003:
+    domain: followup
+    statement: "WHEN the SKILL is invoked with `--followup`, the SKILL shall generate 1-2 L345-pattern probes that surface tacit knowledge the principal may hold but not volunteer in the preceding exchange."
+    pattern: event-driven
+    trigger: followup_mode_invocation
+    priority: medium
+
+  ASK-004:
+    domain: anti_patterns
+    statement: "The SKILL shall filter out context-answerable, decorative, too-late, and buried-load-bearing questions before presentation (L848 anti-patterns 1-5)."
+    pattern: ubiquitous
+    priority: high
+
+  ASK-005:
+    domain: logging
+    statement: "WHEN the SKILL presents questions AND `--log` is not disabled, the SKILL shall append a JSONL entry to `sessions/entropy_log/YYYY-MM-DD.jsonl` recording pre_top1, pre_conf, post_top1, post_conf, delta, count, and invocation context."
+    pattern: event-driven
+    trigger: question_presented_with_log_enabled
+    priority: high
+
+  ASK-006:
+    domain: altitude_requirement
+    statement: "WHEN the SKILL is invoked with `--altitude=requirement`, the SKILL shall filter and frame its questions to the Requirements (human-intent) level (L742) — clarifying WHAT the principal wants (need, goal, value, intent) — and suppress questions that probe specification or mechanism detail."
+    pattern: event-driven
+    trigger: altitude_requirement_invocation
+    priority: high
+
+  ASK-007:
+    domain: altitude_verification
+    statement: "WHEN the SKILL is invoked with `--altitude=verification`, the SKILL shall filter and frame its questions to the Specifications/verification (enforceable-contract) level (L742) — clarifying HOW completion will be confirmed (acceptance criteria, test conditions, done-definition) — and suppress questions that re-open settled requirement intent."
+    pattern: event-driven
+    trigger: altitude_verification_invocation
+    priority: high
+
+test_cases:
+  T-ASK-001:
+    capability: ASK-001
+    scenario: "Clarification mode produces ranked questions with options"
+    given: "An ambiguous principal request with agent top-1 confidence < 0.70"
+    when: "The SKILL is invoked with `--clarification` (default) or no mode argument"
+    then: "It presents 2-4 questions ranked by descending load-bearing weight, each with 2-3 concrete option examples"
+    verification_method: "manual"
+    evidence: "sessions/entropy_log/2026-04-18.jsonl (dogfood — SP-018 approval turn, delta +0.32)"
+
+  T-ASK-002:
+    capability: ASK-002
+    scenario: "High confidence skips asking"
+    given: "Agent pre-ask confidence on its top-1 interpretation ≥ 0.70"
+    when: "The SKILL is invoked"
+    then: "It skips question generation and proceeds with best-guess + verify"
+    verification_method: "manual"
+
+  T-ASK-005:
+    capability: ASK-005
+    scenario: "Entropy log entry is valid JSON with required fields"
+    given: "`--log` enabled and questions presented"
+    when: "The SKILL completes the ask"
+    then: "A valid JSONL entry with pre_top1, pre_conf, post_top1, post_conf, delta, count is appended to sessions/entropy_log/YYYY-MM-DD.jsonl"
+    verification_method: "automated"
+    evidence: "sessions/entropy_log/2026-04-18.jsonl (first entry)"
+
+  T-ASK-006:
+    capability: ASK-006
+    scenario: "Requirement-altitude filter suppresses mechanism questions"
+    given: "A principal request mixing intent-ambiguity and mechanism-ambiguity, confidence < 0.70"
+    when: "The SKILL is invoked with `--altitude=requirement`"
+    then: "Presented questions clarify human-intent (need/goal/value) only; specification/mechanism questions are suppressed; the 2-4 cap (C1) and load-bearing ordering (C5) still hold"
+    verification_method: "manual"
+
+  T-ASK-007:
+    capability: ASK-007
+    scenario: "Verification-altitude filter suppresses requirement-reopening questions"
+    given: "A settled-intent request with an unclear done-definition, confidence < 0.70"
+    when: "The SKILL is invoked with `--altitude=verification`"
+    then: "Presented questions clarify acceptance/test/done-conditions; requirement-reopening questions are suppressed; the 2-4 cap (C1) and ordering (C5) still hold"
+    verification_method: "manual"
+
+constraints:
+  - "C1: NEVER present more than 4 questions (L848 over-count anti-pattern)"
+  - "C2: NEVER present questions whose answer does not change the next action (decorative)"
+  - "C3: NEVER skip logging when --log is enabled (required for #1019 rollup)"
+  - "C4: MUST filter context-answerable questions at draft time (anti-pattern #1)"
+  - "C5: MUST order questions by descending load-bearing weight, NOT by category altitude"
+  - "C6: `--altitude={requirement|verification}` is a cross-cutting FILTER, not a mode — it composes with `--clarification` and `--followup`, and MUST NEVER bypass the 2-4 question cap (C1) or the load-bearing ordering (C5)"
+
+dependencies:
+  specs:
+    - "SKILL_NAMING_CONVENTION_SPEC v1.4.0 (CAP-SNAME-001-06 single-verb exception)"
+  skills:
+    - "aget-propose-actions (related — 5-action default count-cap precedent)"
+  status: "All dependencies exist at v0.1.0 deployment time."
+
+# Known coupling debt — DISPOSITION: PARK (Gate 0, 2026-07-03; #1019 verified OPEN at source):
+#   The quality-metric consumer (#1019 "Reward AGETs by prediction accuracy of
+#   principal's next action") is not yet specified. The entropy-log schema (ASK-005)
+#   MAY change once #1019 defines its consumer input schema. This is a KNOWN,
+#   FORMALLY-PARKED coupling — graduation to production does NOT block on #1019;
+#   the log contract is versioned with the skill and revisable on consumer arrival.
