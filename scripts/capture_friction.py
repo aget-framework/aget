@@ -64,7 +64,11 @@ def extract(prompt):
 
 def append_entry(note, session, ts, ledger=LEDGER):
     """CAP-FRIC-002: persist verbatim to the harvestable ledger with a status field."""
-    entry = f"\n## FRICTION {ts} | session {session} | status: new\n{note}\n"
+    # CAP-FRIC-006-03/04 (v3.25): the capture surface carries the value-class
+    # forward; at capture time the class is by definition untriaged, so the
+    # ambiguity fail-safe applies — default `owed` (tracked, never auto-remediated),
+    # refined by /aget-record-friction triage at harvest. Never default `avoidable`.
+    entry = f"\n## FRICTION {ts} | session {session} | status: new | value-class: owed (pending-triage default, CAP-FRIC-006-04)\n{note}\n"
     os.makedirs(os.path.dirname(ledger), exist_ok=True)
     if not os.path.exists(ledger):
         with open(ledger, "w") as f:
