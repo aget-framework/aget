@@ -1,0 +1,83 @@
+# DEPLOYMENT_SPEC_v3.25.0.yaml
+# Complete target state specification for v3.25.0 deployment
+#
+# Purpose: Define what a correctly-deployed v3.25.0 agent looks like.
+# Governance: R-DEP-002, R-REL-038
+#
+# Created: 2026-07-04 (SAME-DAY BACK-FILL — R-REL-038 lapse at tag time,
+#   caught by independent consumer read (supervisor G-1 prerequisite check);
+#   disclosed in RELEASE_HANDOFF_v3.25.0.md §R-REL-038 Disclosure.)
+# Origin: DEPLOYMENT_SPEC_v3.24.0.yaml
+# Release: Grounded Entities & Trusted Releases
+
+version: "3.25.0"
+spec_version: "2.0.0"
+created: "2026-07-04"
+status: active
+supersedes: "DEPLOYMENT_SPEC_v3.24.0.yaml"
+breaking_release: false
+backfill: true
+backfill_note: >
+  Authored 2026-07-04 (release day) after tag v3.25.0 — NOT reachable at the tag.
+  R-REL-038 requires the spec before tagging; the lapse escaped because the
+  computed close-DoD did not enumerate a DEPLOYMENT_SPEC row (enumeration gap,
+  L711 family). Fetch this file from main, not the tag.
+
+verification_script:
+  file: "scripts/verify_deployment.py"
+  usage: "python3 scripts/verify_deployment.py --version 3.25.0 --path /path/to/agent"
+  known_defects: "Treat tooling output as claim-under-test, not premise (L908)."
+
+# Payload = 5 Framework_Artifact script refreshes (overwrite; *_ext.py hooks
+# untouched) + version pins + reliance-only conformance line (D-1).
+mandatory_changes:
+  - id: "M-3.25-1"
+    description: "version.json aget_version field set to '3.25.0' (+ migration_history entry)"
+    blocking: true
+    detection: "test $(jq -r .aget_version .aget/version.json) = '3.25.0'"
+  - id: "M-3.25-2"
+    description: "AGENTS.md @aget-version header set to '3.25.0'"
+    blocking: true
+    detection: "grep -q '^@aget-version: 3.25.0' AGENTS.md"
+  - id: "M-3.25-3"
+    description: "scripts/study_topic.py refreshed — case-fold + Plan_Status-first active detection; knowledge/ + ontology/ search scope"
+    blocking: true
+    detection: "grep -q 'knowledge' scripts/study_topic.py"
+    note: "Agents with LOCAL study_topic patches (e.g. 703-line divergent copy): RE-BASE, do not blind-overwrite (#1673/#1674)."
+  - id: "M-3.25-4"
+    description: "scripts/capture_friction.py refreshed — triage value-class stamped at capture ('owed' default; healthy controls never auto-remediated)"
+    blocking: true
+    detection: "grep -q 'owed' scripts/capture_friction.py"
+  - id: "M-3.25-5"
+    description: "scripts/wake_up.py refreshed — reliance self-attestation line (silent when no manifest; *_ext.py preserved)"
+    blocking: true
+    detection: "grep -q 'skill_reliance_manifest' scripts/wake_up.py"
+  - id: "M-3.25-6"
+    description: "scripts/health_check.py refreshed — reliance_manifest + permission_accumulation checks (graceful when N/A)"
+    blocking: true
+    detection: "grep -q 'permission_accumulation' scripts/health_check.py"
+  - id: "M-3.25-7"
+    description: "scripts/close_gate_check.py refreshed — placeholder-substance detection + release-close DoD guard wiring"
+    blocking: true
+    detection: "grep -q 'placeholder' scripts/close_gate_check.py"
+  - id: "M-3.25-8"
+    description: "AGENTS.md carries the reliance-only conformance reference line (D-1)"
+    blocking: true
+    detection: "grep -q '@aget-canonical-specs' AGENTS.md"
+
+additive_artifacts: []
+
+optional_changes:
+  - id: "O-3.25-1"
+    description: "Adopt aget-ask v1.0.0 production skill (tier {O} — optional, supervisor-coordinated fan-out)"
+    blocking: false
+    canonical_source: "aget/.claude/skills/aget-ask/ + aget/.aget/specs/skills/SKILL-045_aget-ask.yaml"
+    detection: "test -d .claude/skills/aget-ask"
+
+rollback:
+  procedure: "File-copy restore of the 5 scripts + version pins from your v3.24.0 tag. No data-format migrations."
+
+references:
+  release_handoff: "private handoffs/RELEASE_HANDOFF_v3.25.0.md"
+  migration_message: "handoffs/REMOTE_MIGRATION_MESSAGE_v3.25.0.md (tag-reachable)"
+  release_notes: "release-notes/v3.25.0.md"
