@@ -34,3 +34,11 @@ python3 scripts/study_topic.py --topic "<your active plan's topic>"   # live pla
 ## Rollback
 
 All changes are file-copy; restore prior copies from your `v3.24.0` tag. No data-format migrations.
+
+## Fleet-migration hardening notes (added 2026-07-05, from the first executed fleet migration)
+
+1. **Deployment contract**: `DEPLOYMENT_SPEC_v3.25.0.yaml` lives at canonical root on **main** (same-day back-fill — NOT reachable at the `v3.25.0` tag). Fetch it from main; its M-row detection clauses are your per-agent verify checklist.
+2. **Operative-path caution**: detection clauses verify file content at conventional paths (`scripts/`). Before classifying or verifying any agent, resolve each script's OPERATIVE path from the agent's own config (AGENTS.md / skill invocations) and run checks against THAT path — a marker-complete copy at `scripts/` is inert if the agent's wiring invokes a copy elsewhere (observed once in the pilot fleet: a patterns-dir wake-up).
+3. **Lineage baseline, not tag baseline**: if your agents predate template tagging (v3.9→v3.24 gap), comparing agent scripts against canonical-tag bytes will flag your entire fleet as "locally patched" (observed: 33/33 false positives). Build a known-good hash set from every framework-shipped version across your deployment lineages (canonical + template git histories + ≥N-agent consensus on identical copies), and route only true outliers to per-agent diff review — overwrite (logged), re-base (gated on the feature-marker detection clause), or honored refusal.
+4. **Expected WARN**: the reliance C3 cross-repo check may report "archetype index unreachable" from standard agent seats — expected for non-adjacent checkouts, graceful, not an upgrade regression.
+5. **Upgrade-revealed debt**: the new `health_check.py` gates (permission accumulation, reliance) surface PRE-EXISTING conditions on first run. Diagnose with the two-checker test: if the v3.24-era health check exits 0 on the same tree, the finding is revealed debt, not an upgrade regression.

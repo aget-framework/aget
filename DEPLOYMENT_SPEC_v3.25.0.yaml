@@ -30,6 +30,13 @@ verification_script:
 
 # Payload = 5 Framework_Artifact script refreshes (overwrite; *_ext.py hooks
 # untouched) + version pins + reliance-only conformance line (D-1).
+#
+# operative_path_note (added 2026-07-05, consumer-verified finding): the M-row
+# detection clauses below verify file CONTENT at the conventional scripts/ path —
+# they do not verify WIRING. An agent whose config (AGENTS.md / skill invocations)
+# points at a copy elsewhere (e.g. .aget/patterns/session/) can be marker-PASS yet
+# feature-INERT. Step 0 of any classification or post-verify: resolve each script's
+# operative path from the agent's own config and run the clause against THAT path.
 mandatory_changes:
   - id: "M-3.25-1"
     description: "version.json aget_version field set to '3.25.0' (+ migration_history entry)"
