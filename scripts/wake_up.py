@@ -74,6 +74,8 @@ DEFAULT_CONFIG = {
     'show_structure': False,
     'show_calendar': True,
     'show_pending_work': True,  # gh#1285: surface prior session-note Pending Work
+    'show_release_currency': True,  # gh#1833: release-currency signal (v3.26, C-26-01)
+    'release_currency_timeout': 5,  # seconds; fail-soft budget for the network check
 }
 
 
@@ -172,6 +174,43 @@ def get_calendar_context(config: Dict[str, Any]) -> Dict[str, Any]:
         'in_release_window': in_release_window,
         'release_window': window_name,
     }
+
+
+def get_release_currency(own_version: str, timeout: int = 5) -> Dict[str, Any]:
+    """Release-currency signal (gh#1833, v3.26 C-26-01; L467 Channel-5).
+
+    Compares local aget_version against the latest public framework release
+    tag so target-misresolution (agent plans against N-1 because no currency
+    signal reached its field of view) is caught at session start.
+
+    Fail-soft (ADR-004): any failure — no gh, offline, timeout, auth — returns
+    status 'unknown' and MUST NOT block or slow wake-up beyond the timeout.
+    Reference implementation: main-supervisor _release_banner (accepted at
+    source, natural A/B evidence per #1833 p1 grant).
+    """
+    result: Dict[str, Any] = {'status': 'unknown', 'latest': None}
+    try:
+        # gh api (plain REST) — NOT `gh release view`: the latter blocks
+        # indefinitely under a non-tty python subprocess in field testing
+        # (F-REL326-G1-1, 2026-07-10), which silently defeats the signal
+        # behind the fail-soft timeout. `gh api` returns in <1s.
+        cmd = ["gh", "api", "repos/aget-framework/aget/releases/latest",
+               "-q", ".tag_name"]
+        latest = ""
+        for _attempt in range(2):  # single bounded retry — transient blips
+            proc = subprocess.run(cmd, capture_output=True, text=True,
+                                  timeout=timeout, stdin=subprocess.DEVNULL)
+            if proc.returncode == 0:
+                latest = proc.stdout.strip().lstrip("v")
+                if latest:
+                    break
+        if latest:
+            result['latest'] = latest
+            result['status'] = ('current' if latest == own_version
+                                else 'behind')
+    except Exception:
+        pass
+    return result
 
 
 def compute_active_agents_from_fleet_state(agent_path: Path) -> Optional[Dict[str, Any]]:
@@ -367,6 +406,12 @@ def get_wake_data(agent_path: Path) -> Dict[str, Any]:
     if data['config'].get('show_pending_work', True):
         data['pending_work'] = get_pending_work(agent_path)
 
+    # Release-currency signal (gh#1833, v3.26 C-26-01) — fail-soft, config-gated
+    if data['config'].get('show_release_currency', True):
+        data['release_currency'] = get_release_currency(
+            data['version']['aget_version'],
+            timeout=data['config'].get('release_currency_timeout', 5))
+
     # R-BND-001-03 self-attestation (v3.25, gh#1787): when the reliance manifest
     # and its validator are both present, attest conformance at wake-up. Absence
     # is silent (pre-adoption agents; L601 expected lag, not an error).
@@ -488,6 +533,16 @@ def format_human_output(data: Dict[str, Any]) -> str:
         present = [d for d, exists in optional.items() if exists]
         if present:
             lines.append(f"Directories: {', '.join(present)}")
+
+    # Release currency (toggle: show_release_currency; gh#1833 v3.26 C-26-01).
+    # 'behind' → actionable one-liner (reference-impl wording incl. the
+    # DEPLOYMENT_SPEC guard); 'current'/'unknown' → silent (ADR-004 degradation).
+    if config.get('show_release_currency', True) and 'release_currency' in data:
+        rc = data['release_currency']
+        if rc.get('status') == 'behind':
+            own = data['version']['aget_version']
+            lines.append(f"Framework: v{own} local · v{rc['latest']} latest — "
+                         "verify DEPLOYMENT_SPEC before upgrading")
 
     # Calendar (toggle: show_calendar, CAP-SESSION-011)
     if config.get('show_calendar', True) and 'calendar' in data:
