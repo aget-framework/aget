@@ -24,7 +24,17 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 MANIFEST = REPO / ".aget" / "skill_reliance_manifest.yaml"
 SKILLS_DIR = REPO / ".claude" / "skills"
-ARCHETYPE_INDEX = REPO.parent / "aget" / "specs" / "ARCHETYPE_SKILLS_INDEX.yaml"
+# gh#1837 defect 2 (v3.26 C-26-06): the single parent-relative path only resolves
+# from the canonical repo itself; on every deployed agent (~/github/<agent>) the
+# C3 check silently degraded to WARN "archetype index unreachable" fleet-wide.
+# Candidate list, first existing wins.
+_ARCHETYPE_CANDIDATES = [
+    REPO.parent / "aget" / "specs" / "ARCHETYPE_SKILLS_INDEX.yaml",
+    REPO.parent / "aget-framework" / "aget" / "specs" / "ARCHETYPE_SKILLS_INDEX.yaml",
+    Path.home() / "github" / "aget-framework" / "aget" / "specs" / "ARCHETYPE_SKILLS_INDEX.yaml",
+]
+ARCHETYPE_INDEX = next((p for p in _ARCHETYPE_CANDIDATES if p.exists()),
+                       _ARCHETYPE_CANDIDATES[0])
 
 TIER_KEYS = {"core_S": "S", "optional_O": "O", "domain_D": "D"}
 

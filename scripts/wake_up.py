@@ -293,8 +293,13 @@ def get_pending_work(agent_path: Path, max_items: int = 10) -> Dict[str, Any]:
     sessions_dir = agent_path / 'sessions'
     if not sessions_dir.is_dir():
         return result
+    # gh#1837 defect 1 (v3.26 C-26-06): pathlib.glob is case-sensitive on POSIX,
+    # but SESSION_LOG_SPEC names notes SESSION_*.md (uppercase) — a lowercase-only
+    # glob pins pending-work to a stale note while newer SESSION_* files are
+    # ignored (supervisor field case: 15-day-stale surface). Case-fold the filter.
     session_files = sorted(
-        sessions_dir.glob('session_*.md'),
+        (p for p in sessions_dir.glob('*.md')
+         if p.name.lower().startswith('session_')),
         key=lambda p: p.stat().st_mtime,
         reverse=True,
     )

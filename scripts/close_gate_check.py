@@ -78,6 +78,59 @@ def scan(text: str):
     return violations
 
 
+_CHECKED_RE = re.compile(r'^\s*[-*]\s*\[[xX]\]\s+(.*)$')
+# Claims that require INDEPENDENT (non-producer) evidence to be true (L1047).
+_INDEP_CLAIM_RE = re.compile(
+    r'(deploy[\s-]?verif'
+    r'|downstream\s+deploy'
+    r'|\bdownstream\b[^.]*\bdeploy'
+    r'|[≥>]?=?\s*1\s+downstream'
+    r'|supervisor[\s-]?notif'
+    r'|second[\s-]?agent'
+    r'|independent[\s-]?downstream'
+    r'|cross[\s-]?fleet\s+notif'
+    r'|fleet[\s-]?confirm'
+    r'|consumer[\s-]?confirm)',
+    re.IGNORECASE)
+# Markers that show the item already attests its evidence is producer-only /
+# carried — suppress the WARN (the attestation the WARN asks for is present).
+_ATTESTED_RE = re.compile(
+    r'(producer[\s-]?pilot'
+    r'|\bcarr(y|ies|ied)\b'
+    r'|supervisor[\s-]?lane'
+    r'|\bOPEN\b'
+    r'|independent[\s-]?downstream[^.]*\bOPEN'
+    r'|not\b[^.]*self[\s-]?satisf)',
+    re.IGNORECASE)
+
+
+def scan_independence_warnings(text: str):
+    """Return a list of (kind, detail) independence-WARNs (L1047, non-blocking).
+
+    Restored at v3.26 C-26-06 (F-REL326-G1-2): the v3.25 canonical sync
+    overwrote instance copies and DROPPED this half — canonical never had it.
+    A WARN fires on a checked `[x]` item whose text asserts an independence-
+    requiring claim (deploy-verify / supervisor-notify / second-agent / etc.)
+    and does NOT already carry an attestation marker (producer-pilot / carry /
+    supervisor-lane / OPEN). The gate can confirm the box is checked; it cannot
+    confirm the evidence is independent vs producer-self — so it surfaces the
+    item for attestation rather than passing silently. Never blocks.
+    """
+    warnings = []
+    for raw in text.splitlines():
+        cm = _CHECKED_RE.match(raw.rstrip('\n'))
+        if not cm:
+            continue
+        body = cm.group(1)
+        # Match the CLAIM only in the item's subject window (text before the
+        # first " — "/" - " dash-clause, capped at 80 chars), so an incidental
+        # later mention does not false-positive. Attestation may appear anywhere.
+        subject = re.split(r'\s[—-]\s', body, maxsplit=1)[0][:80]
+        if _INDEP_CLAIM_RE.search(subject) and not _ATTESTED_RE.search(body):
+            warnings.append(('independence_unattested', body.strip()[:100]))
+    return warnings
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description="Close-gate conformance guard (C-P1).")
     p.add_argument('path', help="PROJECT_PLAN or session markdown file being closed")
@@ -89,7 +142,20 @@ def main(argv=None):
         print(f"close-gate: ERROR — file not found: {fp}", file=sys.stderr)
         return 3
 
-    violations = scan(fp.read_text(encoding='utf-8', errors='replace'))
+    content = fp.read_text(encoding='utf-8', errors='replace')
+    violations = scan(content)
+    warnings = scan_independence_warnings(content)
+
+    def _print_independence_warn():
+        # Surface independence-WARNs (L1047) — non-silent PASS. Never blocks.
+        if not warnings:
+            return
+        print(f"close-gate: ⚠ INDEPENDENCE-WARN — {len(warnings)} checked item(s) in "
+              f"{fp.name} assert independence-requiring claims without attestation "
+              f"(non-blocking; attest producer-pilot/carry/supervisor-lane/OPEN or verify independently):")
+        if not args.quiet:
+            for _, detail in warnings:
+                print(f"  - {detail}")
 
     # Release-class BLOCKING guard (#1554, v3.25 C-25-06): when the instance
     # carries scripts/release_close_guard.py and the plan is release-class,
@@ -110,6 +176,7 @@ def main(argv=None):
 
     if not violations:
         print(f"close-gate: PASS — no unchecked conformance signals in {fp.name}")
+        _print_independence_warn()
         return 0
 
     print(f"close-gate: BLOCK — {len(violations)} unchecked conformance signal(s) in {fp.name} "
