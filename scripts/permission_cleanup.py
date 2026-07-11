@@ -28,13 +28,16 @@ SETTINGS = Path(".claude/settings.local.json")
 
 
 def should_keep(p: str) -> bool:
-    if p.startswith("WebFetch("):
+    # Non-Bash categories (Skill/Read/Edit/WebFetch/WebSearch/...) are durable
+    # governance grants — always preserved. The staleness heuristic applies
+    # ONLY within Bash(...) entries. BL-20260706-001: a category-blind version
+    # of this filter dropped every Skill(...)/Read(...) grant (supervisor
+    # instance 621->98); fix field-proven there 2026-07-06, upstreamed 2026-07-11.
+    if not p.startswith("Bash("):
         return True
-    if p.startswith("WebSearch"):
-        return True
+    if "/Users/" in p or "/home/" in p:
+        return False
     if p.endswith(":*)"):
-        if "/Users/" in p or "/home/" in p:
-            return False
         return True
     return False
 
