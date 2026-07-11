@@ -1,0 +1,54 @@
+# DELIVERED_FILES_v3.26.0.yaml — machine-readable per-payload delivered-files manifest
+# Emit half of gmelli/aget-aget#1870 (closes the #1828 delivered-but-not-committed vector).
+# Consumer: SOP_fleet_upgrade G0.2 — commit add-list derives from THIS manifest;
+# post-stage porcelain cross-check asserts no manifest path remains untracked.
+version: "3.26.0"
+source_ref: "v3.26.0"  # canonical aget/ (payload-source ruling 2026-07-11: canonical, not template — see #1871)
+generated: "2026-07-11T15:45:42Z"
+generator: "scripts/emit_delivered_files_manifest.py"
+tracking: "gmelli/aget-aget#1870"
+
+pin_edits:  # edited in place on the agent, not file-copied — outside the porcelain cross-check
+  - path: ".aget/version.json"  # version pin
+  - path: "AGENTS.md"  # @aget-version pin
+
+delivered_files:
+  - path: "scripts/wake_up.py"
+    spec_rows: [M-3.26-3]
+    sha256: "a4e5df688c43952ba2e8486e69391eb468af2cbde7bb0041873466d2bc6844cc"
+  - path: "scripts/health_check.py"
+    spec_rows: [M-3.26-4]
+    sha256: "877572a40edd41c2d69ceaa986dfd2d8aa4407435b1eac2108121d880f2f63d3"
+  - path: "scripts/study_topic.py"
+    spec_rows: [M-3.26-4, M-3.26-5]
+    sha256: "3788a7f822252544ffff9be6253f53beb3cdc9b61610d3be7c3e06ecee253622"
+  - path: "scripts/check_skill_reliance_manifest.py"
+    spec_rows: [M-3.26-6]
+    sha256: "e48d1dd31a5de077b0c71442a1ca76078ccab4076e8e1b17062a057c2c05e28e"
+  - path: "scripts/close_gate_check.py"
+    spec_rows: [M-3.26-7]
+    sha256: "fd03cb90bea3233abcaa46a963298f06ae7edfcdf06ff89b20467631fe5fd903"
+  - path: ".claude/skills/aget-close-project/SKILL.md"
+    spec_rows: [M-3.26-8]
+    sha256: "7a93f8a5a8dca6c86c6ebf6cc814e738c07b214b02b180564ae8043222f7942c"
+
+optional_files:
+  - path: ".claude/skills/aget-file-issue/SKILL.md"
+    spec_rows: [O-3.26-1]
+    sha256: "490e1ee1dc9120d31a64d83a6502b441f09684103a64612aba23346aed6d75e6"
+  - path: ".claude/skills/aget-record-lesson/SKILL.md"
+    spec_rows: [O-3.26-2]
+    sha256: "ABSENT-AT-REF"
+
+additive_files:
+  - path: "scripts/check_permission_quality.py"
+    spec_rows: [A-3.26-2]
+    sha256: "eccbd1b6d3e2752223f78e60e304089fd58f9aa3f9527e4e0b2679dd85e96126"
+  - path: "scripts/check_tag_payload_coherence.py"
+    spec_rows: [A-3.26-2]
+    sha256: "04e6b65abbafee462cb3f4f7f7222247ba389dafcfe9e8885ac49f93955e90b4"
+
+verify_rule: |
+  Post-upgrade, every delivered_files/optional_files path present on the agent's disk
+  MUST be git-tracked. `git status --porcelain` showing any manifest path as untracked
+  (??) is the #1828 defect class — the upgrade is NOT complete until it is staged.
