@@ -90,7 +90,11 @@ def validate() -> dict:
         except Exception as exc:  # pragma: no cover - defensive
             add("WARN", "C3-core", f"could not compare against archetype index: {exc}")
     else:
-        add("WARN", "C3-core", "archetype index unreachable (cross-repo); {S} authority unverified")
+        # Three-state contract (v3.26 C-26-09, CONVENTION_check_three_state_contract):
+        # a check that COULD NOT RUN reports UNREACHABLE with the reason — never
+        # blended into WARN prose or a pass-count. Non-gating per ADR-004.
+        add("UNREACHABLE", "C3-core",
+            "archetype index not found at any candidate path; {S} authority unverified from this vantage")
 
     # C4 — release pin present
     as_of = ((manifest.get("meta") or {}).get("as_of_version"))
@@ -111,6 +115,9 @@ def _result(findings, **extra) -> dict:
         "ok": not errors,
         "errors": len(errors),
         "warnings": len([f for f in findings if f["level"] == "WARN"]),
+        # Three-state contract (C-26-09): UNREACHABLE counted distinctly — never
+        # folded into warnings or the pass verdict (ADR-004 non-gating).
+        "unreachable": len([f for f in findings if f["level"] == "UNREACHABLE"]),
         "findings": findings,
         **extra,
     }
@@ -122,9 +129,10 @@ def main(argv: list[str]) -> int:
         print(json.dumps(res, indent=2))
     else:
         status = "PASS" if res["ok"] else "FAIL"
+        unreach = f", {res['unreachable']} UNREACHABLE" if res.get('unreachable') else ""
         print(f"Skill Reliance Manifest: {status} "
               f"({res.get('declared', 0)} declared / {res.get('on_disk', 0)} on disk; "
-              f"{res['errors']} errors, {res['warnings']} warnings)")
+              f"{res['errors']} errors, {res['warnings']} warnings{unreach})")
         for f in res["findings"]:
             print(f"  [{f['level']}] {f['check']}: {f['msg']}")
     return 0 if res["ok"] else 1
