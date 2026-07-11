@@ -29,6 +29,7 @@ Usage:
 """
 
 import argparse
+import importlib.util
 import json
 import re
 import sys
@@ -695,6 +696,31 @@ def generate_report(topic: str, findings: dict, floor_info: dict = None) -> str:
     return '\n'.join(lines)
 
 
+def call_extension_hook(payload):
+    """Study extension hook (v3.26 C-26-05, gh#1836/#1848): call
+    scripts/study_topic_ext.py:post_study(payload) if present.
+
+    Contract mirrors wake_up.py WU-008: payload = {'topic', 'purpose',
+    'findings', 'floor_info'}; hook returns augmented dict (additive-only,
+    L464 — e.g. instance-specific search surfaces or annotations); absence =
+    no-op; failure = warning + continue (ADR-004).
+    """
+    ext_path = get_agent_root() / 'scripts' / 'study_topic_ext.py'
+    if not ext_path.exists():
+        return payload
+    try:
+        spec = importlib.util.spec_from_file_location('study_topic_ext', str(ext_path))
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        if hasattr(module, 'post_study'):
+            result = module.post_study(payload)
+            if isinstance(result, dict):
+                return result
+    except Exception as e:
+        print(f"Warning: study_topic extension hook failed: {e}", file=sys.stderr)
+    return payload
+
+
 def main():
     parser = argparse.ArgumentParser(
         description='Study Topic Protocol - Focused Topic Research',
@@ -761,6 +787,12 @@ Examples:
             suppressed += len(findings[key]) - len(kept)
             findings[key] = kept
     floor_info = {'floor': floor, 'suppressed': suppressed} if floor is not None else None
+
+    # Extension hook (v3.26 C-26-05) — instance surfaces/annotations join here
+    payload = call_extension_hook({'topic': args.topic, 'purpose': purpose,
+                                   'findings': findings, 'floor_info': floor_info})
+    findings = payload.get('findings', findings)
+    floor_info = payload.get('floor_info', floor_info)
 
     # JSON output
     if args.json:

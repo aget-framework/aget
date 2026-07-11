@@ -36,6 +36,7 @@ Version: 1.0.0 (v3.1.0)
 """
 
 import argparse
+import importlib.util
 import json
 import os
 import re
@@ -611,6 +612,35 @@ def format_human_output(data: Dict[str, Any]) -> str:
 # Main
 # =============================================================================
 
+def call_extension_hook(agent_path, data, verbose=False):
+    """HC extension hook (v3.26 C-26-05, gh#1836/#1848): call
+    scripts/health_check_ext.py:post_health(data) if present.
+
+    Same contract as wake_up.py WU-008: hook receives the housekeeping data
+    dict, returns an augmented dict (additive-only per L464); absence = no-op;
+    failure = warning + continue (ADR-004). Root cause this closes: instances
+    needing agent-specific checks had no hook point and patched the
+    Framework_Artifact itself, which the next upgrade clobbered (legalon
+    GATE-0 halt class).
+    """
+    ext_path = agent_path / 'scripts' / 'health_check_ext.py'
+    if not ext_path.exists():
+        return data
+    try:
+        spec = importlib.util.spec_from_file_location('health_check_ext', str(ext_path))
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        if hasattr(module, 'post_health'):
+            result = module.post_health(data)
+            if isinstance(result, dict):
+                return result
+            if verbose:
+                log_diagnostic("health_check_ext returned non-dict, ignoring")
+    except Exception as e:
+        print(f"Warning: health_check extension hook failed: {e}", file=sys.stderr)
+    return data
+
+
 def main():
     parser = argparse.ArgumentParser(
         description='AGET Housekeeping Protocol (v3.1 template)',
@@ -690,6 +720,9 @@ Exit codes:
 
     # Run housekeeping
     data = run_housekeeping(agent_path, verbose=args.verbose)
+
+    # Extension hook (v3.26 C-26-05) — instance-specific checks join here
+    data = call_extension_hook(agent_path, data, verbose=args.verbose)
 
     if args.verbose:
         log_diagnostic(f"Housekeeping complete, status={data['status']}")
