@@ -1,6 +1,6 @@
 # AGET Session Specification
 
-**Version**: 1.2.0
+**Version**: 1.3.0
 **Status**: Active
 **Category**: Standards (Session Lifecycle)
 **Format Version**: 1.2
@@ -344,8 +344,13 @@ The SYSTEM shall support focused topic research via study_topic protocol.
 | CAP-SESSION-007-05 | ubiquitous | The SYSTEM shall support --verify flag for migration validation |
 | CAP-SESSION-007-06 | optional | WHERE `.aget/config.json` contains `study_topic.priority_areas`, the SYSTEM shall accept a `--purpose` parameter (values: `pre-implementation`, `pre-release`, `exploration`, `audit`) and weight search results from KB areas associated with that purpose higher than results from other areas |
 | CAP-SESSION-007-07 | optional | WHERE `.aget/config.json` contains `study_topic.domain_keywords`, the SYSTEM shall boost ranking scores for search results that match one or more configured domain keywords |
+| CAP-SESSION-007-08 | ubiquitous | The study report SHALL declare its search contract: surfaces searched AND surfaces excluded (with exclusion provenance: deliberate vs unconfigured), so absence-from-results is interpretable (v3.26 C-26-11; gh#1852 S1/C1, gh#1850) |
+| CAP-SESSION-007-09 | ubiquitous | The SYSTEM shall apply token hygiene before matching — stopword removal, case-insensitive dedupe, possessive fold — and word-boundary matching for short tokens; stopword occurrences SHALL NOT count toward coverage or ranking (gh#1852 M1–M4) |
+| CAP-SESSION-007-10 | ubiquitous | Ranking SHALL log-damp raw match counts and boost filename/title matches, so file length × token commonness cannot outrank topical precision (gh#1852 R1/R2, gh#1757); the coverage claim SHALL be contract-derived — no quality adjective the tool cannot demonstrate (C1) |
+| CAP-SESSION-007-11 | conditional | IF a relevance floor is configured or defaulted THEN the SYSTEM shall suppress below-floor results, report the suppressed count, and honor a `--no-floor` escape (gh#1560); recent `inbox/` items (≤14 days) SHALL join the search surface (gh#1850 S2 ruling) |
+| CAP-SESSION-007-12 | optional | WHERE `scripts/study_topic_ext.py` exists, the SYSTEM shall call `post_study(payload)` after findings assembly — additive-only (L464), absence = no-op, failure = warn + continue (v3.26 C-26-05; gh#1836/#1848) |
 
-**Enforcement**: study_topic.py `--purpose` and `--domain-keywords` flags, contract tests
+**Enforcement**: study_topic.py `--purpose` / `--domain-keywords` / `--no-floor` flags; canonical implementation `d2b35d8` (search contract) + `d1b6501` (ext hook); contract tests incl. `tests/test_study_topic_relevance_floor.py` + `tests/test_study_topic_filename_index.py`
 
 **Disambiguation**: study_topic is for focused topic research. Differs from step_back (broad KB review).
 
@@ -360,8 +365,9 @@ The SYSTEM shall support agent health verification via sanity check.
 | CAP-SESSION-008-03 | ubiquitous | The SYSTEM shall support --json output mode |
 | CAP-SESSION-008-04 | prohibited | The SYSTEM shall NOT execute sanity_check script for "wind down" trigger |
 | CAP-SESSION-008-05 | ubiquitous | The SYSTEM shall support --verify flag for migration validation |
+| CAP-SESSION-008-06 | optional | WHERE `scripts/health_check_ext.py` exists, the SYSTEM shall call `post_health(data)` after housekeeping — additive-only (L464), absence = no-op, failure = warn + continue (v3.26 C-26-05; gh#1836/#1848 — closes the patched-Framework_Artifact-clobbered-on-upgrade class) |
 
-**Enforcement**: health_check.py, contract tests
+**Enforcement**: health_check.py, contract tests; ext hook canonical `d1b6501`
 
 **Disambiguation (L491)**: The health_check.py script is for sanity_check, NOT wind_down. This is a common mistake documented in L491 (Script-Level Semantic Slippage).
 
@@ -516,6 +522,26 @@ The SYSTEM shall provide a health remediation capability that consumes `/aget-ch
 **Enforcement**: `/aget-enhance-health` skill v1.0.0 (SKILL-049); consumes `scripts/health_check.py --json` (read-only).
 **Origin**: SP-023 (2026-04-20, self-scored 27/27); PP-006 (2026-04-20); AEH-001 PROJECT_PLAN Gate 0. Evidence: L867 (enhance-verb family), L656 (Loading Dock — replaces unimplemented `--fix` flag across 13 SKILL.md files), L671 (Classification Without Consequence).
 **Inherits from REQ**: TBD — REQ-OPS-* candidate for agent operational health. Current session spec inherits via sibling CAP-SESSION-008 chain.
+
+---
+
+### CAP-SESSION-015: Pre-Assertion Gate Protocol (conversational channel)
+
+The SYSTEM shall gate completeness/verification claims emitted in the CONVERSATIONAL channel behind verify-before-claim discipline. Owning-spec ruling 2026-07-10 (gh#1853 comment 4937608183): AGET_SESSION_SPEC owns the conversational channel of the anti-confabulation coverage matrix; issue-filing claims belong to AGET_ISSUE_GOVERNANCE_SPEC, status-transition claims to the project-plan lifecycle spec.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-SESSION-015-01 | event-driven | WHEN session output asserts a checkable claim (completion of an action, existence/state of an artifact, a verification result), the SYSTEM shall have executed the corresponding check within the current session before emitting the claim |
+| CAP-SESSION-015-02 | ubiquitous | The discipline SHALL be available in two delivery forms: an invoked form (`/aget-check-facts` stratified 3-pass protocol — currently instance-tier; canonical promotion DECLINED by the owning ruling until coverage-matrix evidence accrues) and an always-on advisory hook form (host-runtime response gate, e.g. Stop-hook; fleet-pilot intake per D-26-1) |
+| CAP-SESSION-015-03 | conditional | IF the advisory hook flags a claim THEN the SYSTEM shall fail-open — surface the flagged claim for in-session verification rather than silently blocking output (advisory, not blocking, while the FP bound is unmet) |
+| CAP-SESSION-015-04 | unwanted | Session output shall NOT assert "verified"/"confirmed"/"complete" for a step whose execution record is absent from the current session |
+
+**FP bound (explicitly empirical-and-unmet)**: the hook form's false-positive rate exceeded the 0% replay bound in LIVE pilot (2026-07-10: Stop hook fired same-session on a legitimate claim) — context-gating of claim-verbs is a known v2 requirement. The capability registers the discipline and its two delivery forms; the bound is tuned with pilot evidence, not asserted from replay figures.
+
+**Reference implementation**: legalon fleet `verify_claim_gate.py` + Stop-hook + L247/L249 (cited, not shipped — pilot state; hook-library mode per v3.26 D-26-1 = framework-owned canonical library with fleet-pilot intake).
+
+**Enforcement**: `/aget-check-facts` (invoked form, Layer 2 pre-assertion gates); advisory hook form via fleet-pilot intake (D-26-1). V-SESSION-013.
+**Origin**: gh#1853 (ruling) + gh#1855 (coverage matrix); v3.26 C-26-12. Evidence: legalon LIVE pilot FP datum 2026-07-10.
 
 ---
 
@@ -708,6 +734,9 @@ session_naming_standard:
 | V-SESSION-008 | CAP-SESSION-012 | automated | Sanity gate runs housekeeping checks (9/9 expected) |
 | V-SESSION-009 | CAP-SESSION-007-06 | automated | Purpose parameter weights results from priority_areas globs higher |
 | V-SESSION-010 | CAP-SESSION-007-07 | automated | Domain keywords boost ranking for matching results |
+| V-SESSION-011 | CAP-SESSION-007-08..11 | automated | Search-contract battery: report declares surfaces; stopwords never count; floor suppresses + reports + `--no-floor` escapes; slug topic surfaces its own artifact (tests/test_study_topic_*.py) |
+| V-SESSION-012 | CAP-SESSION-007-12, CAP-SESSION-008-06 | automated | Ext hooks: absent = identical output; present = additive augmentation; failing hook = warning + normal completion |
+| V-SESSION-013 | CAP-SESSION-015 | manual | A checkable conversational claim is traceable to an in-session execution record; hook-flagged claims fail open with surfaced verification |
 
 ### Validation Commands
 
@@ -827,3 +856,4 @@ graduation:
 *"Sessions are transactions; handoffs are commits."*
 *"Disambiguation prevents script-level semantic slippage (L491)."*
 *v1.2.0: Added CAP-SESSION-010 (re-entrancy guard), CAP-SESSION-011 (calendar awareness), CAP-SESSION-012 (sanity gate)*
+*v1.3.0 (2026-07-10, v3.26 G2.4 consolidated pass): CAP-SESSION-015 Pre-Assertion Gate Protocol (conversational channel; gh#1853 ruling, legalon LIVE pilot evidence, FP bound empirical-and-unmet) + CAP-SESSION-007-08..12 search contract (gh#1852 audit enactment: declared surfaces, token hygiene, ranking rebalance, relevance floor, inbox/ 14d, ext hook) + CAP-SESSION-008-06 health ext hook (gh#1836/#1848) + V-SESSION-011..013*

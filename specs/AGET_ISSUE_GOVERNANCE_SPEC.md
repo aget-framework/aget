@@ -1,6 +1,6 @@
 # AGET Issue Governance Specification
 
-**Version**: 2.2.0
+**Version**: 2.3.0
 **Status**: Active
 **Category**: Process (Issue Management)
 **Format Version**: 1.3
@@ -764,17 +764,19 @@ PRIVATE_PATTERNS = [
 
 ### CAP-ISSUE-013: Filing-Mode Declaration (v2.2.0)
 
-**Statement**: The SYSTEM shall require every filed issue to declare its routing mode, defaulting to `direct` to preserve existing routing.
+**Statement**: The SYSTEM shall require every filed issue to declare its routing mode; the absent-mode default is SEAT-CONDITIONAL under the fleet-universal supervisor-relay ruling (principal MC ruling 2026-07-05, gh#1845; enacted v2.3.0 / v3.26 C-26-02).
 
-**Pattern**: ubiquitous
+**Pattern**: ubiquitous + conditional
 
-**Theoretical Basis**: PP-042 Q1=Option B (single-rev mode taxonomy). L638 (private-first routing preserved as the `direct` default).
+**Theoretical Basis**: PP-042 Q1=Option B (single-rev mode taxonomy). gh#1845 (fleet-universal supervisor relay — supervisors are the filing authority). L638 destination routing unchanged: everything still lands at `{private-tracker}`; the flip changes WHO performs the `gh` act, not WHERE issues live.
 
 | ID | Pattern | Statement |
 |----|---------|-----------|
-| R-ISSUE-030 | ubiquitous | Every filed issue SHALL declare a `routing_mode` ∈ {`direct`, `supervisor_intake`, `supervisor_editorial`, `lesson_first`}; absent an explicit mode, the SYSTEM shall apply `direct` (CAP-ISSUE-001 routing to `{private-tracker}`) |
+| R-ISSUE-030 | ubiquitous + conditional | Every filed issue SHALL declare a `routing_mode` ∈ {`direct`, `supervisor_intake`, `supervisor_editorial`, `lesson_first`}. Absent an explicit mode: IF the filing agent is a MANAGED agent THEN the SYSTEM shall apply `supervisor_intake`; IF the filing agent is a supervisor seat THEN the SYSTEM shall apply `direct`. *(v2.2.0 history: default was unconditionally `direct`; flipped per gh#1845.)* |
+| R-ISSUE-032 | ubiquitous | Supervisor seats ARE the filing authority: a supervisor SHALL file directly for itself and for its managed agents' intake artifacts; a managed agent's `supervisor_intake` filing event is the intake artifact in its OWN repo (no cross-fleet write, L480), not a `gh issue create` |
+| R-ISSUE-033 | conditional | IF a managed agent's session is principal-supervised (principal present and directing the filing) THEN `direct` mode is permitted, recorded as `routing_mode: direct (principal-supervised)` in the issue body |
 
-**Enforcement**: `/aget-file-issue` (mode parameter; Stream 2 follow-on). Default-direct preserves backward compatibility with all existing filings.
+**Enforcement**: `/aget-file-issue` Step 2.5 routing-mode gate (canonical `eef2154`, v3.26 C-26-02). Fleet-wide AGENTS.md propagation = next cycle (v3.26 D-26-4). Interim bootstrap filings (pre-enactment) recorded per gh#1845 §5.
 
 ---
 
@@ -1043,6 +1045,7 @@ graduation:
 | 1.1.0 | 2026-02-14 | Added WorkCo, VP-of-AI, WorkCo patterns per L583 |
 | 2.0.0 | 2026-03-02 | **Private-first routing**: R-ISSUE-001 rewritten (all agents -> {private-tracker}), R-ISSUE-002 rewritten (promotion-only), R-ISSUE-009 revised (promotion target), CAP-ISSUE-005 added (R-ISSUE-011 through R-ISSUE-014: promotion requirements), vocabulary updated, Exhaustive_Pattern_List anti-pattern added. Per L638. |
 | 2.2.0 | 2026-05-23 | **Lesson-first filing + supervisor relay (PP-042 leapfrog)**: CAP-ISSUE-009 (Supervisor Intake: R-ISSUE-024..025), CAP-ISSUE-010 (Supervisor Editorial: R-ISSUE-026..027, ADR-021 Option 5), CAP-ISSUE-011 (Lesson-First Precondition: R-ISSUE-028), CAP-ISSUE-012 (Lesson↔Issue Traceability: R-ISSUE-029), CAP-ISSUE-013 (Filing-Mode Declaration: R-ISSUE-030, default `direct` preserves CAP-ISSUE-001), CAP-ISSUE-014 (Lift-Rate Hook: R-ISSUE-031, instrumentation deferred to Stream 3). 6 new V-tests (V-ISSUE-015..020). No changes to CAP-ISSUE-001..008. Per L977 (lesson-as-substrate), L863 (lift-rate gap), L671 (anti-decorative), L638 (routing preserved). PP-042 Stream 1 / INIT-ISSUE-INBOX-STEWARDSHIP Stream 8; v3.19 release T1.3. |
+| 2.3.0 | 2026-07-10 | **Fleet-universal supervisor relay (gh#1845 enactment, v3.26 C-26-02)**: R-ISSUE-030 absent-mode default flipped `direct` → seat-conditional (`supervisor_intake` for managed agents; `direct` for supervisor seats); R-ISSUE-032 supervisor filing authority + own-repo intake artifact (L480-clean); R-ISSUE-033 principal-supervised direct exception. Destination routing (CAP-ISSUE-001, L638) unchanged. Skill layer `eef2154`; fleet propagation next cycle (D-26-4). |
 | 2.1.0 | 2026-04-04 | **Triage, lifecycle, structured filing**: CAP-ISSUE-006 (Triage: R-ISSUE-015 through R-ISSUE-017), CAP-ISSUE-007 (Lifecycle: R-ISSUE-018 through R-ISSUE-020), CAP-ISSUE-008 (Issue Forms: R-ISSUE-021 through R-ISSUE-023). 54 new SKOS vocabulary terms across 4 concept groups (triage, lifecycle, labeling, promotion_workflow). 3 new anti-patterns. 6 new V-tests (V-ISSUE-009 through V-ISSUE-014). Per L750, L671, L498. |
 
 ---
