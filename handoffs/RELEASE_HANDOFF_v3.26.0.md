@@ -33,6 +33,7 @@ The release hears its consumers and hardens its contracts. **Signals pole**: wak
 ## Known residuals (disclosed, not blocking)
 
 - Template copies of `/aget-file-issue` structurally lag canonical (pre-routing-mode shape); refresh staged for the next cycle's propagation batch — adopt from canonical directly if wanted sooner.
+- **Template tags ship `check_skill_reliance_manifest.py` one delta behind** (three-state UNREACHABLE wiring missing → M-3.26-6 detection fails at template tags; found by the first consumer sweep, 2026-07-11 same-day). Fixed on every template's `main` same day, disclosed per-repo. **Pin-to-template-tag guidance is amended for this one script**: fetch it from the template's `main` or canonical `aget/scripts/` at tag.
 - Interaction-channel pattern (`docs/patterns/PATTERN_interaction_channel.md`) ships as substrate; template/fleet promotion is pilot-gated (non-author validation first).
 - The public-surface audit's pre-existing corpus findings (legacy backup dirs in template repos, historical docs) are a recorded cleanup backlog, not v3.26 regressions; this cycle's own delta was scrubbed clean pre-push.
 
