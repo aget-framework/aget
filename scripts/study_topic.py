@@ -128,7 +128,14 @@ def compute_domain_boost(content, domain_keywords):
 # and its occurrence counts dominated ranking in all four seats' failures).
 STOPWORDS = {'a', 'an', 'and', 'are', 'as', 'at', 'be', 'by', 'for', 'from',
              'in', 'is', 'it', 'of', 'on', 'or', 's', 'the', 'this', 'to',
-             'with'}
+             'with',
+             # gh#1876: common function words that passed hygiene and diluted
+             # OR-union results at multiple seats (2026-07-11, e.g. "after").
+             'after', 'all', 'any', 'before', 'but', 'can', 'do', 'does',
+             'has', 'have', 'how', 'if', 'into', 'its', 'not', 'our', 'over',
+             'so', 'some', 'than', 'that', 'their', 'then', 'there', 'these',
+             'they', 'under', 'up', 'was', 'we', 'were', 'what', 'when',
+             'where', 'which', 'who', 'why', 'will', 'you'}
 
 SHORT_TOKEN_LEN = 5      # tokens ≤ this use word-boundary matching (audit M4)
 FILENAME_BOOST = 3.0     # name/title match is the strongest feature (audit R2, #1757)
@@ -152,10 +159,18 @@ def prepare_keywords(topic: str) -> list:
     stopwords, dedupe case-insensitively (order-preserving), fold trailing
     possessive ("supervisor's" -> "supervisor"). Light folds only — not a stemmer.
     Falls back to raw tokens when hygiene would empty the list (all-stopword topic).
+
+    gh#1876 (2026-07-11): edge punctuation is stripped BEFORE stopword/boundary
+    handling — a trailing comma ("health,") previously survived into the token
+    and broke word-boundary matching silently. Internal punctuation survives
+    ("v3.26" is untouched; only token edges are stripped).
     """
     raw = [kw for kw in topic.split() if re.search(r'\w', kw)]
     seen, out = set(), []
     for kw in raw:
+        kw = kw.strip('.,;:!?"\'`()[]{}<>*_-/\\')  # edges only (gh#1876)
+        if not kw:
+            continue
         kw = kw[:-2] if kw.lower().endswith("'s") else kw
         key = kw.lower()
         if key in STOPWORDS or key in seen:
