@@ -115,6 +115,78 @@ def compute_domain_boost(content, domain_keywords):
     return min(2.0, 1.0 + matches * 0.25)
 
 
+# ---------------------------------------------------------------------------
+# Search contract (v3.26 C-26-11 — gh#1852 audit enactment; gh#1850/#1757/#1560)
+#
+# The contract is DECLARED, not implied: the report prints which surfaces are
+# searched and which are excluded (with provenance), so absence-from-results
+# is interpretable (audit Finding S1/C1).
+# ---------------------------------------------------------------------------
+
+# Tokens that must never act as keywords (audit M1: "and" matched every file
+# and its occurrence counts dominated ranking in all four seats' failures).
+STOPWORDS = {'a', 'an', 'and', 'are', 'as', 'at', 'be', 'by', 'for', 'from',
+             'in', 'is', 'it', 'of', 'on', 'or', 's', 'the', 'this', 'to',
+             'with'}
+
+SHORT_TOKEN_LEN = 5      # tokens ≤ this use word-boundary matching (audit M4)
+FILENAME_BOOST = 3.0     # name/title match is the strongest feature (audit R2, #1757)
+RELEVANCE_FLOOR_DEFAULT = 2.0  # composite-score floor (audit R3, #1560); --no-floor escapes
+
+SURFACES_SEARCHED = [
+    '.aget/evolution/L*.md', 'docs/patterns/PATTERN_*.md',
+    'planning/PROJECT_PLAN*.md', 'sops/SOP_*.md', 'governance/*.md',
+    'knowledge/** + ontology/** (v3.25 C-25-14)',
+    'inbox/ ≤14d (v3.26 C-26-11 — S2 revisit ruling: NOTIFYs are study-relevant, gh#1850)',
+]
+SURFACES_EXCLUDED = [
+    'sessions/, workspace/, data/ (deliberate — 2026-07-04 scope decision, noise at study-time)',
+    'docs/ outside patterns/, planning/initiatives/, handoffs/, release-notes/, .claude/skills/ '
+    '(unconfigured — candidates for a future scope ruling)',
+]
+
+
+def prepare_keywords(topic: str) -> list:
+    """Token hygiene (audit M1-M3): tokenize, drop punctuation-only tokens and
+    stopwords, dedupe case-insensitively (order-preserving), fold trailing
+    possessive ("supervisor's" -> "supervisor"). Light folds only — not a stemmer.
+    Falls back to raw tokens when hygiene would empty the list (all-stopword topic).
+    """
+    raw = [kw for kw in topic.split() if re.search(r'\w', kw)]
+    seen, out = set(), []
+    for kw in raw:
+        kw = kw[:-2] if kw.lower().endswith("'s") else kw
+        key = kw.lower()
+        if key in STOPWORDS or key in seen:
+            continue
+        seen.add(key)
+        out.append(kw)
+    return out or raw
+
+
+def _token_pattern(kw: str) -> str:
+    """Boundary semantics (audit M4 + M3): short tokens are word-boundary
+    anchored with light inflection tolerance (so "check" stops matching
+    "checklist" but still matches "checks"/"checked"); longer tokens keep
+    substring semantics (so "lesson" still matches "lessons")."""
+    if len(kw) <= SHORT_TOKEN_LEN:
+        return r'\b' + re.escape(kw) + r'(?:s|es|ed|ing)?\b'
+    return re.escape(kw)
+
+
+def composite_score(item: dict) -> float:
+    """Ranking contract (audit R1/R2): log-damped match_count so length x
+    token-commonness cannot outrank topical precision, times coverage,
+    epistemic boosts, and the filename boost."""
+    import math
+    count = max(1, item.get('match_count', 1))
+    return (item.get('keyword_coverage', 1.0)
+            * item.get('purpose_boost', 1.0)
+            * item.get('domain_boost', 1.0)
+            * item.get('filename_boost', 1.0)
+            * (1 + math.log2(count)))
+
+
 def search_file_for_topic(file_path: Path, topic: str, case_insensitive: bool = True,
                           domain_keywords: list = None) -> dict:
     """Search a file for topic matches.
@@ -132,21 +204,29 @@ def search_file_for_topic(file_path: Path, topic: str, case_insensitive: bool = 
         content = file_path.read_text()
         flags = re.IGNORECASE if case_insensitive else 0
 
-        # Tokenize multi-word topics into keywords, filtering punctuation-only tokens
-        keywords = [kw for kw in topic.split() if re.search(r'\w', kw)]
+        # Filename-index (instance fix 2026-06-26, canonicalized v3.26 C-26-11):
+        # filename tokens (raw stem + slug-normalized) join the searchable text,
+        # so a topic equal to an artifact's name surfaces that artifact even
+        # when the body never echoes the slug. Recall-half of audit R2/#1757;
+        # the rank-half is FILENAME_BOOST below.
+        fname_text = file_path.stem + ' ' + re.sub(r'[_\-.]+', ' ', file_path.stem)
+        haystack = content + '\n' + fname_text
+
+        # Token hygiene (v3.26 C-26-11): stopwords/dupes dropped, possessive folded
+        keywords = prepare_keywords(topic)
         if len(keywords) <= 1:
-            # Single keyword: original behavior
-            matches = list(re.finditer(re.escape(topic), content, flags))
+            single = keywords[0] if keywords else topic
+            matches = list(re.finditer(_token_pattern(single), haystack, flags))
         else:
             # Multi-keyword: search each independently, require majority coverage
             keyword_matches = {}
             all_matches = []
             for kw in keywords:
-                kw_matches = list(re.finditer(re.escape(kw), content, flags))
+                kw_matches = list(re.finditer(_token_pattern(kw), haystack, flags))
                 if kw_matches:
                     keyword_matches[kw] = len(kw_matches)
                     all_matches.extend(kw_matches)
-            # Require at least 50% of keywords present (min 1 for 2-keyword, min 2 for 3+)
+            # Require at least 50% of (hygiened) keywords present
             min_required = max(1, (len(keywords) + 1) // 2) if len(keywords) >= 2 else 1
             if len(keyword_matches) < min(min_required, len(keywords)):
                 return None
@@ -160,6 +240,8 @@ def search_file_for_topic(file_path: Path, topic: str, case_insensitive: bool = 
         contexts = []
         seen_lines = set()
         for match in matches:
+            if match.start() >= len(content):
+                continue  # filename-derived match; no body context to show
             line_start = content.count('\n', 0, match.start())
             if line_start in seen_lines:
                 continue
@@ -186,6 +268,12 @@ def search_file_for_topic(file_path: Path, topic: str, case_insensitive: bool = 
         # Add domain boost if keywords provided (CAP-SESSION-007-07)
         if domain_keywords:
             result['domain_boost'] = compute_domain_boost(content, domain_keywords)
+        # Filename boost (audit R2, #1757): a token in the file's own name is
+        # the strongest single relevance feature in the corpus.
+        stem = file_path.stem.lower()
+        if any(kw.lower() in stem for kw in keywords):
+            result['filename_boost'] = FILENAME_BOOST
+        result['score'] = composite_score(result)
         return result
     except (OSError, UnicodeDecodeError):
         return None
@@ -222,14 +310,11 @@ def search_directory(path: Path, topic: str, extensions: list = None,
                     match['purpose_boost'] = compute_purpose_boost(match['file'], purpose_globs)
                 results.append(match)
 
-    # Sort by composite score: keyword_coverage * purpose_boost * domain_boost * match_count
-    def sort_key(x):
-        coverage = x.get('keyword_coverage', 1.0)
-        purpose = x.get('purpose_boost', 1.0)
-        domain = x.get('domain_boost', 1.0)
-        return coverage * purpose * domain * x['match_count']
-
-    results.sort(key=sort_key, reverse=True)
+    # Composite ranking (v3.26 C-26-11): recompute score once purpose_boost is
+    # attached; log-damped count per the ranking contract (audit R1).
+    for x in results:
+        x['score'] = composite_score(x)
+    results.sort(key=lambda x: x['score'], reverse=True)
     return results
 
 
@@ -266,10 +351,12 @@ def find_ldocs(topic: str, domain_keywords: list = None) -> list:
                 'title': title,
                 'file': match['file'],
                 'match_count': match['match_count'],
-                'domain_boost': match.get('domain_boost', 1.0)
+                'keyword_coverage': match.get('keyword_coverage', 1.0),
+                'domain_boost': match.get('domain_boost', 1.0),
+                'score': match.get('score', 0.0)
             })
 
-    results.sort(key=lambda x: x['domain_boost'] * x['match_count'], reverse=True)
+    results.sort(key=lambda x: x['score'], reverse=True)
     return results
 
 
@@ -296,10 +383,11 @@ def find_patterns(topic: str, domain_keywords: list = None) -> list:
             results.append({
                 'pattern': file.stem,
                 'file': match['file'],
-                'match_count': match['match_count']
+                'match_count': match['match_count'],
+                'score': match.get('score', 0.0)
             })
 
-    results.sort(key=lambda x: x['match_count'], reverse=True)
+    results.sort(key=lambda x: x['score'], reverse=True)
     return results
 
 
@@ -342,10 +430,11 @@ def find_project_plans(topic: str, domain_keywords: list = None) -> list:
                 'plan': file.name,
                 'file': match['file'],
                 'match_count': match['match_count'],
-                'is_active': is_active
+                'is_active': is_active,
+                'score': match.get('score', 0.0)
             })
 
-    results.sort(key=lambda x: x['match_count'], reverse=True)
+    results.sort(key=lambda x: x['score'], reverse=True)
     return results
 
 
@@ -372,10 +461,11 @@ def find_sops(topic: str, domain_keywords: list = None) -> list:
             results.append({
                 'sop': file.name,
                 'file': match['file'],
-                'match_count': match['match_count']
+                'match_count': match['match_count'],
+                'score': match.get('score', 0.0)
             })
 
-    results.sort(key=lambda x: x['match_count'], reverse=True)
+    results.sort(key=lambda x: x['score'], reverse=True)
     return results
 
 
@@ -399,9 +489,10 @@ def find_knowledge(topic: str, domain_keywords: list = None) -> list:
                 results.append({
                     'doc': str(file.relative_to(agent_root)),
                     'file': match['file'],
-                    'match_count': match['match_count']
+                    'match_count': match['match_count'],
+                    'score': match.get('score', 0.0)
                 })
-    results.sort(key=lambda x: x['match_count'], reverse=True)
+    results.sort(key=lambda x: x['score'], reverse=True)
     return results
 
 
@@ -428,19 +519,60 @@ def find_governance(topic: str, domain_keywords: list = None) -> list:
             results.append({
                 'doc': file.name,
                 'file': match['file'],
-                'match_count': match['match_count']
+                'match_count': match['match_count'],
+                'keyword_coverage': match.get('keyword_coverage', 1.0),
+                'score': match.get('score', 0.0)
             })
 
-    results.sort(key=lambda x: x['match_count'], reverse=True)
+    results.sort(key=lambda x: x['score'], reverse=True)
     return results
 
 
-def generate_report(topic: str, findings: dict) -> str:
+def find_inbox(topic: str, domain_keywords: list = None, window_days: int = 14) -> list:
+    """Find recent inbox items related to topic (v3.26 C-26-11, gh#1850).
+
+    Scope ruling (audit S2 revisit, enacted with the search-contract change):
+    inbox/ JOINS the search surface, recency-windowed (default 14 days) —
+    NOTIFYs are precisely study-relevant, and gh#1850's same-day NOTIFY being
+    invisible while the report claimed "Good coverage" was the motivating
+    failure. sessions/, workspace/, data/ remain OUT (2026-07-04 rationale
+    holds; no seat's failure implicates them).
+    """
+    import time
+    agent_root = get_agent_root()
+    inbox_path = agent_root / 'inbox'
+
+    results = []
+    if not inbox_path.exists():
+        return results
+
+    cutoff = time.time() - window_days * 86400
+    for file in inbox_path.rglob('*.md'):
+        try:
+            if file.stat().st_mtime < cutoff:
+                continue
+        except OSError:
+            continue
+        match = search_file_for_topic(file, topic, domain_keywords=domain_keywords)
+        if match:
+            results.append({
+                'doc': str(file.relative_to(agent_root)),
+                'file': match['file'],
+                'match_count': match['match_count'],
+                'score': match.get('score', 0.0)
+            })
+    results.sort(key=lambda x: x['score'], reverse=True)
+    return results
+
+
+def generate_report(topic: str, findings: dict, floor_info: dict = None) -> str:
     """Generate human-readable study report.
 
     Args:
         topic: Topic that was searched
         findings: Dict of findings from search
+        floor_info: Optional {'floor': float, 'suppressed': int} from relevance
+            filtering (v3.26 C-26-11; audit R3/C1)
 
     Returns:
         Formatted markdown report
@@ -452,6 +584,11 @@ def generate_report(topic: str, findings: dict) -> str:
     lines.append("")
     lines.append(f"**Search Date**: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
     lines.append(f"**Topic**: {topic}")
+    lines.append(f"**Keywords (after hygiene)**: {', '.join(prepare_keywords(topic))}")
+    lines.append("")
+    # Declared surface manifest (audit S1/C1): absence is now interpretable.
+    lines.append("**Surfaces searched**: " + " ; ".join(SURFACES_SEARCHED))
+    lines.append("**NOT searched**: " + " ; ".join(SURFACES_EXCLUDED))
     lines.append("")
 
     # Summary
@@ -523,16 +660,34 @@ def generate_report(topic: str, findings: dict) -> str:
             lines.append(f"- {item['doc']} ({item['match_count']} matches)")
         lines.append("")
 
-    # Recommendation
+    # Recommendation — contract-derived (audit C1): states quantity over the
+    # declared surface; no quality adjective the tool cannot demonstrate.
     lines.append("### Recommendation")
     lines.append("")
+    suppressed = (floor_info or {}).get('suppressed', 0)
+    floor_val = (floor_info or {}).get('floor')
+    floor_note = (f"; {suppressed} below score floor {floor_val}, suppressed — "
+                  f"use --no-floor to see all" if floor_val is not None and suppressed else "")
+    # Relevance split (#1560 instance semantics, canonicalized): bucket on
+    # keyword coverage >= 0.5, so token-noise raw hits never read as coverage.
+    all_items = [x for v in findings.values() if isinstance(v, list) for x in v]
+    relevant = [x for x in all_items if x.get('keyword_coverage', 1.0) >= 0.5]
+    noise = len(all_items) - len(relevant)
     if total == 0:
-        lines.append("No existing artifacts found. This appears to be a **novel topic**.")
-        lines.append("Consider creating an L-doc to capture learnings.")
-    elif total < 3:
-        lines.append(f"Limited coverage ({total} artifacts). Review available materials before proposing new work.")
+        lines.append("0 artifacts found on the searched surfaces. This appears to be a "
+                     "**novel topic** — but check the NOT-searched list above before "
+                     "concluding novelty.")
+    elif not relevant:
+        lines.append(f"**novel topic** as far as the searched surfaces show: "
+                     f"{noise} raw hits, all below the relevance threshold "
+                     f"(keyword coverage < 0.5) — token-noise, not coverage{floor_note}.")
     else:
-        lines.append(f"Good coverage ({total} artifacts). Cite precedents when proposing changes.")
+        plural = 'artifact' if len(relevant) == 1 else 'artifacts'
+        noise_note = f" ({noise} additional raw hits below the relevance threshold)" if noise else ""
+        lines.append(f"{len(relevant)} relevant {plural} across the searched "
+                     f"surfaces{noise_note}{floor_note}.")
+        lines.append("Cite precedents from these when proposing changes; consult the "
+                     "NOT-searched list for surfaces this study cannot speak to.")
 
     lines.append("")
     lines.append("=" * 60)
@@ -558,6 +713,8 @@ Examples:
     parser.add_argument('--domain-keywords', nargs='*', metavar='KEYWORD',
                         help='Domain keywords for relevance boosting (CAP-SESSION-007-07)')
     parser.add_argument('--json', action='store_true', help='Output in JSON format')
+    parser.add_argument('--no-floor', action='store_true',
+                        help='Disable the relevance floor (v3.26 C-26-11; useful for exhaustive ID lookups)')
     parser.add_argument('--verify', action='store_true', help='Verification mode for migration')
     parser.add_argument('--quiet', '-q', action='store_true', help='Minimal output')
 
@@ -590,8 +747,20 @@ Examples:
         'project_plans': find_project_plans(args.topic, domain_keywords=domain_keywords),
         'sops': find_sops(args.topic, domain_keywords=domain_keywords),
         'governance': find_governance(args.topic, domain_keywords=domain_keywords),
-        'knowledge': find_knowledge(args.topic, domain_keywords=domain_keywords)
+        'knowledge': find_knowledge(args.topic, domain_keywords=domain_keywords),
+        'inbox': find_inbox(args.topic, domain_keywords=domain_keywords)
     }
+
+    # Relevance floor (v3.26 C-26-11; audit R3, gh#1560): suppress items whose
+    # composite score sits below the floor. Configurable; --no-floor escapes.
+    floor = None if args.no_floor else config.get('relevance_floor', RELEVANCE_FLOOR_DEFAULT)
+    suppressed = 0
+    if floor is not None:
+        for key in findings:
+            kept = [x for x in findings[key] if x.get('score', floor) >= floor]
+            suppressed += len(findings[key]) - len(kept)
+            findings[key] = kept
+    floor_info = {'floor': floor, 'suppressed': suppressed} if floor is not None else None
 
     # JSON output
     if args.json:
@@ -602,13 +771,20 @@ Examples:
             'purpose': purpose,
             'domain_keywords': domain_keywords,
             'findings': findings,
-            'total_artifacts': sum(len(v) for v in findings.values() if isinstance(v, list))
+            'total_artifacts': sum(len(v) for v in findings.values() if isinstance(v, list)),
+            'search_contract': {
+                'keywords': prepare_keywords(args.topic),
+                'surfaces_searched': SURFACES_SEARCHED,
+                'surfaces_excluded': SURFACES_EXCLUDED,
+                'relevance_floor': floor,
+                'suppressed_below_floor': suppressed if floor is not None else None
+            }
         }
         print(json.dumps(output, indent=2, default=str))
         return 0
 
     # Human-readable output
-    report = generate_report(args.topic, findings)
+    report = generate_report(args.topic, findings, floor_info=floor_info)
     print(report)
 
     return 0
