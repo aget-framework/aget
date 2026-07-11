@@ -144,8 +144,8 @@ completion_response:
 
 references:
   changelog: "aget/CHANGELOG.md (v3.21.0 entry)"
-  release_handoff: "private-aget-framework-AGET/handoffs/RELEASE_HANDOFF_v3.21.0.md"
-  remote_migration_message: "private-aget-framework-AGET/handoffs/REMOTE_MIGRATION_MESSAGE_v3.21.0.md"
+  release_handoff: "private handoffs/RELEASE_HANDOFF_v3.21.0.md"
+  remote_migration_message: "private handoffs/REMOTE_MIGRATION_MESSAGE_v3.21.0.md"
   root_cause: "gh#1600 (release verification proves labels agree, not that they are true)"
   remediation: "PP-048 (PROPOSAL_release_toolchain_continuous_validation_and_debt) Streams 5/6"
   lapse_history: "gh#1490 (DEPLOYMENT_SPEC practice lapsed v3.17-v3.19; extended to v3.20/v3.21)"
