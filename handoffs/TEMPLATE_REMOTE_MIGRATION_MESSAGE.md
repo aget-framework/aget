@@ -1,6 +1,6 @@
 # TEMPLATE: Remote Migration Message
 
-**Template Version**: 1.4.0
+**Template Version**: 1.5.0
 **Created**: 2026-03-09
 **Owner**: aget-framework (canonical copy; instance-operative copy lives with the framework manager)
 **Implements**: R-REL-019-07 (public handoff), G4.6 (shareable message)
@@ -42,6 +42,14 @@ Before publishing, verify:
 **Migration Path**: vPREV → vX.Y.Z
 **Breaking Changes**: Yes/No
 **Currency note**: read this message from `main`, not the version tag — post-tag hardening notes and repairs land on `main` (see the release body's "Post-tag repairs" section)
+
+---
+
+## Migration Target
+
+- **Target version**: **vX.Y.Z** (explicit — never infer from N-1; this block is MANDATORY per template v1.5.0)
+- **Deployment contract**: `DEPLOYMENT_SPEC_vX.Y.Z.yaml`, tag-reachable (`git show vX.Y.Z:DEPLOYMENT_SPEC_vX.Y.Z.yaml`)
+- **Payload source**: [canonical `aget/` at tag | per amended handoff guidance — name the ruling if template tags lag]
 
 ---
 
@@ -170,6 +178,7 @@ Recommended wave strategy:
 - **Re-verify independently** — never trust the worker's self-report alone; the supervisor confirms version + SHA + tree state at source.
 - **Respect per-agent variance** — standing no-push policies, deliberate dirty-tree holds, and instance-version semvers are legitimate; a blanket directive must NOT silently override them (use per-file `git add`).
 - **Expect transient failures** at fleet scale — design the runner to record verified facts and make failures cleanly retryable (one retry usually clears it).
+- **Headless dispatch: grant in-session execution authority explicitly** (v3.26 fleet-rollout canary lesson — the ask-but-don't-wait trap). A headless session cannot receive a GO/NOGO, so a dispatched agent that ends with "plan ready, awaiting your approval" has silently failed: the dispatch prompt MUST state that the agent has authority for its chosen in-scope disposition WITHIN THIS SESSION and must decide-execute-report (or decline with reasons) — never end holding a plan for an approval that cannot arrive. Verify-from-disk afterward distinguishes "planned" from "done".
 
 ---
 
@@ -233,6 +242,8 @@ Before sending a message from this template:
 | 1.3.0 | 2026-07-05 | **Target Version header (mandatory)** + read-from-main currency note + authoring-checklist release-list verification. Source: 2026-07-05 remote-fleet round-trip — a dispatch without an explicit target resolved to N-1 (fleet-internal inference) one day after the latest release shipped; and post-tag hardening notes were not reachable at the tag the reader was directed to. Tracking: framework tracker #1835 (dispatch declares target), #1834 (tag-payload coherence). |
 
 | 1.4.0 | 2026-07-05 | **Script Customization pre-flight** (def-level delta before any base-script overwrite; function-preserving merge when local-only defs exist; conformance-then-bump). Source: second-fleet Wave-0 GATE-0 halt — blind overwrite per the message's own instruction would have deleted 8 local health_check invariants. Tracking: framework tracker #1836 (ext-hooks for health_check/study_topic — makes "overwrite" honest once shipped). |
+
+| 1.5.0 | 2026-07-11 | **Migration Target block (mandatory)** — explicit target version + tag-reachable deployment contract + payload-source line as the message's first section. BACK-FILL NOTE: `REMOTE_MIGRATION_MESSAGE_v3.26.0.md` cited "mandatory per template v1.5.0" while the template file itself was never updated past 1.4.0 — the version existed only as a citation (asserted-not-computed class, sibling of #1871); this entry makes the citation true. ALSO: **headless-dispatch authority clause** (Fleet Coordination) — dispatch prompts must grant in-session execution authority; a headless agent ending "awaiting GO" has silently failed (v3.26 fleet-rollout canary lesson, ask-but-don't-wait trap). |
 
 ---
 
