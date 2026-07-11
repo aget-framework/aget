@@ -87,14 +87,34 @@ def check(version: str, cwd: str = None, repo: str = 'aget-framework/aget'):
             divergent)
 
 
+def check_pretag(version: str, cwd: str = None):
+    """--pre-tag mode (v3.26 C-26-29 rehearsal): the check_pretag_inventory.sh
+    successor — verify release-coupled artifacts are PRESENT AT HEAD before the
+    tag is cut (Phase 3.0), so the tag never needs post-tag back-fills. Uses
+    committed-tree state (git cat-file), not working-dir (the v1.46.1 F1 fix)."""
+    missing = []
+    for path in release_coupled_paths(version):
+        r = _run(['git', 'cat-file', '-e', f'HEAD:{path}'], cwd=cwd)
+        if r.returncode != 0:
+            missing.append(path)
+    if not missing:
+        return ('PASS', f'all {len(release_coupled_paths(version))} release-coupled artifacts present at HEAD — clear to tag', [])
+    return ('FAIL', f'{len(missing)} release-coupled artifact(s) ABSENT at HEAD — tag-cut would ship the gh#1834 class; commit-before-tag or Phase 3.0(b)/(d) explicit deferral', [(m, []) for m in missing])
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description='Tag-payload coherence gate (gh#1834, C-26-03)')
     p.add_argument('--version', required=True)
     p.add_argument('--cwd', default=None, help='repo clone to check (default: cwd)')
     p.add_argument('--repo', default='aget-framework/aget', help='GitHub repo for release-body disclosure check')
+    p.add_argument('--pre-tag', action='store_true',
+                   help='pre-tag presence inventory (check_pretag_inventory.sh successor; DEP-PRETAG-SH-001)')
     args = p.parse_args(argv)
 
-    state, msg, divergent = check(args.version, cwd=args.cwd, repo=args.repo)
+    if args.pre_tag:
+        state, msg, divergent = check_pretag(args.version, cwd=args.cwd)
+    else:
+        state, msg, divergent = check(args.version, cwd=args.cwd, repo=args.repo)
     print(f'tag-payload-coherence v{args.version}: {state} — {msg}')
     for path, commits in divergent:
         print(f'  - {path}: {len(commits)} post-tag commit(s): {", ".join(commits[:5])}')
