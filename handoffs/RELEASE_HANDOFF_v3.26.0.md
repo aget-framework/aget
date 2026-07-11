@@ -28,6 +28,8 @@ The release hears its consumers and hardens its contracts. **Signals pole**: wak
 
 **Beyond the pilot pair — fleet deployment, same day (2026-07-11)**: FLEET-UPG v3.26.0 COMPLETE the day of release — **29/31 active agents at v3.26.0, disk-verified** (marker-based M-3.26-1..8 at operative paths) **+ 2 honored governance-grounded refusals** honestly at 3.25.0 (awaiting principal ruling), 0 organic loss, 0 upgrade-induced regressions, **0 payload orphans** (the #1828 class, measured extinct — dispatch add-lists consumed `DELIVERED_FILES_v3.26.0.yaml`). Supervisor plan COMPLETE, rubric 14/15; outcome gmelli/aget-aget#1874, experience #1873. Figures re-derived at source by framework seat 2026-07-11 (FLEET_STATE + both refusal seats' version.json — L908; the v3.25 handoff's 35/35 overstatement class does not recur here).
 
+**Same-day completion — 31/31 (2026-07-11 afternoon)**: both refusal seats upgraded under principal-ruled authorization paths and are disk-verified at 3.26.0 by the framework seat (`version.json` read at both): legal-consultant via a durable `framework_maintenance_carveout` write_scope amendment (its own Option 3, principal-confirmed; upgraded, sha-verified 6/6 vs `DELIVERED_FILES_v3.26.0.yaml`, pushed) and financial-management via a one-time consumed override (upgraded, local-commit-only per scope; push pending principal). Supervisor population re-verify + #1874 exception-flip pending as of this note.
+
 ## Deprecations
 
 - **DEP-PRETAG-SH-001**: `scripts/check_pretag_inventory.sh` deprecated in favor of the `--pre-tag` successor. All five R-DEP-010 fields in the registry (`governance/POLICY_deprecation.md`); runtime warning live; carried v3.27, removed v3.28. First rehearsal of the N-2 policy (R-DEP-020..023) adopted this release.
