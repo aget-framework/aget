@@ -24,7 +24,7 @@ The release hears its consumers and hardens its contracts. **Signals pole**: wak
 | Seat | Version | Deployed | Confirmed |
 |------|---------|----------|-----------|
 | Framework Manager (author) | 3.26.0 | 2026-07-11 | ✅ self-migration pre-ship (R-REL-006-01) + protocol verification + smoke |
-| Fleet Supervisor (non-author) | 3.26.0 | — | pending (this handoff is the request) |
+| Fleet Supervisor (non-author) | 3.26.0 | 2026-07-11 | ✅ ACK relay `ACK_framework_aget_v3.26.0_sup_pilot_evidence_2026-07-11.md` (payload 6/6 sha-verified at tag, 8/8 M-row detections at operative paths, conformance-then-bump, manifest add-list + porcelain cross-check, smoke suite) + received-state re-verified from disk by framework seat same day (version.json 3.26.0) — L656 satisfied same-day; 3 payload findings relayed (M-3.26-6 template lag → #1871 pre-filed; study_topic is_active vocabulary → #1856 thread; record-lesson canonical gap → fixed on main same day) |
 
 ## Deprecations
 
