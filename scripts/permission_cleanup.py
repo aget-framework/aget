@@ -40,6 +40,15 @@ def should_keep(p: str) -> bool:
 
 
 def main():
+    # Fail loud on anything but the one known flag — an unknown argument
+    # (--help included) must never fall through to the mutating default path.
+    # Field data 2026-07-11: '--help' silently applied a live cleanup, twice
+    # (supervisor seat, then framework seat reproducing the report).
+    unknown = [a for a in sys.argv[1:] if a != "--dry-run"]
+    if unknown:
+        print(f"usage: {sys.argv[0]} [--dry-run]")
+        print(f"unknown argument(s): {' '.join(unknown)} — no changes made")
+        return 2
     dry = "--dry-run" in sys.argv
     if not SETTINGS.is_file():
         print(f"no {SETTINGS} — nothing to clean")
