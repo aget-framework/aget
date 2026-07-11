@@ -95,6 +95,16 @@ git log --oneline -- planning/PROJECT_PLAN_<name>.md
 ```
 Build V-test → commit-SHA mapping (per L001: gate completion = plan update + commit).
 
+### Step 3.5: Closer-Mutates-Scaffold Rule (C-CLOSE-007 — v3.26 C-26-07, gh#1838)
+
+**The closer writes to the SAME ANCHORS the creator scaffolded — it MUTATES the existing checklist/section in place; it NEVER appends a parallel prose sign-off.** The scaffolded checkboxes are the structured, greppable representation that bypass-detection and `close_gate_check.py` read; a prose paragraph beside an unticked checklist creates dual representation where the structured copy is born stale (field exhibit 2026-07-05: a COMPLETE plan whose scaffolded closure checklist retained 11 unticked boxes and a `{date}` placeholder 12 lines below the prose sign-off).
+
+Operationally, for every closure element in Steps 4–6:
+1. **Find the scaffolded section first** (Retrospective / Velocity / Closure Checklist / Finalization Checklist headings + `{TBD}`/`{date}` placeholders from the creation template).
+2. **Tick and fill IN PLACE** — `[ ]` → `[x]` with evidence appended to the same line; placeholders replaced, never orphaned.
+3. Add NEW sections ONLY where the scaffold has no anchor (e.g. §Deferred Surface — genuinely net-new at close).
+4. **Self-check before Step 7**: `grep -c '\[ \]\|{TBD}\|{date}' <plan>` over the closure/finalization sections MUST be 0 (or each survivor individually justified in the close reason — e.g. an intentionally-open tracker row on a PARTIAL close).
+
 ### Step 4: Closure Checklist Authoring (C-CLOSE-002)
 
 Generate or update these sections in the plan body (per AGET_PROJECT_PLAN_SPEC template, CAP-PP-013/016/018):
@@ -122,6 +132,19 @@ Update `**Plan_Status**:` header field to one of:
 - V-test summary block referencing commit SHAs
 - Closure timestamp + closing agent identity
 - Retrospective section non-empty
+
+### Step 5.5: Pre-COMPLETE Has-It-Run Gate (C-CLOSE-008 — v3.26 C-26-13, gh#1855, coverage-matrix channel 2)
+
+**A plan whose deliverable is an executable mechanism cannot go COMPLETE on authoring evidence alone — it needs execution evidence.**
+
+Before a COMPLETE transition, scan the plan's deliverables for executable-mechanism classes (script, hook, gate, validator, check, pipeline). For each one found, require ONE of:
+
+1. **Execution evidence**: a recorded run — test output, live firing, V-test invoking the mechanism itself (not just asserting its file exists), deployment confirmation.
+2. **Honest re-route**: absent evidence, the status is NOT COMPLETE — route to **IMPLEMENTED-AWAITING-DEPLOYMENT-EVIDENCE** (per CONVENTION_terminal_state_vocabulary, C-26-14) or **CLOSED (PARTIAL)** with the un-run mechanism named in the reason.
+
+Field basis (2026-07-10): a supervisor seat stamped COMPLETE on a never-run mechanism — reopened by principal Decide. Positive mirror: this gate's own reference impl re-derived DoD at a v3.24 close and caught 13 un-bumped public files pre-claim. "Artifact created" is L656's Loading Dock; execution evidence is what distinguishes IMPLEMENTED from RUNNING.
+
+Distinct from Step 2 (gates ticked) and Step 5's V-test-SHA requirement: those verify the plan's own record; this step verifies the MECHANISM ran at least once. A V-test that merely greps for the mechanism's existence does not satisfy it (L736 assert-before-verify family).
 
 ### Step 6: Deferred-Surface Scan (C-CLOSE-004 — MANDATORY)
 
@@ -195,6 +218,8 @@ Emit terminal block:
 - **C-CLOSE-004 (Deferred-surface scan mandatory)**: Step 6 MUST execute. Output is consumed by `/aget-propose-actions` (L913 closure).
 - **C-CLOSE-005 (Self-verification)**: Step 7.5 PASS for every checklist item before Step 8 fires.
 - **C-CLOSE-006 (INDEX update mandatory when present)**: When `INDEX_PROJECT_PLANS.md` exists, MUST update.
+- **C-CLOSE-007 (Closer mutates scaffold — gh#1838)**: Closure facts land by MUTATING the scaffolded checklist/sections in place; appending a parallel prose sign-off beside unticked scaffold boxes is PROHIBITED (dual representation, structured copy born stale).
+- **C-CLOSE-008 (Has-it-run pre-COMPLETE — gh#1855)**: A plan with executable-mechanism deliverables CANNOT transition to COMPLETE without execution evidence for each mechanism (Step 5.5); absent evidence → IMPLEMENTED-AWAITING-DEPLOYMENT-EVIDENCE or CLOSED (PARTIAL). Existence-grep V-tests do not satisfy.
 
 ## Enforcement Level
 

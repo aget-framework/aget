@@ -78,6 +78,27 @@ Check required fields:
 - Type valid (enhancement, bug, feature)
 - Body not empty (for bugs)
 
+### Step 3.5: Pre-Filing Verify-Before-Claim Probe (v3.26 C-26-13 — gh#1855, coverage-matrix channel 1)
+
+Before ANY filing (direct or intake-artifact), run BOTH probes and record results in the issue body or intake artifact. Three-state reporting per CONVENTION_check_three_state_contract (PASS / FAIL / UNREACHABLE — an unreachable tracker is not a clean probe).
+
+**Probe A — Dedup (novelty claim)**: search the destination tracker for existing issues on the same subject:
+
+```bash
+gh issue list --repo <destination> --search "<title keywords>" --state all --limit 10
+```
+
+- Hit on same subject → STOP: comment on / reopen the existing issue instead, or explicitly record the adjacent-distinct disposition ("#NNNN is X, this is Y") in the new issue body.
+- No hit → record "dedup-probed: no existing tracker" (one line suffices).
+- Tracker unreachable → UNREACHABLE recorded; filing may proceed but the body carries the unprobed state honestly.
+
+**Probe B — Target existence (existence claim)**: any spec, script, skill, path, or artifact the issue names as its TARGET (the thing to be fixed/extended/implemented-against) MUST be verified to exist before filing — `ls` / `grep` the path, or read the artifact header at source. An issue filed against a non-existent canonical target is the field failure this step exists to end (2026-07-10: filing against a non-existent canonical spec; a dedup-less re-proposal of an already-ruled p1).
+
+- Named target verified → cite what was checked ("target verified: `path` exists, header vN.N").
+- Named target absent → the issue's ask changes (it becomes "create X", not "fix X") — reframe before filing.
+
+Reference impl: legalon `issue_freshness.py` (producer-ref-impl pattern). Spec basis: skill-layer gate per this convention; **R-ISSUE-034 spec delta rides the next AGET_ISSUE_GOVERNANCE_SPEC enhance-spec pass** (L644 — registered, not silently enacted; same precedent as Step 2.5's R-ISSUE-030 rider).
+
 ### Step 4: File Issue (direct-mode seats ONLY — Step 2.5 gates this)
 
 ```bash
@@ -143,6 +164,7 @@ These are INVIOLABLE:
 - **C4**: NEVER include internal repo references in promoted public issues
 - **C5**: ALWAYS route to `{private-tracker}` regardless of agent type
 - **C6**: ALWAYS validate destination before filing
+- **C7**: MUST run the Step 3.5 dedup + target-existence probes before any filing or intake-artifact write (v3.26 C-26-13); results recorded in the body. On probe FAIL (duplicate found / target absent), filing is blocked pending disposition or reframe.
 
 ## Examples
 
