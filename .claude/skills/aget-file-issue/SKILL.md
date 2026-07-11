@@ -54,6 +54,23 @@ fi
 
 Agent type detection is retained for metadata tagging, but does NOT affect routing destination. Under the v2.0.0 policy, all agents — private fleet and public/remote — file to the private tracker.
 
+### Step 2.5: Resolve Routing Mode (v3.26 C-26-02 — #1845 fleet-universal supervisor relay)
+
+**Principal MC ruling (2026-07-05, enacted this cycle): no managed agent files issues directly — all filings relay through the managing supervisor.** Supervisors are the filing authority (they file for themselves AND their managed agents).
+
+Resolve the invoking seat + mode:
+
+| Invoking seat | Resolved routing_mode | Step 4 behavior |
+|---------------|----------------------|-----------------|
+| **Supervisor seat** (archetype supervisor / manages agents) | `direct` | file via `gh issue create` as below |
+| **Managed agent** (has a `Managed By:` supervisor) | `supervisor_intake` (the flipped default) | **produce an INTAKE ARTIFACT, do NOT `gh issue create`** |
+| Managed agent, **principal-supervised session** (principal present and directing the filing) | `direct` permitted | file directly; record `routing_mode: direct (principal-supervised)` in the body |
+| Explicit `routing_mode:` in the request | as declared | honor it (lesson_first/supervisor_editorial per CAP-ISSUE-011..014) |
+
+**Intake artifact contract (seat-side half only — queue/batching design is supervisor-lane, #1845)**: write the complete issue (title, body, labels, `routing_mode: supervisor_intake`) to `inbox/outbound/ISSUE_INTAKE_<YYYY-MM-DD>_<slug>.md` in the AGENT'S OWN repo (L480 — no cross-fleet write; the supervisor sweeps managed repos / IAC channel). The artifact IS the filing event for the agent; the `gh` filing is the supervisor's act.
+
+> Spec basis: enacted ruling #1845 (R8); the R-ISSUE-030 default-flip spec delta rides this cycle's `/aget-enhance-spec` pass — until that lands, this skill section is the operative surface (L644-conformant: skill layer, not direct spec edit). Fleet-wide AGENTS.md propagation = next cycle (D-26-4).
+
 ### Step 3: Validate
 
 Check required fields:
@@ -61,7 +78,7 @@ Check required fields:
 - Type valid (enhancement, bug, feature)
 - Body not empty (for bugs)
 
-### Step 4: File Issue
+### Step 4: File Issue (direct-mode seats ONLY — Step 2.5 gates this)
 
 ```bash
 # ALL agents — private-first routing (L638)
