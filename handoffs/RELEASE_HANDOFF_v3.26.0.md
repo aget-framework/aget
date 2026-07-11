@@ -36,7 +36,7 @@ The release hears its consumers and hardens its contracts. **Signals pole**: wak
 - Interaction-channel pattern (`docs/patterns/PATTERN_interaction_channel.md`) ships as substrate; template/fleet promotion is pilot-gated (non-author validation first).
 - The public-surface audit's pre-existing corpus findings (legacy backup dirs in template repos, historical docs) are a recorded cleanup backlog, not v3.26 regressions; this cycle's own delta was scrubbed clean pre-push.
 
-## For external fleets
+## Context for External Fleets
 
 - Pin template-derived agents to the template tag (`v3.26.0`).
 - Migration dispatches SHALL name their target version explicitly (Migration Target block, mandatory from this release's template v1.5.0) — a dispatch without one gets a discovery answer, never an inferred N-1.
