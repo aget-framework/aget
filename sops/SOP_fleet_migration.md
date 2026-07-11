@@ -635,7 +635,7 @@ See: FLEET_MIGRATION_GUIDE_v3.md (Cross-Machine Pre-Flight), L457
 
 ## Post-Migration: Ongoing Health Monitoring
 
-After fleet migration completes, supervisors are recommended to establish a weekly fleet health check routine. Two independent supervisors (main + legalon fleets) converged on the same design independently (L831 cross-fleet spec signal), indicating this is a framework-level best practice.
+After fleet migration completes, supervisors are recommended to establish a weekly fleet health check routine. Two independent fleet supervisors converged on the same design independently (L831 cross-fleet spec signal), indicating this is a framework-level best practice.
 
 **Recommended pattern**: Weekly RemoteTrigger agent running:
 1. `health_check.py --json` against each agent
@@ -678,7 +678,7 @@ See: `docs/patterns/PATTERN_weekly_fleet_health_monitor.md` (framework-recommend
 - **Added**: Prerequisites item 5 — gh auth smoke-test; addresses cloud-hosted keyring failure risk (FLEET-UPG-014 finding)
 - **Added**: Gate 5.4: FLEET_REGISTRY Update as BLOCKING completion criterion (FLEET-UPG-014 D1 gap)
 - **Added**: Rollback Criteria section — 4 triggers, per-agent rollback procedure, partial migration guidance
-- **Added**: Post-Migration: Ongoing Health Monitoring section — weekly fleet health monitor recommendation (SD-6; L831 cross-fleet convergence from main + legalon supervisors)
+- **Added**: Post-Migration: Ongoing Health Monitoring section — weekly fleet health monitor recommendation (SD-6; L831 cross-fleet convergence, two independent supervisors)
 - **Updated**: Scope section — added Mandatory change compliance and FLEET_REGISTRY to Covers; updated Does NOT cover
 - **Updated**: References section — added DEPLOYMENT_SPEC and PATTERN_weekly_fleet_health_monitor
 - Implements SD-3, SD-4 (VERSION_SCOPE_v3.16.0 directives 2026-04-26)

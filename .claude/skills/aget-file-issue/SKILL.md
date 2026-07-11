@@ -97,7 +97,7 @@ gh issue list --repo <destination> --search "<title keywords>" --state all --lim
 - Named target verified → cite what was checked ("target verified: `path` exists, header vN.N").
 - Named target absent → the issue's ask changes (it becomes "create X", not "fix X") — reframe before filing.
 
-Reference impl: legalon `issue_freshness.py` (producer-ref-impl pattern). Spec basis: skill-layer gate per this convention; **R-ISSUE-034 spec delta rides the next AGET_ISSUE_GOVERNANCE_SPEC enhance-spec pass** (L644 — registered, not silently enacted; same precedent as Step 2.5's R-ISSUE-030 rider).
+Reference impl: `issue_freshness.py` (a producer seat's implementation — ported, not re-invented). Spec basis: skill-layer gate per this convention; **R-ISSUE-034 spec delta rides the next AGET_ISSUE_GOVERNANCE_SPEC enhance-spec pass** (L644 — registered, not silently enacted; same precedent as Step 2.5's R-ISSUE-030 rider).
 
 ### Step 4: File Issue (direct-mode seats ONLY — Step 2.5 gates this)
 

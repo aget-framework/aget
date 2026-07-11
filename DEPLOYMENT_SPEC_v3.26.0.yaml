@@ -1,0 +1,103 @@
+# DEPLOYMENT_SPEC_v3.26.0.yaml
+# Complete target state specification for v3.26.0 deployment
+#
+# Purpose: Define what a correctly-deployed v3.26.0 agent looks like.
+# Governance: R-DEP-002, R-REL-038
+#
+# Created: 2026-07-11 (PRE-TAG — closes the v3.25.0 same-day-back-fill lapse;
+#   the DoD row-completeness audit that mandates this row landed this cycle.)
+# Origin: DEPLOYMENT_SPEC_v3.25.0.yaml
+# Release: Signals & Contracts
+
+version: "3.26.0"
+spec_version: "2.0.0"
+created: "2026-07-11"
+status: active
+supersedes: "DEPLOYMENT_SPEC_v3.25.0.yaml"
+breaking_release: false
+backfill: false
+
+verification_script:
+  file: "scripts/verify_deployment.py"
+  usage: "python3 scripts/verify_deployment.py --version 3.26.0 --path /path/to/agent"
+  known_defects: "Treat tooling output as claim-under-test, not premise (L908)."
+
+# Payload = 4 Framework_Artifact script refreshes (overwrite; *_ext.py hooks
+# untouched — and this release ADDS ext hook points to two of them) + 2 skill
+# refreshes + version pins.
+#
+# operative_path_note (carried from v3.25.0, consumer-verified): the M-row
+# detection clauses verify file CONTENT at the conventional scripts/ path —
+# they do not verify WIRING. Resolve each script's operative path from the
+# agent's own config and run the clause against THAT path.
+#
+# customized_base_script_note (carried from v3.25.0 Wave-0 finding): before any
+# overwrite, diff local vs source at function level; local-only defs need a
+# function-preserving merge. The new ext hooks (M-3.26-4) exist to end this
+# class — migrate local additions into *_ext.py where the hook point suffices.
+mandatory_changes:
+  - id: "M-3.26-1"
+    description: "version.json aget_version field set to '3.26.0' (+ migration_history entry)"
+    blocking: true
+    detection: "test $(jq -r .aget_version .aget/version.json) = '3.26.0'"
+  - id: "M-3.26-2"
+    description: "AGENTS.md @aget-version header set to '3.26.0'"
+    blocking: true
+    detection: "grep -q '^@aget-version: 3.26.0' AGENTS.md"
+  - id: "M-3.26-3"
+    description: "scripts/wake_up.py refreshed — release-currency signal (behind → one-line notice; current/unknown silent, fail-soft) + pending-work session-glob case-fold fix"
+    blocking: true
+    detection: "grep -q 'release_currency' scripts/wake_up.py || grep -q 'get_release_currency' scripts/wake_up.py"
+  - id: "M-3.26-4"
+    description: "scripts/health_check.py + scripts/study_topic.py refreshed — extension hook points (health_check_ext.py:post_health / study_topic_ext.py:post_study); local additions migrate into ext files, not the base"
+    blocking: true
+    detection: "grep -q 'health_check_ext' scripts/health_check.py && grep -q 'study_topic_ext' scripts/study_topic.py"
+  - id: "M-3.26-5"
+    description: "scripts/study_topic.py search contract — declared surface manifest in output, token hygiene, boundary matching, ranking floor, inbox/ surface (14d)"
+    blocking: true
+    detection: "grep -q 'NOT searched' scripts/study_topic.py || grep -q 'surfaces_searched' scripts/study_topic.py"
+  - id: "M-3.26-6"
+    description: "scripts/check_skill_reliance_manifest.py refreshed — archetype-index candidate paths resolve on deployed agents; C3 reports UNREACHABLE distinctly (three-state contract)"
+    blocking: true
+    detection: "grep -q 'UNREACHABLE' scripts/check_skill_reliance_manifest.py"
+  - id: "M-3.26-7"
+    description: "scripts/close_gate_check.py refreshed — independence-WARN half restored (scan_independence_warnings; dropped by the v3.25 sync)"
+    blocking: true
+    detection: "grep -q 'scan_independence_warnings' scripts/close_gate_check.py"
+  - id: "M-3.26-8"
+    description: "/aget-close-project skill refreshed — C-CLOSE-007 closer-mutates-scaffold + C-CLOSE-008 has-it-run pre-COMPLETE gate (Step 3.5 + Step 5.5)"
+    blocking: true
+    detection: "grep -q 'C-CLOSE-008' .claude/skills/aget-close-project/SKILL.md"
+
+additive_artifacts:
+  - id: "A-3.26-1"
+    description: "Convention docs (canonical, reference — not copied to agents): three-state check contract, terminal-state vocabulary, verify-before-claim coverage matrix"
+    canonical_source: "aget/docs/CONVENTION_check_three_state_contract.md + CONVENTION_terminal_state_vocabulary.md + CONVENTION_verify_before_claim_coverage_matrix.md"
+  - id: "A-3.26-2"
+    description: "scripts/check_tag_payload_coherence.py + scripts/check_permission_quality.py (release-integrity + permission-quality checks; adopt where the seat runs release or permission audits)"
+    canonical_source: "aget/scripts/"
+
+optional_changes:
+  - id: "O-3.26-1"
+    description: "/aget-file-issue refresh — supervisor-intake routing (Step 2.5) + pre-filing dedup/existence probes (Step 3.5). NOTE: template copies lag this structure this cycle (refresh staged for the next); adopt from canonical .claude/skills/aget-file-issue/ directly"
+    blocking: false
+    canonical_source: "aget/.claude/skills/aget-file-issue/SKILL.md"
+    detection: "grep -q 'Step 3.5' .claude/skills/aget-file-issue/SKILL.md"
+  - id: "O-3.26-2"
+    description: "/aget-record-lesson Step 4.5 cross-seat propagation check (lesson-first filing wiring)"
+    blocking: false
+    detection: "grep -q 'Step 4.5' .claude/skills/aget-record-lesson/SKILL.md"
+
+deprecations:
+  - id: "DEP-PRETAG-SH-001"
+    what: "scripts/check_pretag_inventory.sh"
+    replacement: "the --pre-tag successor path (see governance/POLICY_deprecation.md registry entry)"
+    removal: "v3.28 (N-2 policy, R-DEP-020..023 — adopted this release)"
+
+rollback:
+  procedure: "File-copy restore of the refreshed scripts + skills + version pins from your v3.25.0 tag. No data-format migrations."
+
+references:
+  release_handoff: "handoffs/RELEASE_HANDOFF_v3.26.0.md (tag-reachable)"
+  migration_message: "handoffs/REMOTE_MIGRATION_MESSAGE_v3.26.0.md (tag-reachable)"
+  release_notes: "release-notes/v3.26.0.md"

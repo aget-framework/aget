@@ -453,7 +453,7 @@ The SYSTEM shall provide a close-session capability that orchestrates wind-down 
 **Composition Architecture**: CAP-SESSION-013 EXTENDS CAP-SESSION-004 (Wind-Down Protocol). Wind-down requirements remain in force and are reused via Phase 2 delegation. This pattern (orchestrate-not-rename) prevents the L562 false-positive drift that scaled-rename would cause across 32+ fleet agents.
 
 **Enforcement**: `/aget-close-session` skill v1.0.0; `scripts/wind_down.py` (composition target). Full requirement set (46 sub-requirements) at `planning/artifacts/CAP-SESSION-013_close_session_requirements.md` v0.2.0.
-**Origin**: SP-008 proposal (2026-04-10); Legalon fleet v1.0-v1.3 evidence (8 scored sessions); main fleet SP-004.
+**Origin**: SP-008 proposal (2026-04-10); pilot-fleet v1.0-v1.3 evidence (8 scored sessions); a second fleet's SP-004.
 **Inherits from REQ**: REQ-CORE-F-004 (KB Net-Positive Sessions) — close-session implements the wind-down delegation that detects KB contributions per the REQ.
 
 #### Handoff Note Template
@@ -538,10 +538,10 @@ The SYSTEM shall gate completeness/verification claims emitted in the CONVERSATI
 
 **FP bound (explicitly empirical-and-unmet)**: the hook form's false-positive rate exceeded the 0% replay bound in LIVE pilot (2026-07-10: Stop hook fired same-session on a legitimate claim) — context-gating of claim-verbs is a known v2 requirement. The capability registers the discipline and its two delivery forms; the bound is tuned with pilot evidence, not asserted from replay figures.
 
-**Reference implementation**: legalon fleet `verify_claim_gate.py` + Stop-hook + L247/L249 (cited, not shipped — pilot state; hook-library mode per v3.26 D-26-1 = framework-owned canonical library with fleet-pilot intake).
+**Reference implementation**: a pilot fleet's `verify_claim_gate.py` + Stop-hook + L247/L249 (cited, not shipped — pilot state; hook-library mode per v3.26 D-26-1 = framework-owned canonical library with fleet-pilot intake).
 
 **Enforcement**: `/aget-check-facts` (invoked form, Layer 2 pre-assertion gates); advisory hook form via fleet-pilot intake (D-26-1). V-SESSION-013.
-**Origin**: gh#1853 (ruling) + gh#1855 (coverage matrix); v3.26 C-26-12. Evidence: legalon LIVE pilot FP datum 2026-07-10.
+**Origin**: gh#1853 (ruling) + gh#1855 (coverage matrix); v3.26 C-26-12. Evidence: LIVE pilot-seat FP datum 2026-07-10.
 
 ---
 
@@ -856,4 +856,4 @@ graduation:
 *"Sessions are transactions; handoffs are commits."*
 *"Disambiguation prevents script-level semantic slippage (L491)."*
 *v1.2.0: Added CAP-SESSION-010 (re-entrancy guard), CAP-SESSION-011 (calendar awareness), CAP-SESSION-012 (sanity gate)*
-*v1.3.0 (2026-07-10, v3.26 G2.4 consolidated pass): CAP-SESSION-015 Pre-Assertion Gate Protocol (conversational channel; gh#1853 ruling, legalon LIVE pilot evidence, FP bound empirical-and-unmet) + CAP-SESSION-007-08..12 search contract (gh#1852 audit enactment: declared surfaces, token hygiene, ranking rebalance, relevance floor, inbox/ 14d, ext hook) + CAP-SESSION-008-06 health ext hook (gh#1836/#1848) + V-SESSION-011..013*
+*v1.3.0 (2026-07-10, v3.26 G2.4 consolidated pass): CAP-SESSION-015 Pre-Assertion Gate Protocol (conversational channel; gh#1853 ruling, LIVE pilot-seat evidence, FP bound empirical-and-unmet) + CAP-SESSION-007-08..12 search contract (gh#1852 audit enactment: declared surfaces, token hygiene, ranking rebalance, relevance floor, inbox/ 14d, ext hook) + CAP-SESSION-008-06 health ext hook (gh#1836/#1848) + V-SESSION-011..013*

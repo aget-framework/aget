@@ -11,9 +11,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Items confirmed in-flight for a future release (latest released: **3.25.0**). Per Keep a Changelog 1.1.0 forward-work convention. *(Currency note: this section had gone stale at "since v3.22.0" through the 3.23.x/3.24.0 cycles — reset 2026-07-04; the gap itself is documented as a v3.24 residual in the v3.25.0 release notes.)*
+Items confirmed in-flight for a future release (latest released: **3.26.0**). Per Keep a Changelog 1.1.0 forward-work convention.
 
-- _(none recorded yet)_
+- Issue-governance spec delta for the `/aget-file-issue` pre-filing probes (skill layer shipped in 3.26.0; formal requirement rides the next spec pass).
+- Template `/aget-file-issue` structural refresh (routing + probe steps to all templates; fleet routing propagation staged per the 3.26.0 rollout decision).
+
+## [3.26.0] - 2026-07-11
+
+**Theme**: Signals & Contracts
+
+> The release hears its consumers — a wake-up currency signal, extension hooks at the halt points downstream agents actually hit, supervisor-relay issue routing — and hardens its contracts: three-state check reporting, terminal-state vocabulary, a search contract for KB research, a verify-before-claim coverage matrix, and the first exercised deprecation under the new N-2 policy.
+
+### Added
+
+- **Release-currency signal in `wake_up.py`** — session start reports when the local framework version is behind the latest release (`Framework: vX local · vY latest — verify DEPLOYMENT_SPEC before upgrading`); silent when current or unknown (fail-soft, config-gated). Uses `gh api` (the `gh release view` form hangs indefinitely under non-tty subprocess — documented for adopters of the earlier reference implementation).
+- **Extension hooks for `health_check.py` + `study_topic.py`** (`health_check_ext.py:post_health`, `study_topic_ext.py:post_study`) — instance customization without forking Framework_Artifacts; the fork-pressure halt observed downstream is the motivating case.
+- **Three-state check contract** (`docs/CONVENTION_check_three_state_contract.md`) — every check reports PASS / FAIL / **UNREACHABLE** distinctly; a missing dependency is not a conformance failure, and "nothing found" on an unsearched surface is not a pass. Exemplar wired into `check_skill_reliance_manifest.py`.
+- **Terminal-state vocabulary** (`docs/CONVENTION_terminal_state_vocabulary.md`) — IMPLEMENTED-AWAITING-DEPLOYMENT-EVIDENCE / PILOTED / STAGED as honest plan states with advancement pointers; "artifact created" no longer masquerades as "running".
+- **Verify-before-claim coverage matrix** (`docs/CONVENTION_verify_before_claim_coverage_matrix.md`) — verify-before-claim as claim-channels × enforcement-gates, with placements: `/aget-file-issue` **Step 3.5** pre-filing dedup + target-existence probes; `/aget-close-project` **Step 5.5 / C-CLOSE-008** has-it-run gate (executable-mechanism deliverables need execution evidence pre-COMPLETE); conversational channel registered as AGET_SESSION_SPEC CAP-SESSION-015; lesson-propagation channel via `/aget-record-lesson` Step 4.5.
+- **`/aget-close-project` C-CLOSE-007** — the closer mutates the scaffolded checklist in place; parallel prose sign-offs beside unticked scaffolds are prohibited (dual-representation defect class).
+- **`/aget-file-issue` supervisor-intake routing** (Step 2.5) — managed agents default to a supervisor-relay intake artifact; supervisors and principal-supervised sessions file direct.
+- **`/aget-record-lesson` Step 4.5 propagation check** — multi-seat or framework-relevant lessons route to lesson-first filing (CAP-ISSUE-011) with a cross-namespace join label, ending three-private-captures-of-one-lesson scatter.
+- **Tag-payload coherence gate** (`scripts/check_tag_payload_coherence.py` + SOP Phase 3.6) — post-tag repairs can no longer leave the tag silently divergent from the shipped payload.
+- **Permission-quality check** (`scripts/check_permission_quality.py`) — classifies grants BARE / UNIVERSAL / SCOPED; a write-capable unscoped grant WARNs even when the permission count is green.
+- **Deprecation policy N-2 adopted** (R-DEP-020..023) with the registry's **first exercised rehearsal**: `check_pretag_inventory.sh` deprecated in favor of the `--pre-tag` successor, all five R-DEP-010 fields, runtime warning live, removal v3.28.
+- **Interaction-channel pattern (first rung)** (`docs/patterns/PATTERN_interaction_channel.md`) — engine-agnostic rendered-review channel substrate; promotion is pilot-gated (non-author validation before template rollout).
+- **AGET_SESSION_SPEC 1.3.0** — CAP-SESSION-015 pre-assertion gate (verify-before-claim, conversational channel); CAP-SESSION-007-08..12 study-topic search contract; CAP-SESSION-008-06 extension hook. **AGET_ISSUE_GOVERNANCE_SPEC 2.3.0** — seat-conditional routing default.
+- **Fleet-migration Wave-0 entry criterion** (SOP_fleet_migration) + RELEASE_HANDOFF template **Migration Target** block — a migration dispatch names its target version explicitly or gets a discovery answer; never an inferred N-1.
+
+### Fixed
+
+- **`study_topic.py` search contract** (7 audited defects): surface manifest with exclusion provenance in output, keyword hygiene (stopwords no longer count as keywords), token-boundary matching, log-damped ranking with filename-match boost, relevance floor with `--no-floor` escape, contract-derived recommendation text, and `inbox/` joining the searched surfaces (14-day window).
+- **v3.25-payload defects**: `wake_up.py` pending-work glob was case-sensitive (newest session notes invisible); `check_skill_reliance_manifest.py` archetype-index candidate paths never resolved on deployed agents; `close_gate_check.py` independence-WARN half restored (dropped by the prior release's sync).
+- **Release-history hygiene**: v3.21 DEPLOYMENT_SPEC private-name leak scrubbed; canonical DoD row-completeness for R-REL-038.
+
+### Changed
+
+- `release_cycle_rollup.py` renders compound lock-states correctly (`LOCKED` rather than `?`).
 
 ## [3.25.0] - 2026-07-04
 
