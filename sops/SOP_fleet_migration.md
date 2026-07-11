@@ -117,6 +117,16 @@ gh auth status && echo "PASS: gh auth" || echo "FAIL: gh auth — check keyring 
 
 **Objective**: Confirm framework and fleet readiness
 
+#### V0.0: Dispatch Names the Target (v3.26 C-26-04, gh#1835 — Wave-0 entry criterion)
+
+The migration dispatch/handoff SHALL name the target version explicitly. A dispatch WITHOUT
+a target version is answered with a V0.1 discovery result ("latest public release is vX.Y.Z —
+confirm this is the target"), NOT with an inferred target: inference machinery defaults to
+fleet-internal ground truth (peer/self versions), which cannot see the release channel and
+structurally resolves to N-1 (field-evidenced 2026-07-05: verbatim dispatch "prepare fleet for
+AGET migration" → v3.24.0 plan authored and validated one day after v3.25.0 shipped). The gap
+is symmetric — dispatchers name the target; receivers refuse to infer it.
+
 #### V0.1: Discover Latest Release
 ```bash
 # Check latest release on GitHub (L723, L755)
