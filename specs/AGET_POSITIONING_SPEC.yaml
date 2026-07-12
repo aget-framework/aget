@@ -7,10 +7,10 @@
 
 spec:
   name: AGET_POSITIONING_SPEC
-  version: "1.3.0"
+  version: "1.4.0"
   status: canonical
   created: "2026-01-16"
-  updated: "2026-02-22"
+  updated: "2026-07-12"
   author: aget-framework
   related_specs:
     - AGET_IDENTITY_SPEC
@@ -359,6 +359,21 @@ positioning:
           AGET focuses on governance, session management, and human oversight.
           They are complementary, not competitive.
 
+      - category: "Spec-Driven / Agent-Config / Memory Frameworks"
+        examples:
+          - "GitHub spec-kit"
+          - "BMAD-METHOD"
+          - "Tessl"
+          - "Cline Memory Bank"
+          - "buildermethods/agent-os"
+        aget_distinction: |
+          AGET's closest public analogs — each reinvents ONE of AGET's axes
+          (spec-driven governance, installable agent workflows, a structured
+          config directory, file-based cross-session memory). AGET's distinction
+          is the coherent bundle: persistent identity + accumulating KB memory +
+          Generator-tier governance + session lifecycle + fleet coordination,
+          integrated rather than a la carte.
+
       - category: "CLI Agent Platforms"
         examples:
           - "Claude Code"
@@ -440,6 +455,11 @@ validation:
 # =============================================================================
 
 changelog:
+  - version: "1.4.0"
+    date: "2026-07-12"
+    changes:
+      - "Added 'Spec-Driven / Agent-Config / Memory Frameworks' comparator category (spec-kit, BMAD-METHOD, Tessl, Cline Memory Bank, agent-os) — AGET's verified-closest public peer class (L1083); additive descriptive content, no requirement change"
+
   - version: "1.3.0"
     date: "2026-02-22"
     changes:
