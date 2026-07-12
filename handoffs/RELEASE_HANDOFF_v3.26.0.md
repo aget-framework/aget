@@ -16,7 +16,7 @@ The release hears its consumers and hardens its contracts. **Signals pole**: wak
 
 - **No breaking changes** — additive + repair; rollback = file-copy restore from your v3.25.0 tag.
 - Payload: 5 framework-script refreshes + close-project skill refresh + version pins; file-issue/record-lesson skill refreshes optional this cycle.
-- Full guide: `handoffs/REMOTE_MIGRATION_MESSAGE_v3.26.0.md` (at this tag) — note its Migration Target block: dispatches name v3.26.0 explicitly, never an inferred N-1.
+- Full guide: `handoffs/REMOTE_MIGRATION_MESSAGE_v3.26.0.md` — **read it from `main`, not this tag** (regenerated post-tag, commit `8eb0112`: SHA-enumerated Post-Release Corrections, pre-flight steps, behavioral smoke; the tag copy predates them). Its Migration Target block dispatches v3.26.0 explicitly, never an inferred N-1.
 - Deployment contract: `DEPLOYMENT_SPEC_v3.26.0.yaml` at repository root — **tag-reachable this cycle** (the v3.25.0 same-day-back-fill lapse is closed; the row-completeness audit that mandates it shipped in this release).
 
 ## Pilot tracking (deploy-verify bar = supervisor + self)
