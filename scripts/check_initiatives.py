@@ -32,7 +32,26 @@ Requirements implemented (SKILL.md §Requirements):
   CIS-004 approved-but-unscaffolded PROPOSAL_init_*.md flag
   CIS-005 staleness flag (>=30 days, git-log-based)
   CIS-006 same-arc cohort cluster detection (<=7-day scaffold + naming family)
+  CIS-007 proposal<->manifest status-mismatch detection (header lags disposition —
+          the gap recorded 2026-06-07 in PROPOSAL_init_lesson_first_issue_filing
+          and reproduced 2026-06-12 by 4 stale headers; closed per E2)
+  CIS-008 ACTIVE-ceiling check vs the machine-readable declaration in
+          planning/initiatives/INDEX.md (L178 overrides are recorded there in prose)
+          + capability-ratio floor (>=1/3 of ACTIVE capability-class, v3.22 D-2 —
+          the governing control; integer total is secondary; gh#1655). Three-state
+          per CONVENTION_check_three_state_contract: PASS / FAIL / UNKNOWN
+          (UNKNOWN while any ACTIVE manifest lacks a Class tag — pre-backfill).
+  CIS-009 typed-lifecycle block presence (D-IG-1/4 + gh#1884): ACTIVE untyped ->
+          WARN; ACTIVE Achieve without '## Exit Conditions' -> WARN; ACTIVE
+          Maintain without '## Health Contract' -> WARN. No silent defaults
+          (anti-L671). Design: docs/DESIGN_initiative_typing_v1.0.md
   CAP-INIT-007 / V-INIT-007 recursion check (own-row present in output)
+
+  Typed-detector scoping (D-IG-4, 2-class): CIS-002 0-COMPLETE and CIS-003
+  past-target fire for Achieve-typed (and, conservatively, untyped) manifests
+  only; Maintain is health-metered, not completion-metered. Maintain spine size
+  is reported against the D-IG-1 target band. Achieve manifests additionally
+  report age-in-portfolio (aging-WIP practice) for grooming verdicts (D-IG-3).
 
 Reference: gh#1469 (INIT-INITIATIVE-MATURATION Stream 3); VERSION_SCOPE_v3.21.0
 Tier-1 C-21-02; PROPOSAL_aget-check-initiatives APPROVED 2026-05-21.
@@ -56,15 +75,34 @@ VERSION_JSON = REPO / ".aget" / "version.json"
 # dropped from the rollup — silent-drop defeats the audit (the engine's whole
 # purpose is "don't miss an initiative"). CIS-002 names only COMPLETE/CLOSED;
 # FOLDED is a spec gap recorded as a Finding (L742 — fix the spec, not just code).
-STATUS_ORDER = ["ACTIVE", "NASCENT", "PROPOSED", "COMPLETE", "CLOSED", "FOLDED", "DORMANT"]
-TERMINAL_STATUSES = {"COMPLETE", "CLOSED", "FOLDED"}
+STATUS_ORDER = ["ACTIVE", "NASCENT", "PROPOSED", "COMPLETE", "CLOSED", "FOLDED",
+                "GRADUATED", "DORMANT"]
+TERMINAL_STATUSES = {"COMPLETE", "CLOSED", "FOLDED", "GRADUATED"}
 KNOWN_STATUSES = set(STATUS_ORDER)
 STALE_DAYS = 30
 COHORT_WINDOW_DAYS = 7
 OWN_INITIATIVE = "INIT-INITIATIVE-MATURATION"
+# D-IG-4: 2-class terminal-behavior axis. Anything else parsed as-is and warned
+# (unknown-type is worse than untyped — it looks typed but binds no detector).
+KNOWN_TYPES = {"ACHIEVE", "MAINTAIN"}
+# v3.22 D-2 governing control: >=1/3 of ACTIVE must be capability-class.
+CAPABILITY_FLOOR = 1.0 / 3.0
+# D-IG-1 target shape: ~6-8 Maintain stewards as the stable spine (report-only).
+MAINTAIN_SPINE_BAND = (6, 8)
 
 # **Status**: ACTIVE (trailing parenthetical/prose allowed) -> first bare token.
-STATUS_RE = re.compile(r"^\*\*Status\*\*:\s*([A-Za-z]+)", re.MULTILINE)
+# Optional \** before the token: bold-wrapped statuses (`**Status**: **ACTIVE** (...)`)
+# parsed as UNKNOWN and silently vanished from the report inventory (found via
+# test_v_cis_001 on INIT-ALWAYS-ON-HOST, 2026-06-12 — the silent-drop the header
+# comment warns about, enacted by the parser itself).
+STATUS_RE = re.compile(r"^\*\*Status\*\*:\s*\**\s*([A-Za-z]+)", re.MULTILINE)
+# Typing fields (DESIGN_initiative_typing_v1.0 §1) — same bold-tolerant shape as
+# STATUS_RE (the 2026-06-12 bold-token lesson applied at authoring time).
+TYPE_RE = re.compile(r"^\*\*Type\*\*:\s*\**\s*([A-Za-z]+)", re.MULTILINE)
+CLASS_RE = re.compile(r"^\*\*Class\*\*:\s*\**\s*([A-Za-z]+)", re.MULTILINE)
+INTIMACY_RE = re.compile(r"^\*\*Intimacy\*\*:\s*\**\s*([A-Za-z:_-]+)", re.MULTILINE)
+EXIT_BLOCK_RE = re.compile(r"^##\s+Exit Conditions\b", re.MULTILINE)
+HEALTH_BLOCK_RE = re.compile(r"^##\s+Health Contract\b", re.MULTILINE)
 TARGET_RE = re.compile(r"^\*\*Target Versions?\*\*:\s*(.+)$", re.MULTILINE)
 CREATED_RE = re.compile(r"^\*\*Created\*\*:\s*([0-9]{4}-[0-9]{2}-[0-9]{2})", re.MULTILINE)
 # Version tokens like v3.21 or v4.0.1 (the leading 'v' is optional in the field).
@@ -74,6 +112,19 @@ VERSION_TOKEN_RE = re.compile(r"v?(\d+)\.(\d+)(?:\.(\d+))?")
 # once the agent version passes the bare token. Without this the '+' is dropped
 # and the token mis-reads as a closed ceiling (false-positive Loading Dock).
 OPEN_ENDED_RE = re.compile(r"v?\d+\.\d+(?:\.\d+)?\s*\+")
+INDEX_MD = INIT_DIR / "INDEX.md"
+CEILING_RE = re.compile(r"^\*\*ACTIVE-ceiling \(machine-readable\)\*\*:\s*(\d+)", re.MULTILINE)
+# A proposal whose Status line leads with a terminal disposition is closed at the
+# proposal layer regardless of an earlier APPROVED in its history — FOLDED ones
+# especially must not flag as "approved-but-unscaffolded" (scaffolding a folded
+# proposal would be the error). SCAFFOLDED = approved AND manifest exists.
+PROPOSAL_TERMINAL_RE = re.compile(
+    r"^\*\*Status\*\*:\s*\**\s*(?:FOLDED|REJECTED|WITHDRAWN|SUPERSEDED)", re.MULTILINE)
+PROPOSAL_STATUS_LINE_RE = re.compile(r"^\*\*Status\*\*:\s*(.+)$", re.MULTILINE)
+# Body-level fold disposition (e.g. "> **DISPOSITION — FOLDED 2026-06-10**" or a
+# checked "- [x] **Fold into ...**") — catches a Decision section the header lags.
+BODY_FOLD_RE = re.compile(r"DISPOSITION\s*[—-]+\s*FOLDED|^\s*-\s*\[x\]\s*\**Fold\b",
+                          re.MULTILINE | re.IGNORECASE)
 
 
 def parse_version(text):
@@ -138,15 +189,48 @@ def gather(now=None):
         if commit_dt is not None:
             age_days = (now - commit_dt.astimezone(timezone.utc)).days
         terminal = status in TERMINAL_STATUSES
+        # A target field leading with "suspended" declares its window historical
+        # (E5 Loading-Dock convention, 2026-06-12): version tokens that remain in
+        # the field are provenance, not a live delivery commitment. Keyed off the
+        # field, not Status — a DORMANT manifest with an unannotated live target
+        # SHOULD still flag (pressure to annotate or re-target).
+        suspended = target_field.lstrip().lower().startswith("suspended")
+        # Typing axis (D-IG-4). Untyped = None (never defaulted, anti-L671);
+        # detectors treat untyped conservatively as Achieve-like so coverage
+        # never regresses pre-backfill.
+        ty = TYPE_RE.search(text)
+        itype = ty.group(1).upper() if ty else None
+        cl = CLASS_RE.search(text)
+        iclass = cl.group(1).lower() if cl else None
+        im = INTIMACY_RE.search(text)
+        intimacy = im.group(1).lower() if im else None
+        # D-IG-4 detector scoping: Maintain is health-metered — a version window
+        # is provenance for it, never a live delivery commitment (CIS-003 exempt).
         past_target = bool(
-            cur and target and target < cur and not terminal and not open_ended
+            cur and target and target < cur
+            and not terminal and not open_ended and not suspended
+            and itype != "MAINTAIN"
         )
+        created = cm.group(1) if cm else None
+        created_age_days = None
+        if created:
+            try:
+                created_age_days = (now - datetime.fromisoformat(created)
+                                    .replace(tzinfo=timezone.utc)).days
+            except ValueError:
+                pass
         initiatives.append({
             "id": path.stem,
             "status": status,
+            "type": itype,
+            "class": iclass,
+            "intimacy": intimacy,
+            "has_exit_conditions": bool(EXIT_BLOCK_RE.search(text)),
+            "has_health_contract": bool(HEALTH_BLOCK_RE.search(text)),
             "target": target,
             "target_str": ".".join(map(str, target)) if target else None,
-            "created": cm.group(1) if cm else None,
+            "created": created,
+            "created_age_days": created_age_days,
             "age_days": age_days,
             "stale": age_days is not None and age_days >= STALE_DAYS and not terminal,
             "past_target": past_target,
@@ -163,12 +247,100 @@ def detect_unscaffolded():
             text = prop.read_text(encoding="utf-8")
         except OSError:
             continue
+        if PROPOSAL_TERMINAL_RE.search(text):  # CIS-007 companion: folded != pending-scaffold
+            continue
         if not re.search(r"Status.{0,4}:\s*\**APPROVED", text):
             continue
         init_name = proposal_to_init_name(prop)
         if init_name not in existing:
             flagged.append({"proposal": prop.name, "expected_init": init_name})
     return flagged
+
+
+def detect_status_mismatches():
+    """CIS-007: proposal headers that lag their actual disposition.
+
+    Two cheap, high-precision signals (each reproduced live on 2026-06-12):
+      - header leads PROPOSED while the mapped INIT-*.md manifest exists
+        (PP-014/PP-033 class — approval+scaffold happened, header never updated)
+      - header leads PROPOSED while the body carries a fold disposition
+        (PP-051 class — Decision section ruled FOLDED, header never updated)
+    Name-mapping is heuristic (proposal slug -> INIT id), so a renamed initiative
+    can evade the first signal — false negatives accepted, zero-noise preferred.
+    """
+    flagged = []
+    existing = {p.stem for p in INIT_DIR.glob("INIT-*.md")}
+    for prop in sorted(PROPOSAL_DIR.glob("PROPOSAL_init_*.md")):
+        try:
+            text = prop.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        sl = PROPOSAL_STATUS_LINE_RE.search(text)
+        if not sl or not re.match(r"\**\s*PROPOSED\b", sl.group(1)):
+            continue
+        init_name = proposal_to_init_name(prop)
+        if init_name in existing:
+            flagged.append({"proposal": prop.name, "lag": f"manifest {init_name} exists"})
+        elif BODY_FOLD_RE.search(text):
+            flagged.append({"proposal": prop.name, "lag": "body carries fold disposition"})
+    return flagged
+
+
+def declared_ceiling():
+    """CIS-008: the machine-readable ACTIVE-ceiling declared in INDEX.md, or None."""
+    try:
+        m = CEILING_RE.search(INDEX_MD.read_text(encoding="utf-8"))
+    except OSError:
+        return None
+    return int(m.group(1)) if m else None
+
+
+def detect_cis009(initiatives):
+    """CIS-009: typed-lifecycle block presence on ACTIVE manifests (gh#1884).
+
+    WARN classes (each names the missing consumer-facing artifact, anti-L671):
+      untyped                  ACTIVE manifest with no **Type** field
+      unknown-type             **Type** value outside {Achieve, Maintain}
+      missing-exit-conditions  Achieve without a '## Exit Conditions' block
+      missing-health-contract  Maintain without a '## Health Contract' block
+    """
+    warns = []
+    for it in initiatives:
+        if it["status"] != "ACTIVE":
+            continue
+        if it["type"] is None:
+            warns.append({"id": it["id"], "warn": "untyped"})
+        elif it["type"] not in KNOWN_TYPES:
+            warns.append({"id": it["id"], "warn": f"unknown-type:{it['type']}"})
+        elif it["type"] == "ACHIEVE" and not it["has_exit_conditions"]:
+            warns.append({"id": it["id"], "warn": "missing-exit-conditions"})
+        elif it["type"] == "MAINTAIN" and not it["has_health_contract"]:
+            warns.append({"id": it["id"], "warn": "missing-health-contract"})
+    return warns
+
+
+def capability_ratio(initiatives):
+    """CIS-008 ratio half (gh#1655): capability share of ACTIVE vs the >=1/3 floor.
+
+    Three-state (CONVENTION_check_three_state_contract): UNKNOWN while any
+    ACTIVE manifest lacks a Class tag — an unprobed portfolio must not report
+    PASS (the 'advertised-clean != verified-clean' lesson, #1553).
+    """
+    active = [it for it in initiatives if it["status"] == "ACTIVE"]
+    if not active:
+        return {"state": "PASS", "capability": 0, "governance": 0, "untagged": 0,
+                "ratio": None, "floor": round(CAPABILITY_FLOOR, 4)}
+    cap = sum(1 for it in active if it["class"] == "capability")
+    gov = sum(1 for it in active if it["class"] == "governance")
+    untagged = len(active) - cap - gov
+    ratio = cap / len(active)
+    if untagged:
+        state = "UNKNOWN"
+    else:
+        state = "PASS" if ratio >= CAPABILITY_FLOOR else "FAIL"
+    return {"state": state, "capability": cap, "governance": gov,
+            "untagged": untagged, "ratio": round(ratio, 4),
+            "floor": round(CAPABILITY_FLOOR, 4)}
 
 
 def detect_cohorts(initiatives):
@@ -206,19 +378,43 @@ def build_report(now=None):
     n_folded = len(inventory.get("FOLDED", []))
     n_terminal = n_complete_closed + n_folded
 
+    # D-IG-4 scoping: completion metrics judge Achieve-typed (and, conservatively,
+    # untyped) initiatives only; Maintain is the health-metered spine (D-IG-1).
+    active_achieve_like = [it for it in initiatives
+                           if it["status"] == "ACTIVE" and it["type"] != "MAINTAIN"]
+    maintain_spine = [it for it in initiatives
+                      if it["status"] == "ACTIVE" and it["type"] == "MAINTAIN"]
     anomalies = {
         # CIS-002 (literal) is COMPLETE+CLOSED==0; widened to include FOLDED
         # since a fold IS a walked close-loop (resolution by merger). The
         # COMPLETE/CLOSED=0-while-FOLDED>0 nuance is surfaced in the report.
-        "zero_complete": n_terminal == 0 and n_active > 0,
+        # Typed scoping: fires only while Achieve-like ACTIVE work exists.
+        "zero_complete": n_terminal == 0 and len(active_achieve_like) > 0,
         "complete_closed": n_complete_closed,
         "folded": n_folded,
         "past_target": [it["id"] for it in initiatives if it["past_target"]],
         "unscaffolded": detect_unscaffolded(),
+        "status_mismatches": detect_status_mismatches(),
         "stale": [
             {"id": it["id"], "age_days": it["age_days"]}
             for it in initiatives if it["stale"]
         ],
+        "cis009": detect_cis009(initiatives),
+    }
+    ceiling = declared_ceiling()
+    anomalies["ceiling"] = ceiling
+    anomalies["over_ceiling"] = (n_active - ceiling) if (ceiling is not None and n_active > ceiling) else 0
+    anomalies["capability_ratio"] = capability_ratio(initiatives)
+    # Report-only shape signals (grooming inputs, D-IG-1/3 — not strict-anomalies)
+    spine_lo, spine_hi = MAINTAIN_SPINE_BAND
+    shape = {
+        "maintain_spine": len(maintain_spine),
+        "maintain_spine_band": list(MAINTAIN_SPINE_BAND),
+        "maintain_spine_in_band": spine_lo <= len(maintain_spine) <= spine_hi,
+        "achieve_aging": sorted(
+            ({"id": it["id"], "created_age_days": it["created_age_days"]}
+             for it in active_achieve_like if it["created_age_days"] is not None),
+            key=lambda x: -x["created_age_days"]),
     }
     cohorts = detect_cohorts(initiatives)
     own = next((it for it in initiatives if it["id"] == OWN_INITIATIVE), None)
@@ -230,9 +426,14 @@ def build_report(now=None):
     return {
         "current_version": ".".join(map(str, cur)) if cur else None,
         "total": len(initiatives),
-        "inventory": {s: inventory.get(s, []) for s in STATUS_ORDER},
+        # Include non-standard buckets (e.g. UNKNOWN) — filtering to STATUS_ORDER
+        # silently dropped unparseable statuses from the returned inventory.
+        "inventory": {s: inventory.get(s, [])
+                      for s in (STATUS_ORDER
+                                + sorted(set(inventory) - set(STATUS_ORDER)))},
         "wip": n_active,
         "anomalies": anomalies,
+        "shape": shape,
         "cohorts": cohorts,
         "recursion": recursion,
         "initiatives": initiatives,
@@ -243,14 +444,17 @@ def has_anomaly(report):
     a = report["anomalies"]
     return bool(
         a["zero_complete"] or a["past_target"] or a["unscaffolded"]
-        or a["stale"] or report["recursion"]["v_init_007"] == "FAIL"
+        or a["status_mismatches"] or a["over_ceiling"]
+        or a["stale"] or a["cis009"]
+        or a["capability_ratio"]["state"] == "FAIL"
+        or report["recursion"]["v_init_007"] == "FAIL"
     )
 
 
 def render_human(report):
     lines = ["=== /aget-check-initiatives ===", ""]
     lines.append(f"Inventory ({report['total']} total; agent v{report['current_version']}):")
-    for s in STATUS_ORDER:
+    for s in report["inventory"]:
         ids = report["inventory"][s]
         if ids:
             shown = ", ".join(ids)
@@ -260,6 +464,7 @@ def render_human(report):
     lines.append("")
     a = report["anomalies"]
     lines.append("Pipeline anomalies:")
+    anomaly_mark = len(lines)
     if a["zero_complete"]:
         lines.append("  - 0 terminal dispositions ever AND ACTIVE>0 (close-loop not walked)")
     elif a["complete_closed"] == 0 and a["folded"] > 0:
@@ -269,11 +474,30 @@ def render_human(report):
     if a["unscaffolded"]:
         names = ", ".join(u["proposal"] for u in a["unscaffolded"])
         lines.append(f"  - {len(a['unscaffolded'])} approved-but-unscaffolded: {names}")
+    if a["status_mismatches"]:
+        items = "; ".join(f"{m['proposal']} ({m['lag']})" for m in a["status_mismatches"])
+        lines.append(f"  - {len(a['status_mismatches'])} proposal-header lags (CIS-007): {items}")
     if a["stale"]:
         items = ", ".join(f"{s['id']} ({s['age_days']}d)" for s in a["stale"])
         lines.append(f"  - {len(a['stale'])} stale (>={STALE_DAYS}d no commit): {items}")
-    if not (a["zero_complete"] or a["past_target"] or a["unscaffolded"] or a["stale"]):
+    if a["cis009"]:
+        by_warn = {}
+        for w in a["cis009"]:
+            by_warn.setdefault(w["warn"], []).append(w["id"])
+        for warn, ids in by_warn.items():
+            lines.append(f"  - CIS-009 {warn}: {len(ids)} ({', '.join(ids)})")
+    if len(lines) == anomaly_mark:  # nothing emitted above (incl. the folded nuance)
         lines.append("  - none")
+    lines.append("")
+    sh = report["shape"]
+    lo, hi = sh["maintain_spine_band"]
+    band_note = "in band" if sh["maintain_spine_in_band"] else f"outside D-IG-1 band {lo}-{hi}"
+    lines.append(f"Portfolio shape (D-IG-1, report-only):")
+    lines.append(f"  - Maintain spine: {sh['maintain_spine']} ACTIVE ({band_note})")
+    if sh["achieve_aging"]:
+        top = ", ".join(f"{x['id']} ({x['created_age_days']}d)" for x in sh["achieve_aging"][:5])
+        lines.append(f"  - Achieve/untyped age-in-portfolio (grooming input, oldest first): {top}"
+                     + (" …" if len(sh["achieve_aging"]) > 5 else ""))
     lines.append("")
     lines.append("Cohort detection:")
     if report["cohorts"]:
@@ -282,7 +506,25 @@ def render_human(report):
     else:
         lines.append("  - none")
     lines.append("")
-    lines.append(f"Capacity:\n  - WIP: {report['wip']} ACTIVE initiatives")
+    if a.get("ceiling") is not None:
+        over = a["over_ceiling"]
+        cap_note = (f" — OVER declared ceiling {a['ceiling']} by {over} "
+                    f"(CIS-008; L178 overrides recorded in INDEX.md prose; "
+                    f"split re-baseline owed at grooming)" if over
+                    else f" (within declared ceiling {a['ceiling']})")
+    else:
+        cap_note = " (no machine-readable ceiling declared in INDEX.md)"
+    lines.append(f"Capacity:\n  - WIP: {report['wip']} ACTIVE initiatives{cap_note}")
+    cr = a["capability_ratio"]
+    if cr["state"] == "UNKNOWN":
+        ratio_note = (f"UNKNOWN — {cr['untagged']} ACTIVE untagged "
+                      f"(tagged: {cr['capability']} capability / {cr['governance']} governance); "
+                      f"floor unverifiable until Class backfill")
+    else:
+        pct = f"{cr['ratio']:.0%}" if cr["ratio"] is not None else "n/a"
+        ratio_note = (f"{cr['state']} — {cr['capability']}/{report['wip']} capability ({pct}) "
+                      f"vs >=1/3 floor (v3.22 D-2, gh#1655)")
+    lines.append(f"  - Capability ratio (governing control): {ratio_note}")
     lines.append("")
     r = report["recursion"]
     lines.append(f"Recursion check:\n  - {OWN_INITIATIVE} own-status: {r['own_status']} [V-INIT-007 {r['v_init_007']}]")
