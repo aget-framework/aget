@@ -1,11 +1,11 @@
 # AGET Vocabulary Specification
 
-**Version**: 1.16.1
+**Version**: 1.17.0
 **Status**: Active
 **Category**: Core (Standards)
 **Format Version**: 1.2
 **Created**: 2026-01-04
-**Updated**: 2026-02-20
+**Updated**: 2026-07-11
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_VOCABULARY_SPEC.md`
 **Change Origin**: PROJECT_PLAN_standards_ontology_elevation_v1.0
@@ -90,6 +90,29 @@ Custom properties extending SKOS:
 | `aget:portfolio_boundary` | Cross-portfolio usage rules (L573) | 0:1 |
 | `aget:audit_required` | Whether invocations require logging (L573) | boolean |
 | `aget:inherits_from` | Vocabulary inheritance parent (L573) | 0:1 |
+| `aget:published_at` | Publication record: persistent public URI(s) at which this concept has been published (e.g. `https://w3id.org/aget/vocab#<ConceptName>`), optionally with date — a record of an outbound publication act, NOT a dependency (L882/L1126) | 0:many |
+
+### Publication Provenance (`aget:published_at`) — L882/L1126
+
+WHEN a concept is published to a public surface, the publishing agent SHALL record
+`aget:published_at` on the fleet-local concept with the persistent public URI
+(and SHOULD include the publication date).
+
+The field is a record, not a binding (AsymmetricPublicationFlow):
+- The fleet-local concept remains authoritative (L453). Tooling MUST NOT treat the
+  public copy as an authority, gate, or sync source.
+- The URI recorded SHALL be the persistent (PID-indirected) form, never a host-direct URL.
+- Concepts carrying `aget:published_at` fall under the publication maintain-loop
+  (resolvability + currency validation per release).
+
+Format (YAML):
+
+```yaml
+published_at:
+  - uri: https://w3id.org/aget/vocab#Learning_Document
+    date: 2026-07-11
+    forum: https://www.gabormelli.com/RKB/Learning_Document   # optional
+```
 
 ## Entry Format Patterns
 
@@ -2740,6 +2763,14 @@ Instruction_Asymmetry:
 | CAP-VOC-004-02 | prohibited | The SYSTEM shall NOT accept single-word vocabulary terms (R-VOC-PROSE-003). |
 | CAP-VOC-004-03 | conditional | IF a new specification introduces domain terms, THEN the SYSTEM shall add those terms to the controlled vocabulary. |
 
+### CAP-VOC-005: Publication Provenance (L882/L1126)
+
+| ID | Pattern | Requirement |
+|----|---------|-------------|
+| CAP-VOC-005-01 | event-driven | WHEN a concept is published to a public surface, THEN the publishing agent shall record `aget:published_at` on the fleet-local concept with the persistent public URI. |
+| CAP-VOC-005-02 | prohibited | Tooling shall NOT treat a published public copy as an authority, gate, or sync source for the fleet-local concept (L453). |
+| CAP-VOC-005-03 | ubiquitous | The `aget:published_at` URI shall use the persistent (PID-indirected) form, never a host-direct URL. |
+
 ---
 
 ## Enforcement
@@ -2801,6 +2832,12 @@ grep -E "^    [a-z]" aget/specs/AGET_VOCABULARY_SPEC.md | grep -v "skos:\|aget:\
 ---
 
 ## Changelog
+
+### v1.17.0 (2026-07-11)
+
+- **NEW**: `aget:published_at` publication-provenance extension (0:many, non-breaking) + Publication Provenance subsection (Part 1)
+- **NEW**: CAP-VOC-005 Publication Provenance (3 EARS requirements: record-on-publish, no-inbound-authority, PID-form-only)
+- Origin: PROJECT_PLAN_ontology_publication_v1.0 G3.1(c); L882 (forum) + L1126 (standard); D-PUB rulings 2026-07-11; delta artifact SPEC_DELTA_vocabulary_published_at_2026-07-11
 
 ### v1.16.1 (2026-03-17)
 
