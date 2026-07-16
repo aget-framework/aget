@@ -5,7 +5,7 @@ TEMPLATE INSTRUCTIONS:
 1. Replace all {placeholders} with actual values
 2. Remove sections marked [OPTIONAL] if not needed
 3. Delete this instruction block before finalizing
-4. Follow SOP_SOP_CREATION.md for the full creation process
+4. Follow `aget/sops/SOP_sop_creation.md` for the full creation process
 -->
 
 **Implements**: {R-DOMAIN-NNN-* | Remove if no requirements}

@@ -266,7 +266,7 @@ Default policy: **Phase B1**. Phase B2/B3 require explicit principal Decide.
 | Ontology | C227 (InitiativeScope) |
 | Related skill proposal | SP-004 (aget-check-initiative) |
 | Related proposal | PP-001 (Initiative Construct v1) |
-| Governing SOP | SOP_SOP_CREATION.md |
+| Governing SOP | SOP_sop_creation.md |
 
 ---
 

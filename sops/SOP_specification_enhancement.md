@@ -12,7 +12,7 @@
 **Owner**: aget-framework
 **Category**: Governance
 **Scope Classification**: Framework_Sop (target: `aget/sops/`)
-**Related**: L622, L623, L434, L436, L546, L557, L560, ADR-008, SOP_SOP_CREATION.md, SOP_specification_consolidation.md
+**Related**: L622, L623, L434, L436, L546, L557, L560, ADR-008, SOP_sop_creation.md, SOP_specification_consolidation.md
 
 ---
 
@@ -49,7 +49,7 @@ Standard operating procedure for enhancing AGET specifications — creating, upd
 |-----------|-------------|
 | One-time document edit (typo, formatting) | Direct edit |
 | L-doc creation | `/aget-record-lesson` |
-| SOP creation | SOP_SOP_CREATION.md |
+| SOP creation | SOP_sop_creation.md |
 | Template-only changes (no spec change) | SOP_template_lifecycle.md |
 | Spec consolidation only (no new content) | SOP_specification_consolidation.md (subset) |
 
@@ -369,7 +369,7 @@ Phase 2: Census — 1 spec, 0 dependencies
 Phase 3: Wrote CAP-SOP-005 (5 requirements) in EARS format
 Phase 4: Structural validation passed
 Phase 5: Wired L568 → CAP-SOP-005, V-test defined
-Phase 6: Self-compliance — SOP_SOP_CREATION used this spec ✓
+Phase 6: Self-compliance — SOP_sop_creation used this spec ✓
 
 Result: AGET_SOP_SPEC v1.1.0, clean merge
 ```
@@ -441,7 +441,7 @@ graduation:
 - L611: Stale VERSION_SCOPE Classifications
 - ADR-008: Advisory → Strict → Generator
 - AGET_SOP_SPEC.md v1.1.0 (governing spec)
-- SOP_SOP_CREATION.md v1.0.0 (creation procedure)
+- SOP_sop_creation.md v1.0.0 (creation procedure)
 - SOP_specification_consolidation.md (CONSOLIDATE category subset)
 - SOP_pre_release_research.md (classification taxonomy)
 - PROJECT_PLAN_aget_enhance_spec_skill_v1.0.md (parent project)
