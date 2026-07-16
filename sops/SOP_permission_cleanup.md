@@ -5,7 +5,9 @@
 **Created**: 2026-01-10 (framework-instance v1.0.1) · **Promoted to canonical**: 2026-07-05
 **Author**: Framework Manager
 **Companion script**: `scripts/permission_cleanup.py` (dry-run first; field-proven)
-**Related**: L027 (Permission Governance), L500 (Detection Gap)
+**Related**: permission-governance + detection-gap lessons are recorded in the
+operating agent's own `.aget/evolution/` — this canonical copy deliberately carries no
+L-doc IDs, which are unique per agent and do not resolve across seats.
 
 ---
 
@@ -88,4 +90,6 @@ cp .claude/settings.local.json.bak.YYYYMMDD .claude/settings.local.json
 
 ## Reference
 
-- L027 (Permission Governance) · L500 (Detection Gap)
+- Permission-governance and detection-gap lessons live in each agent's own
+  `.aget/evolution/`. L-doc IDs are agent-scoped and are intentionally not cited here:
+  a bare `LNNN` resolves to different lessons in different agents.
