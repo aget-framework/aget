@@ -1,0 +1,69 @@
+# DEPLOYMENT_SPEC_v3.27.0.yaml
+# Complete target state specification for v3.27.0 deployment
+#
+# Purpose: Define what a correctly-deployed v3.27.0 agent looks like.
+# Governance: R-DEP-002, R-REL-038
+#
+# Created: 2026-07-18 (PRE-TAG)
+# Origin: DEPLOYMENT_SPEC_v3.26.0.yaml
+# Release: Finish & Verify
+#
+# FIRST BINDING USE of executed_surface declarations (gh#1871 third axis /
+# gh#1881 ask 3): every M-row whose target has a dual-basename twin declares
+# the path the agent's config INVOKES. The 3-axis coherence gate
+# (check_tag_payload_coherence.py --three-axis) reads these declarations.
+
+version: "3.27.0"
+spec_version: "2.1.0"
+created: "2026-07-18"
+status: active
+supersedes: "DEPLOYMENT_SPEC_v3.26.0.yaml"
+breaking_release: false
+backfill: false
+
+verification_script:
+  file: "scripts/verify_deployment.py"
+  usage: "python3 scripts/verify_deployment.py --version 3.27.0 --path /path/to/agent"
+  known_defects: "Treat tooling output as claim-under-test, not premise (L908)."
+
+# operative_path_note + customized_base_script_note carried from v3.26.0 unchanged.
+# Rung-4 note (NEW, SOP_fleet_migration v1.7.0 Gate 4.0): receipt+state verification
+# is NOT completion — run the Behavioral Smoke probes in the dispatch, run the seat's
+# own test suite, verify executed-surface parity for dual-basename targets.
+mandatory_changes:
+  - id: "M-3.27-1"
+    description: "version.json aget_version '3.27.0' (+ migration_history entry)"
+    blocking: true
+    detection: "test $(jq -r .aget_version .aget/version.json) = '3.27.0'"
+  - id: "M-3.27-2"
+    description: "AGENTS.md @aget-version 3.27.0 + Transactional Execution section + workspace convention (gh#1774/#1819 propagation)"
+    blocking: true
+    detection: "grep -q '^@aget-version: 3.27.0' AGENTS.md && grep -q 'Transactional Execution (Default)' AGENTS.md"
+  - id: "M-3.27-3"
+    description: "scripts/check_initiatives.py refreshed — CIS-008 Achieve-only denominator (D-27-A) + CIS-010 EC tick-state maintained signal"
+    blocking: true
+    detection: "grep -q 'achieve-only (D-27-A)' scripts/check_initiatives.py && grep -q 'detect_cis010' scripts/check_initiatives.py"
+    executed_surface: "scripts/check_initiatives.py"
+  - id: "M-3.27-4"
+    description: "scripts/check_config.py refreshed — t3_single_slash_rules dead-permission-rule detector (gh#1772)"
+    blocking: true
+    detection: "grep -q 't3_single_slash_rules' scripts/check_config.py"
+    executed_surface: "scripts/check_config.py"
+  - id: "M-3.27-5"
+    description: "scripts/close_gate_check.py refreshed — scan_dual_status_mask (gh#1791)"
+    blocking: true
+    detection: "grep -q 'scan_dual_status_mask' scripts/close_gate_check.py"
+    executed_surface: "scripts/close_gate_check.py"
+  - id: "M-3.27-6"
+    description: "scripts/wind_down.py refreshed — gh#1795 double-fire guard (recent close-session file defers the stub)"
+    blocking: true
+    detection: "grep -q '_recent_close_session_exists' scripts/wind_down.py"
+    executed_surface: "scripts/wind_down.py"  # dual-basename twin exists at .aget/patterns/session/ on some seats — config-invoked copy MUST carry the guard (C-26-01 class)
+  - id: "M-3.27-7"
+    description: "universal skill set present per archetype (validate_archetype_skills clean; core + document-processor conformance ruling 2026-07-18)"
+    blocking: true
+    detection: "test -d .claude/skills/aget-wake-up && test -d .claude/skills/aget-close-project"
+  - id: "M-3.27-8"
+    description: "TEMPLATE_L-DOC Filing_Candidate marker standard available (gh#1821; forward-standard, no backfill owed)"
+    blocking: false
+    detection: "true"
