@@ -1,0 +1,38 @@
+# DELIVERED_FILES_v3.27.0.yaml — machine-readable per-payload delivered-files manifest
+# Emit half of gmelli/aget-aget#1870 (closes the #1828 delivered-but-not-committed vector).
+# Consumer: SOP_fleet_upgrade G0.2 — commit add-list derives from THIS manifest;
+# post-stage porcelain cross-check asserts no manifest path remains untracked.
+version: "3.27.0"
+source_ref: "main"  # canonical aget/ (payload-source ruling 2026-07-11: canonical, not template — see #1871)
+generated: "2026-07-18T19:07:37Z"
+generator: "scripts/emit_delivered_files_manifest.py"
+tracking: "gmelli/aget-aget#1870"
+
+pin_edits:  # edited in place on the agent, not file-copied — outside the porcelain cross-check
+  - path: ".aget/version.json"  # version pin
+  - path: "AGENTS.md"  # @aget-version pin
+
+delivered_files:
+  - path: "scripts/check_initiatives.py"
+    spec_rows: [M-3.27-3]
+    sha256: "f862edabc4180df59c1a03bfb50aac6886b515041587ed9e5c59bc696d4a4383"
+  - path: "scripts/check_config.py"
+    spec_rows: [M-3.27-4]
+    sha256: "ABSENT-AT-REF"
+  - path: "scripts/close_gate_check.py"
+    spec_rows: [M-3.27-5]
+    sha256: "57c5fb09ca41fb894a3f72c01cd17645065a1b2a96b02863e555e0499c88dcb3"
+  - path: "scripts/wind_down.py"
+    spec_rows: [M-3.27-6]
+    sha256: "cdceb2be526de6f465bb638846e4da2a0510ea895811b91f695af1c86e16dc54"
+
+optional_files:
+  []
+
+additive_files:
+  []
+
+verify_rule: |
+  Post-upgrade, every delivered_files/optional_files path present on the agent's disk
+  MUST be git-tracked. `git status --porcelain` showing any manifest path as untracked
+  (??) is the #1828 defect class — the upgrade is NOT complete until it is staged.
