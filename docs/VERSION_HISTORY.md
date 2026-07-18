@@ -12,6 +12,10 @@ This document provides a complete timeline of AGET Framework versions and their 
 
 ## Current Version
 
+**v3.27.0** (2026-07-18) - Finish & Verify
+
+Core `aget/` at v3.27.0: ✅ (GitHub Release live; tag at 14/14 origins). Theme: the portfolio learns to FINISH (EC tick-state signal, Achieve-only capability share, ID injectivity) and the release learns to VERIFY it runs (Rung-4 behavioral verification, 3-axis coherence, corrections single-surface). See `release-notes/v3.27.0.md`.
+
 **v3.26.0** (2026-07-11) - Signals & Contracts
 
 Core `aget/` at v3.26.0: ✅ (GitHub Release live; tag at 14/14 origins — canonical + 13/13 templates; SUP pilot confirmed same-day, fleet 31/31 within the week). Theme: the release hears its consumers (signals) and hardens what it promises them (contracts). First STANDING Phase 7.9 consumer-sweep week executed (6 source-verified dispositions). See `release-notes/v3.26.0.md`.
@@ -29,6 +33,10 @@ Core `aget/` at v3.24.0: ✅ (GitHub Release live). Reliance feature (schema + v
 ---
 
 ## Version Timeline
+
+### v3.27.0 (2026-07-18) ✅
+
+**Theme**: Finish & Verify — Rung-4 behavioral migration verification + honest portfolio-completion signals. Shipped 7 days ahead of point, same-day as its own scope-lock.
 
 ### v3.26.0 (2026-07-11) ✅
 
