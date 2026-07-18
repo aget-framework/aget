@@ -1,6 +1,6 @@
 # TEMPLATE: Remote Migration Message
 
-**Template Version**: 1.5.0
+**Template Version**: 1.6.0
 **Created**: 2026-03-09
 **Owner**: aget-framework (canonical copy; instance-operative copy lives with the framework manager)
 **Implements**: R-REL-019-07 (public handoff), G4.6 (shareable message)
