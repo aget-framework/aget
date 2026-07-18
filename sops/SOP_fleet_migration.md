@@ -1,9 +1,9 @@
 # SOP: Fleet Migration
 
-**Version**: 1.7.0
+**Version**: 1.7.1
 **Status**: Active
 **Created**: 2026-01-05
-**Updated**: 2026-05-02
+**Updated**: 2026-07-18
 **Owner**: aget-framework
 **Implements**: CAP-MIG-017 (Remote Supervisor Upgrade), SD-3 wave-sequencing (v1.6.0)
 **Related**: L455 (AGENTS.md Invocation Verification), L457 (Cross-Machine Pre-Flight), AGET_RELEASE_SPEC, PROJECT_PLAN_fleet_v3.2_migration.md
@@ -156,7 +156,9 @@ python3 -c "import yaml; f=yaml.safe_load(open('~/.../FLEET_STATE.yaml')); print
 ```bash
 # Identify agents created after last migration (may have missed version wave)
 LAST_MIGRATION="YYYY-MM-DD"  # Date of previous fleet migration
-for agent in ~/github/private-*-aget ~/github/GM-*/private-*-aget; do
+# FLEET_GLOBS: your fleet's roots — see §Fleet-root parameterization (Phase 4); glob-miss = silent empty loop
+FLEET_GLOBS=(~/github/private-*-aget ~/github/GM-*/private-*-aget)   # <— EDIT to your topology
+for agent in "${FLEET_GLOBS[@]}"; do
   created=$(jq -r '.created // .discovered // "unknown"' $agent/.aget/version.json 2>/dev/null)
   if [[ "$created" > "$LAST_MIGRATION" ]]; then
     echo "LATE: $(basename $agent) created $created"
@@ -446,10 +448,24 @@ dispatch → receipt → state confirms LANDING; this rung confirms RUNNING. Per
 4. **Evidence bar (amends the L656 pilot row)**: a pilot confirmation SHALL include ≥1 recorded
    behavioral-probe RESULT — received-state disk verification alone no longer confirms.
 
+#### Fleet-root parameterization (v1.7.1 — REQUIRED before running any Gate 4.x loop)
+
+The agent-enumeration globs below are PARAMETERS, not portable defaults — the literal
+`~/github/private-*-aget` pattern encodes ONE fleet's filesystem topology. On any other
+machine (e.g. a remote fleet rooted at `~/code/<org>/`) the glob matches NOTHING and the
+loop **silently passes an empty set** — a wave-boundary gate that green-lights zero agents
+(same silent-skip class as the v1.45 template-glob fix in SOP_release_process). Set your
+fleet's roots explicitly and VERIFY the count before trusting any Gate 4.x output:
+
+```bash
+FLEET_GLOBS=(~/github/private-*-aget ~/github/GM-*/private-*-aget)   # <— EDIT to your topology
+ls -d "${FLEET_GLOBS[@]}" 2>/dev/null | wc -l   # MUST equal your known agent count; 0 or short = STOP
+```
+
 #### Gate 4.1: Batch Housekeeping Validation
 
 ```bash
-for agent in ~/github/private-*-aget ~/github/GM-*/private-*-aget; do
+for agent in "${FLEET_GLOBS[@]}"; do
   result=$(python3 $agent/scripts/health_check.py --json --dir $agent 2>&1)
   status=$(echo "$result" | jq -r '.status')
   echo "$(basename $agent): $status"
@@ -460,7 +476,7 @@ done
 #### Gate 4.2: Version Consistency Check
 
 ```bash
-for agent in ~/github/private-*-aget ~/github/GM-*/private-*-aget; do
+for agent in "${FLEET_GLOBS[@]}"; do
   ver=$(jq -r '.aget_version' $agent/.aget/version.json)
   echo "$(basename $agent): $ver"
 done | grep -v "X.Y.Z" && echo "DRIFT DETECTED" || echo "ALL CONSISTENT"
@@ -472,7 +488,7 @@ done | grep -v "X.Y.Z" && echo "DRIFT DETECTED" || echo "ALL CONSISTENT"
 ```bash
 # Verify migration_history was updated per-agent
 TARGET_VERSION="X.Y.Z"
-for agent in ~/github/private-*-aget ~/github/GM-*/private-*-aget; do
+for agent in "${FLEET_GLOBS[@]}"; do
   last_to=$(jq -r '.migration_history[-1].to_version // "none"' $agent/.aget/version.json 2>/dev/null)
   if [[ "$last_to" != "$TARGET_VERSION" ]]; then
     echo "MISSING: $(basename $agent) - last recorded: $last_to"
@@ -683,6 +699,7 @@ See: `docs/patterns/PATTERN_weekly_fleet_health_monitor.md` (framework-recommend
 
 ## Changelog
 
+| 1.7.1 | 2026-07-18 | **Fleet-root parameterization** — Gate 4.1/4.2/4.2.1 + V0.4 agent-enumeration globs converted from hardcoded `~/github/private-*-aget` literals to an explicit `FLEET_GLOBS` parameter with a MANDATORY count-verification pre-step. Root cause: the literals encode one fleet's filesystem topology; on any other machine the glob matches nothing and every Gate 4.x loop silently passes an empty set (v1.45 silent-skip class at the SOP layer). Field-evidenced 2026-07-18: a remote fleet rooted at `~/code/<org>/` ruled wholesale adoption of this SOP — as written, its wave-boundary gates would have green-lit zero agents. |
 | 1.7.0 | 2026-07-18 | Gate 4.0 Behavioral Verification (Rung 4) — smoke probes from M-rows + post-payload test suite (absorbs it-consultant L239 consumer-grep) + executed-surface parity incl. dual-basename drift (absorbs cli-aget L756; C-26-01 exhibit) + L656 pilot evidence bar (≥1 behavioral result). gh#1881/L1165; built v3.27 G2.1. |
 
 ### v1.6.0 (2026-05-02)

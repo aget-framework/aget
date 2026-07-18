@@ -1,6 +1,6 @@
 # TEMPLATE: Remote Migration Message
 
-**Template Version**: 1.6.0
+**Template Version**: 1.7.0
 **Created**: 2026-03-09
 **Owner**: aget-framework (canonical copy; instance-operative copy lives with the framework manager)
 **Implements**: R-REL-019-07 (public handoff), G4.6 (shareable message)
@@ -42,6 +42,13 @@ Before publishing, verify:
 **Migration Path**: vPREV → vX.Y.Z
 **Breaking Changes**: Yes/No
 **Currency note**: read this message from `main`, not the version tag — post-tag hardening notes and repairs land on `main` (see the release body's "Post-tag repairs" section)
+**Corrections & manifest probe (verbatim — MANDATORY per template v1.7.0)**: the corrections and delivered-files surfaces structurally CANNOT exist at the tag (they are post-tag artifacts); probing them at the tag returns false-absent or the previous release's manifest. Run exactly:
+
+```bash
+git fetch origin
+git show origin/main:handoffs/CORRECTIONS_vX.Y.Z.md        # apply every row on top of the tag payload
+git show origin/main:handoffs/DELIVERED_FILES_vX.Y.Z.yaml  # copy-list source — never the tag's copy
+```
 
 ---
 
@@ -50,6 +57,11 @@ Before publishing, verify:
 *1–3 probes per payload feature, derived from DEPLOYMENT_SPEC M-rows. Each probe runs the new
 signal ON THE EXECUTED SURFACE. Always include: (a) `python3 -m pytest tests/ -q` post-payload;
 (b) executed-surface parity for any dual-basename target.*
+
+**Baseline capture (BEFORE Wave 0 touches anything — per template v1.7.0)**: the "no NEW
+failures vs pre-migration baseline" probe presupposes a recorded pre-migration test run.
+Per seat, save `python3 -m pytest tests/ -q` output BEFORE applying any payload — migrate-first
+destroys the referent and the comparison becomes unanchored.
 
 | # | Payload feature (M-row) | Probe (run this) | Expected |
 |---|---|---|---|
@@ -254,8 +266,11 @@ Before sending a message from this template:
 | 1.4.0 | 2026-07-05 | **Script Customization pre-flight** (def-level delta before any base-script overwrite; function-preserving merge when local-only defs exist; conformance-then-bump). Source: second-fleet Wave-0 GATE-0 halt — blind overwrite per the message's own instruction would have deleted 8 local health_check invariants. Tracking: framework tracker #1836 (ext-hooks for health_check/study_topic — makes "overwrite" honest once shipped). |
 
 | 1.5.0 | 2026-07-11 | **Migration Target block (mandatory)** — explicit target version + tag-reachable deployment contract + payload-source line as the message's first section. BACK-FILL NOTE: `REMOTE_MIGRATION_MESSAGE_v3.26.0.md` cited "mandatory per template v1.5.0" while the template file itself was never updated past 1.4.0 — the version existed only as a citation (asserted-not-computed class, sibling of #1871); this entry makes the citation true. ALSO: **headless-dispatch authority clause** (Fleet Coordination) — dispatch prompts must grant in-session execution authority; a headless agent ending "awaiting GO" has silently failed (v3.26 fleet-rollout canary lesson, ask-but-don't-wait trap). |
+| 1.5.1 | 2026-07-18 | Footer version drift fixed — footer read v1.4.0 against the v1.5.0 changelog row (F-G3-1 class); caught at v3.27 G2.5 verification. [Row promoted from footer parenthetical to this table 2026-07-18 — footer-only changelog entries recreated the drift they documented.] |
+| 1.6.0 | 2026-07-18 | Mandatory §Behavioral Smoke — the v3.26 instance had it, the template didn't (same asserted-not-computed class as v1.5.0's backfill note); gh#1881 item 1, built v3.27 G2.1. [Row promoted from footer parenthetical 2026-07-18; header 1.5.0→1.6.0 fixed same day (`8c8a656`) — third F-G3-1 on this file.] |
+| 1.7.0 | 2026-07-18 | **Corrections & manifest verbatim probe (mandatory header field)** — corrections + DELIVERED_FILES cannot exist at the tag; tag-pinned probes return false-absent (corrections) or the previous release's manifest (worse: wrong-answer-that-looks-right). Field-evidenced same-day: a remote supervisor with the release body's "on `main`" pointer in-context still concluded "no corrections — clean tag" from an at-tag probe (L939 narrow-verify-broad-claim; direct observation at the wrong ref beat in-context prose — hence a copy-pasteable command, not more prose). ALSO: **Baseline capture before Wave 0** (§Behavioral Smoke) — probe "no NEW failures vs pre-migration baseline" is unevaluable unless the baseline is recorded before payload lands. |
 
 ---
 
-*TEMPLATE_REMOTE_MIGRATION_MESSAGE v1.6.0* (v1.6.0: mandatory §Behavioral Smoke — the v3.26 instance had it, the template didn't [same asserted-not-computed class as v1.5.0's backfill note]; gh#1881 item 1, built v3.27 G2.1) (v1.5.1: footer version drift fixed — read v1.4.0 against the v1.5.0 changelog row, F-G3-1 class; caught at v3.27 G2.5 verification 2026-07-18)
+*TEMPLATE_REMOTE_MIGRATION_MESSAGE v1.7.0*
 *Completes G4.6 deliverable type*
