@@ -541,8 +541,12 @@ The cluster is the set of L-docs whose anti-patterns the lock-prep ceremony itse
 | L1155 | Access-Asymmetry | Added v3.26 cycle (VERSION_SCOPE_v3.26.0 prereq #4) — verify claims only on surfaces this seat can actually read |
 | L1158 | Co-Atomic Gate-Row Assertion | Added v3.26 cycle — gate rows asserted together must be verified together |
 | L1160 | Corrections Are Claims-Under-Test | Added v3.26 cycle — a correction pass is itself re-verified at source before it stamps anything |
+| L1168 | Subagent-Relay Claims | Added v3.27 cycle (G0 stamp 2026-07-18) — a fan-out/Critic subagent's synthesis is a relayed claim; re-verify its identifier+characterization pairs at source before any gate consumes them |
+| L1187 | Promotion-to-Canonical ≠ Shipping | Added v3.27 cycle — a "shipped" claim in a scope row requires the propagation vehicle (template), not just the canonical landing |
+| L1188 | Unread Registries / Wrong Denominators | Added v3.27 cycle — every denominator in a lock artifact must name the registry it was read from; stored knowledge unconsulted = coin-flip counts (this SOP's own "11 L-docs" was the exhibit) |
+| L1190 | A Named Pointer Is a Claim | Added v3.27 cycle — when an artifact cites where its overrides/prose live, open the prose; quoting the pointer is not consuming it |
 
-**v3.27-cycle addition candidates (pending Gate-0 confirmation stamp, per `planning/MEMO_v3.27_freshness_audit_2026-07-17.md`)**: L1168 (subagent-relay claims need primary-source re-verification), L1187 (promotion-to-canonical ≠ shipping), L1188 (stored registries don't get read — wrong denominators), L1190 (a named pointer is a claim, not a footnote). Noted-not-added: L1162, L1171. On confirmation, move into the table with a self-application line each.
+*(Cluster = 19 as of the v3.27 G0 stamp, 2026-07-18. Noted-not-added at v3.27: L1162, L1171.)*
 
 **Self-application discipline**: BEFORE Gate 2, verify NO cluster member's anti-pattern is recurring within the lock-prep plan or VERSION_SCOPE. If found, route to in-flight fix at amendment cap (L131: 2 passes max).
 
