@@ -247,5 +247,5 @@ Before sending a message from this template:
 
 ---
 
-*TEMPLATE_REMOTE_MIGRATION_MESSAGE v1.4.0*
+*TEMPLATE_REMOTE_MIGRATION_MESSAGE v1.5.1* (v1.5.1: footer version drift fixed — read v1.4.0 against the v1.5.0 changelog row, F-G3-1 class; caught at v3.27 G2.5 verification 2026-07-18)
 *Completes G4.6 deliverable type*
