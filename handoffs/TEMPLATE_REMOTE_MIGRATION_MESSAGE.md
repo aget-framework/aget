@@ -45,6 +45,16 @@ Before publishing, verify:
 
 ---
 
+## Behavioral Smoke (MANDATORY — rung 4, gh#1881; SOP_fleet_migration Gate 4.0)
+
+*1–3 probes per payload feature, derived from DEPLOYMENT_SPEC M-rows. Each probe runs the new
+signal ON THE EXECUTED SURFACE. Always include: (a) `python3 -m pytest tests/ -q` post-payload;
+(b) executed-surface parity for any dual-basename target.*
+
+| # | Payload feature (M-row) | Probe (run this) | Expected |
+|---|---|---|---|
+| 1 | {M-row id} | {command} | {observable} |
+
 ## Migration Target
 
 - **Target version**: **vX.Y.Z** (explicit — never infer from N-1; this block is MANDATORY per template v1.5.0)
@@ -247,5 +257,5 @@ Before sending a message from this template:
 
 ---
 
-*TEMPLATE_REMOTE_MIGRATION_MESSAGE v1.5.1* (v1.5.1: footer version drift fixed — read v1.4.0 against the v1.5.0 changelog row, F-G3-1 class; caught at v3.27 G2.5 verification 2026-07-18)
+*TEMPLATE_REMOTE_MIGRATION_MESSAGE v1.6.0* (v1.6.0: mandatory §Behavioral Smoke — the v3.26 instance had it, the template didn't [same asserted-not-computed class as v1.5.0's backfill note]; gh#1881 item 1, built v3.27 G2.1) (v1.5.1: footer version drift fixed — read v1.4.0 against the v1.5.0 changelog row, F-G3-1 class; caught at v3.27 G2.5 verification 2026-07-18)
 *Completes G4.6 deliverable type*

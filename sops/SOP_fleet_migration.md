@@ -1,6 +1,6 @@
 # SOP: Fleet Migration
 
-**Version**: 1.6.0
+**Version**: 1.7.0
 **Status**: Active
 **Created**: 2026-01-05
 **Updated**: 2026-05-02
@@ -428,6 +428,24 @@ Update FLEET_STATE.yaml:
 
 **Objective**: Verify fleet-wide consistency
 
+#### Gate 4.0: Behavioral Verification — Rung 4 (v1.7.0, gh#1881/L1165 — BLOCKING at pilot, per-seat elsewhere)
+
+**"31/31 upgraded ≠ 31/31 unregressed"** (supervisor verdict, v3.26 sweep). The ladder
+dispatch → receipt → state confirms LANDING; this rung confirms RUNNING. Per migrated seat:
+
+1. **Behavioral smoke probes** (1–3 per payload feature, derived from DEPLOYMENT_SPEC M-rows;
+   the dispatch's §Behavioral Smoke section names them): run each new signal once ON THE
+   EXECUTED SURFACE ("after upgrade, wake-up prints the new line"), never a file-existence grep.
+2. **Post-payload test suite**: `python3 -m pytest tests/ -q` at the seat — symbol moves strand
+   local imports invisibly (it-consultant CI-red exhibit; absorbs their L239: BEFORE closing a
+   symbol-move migration, grep the seat's own consumers for the moved symbols).
+3. **Executed-surface parity**: for every dual-basename payload target (`scripts/<name>.py` vs
+   `.aget/patterns/session/<name>.py`), verify the copy the config INVOKES carries the payload —
+   version-says-current-behavior-is-old is the cli-aget C-26-01 dead-on-arrival class. Absorbs
+   cli-aget L756 (sync-survival ext guard) as the standing seat-side pattern.
+4. **Evidence bar (amends the L656 pilot row)**: a pilot confirmation SHALL include ≥1 recorded
+   behavioral-probe RESULT — received-state disk verification alone no longer confirms.
+
 #### Gate 4.1: Batch Housekeeping Validation
 
 ```bash
@@ -664,6 +682,8 @@ See: `docs/patterns/PATTERN_weekly_fleet_health_monitor.md` (framework-recommend
 ---
 
 ## Changelog
+
+| 1.7.0 | 2026-07-18 | Gate 4.0 Behavioral Verification (Rung 4) — smoke probes from M-rows + post-payload test suite (absorbs it-consultant L239 consumer-grep) + executed-surface parity incl. dual-basename drift (absorbs cli-aget L756; C-26-01 exhibit) + L656 pilot evidence bar (≥1 behavioral result). gh#1881/L1165; built v3.27 G2.1. |
 
 ### v1.6.0 (2026-05-02)
 
