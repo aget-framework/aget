@@ -15,6 +15,7 @@ TEMPLATE INSTRUCTIONS:
 **Severity**: {Critical | High | Medium | Low} <!-- For Gap type only -->
 **Domain**: {Governance | Session | Memory | Release | Migration | Operations}
 **Source**: {What triggered this learning - session, issue, implementation, etc.}
+**Filing_Candidate**: {yes | no}  <!-- STANDARD MARKER (gh#1821, v3.27): "yes" = this lesson should become a tracker issue (lesson-first filing, CAP-ISSUE-011). Deterministic detection contract: `grep -l '^\*\*Filing_Candidate\*\*: *yes' .aget/evolution/L*.md` — lessons-analysis scans key on THIS line, never reader judgment. Set "no" explicitly once filed or ruled not-filing (delete = unknown, not no). -->
 
 ---
 
