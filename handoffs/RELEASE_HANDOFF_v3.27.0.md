@@ -15,6 +15,13 @@
 6. AGENTS.md gains the Transactional Execution section + workspace/ committing-intent convention.
 7. Universal skill set: your archetype's full set ships; `validate_archetype_skills` should read clean post-migration.
 
+## Context for External Fleets
+
+- Pin template-derived agents to the template tag (`v3.27.0`); post-tag fixes live in `handoffs/CORRECTIONS_v3.27.0.md` on `main` — apply its rows on top of the tag payload (single-surface contract, new this release).
+- Migration confirmations now require **behavioral evidence** (Rung 4): run the dispatch's §Behavioral Smoke on the executed surface + your own test suite — a disk receipt alone no longer confirms.
+- M-3.27-4 is seat-conditional (framework-seat tool) — skip if your seat lacks the config checker; see CORRECTIONS row 1.
+- Verify features at the OPERATIVE path your agent config invokes (dual-basename caution, carried from v3.25/26).
+
 ## Upgrade
 
 Standard wave protocol per REMOTE_MIGRATION_MESSAGE (Migration Target block names **v3.27.0** explicitly — never infer). Rollback: severity-routed per SOP §Defect-Response Routing.
