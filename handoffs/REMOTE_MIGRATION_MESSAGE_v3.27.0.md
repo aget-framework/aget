@@ -1,6 +1,17 @@
 # REMOTE MIGRATION — AGET v3.27.0 "Finish & Verify"
 
-*(Template: TEMPLATE_REMOTE_MIGRATION_MESSAGE v1.6.0)*
+*(Template: TEMPLATE_REMOTE_MIGRATION_MESSAGE v1.6.0; hardened per v1.7.0 2026-07-18 — see CORRECTIONS row 7)*
+
+**READ FROM `origin/main`, NOT THE TAG** — corrections and the delivered-files manifest are post-tag surfaces that structurally cannot exist at the tag; an at-tag probe returns false-absent (corrections) or the previous release's manifest. Run verbatim:
+
+```bash
+git fetch origin
+git show origin/main:handoffs/CORRECTIONS_v3.27.0.md        # apply every row on top of the tag payload
+git show origin/main:handoffs/DELIVERED_FILES_v3.27.0.yaml  # copy-list source — never the tag's copy
+git show origin/main:DEPLOYMENT_SPEC_v3.27.0.yaml           # tag copy pre-dates corrections row 1
+```
+
+**Baseline capture (BEFORE Wave 0 touches anything)**: save `python3 -m pytest tests/ -q` output per seat pre-migration — smoke probe 5 compares against it and is unevaluable post-hoc.
 
 ## Behavioral Smoke (MANDATORY — rung 4, SOP_fleet_migration v1.7.0 Gate 4.0)
 
