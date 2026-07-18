@@ -12,6 +12,10 @@ This document provides a complete timeline of AGET Framework versions and their 
 
 ## Current Version
 
+**v3.26.0** (2026-07-11) - Signals & Contracts
+
+Core `aget/` at v3.26.0: ✅ (GitHub Release live; tag at 14/14 origins — canonical + 13/13 templates; SUP pilot confirmed same-day, fleet 31/31 within the week). Theme: the release hears its consumers (signals) and hardens what it promises them (contracts). First STANDING Phase 7.9 consumer-sweep week executed (6 source-verified dispositions). See `release-notes/v3.26.0.md`.
+
 **v3.25.0** (2026-07-04) - Grounded Entities & Trusted Releases
 
 Core `aget/` at v3.25.0: ✅ (GitHub Release live; 13/13 templates pushed + TAGGED v3.25.0, received-state verified — first tagged template release since v3.9). Capability: ENTITY_DIMENSION spec + validator, FRICTION_SPEC v1.0.0, aget-ask v1.0.0. Integrity: computed DoD close-guard, reliance self-attestation. Conformance model: reliance-only (D-1).
@@ -25,6 +29,14 @@ Core `aget/` at v3.24.0: ✅ (GitHub Release live). Reliance feature (schema + v
 ---
 
 ## Version Timeline
+
+### v3.26.0 (2026-07-11) ✅
+
+**Theme**: Signals & Contracts — consumer-signal intake (Phase 7.9 STANDING sweep-week, first execution) + contract hardening (computed DoD close recompute, tag-payload coherence gate, received-state V-tests). Shipped 7 days ahead of the calendar point under ship-when-ready.
+
+### v3.25.0 (2026-07-04) ✅
+
+**Theme**: Grounded Entities & Trusted Releases — ENTITY_DIMENSION spec + validator, FRICTION_SPEC v1.0.0, aget-ask v1.0.0, computed-DoD close guard, reliance self-attestation. First tagged template release since v3.9 (13/13).
 
 ### v3.24.0 (2026-06-27) ✅
 
