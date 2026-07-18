@@ -4,22 +4,14 @@ fleet_scope.py — resolve fleet scope from the authoritative registry, never fr
 
 Why this exists
 ---------------
-2026-07-16: four seats made fleet-scope claims about one artifact. All four globbed
-paths. All four were wrong, each in the shape of its own vantage point:
+2026-07-16: multiple seats made fleet-scope claims about one artifact by globbing
+directory paths — and every glob undercounted silently, each in the shape of its
+own vantage point. A glob keyed to a path convention returns a plausible number,
+not an error; agents living outside that convention are simply invisible to it.
 
-    professional-core   swept its own repo            -> "exists nowhere"  (n=1)
-    supervisor          swept ~/github/private-*       -> 16/1/2           (missed 15)
-    aget-framework      swept private-*-aget|AGET      -> 15/2/2           (missed 15)
-    truth (FLEET_STATE) 31 agents, 5 parent dirs       -> 31/2/3, 29 dangling
-
-15 of 31 agents live outside ~/github/private-*: GM-CCB (9), GM-RKB (3),
-aget-framework (2), GM-PREDICTIONWORKS (1). Any glob keyed to a path convention
-undercounts silently — it returns a plausible number, not an error.
-
-FLEET_STATE.yaml has been authoritative and cross-fleet-readable the whole time
-(L480 permits reads). Nothing routed anyone to it for *reading*: its only citation
-is SOP_aget_create G6.4/G8.1, a registration (write) step, whose path is itself
-wrong in 5 places. This script is that missing route.
+The authoritative registry (the supervising seat's FLEET_STATE.yaml) was readable
+the whole time. Nothing routed anyone to it for *reading*: its only citation was a
+registration (write) step. This script is that missing read-route.
 
 Usage
 -----
@@ -30,9 +22,7 @@ Usage
     python3 scripts/fleet_scope.py --diverge scripts/record_invocation.py
     python3 scripts/fleet_scope.py --has sops/SOP_permission_cleanup.md --json
 
-Refs: L1187 (promotion != shipping; §the instrument existed the whole time),
-      L480 (cross-fleet read permitted, write not), L794 (ID injectivity),
-      gh#1813 (meta-invariant family), supervisor FLEET_STATE_SPEC_v1.0.
+Refs: gh#1813 (meta-invariant family), FLEET_STATE_SPEC v1.0 (supervising seat).
 """
 
 import argparse
@@ -42,9 +32,22 @@ import os
 import pathlib
 import sys
 
-REGISTRY = pathlib.Path(
-    os.path.expanduser("~/github/private-supervisor-AGET/.aget/fleet/FLEET_STATE.yaml")
-)
+def _find_registry() -> pathlib.Path:
+    """Resolve FLEET_STATE.yaml: env override, else discover under ~/github.
+
+    (Globbing to LOCATE the one registry file is not the anti-pattern this
+    script exists to kill — globbing to ENUMERATE AGENTS is.)
+    """
+    env = os.environ.get("AGET_FLEET_STATE")
+    if env:
+        return pathlib.Path(os.path.expanduser(env))
+    hits = sorted(pathlib.Path(os.path.expanduser("~/github")).glob("*/.aget/fleet/FLEET_STATE.yaml"))
+    if hits:
+        return hits[0]
+    return pathlib.Path(os.path.expanduser("~/github/FLEET_STATE.yaml"))
+
+
+REGISTRY = _find_registry()
 
 
 def load_agents(registry: pathlib.Path):
