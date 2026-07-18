@@ -1,9 +1,9 @@
 # SOP: Scope-Lock Ceremony
 
-**Version**: 1.7.0
+**Version**: 1.7.1
 **Status**: LANDED
 **Created**: 2026-05-09
-**Updated**: 2026-07-11 (v1.6.0 → v1.7.0 — adds Gate 1 **G1.PORTFOLIO**: per-release initiative-portfolio grooming pass (agent-prepared close-candidate/re-authorize/suspend verdicts per ACTIVE, D-IG-3) + **prior-cycle VERSION_SCOPE §Deferred ingest** with PROCEED/RE-DEFER/DROP dispositions (gh#1536 deferral backpressure; L1002 cheapest non-recursive edge). Prior v1.5.0 → v1.6.0 — adds **G1.SELECT board design requirement 7**: predicted-value (V1) selection column, HYBRID threshold-gated per D-RP-13 / gmelli/aget-aget#1758 — value-contribution legible at the moment of selection, distinct-axis-never-summed; tooling column render OWED #1758/#1649. Prior v1.4.0 → v1.5.0 — adds Gate 1 **G1.VALUEGATE** blocking value-to-ship gate per POL-REL-001 v1.1.0 R-REL-CAD-008 / decision D-RP-4; the prework enforcement of substance-gated cadence — stops a v3.23.0-class dominated-thin lock at scope-lock, not post-ship). Prior: 2026-06-12 v1.3.0 → v1.4.0 — Gate 1 **G1.SELECT** principal scope-selection via cycle-current interactive control board; closes L824. v1.2.0 → v1.3.0 2026-05-23 — G1.AUDIT audit-after-synthesis pairing; L980 / gh#1476)
+**Updated**: 2026-07-17 (v1.7.0 → v1.7.1 — **anti-pattern cluster currency fix**: the SOP carried "11 L-docs" at three sites while its own §table listed 12, and the v3.26 additions (L1155/L1158/L1160, recorded only in VERSION_SCOPE_v3.26.0 prereq #4) never propagated back — an L1188 instance (stored registry not read) inside the SOP that defines the cluster. True count 15, all members re-verified on disk 2026-07-17. Fix: §Anti-Pattern Cluster table becomes the single membership source of truth; prereq #4 and Gate 0 reference it instead of restating counts; L1155/L1158/L1160 rows added; v3.27 addition candidates L1168/L1187/L1188/L1190 staged pending Gate-0 stamp. See `planning/MEMO_v3.27_freshness_audit_2026-07-17.md`. Prior 2026-07-11 v1.6.0 → v1.7.0 — adds Gate 1 **G1.PORTFOLIO**: per-release initiative-portfolio grooming pass (agent-prepared close-candidate/re-authorize/suspend verdicts per ACTIVE, D-IG-3) + **prior-cycle VERSION_SCOPE §Deferred ingest** with PROCEED/RE-DEFER/DROP dispositions (gh#1536 deferral backpressure; L1002 cheapest non-recursive edge). Prior v1.5.0 → v1.6.0 — adds **G1.SELECT board design requirement 7**: predicted-value (V1) selection column, HYBRID threshold-gated per D-RP-13 / gmelli/aget-aget#1758 — value-contribution legible at the moment of selection, distinct-axis-never-summed; tooling column render OWED #1758/#1649. Prior v1.4.0 → v1.5.0 — adds Gate 1 **G1.VALUEGATE** blocking value-to-ship gate per POL-REL-001 v1.1.0 R-REL-CAD-008 / decision D-RP-4; the prework enforcement of substance-gated cadence — stops a v3.23.0-class dominated-thin lock at scope-lock, not post-ship). Prior: 2026-06-12 v1.3.0 → v1.4.0 — Gate 1 **G1.SELECT** principal scope-selection via cycle-current interactive control board; closes L824. v1.2.0 → v1.3.0 2026-05-23 — G1.AUDIT audit-after-synthesis pairing; L980 / gh#1476)
 **Owner**: private-aget-framework-AGET (canonical-promoted to `aget-framework/aget/sops/SOP_scope_lock_ceremony.md` at v1.0.0; v1.1.0/v1.2.0/v1.3.0 canonical sync deferred to next public push window per L735 — `origin = aget-framework/*` applies)
 **Implements**: R-REL-022-01 (Lock-Event Status Transition), CAP-REL-029 (Lock-Event Protocol)
 **Governing**: PROJECT_PLAN scope-lock plans (v3.16, v3.17 cycles); VERSION_SCOPE_vX.Y.Z lifecycle state machine (L708)
@@ -40,7 +40,7 @@ Before invoking this SOP:
 1. **L656 Loading Dock cleared** — prior version deployed to ≥1 downstream agent confirmed via handoff pilot tracking table.
 2. **VERSION_SCOPE_vX.Y.Z.md exists** at PLANNING status with candidate inventory.
 3. **PROJECT_PLAN_vX.Y.Z_scope_lock_v1.0.md scaffolded** via `/aget-create-project` (STRUCTURAL — D71 Layer 1).
-4. **Anti-pattern cluster identified** — current cluster is 11 L-docs (L908+L909+L910+L912+L913+L916+L922+L935 original 8; L671+L869+L894 added v1.1.0 of v3.17 lock plan). Update if cycle has identified new members.
+4. **Anti-pattern cluster identified** — membership is enumerated ONLY in §Anti-Pattern Cluster Self-Application Audit (single source of truth; do not restate counts here — the inline "11" this line carried went stale twice, v1.7.1 audit 2026-07-17). Update the §table if the cycle has identified new members; the cycle's VERSION_SCOPE prereq row cites the additions.
 5. **Spec-fault dispositions** known — any OPEN spec faults (e.g., #1179, #1180) noted; same disposition strategy as prior cycle unless amended.
 6. **Tracking issue filed** in `gmelli/aget-aget` (per L638 private-first routing).
 
@@ -100,7 +100,7 @@ grep -cE "(CANONICAL|PRIVATE)" planning/PROJECT_PLAN_vX.Y.Z_scope_lock_v1.0.md  
 
 ### Gate 0: Lock-Prep Synthesis + Self-Application Audit + Freshness Pass
 
-**Objective**: Apply the anti-pattern cluster (currently 11 L-docs) to the lock-prep act itself (L908 self-application). Synthesize lock-prep inputs into a single readiness assessment. Produce VERSION_SCOPE annotation-only pass per L850.
+**Objective**: Apply the anti-pattern cluster (membership per §Anti-Pattern Cluster Self-Application Audit) to the lock-prep act itself (L908 self-application). Synthesize lock-prep inputs into a single readiness assessment. Produce VERSION_SCOPE annotation-only pass per L850.
 
 **Deliverables**:
 - [ ] G0.1: Push-window outcomes verified (no Mon-Fri pushes since prior release per L735)
@@ -522,7 +522,7 @@ grep -c "v1.0.0" planning/VERSION_SCOPE_vX.Y.Z.md  # expect ≥1
 
 ## Anti-Pattern Cluster Self-Application Audit
 
-The cluster is the set of L-docs whose anti-patterns the lock-prep ceremony itself MUST NOT recur. Current cluster (11 L-docs):
+The cluster is the set of L-docs whose anti-patterns the lock-prep ceremony itself MUST NOT recur. **This table is the single source of truth for membership** — prereq #4 and Gate 0 reference it; no other site restates a count. Current cluster (15 L-docs; count re-derived 2026-07-17, all members verified on disk):
 
 | L-doc | Anti-Pattern | Self-Application |
 |-------|--------------|------------------|
@@ -538,6 +538,11 @@ The cluster is the set of L-docs whose anti-patterns the lock-prep ceremony itse
 | L671 | Classification-Without-Consequence | All grace-extends have explicit V-tests verifying registry update |
 | L869 | (cycle-specific) | Per cycle disposition |
 | L894 | (cycle-specific) | Per cycle disposition |
+| L1155 | Access-Asymmetry | Added v3.26 cycle (VERSION_SCOPE_v3.26.0 prereq #4) — verify claims only on surfaces this seat can actually read |
+| L1158 | Co-Atomic Gate-Row Assertion | Added v3.26 cycle — gate rows asserted together must be verified together |
+| L1160 | Corrections Are Claims-Under-Test | Added v3.26 cycle — a correction pass is itself re-verified at source before it stamps anything |
+
+**v3.27-cycle addition candidates (pending Gate-0 confirmation stamp, per `planning/MEMO_v3.27_freshness_audit_2026-07-17.md`)**: L1168 (subagent-relay claims need primary-source re-verification), L1187 (promotion-to-canonical ≠ shipping), L1188 (stored registries don't get read — wrong denominators), L1190 (a named pointer is a claim, not a footnote). Noted-not-added: L1162, L1171. On confirmation, move into the table with a self-application line each.
 
 **Self-application discipline**: BEFORE Gate 2, verify NO cluster member's anti-pattern is recurring within the lock-prep plan or VERSION_SCOPE. If found, route to in-flight fix at amendment cap (L131: 2 passes max).
 
