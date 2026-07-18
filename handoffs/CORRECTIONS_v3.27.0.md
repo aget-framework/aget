@@ -8,7 +8,7 @@ Consumers pulling AT THE TAG: apply every row below on top of the tag payload.
 
 | # | SHA | Date | Artifact(s) | What | Why tag copy insufficient | Consumer action |
 |---|-----|------|-------------|------|---------------------------|-----------------|
-| 1 | (this commit) | 2026-07-18 | `DEPLOYMENT_SPEC_v3.27.0.yaml` + `handoffs/REMOTE_MIGRATION_MESSAGE_v3.27.0.md` | M-3.27-4 corrected to seat-conditional non-blocking (+ smoke probe 3 conditional) — check_config.py is a framework-seat tool, NOT template payload | tag copy's blocking detection FAILS at every template-derived seat | pull spec+message from `main`, or apply: treat M-3.27-4 as skip-if-absent |
+| 1 | `49516a7` | 2026-07-18 | `DEPLOYMENT_SPEC_v3.27.0.yaml` + `handoffs/REMOTE_MIGRATION_MESSAGE_v3.27.0.md` | M-3.27-4 corrected to seat-conditional non-blocking (+ smoke probe 3 conditional) — check_config.py is a framework-seat tool, NOT template payload | tag copy's blocking detection FAILS at every template-derived seat | pull spec+message from `main`, or apply: treat M-3.27-4 as skip-if-absent |
 | 2 | (per-repo) | 2026-07-18 | 12 template `README.md` | **Version** line corrected 3.24.0→3.27.0 (version_bump pattern missed this line shape) | cosmetic at tag; badge misreports version | none — informational (main carries fix) |
 
 ---
