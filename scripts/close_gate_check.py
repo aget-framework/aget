@@ -104,6 +104,26 @@ _ATTESTED_RE = re.compile(
     re.IGNORECASE)
 
 
+def scan_dual_status_mask(text: str):
+    """gh#1791 (v3.27 G3.5.2): a plan carrying BOTH legacy header **Status**: and
+    **Plan_Status**: can mask a non-terminal state — a scanner reading one field
+    sees terminal while the other says In Progress (the v3.24-close residual).
+    Violation when both exist and their terminal-ness disagrees."""
+    import re as _re
+    TERMINAL = ("COMPLETE", "CLOSED", "ABANDONED", "SUPERSEDED")
+    s = _re.search(r"^\*\*Status\*\*:\s*(.+)$", text, _re.M)
+    ps = _re.search(r"^\*\*Plan_Status\*\*:\s*(.+)$", text, _re.M)
+    if not (s and ps):
+        return []
+    s_term = any(k in s.group(1).upper()[:40] for k in TERMINAL)
+    ps_term = any(k in ps.group(1).upper()[:40] for k in TERMINAL)
+    if s_term != ps_term:
+        return [('dual_status_mask',
+                 f"Status={s.group(1)[:40]!r} vs Plan_Status={ps.group(1)[:40]!r} — "
+                 f"terminal-ness disagrees (gh#1791); reconcile to Plan_Status, delete legacy field")]
+    return []
+
+
 def scan_independence_warnings(text: str):
     """Return a list of (kind, detail) independence-WARNs (L1047, non-blocking).
 
@@ -144,6 +164,7 @@ def main(argv=None):
 
     content = fp.read_text(encoding='utf-8', errors='replace')
     violations = scan(content)
+    violations.extend(scan_dual_status_mask(content))
     warnings = scan_independence_warnings(content)
 
     def _print_independence_warn():

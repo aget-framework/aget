@@ -37,10 +37,12 @@ Requirements implemented (SKILL.md §Requirements):
           and reproduced 2026-06-12 by 4 stale headers; closed per E2)
   CIS-008 ACTIVE-ceiling check vs the machine-readable declaration in
           planning/initiatives/INDEX.md (L178 overrides are recorded there in prose)
-          + capability-ratio floor (>=1/3 of ACTIVE capability-class, v3.22 D-2 —
-          the governing control; integer total is secondary; gh#1655). Three-state
-          per CONVENTION_check_three_state_contract: PASS / FAIL / UNKNOWN
-          (UNKNOWN while any ACTIVE manifest lacks a Class tag — pre-backfill).
+          + capability-ratio floor (>=1/3 capability-class among **Achieve-typed
+          ACTIVE only** — D-27-A denominator re-spec, principal-ruled 2026-07-18
+          at v3.27 lock; Maintain stewards excluded, reported for visibility;
+          v3.22 D-2 floor retained; gh#1655 + C-27-12). Three-state per
+          CONVENTION_check_three_state_contract: PASS / FAIL / UNKNOWN
+          (UNKNOWN while any Achieve ACTIVE lacks Class OR any ACTIVE is untyped).
   CIS-009 typed-lifecycle block presence (D-IG-1/4 + gh#1884): ACTIVE untyped ->
           WARN; ACTIVE Achieve without '## Exit Conditions' -> WARN; ACTIVE
           Maintain without '## Health Contract' -> WARN. No silent defaults
@@ -226,6 +228,7 @@ def gather(now=None):
             "class": iclass,
             "intimacy": intimacy,
             "has_exit_conditions": bool(EXIT_BLOCK_RE.search(text)),
+            "ec_ticks": _ec_tick_counts(text),
             "has_health_contract": bool(HEALTH_BLOCK_RE.search(text)),
             "target": target,
             "target_str": ".".join(map(str, target)) if target else None,
@@ -295,6 +298,44 @@ def declared_ceiling():
     return int(m.group(1)) if m else None
 
 
+EC_SECTION_RE = re.compile(r"^##\s+Exit Conditions\b(.*?)(?=^## |\Z)", re.MULTILINE | re.DOTALL)
+EC_ITEM_RE = re.compile(r"^\s*-\s*\[( |x|X)\]", re.MULTILINE)
+
+
+def _ec_tick_counts(text):
+    """(ticked, total) checkbox counts inside the '## Exit Conditions' section, or None."""
+    m = EC_SECTION_RE.search(text)
+    if not m:
+        return None
+    boxes = EC_ITEM_RE.findall(m.group(1))
+    if not boxes:
+        return None
+    ticked = sum(1 for b in boxes if b in "xX")
+    return {"ticked": ticked, "total": len(boxes)}
+
+
+def detect_cis010(initiatives):
+    """CIS-010 (C-27-11, v3.27 G1.3): EC tick-state as a MAINTAINED signal.
+
+    F-2026-07-16-A: 0/38 exit conditions ticked across the Achieve portfolio while
+    >=4 verified MET at source — a decorative EC layer is the mechanism behind a
+    0-COMPLETE portfolio (L1189). This detector makes tick-state a maintained,
+    surfaced reading: per-ACTIVE-Achieve ticked/total + the portfolio aggregate.
+    Detector-before-backfill (L1167): it REPORTS; ticking remains an owner act
+    with verify-evidence (INIT-INITIATIVE-MATURATION S3/S4).
+    Aggregate WARN when ACTIVE Achieve ECs exist and ZERO are ticked portfolio-wide.
+    """
+    rows, total_t, total_n = [], 0, 0
+    for it in initiatives:
+        if it["status"] == "ACTIVE" and (it.get("type") or "").upper() == "ACHIEVE" \
+                and it.get("ec_ticks"):
+            ec = it["ec_ticks"]
+            rows.append({"id": it["id"], "ticked": ec["ticked"], "total": ec["total"]})
+            total_t += ec["ticked"]; total_n += ec["total"]
+    return {"rows": rows, "ticked": total_t, "total": total_n,
+            "state": ("WARN" if (total_n and total_t == 0) else ("PASS" if total_n else "N/A"))}
+
+
 def detect_cis009(initiatives):
     """CIS-009: typed-lifecycle block presence on ACTIVE manifests (gh#1884).
 
@@ -320,26 +361,44 @@ def detect_cis009(initiatives):
 
 
 def capability_ratio(initiatives):
-    """CIS-008 ratio half (gh#1655): capability share of ACTIVE vs the >=1/3 floor.
+    """CIS-008 ratio half (gh#1655), **Achieve-only denominator** (D-27-A, 2026-07-18).
+
+    Principal ruling D-27-A (v3.27 lock, VERSION_SCOPE_v3.27.0 §Rulings Record):
+    capability share is measured among Achieve-typed ACTIVE only — permanent
+    Maintain stewards are governance-by-nature and dilute the ratio in a way no
+    action can fix, and the all-ACTIVE form punished finishing capability work.
+    First computation under this form: 2/9 = 22.2% FAIL (2026-07-18, release plan
+    G(-1).2 — red accepted by principal, consumer = next grooming pass).
 
     Three-state (CONVENTION_check_three_state_contract): UNKNOWN while any
-    ACTIVE manifest lacks a Class tag — an unprobed portfolio must not report
-    PASS (the 'advertised-clean != verified-clean' lesson, #1553).
+    Achieve-typed ACTIVE manifest lacks a Class tag — an unprobed portfolio must
+    not report PASS (#1553). Maintain/untyped ACTIVE are reported for visibility
+    but excluded from the denominator; an untyped ACTIVE row also forces UNKNOWN
+    (it cannot be excluded-or-included honestly until typed — C-27-13 lane).
     """
     active = [it for it in initiatives if it["status"] == "ACTIVE"]
     if not active:
         return {"state": "PASS", "capability": 0, "governance": 0, "untagged": 0,
-                "ratio": None, "floor": round(CAPABILITY_FLOOR, 4)}
-    cap = sum(1 for it in active if it["class"] == "capability")
-    gov = sum(1 for it in active if it["class"] == "governance")
-    untagged = len(active) - cap - gov
-    ratio = cap / len(active)
-    if untagged:
+                "denominator": "achieve-only (D-27-A)", "achieve": 0, "maintain_excluded": 0,
+                "untyped": 0, "ratio": None, "floor": round(CAPABILITY_FLOOR, 4)}
+    achieve = [it for it in active if (it.get("type") or "").upper() == "ACHIEVE"]
+    maintain = [it for it in active if (it.get("type") or "").upper() == "MAINTAIN"]
+    untyped_rows = [it for it in active if (it.get("type") or "").upper() not in KNOWN_TYPES]
+    cap = sum(1 for it in achieve if it["class"] == "capability")
+    gov = sum(1 for it in achieve if it["class"] == "governance")
+    untagged = len(achieve) - cap - gov
+    ratio = (cap / len(achieve)) if achieve else None
+    if untagged or untyped_rows:
         state = "UNKNOWN"
+    elif ratio is None:
+        state = "PASS"
     else:
         state = "PASS" if ratio >= CAPABILITY_FLOOR else "FAIL"
     return {"state": state, "capability": cap, "governance": gov,
-            "untagged": untagged, "ratio": round(ratio, 4),
+            "untagged": untagged, "denominator": "achieve-only (D-27-A)",
+            "achieve": len(achieve), "maintain_excluded": len(maintain),
+            "untyped": len(untyped_rows),
+            "ratio": round(ratio, 4) if ratio is not None else None,
             "floor": round(CAPABILITY_FLOOR, 4)}
 
 
@@ -405,6 +464,7 @@ def build_report(now=None):
     anomalies["ceiling"] = ceiling
     anomalies["over_ceiling"] = (n_active - ceiling) if (ceiling is not None and n_active > ceiling) else 0
     anomalies["capability_ratio"] = capability_ratio(initiatives)
+    anomalies["ec_tick_state"] = detect_cis010(initiatives)
     # Report-only shape signals (grooming inputs, D-IG-1/3 — not strict-anomalies)
     spine_lo, spine_hi = MAINTAIN_SPINE_BAND
     shape = {
@@ -522,9 +582,18 @@ def render_human(report):
                       f"floor unverifiable until Class backfill")
     else:
         pct = f"{cr['ratio']:.0%}" if cr["ratio"] is not None else "n/a"
-        ratio_note = (f"{cr['state']} — {cr['capability']}/{report['wip']} capability ({pct}) "
-                      f"vs >=1/3 floor (v3.22 D-2, gh#1655)")
+        ratio_note = (f"{cr['state']} — {cr['capability']}/{cr.get('achieve', report['wip'])} capability ({pct}) "
+                      f"among Achieve-typed ACTIVE (D-27-A denominator; "
+                      f"{cr.get('maintain_excluded', 0)} Maintain stewards excluded) "
+                      f"vs >=1/3 floor (v3.22 D-2, gh#1655; re-spec 2026-07-18)")
     lines.append(f"  - Capability ratio (governing control): {ratio_note}")
+    ec = report["anomalies"].get("ec_tick_state") or {}
+    if ec.get("total"):
+        worst = " ".join(f"{r['id'].replace('INIT-','')}:{r['ticked']}/{r['total']}" for r in ec.get("rows", [])[:6])
+        lines.append(f"  - EC tick-state (CIS-010, maintained signal): {ec['state']} — "
+                     f"{ec['ticked']}/{ec['total']} ticked across {len(ec.get('rows', []))} ACTIVE Achieve "
+                     f"({worst}{' …' if len(ec.get('rows', []))>6 else ''})"
+                     + (" — decorative-EC-layer warning, L1189/C-27-11" if ec["state"]=="WARN" else ""))
     lines.append("")
     r = report["recursion"]
     lines.append(f"Recursion check:\n  - {OWN_INITIATIVE} own-status: {r['own_status']} [V-INIT-007 {r['v_init_007']}]")
