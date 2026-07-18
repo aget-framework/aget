@@ -9,17 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [3.27.0] - 2026-07-18 - "Finish & Verify"
-
-### Changed
-- Theme: the portfolio learns to FINISH (EC tick-state maintained signal CIS-010; CIS-008 Achieve-only re-spec; NASCENT typing backfill; L-doc ID injectivity remediation L1200-L1209 + tombstone registry) and the release learns to VERIFY what it shipped runs (migration Rung-4 behavioral verification + mandatory Behavioral Smoke; 3-axis tag-payload coherence [14 origins x tagged-tree paths x executed-surface]; single Corrections-since-tag surface; DoD ID-axis row-completeness ratchet; public-graph coherence joins computed DoD; verify-before-claim coverage matrix). Also: Transactional Execution doctrine + workspace convention in all template AGENTS.md; universal-skill conformance 14/14 (core + document-processor backfilled); single-slash permission-rule detector; dual-status mask scanner; wind-down double-fire guard; delegated-prompt date contract; Filing_Candidate L-doc marker standard.
-
 ## [Unreleased]
 
 Items confirmed in-flight for a future release (latest released: **3.26.0**). Per Keep a Changelog 1.1.0 forward-work convention.
 
 - Issue-governance spec delta for the `/aget-file-issue` pre-filing probes (skill layer shipped in 3.26.0; formal requirement rides the next spec pass).
 - Template `/aget-file-issue` structural refresh (routing + probe steps to all templates; fleet routing propagation staged per the 3.26.0 rollout decision).
+
+## [3.27.0] - 2026-07-18 - "Finish & Verify"
+
+### Changed
+- Theme: the portfolio learns to FINISH (EC tick-state maintained signal CIS-010; CIS-008 Achieve-only re-spec; NASCENT typing backfill; L-doc ID injectivity remediation L1200-L1209 + tombstone registry) and the release learns to VERIFY what it shipped runs (migration Rung-4 behavioral verification + mandatory Behavioral Smoke; 3-axis tag-payload coherence [14 origins x tagged-tree paths x executed-surface]; single Corrections-since-tag surface; DoD ID-axis row-completeness ratchet; public-graph coherence joins computed DoD; verify-before-claim coverage matrix). Also: Transactional Execution doctrine + workspace convention in all template AGENTS.md; universal-skill conformance 14/14 (core + document-processor backfilled); single-slash permission-rule detector; dual-status mask scanner; wind-down double-fire guard; delegated-prompt date contract; Filing_Candidate L-doc marker standard.
 
 ## [3.26.0] - 2026-07-11
 
