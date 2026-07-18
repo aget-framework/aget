@@ -31,4 +31,5 @@ Standard wave protocol per REMOTE_MIGRATION_MESSAGE (Migration Target block name
 | Agent (role) | Version | Date | Behavioral-probe evidence (Rung-4 bar — REQUIRED, disk receipt alone insufficient) | Source |
 |---|---|---|---|---|
 | framework seat (producer) | 3.27.0 | 2026-07-18 | self-migration pre-ship; CIS-010/CIS-008 live runs = the probes | this handoff |
-| supervisor seat (pilot) | — | PENDING | — | — |
+| supervisor seat (pilot) | 3.27.0 | 2026-07-18 | **Rung-4 CONFIRMED**: probes 1/2/4/5/6 PASS + probe 3 SKIP-recorded (seat-conditional, corrections row 1); 50/50 test suite vs pre-migration baseline; executed-surface parity verified (all invocations resolve to `scripts/`); 8/8 M-row detections at operative paths | pilot ACK artifact (supervisor `handoffs/ACK_framework_aget_v3.27.0_sup_pilot_evidence_2026-07-18.md`) + gmelli/aget-aget#1938 comment; stamped by framework 2026-07-18 after evidence verification |
+| *(post-pilot)* full local fleet | 3.27.0 | 2026-07-18 | 31/31 seats same-day at the Rung-4 bar, 0 refusals; population verify 29/29 + behavioral sample; supervisor migration plan closed at rubric 14/15 | gmelli/aget-aget#1950 (migration report) + #1951 (experience) |

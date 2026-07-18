@@ -30,7 +30,17 @@ optional_files:
   []
 
 additive_files:
-  []
+  # Principal-ruled cargo (2026-07-18 ruling: rides the v3.27 payload) — added 2026-07-18
+  # post-emit by hand (emitter derives from M-rows only; cargo was ruled but never
+  # M-row-encoded — the gh#1945-class rung-4 vehicle gap, found by the local supervisor's
+  # G2.0). Delivery-only per supervisor:L691 — invocation/adoption is per-seat governance.
+  # Pins verified at canonical origin/main 2026-07-18.
+  - path: "sops/SOP_permission_cleanup.md"
+    spec_rows: [cargo-ruling-2026-07-18]
+    sha256: "632816a9d230c958ad7d28db4bef48b9dce4d9365ddb6415f135f1cc3a44329a"
+  - path: "scripts/permission_cleanup.py"
+    spec_rows: [cargo-ruling-2026-07-18]
+    sha256: "18d15f72fbc921d343aafb3fffc49c58617ae5e412df6872f7621230a438624f"
 
 verify_rule: |
   Post-upgrade, every delivered_files/optional_files path present on the agent's disk
