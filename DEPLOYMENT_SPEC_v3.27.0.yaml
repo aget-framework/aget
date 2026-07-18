@@ -45,9 +45,9 @@ mandatory_changes:
     detection: "grep -q 'achieve-only (D-27-A)' scripts/check_initiatives.py && grep -q 'detect_cis010' scripts/check_initiatives.py"
     executed_surface: "scripts/check_initiatives.py"
   - id: "M-3.27-4"
-    description: "scripts/check_config.py refreshed — t3_single_slash_rules dead-permission-rule detector (gh#1772)"
-    blocking: true
-    detection: "grep -q 't3_single_slash_rules' scripts/check_config.py"
+    description: "IF the seat carries scripts/check_config.py (framework-seat tool, NOT template payload): refreshed with t3_single_slash_rules (gh#1772). Corrected post-tag: templates do not ship this script; original blocking detection would fail at every seat"
+    blocking: false
+    detection: "test ! -f scripts/check_config.py || grep -q 't3_single_slash_rules' scripts/check_config.py"
     executed_surface: "scripts/check_config.py"
   - id: "M-3.27-5"
     description: "scripts/close_gate_check.py refreshed — scan_dual_status_mask (gh#1791)"

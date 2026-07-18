@@ -8,7 +8,7 @@
 |---|---|---|---|
 | 1 | M-3.27-3 | `python3 scripts/check_initiatives.py \| grep "Capability ratio"` | line mentions "Achieve-typed ACTIVE (D-27-A denominator…)" |
 | 2 | M-3.27-3 | `python3 scripts/check_initiatives.py \| grep "EC tick-state"` | CIS-010 line renders (state PASS/WARN/N-A) |
-| 3 | M-3.27-4 | `python3 scripts/check_config.py \| grep single_slash` | t3_single_slash_rules row renders |
+| 3 | M-3.27-4 | ONLY if your seat carries `scripts/check_config.py` (framework-seat tool): `python3 scripts/check_config.py \| grep single_slash` — else SKIP (row corrected post-tag, see CORRECTIONS_v3.27.0.md #1) | conditional |
 | 4 | M-3.27-6 | `touch sessions/session_$(date +%F)_smoke.md && python3 scripts/wind_down.py; …cleanup` | guard line "recent session file … skipping stub" prints |
 | 5 | always | `python3 -m pytest tests/ -q` | no NEW failures vs your pre-migration baseline |
 | 6 | always | dual-basename check: for each M-row with `executed_surface`, confirm the config-invoked copy carries the payload | parity |
