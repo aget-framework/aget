@@ -1,6 +1,6 @@
 # AGET PROJECT_PLAN Specification
 
-**Version**: 1.2.3
+**Version**: 1.3.0
 **Status**: Active
 **Category**: Process (Planning)
 **Format Version**: 1.2
@@ -133,6 +133,7 @@ vocabulary:
 | CAP-PP-001-04 | PROJECT_PLAN SHALL have Success Criteria | Measurability |
 | CAP-PP-001-05 | PROJECT_PLAN SHALL have Gates section | Structure |
 | CAP-PP-001-06 | PROJECT_PLAN SHALL have References section | Traceability |
+| CAP-PP-001-07 *(v1.3.0)* | PROJECT_PLAN SHALL have a `Parent Goal` header field (committed Goal id, or `(none)` + rationale) and a **Benefit hypothesis** block (CAP-PP-020) | Value linkage (rulings 2/6, 2026-07-19) |
 
 **Required Sections:**
 
@@ -855,3 +856,20 @@ authority:
 
 *AGET_PROJECT_PLAN_SPEC.md — Planning standards for AGET framework*
 *"A checkbox is not a verification. A passing test is."* — L440
+
+---
+
+## Amendment v1.3.0 — Value Accounting (goal/value-canon arc G2.2; principal rulings 2/5/6, 2026-07-19)
+
+### CAP-PP-020: Benefit Hypothesis at Creation
+
+A PROJECT_PLAN SHALL carry, at creation, a **falsifiable benefit hypothesis**: an "if this lands, then ⟨measurable improvement⟩, falsified by ⟨observable⟩" statement naming the benefit (PRINCE2/ISO 21502 Output→Outcome→Benefit chain; SAFe benefit-hypothesis pattern) evaluated against the plan's `Parent Goal` frame. WHERE no Parent Goal exists, the hypothesis SHALL name its beneficiary directly and the coverage instrument reports the un-parented state (CAP-GOAL-013). First instance: `PROJECT_PLAN_goal_value_canon_arc_v1.0.md` header (2026-07-19).
+
+### CAP-PP-021: Close-Time Value Resolution (with Cost Side)
+
+WHEN a PROJECT_PLAN transitions to a terminal state via `/aget-close-project`, the closure SHALL record a **value-resolution verdict**: (a) the benefit hypothesis resolved (REALIZED / PARTIAL / NOT-REALIZED / UNMEASURABLE-YET, with the observable cited); (b) evaluated against the Parent Goal's frame (an Outcome is frame-evaluated — C1002); and (c) the **cost side stated** — actual effort (from Velocity Analysis) plus governance overhead honestly estimated — so net value is never asserted from the benefit numerator alone (RQ9 finding, 4-seat critique 2026-07-19: value accounting without the denominator overstates net value; a ceremonial version of this requirement is worse than its absence). A verdict of UNMEASURABLE-YET SHALL name what observable would resolve it and when.
+
+### V-PP-020 / V-PP-021
+
+- V-PP-020: `/aget-create-project` scaffolds refuse-or-warn on a missing benefit-hypothesis block (template ships the stub).
+- V-PP-021: `close_gate_check` flags a terminal close whose Retrospective lacks a value-resolution verdict; verdicts citing no observable are placeholder-substance (existing #1568 class).

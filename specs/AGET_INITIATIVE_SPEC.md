@@ -1,7 +1,8 @@
 # AGET INITIATIVE Specification
 
-**Version**: 1.1.1
+**Version**: 1.2.0
 **Status**: Active
+**v1.2.0 Amendment (2026-07-19 — bundle-scoped per goal/value-canon arc G2.1; principal rulings 1/9, gh#1960 Decision-0)**: adds the **`Serves-Goal` reverse field** (R-INIT-GOAL-001 / CAP-INIT-GOAL-001 / V-INIT-GOAL-001, §11) — initiatives declare the committed Goal(s) they serve, closing the "zero goal references" gap (fwk:L1218). Two-axis grounding: Initiative is a VEHICLE-axis artifact joined to intent-axis Goals only via the typed `serves` edge (AGET_GOAL_SPEC v0.3.0 CAP-GOAL-012); this amendment is the vehicle-side half of that edge. Full manifest-stage formalization remains the v2.0.0 long-tail.
 **Category**: Process (Planning / Governance)
 **Created**: 2026-05-14
 **Updated**: 2026-05-14
@@ -476,3 +477,21 @@ python3 -c "import sys; sys.exit(0 if tuple(map(int, '$START'.split('.'))) > tup
 *Authored under principle-triad: spec+verify-first, coherence-next, evidence-driven (2026-05-14)*
 *v1.1.0 SKOS uplift via PP-028 — first-instance dogfood of INIT-ONTOLOGY-SPEC-BINDING discipline (2026-05-14 PM)*
 *v1.1.1 V-003 split — creation-mode vs revalidation-mode per Gate 2 Auditor finding (2026-05-14 PM)*
+
+---
+
+## 11. Amendment v1.2.0 — Serves-Goal Reverse Linkage (goal/value-canon arc)
+
+### R-INIT-GOAL-001 (Human Level)
+
+An initiative names the committed Goal(s) its work serves — or states legibly that none exists yet. (Principal rulings 2026-07-19: full-ladder coverage + structural linkage; evidence PP-057/fwk:L1219 — the un-modeled reverse direction let four ladder readings diverge fleet-wide.)
+
+### CAP-INIT-GOAL-001: Serves-Goal Field
+
+An initiative manifest (INIT-*.md) SHALL carry a **`Serves-Goal`** header field naming ≥1 committed Goal id (from the owning instance's `governance/GOALS.md`), OR the explicit value `(none)` accompanied by a one-line rationale. WHEN `Serves-Goal` names a Goal id, that id SHALL resolve to an existing committed Goal (referential integrity; the coverage instrument `goal_link_check --coverage` reports dangling or `(none)` states — legible, not silent). The field expresses the typed cross-axis `serves` edge (CAP-GOAL-012); it SHALL NOT be modeled as a parent/child rung relation.
+
+**Archetype-fit boundary note (github:L319, 2026-07-19)**: this requirement binds INITIATIVE and PROJECT_PLAN artifacts (vehicle-axis, full-ladder ruling). It does NOT mandate that every seat operate a committed-Goal registry, nor that seat-level monitoring protocols be registered as Goals — rational non-adoption at seat level is an admissible archetype finding (pending principal ruling on the general boundary).
+
+### V-INIT-GOAL-001
+
+An ACTIVE INIT-*.md lacking a resolvable `Serves-Goal` value (or legible `(none)`+rationale) is reported by `goal_link_check --coverage`; a dangling Goal id FAILs.
