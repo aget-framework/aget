@@ -17,5 +17,7 @@ Consumers pulling AT THE TAG: apply every row below on top of the tag payload.
 
 | 7 | (this commit) | 2026-07-18 | `handoffs/REMOTE_MIGRATION_MESSAGE_v3.27.0.md` | **Hardening (not a defect fix)**: verbatim read-from-`origin/main` probe commands + pre-Wave-0 baseline-capture step prepended (template v1.7.0 mandatory blocks) | field-evidenced same-day: a remote supervisor's tag-pinned reads resolved this corrections surface to false-absent ("clean tag") and the manifest to v3.26.0's — the at-tag copy of the message cannot warn against at-tag reading | read the message from `origin/main`; if you already prepared from tag copies, re-run the three probe commands and discard tag-derived conclusions |
 
+| 8 | (this commit) | 2026-07-18 | `handoffs/RELEASE_HANDOFF_v3.27.0.md` | **Record (not a defect fix)**: pilot table gains the FIRST remote-fleet rows (supervisor Rung-4 + 6/6 full-fleet, stamped on gmelli/aget-aget#1957 tracker-filed behavioral evidence with cross-machine caveat) + honest Phase 7.6 delivery record (formal relay overtaken by events; corrective content delivered via `main` surfaces + principal-carried advice) | tag copy predates the remote confirmation; the handoff is the pilot-evidence surface of record | none — informational; consumers may cite the remote rows as deployment evidence |
+
 ---
 *First binding use of the corrections single-surface (built this release, gh#1882). The release body points here and is not edited further.*
