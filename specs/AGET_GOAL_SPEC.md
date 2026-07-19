@@ -1,7 +1,7 @@
 # AGET_GOAL_SPEC
 
-**Version**: 0.2.0
-**Status**: **CANONICAL** — promoted to `aget-framework/aget/specs/` in v3.23.1 (2026-06-20, L735 Saturday window). 27 Goal-Tier ontology concepts ratified (0 reciprocity defects); grounding gap closed; in-use Goal dogfooded. **storage BLOCKER RESOLVED 2026-06-20 via REQ-3** (principal two-tier Decide). The v0.1.0 review's 4 BLOCKERs shared one root (flat 5-column `governance/GOALS.md` under-dimensioned); REQ-3 replaces it with a **two-tier store**: committed Goals = a structured, principal-facing **section-per-goal** registry (carries provenance + status/lifecycle + the loop 5-tuple at ≥1 multiplicity + parent linkage — all 4 review blockers); aspirational Goals = an agent-internal lightweight store off the governance surface. **3-concept grounding gap CLOSED (2026-06-20)**: Goal Identifier (C1014) / Goal Value (C1015, minimal — full rubric next release per principal) / Commitment Tag (C1016) minted + reciprocity-validated (0 defects). **Promotion-ready**; canonical promotion via `/aget-enhance-spec` + public push gated to v3.23 weekend (L735, Saturday window open). Findings: `planning/triad_findings.jsonl` (gate GTA-G-1).
+**Version**: 0.3.0
+**Status**: **CANONICAL** — v0.3.0 (2026-07-19): **two-axis formalization + structural linkage** per principal rulings 1/9 of 2026-07-19 (gh#1960 Decision-0 = FULL structural relation; two-axis execution shape RATIFIED same day). Evidence: PP-057 fleet conceptual-alignment assessment (`docs/FINDINGS_pp057_conceptual_alignment.md`, L1219) — four ladder orderings operative fleet-wide, spec-induced (this spec's own v0.2.0 C929 row diverged from the live ontology's C929). Delta: CAP-GOAL-001 v2 (two-axis placement + typed `serves` edge + referential integrity), NEW CAP-GOAL-012 (axis integrity), NEW CAP-GOAL-013 (linkage cardinality + lifecycle cascade), Benefit vocabulary (Output→Outcome→Benefit triple, ruling 5), desiderative-tier slot reserved (REQ-PRIN-2026-003 / gh#1939, ccb-drafted), V-GOAL-009..011, footer version-drift fix. Public push: L735 Saturday 2026-07-25 window. v0.2.0 history: promoted to `aget-framework/aget/specs/` in v3.23.1 (2026-06-20, L735 Saturday window). 27 Goal-Tier ontology concepts ratified (0 reciprocity defects); grounding gap closed; in-use Goal dogfooded. **storage BLOCKER RESOLVED 2026-06-20 via REQ-3** (principal two-tier Decide). The v0.1.0 review's 4 BLOCKERs shared one root (flat 5-column `governance/GOALS.md` under-dimensioned); REQ-3 replaces it with a **two-tier store**: committed Goals = a structured, principal-facing **section-per-goal** registry (carries provenance + status/lifecycle + the loop 5-tuple at ≥1 multiplicity + parent linkage — all 4 review blockers); aspirational Goals = an agent-internal lightweight store off the governance surface. **3-concept grounding gap CLOSED (2026-06-20)**: Goal Identifier (C1014) / Goal Value (C1015, minimal — full rubric next release per principal) / Commitment Tag (C1016) minted + reciprocity-validated (0 defects). **Promotion-ready**; canonical promotion via `/aget-enhance-spec` + public push gated to v3.23 weekend (L735, Saturday window open). Findings: `planning/triad_findings.jsonl` (gate GTA-G-1).
 **Author**: private-aget-framework-AGET
 **Owning Initiative**: INIT-CORE-ARTIFACT-MATURATION Stream 9 (PP-051)
 **Governing Process**: `/aget-enhance-spec` (7-phase, L622)
@@ -38,7 +38,10 @@ The central failure mode this spec guards against (C930): a "Goal" defined by th
 | Goal | C926 | A durable, named, cross-session **outcome** between North Star (apex) and Initiative/Workflow. Plural. A BDI declarative-goal projection. |
 | Goal-Loop Ownership | C927 | Each Goal owns ≥1 loop ⟨owner, trigger, review-action, consequence, cadence⟩; operationalizes MP#12. |
 | Goal-Workflow Binding | C928 | A Goal binds the workflows (releases, migrations, fan-outs) executing toward it. |
-| Commitment Tier Hierarchy | C929 | North Star/Purpose → Theme → **Goal** → Objective/Action. |
+| Commitment Tier Hierarchy | C929 | **TWO-AXIS (v0.3.0, ruling 9)** — **Intent axis**: North Star/Purpose → [Theme] → **Goal** —realizes→ Outcome. **Vehicle axis**: Initiative → Project (PROJECT_PLAN) → Action. The axes are ORTHOGONAL; they join only via typed cross-axis edges (`serves`, CAP-GOAL-012). *(Supersedes both prior renderings — v0.2.0's linear "NS→Theme→Goal→Objective/Action" AND the live-ontology "NS→Goal→Initiative→Action": the two disagreed (same ID, two ladders — PP-057 F1); ontology C929 re-statement rides the FWRK merge gate.)* |
+| **Benefit** | (mint pending — FWRK-062 substrate) | **Measurable improvement resulting from an Outcome, tracked before/after** (PRINCE2/ISO 21502; ruling 5, 2026-07-19). Completes the value chain **Output → Outcome (C1002) → Benefit**: Output = artifact produced (V-tested), Outcome = frame-evaluated result of use, Benefit = quantified improvement. Concept mint rides the ontology gate (L1077). |
+| **Serves (cross-axis edge)** | C1222 (Satisfies family) / C1220 | The typed edge joining the axes: a vehicle-axis artifact (Initiative/Project) **serves** ≥0 committed Goals; a Goal is served-by ≥0 vehicles. Replaces rung-ordering between Goal and Initiative. |
+| **Realizes** | C1221 | Goal —realizes→ Outcome (ArchiMate; FWRK-048/genus arc). |
 | Goal-Initiative Conflation | C930 | (counter) The failure mode: a Goal defined by its workstreams rather than its outcome. |
 | Purpose / North Star | C1006 / C966 | The permanent "why"; the apex carrier (distinct from a product KPI). *(Purpose re-pointed C957→C1006: draft C957 collided with the already-merged Gold Standard Evaluation Set; ratified at fresh id C1006, 2026-06-20.)* |
 | Theme | C1007 | An organizing band over Goals — corresponds to an Initiative; not a Goal. *(re-pointed C958→C1007; draft C958 collided.)* |
@@ -62,6 +65,8 @@ The principal's intent, in natural language. The CAP-GOAL specifications below e
 | **REQ-GOAL-4** | Work can be **authorized by goal id**. | CAP-GOAL-009 |
 | **REQ-GOAL-5** | A goal's **value is scored separately** from its commitment/status. | CAP-GOAL-010 |
 | **REQ-GOAL-6** | A goal has a **lifecycle**; its terminal state is **type-differentiated** (Achieve terminates; Maintain persists). | CAP-GOAL-011 |
+| **REQ-GOAL-7** *(v0.3.0 — rulings 1/2/9, 2026-07-19)* | Goal↔vehicle linkage is **structural, not free text**: references resolve, coverage is full-ladder, axes never merge into one ladder. | CAP-GOAL-001 v2, **-012**, **-013** |
+| **REQ-GOAL-8** *(v0.3.0 — ruling 5)* | A goal's value chain is **Output → Outcome → Benefit**; realized value is evaluated against the Goal's frame at vehicle close. | Vocabulary (Benefit); CAP-PP-020/021 (PROJECT_PLAN_SPEC — cross-spec) |
 
 Every CAP-GOAL specification has a parent requirement; no orphan specs.
 
@@ -73,13 +78,25 @@ Every CAP-GOAL specification has a parent requirement; no orphan specs.
 
 *(Parent: REQ-GOAL-1)*
 
-The Goal artifact SHALL be placed in the commitment-tier ladder North Star/Purpose → Theme → **Goal** → Objective/Action (C929). A Goal SHALL declare the Theme (or Initiative) it sits under, where one exists.
+**(v2, two-axis — ruling 9, 2026-07-19.)** The Goal artifact SHALL be placed on the **intent axis** (North Star/Purpose → [Theme] → **Goal** —realizes→ Outcome; C929 v0.3.0). Initiative and Project are **vehicle-axis** artifacts and SHALL NOT be treated as rungs above or below Goal (CAP-GOAL-012). A Goal's `parent` field SHALL name its intent-axis parent (Theme, or North Star where no Theme exists); linkage to Initiatives/Projects SHALL be expressed as typed **`serves`/`served-by`** cross-axis edges, NOT via `parent`. WHEN a committed Goal's `parent` or `served-by` reference names an identifier, that identifier SHALL resolve to an existing artifact (referential integrity — Decision-0, gh#1960; V-GOAL-009). *(v1 history: "NS/Purpose→Theme→Goal→Objective/Action ladder + parent declares Theme-or-Initiative" — the parent-field dual reading was PP-057 F1's root; the v2 split removes Initiative from `parent` semantics.)* **Migration note**: existing `parent: INIT-*` entries are read as `served-by` edges until re-written; the coverage instrument (CAP-GOAL-013) reports them as legacy-form, not violations, for one minor version.
 
 ### CAP-GOAL-002: Outcome-Not-Workstream (Conflation Guard)
 
 *(Parent: REQ-GOAL-1)*
 
 A Goal SHALL be defined by a measurable end-state (an outcome), NOT by an enumeration of workstreams, tasks, or streams. WHEN a candidate Goal's definition enumerates workstreams rather than naming an outcome, `create-goal` SHALL reject it (C930). *(Resolves OQ-5: the conflation guard is a creation V-test, not a warning.)*
+
+### CAP-GOAL-012: Axis Integrity (NEW v0.3.0)
+
+*(Parent: REQ-GOAL-7)*
+
+Governed artifacts SHALL NOT order intent-axis artifacts (North Star, Theme, Goal, Outcome) against vehicle-axis artifacts (Initiative, Project, Action) as rungs of one ladder. Cross-axis reference SHALL use only the typed edges `serves` / `served-by` (vehicle↔Goal) and `realizes` (Goal→Outcome). WHEN a governed artifact renders the commitment-tier hierarchy, it SHALL render both axes or the intent axis alone — never a merged single ladder. *(Root fix for PP-057 F1: four merged-ladder orderings were operative fleet-wide because v0.2.0 canon itself merged the axes inconsistently.)*
+
+### CAP-GOAL-013: Linkage Cardinality & Lifecycle Cascade (NEW v0.3.0)
+
+*(Parent: REQ-GOAL-7)*
+
+Cardinality: a committed Goal MAY be served-by 0..N vehicles; an ACTIVE Initiative or ACTIVE PROJECT_PLAN SHALL be linked (`serves` or legacy `parent`) to ≥1 committed Goal (full-ladder coverage — ruling 2, 2026-07-19); `(none)` + rationale is a legible temporary state the coverage instrument reports. Lifecycle cascade: WHEN a committed Goal transitions to `abandoned`/`superseded`, every vehicle serving it SHALL be flagged for re-parenting review at its next gate boundary (no silent orphaning); WHEN an Achieve Goal transitions to `achieved`, its serving vehicles' close records SHALL cite the realized Outcome (value-resolution hook, CAP-PP-021 cross-ref). The reference instrument is `scripts/goal_link_check.py --coverage` (three-state: PASS/FAIL/UNREACHABLE).
 
 ### CAP-GOAL-003: Goal Typing
 
@@ -165,6 +182,9 @@ A Goal's *potential value* (scored by the paired `RUBRIC_goal_value`, the L851 q
 | V-GOAL-006 | CAP-GOAL-009 | `/aget-go --scope goal <id>` resolves a committed Goal id. |
 | V-GOAL-007 | CAP-GOAL-006b | An aspirational Goal is stored in `.aget/goals/aspirational.jsonl`, NOT on the `governance/GOALS.md` surface. |
 | V-GOAL-008 | CAP-GOAL-011 | A **Maintain** Goal cannot transition to `achieved` (type-differentiated terminal); an **Achieve** Goal can. |
+| V-GOAL-009 *(v0.3.0)* | CAP-GOAL-001 v2 | Every identifier named in a committed Goal's `parent`/`served-by` fields resolves to an existing artifact; a dangling reference FAILs `goal_link_check`. |
+| V-GOAL-010 *(v0.3.0)* | CAP-GOAL-012/-013 | `goal_link_check --coverage` reports every ACTIVE Initiative/PROJECT_PLAN lacking a resolvable committed-Goal link; 0 false positives on conformant artifacts. |
+| V-GOAL-011 *(v0.3.0)* | CAP-GOAL-013 | A Goal transitioned to `abandoned`/`superseded` with ≥1 serving vehicle produces a re-parenting flag (no silent orphaning). |
 
 ---
 
@@ -188,6 +208,10 @@ Acceptably informal at the Requirements level (L742, no grounding needed): "gove
 
 ---
 
+## Desiderative Tier (slot reserved — v0.3.0)
+
+*(REQ-PRIN-2026-003, gh#1939: a Desire/Dream primitive ABOVE the aspirational tier — pre-adoption wants, five-literature grounding per ccb:L110. The section is ccb-drafted and lands here at v3.28 grooming coordination; this slot reserves the position so v0.3.0 and the ccb draft do not collide.)*
+
 ## Open Items (carried)
 
 - **OQ-6 (cross-fleet half)**: reserve bare "Goal" = strategic-outcome here; the sibling `SOP_near_term_ambition_projection` near-term-sense rename is principal/sibling-routed (L480) — not resolved by this spec.
@@ -196,4 +220,4 @@ Acceptably informal at the Requirements level (L742, no grounding needed): "gove
 
 ---
 
-*AGET_GOAL_SPEC v0.1.0 DRAFT — Goal-Tier build, Gate 1. "A Goal is an outcome that owns a loop." Canonical promotion + public push gated to v3.23 weekend release.*
+*AGET_GOAL_SPEC v0.3.0 CANONICAL — two-axis + structural linkage (2026-07-19). "A Goal is an outcome that owns a loop — and the vehicles that serve it are on another axis." (v0.1.0/v0.2.0 footer version-drift fixed this rev.)*
