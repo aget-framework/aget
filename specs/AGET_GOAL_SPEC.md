@@ -1,7 +1,7 @@
 # AGET_GOAL_SPEC
 
-**Version**: 0.3.0
-**Status**: **CANONICAL** — v0.3.0 (2026-07-19): **two-axis formalization + structural linkage** per principal rulings 1/9 of 2026-07-19 (gh#1960 Decision-0 = FULL structural relation; two-axis execution shape RATIFIED same day). Evidence: PP-057 fleet conceptual-alignment assessment (`docs/FINDINGS_pp057_conceptual_alignment.md`, L1219) — four ladder orderings operative fleet-wide, spec-induced (this spec's own v0.2.0 C929 row diverged from the live ontology's C929). Delta: CAP-GOAL-001 v2 (two-axis placement + typed `serves` edge + referential integrity), NEW CAP-GOAL-012 (axis integrity), NEW CAP-GOAL-013 (linkage cardinality + lifecycle cascade), Benefit vocabulary (Output→Outcome→Benefit triple, ruling 5), desiderative-tier slot reserved (REQ-PRIN-2026-003 / gh#1939, ccb-drafted), V-GOAL-009..011, footer version-drift fix. Public push: L735 Saturday 2026-07-25 window. v0.2.0 history: promoted to `aget-framework/aget/specs/` in v3.23.1 (2026-06-20, L735 Saturday window). 27 Goal-Tier ontology concepts ratified (0 reciprocity defects); grounding gap closed; in-use Goal dogfooded. **storage BLOCKER RESOLVED 2026-06-20 via REQ-3** (principal two-tier Decide). The v0.1.0 review's 4 BLOCKERs shared one root (flat 5-column `governance/GOALS.md` under-dimensioned); REQ-3 replaces it with a **two-tier store**: committed Goals = a structured, principal-facing **section-per-goal** registry (carries provenance + status/lifecycle + the loop 5-tuple at ≥1 multiplicity + parent linkage — all 4 review blockers); aspirational Goals = an agent-internal lightweight store off the governance surface. **3-concept grounding gap CLOSED (2026-06-20)**: Goal Identifier (C1014) / Goal Value (C1015, minimal — full rubric next release per principal) / Commitment Tag (C1016) minted + reciprocity-validated (0 defects). **Promotion-ready**; canonical promotion via `/aget-enhance-spec` + public push gated to v3.23 weekend (L735, Saturday window open). Findings: `planning/triad_findings.jsonl` (gate GTA-G-1).
+**Version**: 0.4.0
+**Status**: **CANONICAL** — v0.4.0 (2026-07-22): **verb-family completion** — the Goal artifact class gains its governed mutators, closing the CAP-GOAL-011 "governed edits" naming hole (mutation was specified; no skill was named, so every post-creation edit bypassed provenance/D71). Delta: NEW **CAP-GOAL-014** (governed non-terminal mutation → `/aget-enhance-goal`, D71-Strict, provenance-preserving + mutation receipt), NEW **CAP-GOAL-015** (governed terminal closure → `/aget-close-goal`, D71-Strict, type-differentiated + CAP-GOAL-013 cascade + closure receipt), NEW **CAP-GOAL-016** (typed `served-by` edge field; engine emission), **V-GOAL-012/013/014**. Family reaches parity with project + initiative: propose → create → check → enhance → close. Basis: principal rulings R1–R8 (2026-07-22, `RULINGS_goal_verb_family_2026-07-22.md`); substrate `docs/FINDINGS_goal_verb_family_gap.md`; diagnostic half `/aget-check-goal` shipped + tested (12 falsifiers) and measured **14 of 17 committed Goals in legacy-form** — the registry-wide Tier-A migration CAP-GOAL-016 enables (R5 full fidelity: all vehicle refs preserved as `served-by`, ~10 minimal Themes minted). Grounding (L954): no new mint owed — `served-by` grounds to C1222 Serves-family. Ships **independently** of the v3.28 desiderative tier (R6). Public push: L735 Saturday 2026-07-25 window. — v0.3.0 (2026-07-19): **two-axis formalization + structural linkage** per principal rulings 1/9 of 2026-07-19 (gh#1960 Decision-0 = FULL structural relation; two-axis execution shape RATIFIED same day). Evidence: PP-057 fleet conceptual-alignment assessment (`docs/FINDINGS_pp057_conceptual_alignment.md`, L1219) — four ladder orderings operative fleet-wide, spec-induced (this spec's own v0.2.0 C929 row diverged from the live ontology's C929). Delta: CAP-GOAL-001 v2 (two-axis placement + typed `serves` edge + referential integrity), NEW CAP-GOAL-012 (axis integrity), NEW CAP-GOAL-013 (linkage cardinality + lifecycle cascade), Benefit vocabulary (Output→Outcome→Benefit triple, ruling 5), desiderative-tier slot reserved (REQ-PRIN-2026-003 / gh#1939, ccb-drafted), V-GOAL-009..011, footer version-drift fix. Public push: L735 Saturday 2026-07-25 window. v0.2.0 history: promoted to `aget-framework/aget/specs/` in v3.23.1 (2026-06-20, L735 Saturday window). 27 Goal-Tier ontology concepts ratified (0 reciprocity defects); grounding gap closed; in-use Goal dogfooded. **storage BLOCKER RESOLVED 2026-06-20 via REQ-3** (principal two-tier Decide). The v0.1.0 review's 4 BLOCKERs shared one root (flat 5-column `governance/GOALS.md` under-dimensioned); REQ-3 replaces it with a **two-tier store**: committed Goals = a structured, principal-facing **section-per-goal** registry (carries provenance + status/lifecycle + the loop 5-tuple at ≥1 multiplicity + parent linkage — all 4 review blockers); aspirational Goals = an agent-internal lightweight store off the governance surface. **3-concept grounding gap CLOSED (2026-06-20)**: Goal Identifier (C1014) / Goal Value (C1015, minimal — full rubric next release per principal) / Commitment Tag (C1016) minted + reciprocity-validated (0 defects). **Promotion-ready**; canonical promotion via `/aget-enhance-spec` + public push gated to v3.23 weekend (L735, Saturday window open). Findings: `planning/triad_findings.jsonl` (gate GTA-G-1).
 **Author**: private-aget-framework-AGET
 **Owning Initiative**: INIT-CORE-ARTIFACT-MATURATION Stream 9 (PP-051)
 **Governing Process**: `/aget-enhance-spec` (7-phase, L622)
@@ -64,8 +64,8 @@ The principal's intent, in natural language. The CAP-GOAL specifications below e
 | **REQ-GOAL-3** | A goal is committed through **one governed path**; **committed goals are a principal-facing surface, aspirational goals are agent-internal** (two-tier, REQ-3). | CAP-GOAL-006, -007, **-008** |
 | **REQ-GOAL-4** | Work can be **authorized by goal id**. | CAP-GOAL-009 |
 | **REQ-GOAL-5** | A goal's **value is scored separately** from its commitment/status. | CAP-GOAL-010 |
-| **REQ-GOAL-6** | A goal has a **lifecycle**; its terminal state is **type-differentiated** (Achieve terminates; Maintain persists). | CAP-GOAL-011 |
-| **REQ-GOAL-7** *(v0.3.0 — rulings 1/2/9, 2026-07-19)* | Goal↔vehicle linkage is **structural, not free text**: references resolve, coverage is full-ladder, axes never merge into one ladder. | CAP-GOAL-001 v2, **-012**, **-013** |
+| **REQ-GOAL-6** | A goal has a **lifecycle**; its terminal state is **type-differentiated** (Achieve terminates; Maintain persists); **every change to a committed goal is governed, never a silent direct edit** *(v0.4.0)*. | CAP-GOAL-011, **-014**, **-015** |
+| **REQ-GOAL-7** *(v0.3.0 — rulings 1/2/9, 2026-07-19)* | Goal↔vehicle linkage is **structural, not free text**: references resolve, coverage is full-ladder, axes never merge into one ladder. | CAP-GOAL-001 v2, **-012**, **-013**, **-016** |
 | **REQ-GOAL-8** *(v0.3.0 — ruling 5)* | A goal's value chain is **Output → Outcome → Benefit**; realized value is evaluated against the Goal's frame at vehicle close. | Vocabulary (Benefit); CAP-PP-020/021 (PROJECT_PLAN_SPEC — cross-spec) |
 
 Every CAP-GOAL specification has a parent requirement; no orphan specs.
@@ -168,6 +168,24 @@ A committed Goal SHALL carry a `status` ∈ {`active`, `achieved`, `abandoned`, 
 
 A Goal's *potential value* (scored by the paired `RUBRIC_goal_value`, the L851 quality-loop "Rubrics" arm) SHALL be orthogonal to its commitment tag (CAP-GOAL E7) and its well-formedness (CAP-GOAL-002). The spec SHALL NOT bundle value into the commitment or conflation checks.
 
+### CAP-GOAL-014: Governed Non-Terminal Mutation (NEW v0.4.0)
+
+*(Parent: REQ-GOAL-6)*
+
+WHEN a committed Goal undergoes a **non-terminal** change — loop amendment, `parent`→`served-by` migration (CAP-GOAL-001 v2 / CAP-GOAL-016), or active-state field edit (outcome refinement, non-terminal type correction) — the change SHALL route through `/aget-enhance-goal` and SHALL NOT be performed by direct Write/Edit of a committed-Goal section. `/aget-enhance-goal` SHALL be **D71-Strict** (parity with `create-goal`): it SHALL preserve the existing `provenance` and SHALL append a **mutation receipt** ⟨date, mutation-class, before→after summary⟩ so `V-GOAL-005` remains satisfied post-mutation. `/aget-enhance-goal` SHALL NOT perform a terminal transition (that is CAP-GOAL-015 / `/aget-close-goal`). *(Closes the CAP-GOAL-011 "status transitions are governed edits" naming hole: the mutation was specified but no skill was named, so every post-creation edit bypassed the provenance/D71 discipline.)*
+
+### CAP-GOAL-015: Governed Terminal Closure (NEW v0.4.0)
+
+*(Parent: REQ-GOAL-6)*
+
+WHEN a committed Goal transitions to a terminal state (`achieved` / `abandoned` / `superseded`), the transition SHALL route through `/aget-close-goal` and SHALL NOT be performed by direct status-field edit. `/aget-close-goal` SHALL be **D71-Strict** (parity with `close-project`/`close-initiative`) and SHALL: (a) enforce the type-differentiated terminal (V-GOAL-008 — an **Achieve** Goal reaches `achieved` citing its realized Outcome per CAP-PP-021; a **Maintain** Goal has no `achieved`, terminating only via `abandoned`/`superseded`); (b) execute the CAP-GOAL-013 lifecycle cascade (WHEN `abandoned`/`superseded`, flag every serving vehicle for re-parenting review at its next gate boundary — no silent orphaning); and (c) write a **closure receipt** (mirrors `create-goal` provenance).
+
+### CAP-GOAL-016: Typed `served-by` Edge Field (NEW v0.4.0)
+
+*(Parent: REQ-GOAL-7)*
+
+The committed-Goal storage form (CAP-GOAL-006a) SHALL support an optional `served-by` field listing the vehicle-axis artifacts (Initiative/Project) that serve the Goal, as the typed cross-axis edge (CAP-GOAL-012; `served-by` grounds to C1222 Serves-family). WHERE `/aget-enhance-goal` performs a Tier-A migration, it SHALL populate `served-by` from a legacy `parent: INIT-*`/`PROJECT_PLAN_*` value (preserving **all** vehicle references, R5) and SHALL rewrite `parent` to the Goal's intent-axis Theme or North Star. The `create_goal.py` engine's `build_committed_section()` SHALL emit the `served-by` field WHERE present (v0.3.0 wrote `parent`-only — the pending edge this CAP closes).
+
 ---
 
 ## Verification
@@ -185,6 +203,9 @@ A Goal's *potential value* (scored by the paired `RUBRIC_goal_value`, the L851 q
 | V-GOAL-009 *(v0.3.0)* | CAP-GOAL-001 v2 | Every identifier named in a committed Goal's `parent`/`served-by` fields resolves to an existing artifact; a dangling reference FAILs `goal_link_check`. |
 | V-GOAL-010 *(v0.3.0)* | CAP-GOAL-012/-013 | `goal_link_check --coverage` reports every ACTIVE Initiative/PROJECT_PLAN lacking a resolvable committed-Goal link; 0 false positives on conformant artifacts. |
 | V-GOAL-011 *(v0.3.0)* | CAP-GOAL-013 | A Goal transitioned to `abandoned`/`superseded` with ≥1 serving vehicle produces a re-parenting flag (no silent orphaning). |
+| V-GOAL-012 *(v0.4.0)* | CAP-GOAL-014 | A non-terminal mutation via `/aget-enhance-goal` preserves the original `provenance` AND appends a mutation receipt; a provenance-less direct edit is flagged as a D71 bypass (V-GOAL-005). |
+| V-GOAL-013 *(v0.4.0)* | CAP-GOAL-015 | `/aget-close-goal` refuses a **Maintain**→`achieved` transition; an **Achieve**→`achieved` cites a realized Outcome; an `abandoned` Goal with ≥1 serving vehicle emits a re-parenting flag. |
+| V-GOAL-014 *(v0.4.0)* | CAP-GOAL-016 | A Goal migrated by `/aget-enhance-goal` Tier-A carries `served-by: <vehicle>` (all vehicle refs preserved) AND an intent-axis `parent`; `goal_link_check`/`check-goal` report it on-axis, not legacy-form. |
 
 ---
 
@@ -220,4 +241,4 @@ Acceptably informal at the Requirements level (L742, no grounding needed): "gove
 
 ---
 
-*AGET_GOAL_SPEC v0.3.0 CANONICAL — two-axis + structural linkage (2026-07-19). "A Goal is an outcome that owns a loop — and the vehicles that serve it are on another axis." (v0.1.0/v0.2.0 footer version-drift fixed this rev.)*
+*AGET_GOAL_SPEC v0.4.0 CANONICAL — verb-family completion: governed mutation + closure (2026-07-22). "A Goal is an outcome that owns a loop — the vehicles that serve it are on another axis, and every change to it is governed." (v0.3.0: two-axis + structural linkage, 2026-07-19.)*
