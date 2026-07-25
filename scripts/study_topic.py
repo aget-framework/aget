@@ -142,9 +142,12 @@ FILENAME_BOOST = 3.0     # name/title match is the strongest feature (audit R2, 
 RELEVANCE_FLOOR_DEFAULT = 2.0  # composite-score floor (audit R3, #1560); --no-floor escapes
 
 SURFACES_SEARCHED = [
-    '.aget/evolution/L*.md', 'docs/patterns/PATTERN_*.md',
+    '.aget/evolution/**/L*.md (RECURSIVE — includes discoveries/; 2026-07-25 fix)',
+    'docs/patterns/**/*.md AND patterns/**/*.md (both roots, any filename — 2026-07-25 fix)',
     'planning/PROJECT_PLAN*.md', 'sops/SOP_*.md', 'governance/*.md',
     'knowledge/** + ontology/** (v3.25 C-25-14)',
+    'specs/** + .aget/specs/** (gh#1580 — instance-local spec tier)',
+    '../aget/specs/** + ../aget/sops/** (canonical contract-tier authority, read-only cross-repo)',
     'inbox/ ≤14d (v3.26 C-26-11 — S2 revisit ruling: NOTIFYs are study-relevant, gh#1850)',
 ]
 SURFACES_EXCLUDED = [
@@ -351,7 +354,23 @@ def find_ldocs(topic: str, domain_keywords: list = None) -> list:
     if not evolution_path.exists():
         return results
 
-    for file in evolution_path.glob('L*.md'):
+    # rglob, not glob: `.aget/evolution/discoveries/` (and any other
+    # sub-directory a seat uses) held real, citable KB and was invisible to a
+    # non-recursive glob. Field evidence 2026-07-25: a study-topic run reported
+    # "no direct pattern/governance hits" for a north-star query while
+    # `.aget/evolution/discoveries/north_star_revelation.md` — the origin-story
+    # artifact for that exact concept — sat unsearched. The caller then cited it
+    # anyway, from a manual read, without noticing the instrument had implicitly
+    # denied it existed. A clean zero from a scoped search is not absence.
+    # Prefix rule differs by depth, and conflating the two is what caused the
+    # original miss AND its first attempted fix. Top level: keep the `L*` filter
+    # (that IS the L-doc naming convention). Sub-directories: curated KB with
+    # their own conventions — `discoveries/north_star_revelation.md` carries no
+    # `L` prefix, so a recursive walk that still demanded one re-excluded the
+    # exact artifact the recursion was added to reach.
+    for file in sorted(evolution_path.rglob('*.md')):
+        if file.parent == evolution_path and not file.name.startswith('L'):
+            continue
         match = search_file_for_topic(file, topic, domain_keywords=domain_keywords)
         if match:
             # Extract L-doc title from first heading
@@ -387,21 +406,34 @@ def find_patterns(topic: str, domain_keywords: list = None) -> list:
         List of matching pattern info
     """
     agent_root = get_agent_root()
-    patterns_path = agent_root / 'docs' / 'patterns'
+
+    # TWO pattern roots, and neither filename convention is universal.
+    # `docs/patterns/PATTERN_*.md` was the only surface searched until
+    # 2026-07-25; seats also keep patterns at a top-level `patterns/` tree with
+    # descriptive names (e.g. `patterns/identity/north_star_pattern.md`), which
+    # matches neither the directory nor the `PATTERN_*` prefix. Both were
+    # therefore reported as "no pattern hits" while the governing pattern
+    # document existed. Recurse both roots and drop the prefix requirement.
+    pattern_roots = [agent_root / 'docs' / 'patterns', agent_root / 'patterns']
 
     results = []
-    if not patterns_path.exists():
-        return results
-
-    for file in patterns_path.glob('PATTERN_*.md'):
-        match = search_file_for_topic(file, topic, domain_keywords=domain_keywords)
-        if match:
-            results.append({
-                'pattern': file.stem,
-                'file': match['file'],
-                'match_count': match['match_count'],
-                'score': match.get('score', 0.0)
-            })
+    seen = set()
+    for patterns_path in pattern_roots:
+        if not patterns_path.exists():
+            continue
+        for file in sorted(patterns_path.rglob('*.md')):
+            resolved = file.resolve()
+            if resolved in seen:
+                continue
+            seen.add(resolved)
+            match = search_file_for_topic(file, topic, domain_keywords=domain_keywords)
+            if match:
+                results.append({
+                    'pattern': file.stem,
+                    'file': match['file'],
+                    'match_count': match['match_count'],
+                    'score': match.get('score', 0.0)
+                })
 
     results.sort(key=lambda x: x['score'], reverse=True)
     return results
