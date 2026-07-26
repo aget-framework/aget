@@ -11,10 +11,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Items confirmed in-flight for a future release (latest released: **3.27.0**). Per Keep a Changelog 1.1.0 forward-work convention.
+Items confirmed in-flight for a future release (latest released: **3.28.0**). Per Keep a Changelog 1.1.0 forward-work convention.
 
 - Issue-governance spec delta for the `/aget-file-issue` pre-filing probes (skill layer shipped in 3.26.0; formal requirement rides the next spec pass).
 - Template `/aget-file-issue` structural refresh (routing + probe steps to all templates; fleet routing propagation staged per the 3.26.0 rollout decision).
+- **Traceability ratchet**: the test-requirement floor rises +5pp per minor release from the 3.28.0 baseline of 39%.
+- **AGENTS.md size remediation** — the 40k limit is exceeded and tracked, not silenced.
+
+## [3.28.0] - 2026-07-26 - "Make the gates fire"
+
+**Release class**: governance-hardening. This cycle is **inward-facing** — it adds enforcement that does
+not depend on an agent choosing to run it. Consumers should expect changed *gate behaviour*, not new
+user-facing features.
+
+### Changed
+
+- **Theme: enforcement that fires without being invoked.** Controls that existed and worked before 3.28
+  ran only when an agent chose to run them. The release-gate battery now has a forced firing point at the
+  irreversible act (tag / `push --tags` / `push --follow-tags`), and the Phase 7.1.5 release-quality score
+  must carry a resolvable **independent** verification leg before a tag is permitted — a producer-run score
+  no longer settles its own gate.
+- **Triage freshness** becomes a measured SLO with a rollup that detects *rollup-without-triage*, so
+  measuring the queue can no longer substitute for working it.
+- **Requirements-ledger reach** is reported rather than assumed: principal rulings are counted against
+  ledger entries so un-triaged governance material is visible.
+
+### Fixed
+
+Defects found by *executing* the gates rather than reading them — each had shipped undetected:
+
+- **Release metadata dates were never bumped.** `version_bump.py` moved version strings but not
+  `codemeta.json:dateModified` or `CITATION.cff:date-released`. **3.27.0 shipped on 2026-07-18 carrying
+  dates of 2026-07-11.** A citable artifact was asserting a modification date before its own release.
+- **The KB research tool advertised a surface it never searched.** `study_topic.py` listed the
+  specification tier in its printed search contract while no finder populated it, so every study reported
+  zero specs — *manufactured absence*, not omission. Root cause: the file-search helper raised on any path
+  outside the repository, and the canonical spec tier lives one level above it.
+- **Release-metric counts saturated silently.** Issue counts were taken from page-capped list calls and
+  recorded `0` on API failure, so a failed count was indistinguishable from a count of zero.
+- **The contract suite could not pass.** Pre-release validation runs the suite under a 60-second timeout
+  against a suite that took 528s — 81% of it in three tests that re-ran the entire release battery. A
+  BLOCKING check was structurally unpassable, which is how a prior release shipped with its battery, in its
+  own record, "never run this cycle."
+
+### Governance
+
+- Test-requirement traceability: the long-standing **80%** figure is recorded in its own source as a pilot
+  aspiration, was never met, and became a permanent tag-blocker the moment the suite was enforced. It is
+  replaced by a **ratified floor at the measured 39%, rising +5pp per minor release** — a bar that blocks
+  regression, in place of one that blocked everything.
+- Release-gate scope is now explicit: **release-integrity** failures block a tag absolutely;
+  **codebase-quality** debt is reported at the gate with a named owner and does not block.
 
 ## [3.27.0] - 2026-07-18 - "Finish & Verify"
 
