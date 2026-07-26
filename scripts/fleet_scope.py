@@ -35,16 +35,70 @@ import sys
 def _find_registry() -> pathlib.Path:
     """Resolve FLEET_STATE.yaml: env override, else discover under ~/github.
 
-    (Globbing to LOCATE the one registry file is not the anti-pattern this
-    script exists to kill — globbing to ENUMERATE AGENTS is.)
+    HISTORY — this docstring used to read:
+
+        "(Globbing to LOCATE the one registry file is not the anti-pattern this
+         script exists to kill — globbing to ENUMERATE AGENTS is.)"
+
+    That defence rested on the words "the ONE registry file", and it is now
+    FALSE. A 2026-07-25 principal ruling established two fleet types, each with
+    its own supervising seat and its own registry, so >1 FLEET_STATE.yaml is a
+    supported topology. The old code did `sorted(hits)[0]` -- i.e. it picked a
+    fleet by ALPHABETICAL PATH ORDER, silently.
+
+    Field evidence, same day: a seat with no registry of its own ran
+    `fleet_scope.py --list`, received another fleet's 31-agent roster, printed
+    "FLEET_STATE: 31 agents", and nearly reported it as its own fleet -- while
+    not itself appearing anywhere in that roster. The instrument reported
+    success while answering for the wrong fleet. That is precisely the
+    denominator failure this script exists to prevent, committed by this script.
+
+    Ambiguity is now an ERROR, not a coin-flip. Zero hits is an error too:
+    returning a non-existent fallback path only moved the failure downstream.
     """
     env = os.environ.get("AGET_FLEET_STATE")
     if env:
         return pathlib.Path(os.path.expanduser(env))
+
     hits = sorted(pathlib.Path(os.path.expanduser("~/github")).glob("*/.aget/fleet/FLEET_STATE.yaml"))
-    if hits:
+
+    if len(hits) == 1:
         return hits[0]
-    return pathlib.Path(os.path.expanduser("~/github/FLEET_STATE.yaml"))
+
+    if not hits:
+        raise SystemExit(
+            "fleet_scope: no FLEET_STATE.yaml found under ~/github.\n"
+            "  A fleet registry is required -- this script will NOT fall back to a\n"
+            "  path glob over agent directories (that is the defect it exists to kill).\n"
+            "  Set AGET_FLEET_STATE=<path> or pass --registry <path>."
+        )
+
+    listing = "\n".join(f"    {h}" for h in hits)
+    raise SystemExit(
+        f"fleet_scope: {len(hits)} fleet registries found; refusing to guess.\n"
+        f"{listing}\n"
+        "  Multiple registries is a SUPPORTED topology (two fleet types, one\n"
+        "  supervisor each), so there is no 'the' registry to pick. Picking the\n"
+        "  alphabetically-first one silently answered for the wrong fleet on\n"
+        "  2026-07-25.\n"
+        "  Set AGET_FLEET_STATE=<path> or pass --registry <path>."
+    )
+
+
+def _self_name() -> str:
+    """This seat's own repo-directory name (the seat running the script)."""
+    return pathlib.Path(__file__).resolve().parent.parent.name
+
+
+def registry_is_borrowed(agents, self_name=None) -> bool:
+    """True if the calling seat does NOT appear in the registry it just resolved.
+
+    A seat reading a roster it is not in is reading ANOTHER fleet's registry.
+    That is legitimate (cross-fleet read, L480) but it must never be silently
+    reported as "my fleet" -- which is exactly what happened on 2026-07-25.
+    """
+    self_name = self_name or _self_name()
+    return not any(name == self_name for name, _ in agents)
 
 
 REGISTRY = _find_registry()
@@ -111,7 +165,19 @@ def main():
     agents = load_agents(a.registry)
     absent = [(n, p) for n, p in agents if not p.exists()]
     live = [(n, p) for n, p in agents if p.exists()]
-    out = {"registry": str(a.registry), "agents": len(agents), "resolvable": len(live), "unresolvable": len(absent)}
+    borrowed = registry_is_borrowed(agents)
+    out = {"registry": str(a.registry), "agents": len(agents), "resolvable": len(live),
+           "unresolvable": len(absent), "borrowed_registry": borrowed, "self": _self_name()}
+
+    # A seat reading a roster it is not in must be TOLD so, every time, before
+    # any count. Silence here is what let a seat mistake another fleet's 31
+    # agents for its own on 2026-07-25.
+    if borrowed and not a.json:
+        print(f"⚠ BORROWED REGISTRY: this seat ({_self_name()}) does NOT appear in "
+              f"{a.registry}.\n"
+              f"  These counts describe ANOTHER fleet. Reading it is legitimate "
+              f"(cross-fleet read); reporting it as 'my fleet' is not.\n"
+              f"  If this seat should have its own registry, it does not yet.\n")
 
     if a.list:
         rows = [{"name": n, "path": str(p), "exists": p.exists()} for n, p in agents]
