@@ -77,6 +77,16 @@ to claim leg 3 twice on exactly that basis. A slow honest leg 3 beats a fast fal
 
 ---
 
+## Context for External Fleets
+
+- Pin template-derived agents to the template tag (`v3.28.0`); post-tag fixes live in `handoffs/CORRECTIONS_v3.28.0.md`, created at first fix.
+- **This release can refuse your acts.** A `PreToolUse` hook gates `git tag` / `push --tags` on the release battery and the release-quality gate. A refusal is the payload working. Read the message; it names each failing condition.
+- **Two probes must BOTH pass**, not just the blocking one: the guard must refuse a release act *and* pass ordinary work. A guard that fires on everything gets disabled, and a disabled guard protects nothing.
+- **M-3.28-2/-3/-4 are seat-conditional** — they bind only if your seat carries the release tooling. A worker seat that never tags a framework release skips them legitimately.
+- **Do not delete `.aget/logs/control_firings.jsonl`.** Gate refusals record there, marking whether a control fired unbidden or was run by hand. It is the only evidence path for this cycle's delivery-Goal leg 3.
+- **Please do not manufacture a refusal** to help close that leg. A deliberately triggered gate is *invoked*, which the governing ruling excludes. The producing seat declined to claim it twice on that basis.
+- Verify features at the OPERATIVE path your agent config invokes (dual-basename caution, carried from v3.25/v3.27).
+
 ## Known limitations — stated, not discovered
 
 ### ⚠ This release's own quality score was OVERRIDDEN — disclosed here deliberately
