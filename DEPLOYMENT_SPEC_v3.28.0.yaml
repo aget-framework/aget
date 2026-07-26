@@ -1,0 +1,129 @@
+# DEPLOYMENT_SPEC_v3.28.0.yaml
+# Complete target state specification for v3.28.0 deployment
+#
+# Purpose: Define what a correctly-deployed v3.28.0 agent looks like.
+# Governance: R-DEP-002, R-REL-038
+#
+# Created: 2026-07-26 (PRE-TAG)
+# Origin: DEPLOYMENT_SPEC_v3.27.0.yaml
+# Release: Make the gates fire
+#
+# ⛔ PREPARED, NOT YET PUBLIC. v3.28.0 is committed and unpushed; no tag exists.
+# Every detection below is runnable at a migrated seat, but nothing is migrated yet.
+#
+# WHAT IS DIFFERENT ABOUT THIS RELEASE'S DEPLOYMENT:
+# This is the first payload that can BLOCK the receiving seat. M-3.28-2 installs a
+# PreToolUse hook that refuses release acts when the battery or the release-quality
+# gate fails. A seat that installs the file but does not REGISTER it has taken the
+# node and not the edge — which is this cycle's own root-cause finding, so the
+# detection for M-3.28-2 checks REGISTRATION, not file presence.
+
+version: "3.28.0"
+spec_version: "2.1.0"
+created: "2026-07-26"
+status: active
+supersedes: "DEPLOYMENT_SPEC_v3.27.0.yaml"
+breaking_release: false
+backfill: false
+
+verification_script:
+  file: "scripts/verify_deployment.py"
+  usage: "python3 scripts/verify_deployment.py --version 3.28.0 --path /path/to/agent"
+  known_defects: "Treat tooling output as claim-under-test, not premise. A detection that
+    passes is evidence the STATE is right, never that the BEHAVIOUR is right — run the
+    Behavioral Smoke probes in REMOTE_MIGRATION_MESSAGE_v3.28.0.md."
+
+# Rung-4 note (SOP_fleet_migration v1.7.0 Gate 4.0): receipt+state verification is NOT
+# completion. Run the Behavioral Smoke probes, run the seat's own test suite, and verify
+# executed-surface parity for dual-basename targets.
+#
+# ⚠ M-3.28-2/-3/-4 ARE CONDITIONAL ("test ! -f X || <check X>"), and that form is
+# deliberate. Their first draft used "test -f X && <check>", which PASSED at the
+# producing seat and FAILED at all 13 templates — the exact defect v3.27 shipped
+# (M-3.27-3/-5 had substance only on the producer, caught by a supervisor NOGO and
+# fixed post-tag). Verified 2026-07-26 against template-worker-aget BEFORE tagging,
+# per SOP_release_process v1.60 step 2.5: an M-row's detection SHALL pass at the
+# PAYLOAD surfaces, not the framework seat's instance.
+#
+# The conditional form says what is actually meant: IF a seat carries the release
+# tooling, it SHALL be correctly wired. A worker template that never tags a framework
+# release has no use for a release-gate hook, and shipping it there is cargo.
+#
+# ⚠ CONSEQUENCE FOR DELIVERY-GOAL LEG 3, stated because it is easy to miss:
+# leg 3 needs a control firing UNBIDDEN at a DOWNSTREAM seat. If no downstream seat
+# carries the guard, leg 3 is unreachable and R-REL-CAD-012 blocks the next cycle's
+# scope-lock indefinitely. Leg 3 therefore rests on the SUPERVISOR seat — which does
+# perform release-adjacent acts and is instructed to install the hook — and NOT on
+# template propagation. If the supervisor skips step 2 of the upgrade guide, leg 3
+# has no path.
+#
+# Rung-4 ADDITION for v3.28: probes 3 and 4 of the smoke set must BOTH pass — the guard
+# must refuse a release act AND pass ordinary work. A guard that fires on everything gets
+# disabled, and a disabled guard protects nothing.
+
+mandatory_changes:
+  - id: "M-3.28-1"
+    description: "version.json aget_version '3.28.0' (+ migration_history entry)"
+    blocking: true
+    detection: "test $(jq -r .aget_version .aget/version.json) = '3.28.0'"
+
+  - id: "M-3.28-2"
+    description: "release_gate_firing_guard.sh present AND REGISTERED as a PreToolUse hook.
+      Registration is the deliverable; the file alone does nothing. Seats that never tag a
+      release may skip this row (non-blocking for them), but there is no reason to."
+    blocking: true
+    detection: "test ! -f .claude/hooks/release_gate_firing_guard.sh || jq -e '[.hooks.PreToolUse[].hooks[].command] | map(select(test(\"release_gate_firing_guard\"))) | length > 0' .claude/settings.json >/dev/null"
+    executed_surface: ".claude/hooks/release_gate_firing_guard.sh"
+
+  - id: "M-3.28-3"
+    description: "check_score_independence.py present — a release-quality score must declare a
+      resolvable independent verification leg. The guard delegates to this script."
+    blocking: true
+    detection: "test ! -f scripts/check_score_independence.py || grep -q 'claims\\?[- ]under[- ]test' scripts/check_score_independence.py"
+    executed_surface: "scripts/check_score_independence.py"
+
+  - id: "M-3.28-4"
+    description: "Firing ledger reachable — the guard appends gate refusals to
+      .aget/logs/control_firings.jsonl with hook_event recorded (PreToolUse = unbidden).
+      Detection checks the guard CAN write it, not that a firing has occurred."
+    blocking: true
+    detection: "test ! -f .claude/hooks/release_gate_firing_guard.sh || grep -q 'control_firings.jsonl' .claude/hooks/release_gate_firing_guard.sh"
+
+  - id: "M-3.28-5"
+    description: "Triage-freshness rollup with its second verb (rollup-without-triage detection)"
+    blocking: false
+    detection: "test ! -f scripts/triage_freshness_tick.py || grep -q 'ROLLUP' scripts/triage_freshness_tick.py"
+    executed_surface: "scripts/triage_freshness_tick.py"
+
+  - id: "M-3.28-6"
+    description: "Test-traceability floor DERIVED from version, not hardcoded — the ratchet rises
+      +5pp per minor release. IF the seat carries the contract-test compliance suite."
+    blocking: false
+    detection: "test ! -f tests/test_test_requirements.py || grep -q 'TRACEABILITY_FLOOR' tests/test_test_requirements.py"
+
+# ---------------------------------------------------------------------------
+# NON-mandatory but strongly recommended — the two edge checks this cycle produced.
+# Advisory because their standing debt predates this release at every seat.
+# ---------------------------------------------------------------------------
+recommended_changes:
+  - id: "R-3.28-1"
+    description: "check_actuator_census.py — the `invoked-by` edge: does every control have
+      something that RUNS it? Producing seat found 15 of 44 orphaned."
+    detection: "test -f scripts/check_actuator_census.py"
+
+  - id: "R-3.28-2"
+    description: "check_reference_resolution.py — the `resolves-to` edge: does every path a
+      governed artifact NAMES actually exist? Producing seat found 30 unresolved."
+    detection: "test -f scripts/check_reference_resolution.py"
+
+# ---------------------------------------------------------------------------
+# Known limitations shipped WITH this release, stated so no seat discovers them.
+# ---------------------------------------------------------------------------
+known_limitations:
+  - "The independence check tests non-identity with the PRODUCER and nothing about the
+     verifier's STAKE. A seat with an interest in the outcome passes it. Choose a
+     disinterested verifier; the check cannot do it for you."
+  - "The actuator census and reference-resolution checks are ADVISORY. They will report
+     debt at your seat. That is expected, not a failed migration."
+  - "Three phase-ordering faults in the release process were resolved by ruling rather than
+     structure. A dependency model is owed to the next cycle."
