@@ -79,6 +79,28 @@ to claim leg 3 twice on exactly that basis. A slow honest leg 3 beats a fast fal
 
 ## Known limitations — stated, not discovered
 
+### ⚠ This release's own quality score was OVERRIDDEN — disclosed here deliberately
+
+v3.28 introduces an independence gate for release-quality scores. **Its own score did not pass that gate.**
+
+`rubrics/RUBRIC_release_quality_v3.28.0_score.md` is **producer-run** and carries **no independence
+declaration**. `check_score_independence` exits 1 against it. The tag proceeded under a recorded override.
+
+**Why**, stated so you can judge it rather than take it on trust: the requirement is **unsatisfiable by
+construction**. No seat meets all three conditions at once — not the producer, no stake in the outcome, and
+reachable without crossing the supervisor's fleet-coordination lane. The supervisor is reachable but is
+this release's deployment target (a consumer certifying its own supplier). Peer seats have no stake, but
+the producing agent has no standing to task them. The requirement shipped blocking, with no legal route to
+satisfy it.
+
+**What this means for you**: when you run the check at your seat, it will report v3.28's score as lacking
+an independent leg. **That is accurate, not a defect in your migration.** The override is recorded at
+`.aget/overrides/release_gate_v3.28.0.md` with its reason, and in the firing ledger as `action=OVERRIDDEN`.
+
+**Not claimed**: that the score was independently verified. It was not. Defining a legal independence route
+is v3.29 scope.
+
+
 - **The independence check tests non-identity with the producer, and nothing about the verifier's stake.**
   A seat with an interest in the outcome passes it. The supervisor seat is therefore **excluded** as
   verifier for this release, being its deployment target — a consumer certifying its own supplier.
