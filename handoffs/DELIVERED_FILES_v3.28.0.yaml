@@ -1,0 +1,43 @@
+# DELIVERED_FILES_v3.28.0.yaml — machine-readable per-payload delivered-files manifest
+# Emit half of gmelli/aget-aget#1870 (closes the #1828 delivered-but-not-committed vector).
+# Consumer: SOP_fleet_upgrade G0.2 — commit add-list derives from THIS manifest;
+# post-stage porcelain cross-check asserts no manifest path remains untracked.
+version: "3.28.0"
+source_ref: "v3.28.0"  # canonical aget/ (payload-source ruling 2026-07-11: canonical, not template — see #1871)
+generated: "2026-07-26T23:44:14Z"
+generator: "scripts/emit_delivered_files_manifest.py"
+tracking: "gmelli/aget-aget#1870"
+
+pin_edits:  # edited in place on the agent, not file-copied — outside the porcelain cross-check
+  - path: ".aget/version.json"  # version pin
+  - path: "AGENTS.md"  # @aget-version pin
+
+delivered_files:
+  - path: ".claude/hooks/release_gate_firing_guard.sh"
+    spec_rows: [M-3.28-2, M-3.28-4]
+    sha256: "ABSENT-AT-REF"
+  - path: "scripts/check_score_independence.py"
+    spec_rows: [M-3.28-3]
+    sha256: "ABSENT-AT-REF"
+  - path: "scripts/triage_freshness_tick.py"
+    spec_rows: [M-3.28-5]
+    sha256: "ABSENT-AT-REF"
+  - path: "tests/test_test_requirements.py"
+    spec_rows: [M-3.28-6]
+    sha256: "ABSENT-AT-REF"
+
+optional_files:
+  - path: "scripts/check_actuator_census.py"
+    spec_rows: [R-3.28-1]
+    sha256: "ABSENT-AT-REF"
+  - path: "scripts/check_reference_resolution.py"
+    spec_rows: [R-3.28-2]
+    sha256: "ABSENT-AT-REF"
+
+additive_files:
+  []
+
+verify_rule: |
+  Post-upgrade, every delivered_files/optional_files path present on the agent's disk
+  MUST be git-tracked. `git status --porcelain` showing any manifest path as untracked
+  (??) is the #1828 defect class — the upgrade is NOT complete until it is staged.

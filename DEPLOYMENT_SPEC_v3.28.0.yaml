@@ -8,8 +8,18 @@
 # Origin: DEPLOYMENT_SPEC_v3.27.0.yaml
 # Release: Make the gates fire
 #
-# ⛔ PREPARED, NOT YET PUBLIC. v3.28.0 is committed and unpushed; no tag exists.
-# Every detection below is runnable at a migrated seat, but nothing is migrated yet.
+# ⚠ PUBLIC AND TAGGED 2026-07-26 (v3.28.0 = 572d10d8, 14/14 repos in sync). The prior
+# header said "not yet public"; it was written pre-push and went stale at the tag.
+#
+# ⛔ THE CONDITIONAL M-ROWS BELOW DO NOT DETECT AN ABSENT PAYLOAD. Read this before
+# trusting a PASS. M-3.28-2/-3/-4/-5/-6 use the form `test ! -f X || <check X>`, which
+# is TRUE when X is absent. That form was adopted to express genuine seat-conditionality
+# (a worker template that never tags a release has no use for a release-gate hook) and
+# it does express it — but it cannot distinguish "correctly absent at a seat that does
+# not need it" from "never shipped to anywhere." v3.28.0 was tagged with its entire
+# enforcement payload present only on the producing seat, and every blocking row PASSED.
+# See handoffs/CORRECTIONS_v3.28.0.md row 3. A seat-conditionality clause that also
+# checks the DISTRIBUTION POINT is owed to v3.29.
 #
 # WHAT IS DIFFERENT ABOUT THIS RELEASE'S DEPLOYMENT:
 # This is the first payload that can BLOCK the receiving seat. M-3.28-2 installs a

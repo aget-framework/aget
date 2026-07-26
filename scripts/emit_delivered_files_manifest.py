@@ -30,7 +30,19 @@ from datetime import datetime, timezone
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Payload path extraction: file paths named in a row's detection or description.
-PATH_RE = re.compile(r"(?:scripts|\.claude/skills)/[\w./-]+\.(?:py|md|sh)")
+#
+# ⚠ 2026-07-26: this regex named only `scripts/` and `.claude/skills/`, so it was
+# STRUCTURALLY BLIND to `.claude/hooks/` — and v3.28.0's central deliverable was a
+# PreToolUse hook. The manifest is the copy-list a fleet dispatch derives its
+# add-list from, so an unmatched payload path is not an omission in a report: it is
+# a file the fleet never receives. v3.28.0 emitted 2 rows for a 7-artifact payload
+# and named neither the hook (M-3.28-2/-4) nor the traceability test (M-3.28-6).
+# Directories are enumerated rather than globbed so a new payload location fails
+# loudly here instead of vanishing from the copy-list.
+PATH_RE = re.compile(
+    r"(?:scripts|tests|rubrics|\.claude/(?:skills|hooks|agents)|\.aget/patterns)"
+    r"/[\w./-]+\.(?:py|md|sh|yaml|json)"
+)
 # Rows whose detections test agent state edited in place (pins), not delivered files.
 PIN_PATHS = {"M": [(".aget/version.json", "version pin"), ("AGENTS.md", "@aget-version pin")]}
 
@@ -41,13 +53,25 @@ def git(repo, *args):
 
 
 def parse_spec_rows(spec_text):
-    """Line-based parse of mandatory_changes / optional_changes / additive_artifacts rows."""
+    """Line-based parse of mandatory / optional / recommended / additive rows.
+
+    `recommended_changes` is normalised to `optional_changes`: DEPLOYMENT_SPEC
+    v3.28.0 used that heading for its two edge-checker rows and this parser did not
+    recognise it, so both were dropped silently — the same blindness as an
+    unmatched PATH_RE, one level up. An unknown section heading is a payload the
+    fleet never sees, so the alternation is explicit rather than permissive.
+    """
     rows, section, cur = [], None, None
     for line in spec_text.splitlines():
         s = line.strip()
-        m = re.match(r"^(mandatory_changes|optional_changes|additive_artifacts):", line)
+        m = re.match(
+            r"^(mandatory_changes|optional_changes|recommended_changes|additive_artifacts):",
+            line,
+        )
         if m:
             section = m.group(1)
+            if section == "recommended_changes":
+                section = "optional_changes"
             continue
         if re.match(r"^\w", line) and ":" in line and not line.startswith(" "):
             section = None

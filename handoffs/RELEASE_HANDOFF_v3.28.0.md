@@ -3,9 +3,15 @@
 **Prepared**: 2026-07-26 · **Class**: **governance-hardening (inward-facing)**
 **Implements**: R-REL-019 (release-to-fleet handoff)
 
-> ⛔ **NOT YET PUBLIC.** v3.28.0 is **committed and unpushed**. No tag exists; the public repositories are
-> at v3.27.0. **Do not begin migrating until the tag is live.** Prepared ahead so this package is reviewable
-> before the irreversible act.
+> ⚠ **PUBLIC AND TAGGED — payload incomplete. Read `CORRECTIONS_v3.28.0.md` row 3 before migrating.**
+> v3.28.0 is live (`v3.28.0` = `572d10d8`, 14/14 repositories in sync, verified 2026-07-26). The prior
+> banner here read *"Do not begin migrating until the tag is live"*; it was written pre-push and went stale
+> at the tag, so for several hours this package instructed consumers not to proceed after the act it was
+> waiting for had happened.
+>
+> The tag being live is **not** by itself clearance to migrate: the firing guard and its battery are absent
+> from every public repository, so the upgrade guide's step 2 has no source. Row 3 of CORRECTIONS carries
+> the detail.
 
 ---
 
