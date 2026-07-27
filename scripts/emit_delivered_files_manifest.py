@@ -132,7 +132,7 @@ def template_shipped_paths(version):
 
     A downstream seat deriving its add-list from that manifest, exactly as
     SOP_fleet_upgrade G0.2 instructs, would have staged **zero** fleet-facing
-    files. Found by the supervisor seat's independent migration-prep audit, not
+    files. Found by `private-supervisor-AGET`'s independent migration-prep audit, not
     by this producer.
 
     The spec is the contract, so a shipped-but-uncontracted file is a real
@@ -232,7 +232,7 @@ def emit(version, ref):
         "  said 'derive from the FULL manifest'; this rule, the half a consuming SOP mechanises,",
         "  still named two of three sections. Prose fixed, actuator not — inside the commit that",
         "  closed the previous instance of that same shape. Found by the manifest's first",
-        "  consumer (the supervisor seat) before it ran G0.2, not by the producer.",
+        "  consumer (`private-supervisor-AGET`) before it ran G0.2, not by the producer.",
     ]
     out_path = os.path.join(REPO, "handoffs", f"DELIVERED_FILES_v{version}.yaml")
     with open(out_path, "w") as f:

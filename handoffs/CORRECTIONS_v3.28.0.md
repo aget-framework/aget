@@ -104,7 +104,7 @@ with no route past it but unregistering the hook — the precise failure this re
 against (*"a guard that fires on everything gets disabled, and a disabled guard protects nothing"*).
 
 **Consequence for the delivery Goal, stated because it is load-bearing**: `DEPLOYMENT_SPEC_v3.28.0.yaml`
-rests leg 3 on the supervisor seat installing this hook. Either the guard ships unmodified and bricks that
+rests leg 3 on `private-supervisor-AGET` installing this hook. Either the guard ships unmodified and bricks that
 seat's tagging, or it gains an applicability predicate and never fires there for the supervisor's own
 tags. **Leg 3 is unreachable as designed, in both directions** — and `POLICY_release_cadence`
 R-REL-CAD-012 gates the v3.29 scope-lock on it.
@@ -220,14 +220,14 @@ That is a DEPLOYMENT_SPEC gap and it is v3.29 work — recorded rather than back
 contract.
 
 **Credit**: the two-payload distinction, the G0.2 add-list consequence, and the `.aget/logs/` ledger-channel
-gap are the supervisor seat's findings. This producer verified its own release twice and found neither.
+gap are `private-supervisor-AGET`'s findings. This producer verified its own release twice and found neither.
 
 
 ---
 
 ## Row 8 — the BLOCKING pre-release check this release claims to have fixed is still unpassable
 
-**Found**: 2026-07-26 evening, chasing a suite-runtime question the supervisor seat raised. Its premise was
+**Found**: 2026-07-26 evening, chasing a suite-runtime question `private-supervisor-AGET` raised. Its premise was
 different and one of its inferences does not hold (see below), but the instinct was right and neither seat
 had this.
 
@@ -349,3 +349,38 @@ invokes against a published spec.
 name its **conditions**. A wall-clock measurement on a shared machine is a claim about the machine as much
 as the code. `L1220 §Count` says name the instrument; this says the instrument is not sufficient when the
 quantity is time.
+
+
+---
+
+## Row 11 — "the supervisor seat" was ambiguous across fleets, and a remote seat paid for it
+
+**Found**: 2026-07-26 late, by `private-legalon-supervisor-AGET` — a supervisor in a **different fleet**,
+reading these artifacts as its only source while planning its own v3.28.0 wave.
+
+Rows 3b/7/8 and the manifest's `verify_rule` credited findings to *"the supervisor seat"*, unqualified,
+five times across two public artifacts. There is more than one. That seat wrote:
+
+> *"CORRECTIONS rows 7 and the manifest's own `verify_rule` both credit 'the supervisor seat'…
+> **Unverified at this seat** — no `verify_v328_mrows.sh` exists here and no session note today mentions
+> v3.28. **Treat as a peer seat's work until probed, not as ours.**"*
+
+It could not determine whether it was being credited with work it had not done, and had to park the
+question. **Fixed**: all five now read `private-supervisor-AGET`. The manifest was re-emitted rather than
+hand-edited, so its generator carries the fix too.
+
+**Why this is a correction row and not a typo fix.** A seat name in a public artifact is an
+**identifier**, and an unqualified one resolves at the *reading* seat — the same failure this framework
+already rules on for L-doc citations, where `LNNN` without a seat prefix is *"a coin-flip, not a
+citation."* That rule was written for lesson IDs and never extended to prose references, which is the
+surface a multi-fleet audience actually reads. `seat:LNNN` is canonical because the qualifier is
+decidable without a registry lookup; **"the supervisor seat" is not decidable at all** without knowing
+which fleet is being discussed.
+
+**For consumers**: wherever these artifacts name a seat, the name is now the FLEET_STATE-registered one.
+If you find an unqualified role-noun (*"the supervisor"*, *"the framework seat"*) in any v3.28 artifact,
+it is a defect — report it rather than inferring which seat is meant.
+
+**Credit**: found by a consuming seat in another fleet, on first contact with these artifacts, without
+asking the producer anything. That is the outcome the self-sufficiency bar was set for, and this defect
+is the cost it surfaced.

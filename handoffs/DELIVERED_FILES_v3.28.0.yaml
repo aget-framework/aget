@@ -9,7 +9,7 @@
 #   The missing M-rows are a DEPLOYMENT_SPEC gap, owed to the next release.
 version: "3.28.0"
 source_ref: "v3.28.0"  # canonical aget/ (payload-source ruling 2026-07-11: canonical, not template — see #1871)
-generated: "2026-07-27T00:21:08Z"
+generated: "2026-07-27T06:52:14Z"
 generator: "scripts/emit_delivered_files_manifest.py"
 tracking: "gmelli/aget-aget#1870"
 
@@ -65,4 +65,4 @@ verify_rule: |
   said 'derive from the FULL manifest'; this rule, the half a consuming SOP mechanises,
   still named two of three sections. Prose fixed, actuator not — inside the commit that
   closed the previous instance of that same shape. Found by the manifest's first
-  consumer (the supervisor seat) before it ran G0.2, not by the producer.
+  consumer (`private-supervisor-AGET`) before it ran G0.2, not by the producer.
