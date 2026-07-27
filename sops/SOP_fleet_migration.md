@@ -1,6 +1,6 @@
 # SOP: Fleet Migration
 
-**Version**: 1.8.1
+**Version**: 1.8.2
 **Status**: Active
 **Created**: 2026-01-05
 **Updated**: 2026-07-27
@@ -140,6 +140,31 @@ the ignition source.
 > another guarded every one and detonated anyway (not necessary). The mechanism was a `Path.cwd()` default
 > in a vendored command module — a *product* path, not a test path. If a seat's suite mutates its repo,
 > **bisect per file with the two-clause gate** rather than reasoning about which calls look unsafe.
+
+**Run it, do not re-implement it — and do not rely on this paragraph.** `scripts/run_suite_gated.py`
+enforces both clauses and bisects:
+
+```bash
+python3 scripts/run_suite_gated.py <seat-path>                      # gated run; exit 2 = mutated
+python3 scripts/run_suite_gated.py <seat-path> --bisect             # every igniter, one file at a time
+python3 scripts/run_suite_gated.py <seat-path> --allow-path .aget/logs/   # declare benign, still reported
+```
+
+Exit `2` means the run mutated the repository — **do not report it as a pass whatever the test result
+was.** `--allow-path` declares append-only paths benign; exemptions are always printed, and the
+**commit-count clause is never exemptible**. Self-test: `--self-test` (12/12).
+
+**Why a script and not the paragraph above.** The prose was read, cited, and planned around by a
+consuming supervisor seat on 2026-07-27 — which reached for grep first anyway, scoring **0-for-2 on its
+hits and 0-for-3 on the real igniters**, then found all three by bisecting with the gate as oracle. Its
+own retrospective: *"the upstream correction warned about precisely that and the warning didn't stop me;
+the gate did."* A warning its most careful reader cites and then does not follow is decorative (L671).
+That seat's incident was contained at **3 junk commits instead of 527** by the gate, not by the warning.
+
+**One calibration from the instrument's first real run**: it fired on canonical `aget` itself, because
+that suite appends to tracked logs under `.aget/logs/`. Real mutation, benign cause. Declare such paths
+with `--allow-path` rather than lowering the gate — a gate that fires on every run gets disabled, and a
+disabled gate protects nothing.
 >
 > When one file is the igniter: `--deselect` it, run the rest, and report the probe **PARTIAL, naming what
 > was deselected**. Never as a clean pass.
@@ -850,6 +875,7 @@ validator that flags a bare `gh#N` in a heading, is **owed, not done**.
 
 | Version | Date | Change |
 |---|---|---|
+| 1.8.2 | 2026-07-27 | **§Dispatch Safety item 1 gains a runnable instrument** — `scripts/run_suite_gated.py` (two-clause gate + per-file `--bisect` + `--allow-path` declared-benign exemptions that are always reported; commit-count clause never exemptible; `--self-test` 12/12). Reason: the item-1 prose was measured **ineffective on its most careful reader** — a consuming supervisor seat read it, cited it, built a plan around it, and reached for grep anyway (0-for-2 on hits, 0-for-3 on the real igniters), finding all three only by bisecting with the gate as oracle. Decorative-warning closure per L671. First real run of the instrument fired on canonical `aget` itself (suite appends to tracked `.aget/logs/`) — recorded as the calibration case for `--allow-path` rather than as a reason to weaken the gate. |
 | 1.8.1 | 2026-07-27 | **Corrections from v1.8.0's first field use, all consumer-found.** (a) §Dispatch Safety item 4's failure-direction table was **wrong**: it assigned one direction per signal (mtime over-reports, process under-reports); both signals fail both ways. mtime **under**-reports because a session file is written once at open, not continuously — measured at two live seats with session files 268 and 23 minutes old under a 10-minute window, which an mtime-only gate would have dispatched into. The **gate rule is unchanged and held**; only its explanation was wrong. Item 4 also gains the own-ancestry exclusion (walk the ancestor chain — `getppid()` is insufficient because the harness spawns a fresh subshell per tool call) and the `SELF`-as-distinct-state rule. (b) New **§Citing issues** — provenance (`Delivered by gh#N`) vs. live dependency (`Blocked on gh#N`), no bare `gh#N` in headings, never beside an enforcement word. `Gate 4.0` and `V0.0` headings reformed accordingly. A consuming seat's citation gate blocked on `gh#1881` cited as provenance in Gate 4.0's heading beside the word `BLOCKING`; the defect was ours, not the gate's. Cross-`sops/`/`specs/` application and a heading validator are **owed, not done**. |
 | 1.8.0 | 2026-07-26 | **§Dispatch Safety added** — seven field learnings from the v3.28.0 wave, each costing a real incident or a wrong gate verdict: two-clause behavioural gate for suite runs (a one-clause version passed a run that mutated the repo); per-seat timeout scaled to divergence count (0-diverged seats 177–296s, diverged seats both blew 540s — perfect separation); timed-out dispatch can leave a seat version-pinned with no payload and a dirty tree; two-signal liveness (mtime over-reports and is blind to non-session writes, process-check under-reports); executed-surface verification **with** the caution that a byte gap does not imply a capability gap; bounded diff reads (`--stat` before `head -N` — a truncated diff has no truncation signal); composition reporting instead of a single N/M headline. Also records that the "unguarded test call sites" hypothesis for the self-replicating commit loop was **falsified in both directions** and names the bisect method that found the real cause. |
 | 1.7.1 | 2026-07-18 | FLEET_GLOBS parameterization; silent-empty-set gate fix. |

@@ -56,8 +56,15 @@ Run these **after** migrating. Each probe verifies the payload *executes*, not t
 | 3 | Guard **refuses** a release act | `echo '{"hook_event_name":"PreToolUse","tool_input":{"command":"git tag -a v9.9.9 -m t"}}' \| bash .claude/hooks/release_gate_firing_guard.sh; echo "exit=$?"` | `exit=2` **and** `RELEASE GATE FIRING GUARD` on stderr |
 | 4 | Guard **passes** ordinary work | `echo '{"hook_event_name":"PreToolUse","tool_input":{"command":"git status"}}' \| bash .claude/hooks/release_gate_firing_guard.sh; echo "exit=$?"` | `exit=0` |
 | 5 | Firing ledger records the refusal | `tail -1 .aget/logs/control_firings.jsonl \| jq -r .hook_event` | `PreToolUse` |
-| 6 | Version coherence | `jq -r .aget_version .aget/version.json` and `grep '@aget-version' AGENTS.md` | both `3.28.0` |
+| 6 | Version coherence | `jq -r .aget_version .aget/version.json` · `grep '@aget-version' AGENTS.md` · **`grep '@aget-canonical-specs' AGENTS.md`** | first two `3.28.0`; the third's `/tree/vX.Y.Z/` **also** `3.28.0` |
 | 7 | Contract suite | `python3 -m pytest tests/ -q` | no NEW failures vs your baseline |
+
+⚠ **Probe 6 gained a third surface on 2026-07-27 and you should re-run it if you migrated before then.**
+`AGENTS.md` carries **two** version-bearing lines — `@aget-version` and `@aget-canonical-specs`, whose URL
+pins a `/tree/vX.Y.Z/` ref. The original probe greped only the first and called the result *"version
+coherence"*, so a seat that bumped one line and not the other passed. Measured in the producing fleet
+after the fix landed: **4 seats drifted** — `@aget-version: 3.28.0` beside `.../tree/v3.27.0/specs`. Found
+by a consuming seat in another fleet reading a diff, not by any check.
 
 ⚠ **Probe 3 is the important one, and probes 3+4 must BOTH pass.** A guard that blocks everything gets
 disabled, and a disabled guard protects nothing. If 3 passes and 4 fails, stop and report — do not migrate

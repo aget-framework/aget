@@ -430,3 +430,46 @@ readability silently exempts the term from every audit that follows.
 form is the FLEET_STATE-registered name. Only its completeness claim was wrong, and it never reached you
 in any case. The standing instruction to report any unqualified role-noun you find is now more
 load-bearing, not less: **two** audits of this surface have now returned a false all-clear on it.
+
+---
+
+## Row 13 — probe 6 checked two of the three version-bearing surfaces and was named for all of them
+
+**Found**: 2026-07-27 by `private-legalon-supervisor-AGET` — **from a permission-prompt diff**, mid-wave,
+not from running any check. The dialog rendered three lines of context around the edit, and line 4 was
+visibly wrong.
+
+`REMOTE_MIGRATION_MESSAGE_v3.28.0.md` probe 6 read:
+
+> `jq -r .aget_version .aget/version.json` and `grep '@aget-version' AGENTS.md` → both `3.28.0`
+
+and was titled **"Version coherence."** `AGENTS.md` carries **two** version-bearing lines:
+
+```
+@aget-version: 3.28.0
+@aget-canonical-specs: https://github.com/aget-framework/aget/tree/v3.27.0/specs — reliance-only conformance
+```
+
+The second pins a `/tree/vX.Y.Z/` ref and sits **two lines below** the one the probe greps. A seat that
+bumps `@aget-version` and not the specs pin passes probe 6 cleanly while pointing its conformance
+reference at the previous release.
+
+**Measured in the producing fleet, after the finding**: 30 of 31 seats carry the field; **4 are drifted**
+— `3.28.0` beside `/tree/v3.27.0/`. Every one of them had passed probe 6.
+
+**Why it survived every self-check.** The producing seat's own `AGENTS.md` is **the one file in the fleet
+that does not carry `@aget-canonical-specs`**. No amount of dogfooding at the producer could surface it;
+the probe was correct-by-construction on the only instance its author could see. This is the
+non-representative-pilot failure the release SOP already names at Phase 7.8 (*"FWK+SUP pilots were 2 of
+only 3 clean agents"*), recurring at the probe-authoring layer.
+
+**Fixed**: probe 6 now checks all three surfaces and carries a re-run notice for seats that migrated
+before this row. The 4 drifted seats are **routed to their owners, not fixed here** — a cross-fleet write
+is prohibited and the fix is one line at each seat.
+
+**For consumers**: if you migrated before 2026-07-27, re-run probe 6 in its new form. A pass under the old
+form is not evidence for the new one.
+
+**The transferable part**: a check named for a *property* ("version coherence") and implemented against
+an *enumeration of surfaces* silently narrows to whatever surfaces existed when it was written. When you
+name a probe after the property, state the surface list and say why it is complete.
