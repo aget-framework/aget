@@ -1,9 +1,9 @@
 # SOP: Fleet Migration
 
-**Version**: 1.7.1
+**Version**: 1.8.0
 **Status**: Active
 **Created**: 2026-01-05
-**Updated**: 2026-07-18
+**Updated**: 2026-07-26
 **Owner**: aget-framework
 **Implements**: CAP-MIG-017 (Remote Supervisor Upgrade), SD-3 wave-sequencing (v1.6.0)
 **Related**: L455 (AGENTS.md Invocation Verification), L457 (Cross-Machine Pre-Flight), AGET_RELEASE_SPEC, PROJECT_PLAN_fleet_v3.2_migration.md
@@ -108,6 +108,102 @@ gh auth status && echo "PASS: gh auth" || echo "FAIL: gh auth — check keyring 
 ```
 
 **Warning**: Cloud-hosted agents may return keyring errors on `gh auth status` even when auth is configured. If any agent shows a keyring error, resolve before migration (re-run `gh auth login` on that machine). Undetected auth failures cause silent gh CLI failures during migration.
+
+---
+
+## Dispatch Safety — field learnings, v3.28.0 cycle (2026-07-26)
+
+**Read this before Phase 0.** Each item below cost a real incident or a wrong gate verdict during the
+v3.28.0 fleet wave. They are procedure, not anecdote: every one changed how a gate closes.
+
+### 1. A suite run during migration needs a TWO-CLAUSE behavioural gate
+
+A migrating seat is told to run its contract suite (pre-migration baseline, then post-migration probe).
+That suite can mutate the repository. Assert **both** clauses across the run:
+
+```bash
+git rev-list --count HEAD     # unchanged
+git status --porcelain        # unchanged
+```
+
+**Why both.** The commit-count clause alone was adopted first and passed a run that wrote 18 files into
+the live repo without committing them. Count-unchanged and tree-unchanged are different claims; a mutation
+that stops short of a commit satisfies the first and violates the second.
+
+**Why any clause at all.** A dispatched seat's suite committed to its own repository in a self-replicating
+loop: the wind-down pattern ran `git add -A && git commit`, whose post-commit action re-invoked the suite.
+**527 junk commits in 67 minutes, unattended.** The dispatch instruction to "run the contract suite" was
+the ignition source.
+
+> **Do not diagnose this by grepping for unguarded test call sites.** That hypothesis was filed, and both
+> halves were falsified within hours: one seat carried the call sites and never detonated (not sufficient),
+> another guarded every one and detonated anyway (not necessary). The mechanism was a `Path.cwd()` default
+> in a vendored command module — a *product* path, not a test path. If a seat's suite mutates its repo,
+> **bisect per file with the two-clause gate** rather than reasoning about which calls look unsafe.
+>
+> When one file is the igniter: `--deselect` it, run the rest, and report the probe **PARTIAL, naming what
+> was deselected**. Never as a clean pass.
+
+### 2. Per-seat timeout SHALL scale with that seat's divergence count
+
+Measured across five pilots on one release, wall-clock to completion:
+
+| Seat divergence | Time |
+|---|---|
+| 0 diverged payload files | 177s · 282s · 296s |
+| 2 diverged | timed out at 540s |
+| 4 diverged | timed out at 540s |
+
+Perfect separation. The cost driver is **diff-review-and-re-base** — the work the divergence-routing rules
+require. A budget measured on the easy case and applied to the hard one times out precisely the seats
+doing the most careful work, and a raised constant does not fix it: size the budget from the seat's
+measured divergence, or dispatch outlier seats individually.
+
+### 3. A timed-out dispatch can leave a seat WORSE than untouched
+
+A timeout is not a no-op. One seat was killed mid-gate holding: `aget_version` pinned to the new release,
+one payload file re-based, three untouched, **nothing committed**, dirty tree. It claimed a version it did
+not carry, and the state was harder to see after a later commit made the tree clean.
+
+**Therefore**: before dispatching, refuse any seat whose payload-relevant tree is already dirty — you may
+be landing on top of a partial. After a timeout, **inspect the seat's tree before re-dispatching**, and
+have it either complete-and-commit or roll back its own version pin. Do not clean it up from the
+supervisor: that is the seat's repository.
+
+### 4. Liveness needs TWO signals, and neither alone is safe
+
+Dispatching into a live session races that session's writes — same tree, sequential writers, and git emits
+no signal until one commits over the other.
+
+| Signal | Answers | Fails how |
+|---|---|---|
+| session-file mtime | "did something write here recently" | **over-reports** — a session that just exited reads LIVE; also **blind** to a runaway writing only to `scripts/` and git |
+| running process + cwd | "is a session here now" | **under-reports** — misses a session open and thinking, having written nothing yet |
+
+**Gate**: refuse to dispatch if **either** fires. `CLEAR` means *no evidence of activity*, never *proved
+idle*. An mtime-only gate produced 2 false LIVE readings out of 4 and cost a pilot slot.
+
+### 5. Verify the EXECUTED surface, not the delivered path
+
+A payload file can land byte-exact at its delivered path and be invoked by nothing. Resolve what the
+seat's own skills actually run — read its `SKILL.md`, do not assume `scripts/`.
+
+**But do not infer a capability gap from a byte gap.** One seat's executed copy differed from the payload
+and was declared non-green four times; measuring the release's actual delivery showed one of the two
+changes already present there and the other structurally inapplicable. **Byte gap ⇒ executed-surface
+differs** is sound; **⇒ capability absent** does not follow. Measure the delta, then rule.
+
+### 6. Bound every diff read before you read it
+
+Run `git diff --stat` (or `| wc -l`) **before** any `head -N`. A truncated diff has **no truncation
+signal** — `head -30` renders identically on a 28-line delta and a 300-line one, and only one of those
+conclusions is right. This decided a seat's gate status with two lines of margin nobody could see.
+
+### 7. Report composition, not a single headline number
+
+A migration tally of "N/M green" hides whether a seat is green by delivery, by declared-and-accepted
+divergence, or by exemption. State the decomposition: *delivered X · re-based Y · exempt Z*. A single
+number lets a definitional pass read as a capability claim.
 
 ---
 
@@ -698,6 +794,15 @@ See: `docs/patterns/PATTERN_weekly_fleet_health_monitor.md` (framework-recommend
 ---
 
 ## Changelog
+
+| Version | Date | Change |
+|---|---|---|
+| 1.8.0 | 2026-07-26 | **§Dispatch Safety added** — seven field learnings from the v3.28.0 wave, each costing a real incident or a wrong gate verdict: two-clause behavioural gate for suite runs (a one-clause version passed a run that mutated the repo); per-seat timeout scaled to divergence count (0-diverged seats 177–296s, diverged seats both blew 540s — perfect separation); timed-out dispatch can leave a seat version-pinned with no payload and a dirty tree; two-signal liveness (mtime over-reports and is blind to non-session writes, process-check under-reports); executed-surface verification **with** the caution that a byte gap does not imply a capability gap; bounded diff reads (`--stat` before `head -N` — a truncated diff has no truncation signal); composition reporting instead of a single N/M headline. Also records that the "unguarded test call sites" hypothesis for the self-replicating commit loop was **falsified in both directions** and names the bisect method that found the real cause. |
+| 1.7.1 | 2026-07-18 | FLEET_GLOBS parameterization; silent-empty-set gate fix. |
+| 1.7.0 | 2026-07-18 | Rung-4 behavioural verification — M-row smoke probes, post-payload suite (`it-consultant:L239`), executed-surface/dual-basename parity (`cli-aget:L756`), L656 pilot evidence bar. |
+| 1.6.0 | 2026-05-02 | Wave Sequencing (SD-3 residual). |
+
+> Entries before 1.6.0 predate this table; see `git log -- sops/SOP_fleet_migration.md`.
 
 | 1.7.1 | 2026-07-18 | **Fleet-root parameterization** — Gate 4.1/4.2/4.2.1 + V0.4 agent-enumeration globs converted from hardcoded `~/github/private-*-aget` literals to an explicit `FLEET_GLOBS` parameter with a MANDATORY count-verification pre-step. Root cause: the literals encode one fleet's filesystem topology; on any other machine the glob matches nothing and every Gate 4.x loop silently passes an empty set (v1.45 silent-skip class at the SOP layer). Field-evidenced 2026-07-18: a remote fleet rooted at `~/code/<org>/` ruled wholesale adoption of this SOP — as written, its wave-boundary gates would have green-lit zero agents. |
 | 1.7.0 | 2026-07-18 | Gate 4.0 Behavioral Verification (Rung 4) — smoke probes from M-rows + post-payload test suite (absorbs it-consultant L239 consumer-grep) + executed-surface parity incl. dual-basename drift (absorbs cli-aget L756; C-26-01 exhibit) + L656 pilot evidence bar (≥1 behavioral result). gh#1881/L1165; built v3.27 G2.1. |

@@ -263,3 +263,47 @@ bound; the suite is **green**. This is a v3.29 release-process finding, not a mi
 
 **Owed, not done**: raise the timeout to fit the real suite (or split the suite), then re-derive the gate
 result and reconcile the two published figures.
+
+
+---
+
+## Row 9 — a self-replicating commit loop can fire during YOUR migration; the published diagnosis was wrong
+
+**Found**: 2026-07-26, during the fleet wave. **Diagnosed correctly only on the fourth firing.**
+
+**What happens**: a migrating seat is instructed to run its contract suite (baseline, then post-migration
+probe). At some seats that suite commits to the live repository and re-invokes itself. Observed:
+**527 junk commits in 67 minutes, unattended**, `.git` to 305 MB, `.aget/evolution/index.json` corrupted by
+concurrent writers. Nothing was pushed, so damage stayed local — but the seat's history needs surgery.
+
+**The mechanism, stated correctly.** An earlier issue attributed this to unmocked `wind_down_pattern()`
+call sites in `tests/`. **That diagnosis is false and was falsified in both directions the same day**: one
+seat carried the call sites and never detonated (not sufficient); another guarded every one and detonated
+anyway (not necessary). The actual cause is a `Path.cwd()` default in a vendored command module reached
+through `init --with-patterns`, which applies patterns to the *current* directory rather than the one it
+just created. A second `Path.cwd()` on the evolution path explains an accompanying file hoard.
+
+**Scope, measured**: the vendored `aget/config/commands/` package is present at **8 of 31 seats** in this
+fleet, all 8 carrying the defect. It is **not shipped by canonical `aget/` and not present at the
+`v3.28.0` tag** — there is no importable package, no console entry point, and `import aget` fails on a
+migrated host. It is legacy vendored code that only a seat's own test suite reaches.
+
+**What to do at your seat**:
+
+1. Before running any suite during migration, assert the **two-clause gate** — `git rev-list --count HEAD`
+   *and* `git status --porcelain` unchanged across the run. The count clause alone is insufficient: a clean
+   count passed a run that wrote 18 untracked files.
+2. If your suite mutates the repo, **bisect per file** with that gate rather than guessing at call sites.
+   `--deselect` the igniter, run the rest, and report the probe **PARTIAL naming the deselection** — never
+   as a clean pass.
+3. If you carry `aget/config/commands/`, check whether anything outside your tests reaches it. If nothing
+   does, **deleting the vendored package removes the ignition source permanently** — a stronger fix than
+   correcting its argument handling, which repairs code no user path reaches.
+
+**Not claimed**: that this is a user-facing defect in a shipped command. On the fleet's filesystem there is
+no route by which a user reaches it. That negative is bounded to what was measurable here; if the package
+ships from a source not visible on this host, this row does not cover it.
+
+**Durable procedure from this incident** — the two-clause gate, divergence-scaled timeouts, two-signal
+liveness, and executed-surface verification — is in `sops/SOP_fleet_migration.md` **§Dispatch Safety**
+(v1.8.0), not here. This row is the v3.28-specific fact; that section is the procedure.
