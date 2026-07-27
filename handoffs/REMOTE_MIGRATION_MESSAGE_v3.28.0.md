@@ -58,6 +58,28 @@ Run these **after** migrating. Each probe verifies the payload *executes*, not t
 | 5 | Firing ledger records the refusal | `tail -1 .aget/logs/control_firings.jsonl \| jq -r .hook_event` | `PreToolUse` |
 | 6 | Version coherence | `jq -r .aget_version .aget/version.json` · `grep '@aget-version' AGENTS.md` · **`grep '@aget-canonical-specs' AGENTS.md`** | first two `3.28.0`; the third's `/tree/vX.Y.Z/` **also** `3.28.0` |
 | 7 | Contract suite | `python3 -m pytest tests/ -q` | no NEW failures vs your baseline |
+| 8 | **Payload present** | `shasum -a 256 scripts/study_topic.py scripts/wind_down.py scripts/check_initiatives.py scripts/close_gate_check.py` (or `python3 -c "import hashlib,sys;[print(hashlib.sha256(open(p,'rb').read()).hexdigest(),p) for p in sys.argv[1:]]" scripts/*.py`) | each sha matches `handoffs/DELIVERED_FILES_v3.28.0.yaml` `additive_files` **on `origin/main`** |
+| 9 | **Persisted** | `git show HEAD:$(git rev-parse --show-prefix).aget/version.json \| jq -r .aget_version` | `3.28.0` — **at `HEAD`, not on disk** |
+
+⛔ **Probes 8 and 9 were added 2026-07-27 and the migration bar is now 6+7+8+9. If you migrated before
+then, you have not met it — re-run.** Probes 1–7 as originally published **all read the working tree**.
+Three distinct failures pass that battery cleanly, and all three were observed in the field within 24
+hours of the tag:
+
+| Failure | What passes | What is false |
+|---|---|---|
+| **version without payload** | probe 6 — both files say `3.28.0` | the four scripts never landed |
+| **payload without persistence** | probes 6, 7, and the smoke — the working tree is correct | nothing is committed; one `git checkout` reverts the migration |
+| **`exit=0` without work** | the dispatcher's exit code | the seat could not run `python3` at all and migrated nothing |
+
+Measured in the producing fleet at one instant, 2026-07-27: **17** seats read `3.28.0` on disk · **15**
+also carry the payload · **13** also have it at `HEAD`. Four seats claim the version and do not hold it,
+in two non-overlapping failure modes. Every count published that day was the 17.
+
+**Probe 9 is repo-root-relative on purpose.** `git show HEAD:<path>` resolves from the repository root,
+so a seat that is a *subdirectory of a monorepo* must include `$(git rev-parse --show-prefix)` or every
+such seat reads as un-persisted. Omitting it is a false alarm, not a false pass — but a check that cries
+wolf during normal operation gets ignored exactly when it is right.
 
 ⚠ **Probe 6 gained a third surface on 2026-07-27 and you should re-run it if you migrated before then.**
 `AGENTS.md` carries **two** version-bearing lines — `@aget-version` and `@aget-canonical-specs`, whose URL
@@ -96,7 +118,23 @@ git checkout HEAD~1 -- .aget/version.json AGENTS.md      # or edit 3.28.0 -> 3.2
 
 Two things, both short:
 
-1. **Confirm your version** — this closes `GOAL-V328-DELIVERED` leg 2.
+1. **Confirm your version AT `HEAD`, and confirm the payload** — this closes `GOAL-V328-DELIVERED` leg 2.
+
+   ```bash
+   git show HEAD:$(git rev-parse --show-prefix).aget/version.json | jq -r .aget_version   # probe 9
+   shasum -a 256 scripts/study_topic.py                                                    # probe 8
+   ```
+
+   > **This standard was corrected on 2026-07-27 and the correction matters.** It previously read
+   > *"Confirm your version"*, with no ref. A seat that applies the payload and **cannot commit it**
+   > satisfies that sentence **truthfully** — it reads `3.28.0` on disk and says so — while being one
+   > `git checkout` from losing the migration. Two seats were in exactly that state when this was found,
+   > and both would have closed leg 2 on the old wording. A disk read is not a delivery receipt.
+   >
+   > `POLICY_release_cadence` **R-REL-CAD-012** gates the v3.29 scope-lock on `GOAL-V328-DELIVERED`, so
+   > the old bar would have released the next cycle's gate on work that can evaporate. **A leg-2
+   > confirmation recorded before 2026-07-27 does not meet this bar** — it was taken against the disk.
+   > Re-confirm at `HEAD`; it is one command.
 2. **If any gate refuses something you did not expect**, say so. That is leg 3 substrate and it is the
    framework's most valuable signal from this release.
 

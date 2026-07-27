@@ -473,3 +473,66 @@ form is not evidence for the new one.
 **The transferable part**: a check named for a *property* ("version coherence") and implemented against
 an *enumeration of surfaces* silently narrows to whatever surfaces existed when it was written. When you
 name a probe after the property, state the surface list and say why it is complete.
+
+---
+
+## Row 14 — every probe in this release read the working tree, and leg 2's evidence bar did too
+
+**Found**: 2026-07-27, from a supervisor seat's Gate-3 fan-out. Row 13 fixed probe 6 by adding a *third
+surface*. This row is the question row 13 did not ask: **are all its surfaces the same KIND of surface?**
+They were. Probes 1–7 are seven filesystem reads.
+
+**Three failures pass that battery**, all observed in the field within 24 hours of the tag:
+
+| Failure | What passes | What is false |
+|---|---|---|
+| **version without payload** | probe 6 — both files say `3.28.0` | the four scripts never landed |
+| **payload without persistence** | probes 6, 7 and the smoke — the working tree is correct | nothing committed; one `git checkout` reverts it |
+| **`exit=0` without work** | a dispatcher's exit code | the seat could not execute `python3` and migrated nothing |
+
+They share one cause, stated by the seat that found the third: *the signal was always whatever was
+cheapest to read — an exit code, a version string, a hash of a file on disk — never the thing actually
+claimed, which is that the seat carries the capability, durably.*
+
+**Measured in the producing fleet at one instant** (`scripts/verify_migration_landed.py`):
+
+| Instrument | Reading |
+|---|---:|
+| `.aget/version.json` on disk == `3.28.0` | **17**/31 |
+| …and payload sha matches the manifest | **15**/31 |
+| …and `version.json` == `3.28.0` **at `HEAD`** | **13**/31 |
+
+Four seats claimed the version and did not hold it, in **two non-overlapping** modes — two carrying an
+uncommitted payload, two carrying a version with no payload. Every fleet count published that day was
+the 17.
+
+### The part with teeth: leg 2's bar admitted work that can evaporate
+
+§Report back read *"**Confirm your version** — this closes `GOAL-V328-DELIVERED` leg 2."* No ref. A seat
+that applies the payload and **cannot commit it** — headless dispatch can edit files but cannot `git
+commit` without an allow rule — satisfies that sentence **truthfully**, reading `3.28.0` off its own disk.
+Two seats were in exactly that state and both would have closed leg 2 on the old wording.
+
+`POLICY_release_cadence` **R-REL-CAD-012** gates the v3.29 scope-lock on `GOAL-V328-DELIVERED`. The old
+bar would have released the next cycle's gate on work one `git checkout` from gone.
+
+**Fixed**: §Report back now requires the version **at `HEAD`** plus the payload sha, with both commands
+inline. **A leg-2 confirmation recorded before 2026-07-27 does not meet the corrected bar** — it was
+taken against the disk. Re-confirm; it is one command.
+
+**Also fixed**: probes **8** (payload sha vs the manifest) and **9** (version at `HEAD`) added. The
+migration bar for v3.28.0 is now **6+7+8+9**.
+
+### One trap worth copying, and one instrument
+
+`git show HEAD:<path>` is **repo-root-relative**. A seat that is a subdirectory of a monorepo needs
+`$(git rev-parse --show-prefix)` or it reads un-persisted. That is a false alarm rather than a false pass
+— but a check that cries wolf during normal operation gets ignored exactly when it is right. The same
+class bit two independent instruments at the consuming seat within one hour.
+
+`scripts/verify_migration_landed.py` implements all three axes per seat
+(`LANDED` / `NOT-COMMITTED` / `VERSION-ONLY` / `NOT-APPLIED` / `UNVERIFIABLE`), handles the prefix,
+reports an unchecked payload axis as `UNCHECKED` rather than as pass, and exits 0 only on `LANDED`.
+Self-test 8/8; control-tested 5/5 against seats whose true state was established independently, including
+a monorepo seat. **Use it instead of a version grep — and when you publish a count, name which of the
+three readings you mean.**
