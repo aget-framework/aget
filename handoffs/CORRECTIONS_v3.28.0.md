@@ -105,7 +105,7 @@ against (*"a guard that fires on everything gets disabled, and a disabled guard 
 
 **Consequence for the delivery Goal, stated because it is load-bearing**: `DEPLOYMENT_SPEC_v3.28.0.yaml`
 rests leg 3 on `private-supervisor-AGET` installing this hook. Either the guard ships unmodified and bricks that
-seat's tagging, or it gains an applicability predicate and never fires there for the supervisor's own
+seat's tagging, or it gains an applicability predicate and never fires there for that seat's own
 tags. **Leg 3 is unreachable as designed, in both directions** — and `POLICY_release_cadence`
 R-REL-CAD-012 gates the v3.29 scope-lock on it.
 
@@ -175,7 +175,7 @@ pre-push banner corrected and the `DELIVERED_FILES` probe restored to the header
 
 ## Row 7 — v3.28.0 has TWO payloads, and the manifest described only the missing one
 
-**Found**: 2026-07-26 by the **supervisor seat's independent migration-prep audit** — not by this
+**Found**: 2026-07-26 by **`private-supervisor-AGET`**'s independent migration-prep audit — not by this
 producer. It verified the finding three ways (`git ls-tree -r` at both refs, `shasum` canonical↔tag, and a
 re-run of its own `verify_v328_mrows.sh`) before reporting. Re-verified here at source before acting.
 
@@ -384,3 +384,39 @@ it is a defect — report it rather than inferring which seat is meant.
 **Credit**: found by a consuming seat in another fleet, on first contact with these artifacts, without
 asking the producer anything. That is the outcome the self-sufficiency bar was set for, and this defect
 is the cost it surfaced.
+
+---
+
+## Row 12 — CORRECTING ROW 11: the fix it announced landed at three of five sites, not five
+
+**Found**: 2026-07-27, auditing row 11's own completeness claim before relying on it.
+
+Row 11 states: *"**Fixed**: all five now read `private-supervisor-AGET`."* **Two of the five were still
+unqualified when that sentence was published** — and they are two of the three rows row 11 names by
+number:
+
+| Site | State at row 11's publication |
+|---|---|
+| Row 3b (`…never fires there for **the supervisor's** own tags`) | **unfixed** |
+| Row 7 (`Found: by the **supervisor seat's** independent migration-prep audit`) | **unfixed** — the primary credit line, and the one the remote seat actually quoted |
+| Row 8, row 3b's leg-3 sentence, manifest `verify_rule` | fixed, correctly |
+
+Both are now fixed. Row 3b's second instance is resolved by anaphora (*"that seat's own tags"*) rather
+than a fourth repetition of the name.
+
+**Why this is a row and not a silent edit.** Row 11 is published and was consumed — it is the row that
+told consumers *"if you find an unqualified role-noun in any v3.28 artifact, it is a defect."* A reader
+who trusted its completeness claim would have stopped looking. Same disposition as row 10 correcting row
+8, for the same reason.
+
+**The instrument lesson, which is the transferable part.** The first audit run here searched
+`the supervisor seat` and returned row 7's line as **absent** — because the file writes it as
+`the **supervisor seat's**`, and the `**` breaks the phrase adjacency the pattern required. A clean
+negative from a pattern that cannot match its own subject reads exactly like a clean bill of health. The
+audit that produced row 11's "all five" is likely to have been the same shape. **Strip markdown emphasis
+before matching prose identifiers** — `re.sub(r'[*\`_]', '', line)` — or the emphasis you added for
+readability silently exempts the term from every audit that follows.
+
+**For consumers**: row 11's *substance* stands — unqualified role-nouns are defects and the canonical
+form is the FLEET_STATE-registered name. Only its completeness claim was wrong. The standing instruction
+to report any unqualified role-noun you find is now more load-bearing, not less.

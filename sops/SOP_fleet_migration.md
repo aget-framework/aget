@@ -1,9 +1,9 @@
 # SOP: Fleet Migration
 
-**Version**: 1.8.0
+**Version**: 1.8.1
 **Status**: Active
 **Created**: 2026-01-05
-**Updated**: 2026-07-26
+**Updated**: 2026-07-27
 **Owner**: aget-framework
 **Implements**: CAP-MIG-017 (Remote Supervisor Upgrade), SD-3 wave-sequencing (v1.6.0)
 **Related**: L455 (AGENTS.md Invocation Verification), L457 (Cross-Machine Pre-Flight), AGET_RELEASE_SPEC, PROJECT_PLAN_fleet_v3.2_migration.md
@@ -175,13 +175,29 @@ supervisor: that is the seat's repository.
 Dispatching into a live session races that session's writes — same tree, sequential writers, and git emits
 no signal until one commits over the other.
 
-| Signal | Answers | Fails how |
-|---|---|---|
-| session-file mtime | "did something write here recently" | **over-reports** — a session that just exited reads LIVE; also **blind** to a runaway writing only to `scripts/` and git |
-| running process + cwd | "is a session here now" | **under-reports** — misses a session open and thinking, having written nothing yet |
+**Both signals fail in BOTH directions.** The first published version of this table assigned one failure
+direction to each signal — mtime over-reports, process under-reports. That is wrong, and the first field
+use of the gate proved it wrong in under a day. Corrected 2026-07-27:
+
+| Signal | Answers | Over-reports (false LIVE) | Under-reports (false CLEAR) |
+|---|---|---|---|
+| session-file mtime | "did something write here recently" | a session that just exited still reads LIVE — **2 of 4 readings**, cost a pilot slot | **a session file is written once at open, not continuously** — a long-running session that is reading and thinking goes stale and reads CLEAR. Measured: two live seats with session files **268 and 23 minutes old** under a 10-minute window. Also **blind** to a runaway writing only to `scripts/` and git |
+| running process + cwd | "is a session here now" | a process parked at that cwd doing nothing else | misses a session open and thinking, having written nothing yet — and misses everything if it counts **its own ancestry** as foreign (below) |
 
 **Gate**: refuse to dispatch if **either** fires. `CLEAR` means *no evidence of activity*, never *proved
-idle*. An mtime-only gate produced 2 false LIVE readings out of 4 and cost a pilot slot.
+idle*. The gate rule is unchanged by the correction above and held on first field use — it refused two
+seats that an mtime-only gate would have dispatched into.
+
+**Exclude your own ancestry, and do it by ancestry — not `getppid()`.** A liveness instrument run by the
+supervisor finds the supervisor's own session at the supervisor's own repo and refuses Wave 0 forever.
+The fix is not `os.getppid()`: the harness spawns a **fresh subshell per tool call**, so the parent PID
+differs between calls inside one logical session. Walk the full ancestor chain and treat that set as
+"us". Report the result as a distinct `SELF` state rather than silently downgrading to `CLEAR` — the
+distinction is the evidence, and collapsing it is the same shape as recording a vacuous PASS as a PASS.
+
+**Verify your matcher can match its subject.** Both defects above were found by a seat auditing its own
+freshly-built instrument *before* trusting its verdict — it initially refused all seven seats. An
+instrument's clean negative is only as good as its ability to match what it is looking for.
 
 ### 5. Verify the EXECUTED surface, not the delivered path
 
@@ -213,7 +229,9 @@ number lets a definitional pass read as a capability claim.
 
 **Objective**: Confirm framework and fleet readiness
 
-#### V0.0: Dispatch Names the Target (v3.26 C-26-04, gh#1835 — Wave-0 entry criterion)
+#### V0.0: Dispatch Names the Target — Wave-0 entry criterion
+
+*Delivered by gh#1835 / v3.26 C-26-04. Provenance, not a live dependency — see §Citing issues below.*
 
 The migration dispatch/handoff SHALL name the target version explicitly. A dispatch WITHOUT
 a target version is answered with a V0.1 discovery result ("latest public release is vX.Y.Z —
@@ -526,7 +544,9 @@ Update FLEET_STATE.yaml:
 
 **Objective**: Verify fleet-wide consistency
 
-#### Gate 4.0: Behavioral Verification — Rung 4 (v1.7.0, gh#1881/L1165 — BLOCKING at pilot, per-seat elsewhere)
+#### Gate 4.0: Behavioral Verification — Rung 4 — BLOCKING at pilot, per-seat elsewhere
+
+*Delivered by gh#1881 / L1165, SOP v1.7.0. Provenance, not a live dependency — see §Citing issues below.*
 
 **"31/31 upgraded ≠ 31/31 unregressed"** (supervisor verdict, v3.26 sweep). The ladder
 dispatch → receipt → state confirms LANDING; this rung confirms RUNNING. Per migrated seat:
@@ -781,6 +801,39 @@ See: `docs/patterns/PATTERN_weekly_fleet_health_monitor.md` (framework-recommend
 
 ---
 
+## Citing issues — provenance vs. live dependency
+
+An issue reference in this document is one of two speech acts, and **consuming seats run automated
+citation gates that cannot tell them apart from context**. Write the distinction explicitly:
+
+| Intent | Form | What a gate should do |
+|---|---|---|
+| **Provenance** — the issue that *delivered* this rule; usually CLOSED, and correctly so | `Delivered by gh#N` · `Origin: gh#N` | ignore; a CLOSED state is expected |
+| **Live dependency** — this rule is waiting on that issue | `Blocked on gh#N` · `Pending gh#N` | flag if the issue is CLOSED |
+
+**Never put a bare `gh#N` in a heading**, and never place one in the same parenthetical as an
+enforcement word (`BLOCKING`, `MANDATORY`). Adjacency is all an automated gate has.
+
+**Why this section exists.** `Gate 4.0`'s heading read
+`(v1.7.0, gh#1881/L1165 — BLOCKING at pilot, per-seat elsewhere)`. `gh#1881` is provenance — it is the
+issue that *delivered* Rung 4, CLOSED 2026-07-18 — and `BLOCKING` describes the **gate's** enforcement
+level, not the issue's state. On 2026-07-27 a consuming supervisor in another fleet adopted this file
+verbatim and its citation gate blocked the commit as a stale-blocker citation. That seat's judgment was
+correct in both directions: it verified `gh#1881` first-party, and it declined to edit adopted canonical
+text to satisfy a local hook, because a hand-patched copy forks from canonical — a worse defect than the
+citation. It committed with `--no-verify` and **disclosed that in the same turn**, in its plan's risk
+table and its commit message.
+
+The defect was ours. A reader can infer speech-act class from surrounding prose; an instrument cannot,
+and every consuming seat runs one. Same failure class as quoting a `Last reviewed:` line to ground a
+requirement — the right words in the wrong speech-act class — here at machine scale, at every seat, on
+every adoption.
+
+**Scope**: this file. Applying the convention across canonical `sops/` and `specs/`, and adding a
+validator that flags a bare `gh#N` in a heading, is **owed, not done**.
+
+---
+
 ## References
 
 - AGET_RELEASE_SPEC.md (version types, deployment scope)
@@ -797,6 +850,7 @@ See: `docs/patterns/PATTERN_weekly_fleet_health_monitor.md` (framework-recommend
 
 | Version | Date | Change |
 |---|---|---|
+| 1.8.1 | 2026-07-27 | **Corrections from v1.8.0's first field use, all consumer-found.** (a) §Dispatch Safety item 4's failure-direction table was **wrong**: it assigned one direction per signal (mtime over-reports, process under-reports); both signals fail both ways. mtime **under**-reports because a session file is written once at open, not continuously — measured at two live seats with session files 268 and 23 minutes old under a 10-minute window, which an mtime-only gate would have dispatched into. The **gate rule is unchanged and held**; only its explanation was wrong. Item 4 also gains the own-ancestry exclusion (walk the ancestor chain — `getppid()` is insufficient because the harness spawns a fresh subshell per tool call) and the `SELF`-as-distinct-state rule. (b) New **§Citing issues** — provenance (`Delivered by gh#N`) vs. live dependency (`Blocked on gh#N`), no bare `gh#N` in headings, never beside an enforcement word. `Gate 4.0` and `V0.0` headings reformed accordingly. A consuming seat's citation gate blocked on `gh#1881` cited as provenance in Gate 4.0's heading beside the word `BLOCKING`; the defect was ours, not the gate's. Cross-`sops/`/`specs/` application and a heading validator are **owed, not done**. |
 | 1.8.0 | 2026-07-26 | **§Dispatch Safety added** — seven field learnings from the v3.28.0 wave, each costing a real incident or a wrong gate verdict: two-clause behavioural gate for suite runs (a one-clause version passed a run that mutated the repo); per-seat timeout scaled to divergence count (0-diverged seats 177–296s, diverged seats both blew 540s — perfect separation); timed-out dispatch can leave a seat version-pinned with no payload and a dirty tree; two-signal liveness (mtime over-reports and is blind to non-session writes, process-check under-reports); executed-surface verification **with** the caution that a byte gap does not imply a capability gap; bounded diff reads (`--stat` before `head -N` — a truncated diff has no truncation signal); composition reporting instead of a single N/M headline. Also records that the "unguarded test call sites" hypothesis for the self-replicating commit loop was **falsified in both directions** and names the bisect method that found the real cause. |
 | 1.7.1 | 2026-07-18 | FLEET_GLOBS parameterization; silent-empty-set gate fix. |
 | 1.7.0 | 2026-07-18 | Rung-4 behavioural verification — M-row smoke probes, post-payload suite (`it-consultant:L239`), executed-surface/dual-basename parity (`cli-aget:L756`), L656 pilot evidence bar. |
