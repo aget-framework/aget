@@ -101,6 +101,54 @@ def sha_at_ref(ref, path):
     return hashlib.sha256(blob.encode()).hexdigest()
 
 
+TEMPLATE_REPO = os.path.join(os.path.dirname(REPO), "template-worker-aget")
+# Files the fleet receives that are pinned in place rather than copied; never manifest rows.
+_PIN_BASENAMES = {".aget/version.json", "AGENTS.md", "CHANGELOG.md", "README.md"}
+
+
+def prev_tag(version):
+    """The release tag immediately preceding v{version} in the template repo."""
+    rc, out = git(TEMPLATE_REPO, "tag", "--list", "v[0-9]*.[0-9]*.[0-9]*", "--sort=-v:refname")
+    if rc != 0:
+        return None
+    tags = [t.strip() for t in out.splitlines() if t.strip()]
+    try:
+        return tags[tags.index(f"v{version}") + 1]
+    except (ValueError, IndexError):
+        return None
+
+
+def template_shipped_paths(version):
+    """Paths the FLEET actually receives, derived from the template tag diff.
+
+    ⚠ 2026-07-26: this cross-check exists because the manifest was derived
+    EXCLUSIVELY from DEPLOYMENT_SPEC M-rows, which means **anything shipped
+    without an M-row naming it is invisible to the copy-list** — not flagged,
+    not warned, simply absent. v3.28.0 shipped four fleet scripts
+    (study_topic / check_initiatives / close_gate_check / wind_down, +585 lines,
+    byte-identical canonical↔tag) that no M-row mentions. The emitted manifest
+    listed six enforcement artifacts, every one ABSENT-AT-REF, and none of the
+    four files agents were actually going to receive.
+
+    A downstream seat deriving its add-list from that manifest, exactly as
+    SOP_fleet_upgrade G0.2 instructs, would have staged **zero** fleet-facing
+    files. Found by the supervisor seat's independent migration-prep audit, not
+    by this producer.
+
+    The spec is the contract, so a shipped-but-uncontracted file is a real
+    finding in its own right — it is emitted as an additive row carrying
+    NO-M-ROW so the gap is visible rather than silently absorbed.
+    """
+    prev = prev_tag(version)
+    if not prev or not os.path.isdir(TEMPLATE_REPO):
+        return None, None
+    rc, out = git(TEMPLATE_REPO, "diff", "--name-only", prev, f"v{version}")
+    if rc != 0:
+        return None, prev
+    paths = [p.strip() for p in out.splitlines() if p.strip()]
+    return [p for p in paths if p not in _PIN_BASENAMES], prev
+
+
 def emit(version, ref):
     rc, spec_text = git(REPO, "show", f"{ref}:DEPLOYMENT_SPEC_v{version}.yaml")
     if rc != 0:
@@ -120,6 +168,17 @@ def emit(version, ref):
             seen[key] = entry
             sections[info["section"]].append(entry)
 
+    # Cross-check against what the FLEET actually receives (see template_shipped_paths).
+    shipped, prev = template_shipped_paths(version)
+    uncontracted = []
+    if shipped is not None:
+        contracted = {p for (_sec, p) in seen}
+        for path in sorted(set(shipped) - contracted):
+            sha = sha_at_ref(ref, path)
+            entry = {"path": path, "spec_rows": ["NO-M-ROW"], "sha256": sha}
+            uncontracted.append(entry)
+            sections["additive_artifacts"].append(entry)
+
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     lines = [
         f"# DELIVERED_FILES_v{version}.yaml — machine-readable per-payload delivered-files manifest",
@@ -134,6 +193,14 @@ def emit(version, ref):
         "",
         "pin_edits:  # edited in place on the agent, not file-copied — outside the porcelain cross-check",
     ]
+    if uncontracted:
+        lines[4:4] = [
+            f"# ⚠ {len(uncontracted)} file(s) ship to the fleet with NO M-row contracting them",
+            f"#   (template diff {prev}..v{version}). They appear under additive_files with",
+            "#   spec_rows: [NO-M-ROW]. Derive your add-list from the FULL manifest — a",
+            "#   mandatory-rows-only reading of v3.28.0 yields zero fleet-facing files.",
+            "#   The missing M-rows are a DEPLOYMENT_SPEC gap, owed to the next release.",
+        ]
     for path, note in PIN_PATHS["M"]:
         lines.append(f'  - path: "{path}"  # {note}')
     for section, label in [

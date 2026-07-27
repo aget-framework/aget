@@ -170,3 +170,54 @@ no M-row — a separate gap left recorded rather than papered over).
 Public at v3.26.0 and v3.27.0; absent from `origin/main` at v3.28.0. It carries the mandatory rung-4
 behavioural smoke probes, and no public artifact replicates them. **Published now**, with its stale
 pre-push banner corrected and the `DELIVERED_FILES` probe restored to the header block.
+
+---
+
+## Row 7 — v3.28.0 has TWO payloads, and the manifest described only the missing one
+
+**Found**: 2026-07-26 by the **supervisor seat's independent migration-prep audit** — not by this
+producer. It verified the finding three ways (`git ls-tree -r` at both refs, `shasum` canonical↔tag, and a
+re-run of its own `verify_v328_mrows.sh`) before reporting. Re-verified here at source before acting.
+
+**Rows 3–6 above are correct and incomplete.** They describe the *enforcement* payload, which is absent.
+There is a second payload, and it shipped **fine**:
+
+| | Enforcement payload | Fleet-script payload |
+|---|---|---|
+| Artifacts | firing guard, battery, 3 checkers, traceability test | `study_topic.py`, `check_initiatives.py`, `close_gate_check.py`, `wind_down.py` |
+| At tag `v3.28.0` | **0 of 7** | **present**, +585 lines |
+| At 13 templates | 0 of 7 | present, byte-identical to canonical |
+| Named by an M-row | yes — all VACUOUS | **no — none** |
+
+So the accurate statement is not "the release shipped hollow." It is: **the release shipped its
+fleet-facing payload correctly and withheld the enforcement payload it is named for** — and its own
+deployment contract covers only the half that is missing.
+
+### The defect this produced, which is worse than the omission
+
+`DELIVERED_FILES_v3.28.0.yaml` is derived **exclusively from DEPLOYMENT_SPEC M-rows**. No M-row names any
+of the four fleet scripts, so the manifest could not see them. As first emitted it listed six enforcement
+artifacts, **every one `ABSENT-AT-REF`**, and none of the four files agents were actually going to receive.
+
+`SOP_fleet_upgrade` G0.2 instructs a consuming seat to derive its commit add-list from that manifest.
+**Following the SOP correctly would have staged zero fleet-facing files.** The correction written to fix a
+payload gap became, for one afternoon, a live misdirection of the migration it was meant to unblock.
+
+This is L320's shape (`gmelli/aget-aget#2008`, filed by a third seat the same day) recursing into the
+remediation: *a check that cannot distinguish ABSENT from PASSING certifies nothing* — here, a manifest
+that cannot distinguish *not-contracted* from *not-shipped*.
+
+**Fixed**: the emitter now cross-checks the template tag diff (`v3.27.0..v3.28.0`) and emits any shipped
+file no M-row contracts as an additive row carrying `spec_rows: [NO-M-ROW]`, with a header warning. The
+manifest went 6 → **10 rows**; the four fleet scripts now carry real sha256 values matching the template
+tag, so a hash-verified add-list is possible.
+
+**What to do**: derive your add-list from the **full** manifest — `delivered_files` + `optional_files` +
+**`additive_files`**. A mandatory-rows-only reading of v3.28.0 yields nothing.
+
+**Still owed, not done**: the four scripts have no M-rows, so nothing verifies their arrival at a seat.
+That is a DEPLOYMENT_SPEC gap and it is v3.29 work — recorded rather than back-filled into a published
+contract.
+
+**Credit**: the two-payload distinction, the G0.2 add-list consequence, and the `.aget/logs/` ledger-channel
+gap are the supervisor seat's findings. This producer verified its own release twice and found neither.

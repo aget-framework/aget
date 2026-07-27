@@ -2,9 +2,14 @@
 # Emit half of gmelli/aget-aget#1870 (closes the #1828 delivered-but-not-committed vector).
 # Consumer: SOP_fleet_upgrade G0.2 — commit add-list derives from THIS manifest;
 # post-stage porcelain cross-check asserts no manifest path remains untracked.
+# ⚠ 4 file(s) ship to the fleet with NO M-row contracting them
+#   (template diff v3.27.0..v3.28.0). They appear under additive_files with
+#   spec_rows: [NO-M-ROW]. Derive your add-list from the FULL manifest — a
+#   mandatory-rows-only reading of v3.28.0 yields zero fleet-facing files.
+#   The missing M-rows are a DEPLOYMENT_SPEC gap, owed to the next release.
 version: "3.28.0"
 source_ref: "v3.28.0"  # canonical aget/ (payload-source ruling 2026-07-11: canonical, not template — see #1871)
-generated: "2026-07-26T23:44:14Z"
+generated: "2026-07-27T00:08:22Z"
 generator: "scripts/emit_delivered_files_manifest.py"
 tracking: "gmelli/aget-aget#1870"
 
@@ -35,7 +40,18 @@ optional_files:
     sha256: "ABSENT-AT-REF"
 
 additive_files:
-  []
+  - path: "scripts/check_initiatives.py"
+    spec_rows: [NO-M-ROW]
+    sha256: "f862edabc4180df59c1a03bfb50aac6886b515041587ed9e5c59bc696d4a4383"
+  - path: "scripts/close_gate_check.py"
+    spec_rows: [NO-M-ROW]
+    sha256: "57c5fb09ca41fb894a3f72c01cd17645065a1b2a96b02863e555e0499c88dcb3"
+  - path: "scripts/study_topic.py"
+    spec_rows: [NO-M-ROW]
+    sha256: "2f3bd28ae29e4c0f08344f695e6d96891fb7c1986b0ce45bbbac0d79ec07c7d1"
+  - path: "scripts/wind_down.py"
+    spec_rows: [NO-M-ROW]
+    sha256: "cdceb2be526de6f465bb638846e4da2a0510ea895811b91f695af1c86e16dc54"
 
 verify_rule: |
   Post-upgrade, every delivered_files/optional_files path present on the agent's disk
