@@ -392,7 +392,7 @@ is the cost it surfaced.
 **Found**: 2026-07-27, auditing row 11's own completeness claim before relying on it.
 
 Row 11 states: *"**Fixed**: all five now read `private-supervisor-AGET`."* **Two of the five were still
-unqualified when that sentence was published** — and they are two of the three rows row 11 names by
+unqualified when that sentence was written** — and they are two of the three rows row 11 names by
 number:
 
 | Site | State at row 11's publication |
@@ -404,10 +404,19 @@ number:
 Both are now fixed. Row 3b's second instance is resolved by anaphora (*"that seat's own tags"*) rather
 than a fourth repetition of the name.
 
-**Why this is a row and not a silent edit.** Row 11 is published and was consumed — it is the row that
-told consumers *"if you find an unqualified role-noun in any v3.28 artifact, it is a defect."* A reader
-who trusted its completeness claim would have stopped looking. Same disposition as row 10 correcting row
-8, for the same reason.
+**Row 11 was never published, and that is a second finding.** It was committed locally and the commit was
+never pushed. `origin/main` carried **10 rows** while the working copy carried 11 — so the remote seat
+whose quote row 11 credits was reading the *original, unqualified* artifacts, not row 11's account of
+them. Row 11's own text (*"**Fixed**: all five now read…"*, *"**For consumers**: …"*) is written in the
+voice of a published correction and was never one. A correction that does not reach `origin/main` has the
+same consumer value as no correction at all — the L656 Loading-Dock shape, at the corrections surface
+that exists specifically to defeat it.
+
+**Why this is a row and not a silent edit of row 11.** Since row 11 never reached a reader, editing its
+claim in place would have been defensible. It is kept as a separate row because both rows now go public
+in the same push, and the reader is better served seeing what was claimed alongside what was true than
+seeing a tidied row 11 that never records the miss. Same disposition as row 10 correcting row 8 —
+different reason: row 8 *was* published; row 11 was not.
 
 **The instrument lesson, which is the transferable part.** The first audit run here searched
 `the supervisor seat` and returned row 7's line as **absent** — because the file writes it as
@@ -418,5 +427,6 @@ before matching prose identifiers** — `re.sub(r'[*\`_]', '', line)` — or the
 readability silently exempts the term from every audit that follows.
 
 **For consumers**: row 11's *substance* stands — unqualified role-nouns are defects and the canonical
-form is the FLEET_STATE-registered name. Only its completeness claim was wrong. The standing instruction
-to report any unqualified role-noun you find is now more load-bearing, not less.
+form is the FLEET_STATE-registered name. Only its completeness claim was wrong, and it never reached you
+in any case. The standing instruction to report any unqualified role-noun you find is now more
+load-bearing, not less: **two** audits of this surface have now returned a false all-clear on it.
