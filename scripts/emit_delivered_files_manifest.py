@@ -221,9 +221,18 @@ def emit(version, ref):
     lines += [
         "",
         "verify_rule: |",
-        "  Post-upgrade, every delivered_files/optional_files path present on the agent's disk",
-        "  MUST be git-tracked. `git status --porcelain` showing any manifest path as untracked",
-        "  (??) is the #1828 defect class — the upgrade is NOT complete until it is staged.",
+        "  Post-upgrade, every path in delivered_files, optional_files AND additive_files",
+        "  present on the agent's disk MUST be git-tracked. `git status --porcelain` showing",
+        "  any manifest path as untracked (??) is the #1828 defect class — the upgrade is NOT",
+        "  complete until it is staged.",
+        "",
+        "  ⚠ additive_files is NOT optional to check. This rule enumerated only the first two",
+        "  sections until 2026-07-26, when additive_files was added to carry payload no M-row",
+        "  contracts — which for v3.28.0 is EVERY file the fleet actually receives. The header",
+        "  said 'derive from the FULL manifest'; this rule, the half a consuming SOP mechanises,",
+        "  still named two of three sections. Prose fixed, actuator not — inside the commit that",
+        "  closed the previous instance of that same shape. Found by the manifest's first",
+        "  consumer (the supervisor seat) before it ran G0.2, not by the producer.",
     ]
     out_path = os.path.join(REPO, "handoffs", f"DELIVERED_FILES_v{version}.yaml")
     with open(out_path, "w") as f:

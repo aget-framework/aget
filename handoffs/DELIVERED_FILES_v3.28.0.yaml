@@ -9,7 +9,7 @@
 #   The missing M-rows are a DEPLOYMENT_SPEC gap, owed to the next release.
 version: "3.28.0"
 source_ref: "v3.28.0"  # canonical aget/ (payload-source ruling 2026-07-11: canonical, not template — see #1871)
-generated: "2026-07-27T00:08:22Z"
+generated: "2026-07-27T00:21:08Z"
 generator: "scripts/emit_delivered_files_manifest.py"
 tracking: "gmelli/aget-aget#1870"
 
@@ -54,6 +54,15 @@ additive_files:
     sha256: "cdceb2be526de6f465bb638846e4da2a0510ea895811b91f695af1c86e16dc54"
 
 verify_rule: |
-  Post-upgrade, every delivered_files/optional_files path present on the agent's disk
-  MUST be git-tracked. `git status --porcelain` showing any manifest path as untracked
-  (??) is the #1828 defect class — the upgrade is NOT complete until it is staged.
+  Post-upgrade, every path in delivered_files, optional_files AND additive_files
+  present on the agent's disk MUST be git-tracked. `git status --porcelain` showing
+  any manifest path as untracked (??) is the #1828 defect class — the upgrade is NOT
+  complete until it is staged.
+
+  ⚠ additive_files is NOT optional to check. This rule enumerated only the first two
+  sections until 2026-07-26, when additive_files was added to carry payload no M-row
+  contracts — which for v3.28.0 is EVERY file the fleet actually receives. The header
+  said 'derive from the FULL manifest'; this rule, the half a consuming SOP mechanises,
+  still named two of three sections. Prose fixed, actuator not — inside the commit that
+  closed the previous instance of that same shape. Found by the manifest's first
+  consumer (the supervisor seat) before it ran G0.2, not by the producer.
