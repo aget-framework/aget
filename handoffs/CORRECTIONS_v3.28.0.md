@@ -307,3 +307,45 @@ ships from a source not visible on this host, this row does not cover it.
 **Durable procedure from this incident** — the two-clause gate, divergence-scaled timeouts, two-signal
 liveness, and executed-surface verification — is in `sops/SOP_fleet_migration.md` **§Dispatch Safety**
 (v1.8.0), not here. This row is the v3.28-specific fact; that section is the procedure.
+
+
+---
+
+## Row 10 — CORRECTING ROW 8: the gate failure was real, my diagnosis of it was not
+
+**Found**: 2026-07-26, hours after row 8 was published, while fixing the thing row 8 described.
+
+Row 8 asserts: *"The suite was fixed 528 → 144s. The 60s timeout was never raised. 144 > 60 — the check
+is still structurally unpassable."*
+
+**The 144.45s figure is load-contaminated.** Re-measured with the identical command
+(`pytest tests/ -q --no-header -p no:cacheprovider`):
+
+| | Tests | Wall |
+|---|---|---|
+| Original measurement | 684 passed | **144.45s** |
+| Clean re-measurement | 699 passed | **31.25s** |
+
+The first was taken while three agent sessions and a self-replicating pytest loop at another seat were
+competing for CPU — the same evening's incident. **31 < 60 comfortably**, so the check is *not*
+structurally unpassable, and the v3.28 suite fix was not incomplete.
+
+**What survives, and it is not nothing**: the gate *did* return `❌ Tests timeout (>60s)` and
+`FAIL: Pre-Release Validation [BLOCKING]` at the producing seat. That was observed, not inferred. A
+BLOCKING release gate that fails under ordinary multi-session load on a shared machine is a real defect —
+just a **different** one than "the timeout was never raised."
+
+**What changed as a result** (`.aget/patterns/release/pre_release_validation.py`): budget 60s → 300s, sized
+against the *contended* observation rather than the quiet one, because a budget that only holds on an idle
+machine reproduces the defect elsewhere. And `-v` → `-q`: the gate needs an exit code and a count, and
+rendering 699 verbose result lines is work done to be discarded. Gate now returns
+`✅ All tests passed (699 tests, 37s / 300s budget)`.
+
+**Why this row exists rather than an edit to row 8.** Row 8 is published and consumed. Silently correcting
+a number in it is the undisclosed-divergence defect this file exists to prevent — the same rule row 1
+invokes against a published spec.
+
+**The transferable part**: row 8 named its instrument (`pytest -q`, the file, the line numbers) and did not
+name its **conditions**. A wall-clock measurement on a shared machine is a claim about the machine as much
+as the code. `L1220 §Count` says name the instrument; this says the instrument is not sufficient when the
+quantity is time.
