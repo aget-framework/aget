@@ -221,3 +221,45 @@ contract.
 
 **Credit**: the two-payload distinction, the G0.2 add-list consequence, and the `.aget/logs/` ledger-channel
 gap are the supervisor seat's findings. This producer verified its own release twice and found neither.
+
+
+---
+
+## Row 8 — the BLOCKING pre-release check this release claims to have fixed is still unpassable
+
+**Found**: 2026-07-26 evening, chasing a suite-runtime question the supervisor seat raised. Its premise was
+different and one of its inferences does not hold (see below), but the instinct was right and neither seat
+had this.
+
+**The release notes' §Fixed states**:
+
+> *"Pre-release validation ran the full contract suite under a 60-second timeout against a suite that took
+> **528 seconds** — 81% of it inside three tests that each re-ran the entire release battery. A BLOCKING
+> check was structurally unpassable, so its failure had become background noise."*
+
+**The suite was fixed. The timeout was not.**
+
+| | |
+|---|---|
+| `.aget/patterns/release/pre_release_validation.py:166` | `timeout=60` — unchanged |
+| `:178` | `return False, "❌ Tests timeout (>60s)"` |
+| Measured suite, 2026-07-26 | **684 passed, 1 skipped, 1 xfailed, 144.45s** |
+
+144 > 60. The check is **still structurally unpassable**, and `validate_release_gate.py --version 3.28.0
+--phase pre-release` returns **`GATE BLOCKED — 1 blocking failure`** at the producing seat right now:
+`❌ FAIL: Pre-Release Validation [BLOCKING] (60.3s)`.
+
+The cycle reduced the numerator by 3.7× and left the denominator alone. The theme was *make the gates
+fire*; this gate fires, fails, and its failure is once again the background noise the entry describes.
+
+**What I cannot resolve from here**: the cycle's record also claims *"7/8, 0 blocking — GATE OPEN"* and a
+*"~30s"* suite. Both cannot be true alongside a 60s timeout and a 144s suite. Either the suite has slowed
+~4.8× since the tag, or the GATE OPEN claim was already false when recorded. Distinguishing them requires
+measuring the suite at the tagged tree, which this correction does not do — stated rather than guessed,
+because this seat has already published one figure this cycle that did not survive re-measurement.
+
+**Impact on your migration: none.** Probe 7 is *"no NEW failures vs your baseline"* and carries no time
+bound; the suite is **green**. This is a v3.29 release-process finding, not a migration blocker.
+
+**Owed, not done**: raise the timeout to fit the real suite (or split the suite), then re-derive the gate
+result and reconcile the two published figures.
