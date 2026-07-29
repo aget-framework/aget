@@ -766,7 +766,7 @@ def generate_report(topic: str, findings: dict, floor_info: dict = None) -> str:
 
     # Summary
     total = sum(len(v) for v in findings.values() if isinstance(v, list))
-    lines.append(f"### Summary")
+    lines.append("### Summary")
     lines.append("")
     lines.append(f"Found **{total}** related artifacts:")
     lines.append("")
@@ -938,7 +938,22 @@ Examples:
     # Load config and resolve epistemic parameters (CAP-SESSION-007-06/07)
     config = load_study_topic_config()
     purpose = resolve_purpose(args.purpose, config)
-    purpose_globs = get_purpose_globs(purpose, config)
+    # ⚠ DEAD CAPABILITY, DELIBERATELY LEFT VISIBLE — do NOT "clean up" this line.
+    # ruff reports F841 (assigned, never used) and ruff is right, but deleting the
+    # assignment would erase the last trace of a capability that is fully built and
+    # never reachable. CAP-SESSION-007-06 (purpose weighting via `priority_areas`) is
+    # implemented end to end and wired NOWHERE:
+    #   * get_purpose_globs()      -- returns the globs (works)
+    #   * compute_purpose_boost()  -- applies the boost (works)
+    #   * search_directory()       -- the ONLY caller of that boost: ZERO callers itself
+    #   * find_ldocs/patterns/...  -- all 9 take domain_keywords, NONE takes purpose_globs
+    # So `--purpose` is accepted, documented as "weights results by KB area", and its
+    # weighting has never once applied to a result. This value is computed and discarded.
+    #
+    # Not fixed here on purpose: wiring it changes result ranking for every study at
+    # every seat, which needs a V-test and a release, not a lint pass. Tracked upstream;
+    # it survived v3.28's own orphaned-control census, which is itself the finding.
+    purpose_globs = get_purpose_globs(purpose, config)  # noqa: F841 - see above, tracked
 
     # Domain keywords: explicit flag > config > none
     domain_keywords = args.domain_keywords or config.get('domain_keywords')

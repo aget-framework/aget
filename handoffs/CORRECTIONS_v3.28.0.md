@@ -536,3 +536,106 @@ reports an unchecked payload axis as `UNCHECKED` rather than as pass, and exits 
 Self-test 8/8; control-tested 5/5 against seats whose true state was established independently, including
 a monorepo seat. **Use it instead of a version grep — and when you publish a count, name which of the
 three readings you mean.**
+
+---
+
+## Row 15 — probes 8 and 9 read the wrong REF, and the instrument written to fix that had the same defect three times
+
+**Found**: 2026-07-29 by `private-supervisor-AGET` and `private-aget-framework-AGET` measuring the same
+fleet independently. **Both reported `22/31 LANDED`. The sets were different.** That is the finding; the
+ref bug is only its cause.
+
+Row 14 moved the migration bar from *disk* to *`HEAD`* and stopped one ref short. **A fourth failure
+passes the 6+7+8+9 battery as published:**
+
+| Failure | What passes | What is false |
+|---|---|---|
+| **committed but OFF-TRUNK** | probes 8 and 9 — `HEAD` carries version *and* payload | the seat's **trunk** is two releases back; the migration lives on an unmerged branch |
+
+`private-career-aget` sat on `session/2026-07-17-…` with `HEAD` = `3.28.0` and `main` = **`3.26.0`**. It
+passed every `HEAD`-based probe. `R-FU-014-6` at the consuming seat had **already** superseded `HEAD` with
+trunk; canonical had not converged, so the consuming seat's bar was knowingly stronger than the published
+one for two days. **Canonical now converges to it** (`gh#2059`) — the consuming seat was right and this is
+the producer following, not the reverse.
+
+### The three defects in `scripts/verify_migration_landed.py`, the file written to kill this class
+
+1. **Version axis read `HEAD`, not trunk** — it certified `career` LANDED.
+2. **Payload axis hashed the WORKING TREE while the version axis read a commit.** Two axes, two refs, one
+   verdict, so the verdict answered no single question. One local edit made
+   `private-professional-core-aget` read DIVERGENT while its committed state was byte-exact. Worktree
+   drift is real information and is now reported **separately**, never against the verdict.
+3. **Payload axis silently scored ONE of THREE sha-bearing manifest sections** (`additive_files` only,
+   with `delivered_files` and `optional_files` unread and unmentioned, while the manifest's own
+   `verify_rule` names all three). At v3.28 the narrow read was **accidentally correct** — the
+   `delivered_files` enforcement payload never shipped (row 3), so scoring it would have reported
+   DIVERGENT at all 31 seats. The accident inverts the moment a release ships its `delivered_files`.
+   This is row 12's lesson one layer down: prose named three sections, the actuator mechanised one.
+
+**Defects 1 and 2 were sign-opposed and cancelled exactly.** That is why two seats agreed on `22` from
+different sets: one over-counted `career` and under-counted `professional-core`; the other did neither.
+**An aggregate cannot surface a sign-opposed pair. An element-wise diff of the SET can.** Publish the
+per-seat set, not the count.
+
+### Two more defects, found on the first live runs of the fix itself
+
+- **`ABSENT-AT-REF` is a SENTINEL, not a hash.** The manifest writes it into `sha256` for every
+  enforcement-payload row. Comparing it as a hash reported **all 31 seats DIVERGENT** for correctly not
+  having files that were never shipped — a disclosed producer-side gap re-rendered as 31 phantom consumer
+  defects. Sentinel rows are now `declared-absent`: not scoreable as delivery, and a seat that *does* hold
+  one is flagged `PRESENT-ANOMALY` (provenance not this release) rather than passed or failed.
+- **Precedence.** The payload axis is scored *at trunk*, so a stale trunk **entails** a stale payload.
+  Scoring payload first made `career` read `VERSION-ONLY`, whose stated meaning is "version pinned,
+  payload absent" and whose remedy is **re-migration**. `career`'s real remedy is a conflict-free
+  fast-forward. Reporting a consequence in place of its cause hands the reader the wrong repair, which is
+  worse than a vague answer. Trunk position is now answered first, and `OFF-TRUNK` is a distinct verdict.
+
+**The repo-root prefix is KEPT.** Probe 9's `$(git rev-parse --show-prefix)` was always correct — that is
+the monorepo fix (`R-FU-014-5`). Only the **ref** was wrong. Dropping the prefix while changing the ref
+reintroduces the monorepo false alarm: a correction failing to reach what was derived from it.
+
+**What to do**: re-run probes 8 and 9 in their trunk form, or run
+`python3 scripts/verify_migration_landed.py . --version 3.28.0 --manifest handoffs/DELIVERED_FILES_v3.28.0.yaml`
+(one command, both axes at one ref, exit 0 only on `LANDED`). **A leg-2 confirmation recorded against
+`HEAD` does not meet the corrected bar.** Re-confirm; it is one command.
+
+**Re-measured trunk-based, 2026-07-29T18:09Z**: **29 LANDED · 1 OFF-TRUNK (`career`) · 1 NOT-APPLIED
+(`llm-connectivity`)**. Self-test 8 → 10 cases, including one deliberate precedence flip recorded rather
+than silently re-asserted. A census is a snapshot — run the instrument rather than citing this line.
+
+---
+
+## Row 16 — canonical `study_topic.py` moved: two lint defects fixed, and one of them was a dead capability
+
+**Found**: 2026-07-29, fixing `gh#2041`'s upstream half.
+
+`gh#2041` established that the shipped `study_topic.py` fails a standard ruff gate, making probe-8
+byte-identity and a seat's own pre-commit hook mutually unsatisfiable. **Both defects are now fixed on
+canonical `HEAD`.**
+
+**This moves no manifest sha and cannot un-land any seat.** `DELIVERED_FILES_v3.28.0.yaml` pins
+`source_ref: "v3.28.0"` — the immutable tag. Verified: the tag's blob still hashes `2f3bd28ae29e…`;
+canonical `HEAD` now hashes `7e570c4563a2…`, and the two are *meant* to differ. **Do not re-cut any hash,
+and do not "fix" your local copy toward a value you computed** — the bytes probe 8 measures are still the
+tag's. The dispatch precedence clause (`--no-verify` authorized for the migration commit only) therefore
+still stands unchanged.
+
+**The F841 was not lint.** `purpose_globs` was computed in `main()` and discarded, and chasing it found
+**CAP-SESSION-007-06 (purpose weighting via `priority_areas`) is entirely dead code**:
+
+| Component | State |
+|---|---|
+| `get_purpose_globs()` | implemented, works |
+| `compute_purpose_boost()` | implemented, works — reachable **only** from `search_directory()` |
+| `search_directory()` | **zero callers** |
+| `find_ldocs` … `find_inbox` (9 functions) | all take `domain_keywords`; **none takes `purpose_globs`** |
+| `--purpose` flag | accepted, and documented as *"weights results by KB area"* |
+
+So `--purpose` has never weighted a single result. **The assignment is deliberately retained with an
+explicit `# noqa: F841` and a comment**, because deleting it to satisfy the linter would have erased the
+last trace of a built-and-unreachable capability — the tidy fix that destroys the finding.
+
+**Not fixed here, on purpose**: wiring it changes result ranking for every study at every seat, which
+needs a V-test and a release, not a lint pass. **It survived v3.28's own orphaned-control census** (15
+controls wired that cycle), and that is the more useful finding: the census reads controls, and this is a
+capability whose orphaning lives at a *parameter* call site.
