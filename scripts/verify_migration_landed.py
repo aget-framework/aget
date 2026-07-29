@@ -34,7 +34,10 @@ Every count published that day was the 17.
     NOT-COMMITTED  payload correct on disk, HEAD behind. One `git checkout` from gone.
     NOT-APPLIED    payload absent or divergent. The dispatch did no work.
     VERSION-ONLY   version pinned, payload absent. The Gate-2 false-green shape.
-    UNVERIFIABLE   could not read the seat. NEVER treat as success.
+    UNVERIFIABLE   an axis was not examined, or the seat could not be read.
+                   NEVER treat as success. Exit 2 -- distinct from FAIL.
+                   Running without --manifest leaves the payload axis
+                   unexamined and therefore CANNOT yield LANDED.
 
 ## The monorepo trap
 
@@ -47,7 +50,11 @@ check that cries wolf during normal operation gets ignored exactly when it is ri
 
 Per-seat by design. The fleet loop belongs to the consumer, whose seat registry this
 script deliberately does not know about: `for p in <paths>; do verify_migration_landed.py
-"$p" --version X.Y.Z; done`. Exit code is 0 only for LANDED, so the loop is scriptable.
+"$p" --version X.Y.Z --manifest <DELIVERED_FILES>; done`.
+
+Exit codes: **0** LANDED · **1** a defect was found · **2** UNVERIFIABLE (an axis was
+not examined). Two and one are different facts; collapsing them trains readers to
+ignore the one that means "this run cannot answer your question."
 """
 
 import argparse
@@ -112,6 +119,15 @@ def classify(disk, head, payload_ok, want):
         return "NOT-APPLIED"
     if payload_ok is False:
         return "VERSION-ONLY"
+    if payload_ok is None:
+        # ZERO-DENOMINATOR GATE (2026-07-28, gh#2045). This returned LANDED --
+        # a PASS -- on an axis that was never examined, and scripts/…:152 below
+        # asserted that as correct in the self-test. The docstring said "reports
+        # an unchecked payload axis as UNCHECKED, never as pass": true of the
+        # DISPLAY, false of the VERDICT, and callers read the exit code.
+        # A conjunction over an unexamined conjunct is not satisfied; it is
+        # unevaluated. Fail closed.
+        return "UNVERIFIABLE"
     if head is None:
         return "UNVERIFIABLE"
     if head != want:
@@ -149,7 +165,12 @@ def self_test():
     W = "3.28.0"
     cases = [
         ("clean landing",            (W, W, True),  "LANDED"),
-        ("payload axis unchecked",   (W, W, None),  "LANDED"),
+        # Inverted 2026-07-28. The prior case asserted LANDED here and passed
+        # 8/8, which is how a suite comes to DEFEND a defect: the error was
+        # encoded as a requirement. A self-test is a claim under test (gh#2045).
+        ("unchecked axis is NOT a pass", (W, W, None), "UNVERIFIABLE"),
+        ("unchecked axis, stale version still NOT-APPLIED",
+                                        ("3.27.0", "3.27.0", None), "NOT-APPLIED"),
         ("applied, not committed",   (W, "3.27.0", True),  "NOT-COMMITTED"),
         ("version pinned, no payload", (W, W, False), "VERSION-ONLY"),
         ("version-only beats persistence", (W, "3.27.0", False), "VERSION-ONLY"),
@@ -209,7 +230,13 @@ def main(argv=None):
             print("     probe passes. One `git checkout` reverts the migration.")
         if verdict == "VERSION-ONLY":
             print("  ⛔ The version claims delivery the payload does not support.")
-    return 0 if verdict == "LANDED" else 1
+    # Three states, not two (gh#2045 request 2): UNVERIFIABLE is not FAIL, and
+    # collapsing them trains readers to ignore it.
+    if verdict == "LANDED":
+        return 0
+    if verdict == "UNVERIFIABLE":
+        return 2
+    return 1
 
 
 if __name__ == "__main__":
