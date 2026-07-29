@@ -100,11 +100,12 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 
-VERDICTS = ("LANDED", "OFF-TRUNK", "NOT-COMMITTED", "VERSION-ONLY",
-            "NOT-APPLIED", "UNVERIFIABLE")
+VERDICTS = ("LANDED", "LANDED-AND-ADVANCED", "ADVANCED-UNPAIRED", "OFF-TRUNK",
+            "NOT-COMMITTED", "VERSION-ONLY", "NOT-APPLIED", "UNVERIFIABLE")
 
 #: Every manifest section that carries sha256 rows. `pin_edits` is excluded because it
 #: is edited in place on the agent and carries no sha by design.
@@ -149,6 +150,122 @@ def _show_bytes(repo, ref, relpath):
     return r.stdout if r.returncode == 0 else None
 
 
+def ever_held(repo, relpath, want_sha):
+    """ANCESTOR-CONTAINMENT: did this seat's own history ever hold exactly `want_sha`?
+
+    Distinguishes a seat that RECEIVED the payload and then advanced past it (the
+    producing seat, by construction — it is where the next version is authored) from a
+    seat that never held those bytes at all. Principal ruling 2026-07-29: this counts.
+
+    ⚠ THIS PREDICATE IS MONOTONE, AND THAT IS ITS CEILING. Once true it is true forever;
+    it can never return to False. So it CANNOT express regression. A seat may hold the
+    payload, have it reverted or damaged by any later commit, and pass this check
+    permanently. It answers *did the payload arrive*, never *is this seat correct now*.
+    That is why `LANDED-AND-ADVANCED` requires a capability attestation — see classify().
+
+    Implementation note: the commit list is MATERIALISED before iterating. A `git show`
+    inside a `while read` pipeline consumes the loop's own stdin and shifts every result
+    by one row — no error, confident garbage. That defect nearly inverted a conclusion at
+    the framework seat on 2026-07-29; it is why this is a list comprehension.
+    """
+    if not want_sha:
+        return None
+    prefix = _git(repo, "rev-parse", "--show-prefix")
+    if prefix is None:
+        return None
+    log = _git(repo, "log", "--format=%H", "--", f"{prefix}{relpath}")
+    if not log:
+        return False
+    for commit in [ln.strip() for ln in log.splitlines() if ln.strip()]:
+        blob = _show_bytes(repo, commit, relpath)
+        if blob is not None and _sha256_bytes(blob) == want_sha:
+            return True
+    return False
+
+
+#: `@aget-canonical-specs` pins a `/tree/vX.Y.Z/specs` ref and declares reliance-only
+#: conformance. Read at three surfaces because they disagree; see check_pin().
+_PIN_RE = re.compile(r'@aget-canonical-specs:\s*\S*?/tree/v([0-9.]+)/')
+_VER_RE = re.compile(r'@aget-version:\s*([0-9.]+)')
+
+
+def _strip_emphasis(text):
+    # Markdown emphasis silently exempts a term from every audit that follows
+    # (CORRECTIONS row 12). Strip before matching prose identifiers.
+    return re.sub(r'[*`_]', '', text or '')
+
+
+def check_pin(repo, trunk_ref, want):
+    """The `@aget-canonical-specs` axis, at worktree / trunk / PUBLISHED.
+
+    ⚠ WHY THE PUBLISHED SURFACE NEEDS ITS OWN READ. `@aget-canonical-specs` is a
+    reliance-only conformance declaration — the line another agent reads to learn which
+    spec revision this seat's behaviour was built against. A pin correct only locally is
+    correct nowhere a remote consumer looks.
+
+    SCOPE, per principal ruling 2026-07-29: the published surface is BLOCKING for
+    publicly-readable repos and ADVISORY for private ones, because cross-seat reads in a
+    private fleet happen on the local filesystem (L480) — there, trunk is what a peer
+    actually reads. The scope is REPORTED here, never silently applied.
+
+    ⚠ AND THE READ MUST CARRY THE REPO-ROOT PREFIX. `git show <ref>:<path>` resolves from
+    the repository root. Three GM-RKB monorepo seats read as UNMEASURABLE on 2026-07-29
+    from an unprefixed probe — and TWO of them were actually STALE, so two real failures
+    sat inside a bucket labelled "couldn't check". An unmeasured bucket adjacent to a
+    failing axis absorbs failures. This routes through _show_bytes(), which prefixes.
+    """
+    rep = {"worktree": None, "trunk": None, "published": None,
+           "has_pin": False, "has_remote": False, "state": "UNMEASURED",
+           "blocking": _is_public_repo(repo), "want": want}
+    try:
+        with open(os.path.join(repo, "AGENTS.md"), encoding="utf-8", errors="replace") as f:
+            wt = f.read()
+    except OSError:
+        rep["state"] = "NO-AGENTS-FILE"
+        return rep
+    wt = _strip_emphasis(wt)
+    rep["has_pin"] = "@aget-canonical-specs" in wt
+    m = _PIN_RE.search(wt)
+    rep["worktree"] = m.group(1) if m else None
+
+    def pin_at(ref):
+        blob = _show_bytes(repo, ref, "AGENTS.md")
+        if blob is None:
+            return None
+        mm = _PIN_RE.search(_strip_emphasis(blob.decode("utf-8", "replace")))
+        return mm.group(1) if mm else None
+
+    if trunk_ref:
+        rep["trunk"] = pin_at(trunk_ref)
+        pub_ref = f"origin/{trunk_ref}"
+        if _git(repo, "rev-parse", "--verify", "--quiet", pub_ref) is not None:
+            rep["has_remote"] = True
+            rep["published"] = pin_at(pub_ref)
+
+    if not rep["has_pin"]:
+        # A seat with no pin line at all is a GOVERNED ABSENCE candidate, not drift.
+        # Never invent one to make a sweep look complete.
+        rep["state"] = "NO-PIN-GOVERNED-ABSENCE"
+    elif not rep["has_remote"]:
+        rep["state"] = "UNMEASURED-NO-REMOTE"      # NOT a pass (UNREACHABLE is not PASS)
+    elif rep["published"] == want:
+        rep["state"] = "PUBLISHED-CURRENT"
+    elif rep["trunk"] == want:
+        rep["state"] = "COMMITTED-NOT-PUBLISHED"
+    else:
+        rep["state"] = "DRIFTED"
+    return rep
+
+
+def _is_public_repo(repo):
+    """Publicly readable? Decides whether the published pin axis BLOCKS or advises."""
+    name = os.path.basename(os.path.realpath(repo).rstrip("/"))
+    if name.startswith("public-"):
+        return True
+    url = _git(repo, "remote", "get-url", "origin") or ""
+    return "aget-framework/" in url
+
+
 def resolve_trunk(repo):
     """(ref, how). Never guesses -- returns (None, reason) when it cannot resolve."""
     sym = _git(repo, "symbolic-ref", "--quiet", "refs/remotes/origin/HEAD")
@@ -186,11 +303,16 @@ def version_at(repo, ref):
         return None
 
 
-def classify(disk, head, trunk, payload_ok, want):
+def classify(disk, head, trunk, payload_ok, want, advanced=None, capability=None):
     """The whole decision, as a pure function -- which is what the self-test exercises.
 
     payload_ok is tri-state: True / False / None (axis not checked).
     `trunk` is the version AT the trunk ref, or None if trunk was unresolvable.
+    `advanced` -- every mismatching payload file's pinned blob was once held here
+                  (ancestor-containment). MONOTONE: see ever_held().
+    `capability` -- executed-surface/probe-7 attestation for this seat. This instrument
+                  CANNOT determine it (it does not run the seat's suite), so it must be
+                  supplied. None means "not attested", which is never a pass.
     """
     if disk is None:
         return "UNVERIFIABLE"
@@ -224,8 +346,24 @@ def classify(disk, head, trunk, payload_ok, want):
         # is not satisfied; it is unevaluated. Fail closed.
         return "UNVERIFIABLE"
     if payload_ok is False:
-        # Trunk IS at the target version and the payload does not back it. This is now the
-        # only route to VERSION-ONLY, which is what the verdict always claimed to mean.
+        # Trunk IS at the target version and the payload does not back it.
+        #
+        # ANCESTOR-CONTAINMENT (principal ruling 2026-07-29). If every mismatching file's
+        # pinned blob was once held HERE, this seat received the payload and advanced past
+        # it — which is what the PRODUCING seat does by construction, because it is where
+        # the next version is authored. A wave that counts the producer in a
+        # hash-match-against-frozen-tag denominator fails the moment the producer resumes
+        # work. That is a spec defect, not a compliance defect (L742).
+        #
+        # THE PAIRING CONSTRAINT IS STRUCTURAL, NOT ADVISORY. `advanced` is monotone and
+        # therefore blind to regression: hold the bytes once, diverge arbitrarily forever,
+        # still True. So provenance alone MUST NOT yield a pass. Without a capability
+        # attestation the verdict is ADVANCED-UNPAIRED and the exit code is a failure.
+        # Unpaired, this state would become "differences are fine if you once matched" —
+        # precedent the next wave inherits.
+        if advanced:
+            return "LANDED-AND-ADVANCED" if capability else "ADVANCED-UNPAIRED"
+        # Never held the bytes: a genuine non-delivery, no role privilege available.
         return "VERSION-ONLY"
     return "LANDED"
 
@@ -238,7 +376,7 @@ def check_payload(repo, manifest_path, ref, sections):
     """
     report = {"ref": ref, "sections_scored": list(sections),
               "sections_excluded": [], "per_section": {}, "details": [],
-              "worktree_drift": []}
+              "worktree_drift": [], "mismatched": []}
     if not manifest_path:
         return None, report
     try:
@@ -294,6 +432,7 @@ def check_payload(repo, manifest_path, ref, sections):
             else:
                 s_bad += 1
                 ok = False
+                report["mismatched"].append({"path": rel, "want": want, "got": got})
                 report["details"].append(
                     f"[{sect}] {rel}: "
                     f"{'ABSENT-AT-' + str(ref) if got is None else got[:12]} "
@@ -343,10 +482,36 @@ def self_test():
                                              (W, O, O, False),  "NOT-COMMITTED"),
         ("dispatch did nothing",             (O, O, O, None),   "NOT-APPLIED"),
         ("no version on disk",               (None, W, W, True), "UNVERIFIABLE"),
+
+        # ---- ancestor-containment, added 2026-07-29 (principal ruling) ----
+        # The producing seat: held the pinned blob, advanced past it, capability attested.
+        ("advanced + capability attested -> LANDED-AND-ADVANCED",
+                                             (W, W, W, False, True, True),
+                                             "LANDED-AND-ADVANCED"),
+        # THE FALSIFIER THAT NOTHING ELSE COVERS. `advanced` is MONOTONE: once a seat has
+        # held the blob it passes forever, so it cannot fail on regression. A seat that
+        # held the payload and then had it reverted or damaged looks IDENTICAL to the
+        # producing seat on that axis. The only thing separating them is the capability
+        # attestation — so if this row ever reads LANDED-AND-ADVANCED, the pairing
+        # constraint has been dropped and provenance is being read as correctness.
+        ("held-then-REGRESSED, no capability -> NOT a pass",
+                                             (W, W, W, False, True, False),
+                                             "ADVANCED-UNPAIRED"),
+        ("advanced but capability merely UNSTATED -> still not a pass",
+                                             (W, W, W, False, True, None),
+                                             "ADVANCED-UNPAIRED"),
+        # No role privilege: a seat that never held the bytes cannot reach the state, and
+        # an attestation does not buy it either.
+        ("never held the blob -> VERSION-ONLY even WITH capability",
+                                             (W, W, W, False, False, True),
+                                             "VERSION-ONLY"),
+        ("ancestor-containment unknown -> VERSION-ONLY, not a pass",
+                                             (W, W, W, False, None, True),
+                                             "VERSION-ONLY"),
     ]
     failed = []
     for name, args, want in cases:
-        got = classify(*args, W)
+        got = classify(*args[:4], W, *args[4:])
         ok = got == want
         if not ok:
             failed.append(f"{name}: got {got}, want {want}")
@@ -375,6 +540,11 @@ def main(argv=None):
                     help="comma-separated manifest sections to score. "
                          "Default: all sha-bearing sections (%(default)s). "
                          "Excluded sections are ALWAYS reported.")
+    ap.add_argument("--capability-attested", metavar="EVIDENCE",
+                    help="Attest that the executed-surface/probe-7 check PASSED at this "
+                         "seat, with evidence text (recorded in output). REQUIRED to reach "
+                         "LANDED-AND-ADVANCED: ancestor-containment is monotone and cannot "
+                         "detect regression, so provenance alone is never a pass.")
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
 
@@ -395,9 +565,28 @@ def main(argv=None):
     head = version_at(repo, "HEAD")
     trunk = version_at(repo, trunk_ref)
     payload_ok, report = check_payload(repo, args.manifest, trunk_ref, sections)
-    verdict = classify(disk, head, trunk, payload_ok, args.version)
+
+    # ANCESTOR-CONTAINMENT: only asked when the payload actually mismatches, and it must
+    # hold for EVERY mismatching file. One file this seat never held is enough to make the
+    # whole claim false -- "some of the payload arrived" is not a landing.
+    advanced = None
+    held_detail = []
+    if payload_ok is False and report["mismatched"]:
+        results = []
+        for row in report["mismatched"]:
+            h = ever_held(repo, row["path"], row["want"])
+            results.append(h)
+            held_detail.append({"path": row["path"], "ever_held": h})
+        advanced = all(r is True for r in results)
+
+    pin = check_pin(repo, trunk_ref, args.version)
+    capability = args.capability_attested or None
+    verdict = classify(disk, head, trunk, payload_ok, args.version, advanced, capability)
     payload_state = ("UNCHECKED" if payload_ok is None
                      else "MATCH" if payload_ok else "DIVERGENT")
+    # The published pin BLOCKS only where the repo is publicly readable (principal ruling
+    # 2026-07-29). Reported for every seat either way -- the scope is stated, not silent.
+    pin_blocks = pin["blocking"] and pin["state"] in ("DRIFTED", "COMMITTED-NOT-PUBLISHED")
 
     if args.json:
         print(json.dumps({
@@ -410,6 +599,11 @@ def main(argv=None):
             "payload_per_section": report["per_section"],
             "payload_detail": report["details"],
             "worktree_drift": sorted(set(report["worktree_drift"])),
+            "advanced": advanced,
+            "ancestor_containment": held_detail,
+            "capability_attested": capability,
+            "pin": pin,
+            "pin_blocks": pin_blocks,
         }, indent=2))
     else:
         print(f"{verdict:15s} {os.path.basename(repo.rstrip('/'))}")
@@ -449,13 +643,32 @@ def main(argv=None):
             print("     filesystem probe passes. One `git checkout` reverts the migration.")
         if verdict == "VERSION-ONLY":
             print("  ⛔ The version claims delivery the payload does not support.")
+        for h in held_detail:
+            print(f"  ancestor {h['path']}: ever held pinned blob = {h['ever_held']}")
+        if verdict == "LANDED-AND-ADVANCED":
+            print(f"  ✅ Held the payload, then advanced past it. Capability attested: "
+                  f"{capability}")
+            print("     Provenance + capability. Ancestor-containment ALONE is monotone")
+            print("     and cannot detect regression — the attestation is what carries it.")
+        if verdict == "ADVANCED-UNPAIRED":
+            print("  ⛔ This seat HELD the payload and advanced past it, but no capability")
+            print("     attestation was supplied. Ancestor-containment is monotone: a seat")
+            print("     whose payload was reverted or damaged reads identically here.")
+            print("     Re-run with --capability-attested '<probe-7 evidence>'.")
+        print(f"  pin      @aget-canonical-specs: {pin['state']}  "
+              f"(worktree={pin['worktree']} trunk={pin['trunk']} "
+              f"published={pin['published']})")
+        print(f"           scope: {'BLOCKING (publicly readable)' if pin['blocking'] else 'advisory (private — peers read trunk on the filesystem, L480)'}")
+        if pin_blocks:
+            print("  ⛔ Published pin is stale on a PUBLICLY READABLE repo. This is the one")
+            print("     surface a remote consumer actually reads. Blocking.")
 
     # Three states, not two (gh#2045 request 2): UNVERIFIABLE is not FAIL, and collapsing
     # them trains readers to ignore it.
-    if verdict == "LANDED":
-        return 0
     if verdict == "UNVERIFIABLE":
         return 2
+    if verdict in ("LANDED", "LANDED-AND-ADVANCED"):
+        return 1 if pin_blocks else 0
     return 1
 
 
