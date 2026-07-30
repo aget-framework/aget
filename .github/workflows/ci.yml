@@ -1,0 +1,177 @@
+# CI for the canonical AGET framework repository.
+#
+# WHY THIS FILE DID NOT EXIST UNTIL 2026-07-29, WHICH IS THE POINT
+# ----------------------------------------------------------------
+# This repo publishes `specs/AGET_CI_SPEC.md` (CAP-CI-001..005) and ships contract tests
+# for it at `tests/ci/test_ci_contract.py`. It had **no workflow of its own**: `.github/`
+# held only ISSUE_TEMPLATE files, and `gh run list` showed zero runs, ever.
+#
+# So the verification asymmetry ran backwards. Consuming seats — which inherit `.github/`
+# from `template-*` — run CI continuously and were, on 2026-07-29, the seats *finding* CI
+# failures. The repo that produces the payload, and the agent that cuts the release, ran
+# none. Every "suite green" claim made about a release was therefore local-only, on one
+# machine, for a payload whose canonical home had never been CI-tested. The bytes were
+# still the bytes and no hash-match is invalidated by this — but "verified" meant less than
+# it read.
+#
+# AND THE SPEC EXEMPTED ITS OWN HOME. `AGET_CI_SPEC.md:33` reads:
+#     "Applies to: All AGET templates and agent repositories **with CI**."
+# A repository with no CI is conformant by having none. That scope clause exempts precisely
+# the repositories that most need the requirement, and it is why four cycles of release
+# reviews never flagged this. Filed separately; the clause is a spec defect, not a
+# reason to keep the gap.
+#
+# EVERY GATE BELOW WAS MEASURED BEFORE BEING WIRED, and each carries its filter — a
+# scoped pass is only true under its scope, and prose is where scope clauses go missing.
+#   * Test_Job     — `pytest tests` = 270 passed, 4.6s. Verified on **3.14 only**; see
+#                    the matrix note.
+#   * Lint_Job     — `ruff check --select E9,F63,F7,F82` = clean. NOT full ruff: full ruff
+#                    is **150 errors** today. Scope and backlog are stated in the job.
+#   * Security_Job — absolute-home-path scan = clean, after redacting the single
+#                    occurrence found (`migration_3.12.0_to_3.13.0_20260412.md:15`).
+#
+# A gate wired at a threshold that already holds is a real gate. A gate wired above the
+# current state ships red and gets disabled, and a disabled gate protects nothing (L671).
+
+name: CI
+
+# CAP-CI-004-01/02/03: push to main and develop, PR to main.
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # CAP-CI-003-01 / CAP-CI-003-05: Test_Job, using pytest.
+  test:
+    name: test (py${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # CAP-CI-003-04 requires [3.10, 3.11, 3.12, 3.13]. 3.14 is added because it is
+        # the interpreter the suite is actually developed against.
+        #
+        # ⚠ HONEST SCOPE: only 3.14 exists on the authoring machine, so 3.10-3.13 are
+        # SPEC-REQUIRED AND LOCALLY UNVERIFIABLE. `fail-fast: false` is deliberate — the
+        # first run should report every version's result rather than stopping at the first
+        # failure, because the useful output here is *which* versions diverge. If a
+        # spec-required version fails on first run, the honest responses are to fix the
+        # incompatibility or to amend CAP-CI-003-04 with evidence — not to quietly trim
+        # the matrix to whatever happens to be green.
+        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        # Derived by AST-walking every import in tests/, scripts/ and conftest.py and
+        # subtracting the stdlib and in-repo modules: the only third-party names are
+        # `pytest` and `yaml`. This repo has no pyproject.toml or setup.py, so there is no
+        # dependency manifest to install from — that absence is itself worth noting, and
+        # this list is derived rather than guessed.
+        run: python -m pip install --upgrade pip pytest pyyaml
+
+      - name: Run tests
+        run: python -m pytest tests -q
+
+  # CAP-CI-003-02: Lint_Job.
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python -m pip install --upgrade pip ruff
+
+      - name: Ruff — blocking set (syntax errors, undefined names)
+        # MEASURED CLEAN 2026-07-29. This is a genuine blocking gate at a threshold that
+        # holds, not a decorative one: E9/F63/F7/F82 catch syntax errors, undefined names
+        # and broken comparisons — real breakage, never style.
+        run: ruff check --select E9,F63,F7,F82 scripts tests conftest.py
+
+      - name: Ruff — full report (non-blocking, backlog is named not hidden)
+        # 150 errors as of 2026-07-29: F541 x70, F401 x60, E741 x8, F841 x7, E401 x3,
+        # E702 x1, E731 x1. Reported so the number is visible and dated rather than
+        # discovered later, and NOT blocking because wiring a gate above the current state
+        # ships red on day one.
+        #
+        # ⛔ DO NOT `ruff --fix` THIS BACKLOG BLINDLY. On 2026-07-29 an F841
+        # "unused variable" in `scripts/study_topic.py` turned out to be the last surviving
+        # witness that CAP-SESSION-007-06 purpose-weighting was built and wired to nothing
+        # (gh#2061). `--fix` would have cleared the gate and destroyed the finding. F841
+        # and E741 are evidence; F541 and F401 are cosmetic. Triage before fixing.
+        continue-on-error: true
+        run: ruff check --statistics scripts tests conftest.py
+
+  # CAP-CI-003-03: Security_Job.
+  security:
+    name: security
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: No operator-identifying home paths in a public repository
+        # The relevant security property for THIS repo is not memory safety — it is that a
+        # public repo not carry local-filesystem or operator-identifying paths. Measured
+        # 2026-07-29: exactly one real occurrence existed, in a 2026-04-12 migration
+        # record; redacted to `~` (same path, no username), which is what makes this gate
+        # blocking rather than advisory.
+        #
+        # `public-llm-connectivity-AGET` independently flagged this class at its own seat
+        # the same day, ahead of a planned public transfer. Same property, two seats.
+        #
+        # ⚠ THE FIRST DRAFT OF THIS GATE FAILED, ON THE SPEC THAT DEFINES THE RULE.
+        # It matched `/Users/[^/]+/` generically, which flagged `AGET_SECURITY_SPEC.md`
+        # (`/Users/username/`, `/Users/johndoe/`) and `SOP_learning_publication.md` — files
+        # that carry those strings as *examples of the violation*. An instrument cannot
+        # tell a citation from a quotation, and a gate that flags its own specification
+        # would have been switched off within a day.
+        #
+        # Worse, the comment here originally read "Measured 2026-07-29: exactly one
+        # occurrence" — true of `git grep '/Users/gabormelli'`, which is what I actually
+        # ran, and NOT true of the generic pattern I then wired. I measured one predicate
+        # and shipped a different one, in the same breath as asserting the measurement.
+        # Corrected rather than quietly re-scoped, because the mis-statement is the more
+        # useful record: a scoped pass is only true under its scope.
+        #
+        # Now gated on the property that actually matters — a home path whose user
+        # component is a REAL identity rather than a documented placeholder. The
+        # placeholder list is explicit and short, so an unlisted real username still
+        # fails; it does not blanket-exempt any directory.
+        run: |
+          PLACEHOLDERS='username|johndoe|user|youruser|your-user|YOUR_USER|<user>|me'
+          hits=$(git grep -nI -E '/Users/[a-zA-Z0-9_.-]+/' -- . \
+                   | grep -vE "/Users/($PLACEHOLDERS)/" || true)
+          if [ -n "$hits" ]; then
+            echo "$hits"
+            echo "::error::operator-identifying home path(s) in a public repository — redact to '~'"
+            exit 1
+          fi
+          echo "clean: no operator-identifying home paths (documented placeholders exempt)"
+
+      - name: Private-identifier census (non-blocking, deliberately)
+        # Reported, NOT gated, and the reason is a scope distinction that matters:
+        # AGET_ISSUE_GOVERNANCE_SPEC's sanitization patterns (`private-*-aget`, `gmelli/`,
+        # fleet-size disclosures) govern the ISSUE PROMOTION boundary — content moved from
+        # the private tracker to a public issue. They have never governed this repo's own
+        # file content, and treating them as if they did would invent a requirement.
+        #
+        # Census 2026-07-29: 24 files match `private-*-aget`, 57 match `gmelli/`. Whether
+        # any of that should be reduced is a principal call about public-facing posture,
+        # not something a CI job should decide by failing. Surfaced so the number is
+        # visible and dated instead of assumed to be zero.
+        continue-on-error: true
+        run: |
+          echo "files matching private-*-aget: $(git grep -lIE 'private-[a-zA-Z0-9_]+-(aget|AGET)' -- . | wc -l)"
+          echo "files matching gmelli/:        $(git grep -lI 'gmelli/' -- . | wc -l)"

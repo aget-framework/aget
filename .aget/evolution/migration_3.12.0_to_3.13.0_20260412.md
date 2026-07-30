@@ -12,7 +12,12 @@
 ## Report
 
 - Prerequisites check passed
-- Backup created at: /Users/gabormelli/github/aget-framework/aget/.aget/backups/2026-04-12_v3.12.0
+- Backup created at: ~/github/aget-framework/aget/.aget/backups/2026-04-12_v3.12.0
+  <!-- home prefix redacted to `~` 2026-07-29: same path, no username. A path is not a
+       claim, so redacting it does not alter this record's content — and this was the only
+       absolute home path in the public repo, which is what lets CI's security job block
+       repo-wide instead of merely reporting. -->
+
 - Applying version changes...
 - Updated version.json: 3.12.0 -> 3.13.0
 - AGENTS.md not found - skipping (may need manual update)
