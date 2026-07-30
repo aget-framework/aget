@@ -639,3 +639,47 @@ last trace of a built-and-unreachable capability — the tidy fix that destroys 
 needs a V-test and a release, not a lint pass. **It survived v3.28's own orphaned-control census** (15
 controls wired that cycle), and that is the more useful finding: the census reads controls, and this is a
 capability whose orphaning lives at a *parameter* call site.
+
+---
+
+## Row 17 — this release told you a requirement gates the next cycle, and pointed at a file you do not have
+
+**Found 2026-07-29 by the framework seat, auditing its own release artifacts. Not consumer-affecting;
+correcting it anyway, because the defect is a citation this release asked you to trust.**
+
+**R-REL-CAD-012** is cited as the gate on the v3.29 scope-lock in **four** artifacts you received —
+`DEPLOYMENT_SPEC_v3.28.0.yaml`, `RELEASE_HANDOFF_v3.28.0.md`, `REMOTE_MIGRATION_MESSAGE_v3.28.0.md`, and
+this file. All twelve `R-REL-CAD-*` requirements are defined **only** in
+`governance/POLICY_release_cadence.md`, which exists in the framework agent's **private** repo and has no
+public counterpart. Measured with `scripts/audit_release_citation_resolution.py`, counted from its `--json`
+path rather than its printed table: **4 public citations, 0 public definitions.**
+
+**Why this is a defect and not a nitpick.** The framework's own `v328-prelock:R15` requires that an
+artifact asserting a prerequisite carry the **verbatim text** *and* a **cite the reader can follow**. The
+handoff's quote is faithful — verified against the normative section, not against the version-history line
+(`v328-shipday:R63` forbids grounding an assertion in metadata) — but you had no way to establish that.
+**A faithful quote plus an unopenable cite is an unfalsifiable claim**, and the rule exists specifically to
+make fabrication mechanically visible. Satisfying half of it produces the appearance of the guarantee
+without the guarantee.
+
+**Two corrections that run in your favour**, both quoted verbatim from that section:
+
+- *"Accepted consequence, stated at ruling time: leg 3 is satisfiable only at a seat the releasing agent
+  does not control, so the next cycle's schedule is downstream of fleet deployment. That is the intended
+  shape of a Loading-Dock guard (L656) rather than a flaw in it."*
+- *"Override: principal MAY lift with recorded reason (L178); the default is HOLD."*
+
+So the gate is **deliberate and overridable**. Characterisations of it as *"circular as written"* — including
+in the framework seat's own analysis earlier the same day, and in a peer seat's — were wrong twice over:
+the consequence was ruled, not stumbled into, and a documented lift exists. The residual defect is
+narrower: leg 3's only *specified* route (the supervisor installs the firing guard) is the one **Row 3b of
+this file forbids**, so the route is blocked while the gate is fine.
+
+**And it was addressed to the wrong audience.** R-REL-CAD-012 constrains *the framework agent*. Nothing in
+it asks a migrating seat for anything. Citing it to consumers reads as an obligation you cannot discharge —
+which is the same shape as `gh#2076` one level down, where a shipped skill cites `AGENTS.md` sections
+present at 1 of 31 seats and every consumer pre-flight reports PASS regardless.
+
+**Fixed in this release's artifacts** (audience-scoped, full quote, override disclosed). **Owed, not
+claimed** (L671): no instrument gates a public artifact citing a private-only requirement id at publication
+time — the audit exists and is not wired into the release gate.

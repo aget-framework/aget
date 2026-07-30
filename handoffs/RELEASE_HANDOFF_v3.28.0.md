@@ -58,6 +58,27 @@ sitting at an unmet aspiration.
 > *"A cycle's **scope-lock ceremony SHALL NOT begin** while the prior cycle's delivery Goal has open legs …
 > where 'delivered' is defined by the prior cycle's own committed Goal, **not by its tag**."*
 
+> **⚠ Read this requirement as producer-internal, and know that you cannot open its home (added 2026-07-29).**
+> `POLICY_release_cadence.md` lives in the framework agent's **private** repo. It has no public counterpart,
+> so the citation above is **unresolvable for you** — the quote is faithful to the normative section, and you
+> have no way to check that. Corrected here rather than left standing, because the framework's own
+> `v328-prelock:R15` requires a prerequisite assertion to carry verbatim text *and a cite the reader can
+> follow*, and this one satisfied only the first half. Measured: **4** public v3.28 artifacts cite this id;
+> **0** public files define it (`scripts/audit_release_citation_resolution.py`).
+>
+> **It does not bind you.** R-REL-CAD-012 constrains *when the framework agent may open the next
+> scope-lock*. Nothing in it asks a migrating seat to do anything. It appears in a handoff because it
+> explains why v3.29 may be **late**, not because you owe it compliance — and a requirement addressed to
+> the wrong audience reads as an obligation you cannot discharge.
+>
+> **Two things the policy states that were missing here.** First, the consequence was accepted at ruling
+> time, not discovered: *"leg 3 is satisfiable only at a seat the releasing agent does not control, so the
+> next cycle's schedule is downstream of fleet deployment. That is the intended shape of a Loading-Dock
+> guard (L656) rather than a flaw in it."* Second, it is **not a deadlock** — *"Override: principal MAY lift
+> with recorded reason (L178); the default is HOLD."* Both sentences are verbatim from
+> `governance/POLICY_release_cadence.md` §R-REL-CAD-012 (private). Earlier framing of this gate as
+> *"circular as written"* — including in my own analysis — was wrong on both counts.
+
 The v3.28 delivery Goal has three legs:
 
 | Leg | Condition | Who can close it |

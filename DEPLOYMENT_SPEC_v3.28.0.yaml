@@ -67,6 +67,21 @@ verification_script:
 # template propagation. If the supervisor skips step 2 of the upgrade guide, leg 3
 # has no path.
 #
+# ⚠ THREE CORRECTIONS TO THE PARAGRAPH ABOVE (2026-07-29 — see CORRECTIONS row 17):
+#   1. "indefinitely" is wrong. R-REL-CAD-012 carries an explicit override — verbatim:
+#      "Override: principal MAY lift with recorded reason (L178); the default is HOLD."
+#      A gate with a documented lift is a hold, not a deadlock, and calling it indefinite
+#      overstates it in the direction that invites an exception instead of a decision.
+#   2. R-REL-CAD-012 is defined ONLY in the framework agent's PRIVATE
+#      governance/POLICY_release_cadence.md — 4 public v3.28 artifacts cite it, 0 public
+#      files define it. It is producer-internal and binds nothing at a consuming seat.
+#   3. The route named here — "the supervisor is instructed to install the hook" — is the
+#      one CORRECTIONS row 3b FORBIDS. So leg 3's gate is sound and its only specified
+#      route is blocked: a route specified and simultaneously prohibited, which is this
+#      release's fourth instance of that shape (cf. gh#2041 lint-vs-hash, gh#2013
+#      SOP-vs-ruling, R8-vs-R20). The remedy is a control genuinely applicable downstream
+#      or a recorded lift — not a re-reading of this comment.
+#
 # Rung-4 ADDITION for v3.28: probes 3 and 4 of the smoke set must BOTH pass — the guard
 # must refuse a release act AND pass ordinary work. A guard that fires on everything gets
 # disabled, and a disabled guard protects nothing.

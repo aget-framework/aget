@@ -178,7 +178,9 @@ Two things, both short:
    > `git checkout` from losing the migration. Two seats were in exactly that state when this was found,
    > and both would have closed leg 2 on the old wording. A disk read is not a delivery receipt.
    >
-   > `POLICY_release_cadence` **R-REL-CAD-012** gates the v3.29 scope-lock on `GOAL-V328-DELIVERED`, so
+   > `POLICY_release_cadence` **R-REL-CAD-012** — *producer-internal; its home is a **private** file you
+   > cannot open, and it asks nothing of you (see `RELEASE_HANDOFF_v3.28.0.md` §critical-path for the full
+   > quote and the override clause)* — gates the v3.29 scope-lock on `GOAL-V328-DELIVERED`, so
    > the old bar would have released the next cycle's gate on work that can evaporate. **A leg-2
    > confirmation recorded before 2026-07-27 does not meet this bar** — it was taken against the disk.
    > Re-confirm at `HEAD`; it is one command.
