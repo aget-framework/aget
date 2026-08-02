@@ -32,6 +32,20 @@ manager paths or identifiers entered the public payload.
 4. On one downstream v3.29 Codex seat, discover and invoke one exposed workflow and exercise save-state
    recovery. Record this separately as Gate 4 evidence; producer rehearsal cannot substitute.
 
+## Context for External Fleets
+
+v3.29.0 is an additive minor release. External fleets do not need access to the framework manager's
+private planning or decision ledgers: use the public release notes, delivered-files manifest, deployment
+specification, and this handoff. Supported-client conformance is limited to Claude Code and Codex CLI.
+
+Codex-native support means discovery through `.agents/skills/`; it does not promise literal `/aget-*`
+commands. Preserve local extensions and trust settings, and treat producer state, public availability,
+received version, and ordinary downstream behavior as four separate facts. A successful tag fetch or
+version bump does not establish discovery/invocation/recovery behavior.
+
+Post-tag release corrections are disclosed at `handoffs/CORRECTIONS_v3.29.0.md` on `main`; immutable tags
+are never moved to hide a release-time documentation defect.
+
 ## Rollback
 
 Restore the prior version/tag and version pins; remove the `.agents/skills` exposure links; restore the prior
