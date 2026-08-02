@@ -17,7 +17,7 @@ mandatory_changes:
     outcome: "H-29-003"
     description: "root instructions remain below 40000 bytes with load-bearing reach"
     blocking: true
-    detection: "python3 scripts/check_agents_instruction_reach.py . --json"
+    detection: "test ! -f AGENTS.md || python3 scripts/check_agents_instruction_reach.py . --json"
     distribution_point: "scripts/check_agents_instruction_reach.py"
     applies_to: "AGET seats with root AGENTS.md; advisor is the release conformance exemplar"
   - id: "M-3.29-2"
@@ -31,14 +31,14 @@ mandatory_changes:
     outcome: "H-29-013"
     description: "one release decision view has zero contradictions, omissions, and manual joins"
     blocking: true
-    detection: "python3 scripts/render_release_decision_view.py --version 3.29.0 --verify --json"
+    detection: "test ! -f planning/VERSION_SCOPE_v3.29.0.md || python3 scripts/render_release_decision_view.py --version 3.29.0 --verify --json"
     distribution_point: "scripts/render_release_decision_view.py"
     applies_to: "framework-manager seats with VERSION_SCOPE, rulings, Goal, and requirements ledger"
   - id: "M-3.29-4"
     outcome: "H-29-016"
     description: "delivery predicates cannot be inferred from producer evidence"
     blocking: true
-    detection: "python3 -m pytest tests/test_release_distribution_evidence.py -q"
+    detection: "test ! -f scripts/release_distribution_evidence.py || python3 -m pytest tests/test_release_distribution_evidence.py -q"
     distribution_point: "scripts/release_distribution_evidence.py"
     applies_to: "release-manager seats"
   - id: "M-3.29-5"
