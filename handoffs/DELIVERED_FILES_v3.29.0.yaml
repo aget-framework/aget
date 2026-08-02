@@ -1,0 +1,83 @@
+# DELIVERED_FILES_v3.29.0.yaml — machine-readable per-payload delivered-files manifest
+# Emit half of aget-framework/aget#1870 (closes the #1828 delivered-but-not-committed vector).
+# Consumer: SOP_fleet_upgrade G0.2 — commit add-list derives from THIS manifest;
+# post-stage porcelain cross-check asserts no manifest path remains untracked.
+version: "3.29.0"
+source_ref: "HEAD"  # canonical aget/ (payload-source ruling 2026-07-11: canonical, not template — see #1871)
+generated: "2026-08-02T03:43:30Z"
+generator: "scripts/emit_delivered_files_manifest.py"
+tracking: "aget-framework/aget#1870"
+
+pin_edits:  # edited in place on the agent, not file-copied — outside the porcelain cross-check
+  - path: ".aget/version.json"  # version pin
+  - path: "AGENTS.md"  # @aget-version pin
+
+delivered_files:
+  - path: "scripts/check_agents_instruction_reach.py"
+    spec_rows: [M-3.29-1]
+    sha256: "6ff773f74be174a150964b953d1359bf113a5c72677cfc85016acd387fb85d5e"
+  - path: "poc/claude-hook-controls/README.md"
+    spec_rows: [M-3.29-2]
+    sha256: "e81a0a3bc17beccfecf243485ad3838676b80e120d2fd441fbc1fe7dbf5bab3a"
+  - path: "poc/claude-hook-controls/claude_pretool_guard.py"
+    spec_rows: [M-3.29-2]
+    sha256: "793bfdf15cc3128b50e3554a2d7326239b18547f2818f60eb5b1d3bbc128a0b5"
+  - path: "poc/claude-hook-controls/settings.fixture.json"
+    spec_rows: [M-3.29-2]
+    sha256: "41fe55e30e54e50a6cc933d20c618f8b4fd8c3c4fc41bf63b160542e05098081"
+  - path: "poc/codex-hook-controls/README.md"
+    spec_rows: [M-3.29-2]
+    sha256: "03f73e0d6c2087b3ea3dea2c355a9d4473ffa946f23697105304e2af5792d87f"
+  - path: "poc/codex-hook-controls/codex_pretool_guard.py"
+    spec_rows: [M-3.29-2]
+    sha256: "36b7f8cee4c3f541cf89119e3b3510c2b084f7efcce9c81cc24096147bde365b"
+  - path: "scripts/check_cross_client_hook_controls.py"
+    spec_rows: [M-3.29-2]
+    sha256: "4ec2e0f323f0696d5249424d4a1ea87499ef3428dfedeaf612b83e288ddf1c2f"
+  - path: "scripts/render_release_decision_view.py"
+    spec_rows: [M-3.29-3]
+    sha256: "2ce9b0e494780f7208ca6d04241156161d90f747e046caeaff0e601627845a4e"
+  - path: "scripts/release_distribution_evidence.py"
+    spec_rows: [M-3.29-4]
+    sha256: "546f84cf2ac48c317df6a32dc7d0434d151270e6b20ec5b21bbfa13f4cc1a6c3"
+  - path: "tests/test_release_distribution_evidence.py"
+    spec_rows: [M-3.29-4]
+    sha256: "b794e9fcd5c661535217d2de0ba59da0f51db211414dec87d4d90919f1d684ca"
+  - path: ".agents/skills/aget-save-state/SKILL.md"
+    spec_rows: [M-3.29-5]
+    sha256: "7b67ca49c7967fb9497f64f34ba7d543a009ff4272052a41672b11cf39f0a875"
+  - path: ".agents/skills/aget-study-topic/SKILL.md"
+    spec_rows: [M-3.29-5]
+    sha256: "a7d6172b991925e1b9c2394f4790563b0527a1424007b12d032be34c4fdc710c"
+  - path: ".agents/skills/aget-wake-up/SKILL.md"
+    spec_rows: [M-3.29-5]
+    sha256: "85eecfdb6cc7d82509d9ba70a67ca43dc914cbad5e5abc91ca48c903a28d054d"
+  - path: "scripts/validate_codex_skill_discovery.py"
+    spec_rows: [M-3.29-5]
+    sha256: "7dfbbb94b8848c3d5962b59ca0421251bda713f6120eed59c6a5f0a0e5e72bd4"
+  - path: "scripts/study_topic.py"
+    spec_rows: [M-3.29-6]
+    sha256: "86b2632cdef30fa7e9b39532af2cff2d40a3d302cca81dbd604c459668d9de40"
+  - path: "tests/test_study_topic_purpose_recency_rendering.py"
+    spec_rows: [M-3.29-6]
+    sha256: "0c965421bb1e2914250926cc3f1beb72306402c171ac4a70732ecd0063e5ddb4"
+
+optional_files:
+  []
+
+additive_files:
+  []
+
+verify_rule: |
+  Post-upgrade, every path in delivered_files, optional_files AND additive_files
+  present on the agent's disk MUST be git-tracked. `git status --porcelain` showing
+  any manifest path as untracked (??) is the #1828 defect class — the upgrade is NOT
+  complete until it is staged.
+
+  ⚠ additive_files is NOT optional to check. This rule enumerated only the first two
+  sections until 2026-07-26, when additive_files was added to carry payload no M-row
+  contracts — which for v3.28.0 is EVERY file the fleet actually receives. The header
+  said 'derive from the FULL manifest'; this rule, the half a consuming SOP mechanises,
+  still named two of three sections. Prose fixed, actuator not — inside the commit that
+  closed the previous instance of that same shape. Found by the manifest's first
+  consumer (the originating supervisor seat) before it ran G0.2, not by the producer.
