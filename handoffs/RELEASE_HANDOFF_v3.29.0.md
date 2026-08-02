@@ -67,5 +67,5 @@ study-topic script. No data schema rollback is required.
 
 | Seat | v3.29 received state | Native discovery/invocation/recovery | Evidence |
 |---|---|---|---|
-| framework producer | pending Gate 2 migration | producer tests PASS; not downstream evidence | Gate 0 receipt |
-| downstream v3.29 Codex seat | pending Gate 4 | pending Gate 4 | must be verified at source |
+| framework producer | v3.29 at release Gate 2 | producer tests PASS; not downstream evidence | release-manager Gate 2 receipt |
+| downstream v3.29 receiver | verified 2026-08-02 | cold-context Codex discovery/invocation/recovery still pending | verified at source by release manager; private receiver identity not published |

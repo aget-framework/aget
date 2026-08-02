@@ -70,3 +70,12 @@ def test_post_tag_receiver_guidance_is_correction_only_and_schema_semantic():
     assert "Do not replay the full migration" in text
     assert "never edit “the first semver-shaped field.”" in text
     assert "An unknown schema is unmeasurable" in text
+
+
+def test_handoff_pilot_table_separates_received_state_from_behavior():
+    """L656: a received version is evidence, but not cold-context behavior."""
+    text = HANDOFF.read_text(encoding="utf-8")
+    assert "pending Gate 2 migration" not in text
+    assert "downstream v3.29 receiver | verified 2026-08-02" in text
+    assert "cold-context Codex discovery/invocation/recovery still pending" in text
+    assert "private receiver identity not published" in text
