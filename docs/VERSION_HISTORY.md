@@ -12,6 +12,14 @@ This document provides a complete timeline of AGET Framework versions and their 
 
 ## Current Version
 
+**v3.29.0** (2026-08-01) - Repair release truth and reduce principal decision work
+
+Core `aget/` at v3.29.0: ✅ (GitHub Release live; tag at 14/14 origins). Release truth now keeps producer, distribution point, received state, and downstream behavior independent; the principal release decision is available in one governed view; Codex-native discovery exposes wake-up, study-topic, and save-state with explicit recovery. See `release-notes/v3.29.0.md`.
+
+**v3.28.0** (2026-07-26) - Make the gates fire
+
+Core `aget/` at v3.28.0: ✅ (GitHub Release live; tag at 14/14 origins). Release gating moved toward execution-time enforcement, independent quality evidence, and append-only control-firing receipts. See `release-notes/v3.28.0.md` and its corrections surface for post-tag payload disclosures.
+
 **v3.27.0** (2026-07-18) - Finish & Verify
 
 Core `aget/` at v3.27.0: ✅ (GitHub Release live; tag at 14/14 origins). Theme: the portfolio learns to FINISH (EC tick-state signal, Achieve-only capability share, ID injectivity) and the release learns to VERIFY it runs (Rung-4 behavioral verification, 3-axis coherence, corrections single-surface). See `release-notes/v3.27.0.md`.
@@ -33,6 +41,14 @@ Core `aget/` at v3.24.0: ✅ (GitHub Release live). Reliance feature (schema + v
 ---
 
 ## Version Timeline
+
+### v3.29.0 (2026-08-01) ✅
+
+**Theme**: Repair release truth and reduce principal decision work — four independent distribution predicates, a one-view release decision, supported Claude Code/Codex CLI control evidence, truthful purpose-weighted study, and Codex-native operating support.
+
+### v3.28.0 (2026-07-26) ✅
+
+**Theme**: Make the gates fire — execution-time release controls, independent-score checks, firing receipts, triage-freshness signals, and an enforced traceability ratchet; post-tag corrections remain disclosed in the canonical corrections surface.
 
 ### v3.27.0 (2026-07-18) ✅
 
