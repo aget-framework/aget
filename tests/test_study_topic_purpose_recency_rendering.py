@@ -8,14 +8,16 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 LOCAL_SCRIPT = ROOT / "scripts" / "study_topic.py"
-CANONICAL_SCRIPT = ROOT.parent / "aget" / "scripts" / "study_topic.py"
-SCRIPT = Path(os.environ.get("AGET_STUDY_TOPIC_SCRIPT",
-                             CANONICAL_SCRIPT if CANONICAL_SCRIPT.is_file() else LOCAL_SCRIPT))
+
+
+def _study_topic_script() -> Path:
+    """Select the receiving seat by default; an explicit override supports falsifiers."""
+    return Path(os.environ.get("AGET_STUDY_TOPIC_SCRIPT", LOCAL_SCRIPT))
 
 
 def _run(root: Path, *args):
     env = {**os.environ, "AGET_STUDY_ROOT": str(root)}
-    return subprocess.run([sys.executable, str(SCRIPT), *args], text=True,
+    return subprocess.run([sys.executable, str(_study_topic_script()), *args], text=True,
                           capture_output=True, env=env, timeout=30)
 
 
@@ -26,6 +28,19 @@ def _base(root: Path):
     }))
     (root / "planning").mkdir()
     (root / "governance").mkdir()
+
+
+def test_script_selector_defaults_to_receiving_seat(monkeypatch):
+    """M-3.29-6 must test this checkout, never a conveniently co-located sibling."""
+    monkeypatch.delenv("AGET_STUDY_TOPIC_SCRIPT", raising=False)
+    assert _study_topic_script() == LOCAL_SCRIPT
+
+
+def test_script_selector_honors_explicit_falsifier(monkeypatch, tmp_path):
+    """The override remains available for controlled known-bad/known-good probes."""
+    candidate = tmp_path / "study_topic.py"
+    monkeypatch.setenv("AGET_STUDY_TOPIC_SCRIPT", str(candidate))
+    assert _study_topic_script() == candidate
 
 
 def test_cli_purpose_changes_ranking(tmp_path):

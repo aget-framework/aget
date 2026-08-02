@@ -63,7 +63,7 @@ delivered_files:
     sha256: "86b2632cdef30fa7e9b39532af2cff2d40a3d302cca81dbd604c459668d9de40"
   - path: "tests/test_study_topic_purpose_recency_rendering.py"
     spec_rows: [M-3.29-6]
-    sha256: "0c965421bb1e2914250926cc3f1beb72306402c171ac4a70732ecd0063e5ddb4"
+    sha256: "e41c7bdb53ba1545d3ba0375717d5fc9a3074a33c51d91d515d163c009473f7c"
 
 optional_files:
   []
