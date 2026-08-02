@@ -4,7 +4,7 @@
 # post-stage porcelain cross-check asserts no manifest path remains untracked.
 version: "3.29.0"
 source_ref: "HEAD"  # canonical aget/ (payload-source ruling 2026-07-11: canonical, not template — see #1871)
-generated: "2026-08-02T17:26:50Z"
+generated: "2026-08-02T21:55:06Z"
 generator: "scripts/emit_delivered_files_manifest.py"
 tracking: "aget-framework/aget#1870"
 
@@ -36,7 +36,7 @@ delivered_files:
     sha256: "36b7f8cee4c3f541cf89119e3b3510c2b084f7efcce9c81cc24096147bde365b"
   - path: "scripts/check_cross_client_hook_controls.py"
     spec_rows: [M-3.29-2]
-    sha256: "4ec2e0f323f0696d5249424d4a1ea87499ef3428dfedeaf612b83e288ddf1c2f"
+    sha256: "dbaf81cdc1b035690768d4bdc0ec848dfcc195c4f1c0411077c25e324f102e9d"
   - path: "scripts/render_release_decision_view.py"
     spec_rows: [M-3.29-3]
     sha256: "2ce9b0e494780f7208ca6d04241156161d90f747e046caeaff0e601627845a4e"

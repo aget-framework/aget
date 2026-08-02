@@ -1,10 +1,10 @@
 # RELEASE HANDOFF — v3.29.0
 
-**Prepared**: 2026-08-01 · **State**: PUBLIC RELEASE — POST-TAG CORRECTION #5 ACTIVE ON `main`
+**Prepared**: 2026-08-01 · **State**: PUBLIC RELEASE — POST-TAG CORRECTIONS ACTIVE ON `main`
 
 > v3.29.0 is public. Do not report it as delivered from this artifact. Gate 4 must verify received state
-> and ordinary downstream Codex behavior. Correction #5 makes M-3.29-1 marker-sufficient and governed by
-> the `main` manifest; it does not prove that a receiving seat applied it.
+> and ordinary downstream Codex behavior. Corrections #5–#7 repair receiver payload and validation
+> surfaces on `main`; they do not prove that a receiving seat applied them.
 
 ## Breaking Changes
 
@@ -18,6 +18,14 @@ Read `release-notes/v3.29.0.md`, pin the immutable v3.29.0 tag for the original 
 applicable manifest path—including the M-3.29-1 POSITION document—update the seat version pins, preserve
 instance extensions, and run the receiving seat's own health/tests. Do not change Codex project trust as
 part of migration.
+
+For a seat already at v3.29, correction adoption is **correction-only**: compare the current `main`
+manifest hashes, copy only changed paths, run their receiving-seat checks, and commit only those paths.
+Do not replay the full migration, append a duplicate migration-history row, or rewrite unrelated version
+surfaces to consume one correction. The manifest's `pin_edits` list names the release-owned pins. If a
+fleet maintains additional local version fields, select them by that fleet's declared schema meaning;
+never edit “the first semver-shaped field.” An unknown schema is unmeasurable and requires owner routing,
+not a positional guess (for example, a template-provenance version is not necessarily the seat version).
 
 ## Deployment Requirements
 

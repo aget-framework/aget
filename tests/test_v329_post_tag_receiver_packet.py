@@ -9,6 +9,7 @@ from scripts.check_agents_instruction_reach import REQUIRED_ROOT_MARKERS, check_
 ROOT = Path(__file__).resolve().parents[1]
 POSITION = ROOT / "docs" / "POSITION_agents_instruction_reach_and_self_amendment.md"
 CORRECTIONS = ROOT / "handoffs" / "CORRECTIONS_v3.29.0.md"
+HANDOFF = ROOT / "handoffs" / "RELEASE_HANDOFF_v3.29.0.md"
 
 
 def _write_candidate(tmp_path: Path, position_text: str) -> None:
@@ -60,3 +61,12 @@ def test_correction_record_keeps_textual_acceptance_separate_from_delivery():
     text = CORRECTIONS.read_text(encoding="utf-8")
     assert "adds the file and exact hash" in text
     assert re.search(r"Regex acceptance is not received-state", text, re.I)
+
+
+def test_post_tag_receiver_guidance_is_correction_only_and_schema_semantic():
+    """R-REL-019: consuming one fix must not replay migration or guess a version field."""
+    text = HANDOFF.read_text(encoding="utf-8")
+    assert "correction-only" in text
+    assert "Do not replay the full migration" in text
+    assert "never edit “the first semver-shaped field.”" in text
+    assert "An unknown schema is unmeasurable" in text

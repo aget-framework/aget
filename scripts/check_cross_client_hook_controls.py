@@ -21,6 +21,26 @@ def _load_poc(path: Path, name: str):
     return module
 
 
+def _registered_command_hooks(groups: object) -> list[str]:
+    """Return structurally registered command hooks, independent of filename wording."""
+    if not isinstance(groups, list):
+        return []
+    commands: list[str] = []
+    for group in groups:
+        if not isinstance(group, dict):
+            continue
+        handlers = group.get("hooks", [])
+        if not isinstance(handlers, list):
+            continue
+        for handler in handlers:
+            if not isinstance(handler, dict) or handler.get("type") != "command":
+                continue
+            command = handler.get("command")
+            if isinstance(command, str) and command.strip():
+                commands.append(command.strip())
+    return commands
+
+
 def claude_result(root: Path = ROOT) -> dict:
     settings = root / ".claude" / "settings.json"
     evidence_kind = "live-settings"
@@ -29,13 +49,13 @@ def claude_result(root: Path = ROOT) -> dict:
         evidence_kind = "sanitized-portable-fixture"
     payload = json.loads(settings.read_text()) if settings.is_file() else {}
     hooks = ((payload.get("hooks") or {}).get("PreToolUse") or [])
-    blob = json.dumps(hooks)
+    command_hooks = _registered_command_hooks(hooks)
     module = _load_poc(CLAUDE_POC, "claude_pretool_guard")
     blocked = module.decide({"path": ".claude/settings.json"})
     allowed = module.decide({"path": "docs/README.md"})
     affirmed = module.decide({"path": "AGENTS.md", "affirmed": True})
     dimensions = {
-        "applicability": bool(hooks) and "guard" in blob.lower(),
+        "applicability": bool(command_hooks),
         "trust_boundary": bool(payload.get("permissions")) or bool(hooks),
         "positive_block": blocked["decision"] == "block",
         "negative_control": allowed["decision"] == "allow" and affirmed["decision"] == "allow",

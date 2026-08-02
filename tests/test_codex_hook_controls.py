@@ -22,13 +22,41 @@ def test_supported_client_set_is_exact_and_green(tmp_path):
     settings.write_text(json.dumps({
         "permissions": {"defaultMode": "default"},
         "hooks": {"PreToolUse": [{"hooks": [
-            {"type": "command", "command": "claude_pretool_guard.py"}
+            {"type": "command", "command": "python3 scripts/policy_enforcement.py"}
         ]}]},
     }))
     result = matrix(tmp_path)
     assert result["supported_clients"] == ["Claude Code", "Codex CLI"]
     assert result["state"] == "PASS"
     assert all(all(c["dimensions"].values()) for c in result["clients"])
+
+
+def test_claude_applicability_does_not_depend_on_guard_filename(tmp_path):
+    """H-29-012: registration structure, not the token 'guard', establishes applicability."""
+    settings = tmp_path / ".claude" / "settings.json"
+    settings.parent.mkdir(parents=True)
+    settings.write_text(json.dumps({
+        "hooks": {"PreToolUse": [{"hooks": [
+            {"type": "command", "command": "python3 scripts/permission_enforcement.py"}
+        ]}]},
+    }))
+    claude = matrix(tmp_path)["clients"][0]
+    assert claude["dimensions"]["applicability"] is True
+    assert claude["state"] == "PASS"
+
+
+def test_claude_applicability_rejects_keyword_only_non_command_entry(tmp_path):
+    """H-29-012 falsifier: prose containing 'guard' is not an installed command hook."""
+    settings = tmp_path / ".claude" / "settings.json"
+    settings.parent.mkdir(parents=True)
+    settings.write_text(json.dumps({
+        "hooks": {"PreToolUse": [{"hooks": [
+            {"type": "prompt", "prompt": "Ask the guard before continuing"}
+        ]}]},
+    }))
+    claude = matrix(tmp_path)["clients"][0]
+    assert claude["dimensions"]["applicability"] is False
+    assert claude["state"] == "FAIL"
 
 
 def test_public_checkout_uses_sanitized_claude_fixture(tmp_path):
