@@ -23,6 +23,7 @@ BODY = "# Release-Integrity Recurrence-Guard\n\nAbstract: installs a guard.\n"
 
 
 def test_filename_slug_matches_when_body_lacks_it(tmp_path, monkeypatch):
+    """R-TEST-001-02: filename identity remains a searchable topic signal."""
     monkeypatch.setattr(st, "get_agent_root", lambda: tmp_path)
     plan = tmp_path / FNAME
     plan.write_text(BODY)
@@ -32,6 +33,7 @@ def test_filename_slug_matches_when_body_lacks_it(tmp_path, monkeypatch):
 
 
 def test_normalized_filename_words_match(tmp_path, monkeypatch):
+    """R-TEST-001-02: normalized filename words contribute to topic coverage."""
     monkeypatch.setattr(st, "get_agent_root", lambda: tmp_path)
     plan = tmp_path / FNAME
     plan.write_text("# unrelated title only\n")
@@ -42,6 +44,7 @@ def test_normalized_filename_words_match(tmp_path, monkeypatch):
 
 
 def test_unrelated_topic_still_returns_none(tmp_path, monkeypatch):
+    """R-TEST-001-02: filename indexing does not manufacture unrelated hits."""
     # filename matching must not manufacture false positives
     monkeypatch.setattr(st, "get_agent_root", lambda: tmp_path)
     plan = tmp_path / FNAME
@@ -50,6 +53,7 @@ def test_unrelated_topic_still_returns_none(tmp_path, monkeypatch):
 
 
 def test_body_line_numbers_unaffected_by_appended_filename(tmp_path, monkeypatch):
+    """R-TEST-001-02: filename indexing preserves body evidence line numbers."""
     # appended (not prepended) tokens must leave body context line numbers intact
     monkeypatch.setattr(st, "get_agent_root", lambda: tmp_path)
     plan = tmp_path / FNAME

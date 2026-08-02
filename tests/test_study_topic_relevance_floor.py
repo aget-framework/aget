@@ -29,7 +29,7 @@ def _recommendation(report):
 
 
 def test_noise_input_not_good_coverage():
-    """Many low-coverage hits (token-noise) must NOT read as 'Good coverage' (#1560 core)."""
+    """R-TEST-001-02: low-coverage noise must not read as good coverage."""
     rec = _recommendation(st.generate_report("test app as an aget", _ldocs([0.1] * 50)))
     assert "Good coverage" not in rec
     assert "novel topic" in rec
@@ -37,7 +37,7 @@ def test_noise_input_not_good_coverage():
 
 
 def test_genuine_hits_reported_as_relevant_count():
-    """Several high-coverage hits report the relevant count — WITHOUT a quality
+    """R-TEST-001-02: several high-coverage hits report the relevant count — WITHOUT a quality
     adjective. Updated 2026-07-10 (v3.26 C-26-11, audit C1 ruling): 'Good
     coverage' was the defect's carrier — a quality claim the tool cannot
     demonstrate — so the contract-derived line replaced it. The substance this
@@ -48,14 +48,14 @@ def test_genuine_hits_reported_as_relevant_count():
 
 
 def test_mixed_reports_relevant_and_noise():
-    """A mix counts only the relevant ones and surfaces the filtered noise count."""
+    """R-TEST-001-02: a mix separates relevant hits from filtered noise."""
     rec = _recommendation(st.generate_report("x", _ldocs([0.9, 0.6, 0.2, 0.1, 0.1])))  # 2 relevant
     assert "2 relevant" in rec
     assert "3 additional raw hits" in rec
 
 
 def test_single_keyword_topics_unaffected():
-    """Single-keyword findings (no keyword_coverage -> default 1.0) stay relevant."""
+    """R-TEST-001-02: single-keyword findings remain relevant."""
     f = {"ldocs": [{"ldoc": "L1", "title": "T1", "file": "L1.md", "match_count": 5}],
          "patterns": [], "project_plans": [], "sops": [], "governance": []}
     rec = _recommendation(st.generate_report("release", f))
@@ -63,13 +63,14 @@ def test_single_keyword_topics_unaffected():
 
 
 def test_zero_total_still_novel():
+    """R-TEST-001-02: zero findings retain the novel-topic result."""
     f = {"ldocs": [], "patterns": [], "project_plans": [], "sops": [], "governance": []}
     rec = _recommendation(st.generate_report("brand new", f))
     assert "novel topic" in rec
 
 
 def test_coverage_propagated_through_finder():
-    """F-G2-A fix: find_ldocs now carries keyword_coverage (the dropped signal)."""
+    """R-TEST-001-02: finders propagate the keyword-coverage signal."""
     import inspect
     assert "keyword_coverage" in inspect.getsource(st.find_ldocs)
     assert "keyword_coverage" in inspect.getsource(st.find_governance)
