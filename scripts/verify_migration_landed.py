@@ -22,18 +22,18 @@ which is *this seat carries the capability, durably*.
 ## ⚠ THREE DEFECTS IN THIS SCRIPT'S OWN AXES, FIXED 2026-07-29
 
 This file was written to kill the cheapest-to-read failure and shipped carrying three
-instances of it. All three were surfaced by `private-supervisor-AGET` measuring the same
+instances of it. All three were surfaced by the originating supervisor seat measuring the same
 fleet independently and disagreeing about *which seats* landed while agreeing on the
 total. See `.aget/evolution/` at the framework seat and CORRECTIONS row 15.
 
-  1. **The version axis read `HEAD`, not trunk.** `private-career-aget` sat on branch
+  1. **The version axis read `HEAD`, not trunk.** a downstream seat on an unmerged branch sat on branch
      `session/2026-07-17-...` with `HEAD`=3.28.0 and `main`=**3.26.0**, and this script
      certified it LANDED. A payload on an unmerged branch is not durably held: the branch
      can be abandoned and nothing about the seat's trunk changes. `R-FU-014-6` at the
      consuming seat had already superseded HEAD with trunk; canonical had not converged.
 
   2. **The payload axis hashed the WORKING TREE while the version axis read a commit.**
-     One local edit to a payload file made `private-professional-core-aget` read
+     One local edit to a payload file made a downstream monorepo seat read
      DIVERGENT while its committed state was byte-exact. Two axes, two different refs,
      one verdict -- so the verdict answered no single question. Worktree drift is real
      information and is now reported SEPARATELY, as drift, without touching the verdict.
@@ -43,14 +43,14 @@ total. See `.aget/evolution/` at the framework seat and CORRECTIONS row 15.
      unread and unmentioned, while the manifest's own `verify_rule` names all three.
      For v3.28 the narrow read gave the *right answer for the wrong reason*: the
      `delivered_files` enforcement payload never shipped (CORRECTIONS row 3), so scoring
-     it would have reported DIVERGENT at all 31 seats. Being accidentally correct is not
+     it would have reported DIVERGENT at all evaluated seats. Being accidentally correct is not
      being correct -- the next release ships its `delivered_files` and the accident
      inverts. Sections are now explicit, per-section, and **always printed**, including
      the ones excluded. A filtered result that does not carry its filter is a false
      clean.
 
 Defects 1 and 2 were sign-opposed and cancelled exactly, so two seats independently
-reported **22/31 LANDED** from different sets. An aggregate cannot show that; an
+reported **the same LANDED total** from different sets. An aggregate cannot show that; an
 element-wise diff can. Publish the set, not the count.
 
 ## Verdicts
@@ -69,7 +69,7 @@ element-wise diff can. Publish the set, not the count.
 
 ## Trunk resolution, and why it is not just "main"
 
-Seats differ: `private-RKB-analytics-aget` is on `master`. Resolution order is
+Seats differ: a seat whose trunk branch is `master` is on `master`. Resolution order is
 `origin/HEAD` symref, then local `main`, then local `master`. If none resolves, the run
 is UNVERIFIABLE -- guessing a trunk name is how a check starts certifying the wrong ref.
 Trunk is read LOCALLY on purpose: fleet dispatch does not push, so "durably held at this
@@ -328,7 +328,7 @@ def classify(disk, head, trunk, payload_ok, want, advanced=None, capability=None
     #
     # The payload axis is scored AT TRUNK. So when trunk is behind, the payload at trunk
     # is *necessarily* behind too -- it is a CONSEQUENCE of the trunk position, not an
-    # independent finding. Scoring payload first made `private-career-aget` read
+    # independent finding. Scoring payload first made a downstream seat on an unmerged branch read
     # VERSION-ONLY, whose stated meaning is "version pinned, payload absent" -- the
     # Gate-2 false-green shape, whose remedy is re-migration. career's actual remedy is a
     # conflict-free fast-forward. Reporting a consequence instead of its cause hands the
@@ -413,7 +413,7 @@ def check_payload(repo, manifest_path, ref, sections):
                 # payload was never propagated (CORRECTIONS rows 3 and 5 -- "every row
                 # reads ABSENT-AT-REF, which is the defect in row 3 stated machine-
                 # readably"). There is nothing to deliver, so there is nothing to match.
-                # Scoring it as a hash mismatch would report all 31 seats DIVERGENT for
+                # Scoring it as a hash mismatch would report all evaluated seats DIVERGENT for
                 # correctly not having a file that was never shipped -- turning a
                 # disclosed producer-side gap into 31 phantom consumer defects.
                 s_absent += 1

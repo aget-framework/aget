@@ -1,0 +1,1 @@
+../../../.claude/skills/aget-study-topic/SKILL.md

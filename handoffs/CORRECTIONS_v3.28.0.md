@@ -104,7 +104,7 @@ with no route past it but unregistering the hook — the precise failure this re
 against (*"a guard that fires on everything gets disabled, and a disabled guard protects nothing"*).
 
 **Consequence for the delivery Goal, stated because it is load-bearing**: `DEPLOYMENT_SPEC_v3.28.0.yaml`
-rests leg 3 on `private-supervisor-AGET` installing this hook. Either the guard ships unmodified and bricks that
+rests leg 3 on the originating supervisor seat installing this hook. Either the guard ships unmodified and bricks that
 seat's tagging, or it gains an applicability predicate and never fires there for that seat's own
 tags. **Leg 3 is unreachable as designed, in both directions** — and `POLICY_release_cadence`
 R-REL-CAD-012 gates the v3.29 scope-lock on it.
@@ -175,7 +175,7 @@ pre-push banner corrected and the `DELIVERED_FILES` probe restored to the header
 
 ## Row 7 — v3.28.0 has TWO payloads, and the manifest described only the missing one
 
-**Found**: 2026-07-26 by **`private-supervisor-AGET`**'s independent migration-prep audit — not by this
+**Found**: 2026-07-26 by **the originating supervisor seat**'s independent migration-prep audit — not by this
 producer. It verified the finding three ways (`git ls-tree -r` at both refs, `shasum` canonical↔tag, and a
 re-run of its own `verify_v328_mrows.sh`) before reporting. Re-verified here at source before acting.
 
@@ -220,14 +220,14 @@ That is a DEPLOYMENT_SPEC gap and it is v3.29 work — recorded rather than back
 contract.
 
 **Credit**: the two-payload distinction, the G0.2 add-list consequence, and the `.aget/logs/` ledger-channel
-gap are `private-supervisor-AGET`'s findings. This producer verified its own release twice and found neither.
+gap are the originating supervisor seat's findings. This producer verified its own release twice and found neither.
 
 
 ---
 
 ## Row 8 — the BLOCKING pre-release check this release claims to have fixed is still unpassable
 
-**Found**: 2026-07-26 evening, chasing a suite-runtime question `private-supervisor-AGET` raised. Its premise was
+**Found**: 2026-07-26 evening, chasing a suite-runtime question the originating supervisor seat raised. Its premise was
 different and one of its inferences does not hold (see below), but the instinct was right and neither seat
 had this.
 
@@ -355,7 +355,7 @@ quantity is time.
 
 ## Row 11 — "the supervisor seat" was ambiguous across fleets, and a remote seat paid for it
 
-**Found**: 2026-07-26 late, by `private-legalon-supervisor-AGET` — a supervisor in a **different fleet**,
+**Found**: 2026-07-26 late, by a supervisor seat in another fleet — a supervisor in a **different fleet**,
 reading these artifacts as its only source while planning its own v3.28.0 wave.
 
 Rows 3b/7/8 and the manifest's `verify_rule` credited findings to *"the supervisor seat"*, unqualified,
@@ -366,7 +366,7 @@ five times across two public artifacts. There is more than one. That seat wrote:
 > v3.28. **Treat as a peer seat's work until probed, not as ours.**"*
 
 It could not determine whether it was being credited with work it had not done, and had to park the
-question. **Fixed**: all five now read `private-supervisor-AGET`. The manifest was re-emitted rather than
+question. **Fixed**: all five now read the originating supervisor seat. The manifest was re-emitted rather than
 hand-edited, so its generator carries the fix too.
 
 **Why this is a correction row and not a typo fix.** A seat name in a public artifact is an
@@ -391,7 +391,7 @@ is the cost it surfaced.
 
 **Found**: 2026-07-27, auditing row 11's own completeness claim before relying on it.
 
-Row 11 states: *"**Fixed**: all five now read `private-supervisor-AGET`."* **Two of the five were still
+Row 11 states: *"**Fixed**: all five now read the originating supervisor seat."* **Two of the five were still
 unqualified when that sentence was written** — and they are two of the three rows row 11 names by
 number:
 
@@ -435,7 +435,7 @@ load-bearing, not less: **two** audits of this surface have now returned a false
 
 ## Row 13 — probe 6 checked two of the three version-bearing surfaces and was named for all of them
 
-**Found**: 2026-07-27 by `private-legalon-supervisor-AGET` — **from a permission-prompt diff**, mid-wave,
+**Found**: 2026-07-27 by a supervisor seat in another fleet — **from a permission-prompt diff**, mid-wave,
 not from running any check. The dialog rendered three lines of context around the edit, and line 4 was
 visibly wrong.
 
@@ -541,8 +541,8 @@ three readings you mean.**
 
 ## Row 15 — probes 8 and 9 read the wrong REF, and the instrument written to fix that had the same defect three times
 
-**Found**: 2026-07-29 by `private-supervisor-AGET` and `private-aget-framework-AGET` measuring the same
-fleet independently. **Both reported `22/31 LANDED`. The sets were different.** That is the finding; the
+**Found**: 2026-07-29 by the originating supervisor seat and the framework producer seat measuring the same
+fleet independently. **Both reported `the same LANDED total`. The sets were different.** That is the finding; the
 ref bug is only its cause.
 
 Row 14 moved the migration bar from *disk* to *`HEAD`* and stopped one ref short. **A fourth failure
@@ -552,7 +552,7 @@ passes the 6+7+8+9 battery as published:**
 |---|---|---|
 | **committed but OFF-TRUNK** | probes 8 and 9 — `HEAD` carries version *and* payload | the seat's **trunk** is two releases back; the migration lives on an unmerged branch |
 
-`private-career-aget` sat on `session/2026-07-17-…` with `HEAD` = `3.28.0` and `main` = **`3.26.0`**. It
+a downstream seat on an unmerged branch sat on `session/2026-07-17-…` with `HEAD` = `3.28.0` and `main` = **`3.26.0`**. It
 passed every `HEAD`-based probe. `R-FU-014-6` at the consuming seat had **already** superseded `HEAD` with
 trunk; canonical had not converged, so the consuming seat's bar was knowingly stronger than the published
 one for two days. **Canonical now converges to it** (`gh#2059`) — the consuming seat was right and this is
@@ -563,13 +563,13 @@ the producer following, not the reverse.
 1. **Version axis read `HEAD`, not trunk** — it certified `career` LANDED.
 2. **Payload axis hashed the WORKING TREE while the version axis read a commit.** Two axes, two refs, one
    verdict, so the verdict answered no single question. One local edit made
-   `private-professional-core-aget` read DIVERGENT while its committed state was byte-exact. Worktree
+   a downstream monorepo seat read DIVERGENT while its committed state was byte-exact. Worktree
    drift is real information and is now reported **separately**, never against the verdict.
 3. **Payload axis silently scored ONE of THREE sha-bearing manifest sections** (`additive_files` only,
    with `delivered_files` and `optional_files` unread and unmentioned, while the manifest's own
    `verify_rule` names all three). At v3.28 the narrow read was **accidentally correct** — the
    `delivered_files` enforcement payload never shipped (row 3), so scoring it would have reported
-   DIVERGENT at all 31 seats. The accident inverts the moment a release ships its `delivered_files`.
+   DIVERGENT at all evaluated seats. The accident inverts the moment a release ships its `delivered_files`.
    This is row 12's lesson one layer down: prose named three sections, the actuator mechanised one.
 
 **Defects 1 and 2 were sign-opposed and cancelled exactly.** That is why two seats agreed on `22` from
@@ -580,7 +580,7 @@ per-seat set, not the count.
 ### Two more defects, found on the first live runs of the fix itself
 
 - **`ABSENT-AT-REF` is a SENTINEL, not a hash.** The manifest writes it into `sha256` for every
-  enforcement-payload row. Comparing it as a hash reported **all 31 seats DIVERGENT** for correctly not
+  enforcement-payload row. Comparing it as a hash reported **all evaluated seats DIVERGENT** for correctly not
   having files that were never shipped — a disclosed producer-side gap re-rendered as 31 phantom consumer
   defects. Sentinel rows are now `declared-absent`: not scoreable as delivery, and a seat that *does* hold
   one is flagged `PRESENT-ANOMALY` (provenance not this release) rather than passed or failed.
@@ -599,7 +599,7 @@ reintroduces the monorepo false alarm: a correction failing to reach what was de
 (one command, both axes at one ref, exit 0 only on `LANDED`). **A leg-2 confirmation recorded against
 `HEAD` does not meet the corrected bar.** Re-confirm; it is one command.
 
-**Re-measured trunk-based, 2026-07-29T18:09Z**: **29 LANDED · 1 OFF-TRUNK (`career`) · 1 NOT-APPLIED
+**Re-measured trunk-based, 2026-07-29T18:09Z**: **most seats LANDED · one OFF-TRUNK · one NOT-APPLIED
 (`llm-connectivity`)**. Self-test 8 → 10 cases, including one deliberate precedence flip recorded rather
 than silently re-asserted. A census is a snapshot — run the instrument rather than citing this line.
 

@@ -1,0 +1,66 @@
+version: "3.29.0"
+spec_version: "2.1.0"
+created: "2026-08-01"
+status: pre-push
+supersedes: "DEPLOYMENT_SPEC_v3.28.0.yaml"
+breaking_release: false
+
+verification_script:
+  file: "scripts/verify_deployment.py"
+  usage: "python3 scripts/verify_deployment.py --version 3.29.0 --path /path/to/agent"
+  behavioral_smoke: "handoffs/REMOTE_MIGRATION_MESSAGE_v3.29.0.md"
+
+detection_context: "Run each applicable row from the receiving AGET seat root after copying the named distribution point. The bare public core is the distribution point and intentionally lacks a manager AGENTS.md/governed decision-source set."
+
+mandatory_changes:
+  - id: "M-3.29-1"
+    outcome: "H-29-003"
+    description: "root instructions remain below 40000 bytes with load-bearing reach"
+    blocking: true
+    detection: "python3 scripts/check_agents_instruction_reach.py . --json"
+    distribution_point: "scripts/check_agents_instruction_reach.py"
+    applies_to: "AGET seats with root AGENTS.md; advisor is the release conformance exemplar"
+  - id: "M-3.29-2"
+    outcome: "H-29-012"
+    description: "Claude/Codex supported-client control matrix remains exact and trust-bounded"
+    blocking: true
+    detection: "python3 scripts/check_cross_client_hook_controls.py --json"
+    distribution_point: "poc/claude-hook-controls/claude_pretool_guard.py + poc/codex-hook-controls/codex_pretool_guard.py"
+    applies_to: "release conformance; portable sanitized fixtures do not install hooks"
+  - id: "M-3.29-3"
+    outcome: "H-29-013"
+    description: "one release decision view has zero contradictions, omissions, and manual joins"
+    blocking: true
+    detection: "python3 scripts/render_release_decision_view.py --version 3.29.0 --verify --json"
+    distribution_point: "scripts/render_release_decision_view.py"
+    applies_to: "framework-manager seats with VERSION_SCOPE, rulings, Goal, and requirements ledger"
+  - id: "M-3.29-4"
+    outcome: "H-29-016"
+    description: "delivery predicates cannot be inferred from producer evidence"
+    blocking: true
+    detection: "python3 -m pytest tests/test_release_distribution_evidence.py -q"
+    distribution_point: "scripts/release_distribution_evidence.py"
+    applies_to: "release-manager seats"
+  - id: "M-3.29-5"
+    outcome: "H-29-018"
+    description: "Codex-native wake-up, study-topic, and save-state skills resolve with recovery"
+    blocking: true
+    detection: "python3 scripts/validate_codex_skill_discovery.py --json"
+    distribution_point: ".agents/skills/"
+    applies_to: "Codex-capable AGET seats"
+  - id: "M-3.29-6"
+    outcome: "H-29-022"
+    description: "purpose affects ranking and recency/surface/rendering contract is truthful"
+    blocking: true
+    detection: "python3 -m pytest tests/test_study_topic_purpose_recency_rendering.py -q"
+    distribution_point: "scripts/study_topic.py"
+    applies_to: "all AGET seats"
+
+delivery_boundary:
+  producer: "Gate 0 family receipts"
+  distribution_point: "public v3.29 tag payload"
+  received_state: "Gate 4 downstream version verification"
+  downstream_behavior: "Gate 4 cold Codex discovery, invocation, and recovery"
+  inference_prohibited: true
+
+rollback: "restore v3.28 tag/pins and remove v3.29 additive paths; no data conversion"

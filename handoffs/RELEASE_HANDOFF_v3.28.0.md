@@ -47,7 +47,7 @@ sitting at an unmet aspiration.
 |---|---|:--:|---|---|
 | framework (producer) | 3.27.0 | ✅ **3.28.0** | self-migration, 2026-07-26 | R-REL-006 manager migration |
 | supervisor seat | 3.27.0 | ✅ **3.28.0** | **ACK by that seat, 2026-07-29** | **delivery-Goal leg 2 — MET** |
-| fleet wave | 3.27.0 | ✅ **31/31 LANDED** | supervisor seat, 2026-07-29 | six axes; 1 seat `LANDED-AND-ADVANCED` |
+| fleet wave | 3.27.0 | ✅ **all evaluated seats LANDED** | supervisor seat, 2026-07-29 | six axes; includes an advanced-version seat |
 
 > **Leg 2 is MET, and this table is where that is recorded — deliberately not in the Goal (2026-07-29).**
 > `GOAL-V328-DELIVERED` stores **no per-leg state**: its first loop reads *"review=re-read all three
@@ -58,7 +58,7 @@ sitting at an unmet aspiration.
 > between edits; one that says how to compute does not.** So the Goal was left unmutated and this
 > row, which its loop already names as the review route, carries the evidence.
 >
-> **Evidence, and why it is adequate.** `private-supervisor-AGET` authored
+> **Evidence, and why it is adequate.** the originating supervisor seat authored
 > `handoffs/ACK_framework_aget_v3.28.0_sup_pilot_evidence_2026-07-29.md` at its own seat; this seat
 > verified the artifact exists at source by read-only cross-fleet read (L480), and did **not**
 > write it. A producer closing the leg whose entire purpose is third-party confirmation would make

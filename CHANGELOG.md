@@ -11,12 +11,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Items confirmed in-flight for a future release (latest released: **3.28.0**). Per Keep a Changelog 1.1.0 forward-work convention.
+Items confirmed in-flight for a future release (latest released: **3.29.0**). Per Keep a Changelog 1.1.0 forward-work convention.
 
 - Issue-governance spec delta for the `/aget-file-issue` pre-filing probes (skill layer shipped in 3.26.0; formal requirement rides the next spec pass).
 - Template `/aget-file-issue` structural refresh (routing + probe steps to all templates; fleet routing propagation staged per the 3.26.0 rollout decision).
-- **Traceability ratchet**: the test-requirement floor rises +5pp per minor release from the 3.28.0 baseline of 39%.
-- **AGENTS.md size remediation** — the 40k limit is exceeded and tracked, not silenced.
+- **Traceability ratchet**: the test-requirement floor rises +5pp per minor release from the v3.29 measured floor.
+
+## [3.29.0] - 2026-08-01 - "Repair release truth and reduce principal decision work"
+
+### Added
+- Added Codex-native discovery for wake-up, study-topic, and save-state with explicit recovery.
+- Added exact Claude Code and Codex CLI control-conformance evidence plus a one-view release decision contract.
+
+### Changed
+- Changed study-topic ranking so purpose weighting is effective and recency, searched surfaces, and external omissions are disclosed.
+
+### Fixed
+- Fixed distribution evidence so producer, distribution point, received state, and downstream behavior remain independent predicates.
 
 ## [3.28.0] - 2026-07-26 - "Make the gates fire"
 

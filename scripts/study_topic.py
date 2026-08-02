@@ -31,6 +31,7 @@ Usage:
 import argparse
 import importlib.util
 import json
+import os
 import re
 import sys
 from datetime import datetime
@@ -39,6 +40,8 @@ from pathlib import Path
 
 def get_agent_root():
     """Get the agent root directory."""
+    if os.environ.get('AGET_STUDY_ROOT'):
+        return Path(os.environ['AGET_STUDY_ROOT']).resolve()
     current = Path(__file__).resolve()
     return current.parent.parent
 
@@ -84,7 +87,16 @@ def get_purpose_globs(purpose, config):
     Implements: CAP-SESSION-007-06 (priority_areas)
     """
     priority_areas = config.get('priority_areas', {})
-    return priority_areas.get(purpose, [])
+    if purpose in priority_areas:
+        return priority_areas[purpose]
+    defaults = {
+        'pre-implementation': ['planning/**', 'specs/**', '*/specs/**', 'docs/patterns/**'],
+        'pre-release': ['planning/PROJECT_PLAN*', 'sops/SOP_release*', 'release-notes/**',
+                        'handoffs/RELEASE*', 'specs/*RELEASE*', '*/specs/*RELEASE*'],
+        'audit': ['governance/**', 'tests/**', 'scripts/**', '.claude/hooks/**', '.codex/hooks/**'],
+        'exploration': ['knowledge/**', 'ontology/**', '.aget/evolution/**'],
+    }
+    return defaults.get(purpose, [])
 
 
 def compute_purpose_boost(file_path_str, purpose_globs):
@@ -151,10 +163,17 @@ SURFACES_SEARCHED = [
     'inbox/ ≤14d (v3.26 C-26-11 — S2 revisit ruling: NOTIFYs are study-relevant, gh#1850)',
 ]
 SURFACES_EXCLUDED = [
-    'sessions/, workspace/, data/ (deliberate — 2026-07-04 scope decision, noise at study-time)',
+    'sessions/, workspace/, data/ (deliberate — 2026-07-04 scope decision, noise at study-time; '
+    'sessions/ is reachable on request via --include-sessions)',
     'docs/ outside patterns/, planning/initiatives/, handoffs/, release-notes/, .claude/skills/ '
     '(unconfigured — candidates for a future scope ruling)',
 ]
+SURFACES_OUT_OF_UNIVERSE = (
+    'this list is REPO-INTERNAL ONLY. Two classes lie outside it and are never searched: '
+    'the WORK REPO this agent contributes to, and the WEB / external prior art. '
+    'A topic settled in either is invisible here and will be re-derived — pair this study '
+    'with an explicit search of both before concluding a gap exists'
+)
 
 
 def prepare_keywords(topic: str) -> list:
@@ -738,7 +757,40 @@ def find_inbox(topic: str, domain_keywords: list = None, window_days: int = 14) 
     return results
 
 
-def generate_report(topic: str, findings: dict, floor_info: dict = None) -> str:
+def find_instruments(topic: str, domain_keywords: list = None) -> list:
+    """Find executable instruments when explicitly requested.
+
+    Scripts, tests, and hook sources are excluded by default because their token
+    density can dominate KB prose. The opt-in makes that omission recoverable.
+    """
+    agent_root = get_agent_root()
+    results = []
+    seen = set()
+    roots = (agent_root / 'scripts', agent_root / 'tests',
+             agent_root / '.claude' / 'hooks', agent_root / '.codex' / 'hooks')
+    for base in roots:
+        if not base.exists():
+            continue
+        for file in sorted(base.rglob('*')):
+            if not file.is_file() or file.suffix not in ('.py', '.sh', '.js', '.ts', '.json'):
+                continue
+            resolved = file.resolve()
+            if resolved in seen:
+                continue
+            seen.add(resolved)
+            match = search_file_for_topic(file, topic, domain_keywords=domain_keywords)
+            if match:
+                results.append({'doc': str(file.relative_to(agent_root)),
+                                'file': match['file'],
+                                'match_count': match['match_count'],
+                                'keyword_coverage': match.get('keyword_coverage', 1.0),
+                                'score': match.get('score', 0.0)})
+    results.sort(key=lambda x: x['score'], reverse=True)
+    return results
+
+
+def generate_report(topic: str, findings: dict, floor_info: dict = None,
+                    purpose: str = None, purpose_globs: list = None) -> str:
     """Generate human-readable study report.
 
     Args:
@@ -758,10 +810,13 @@ def generate_report(topic: str, findings: dict, floor_info: dict = None) -> str:
     lines.append(f"**Search Date**: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
     lines.append(f"**Topic**: {topic}")
     lines.append(f"**Keywords (after hygiene)**: {', '.join(prepare_keywords(topic))}")
+    lines.append(f"**Purpose**: {purpose or 'exploration'}; priority globs: "
+                 f"{', '.join(purpose_globs or []) or 'none configured'}")
     lines.append("")
     # Declared surface manifest (audit S1/C1): absence is now interpretable.
     lines.append("**Surfaces searched**: " + " ; ".join(SURFACES_SEARCHED))
-    lines.append("**NOT searched**: " + " ; ".join(SURFACES_EXCLUDED))
+    lines.append("**NOT searched (repo-internal)**: " + " ; ".join(SURFACES_EXCLUDED))
+    lines.append("**⚠ Scope of that list**: " + SURFACES_OUT_OF_UNIVERSE)
     lines.append("")
 
     # Summary
@@ -832,6 +887,18 @@ def generate_report(topic: str, findings: dict, floor_info: dict = None) -> str:
         for item in findings['knowledge'][:5]:
             lines.append(f"- {item['doc']} ({item['match_count']} matches)")
         lines.append("")
+
+    # Every opt-in or contract tier is rendered, not merely counted in Summary.
+    for key, title in (('specs', 'Related Specifications'), ('inbox', 'Related Inbox'),
+                       ('sessions', 'Related Sessions'), ('instruments', 'Related Instruments')):
+        if findings.get(key):
+            lines.append(f"### {title}")
+            lines.append("")
+            for item in findings[key][:5]:
+                label = item.get('spec') or item.get('doc') or item.get('file')
+                count = item.get('match_count', item.get('matches', 0))
+                lines.append(f"- {label} ({count} matches)")
+            lines.append("")
 
     # Recommendation — contract-derived (audit C1): states quantity over the
     # declared surface; no quality adjective the tool cannot demonstrate.
@@ -920,6 +987,8 @@ Examples:
                              'decision). Use when sessions are the SUBJECT of the study.')
     parser.add_argument('--session-days', type=int, default=90, metavar='N',
                         help='Recency window for --include-sessions (default 90)')
+    parser.add_argument('--include-instruments', action='store_true',
+                        help='Also search scripts/tests/hooks (OFF by default; executable surface)')
 
     args = parser.parse_args()
 
@@ -938,22 +1007,7 @@ Examples:
     # Load config and resolve epistemic parameters (CAP-SESSION-007-06/07)
     config = load_study_topic_config()
     purpose = resolve_purpose(args.purpose, config)
-    # ⚠ DEAD CAPABILITY, DELIBERATELY LEFT VISIBLE — do NOT "clean up" this line.
-    # ruff reports F841 (assigned, never used) and ruff is right, but deleting the
-    # assignment would erase the last trace of a capability that is fully built and
-    # never reachable. CAP-SESSION-007-06 (purpose weighting via `priority_areas`) is
-    # implemented end to end and wired NOWHERE:
-    #   * get_purpose_globs()      -- returns the globs (works)
-    #   * compute_purpose_boost()  -- applies the boost (works)
-    #   * search_directory()       -- the ONLY caller of that boost: ZERO callers itself
-    #   * find_ldocs/patterns/...  -- all 9 take domain_keywords, NONE takes purpose_globs
-    # So `--purpose` is accepted, documented as "weights results by KB area", and its
-    # weighting has never once applied to a result. This value is computed and discarded.
-    #
-    # Not fixed here on purpose: wiring it changes result ranking for every study at
-    # every seat, which needs a V-test and a release, not a lint pass. Tracked upstream;
-    # it survived v3.28's own orphaned-control census, which is itself the finding.
-    purpose_globs = get_purpose_globs(purpose, config)  # noqa: F841 - see above, tracked
+    purpose_globs = get_purpose_globs(purpose, config)
 
     # Domain keywords: explicit flag > config > none
     domain_keywords = args.domain_keywords or config.get('domain_keywords')
@@ -981,6 +1035,21 @@ Examples:
                 SURFACES_EXCLUDED[i] = (
                     'workspace/, data/ (deliberate — 2026-07-04 scope decision, noise at '
                     'study-time). sessions/ is INCLUDED this run via --include-sessions')
+    if args.include_instruments:
+        findings['instruments'] = find_instruments(args.topic, domain_keywords=domain_keywords)
+        SURFACES_SEARCHED.append(
+            'scripts/** + tests/** + .claude/hooks/** + .codex/hooks/** '
+            '(OPT-IN via --include-instruments)')
+
+    # Purpose weighting is applied after all default and opt-in finders have run,
+    # so no result tier can silently bypass the advertised epistemic parameter.
+    for items in findings.values():
+        if not isinstance(items, list):
+            continue
+        for item in items:
+            item['purpose_boost'] = compute_purpose_boost(item.get('file', ''), purpose_globs)
+            item['score'] = composite_score(item)
+        items.sort(key=lambda item: item.get('score', 0.0), reverse=True)
 
     # Relevance floor (v3.26 C-26-11; audit R3, gh#1560): suppress items whose
     # composite score sits below the floor. Configurable; --no-floor escapes.
@@ -1013,6 +1082,12 @@ Examples:
                 'keywords': prepare_keywords(args.topic),
                 'surfaces_searched': SURFACES_SEARCHED,
                 'surfaces_excluded': SURFACES_EXCLUDED,
+                'surfaces_out_of_universe': SURFACES_OUT_OF_UNIVERSE,
+                'purpose_globs': purpose_globs,
+                'sessions': {'included': args.include_sessions,
+                             'recency_days': args.session_days if args.include_sessions else None,
+                             'date_basis': 'filename date; undated files included'},
+                'instruments_included': args.include_instruments,
                 'relevance_floor': floor,
                 'suppressed_below_floor': suppressed if floor is not None else None
             }
@@ -1021,7 +1096,8 @@ Examples:
         return 0
 
     # Human-readable output
-    report = generate_report(args.topic, findings, floor_info=floor_info)
+    report = generate_report(args.topic, findings, floor_info=floor_info,
+                             purpose=purpose, purpose_globs=purpose_globs)
     print(report)
 
     return 0

@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "defaultMode": "default"
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 poc/claude-hook-controls/claude_pretool_guard.py"
+          }
+        ]
+      }
+    ]
+  }
+}

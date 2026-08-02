@@ -82,7 +82,7 @@ Measured in the producing fleet at one instant, 2026-07-27: **17** seats read `3
 also carry the payload · **13** also have it at `HEAD`. Four seats claim the version and do not hold it,
 in two non-overlapping failure modes. Every count published that day was the 17. *(Those three readings
 are `HEAD`-based and therefore over-report — see the trunk correction immediately below. Re-measured
-trunk-based 2026-07-29T18:09Z: **29 LANDED · 1 OFF-TRUNK · 1 NOT-APPLIED**. A census is a snapshot; run
+trunk-based 2026-07-29T18:09Z: **most seats LANDED · one OFF-TRUNK · one NOT-APPLIED**. A census is a snapshot; run
 the instrument rather than citing this line.)*
 
 ### ⛔ CORRECTED 2026-07-29 — probes 8 and 9 read the wrong REF. Re-run if you migrated before this.
@@ -93,7 +93,7 @@ the instrument rather than citing this line.)*
 |---|---|---|
 | **committed but OFF-TRUNK** | probes 8 and 9 — `HEAD` carries version *and* payload | the seat's **trunk** is two releases back; the migration lives on an unmerged branch |
 
-`private-career-aget` sat on branch `session/2026-07-17-…` with `HEAD` = `3.28.0` and `main` = **`3.26.0`**.
+a downstream seat on an unmerged branch sat on branch `session/2026-07-17-…` with `HEAD` = `3.28.0` and `main` = **`3.26.0`**.
 It passed every `HEAD`-based probe, and the framework seat's own
 `verify_migration_landed.py` certified it **LANDED**. A payload on an unmerged branch is not durably
 held: abandon the branch and nothing about the seat's trunk changes.
@@ -105,7 +105,7 @@ reverse (`gh#2059`). **A pass under the `HEAD` form is not evidence for the trun
 **Probe 8 had the same defect in a second place**: it hashed the **working tree** while probe 9 read a
 commit. Two probes, two refs, one verdict — so the verdict answered no single question, and a seat with any
 local edit to a payload file failed probe 8 while its committed state was byte-exact
-(`private-professional-core-aget`). Working-tree drift is real information and is now reported
+(a downstream monorepo seat). Working-tree drift is real information and is now reported
 **separately**, never against the bar.
 
 **The repo-root prefix is KEPT, and this is the part most likely to be got wrong when copying the fix.**

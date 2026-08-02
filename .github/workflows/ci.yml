@@ -160,18 +160,16 @@ jobs:
           fi
           echo "clean: no operator-identifying home paths (documented placeholders exempt)"
 
-      - name: Private-identifier census (non-blocking, deliberately)
+      - name: Private-agent identifier census (non-blocking, deliberately)
         # Reported, NOT gated, and the reason is a scope distinction that matters:
-        # AGET_ISSUE_GOVERNANCE_SPEC's sanitization patterns (`private-*-aget`, `gmelli/`,
-        # fleet-size disclosures) govern the ISSUE PROMOTION boundary — content moved from
+        # AGET_ISSUE_GOVERNANCE_SPEC's sanitization patterns (private agent identifiers,
+        # owner-qualified private issue references, fleet-size disclosures) govern the ISSUE PROMOTION boundary — content moved from
         # the private tracker to a public issue. They have never governed this repo's own
         # file content, and treating them as if they did would invent a requirement.
         #
-        # Census 2026-07-29: 24 files match `private-*-aget`, 57 match `gmelli/`. Whether
-        # any of that should be reduced is a principal call about public-facing posture,
+        # Whether legacy private-agent references should be reduced is a principal call about public-facing posture,
         # not something a CI job should decide by failing. Surfaced so the number is
         # visible and dated instead of assumed to be zero.
         continue-on-error: true
         run: |
-          echo "files matching private-*-aget: $(git grep -lIE 'private-[a-zA-Z0-9_]+-(aget|AGET)' -- . | wc -l)"
-          echo "files matching gmelli/:        $(git grep -lI 'gmelli/' -- . | wc -l)"
+          echo "files matching private agent identifiers: $(git grep -lIE 'private-[a-zA-Z0-9_]+-(aget|AGET)' -- . | wc -l)"

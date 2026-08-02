@@ -1,0 +1,1 @@
+../../../.claude/skills/aget-wake-up/SKILL.md
