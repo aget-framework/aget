@@ -1,7 +1,7 @@
 version: "3.29.0"
 spec_version: "2.1.0"
 created: "2026-08-01"
-status: pre-push
+status: active
 supersedes: "DEPLOYMENT_SPEC_v3.28.0.yaml"
 breaking_release: false
 
@@ -18,7 +18,7 @@ mandatory_changes:
     description: "root instructions remain below 40000 bytes with load-bearing reach"
     blocking: true
     detection: "test ! -f AGENTS.md || python3 scripts/check_agents_instruction_reach.py . --json"
-    distribution_point: "scripts/check_agents_instruction_reach.py"
+    distribution_point: "scripts/check_agents_instruction_reach.py + docs/POSITION_agents_instruction_reach_and_self_amendment.md"
     tagged_origins: "aget,template-advisor-aget"
     applies_to: "AGET seats with root AGENTS.md; advisor is the release conformance exemplar"
   - id: "M-3.29-2"

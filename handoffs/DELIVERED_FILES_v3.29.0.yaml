@@ -4,7 +4,7 @@
 # post-stage porcelain cross-check asserts no manifest path remains untracked.
 version: "3.29.0"
 source_ref: "HEAD"  # canonical aget/ (payload-source ruling 2026-07-11: canonical, not template — see #1871)
-generated: "2026-08-02T03:43:30Z"
+generated: "2026-08-02T17:26:50Z"
 generator: "scripts/emit_delivered_files_manifest.py"
 tracking: "aget-framework/aget#1870"
 
@@ -16,6 +16,9 @@ delivered_files:
   - path: "scripts/check_agents_instruction_reach.py"
     spec_rows: [M-3.29-1]
     sha256: "6ff773f74be174a150964b953d1359bf113a5c72677cfc85016acd387fb85d5e"
+  - path: "docs/POSITION_agents_instruction_reach_and_self_amendment.md"
+    spec_rows: [M-3.29-1]
+    sha256: "76d0548d9bf2b539dc077b9c1067297c71fbbbb8d79bfcbce25b542ddc6aaaa1"
   - path: "poc/claude-hook-controls/README.md"
     spec_rows: [M-3.29-2]
     sha256: "e81a0a3bc17beccfecf243485ad3838676b80e120d2fd441fbc1fe7dbf5bab3a"

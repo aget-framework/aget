@@ -1,9 +1,10 @@
 # RELEASE HANDOFF — v3.29.0
 
-**Prepared**: 2026-08-01 · **State**: PRE-PUSH CANDIDATE
+**Prepared**: 2026-08-01 · **State**: PUBLIC RELEASE — POST-TAG CORRECTION #5 ACTIVE ON `main`
 
-> Do not report this release as public or delivered from this artifact. Gate 3 must verify the public chain;
-> Gate 4 must verify received state and ordinary downstream Codex behavior.
+> v3.29.0 is public. Do not report it as delivered from this artifact. Gate 4 must verify received state
+> and ordinary downstream Codex behavior. Correction #5 makes M-3.29-1 marker-sufficient and governed by
+> the `main` manifest; it does not prove that a receiving seat applied it.
 
 ## Breaking Changes
 
@@ -12,9 +13,11 @@ out of scope until v3.30.
 
 ## Upgrade Guide
 
-Read `release-notes/v3.29.0.md`, pin the v3.29.0 tag after it is public, apply the complete delivered-files
-manifest, update the seat version pins, preserve instance extensions, and run the receiving seat's own
-health/tests. Do not change Codex project trust as part of migration.
+Read `release-notes/v3.29.0.md`, pin the immutable v3.29.0 tag for the original payload, then read
+`handoffs/CORRECTIONS_v3.29.0.md` and use the corrected delivered-files manifest from `main`. Apply every
+applicable manifest path—including the M-3.29-1 POSITION document—update the seat version pins, preserve
+instance extensions, and run the receiving seat's own health/tests. Do not change Codex project trust as
+part of migration.
 
 ## Deployment Requirements
 
@@ -44,7 +47,8 @@ received version, and ordinary downstream behavior as four separate facts. A suc
 version bump does not establish discovery/invocation/recovery behavior.
 
 Post-tag release corrections are disclosed at `handoffs/CORRECTIONS_v3.29.0.md` on `main`; immutable tags
-are never moved to hide a release-time documentation defect.
+are never moved to hide a release-time documentation defect. Payload remains tag-pinned, while corrected
+migration instructions and correction payload hashes are read from `main`.
 
 ## Rollback
 
