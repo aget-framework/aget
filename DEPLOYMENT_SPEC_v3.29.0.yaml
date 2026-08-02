@@ -19,6 +19,7 @@ mandatory_changes:
     blocking: true
     detection: "test ! -f AGENTS.md || python3 scripts/check_agents_instruction_reach.py . --json"
     distribution_point: "scripts/check_agents_instruction_reach.py"
+    tagged_origins: "aget,template-advisor-aget"
     applies_to: "AGET seats with root AGENTS.md; advisor is the release conformance exemplar"
   - id: "M-3.29-2"
     outcome: "H-29-012"
@@ -26,6 +27,7 @@ mandatory_changes:
     blocking: true
     detection: "python3 scripts/check_cross_client_hook_controls.py --json"
     distribution_point: "poc/claude-hook-controls/README.md + poc/claude-hook-controls/claude_pretool_guard.py + poc/claude-hook-controls/settings.fixture.json + poc/codex-hook-controls/README.md + poc/codex-hook-controls/codex_pretool_guard.py"
+    tagged_origins: "aget,template-advisor-aget"
     applies_to: "release conformance; portable sanitized fixtures do not install hooks"
   - id: "M-3.29-3"
     outcome: "H-29-013"
@@ -33,6 +35,7 @@ mandatory_changes:
     blocking: true
     detection: "test ! -f planning/VERSION_SCOPE_v3.29.0.md || python3 scripts/render_release_decision_view.py --version 3.29.0 --verify --json"
     distribution_point: "scripts/render_release_decision_view.py"
+    tagged_origins: "aget"
     applies_to: "framework-manager seats with VERSION_SCOPE, rulings, Goal, and requirements ledger"
   - id: "M-3.29-4"
     outcome: "H-29-016"
@@ -40,6 +43,7 @@ mandatory_changes:
     blocking: true
     detection: "test ! -f scripts/release_distribution_evidence.py || python3 -m pytest tests/test_release_distribution_evidence.py -q"
     distribution_point: "scripts/release_distribution_evidence.py"
+    tagged_origins: "aget"
     applies_to: "release-manager seats"
   - id: "M-3.29-5"
     outcome: "H-29-018"
@@ -47,6 +51,7 @@ mandatory_changes:
     blocking: true
     detection: "python3 scripts/validate_codex_skill_discovery.py --json"
     distribution_point: ".agents/skills/aget-wake-up/SKILL.md + .agents/skills/aget-study-topic/SKILL.md + .agents/skills/aget-save-state/SKILL.md + scripts/validate_codex_skill_discovery.py"
+    tagged_origins: "aget,template-advisor-aget"
     applies_to: "Codex-capable AGET seats"
   - id: "M-3.29-6"
     outcome: "H-29-022"
@@ -54,6 +59,7 @@ mandatory_changes:
     blocking: true
     detection: "python3 -m pytest tests/test_study_topic_purpose_recency_rendering.py -q"
     distribution_point: "scripts/study_topic.py"
+    tagged_origins: "aget,template-advisor-aget"
     applies_to: "all AGET seats"
 
 delivery_boundary:
