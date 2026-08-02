@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 POSITION = ROOT / "docs" / "POSITION_agents_instruction_reach_and_self_amendment.md"
 CORRECTIONS = ROOT / "handoffs" / "CORRECTIONS_v3.29.0.md"
 HANDOFF = ROOT / "handoffs" / "RELEASE_HANDOFF_v3.29.0.md"
+REMOTE = ROOT / "handoffs" / "REMOTE_MIGRATION_MESSAGE_v3.29.0.md"
 
 
 def _write_candidate(tmp_path: Path, position_text: str) -> None:
@@ -79,3 +80,49 @@ def test_handoff_pilot_table_separates_received_state_from_behavior():
     assert "downstream v3.29 receiver | verified 2026-08-02" in text
     assert "cold-context Codex discovery/invocation/recovery still pending" in text
     assert "private receiver identity not published" in text
+
+
+def _remote_contract_violations(text: str) -> list[str]:
+    violations = []
+    if "PRE-PUSH" in text:
+        violations.append("stale-state")
+    if not re.search(r"DELIVERED_FILES_v3\.29\.0\.yaml` from \*\*`main`\*\*", text):
+        violations.append("manifest-ref")
+    if "composite packet identity" not in text:
+        violations.append("packet-identity")
+    if "FLEET FAN-OUT HOLD" not in text:
+        violations.append("fanout-boundary")
+    if "correction-only adoption" not in text:
+        violations.append("correction-only")
+    return violations
+
+
+def test_remote_entrypoint_selects_current_packet_and_preserves_gate4_boundary():
+    """R-REL-019/L1142: remote guidance must select current bytes and not infer behavior."""
+    text = REMOTE.read_text(encoding="utf-8")
+    assert _remote_contract_violations(text) == []
+    assert re.search(r"tag-only\s+> migration selects a known-defective packet", text)
+    assert "tag object" in text and "peeled tag commit" in text
+    assert re.search(r"resolved `main`\s+commit", text) and "SHA-256" in text
+
+
+@pytest.mark.parametrize(
+    ("mutator", "expected"),
+    [
+        (lambda text: text.replace("PUBLIC RELEASE", "PRE-PUSH", 1), "stale-state"),
+        (
+            lambda text: text.replace(
+                "DELIVERED_FILES_v3.29.0.yaml` from **`main`**",
+                "DELIVERED_FILES_v3.29.0.yaml` from the tag",
+                1,
+            ),
+            "manifest-ref",
+        ),
+        (lambda text: text.replace("composite packet identity", "packet details"), "packet-identity"),
+        (lambda text: text.replace("FLEET FAN-OUT HOLD", "FLEET READY"), "fanout-boundary"),
+    ],
+)
+def test_remote_entrypoint_regression_fixture_proves_the_contract_bites(mutator, expected):
+    """ADR-007: each formerly-live defect must make the consumer contract fail."""
+    stale = mutator(REMOTE.read_text(encoding="utf-8"))
+    assert expected in _remote_contract_violations(stale)

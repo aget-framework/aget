@@ -3,7 +3,7 @@
 **Prepared**: 2026-08-01 · **State**: PUBLIC RELEASE — POST-TAG CORRECTIONS ACTIVE ON `main`
 
 > v3.29.0 is public. Do not report it as delivered from this artifact. Gate 4 must verify received state
-> and ordinary downstream Codex behavior. Corrections #5–#7 repair receiver payload and validation
+> and ordinary downstream Codex behavior. Corrections #5–#8 repair receiver payload, validation, and
 > surfaces on `main`; they do not prove that a receiving seat applied them.
 
 ## Breaking Changes
@@ -57,6 +57,12 @@ version bump does not establish discovery/invocation/recovery behavior.
 Post-tag release corrections are disclosed at `handoffs/CORRECTIONS_v3.29.0.md` on `main`; immutable tags
 are never moved to hide a release-time documentation defect. Payload remains tag-pinned, while corrected
 migration instructions and correction payload hashes are read from `main`.
+
+The remote entrypoint is `handoffs/REMOTE_MIGRATION_MESSAGE_v3.29.0.md` on `main`, not the tagged copy.
+It requires a composite packet receipt (tag object + peeled commit + resolved `main` commit + delivered-
+manifest SHA-256). Any later correction invalidates dependent packet-currency claims until receivers
+re-derive them against the new identity. Remote pilot readiness and fleet fan-out readiness are separate:
+fan-out remains on HOLD until Gate 4 has a qualifying cold-context behavior receipt.
 
 ## Rollback
 
