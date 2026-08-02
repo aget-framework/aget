@@ -40,7 +40,7 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Directories are enumerated rather than globbed so a new payload location fails
 # loudly here instead of vanishing from the copy-list.
 PATH_RE = re.compile(
-    r"(?:scripts|tests|rubrics|\.claude/(?:skills|hooks|agents)|\.aget/patterns)"
+    r"(?:scripts|tests|rubrics|poc|\.agents/skills|\.claude/(?:skills|hooks|agents)|\.aget/patterns)"
     r"/[\w./-]+\.(?:py|md|sh|yaml|json)"
 )
 # Rows whose detections test agent state edited in place (pins), not delivered files.
@@ -182,14 +182,14 @@ def emit(version, ref):
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     lines = [
         f"# DELIVERED_FILES_v{version}.yaml — machine-readable per-payload delivered-files manifest",
-        "# Emit half of gmelli/aget-aget#1870 (closes the #1828 delivered-but-not-committed vector).",
+        "# Emit half of aget-framework/aget#1870 (closes the #1828 delivered-but-not-committed vector).",
         "# Consumer: SOP_fleet_upgrade G0.2 — commit add-list derives from THIS manifest;",
         "# post-stage porcelain cross-check asserts no manifest path remains untracked.",
         f'version: "{version}"',
         f'source_ref: "{ref}"  # canonical aget/ (payload-source ruling 2026-07-11: canonical, not template — see #1871)',
         f'generated: "{ts}"',
         'generator: "scripts/emit_delivered_files_manifest.py"',
-        'tracking: "gmelli/aget-aget#1870"',
+        'tracking: "aget-framework/aget#1870"',
         "",
         "pin_edits:  # edited in place on the agent, not file-copied — outside the porcelain cross-check",
     ]

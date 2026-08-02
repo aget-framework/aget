@@ -25,7 +25,7 @@ mandatory_changes:
     description: "Claude/Codex supported-client control matrix remains exact and trust-bounded"
     blocking: true
     detection: "python3 scripts/check_cross_client_hook_controls.py --json"
-    distribution_point: "poc/claude-hook-controls/claude_pretool_guard.py + poc/codex-hook-controls/codex_pretool_guard.py"
+    distribution_point: "poc/claude-hook-controls/README.md + poc/claude-hook-controls/claude_pretool_guard.py + poc/claude-hook-controls/settings.fixture.json + poc/codex-hook-controls/README.md + poc/codex-hook-controls/codex_pretool_guard.py"
     applies_to: "release conformance; portable sanitized fixtures do not install hooks"
   - id: "M-3.29-3"
     outcome: "H-29-013"
@@ -46,7 +46,7 @@ mandatory_changes:
     description: "Codex-native wake-up, study-topic, and save-state skills resolve with recovery"
     blocking: true
     detection: "python3 scripts/validate_codex_skill_discovery.py --json"
-    distribution_point: ".agents/skills/"
+    distribution_point: ".agents/skills/aget-wake-up/SKILL.md + .agents/skills/aget-study-topic/SKILL.md + .agents/skills/aget-save-state/SKILL.md + scripts/validate_codex_skill_discovery.py"
     applies_to: "Codex-capable AGET seats"
   - id: "M-3.29-6"
     outcome: "H-29-022"
