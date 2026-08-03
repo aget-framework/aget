@@ -1,9 +1,9 @@
 # SOP: Fleet Migration
 
-**Version**: 1.8.2
+**Version**: 1.9.0
 **Status**: Active
 **Created**: 2026-01-05
-**Updated**: 2026-07-27
+**Updated**: 2026-08-03
 **Owner**: aget-framework
 **Implements**: CAP-MIG-017 (Remote Supervisor Upgrade), SD-3 wave-sequencing (v1.6.0)
 **Related**: L455 (AGENTS.md Invocation Verification), L457 (Cross-Machine Pre-Flight), AGET_RELEASE_SPEC, PROJECT_PLAN_fleet_v3.2_migration.md
@@ -24,6 +24,18 @@ Fleet migration is **centralized by default**: the supervisor executes all agent
 |-------|------|-----------|
 | **Centralized** (default) | Fleet ≤ 40 agents, single supervisor machine | Supervisor iterates agents directly |
 | **Distributed** | Fleet > 40, multi-machine, or principal directed | Each agent receives REMOTE_MIGRATION_MESSAGE; supervisor coordinates |
+
+### Execution-model authorization receipt
+
+Record the chosen model before dispatch: model, reason, authorizing event, executing identity, and the
+permission surface that will actually be consulted. Distributed execution is not centralized execution
+performed through more prompts: each receiving seat becomes an executor, so its write scope, command
+allowlist, and refusal behavior become load-bearing. A blocked seat is evidence about the chosen model;
+do not broaden that seat's permissions merely to make an unauthorized model work.
+
+If distributed execution lacks its required principal approval, stop and use the centralized default or
+obtain the approval. Do not describe a later reversion to the default as remediation of five individual
+permission defects when the execution model was the shared cause.
 
 ---
 
@@ -245,6 +257,122 @@ conclusions is right. This decided a seat's gate status with two lines of margin
 A migration tally of "N/M green" hides whether a seat is green by delivery, by declared-and-accepted
 divergence, or by exemption. State the decomposition: *delivered X · re-based Y · exempt Z*. A single
 number lets a definitional pass read as a capability claim.
+
+---
+
+## Migration Mechanism — plan once, re-derive at apply
+
+The v3.29 receiving-seat experience exposed four ways a careful migration can still pass the wrong
+predicate: a scalar count can hide substitution, a comparison against the incoming release can call
+staleness a graft, a checker can pass only because the migration supplies its answer, and a target can
+move after the operator reviewed it. The rules below make the migration a reviewable transaction rather
+than a sequence of individually-approved verbs.
+
+### M1. Plan the complete mutation set before the first write
+
+Derive and display one manifest containing every intended mutation: seat, path, operation, source,
+classification, expected hash or semantic result, and rollback. Hash the manifest. The review checkpoint
+is the manifest, not each later `cp`, edit, or commit command.
+
+At `--apply` time, re-derive the manifest from current source and target state. Refuse if its hash or any
+listed precondition changed. A target `HEAD`, working tree, release correction, or source byte that moved
+after review invalidates the approval; it does not become an implicit amendment.
+
+```text
+plan = derive(source, target, claimed_baseline)
+display(plan, sha256(plan))
+apply(expected_hash):
+    current = derive(source, target, claimed_baseline)
+    refuse unless sha256(current) == expected_hash
+    apply current exactly
+```
+
+The manifest is an execution contract, not proof of completion. After application, verify received state
+and behavior separately.
+
+### M2. Classify at the baseline the seat claims
+
+Compare a seat's current artifact first with the framework version recorded by that seat. If it is
+byte-identical at the claimed baseline, content absent from the incoming release is staleness, not an
+organic graft, and may be replaced under the migration contract. Only a difference from the claimed
+baseline is evidence of local divergence requiring preserve/re-base review.
+
+Classification order:
+
+1. Read the seat's claimed framework version from its governed version surfaces.
+2. Resolve the corresponding framework baseline.
+3. Compare the live seat artifact with that baseline.
+4. Classify `baseline-identical`, `local divergence`, `unreadable baseline`, or `not applicable`.
+5. Only then compare with the incoming payload and select overwrite/re-base/exempt/refuse.
+
+If the claimed baseline cannot be resolved or parsed, report `UNREADABLE`; silence is not a clean
+classification.
+
+### M3. Fix the expectation before migration
+
+Run the incoming release's checker against the current seat before changing it. Record the check names,
+applicability decisions, and results. This establishes what the incoming instrument can actually see and
+the exact post-migration result expected after known payload changes.
+
+An expectation such as "at least 15 checks" is insufficient. It can pass when a new framework check
+arrives and a local check disappears. Record the ordered or normalized name set and compare sets after
+application. A checker that cannot fail on a known-bad pre-migration fixture is not a conformance oracle;
+route the detector defect and keep the affected result qualified.
+
+### M4. Verify graft preservation by identity, never count
+
+Before mutation, enumerate every accepted local graft by path and, where the artifact contains a registry
+or check collection, by stable name. After mutation, require the same identities or an explicit reviewed
+mapping. Count equality proves only cardinality:
+
+```text
+before = {local_check_a, local_check_b}
+after  = {framework_check_c, local_check_b}
+len(before) == len(after)  # true; local_check_a was still lost
+```
+
+Use name/path set difference as the V-test. A relocation is not an append: if the incoming release moves a
+concept between semantic categories, preserve its meaning at the new category and reject a verbatim merge
+that would make the artifact contradict itself.
+
+### M5. Separate status predicates and name every denominator
+
+Use these terms independently:
+
+| Predicate | Minimum evidence |
+|---|---|
+| `current` | Governed version surfaces agree at the receiving seat. |
+| `applicable-detection conformant` | Every applicable published detection passes, with disputed or non-discriminating detections named. |
+| `received state` | Declared payload and persisted state are observed at the destination. |
+| `behavioral evidence` | The selected workflow runs in the receiving environment through the documented discovery, invocation, and recovery path. |
+
+Report composition alongside any fleet headline: delivered, re-based, exempt, disputed, and failed. State
+the row-seat denominator and applicability basis. `current` does not imply conformance; conformance does
+not imply received persistence; received state does not imply behavior.
+
+### M6. A detector cannot borrow its answer from the payload without disclosure
+
+When a detector claims a property of artifact A but concatenates or consults migration-delivered artifact
+B, report both surfaces separately. A payload-engineered marker can turn every receiving seat green while
+artifact A remains unchanged. At minimum emit `subject_only` and `subject_plus_payload` results and use
+`subject_only` for a native-subject conformance claim.
+
+This rule does not forbid a multi-artifact contract. It forbids naming the result as if one artifact were
+measured when another supplied the passing evidence. The v3.29 M-3.29-1 marker finding is the calibration
+case: correction #5 fixed distribution while making the marker half partly self-satisfying; the size half
+remained discriminating.
+
+### M7. Receiving-seat critique is an independent falsification channel
+
+Invite the pilot seat to challenge the proposed merge, baseline, V-test, and expected result, and verify
+its correction at source before accepting or disputing it. In the v3.29 Legalon migration, four receiving-
+seat corrections were confirmed: relocation instead of append, name-list instead of count, incoming-
+checker expectation capture, and claimed-version baseline classification.
+
+This is a bounded observation, not an authority inversion or proof that peer critique is universally
+superior to guards or self-review. The transferable rule is narrower: semantic review from the receiving
+context is a distinct evidence channel, and a supervisor must not discard it merely because the dispatch
+originated at the supervisor.
 
 ---
 
@@ -875,6 +1003,7 @@ validator that flags a bare `gh#N` in a heading, is **owed, not done**.
 
 | Version | Date | Change |
 |---|---|---|
+| 1.9.0 | 2026-08-03 | **Migration Mechanism + execution-model receipt** — canonicalizes the v3.29 receiving-seat corrections after source review: hash-bound plan/apply transaction with re-derivation and drift refusal; classification at the version the seat claims; incoming-checker expectation capture; graft identity/name-list verification instead of scalar count; separate current/conformant/received/behavior predicates and composition denominators; subject-only vs payload-supplied detector provenance; and receiving-seat critique as a bounded independent falsification channel, not an authority inversion. The execution-model section now requires a pre-dispatch authorization/permission receipt. Evidence: `gmelli/aget-aget#2119`; marker-provenance calibration: `gmelli/aget-aget#2103`. Prepared locally under v3.29 release-plan Gate 4R1; publication is separately governed by L735. |
 | 1.8.2 | 2026-07-27 | **§Dispatch Safety item 1 gains a runnable instrument** — `scripts/run_suite_gated.py` (two-clause gate + per-file `--bisect` + `--allow-path` declared-benign exemptions that are always reported; commit-count clause never exemptible; `--self-test` 12/12). Reason: the item-1 prose was measured **ineffective on its most careful reader** — a consuming supervisor seat read it, cited it, built a plan around it, and reached for grep anyway (0-for-2 on hits, 0-for-3 on the real igniters), finding all three only by bisecting with the gate as oracle. Decorative-warning closure per L671. First real run of the instrument fired on canonical `aget` itself (suite appends to tracked `.aget/logs/`) — recorded as the calibration case for `--allow-path` rather than as a reason to weaken the gate. |
 | 1.8.1 | 2026-07-27 | **Corrections from v1.8.0's first field use, all consumer-found.** (a) §Dispatch Safety item 4's failure-direction table was **wrong**: it assigned one direction per signal (mtime over-reports, process under-reports); both signals fail both ways. mtime **under**-reports because a session file is written once at open, not continuously — measured at two live seats with session files 268 and 23 minutes old under a 10-minute window, which an mtime-only gate would have dispatched into. The **gate rule is unchanged and held**; only its explanation was wrong. Item 4 also gains the own-ancestry exclusion (walk the ancestor chain — `getppid()` is insufficient because the harness spawns a fresh subshell per tool call) and the `SELF`-as-distinct-state rule. (b) New **§Citing issues** — provenance (`Delivered by gh#N`) vs. live dependency (`Blocked on gh#N`), no bare `gh#N` in headings, never beside an enforcement word. `Gate 4.0` and `V0.0` headings reformed accordingly. A consuming seat's citation gate blocked on `gh#1881` cited as provenance in Gate 4.0's heading beside the word `BLOCKING`; the defect was ours, not the gate's. Cross-`sops/`/`specs/` application and a heading validator are **owed, not done**. |
 | 1.8.0 | 2026-07-26 | **§Dispatch Safety added** — seven field learnings from the v3.28.0 wave, each costing a real incident or a wrong gate verdict: two-clause behavioural gate for suite runs (a one-clause version passed a run that mutated the repo); per-seat timeout scaled to divergence count (0-diverged seats 177–296s, diverged seats both blew 540s — perfect separation); timed-out dispatch can leave a seat version-pinned with no payload and a dirty tree; two-signal liveness (mtime over-reports and is blind to non-session writes, process-check under-reports); executed-surface verification **with** the caution that a byte gap does not imply a capability gap; bounded diff reads (`--stat` before `head -N` — a truncated diff has no truncation signal); composition reporting instead of a single N/M headline. Also records that the "unguarded test call sites" hypothesis for the self-replicating commit loop was **falsified in both directions** and names the bisect method that found the real cause. |
