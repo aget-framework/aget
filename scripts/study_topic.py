@@ -26,6 +26,11 @@ Usage:
     python3 study_topic.py --topic "wind down"       # Research wind down
     python3 study_topic.py --topic "release" --json  # JSON output
     python3 study_topic.py --verify                  # Migration verification
+
+Exit codes:
+    0 — study completed (including a zero-result study; an empty result is a
+        finding, not an error — see the surfaces banner for what was reachable)
+    1 — invalid invocation (no --topic and no --verify), or --verify failed
 """
 
 import argparse
@@ -155,11 +160,15 @@ RELEVANCE_FLOOR_DEFAULT = 2.0  # composite-score floor (audit R3, #1560); --no-f
 
 SURFACES_SEARCHED = [
     '.aget/evolution/**/L*.md (RECURSIVE — includes discoveries/; 2026-07-25 fix)',
-    'docs/patterns/**/*.md AND patterns/**/*.md (both roots, any filename — 2026-07-25 fix)',
+    'docs/patterns/**/*.md AND patterns/**/*.md (both roots INSTANCE-LOCAL, any filename '
+    '— 2026-07-25 fix; "both roots" read as complete coverage until 2026-08-08)',
+    'canonical framework pattern tier (resolved from a local sibling checkout; '
+    'reported as unavailable when absent)',
     'planning/PROJECT_PLAN*.md', 'sops/SOP_*.md', 'governance/*.md',
     'knowledge/** + ontology/** (v3.25 C-25-14)',
     'specs/** + .aget/specs/** (gh#1580 — instance-local spec tier)',
-    '../aget/specs/** + ../aget/sops/** (canonical contract-tier authority, read-only cross-repo)',
+    'canonical framework spec tier (resolved from a local sibling checkout; '
+    'reported as unavailable when absent)',
     'inbox/ ≤14d (v3.26 C-26-11 — S2 revisit ruling: NOTIFYs are study-relevant, gh#1850)',
 ]
 SURFACES_EXCLUDED = [
@@ -444,7 +453,12 @@ def find_patterns(topic: str, domain_keywords: list = None) -> list:
     # matches neither the directory nor the `PATTERN_*` prefix. Both were
     # therefore reported as "no pattern hits" while the governing pattern
     # document existed. Recurse both roots and drop the prefix requirement.
+    # Local roots, then the CANONICAL pattern tier. Both local roots were the
+    # 2026-07-25 fix; neither leaves this repo, so every framework pattern was
+    # unreachable while the banner read "both roots". See
+    # find_canonical_pattern_roots() for the measured cost.
     pattern_roots = [agent_root / 'docs' / 'patterns', agent_root / 'patterns']
+    pattern_roots.extend(find_canonical_pattern_roots(agent_root))
 
     results = []
     seen = set()
@@ -627,6 +641,114 @@ def find_sessions(topic: str, domain_keywords: list = None, days: int = 90) -> l
     return results
 
 
+def find_canonical_spec_roots(agent_root: Path) -> list:
+    """Resolve canonical framework specs from any adjacent local checkout.
+
+    Instances are portable across checkout layouts: the framework repository's
+    directory NAME is not a contract, and neither is its DEPTH. Two layouts are
+    both live in this fleet as of 2026-08-05:
+
+      <parent>/aget/specs/AGET_SESSION_SPEC.md          — canonical repo IS the sibling
+      <parent>/<checkout>/aget/specs/AGET_SESSION_SPEC.md — canonical repo CONTAINS aget/
+
+    Presence of the marker file `specs/AGET_SESSION_SPEC.md` is the contract;
+    where it sits relative to the sibling is not. Probing only one shape is how
+    this function was lost and re-lost: `parent/'aget'` (this seat's prior form)
+    resolved at 2 of 32 seats, and `sibling/'aget'/'specs'` (the aof form,
+    010b21b) resolves at aof but NOT here — verified 2026-08-05, it returns []
+    against an `../aget/specs/AGET_SESSION_SPEC.md` that demonstrably exists.
+    A resolver that assumes one layout produces a false surface claim in the
+    other, which is the exact defect this whole function exists to prevent.
+    """
+    roots = []
+    parent = agent_root.parent
+    if not parent.is_dir():
+        return roots
+    for sibling in sorted(parent.iterdir()):
+        if not sibling.is_dir() or sibling == agent_root:
+            continue
+        for candidate in (sibling / 'specs', sibling / 'aget' / 'specs'):
+            if candidate.is_dir() and (candidate / 'AGET_SESSION_SPEC.md').is_file():
+                roots.append(candidate)
+    return roots
+
+
+def find_canonical_pattern_roots(agent_root: Path) -> list:
+    """Resolve canonical framework PATTERNS from any adjacent local checkout.
+
+    THE DEFECT THIS CLOSES — and it is the specs-tier defect one directory over.
+    `find_patterns()` rooted both of its pattern trees at `agent_root`, so no
+    framework pattern was reachable by any study, at any seat, ever. The banner
+    said "docs/patterns/** AND patterns/** (both roots)", which a reader
+    correctly parses as complete coverage; both roots were agent-local.
+
+    Measured cost, 2026-08-08: three seats in one day published false
+    canonical-absence claims downstream of this — "canonical is silent on the
+    procedure", "no fleet-review surface exists at any layer", and a recurrence
+    vocabulary claim — while `docs/patterns/PATTERN_weekly_fleet_health_monitor.md`
+    (v1.0.0, Active, 2026-04-26) sat in canonical the whole time. A study for
+    that file's own literal title returned three unrelated local patterns.
+
+    Note the lineage: this function's 2026-07-25 predecessor fixed the SAME
+    failure mode — "reported as no pattern hits while the governing pattern
+    document existed" — by widening one local root to two local roots. The
+    repair stopped at the repo boundary and moved the blind spot instead of
+    removing it. Scope the fix to the boundary the claim crosses.
+
+    Reuses find_canonical_spec_roots()'s marker probe rather than adding a
+    second layout guess: that resolver already carries the two-layout lesson,
+    and a parallel probe would drift from it.
+    """
+    roots = []
+    for spec_root in find_canonical_spec_roots(agent_root):
+        candidate = spec_root.parent / 'docs' / 'patterns'
+        if candidate.is_dir():
+            roots.append(candidate)
+    return roots
+
+
+def refresh_canonical_pattern_surface(agent_root: Path) -> None:
+    """Make the reported pattern surface match what this run can actually reach.
+
+    Same contract as refresh_canonical_spec_surface: DERIVE the claim, never
+    assert it. An unreachable tier must read UNAVAILABLE, because a banner that
+    names a surface it cannot open is what turns a zero into manufactured
+    absence.
+    """
+    roots = find_canonical_pattern_roots(agent_root)
+    if roots:
+        surface = 'canonical framework patterns: ' + ', '.join(str(root) for root in roots)
+    else:
+        surface = ('canonical framework pattern tier: UNAVAILABLE '
+                   '(no adjacent checkout with aget/specs/AGET_SESSION_SPEC.md)')
+    for index, value in enumerate(SURFACES_SEARCHED):
+        if value.startswith('canonical framework pattern'):
+            SURFACES_SEARCHED[index] = surface
+            break
+
+
+def refresh_canonical_spec_surface(agent_root: Path) -> None:
+    """Make the reported search contract match locally resolvable authority.
+
+    The declared surface must be DERIVED from what the run can actually reach,
+    never asserted as a literal. `SURFACES_SEARCHED` is printed unconditionally
+    by generate_report(); before this function existed, a seat with no adjacent
+    canonical checkout printed a coverage claim for a path that could not
+    resolve — measured 2026-08-05 at 30 of 32 fleet seats. That is manufactured
+    coverage, the mirror of the manufactured absence gh#1580 was filed for.
+    """
+    roots = find_canonical_spec_roots(agent_root)
+    if roots:
+        surface = 'canonical framework specs: ' + ', '.join(str(root) for root in roots)
+    else:
+        surface = ('canonical framework spec tier: UNAVAILABLE '
+                   '(no adjacent checkout with aget/specs/AGET_SESSION_SPEC.md)')
+    for index, value in enumerate(SURFACES_SEARCHED):
+        if value.startswith('canonical framework spec'):
+            SURFACES_SEARCHED[index] = surface
+            break
+
+
 def find_specs(topic: str, domain_keywords: list = None) -> list:
     """Find specifications related to topic — the spec tier (gh#1580).
 
@@ -656,13 +778,20 @@ def find_specs(topic: str, domain_keywords: list = None) -> list:
     results = []
     seen = set()
 
-    # Instance-local tiers, then the canonical contract tier one level up.
-    # AGENTS.md §Canonical Path Resolution: canonical specs live at ../aget/,
-    # NOT at aget/ — a cwd-scoped search produces silent false-negatives.
+    # Instance-local tiers, then the canonical contract tier from ANY adjacent
+    # sibling checkout. AGENTS.md §Canonical Path Resolution: canonical specs
+    # live outside this repo — a cwd-scoped search produces silent
+    # false-negatives. But `parent/'aget'` was equally wrong: it hardcodes one
+    # seat's directory layout, so at 30 of 32 fleet seats the root does not
+    # exist, `continue` skips it, and the banner still claims it was searched
+    # (measured 2026-08-05). The checkout's NAME is not a contract; the
+    # presence of aget/specs/AGET_SESSION_SPEC.md is. Restored from the
+    # implementation authored at aof-AGET (010b21b) and destroyed by the
+    # v3.29.0 fleet upgrade (b8ece25) — see find_canonical_spec_roots.
     roots = [
         agent_root / 'specs',
         agent_root / '.aget' / 'specs',
-        agent_root.parent / 'aget' / 'specs',
+        *find_canonical_spec_roots(agent_root),
     ]
 
     for root in roots:
@@ -679,8 +808,31 @@ def find_specs(topic: str, domain_keywords: list = None) -> list:
                     'doc': file.name,
                     'file': (str(file.relative_to(agent_root))
                              if agent_root in file.parents else str(file)),
+                    # THE SECOND MANUFACTURED-ABSENCE DEFECT, in the same function
+                    # the first one was fixed in. The finder was restored and the
+                    # SCORING path re-zeroed it, so `Specs: 0` survived the fix
+                    # that was written to end it (measured 2026-08-05: 62 results
+                    # found, 0 rendered, on every topic).
+                    #
+                    # Two independent emission bugs, both here, both silent:
+                    #   1. `matches` — this was the ONLY finder not emitting
+                    #      `match_count`. main() re-scores every item through
+                    #      composite_score(), which reads `match_count` and
+                    #      defaults it to 1 → log2(1)=0 → the count term
+                    #      collapses to 1 for every spec.
+                    #   2. `keyword_coverage` default 0.0 — every other finder
+                    #      defaults 1.0 (lines 425/782/853). search_file_for_topic
+                    #      OMITS the key entirely for single-token topics, so the
+                    #      default IS the value, and composite_score multiplies by
+                    #      it: 0.0 × anything = 0.0, below RELEVANCE_FLOOR_DEFAULT.
+                    #
+                    # Net: the spec tier was unconditionally suppressed for every
+                    # topic at every seat, and the report printed a confident 0.
+                    # `matches` is retained because generate_report() falls back to
+                    # it; `match_count` is what the scorer actually reads.
+                    'match_count': match.get('match_count', 0),
                     'matches': match.get('match_count', 0),
-                    'keyword_coverage': match.get('keyword_coverage', 0.0),
+                    'keyword_coverage': match.get('keyword_coverage', 1.0),
                     'score': match.get('score', 0.0),
                 })
 
@@ -961,6 +1113,12 @@ def call_extension_hook(payload):
 
 
 def main():
+    # Derive the declared canonical surface from what this seat can actually
+    # reach, BEFORE any report is generated. Must precede report generation:
+    # generate_report() prints SURFACES_SEARCHED verbatim.
+    refresh_canonical_spec_surface(get_agent_root())
+    refresh_canonical_pattern_surface(get_agent_root())
+
     parser = argparse.ArgumentParser(
         description='Study Topic Protocol - Focused Topic Research',
         formatter_class=argparse.RawDescriptionHelpFormatter,
