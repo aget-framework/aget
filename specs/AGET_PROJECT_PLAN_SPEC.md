@@ -808,7 +808,7 @@ authority:
 - L426: Effort Estimation Patterns
 - L440: Manager Migration Verification Gap
 - L502: Artifact Comprehensibility Gap
-- CAP-REASON-008: Retrospective Requirement (AGET_5D_COMPONENTS_SPEC §CAP-REASON-008)
+- Retrospective Requirement → defined in AGET_5D_COMPONENTS_SPEC §CAP-REASON-008
 - SOP_release_process.md
 
 ---
