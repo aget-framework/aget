@@ -1,6 +1,6 @@
 # AGET 5D Components Specification
 
-**Version**: 1.0.0
+**Version**: 1.0.1
 **Status**: Active
 **Category**: Core (Architecture)
 **Format Version**: 1.2
@@ -490,7 +490,13 @@ reasoning:
 | CAP-REASON-008-05 | ubiquitous | Retrospective shall include Recommendations (prioritized) |
 | CAP-REASON-008-06 | ubiquitous | Retrospective shall include Release_Health_Score (X/10) |
 
-**Enforcement**: `validate_project_plan.py --release`
+**Enforcement**: ⚠ **PARTIAL — verified 2026-08-08.** `validate_project_plan.py` emits a *warning*
+when a plan marked COMPLETE lacks a `Retrospective` / `What Went Well` heading (presence only,
+attributed to L515/#247). **There is no `--release` flag** — this line asserted one until now, and the
+sub-requirements it implied were enforced (`-02`..`-06`: the three min-3-item counts, prioritized
+recommendations, and Release_Health_Score) have **no automated check**. `V-PP-006` in
+AGET_PROJECT_PLAN_SPEC already records verification method `manual` for the sibling CAP-PP-018.
+Stating an unreachable invocation is worse than stating none: it reads as enforced and suppresses the gap.
 
 #### Retrospective Section Template
 

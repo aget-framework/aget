@@ -1,6 +1,6 @@
 # AGET PROJECT_PLAN Specification
 
-**Version**: 1.3.0
+**Version**: 1.3.1
 **Status**: Active
 **Category**: Process (Planning)
 **Format Version**: 1.2
@@ -9,7 +9,8 @@
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_PROJECT_PLAN_SPEC.md`
 **Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.7, Issue #30
-**Related Specs**: AGET_RELEASE_SPEC, AGET_REASONING_SPEC, AGET_SOP_SPEC
+**Related Specs**: AGET_RELEASE_SPEC, AGET_5D_COMPONENTS_SPEC (holds CAP-REASON-008; supersedes the
+archived AGET_REASONING_SPEC), AGET_SOP_SPEC
 
 ---
 
@@ -43,7 +44,9 @@ L186 (PROJECT_PLAN Not TodoWrite), L426 (Effort Estimation), and L440 (Gate Veri
 
 **Does not cover**:
 - Release execution (see AGET_RELEASE_SPEC)
-- Retrospective process (see AGET_REASONING_SPEC CAP-REASON-008)
+- Retrospective process (see AGET_5D_COMPONENTS_SPEC CAP-REASON-008 — the REASONING dimension was
+  folded into AGET_5D_COMPONENTS_SPEC; `AGET_REASONING_SPEC.md` now exists only under `specs/archive/`
+  and still self-declares `Status: Active`, so do not cite it)
 - SOP format (see AGET_SOP_SPEC)
 
 ---
@@ -396,7 +399,7 @@ Gate: Pending → In Progress → Complete
 
 ### Specs
 - AGET_RELEASE_SPEC.md
-- AGET_REASONING_SPEC.md
+- AGET_5D_COMPONENTS_SPEC.md  (REASONING dimension; the standalone AGET_REASONING_SPEC.md is archived)
 ```
 
 ### CAP-PP-011: Gate Verification Tests (L440 Critical)
@@ -556,7 +559,7 @@ PROJECT_PLAN_v3.2.0 (25,088 tokens, 1,641 lines) exceeded the Read tool's 25,000
 - [ ] All gates marked Complete or Skipped (with justification)
 - [ ] All V-tests executed with results recorded
 - [ ] Velocity analysis completed
-- [ ] Retrospective captured (per CAP-REASON-008)
+- [ ] Retrospective captured (per AGET_5D_COMPONENTS_SPEC CAP-REASON-008)
 - [ ] Status updated to Complete
 - [ ] Related issues closed
 ```
@@ -656,7 +659,7 @@ See: `templates/PROJECT_PLAN_TEMPLATE.md` (G2.9 deliverable)
 7. Gates (with V-tests and decision points)
 8. References
 9. Velocity Analysis (post-execution)
-10. Retrospective (per CAP-REASON-008)
+10. Retrospective (per AGET_5D_COMPONENTS_SPEC CAP-REASON-008)
 
 ### CAP-PP-019: EARS System-Level Requirements
 
@@ -805,7 +808,7 @@ authority:
 - L426: Effort Estimation Patterns
 - L440: Manager Migration Verification Gap
 - L502: Artifact Comprehensibility Gap
-- CAP-REASON-008: Retrospective Requirement (AGET_REASONING_SPEC)
+- CAP-REASON-008: Retrospective Requirement (AGET_5D_COMPONENTS_SPEC §CAP-REASON-008)
 - SOP_release_process.md
 
 ---

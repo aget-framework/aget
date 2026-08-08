@@ -1,13 +1,18 @@
 # AGET REASONING Specification
 
 **Version**: 1.2.0
-**Status**: Active
+**Status**: ⚠ **ARCHIVED — superseded by `AGET_5D_COMPONENTS_SPEC.md`** *(banner corrected 2026-08-08;
+this file read `Status: Active` while sitting in `specs/archive/`, and four citations in the ACTIVE
+AGET_PROJECT_PLAN_SPEC pointed here. A reader who followed them saw "Active" and stopped. Cite
+`AGET_5D_COMPONENTS_SPEC §CAP-REASON-008` instead.)*
 **Category**: Standards (5D Composition - REASONING Dimension)
 **Format Version**: 1.2
 **Created**: 2025-12-26
 **Updated**: 2026-01-04
 **Author**: aget-framework
-**Location**: `aget/specs/AGET_REASONING_SPEC.md`
+**Location**: `aget/specs/archive/AGET_REASONING_SPEC.md` *(corrected 2026-08-08 — this field named
+`aget/specs/AGET_REASONING_SPEC.md`, a path with no file, so a reader checking the pointer could not
+even discover the move)*
 **Change Proposal**: CP-011
 
 ---

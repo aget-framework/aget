@@ -1,6 +1,6 @@
 # AGET Requirements Traceability Matrix
 
-**Version**: 1.2.1
+**Version**: 1.2.2
 **Status**: Active
 **Updated**: 2026-01-07
 **Author**: aget-framework
@@ -55,7 +55,7 @@ Issue/L-doc → CAP Requirement → Specification → Validator → Test
 | CAP-REASON-005 | Quality Assurance | L382 | validate_project_plan.py |
 | CAP-REASON-006 | Session Scope | L342 | Session review |
 | CAP-REASON-007 | Execution Governance | L340 | Pre-execution checklist |
-| CAP-REASON-008 | Release Retrospective | L435 | validate_project_plan.py --release |
+| CAP-REASON-008 | Release Retrospective | L435 | ⚠ PARTIAL — `validate_project_plan.py` warns when a COMPLETE plan lacks a Retrospective heading (presence only). There is **no `--release` flag**; sub-requirements -02..-06 (min-3 items ×3, prioritized recommendations, Release_Health_Score) are UNENFORCED |
 
 ### CAP-SKILL (AGET_5D_COMPONENTS_SPEC Part 4)
 
