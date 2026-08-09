@@ -1,0 +1,40 @@
+{
+  "schema": "aget.agent-skills-package.v1",
+  "package": {
+    "name": "aget-session-core",
+    "version": "3.30.0",
+    "license": "Apache-2.0",
+    "distribution": "manual"
+  },
+  "specification": {
+    "name": "Agent Skills",
+    "url": "https://agentskills.io/specification",
+    "verified_on": "2026-08-08"
+  },
+  "manual_guide": "docs/AGENT_SKILLS_PACKAGE.md",
+  "skills": [
+    {
+      "name": "aget-wake-up",
+      "path": ".agents/skills/aget-wake-up",
+      "source": ".claude/skills/aget-wake-up",
+      "sha256": "57e6c61a87899deefcd30e27a0ba1d35e2d029f2332202ba13e784820e4a2cac"
+    },
+    {
+      "name": "aget-study-topic",
+      "path": ".agents/skills/aget-study-topic",
+      "source": ".claude/skills/aget-study-topic",
+      "sha256": "e79fffc3f400031012a6e8fb7b3fae2d1b8c616ed9ad5a924ac2063ddcc58a67"
+    },
+    {
+      "name": "aget-save-state",
+      "path": ".agents/skills/aget-save-state",
+      "source": ".claude/skills/aget-save-state",
+      "sha256": "b7145bce8eac6e7ad36dc06d703f0f6122f1011737ed4ac93fcd7c224cce60e1"
+    }
+  ],
+  "enforcement": {
+    "portable": false,
+    "hooks_included": false,
+    "disclosure": "The package carries model-followed skill instructions only. AGET structural hooks, permissions, release gates, and D71 enforcement do not travel with it."
+  }
+}

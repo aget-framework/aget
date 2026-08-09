@@ -1,10 +1,7 @@
 ---
 name: aget-wake-up
 description: Initialize AGET session with status briefing
-allowed-tools:
-  - Bash
-  - Read
-  - Glob
+allowed-tools: Bash Read Glob
 ---
 
 # aget-wake-up

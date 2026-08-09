@@ -1,7 +1,8 @@
 ---
 name: aget-study-topic
 description: Research a topic across the knowledge base before implementation. Searches L-docs, patterns, PROJECT_PLANs, SOPs, and governance for relevant context.
-version: 1.0.0
+metadata:
+  version: "1.0.0"
 ---
 
 # /aget-study-topic
