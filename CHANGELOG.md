@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+
+## [3.30.0] - 2026-08-09 - "Portable Skills, Continuous Cadence"
+
+### Added
+- Added a bounded, digest-addressed Agent Skills package with a shipped conformance validator and documented manual cross-client use.
+
+### Changed
+- Changed Agent Skills frontmatter to the current specification shape for the packaged subset.
+
+### Documentation
+- Documented that hooks, permissions, release gates, and structural enforcement do not travel with the package.
+
 ## [Unreleased]
 
 Items confirmed in-flight for a future release (latest released: **3.29.0**). Per Keep a Changelog 1.1.0 forward-work convention.

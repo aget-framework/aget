@@ -1,0 +1,39 @@
+# DELIVERED_FILES_v3.30.0.yaml — bounded gh#2108 package payload
+version: "3.30.0"
+source_ref: "HEAD"
+generated: "2026-08-09T04:10:00Z"
+generator: "release-manager Gate 0J; SHA-256 re-derived from canonical working tree"
+tracking: "aget-framework/aget#2108"
+
+pin_edits:
+  - path: ".aget/version.json"
+  - path: "AGENTS.md"
+
+delivered_files:
+  - path: "AGENT_SKILLS_PACKAGE.json"
+    spec_rows: [M-3.30-1]
+    sha256: "991342e386a6463a4afcb72a099c8889985a049bad7fc7f2447042c7539467c1"
+  - path: "docs/AGENT_SKILLS_PACKAGE.md"
+    spec_rows: [M-3.30-1]
+    sha256: "b4aad317574282355509dbb09b176bb1e7c25c32b2fb9027078e6367a20c560c"
+  - path: "scripts/validate_agent_skill_package.py"
+    spec_rows: [M-3.30-1]
+    sha256: "2646a7a31bf2eed12dff27b097ade7e4e67aec8e0c17e4c4328e53da3dcb64e9"
+  - path: "tests/test_validate_agent_skill_package.py"
+    spec_rows: [M-3.30-1]
+    sha256: "243078b453ac63286695e85d238040ecdc542d0604a356ffbf3a172094f4d471"
+  - path: ".claude/skills/aget-wake-up/SKILL.md"
+    spec_rows: [M-3.30-1]
+    sha256: "57e6c61a87899deefcd30e27a0ba1d35e2d029f2332202ba13e784820e4a2cac"
+  - path: ".claude/skills/aget-study-topic/SKILL.md"
+    spec_rows: [M-3.30-1]
+    sha256: "e79fffc3f400031012a6e8fb7b3fae2d1b8c616ed9ad5a924ac2063ddcc58a67"
+
+optional_files: []
+
+additive_files: []
+
+verify_rule: |
+  Every listed delivered-file path must be present, remain inside the receiving repository, and match
+  the declared SHA-256 before use. Then run `python3 scripts/validate_agent_skill_package.py --json`
+  and require exit 0. A digest/conformance PASS is package integrity, not downstream invocation evidence.

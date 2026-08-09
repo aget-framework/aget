@@ -12,6 +12,12 @@ This document provides a complete timeline of AGET Framework versions and their 
 
 ## Current Version
 
+**v3.30.0** (2026-08-09) - Portable Skills, Continuous Cadence
+
+Core `aget/` at v3.30.0: release candidate. A bounded, digest-addressed Agent Skills package adds an
+executable conformance check, documented manual cross-client use, and an explicit non-portable-enforcement
+boundary. See `release-notes/v3.30.0.md`.
+
 **v3.29.0** (2026-08-01) - Repair release truth and reduce principal decision work
 
 Core `aget/` at v3.29.0: ✅ (GitHub Release live; tag at 14/14 origins). Release truth now keeps producer, distribution point, received state, and downstream behavior independent; the principal release decision is available in one governed view; Codex-native discovery exposes wake-up, study-topic, and save-state with explicit recovery. See `release-notes/v3.29.0.md`.
@@ -41,6 +47,11 @@ Core `aget/` at v3.24.0: ✅ (GitHub Release live). Reliance feature (schema + v
 ---
 
 ## Version Timeline
+
+### v3.30.0 (2026-08-09)
+
+**Theme**: Portable Skills, Continuous Cadence — a bounded Agent Skills package, digest and conformance
+contract, documented manual cross-client path, and explicit enforcement boundary.
 
 ### v3.29.0 (2026-08-01) ✅
 

@@ -1,0 +1,38 @@
+version: "3.30.0"
+spec_version: "2.1.0"
+created: "2026-08-09"
+status: release-candidate
+supersedes: "DEPLOYMENT_SPEC_v3.29.0.yaml"
+breaking_release: false
+
+verification_script:
+  file: "scripts/verify_deployment.py"
+  usage: "python3 scripts/verify_deployment.py --version 3.30.0 --path /path/to/agent"
+  behavioral_smoke: "handoffs/REMOTE_MIGRATION_MESSAGE_v3.30.0.md"
+
+detection_context: "Run the conformance check from the receiving checkout before copying or invoking a packaged skill. Producer validation, public availability, received state, and downstream behavior are separate facts."
+
+mandatory_changes:
+  - id: "M-3.30-1"
+    outcome: "gh#2108"
+    description: "bounded Agent Skills package is digest-addressed, conformant, manually consumable, and explicit about non-portable enforcement"
+    blocking: true
+    detection: "python3 scripts/validate_agent_skill_package.py --json"
+    distribution_point: "AGENT_SKILLS_PACKAGE.json + docs/AGENT_SKILLS_PACKAGE.md + scripts/validate_agent_skill_package.py + .agents/skills/{aget-wake-up,aget-study-topic,aget-save-state}/SKILL.md"
+    tagged_origins: "aget"
+    applies_to: "compatible Agent Skills clients; manual distribution only"
+
+delivery_boundary:
+  producer: "Gate 0A capability receipt bound to canonical commit"
+  distribution_point: "public v3.30.0 tag payload"
+  received_state: "Gate 4 independent-seat package digest and conformance exit 0"
+  downstream_behavior: "Gate 4 independent-seat invocation of one packaged skill through the documented manual path"
+  inference_prohibited: true
+
+non_portable_controls:
+  - hooks
+  - permission settings
+  - release gates
+  - D71 structural routing
+
+rollback: "restore v3.29.0 tag/pins and remove the v3.30 package manifest, guide, and validator; no registry, installer, data migration, or destructive conversion"
