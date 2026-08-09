@@ -156,6 +156,26 @@ def validate_package(root: Path, manifest_path: Path) -> dict:
         ):
             errors.append("enforcement.disclosure must state that structural enforcement does not travel")
 
+    runtime = manifest.get("runtime")
+    receiver_owned_paths: set[str] = set()
+    if not isinstance(runtime, dict):
+        errors.append("runtime disclosure is required")
+    else:
+        if runtime.get("portable") is not False or runtime.get("substrate") != "AGET repository":
+            errors.append("runtime must declare portable=false and substrate=AGET repository")
+        raw_paths = runtime.get("receiver_owned_paths")
+        if not isinstance(raw_paths, list) or any(
+            not isinstance(path, str) or not path for path in raw_paths
+        ):
+            errors.append("runtime.receiver_owned_paths must be a list of non-empty strings")
+        else:
+            receiver_owned_paths = set(raw_paths)
+        runtime_disclosure = runtime.get("disclosure")
+        if not isinstance(runtime_disclosure, str) or not re.search(
+            r"\bdoes not carry or digest-bind\b", runtime_disclosure.lower()
+        ):
+            errors.append("runtime.disclosure must state that receiver runtime does not carry or digest-bind")
+
     guide = manifest.get("manual_guide")
     guide_path = root / guide if isinstance(guide, str) else root / "__missing__"
     if not isinstance(guide, str) or not _inside(root, guide_path) or not guide_path.is_file():
@@ -193,6 +213,14 @@ def validate_package(root: Path, manifest_path: Path) -> dict:
         if not re.fullmatch(r"[0-9a-f]{64}", digest) or actual != digest:
             errors.append(f"{name}: sha256 mismatch (manifest={digest}, actual={actual})")
         errors.extend(validate_skill(skill_dir, name))
+        body = skill_md.read_text(encoding="utf-8")
+        for target in sorted(set(re.findall(r"\bpython3?\s+(scripts/[A-Za-z0-9_./-]+\.py)\b", body))):
+            if target not in receiver_owned_paths:
+                errors.append(f"{name}: invoked runtime target is not declared receiver-owned: {target}")
+                continue
+            target_path = root / target
+            if not _inside(root, target_path) or not target_path.is_file():
+                errors.append(f"{name}: declared receiver runtime target is absent from AGET source: {target}")
 
     return {
         "status": "PASS" if not errors else "FAIL",

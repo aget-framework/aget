@@ -1,9 +1,11 @@
-# DELIVERED_FILES_v3.30.0.yaml — bounded gh#2108 package payload
+# DELIVERED_FILES_v3.30.0.yaml — immutable-tag bounded gh#2108 capability payload
 version: "3.30.0"
-source_ref: "HEAD"
+source_ref: "v3.30.0"
 generated: "2026-08-09T04:10:00Z"
 generator: "release-manager Gate 0J; SHA-256 re-derived from canonical working tree"
 tracking: "aget-framework/aget#2108"
+scope: "bounded capability tranche; not a full-version or fleet-migration payload"
+fleet_migration_contract: "handoffs/FLEET_MIGRATION_CONTRACT_v3.30.0.json"
 
 pin_edits:
   - path: ".aget/version.json"
@@ -37,3 +39,5 @@ verify_rule: |
   Every listed delivered-file path must be present, remain inside the receiving repository, and match
   the declared SHA-256 before use. Then run `python3 scripts/validate_agent_skill_package.py --json`
   and require exit 0. A digest/conformance PASS is package integrity, not downstream invocation evidence.
+  These digests bind the immutable v3.30.0 tag. Post-tag corrections on mutable main use their own current
+  manifest and do not rewrite this receipt. Do not use this six-file list as a full-version fleet add-list.

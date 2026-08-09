@@ -23,7 +23,7 @@
       "name": "aget-study-topic",
       "path": ".agents/skills/aget-study-topic",
       "source": ".claude/skills/aget-study-topic",
-      "sha256": "e79fffc3f400031012a6e8fb7b3fae2d1b8c616ed9ad5a924ac2063ddcc58a67"
+      "sha256": "af7cf2a8fba54ba5389254207c432f8e42538fab8a3a0f940de80d8db4a94d6a"
     },
     {
       "name": "aget-save-state",
@@ -32,6 +32,19 @@
       "sha256": "b7145bce8eac6e7ad36dc06d703f0f6122f1011737ed4ac93fcd7c224cce60e1"
     }
   ],
+  "runtime": {
+    "portable": false,
+    "substrate": "AGET repository",
+    "receiver_owned_paths": [
+      "scripts/wake_up.py",
+      "scripts/study_topic.py",
+      ".aget/",
+      "AGENTS.md",
+      "planning/",
+      "sessions/"
+    ],
+    "disclosure": "The package does not carry or digest-bind the receiver-local scripts and AGET repository paths invoked by its skill instructions."
+  },
   "enforcement": {
     "portable": false,
     "hooks_included": false,

@@ -1,0 +1,136 @@
+{
+  "schema": "aget.fleet-migration-contract.v1",
+  "version": "3.30.0",
+  "created": "2026-08-09",
+  "state": "HOLD_PENDING_SUPERVISOR_WAVE_PLAN",
+  "tracking": "gmelli/aget-aget#2191",
+  "goal": "GOAL-V330-FLEET-CONVERGED",
+  "source": {
+    "immutable_release_ref": "v3.30.0",
+    "immutable_release_commit": "72c479c3c8414e8a425c9ea79299bf6075da80eb",
+    "post_tag_corrections_ref": "main",
+    "tag_delta_observation": {
+      "as_of": "2026-08-09",
+      "command": "git diff --name-only v3.29.0..v3.30.0",
+      "files": 38
+    }
+  },
+  "scope_decision": {
+    "bounded_package_receipt": "The six-file DELIVERED_FILES manifest closes GOAL-V330-DELIVERED only.",
+    "fleet_migration": "Converge version pins and applicable credited executable behavior through the semantic rows below.",
+    "rejected_shortcut": "Do not report full v3.30 convergence from the six-file bounded package or from version strings alone.",
+    "rejected_overreach": "Do not copy all 38 tag-delta files indiscriminately; release-only and repository-specific artifacts are not automatically instance-applicable."
+  },
+  "target_denominator": {
+    "authority": "supervisor-owned authoritative fleet register",
+    "derivation_time": "immediately before wave planning and again at final reconciliation",
+    "hardcoded_count_prohibited": true,
+    "directory_glob_is_not_a_register": true
+  },
+  "semantic_rows": [
+    {
+      "id": "V330-VERSION-PINS",
+      "applies_to": "every in-scope AGET fleet seat",
+      "target_values": {
+        ".aget/version.json::aget_version": "3.30.0",
+        "AGENTS.md::@aget-version": "3.30.0"
+      },
+      "preserve": "all instance-owned identity, history, extension, governance, and local configuration fields",
+      "receipt": [
+        "pre-migration values captured",
+        "post-migration values equal 3.30.0",
+        "values persist in a fresh process or post-restart verification"
+      ]
+    },
+    {
+      "id": "CI-3000-01",
+      "applies_to": "every in-scope AGET fleet seat that owns scripts/study_topic.py",
+      "outcome": "study_topic reaches canonical spec and pattern tiers when available and reports them UNAVAILABLE rather than manufacturing coverage when absent",
+      "runtime_payload": [
+        {
+          "path": "scripts/study_topic.py",
+          "sha256_at_v3.30.0": "26b309bfcb0a7f921317f16cb05f5a2326a506af4366c736e718aa64064a452d"
+        }
+      ],
+      "verification_sources": [
+        {
+          "path": "tests/test_study_topic_canonical_pattern_tier.py",
+          "sha256_at_v3.30.0": "249278d40da6d6875bf535dc0d44aff1d78d0ec0691975de0cd423d43796d225"
+        },
+        {
+          "path": "tests/test_study_topic_canonical_surface.py",
+          "sha256_at_v3.30.0": "72595ee2e92ef508198373219a84777960503f413358d2859ba1102195c4c6bf"
+        },
+        {
+          "path": "tests/test_study_topic_purpose_recency_rendering.py",
+          "sha256_at_v3.30.0": "e41c7bdb53ba1545d3ba0375717d5fc9a3074a33c51d91d515d163c009473f7c"
+        },
+        {
+          "path": "tests/test_study_topic_specs_tier.py",
+          "sha256_at_v3.30.0": "e88ae80ff3739747c8fcb34d0cbd695e3df9d7c2dbf5cc06ba04dcf36c3379e7"
+        }
+      ],
+      "v_test": "python3 -m pytest -q tests/test_study_topic_canonical_pattern_tier.py tests/test_study_topic_canonical_surface.py tests/test_study_topic_purpose_recency_rendering.py tests/test_study_topic_specs_tier.py",
+      "receipt": [
+        "destination script digest matches the declared v3.30.0 digest",
+        "focused tests pass on the executed destination surface",
+        "a fresh-process study reports a canonical path or explicit UNAVAILABLE state"
+      ]
+    },
+    {
+      "id": "M-3.30-1",
+      "applies_to": "in-scope AGET repositories whose selected client consumes the bounded Agent Skills package",
+      "outcome": "the corrected bounded package is digest-addressed, conformant, manually copied with a destination postcondition, and invoked with its AGET runtime dependencies satisfied",
+      "source_ref": "main containing the gmelli/aget-aget#2191 fix-forward",
+      "package_manifest": "AGENT_SKILLS_PACKAGE.json",
+      "runtime_boundary": "client-format portable, not substrate-free",
+      "required_receiver_paths": [
+        "scripts/wake_up.py for the wake-up script path or the documented AGET fallback substrate",
+        "scripts/study_topic.py for aget-study-topic",
+        ".aget/ and AGENTS.md",
+        "planning/ and sessions/ where the selected skill uses them"
+      ],
+      "v_tests": [
+        "python3 scripts/validate_agent_skill_package.py --json exits 0",
+        "destination SKILL.md digest equals the selected manifest row",
+        "one applicable packaged skill invokes successfully from the destination AGET repository",
+        "the receipt names whether the script path or fallback path executed"
+      ]
+    }
+  ],
+  "excluded_from_automatic_instance_copy": [
+    "release notes, handoffs, release plans, and publication telemetry unless the target archetype owns them",
+    "tests not needed at runtime after their migration receipt is recorded",
+    "public-repository governance or template-publication artifacts",
+    "any tag-delta file not selected by an applicable semantic row"
+  ],
+  "wave_preconditions": [
+    "gmelli/aget-aget#2191 public fix-forward is present on the selected source ref",
+    "the supervisor has created a governed wave plan with success criteria and rollback",
+    "the authoritative fleet register and target denominator are recorded",
+    "a pilot seat passes every applicable semantic row before the next cohort"
+  ],
+  "receipt_contract": {
+    "per_seat_required": [
+      "seat identifier and authoritative-register membership",
+      "pre-state and source ref",
+      "applied payload with source and destination digests",
+      "fresh-process persistence result",
+      "applicable executed-surface V-test results",
+      "rollback result if any row fails"
+    ],
+    "success_prohibited_if": [
+      "study_topic.py remains at the v3.29.0 blob",
+      "only version labels changed",
+      "only producer-side validation ran",
+      "a packaged-skill runtime prerequisite is missing",
+      "the destination copy or digest was not verified"
+    ]
+  },
+  "authorization": {
+    "framework_lane": "defines public contract and verifies evidence",
+    "supervisor_lane": "creates wave plan, dispatches, mutates fleet, and supplies receipts",
+    "current_decision": "HOLD; this artifact does not authorize dispatch or cross-fleet writes"
+  },
+  "rollback": "Restore the prior per-seat version pins and only the semantic-row payloads changed by the wave; preserve instance-owned state and record the failed row."
+}

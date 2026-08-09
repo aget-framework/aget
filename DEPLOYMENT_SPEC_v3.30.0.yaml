@@ -1,7 +1,7 @@
 version: "3.30.0"
 spec_version: "2.1.0"
 created: "2026-08-09"
-status: release-candidate
+status: released
 supersedes: "DEPLOYMENT_SPEC_v3.29.0.yaml"
 breaking_release: false
 
@@ -20,7 +20,24 @@ mandatory_changes:
     detection: "python3 scripts/validate_agent_skill_package.py --json"
     distribution_point: "AGENT_SKILLS_PACKAGE.json + docs/AGENT_SKILLS_PACKAGE.md + scripts/validate_agent_skill_package.py + .agents/skills/{aget-wake-up,aget-study-topic,aget-save-state}/SKILL.md"
     tagged_origins: "aget"
-    applies_to: "compatible Agent Skills clients; manual distribution only"
+    applies_to: "AGET repositories with compatible Agent Skills clients; manual distribution only"
+
+  - id: "CI-3000-01"
+    outcome: "canonical study-topic coverage"
+    description: "study_topic reaches canonical spec and pattern tiers when available and reports them UNAVAILABLE rather than manufacturing coverage when absent"
+    blocking: true
+    detection: "python3 -m pytest -q tests/test_study_topic_canonical_pattern_tier.py tests/test_study_topic_canonical_surface.py tests/test_study_topic_purpose_recency_rendering.py tests/test_study_topic_specs_tier.py"
+    distribution_point: "scripts/study_topic.py plus the four named focused tests"
+    tagged_origins: "aget"
+    applies_to: "AGET fleet seats that own scripts/study_topic.py"
+
+fleet_migration_contract: "handoffs/FLEET_MIGRATION_CONTRACT_v3.30.0.json"
+
+runtime_boundary:
+  portable: false
+  substrate: "AGET repository"
+  receiver_owned: "scripts/wake_up.py, scripts/study_topic.py, .aget/, AGENTS.md, planning/, and sessions/ as used by the selected skill"
+  disclosure: "the bounded package does not carry or digest-bind these invocation targets and repository paths"
 
 delivery_boundary:
   producer: "Gate 0A capability receipt bound to canonical commit"
@@ -28,6 +45,7 @@ delivery_boundary:
   received_state: "Gate 4 independent-seat package digest and conformance exit 0"
   downstream_behavior: "Gate 4 independent-seat invocation of one packaged skill through the documented manual path"
   inference_prohibited: true
+  fleet_convergence: "separate GOAL-V330-FLEET-CONVERGED receipts under the fleet migration contract"
 
 non_portable_controls:
   - hooks
@@ -35,4 +53,4 @@ non_portable_controls:
   - release gates
   - D71 structural routing
 
-rollback: "restore v3.29.0 tag/pins and remove the v3.30 package manifest, guide, and validator; no registry, installer, data migration, or destructive conversion"
+rollback: "restore v3.29.0 pins and only the applicable semantic-row payloads changed on the receiving seat; preserve instance-owned state; no registry, installer, data migration, or destructive conversion"

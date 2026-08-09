@@ -39,6 +39,12 @@ def _fixture(tmp_path: Path) -> tuple[Path, Path]:
             "source": ".claude/skills/example-skill",
             "sha256": hashlib.sha256(skill.read_bytes()).hexdigest(),
         }],
+        "runtime": {
+            "portable": False,
+            "substrate": "AGET repository",
+            "receiver_owned_paths": [],
+            "disclosure": "The package does not carry or digest-bind receiver runtime paths.",
+        },
         "enforcement": {
             "portable": False,
             "hooks_included": False,
@@ -96,6 +102,19 @@ def test_path_escape_fails(tmp_path):
     manifest.write_text(json.dumps(data))
     result = module.validate_package(root, manifest)
     assert any("escapes/misses" in error for error in result["errors"])
+
+
+def test_invoked_runtime_target_must_be_declared_and_exist(tmp_path):
+    root, manifest = _fixture(tmp_path)
+    source = root / ".claude/skills/example-skill/SKILL.md"
+    source.write_text(source.read_text() + "\n```bash\npython3 scripts/missing.py\n```\n")
+    data = json.loads(manifest.read_text())
+    data["skills"][0]["sha256"] = hashlib.sha256(source.read_bytes()).hexdigest()
+    data["runtime"]["receiver_owned_paths"] = ["scripts/missing.py"]
+    manifest.write_text(json.dumps(data))
+    result = module.validate_package(root, manifest)
+    assert result["status"] == "FAIL"
+    assert any("runtime target is absent" in error for error in result["errors"])
 
 
 def test_live_package_passes():

@@ -2,7 +2,7 @@
 name: aget-study-topic
 description: Research a topic across the knowledge base before implementation. Searches L-docs, patterns, PROJECT_PLANs, SOPs, and governance for relevant context.
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # /aget-study-topic
@@ -34,10 +34,10 @@ If no topic provided, prompt user:
 >
 > Example: `/aget-study-topic release`
 
-### Step 2: Run Study Up Script
+### Step 2: Run Study Topic Script
 
 ```bash
-python3 scripts/study_up.py --topic "$ARGUMENTS"
+python3 scripts/study_topic.py --topic "$ARGUMENTS"
 ```
 
 The script searches 5 KB areas:
@@ -85,17 +85,17 @@ Based on findings, suggest:
 
 ### Human-Readable (default)
 ```bash
-python3 scripts/study_up.py --topic "$ARGUMENTS"
+python3 scripts/study_topic.py --topic "$ARGUMENTS"
 ```
 
 ### JSON (programmatic)
 ```bash
-python3 scripts/study_up.py --topic "$ARGUMENTS" --json
+python3 scripts/study_topic.py --topic "$ARGUMENTS" --json
 ```
 
 ### Quiet (minimal)
 ```bash
-python3 scripts/study_up.py --topic "$ARGUMENTS" --quiet
+python3 scripts/study_topic.py --topic "$ARGUMENTS" --quiet
 ```
 
 ## Constraints
@@ -125,7 +125,7 @@ python3 scripts/study_up.py --topic "$ARGUMENTS" --quiet
 
 | Link | Reference |
 |------|-----------|
-| Script | `scripts/study_up.py` |
+| Script | `scripts/study_topic.py` |
 | Spec | AGET_SESSION_SPEC.md (CAP-SESSION-007) |
 | Pattern | PATTERN_step_back_review_kb.md |
 | L-docs | L335 (Memory Architecture), L187 (Silent Execution) |
@@ -133,6 +133,6 @@ python3 scripts/study_up.py --topic "$ARGUMENTS" --quiet
 
 ---
 
-*aget-study-topic v1.0.0*
+*aget-study-topic v1.0.1*
 *Category: Research*
 *Based on CAP-SESSION-007 (Study Up Protocol)*

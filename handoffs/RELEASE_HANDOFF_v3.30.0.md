@@ -1,10 +1,14 @@
 # RELEASE HANDOFF — v3.30.0
 
-**Prepared**: 2026-08-09 · **State**: RELEASE CANDIDATE
+**Prepared**: 2026-08-09 · **State**: RELEASED
 
-> Publication is not downstream delivery. `GOAL-V330-DELIVERED` remains active until an independent seat
-> obtains the public package, records its digest, receives a conformance exit 0, and invokes one packaged
-> skill through the documented manual path.
+> Publication was not treated as downstream delivery. An independent seat has now completed the bounded
+> package receipt: public digest recorded, conformance exit 0, destination digest verified, and one
+> packaged skill invoked. This does not prove fleet-wide semantic convergence; that separate contract is
+> `handoffs/FLEET_MIGRATION_CONTRACT_v3.30.0.json` and remains on HOLD pending a supervisor wave plan.
+
+The immutable `v3.30.0` tag was cut before publication and still contains `State: RELEASE CANDIDATE` in
+this file. Mutable `main` records the released state and post-tag corrections; the tag is not moved.
 
 ## Breaking Changes
 
@@ -13,13 +17,15 @@ None. Existing Claude and Agent Skills paths remain; no trust or permission sett
 ## Upgrade Guide
 
 Read `release-notes/v3.30.0.md`, pin the immutable v3.30.0 tag after publication, and use
-`handoffs/DELIVERED_FILES_v3.30.0.yaml` with `DEPLOYMENT_SPEC_v3.30.0.yaml`. Preserve instance-owned
-extensions and local governance. This release does not authorize marketplace registration, an installer,
-or changes to client trust.
+`handoffs/DELIVERED_FILES_v3.30.0.yaml` only for the bounded package receipt. For an AGET fleet upgrade,
+use `handoffs/FLEET_MIGRATION_CONTRACT_v3.30.0.json` with `DEPLOYMENT_SPEC_v3.30.0.yaml`. Preserve
+instance-owned extensions and local governance. This release does not authorize marketplace registration,
+an installer, changes to client trust, or fleet dispatch.
 
 ## Deployment Requirements
 
-Python 3.9+ and a compatible Agent Skills client. Run:
+Python 3.9+, a compatible Agent Skills client, and an AGET repository substrate providing the
+receiver-local scripts and paths named in `docs/AGENT_SKILLS_PACKAGE.md`. Run:
 
 ```bash
 python3 scripts/validate_agent_skill_package.py --json
@@ -41,13 +47,14 @@ does not satisfy the Goal.
 ## Context for External Fleets
 
 v3.30.0 is an additive minor release. External fleets should consume the public package manifest,
-conformance validator, package guide, deployment specification, and this handoff; private release ledgers
-are not part of the delivery contract.
+conformance validator, package guide, deployment specification, semantic fleet-migration contract, and
+this handoff; private release ledgers are not part of the delivery contract.
 
-The package provides a bounded manual cross-client path. It does not provide marketplace registration, a
-one-command installer, automatic client discovery, or portable hooks, permissions, release gates, and
-structural enforcement. Preserve local governance and trust settings, and require the independent Gate-4
-receipt before treating publication as downstream delivery.
+The package provides a bounded manual path across compatible clients **inside an AGET repository
+substrate**. It does not provide marketplace registration, a one-command installer, automatic client
+discovery, receiver-local scripts, or portable hooks, permissions, release gates, and structural
+enforcement. Preserve local governance and trust settings. The independent Gate-4 receipt proves this
+bounded package was received once; it is not a fleet-upgrade receipt.
 
 The immutable v3.30.0 tag contains the shipped package. Post-tag corrections to mutable instructions are
 read from `main`; tags are never moved to conceal a correction.
@@ -61,5 +68,5 @@ copied skill may be removed independently. Preserve local extensions and operati
 
 | Seat | v3.30 received state | Conformance | Manual invocation | Evidence |
 |---|---|---|---|---|
-| framework producer | candidate built | producer PASS; not downstream | producer documentation only | Gate 0A receipt |
-| independent receiver | pending Gate 4 | pending | pending | Independent-seat receipt required: package digest, conformance exit 0, one documented manual-path invocation, and seat named |
+| framework producer | released | producer PASS; not downstream | producer documentation only | Gate 0A receipt |
+| independent downstream seat | received from public tag | PASS, exit 0; destination digest matched | PASS, `aget-wake-up`, exit 0 ending `Ready.` | `gmelli/aget-aget#2191`; full receipt retained in the governed producer/supervisor evidence chain |
