@@ -51,17 +51,52 @@ MIN_SINGLE_LEN = 6
 URI_REF_RE = re.compile(r"aget:concept/([A-Za-z][A-Za-z0-9_]+)")
 
 
+def _clean_label(raw: str) -> str:
+    return raw.strip().strip('"').strip("'")
+
+
 def load_ontology(path: Path):
-    """Parse concept blocks (id / uri / prefLabel) by line scan — no yaml dep,
-    cheap on the 1.4MB vocabulary file. Returns list of dicts."""
+    """Parse concept blocks (id / uri / prefLabel / altLabel) by line scan — no
+    yaml dep, cheap on the 1.4MB vocabulary file. Returns list of dicts.
+
+    altLabel was added 2026-08-08. It had been omitted since the tool was written,
+    which capped recall at roughly one third of the vocabulary's label surface:
+    893 of 926 concepts (96%) carry altLabels, 1,857 in total, of which 1,801 pass
+    this module's own is_specific() filter — so the matchable surface was 926 where
+    it should have been 2,727.
+
+    The consequence was not merely missed suggestions. This tool exists to stop a
+    term being coined for a concept that already exists, and a miss is SILENT:
+    "no suggestions" reads identically to "no such concept," which licenses the
+    coinage. Measured the day this was fixed: of four terms coined and then found
+    to be duplicates, THREE were reachable only via altLabel (Scope-Blind PASS →
+    C1771, Minimal Authority Default → C267, Default Path Reversal → C222). The
+    duplicate-detector was blind to the label class where the duplicates lived.
+    """
     concepts = []
     cur = {}
+    in_alt = False
+
+    def flush():
+        if cur.get("id") and cur.get("prefLabel"):
+            concepts.append(cur)
+
     for raw in path.read_text(encoding="utf-8").splitlines():
         line = raw.rstrip()
+
+        # An altLabel list item: "    - Foo" / '    - "Foo"'. Must be tested before
+        # the id rule, whose pattern ("- id:") is a different shape, and before any
+        # other key match, since list items only mean something inside the block.
+        if in_alt:
+            m_item = re.match(r"\s+-\s+(?!id:)(.+?)\s*$", line)
+            if m_item and cur:
+                cur.setdefault("altLabel", []).append(_clean_label(m_item.group(1)))
+                continue
+            in_alt = False  # any non-item line closes the list
+
         m_id = re.match(r"\s*-\s+id:\s*(C\d+)\s*$", line)
         if m_id:
-            if cur.get("id") and cur.get("prefLabel"):
-                concepts.append(cur)
+            flush()
             cur = {"id": m_id.group(1)}
             continue
         m_uri = re.match(r"\s+uri:\s*(aget:concept/\S+)\s*$", line)
@@ -70,11 +105,39 @@ def load_ontology(path: Path):
             continue
         m_pref = re.match(r"\s+prefLabel:\s*(.+?)\s*$", line)
         if m_pref and cur and "prefLabel" not in cur:
-            cur["prefLabel"] = m_pref.group(1).strip().strip('"').strip("'")
+            cur["prefLabel"] = _clean_label(m_pref.group(1))
             continue
-    if cur.get("id") and cur.get("prefLabel"):
-        concepts.append(cur)
+        m_alt = re.match(r"\s+altLabel:\s*(.*)$", line)
+        if m_alt and cur:
+            rest = m_alt.group(1).strip()
+            if rest in ("", "|", ">"):          # block form: items follow
+                in_alt = True
+            elif rest.startswith("["):          # inline flow form: [a, b]
+                inner = rest.strip("[]")
+                cur.setdefault("altLabel", []).extend(
+                    _clean_label(p) for p in inner.split(",") if p.strip()
+                )
+            elif rest not in ("null", "~"):     # scalar form
+                cur.setdefault("altLabel", []).append(_clean_label(rest))
+            continue
+    flush()
     return concepts
+
+
+def concept_labels(c: dict):
+    """Yield (label, label_class) for every usable label on a concept.
+
+    label_class is reported downstream so a suggestion states WHICH label class it
+    matched. A matcher that prints only (concept_id, matched_text) invites a false
+    structural inference — the same id appearing under two different names reads as
+    a duplicate-id defect when it is simply a prefLabel and an altLabel.
+    """
+    pref = c.get("prefLabel", "")
+    if pref:
+        yield pref, "prefLabel"
+    for alt in c.get("altLabel", []) or []:
+        if alt:
+            yield alt, "altLabel"
 
 
 def is_specific(label: str) -> bool:
@@ -99,30 +162,41 @@ def scan(file_path: Path, concepts):
     suggestions = []
     seen = set()
     for c in concepts:
-        label = c.get("prefLabel", "")
         uri = c.get("uri", "")
         suffix = uri.split("/")[-1] if uri else ""
-        if not label or not uri or not is_specific(label):
+        if not uri or suffix in already_bound or suffix in seen:
             continue
-        if suffix in already_bound or suffix in seen:
-            continue
-        # whole-phrase, word-boundary match (case-sensitive — prefLabels are TitleCase nouns)
-        pat = re.compile(r"(?<![\w-])" + re.escape(label) + r"(?![\w-])")
-        for i, line in enumerate(lines, 1):
-            # don't suggest where this exact URI already sits on the line
-            if pat.search(line):
-                suggestions.append(
-                    {
-                        "line": i,
-                        "phrase": label,
-                        "concept_id": c["id"],
-                        "uri": uri,
-                        "specificity": specificity(label),
-                        "context": line.strip()[:100],
-                    }
-                )
-                seen.add(suffix)
-                break  # one suggestion per concept (first occurrence)
+        # Try every label class. prefLabel first so it wins the tie when a concept
+        # is reachable by both; is_specific() is applied per label, unchanged, so
+        # altLabels clear exactly the same floor prefLabels always have.
+        for label, label_class in concept_labels(c):
+            if not is_specific(label):
+                continue
+            # whole-phrase, word-boundary match (case-sensitive — labels are TitleCase nouns)
+            pat = re.compile(r"(?<![\w-])" + re.escape(label) + r"(?![\w-])")
+            hit = None
+            for i, line in enumerate(lines, 1):
+                # don't suggest where this exact URI already sits on the line
+                if pat.search(line):
+                    hit = (i, line)
+                    break
+            if hit is None:
+                continue
+            i, line = hit
+            suggestions.append(
+                {
+                    "line": i,
+                    "phrase": label,
+                    "matched_label_class": label_class,   # pref vs alt — see concept_labels()
+                    "concept_id": c["id"],
+                    "prefLabel": c.get("prefLabel", ""),
+                    "uri": uri,
+                    "specificity": specificity(label),
+                    "context": line.strip()[:100],
+                }
+            )
+            seen.add(suffix)
+            break  # one suggestion per concept, best available label
 
     suggestions.sort(key=lambda s: s["specificity"], reverse=True)
     return existing_ref_count, suggestions
