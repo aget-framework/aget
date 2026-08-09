@@ -39,14 +39,74 @@ subject" and "assert both polarities".
 """
 
 import json
+import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 import pytest
 
 REPO = Path(__file__).resolve().parents[1]
 SCRIPT = REPO / "scripts" / "study_topic.py"
+
+
+def run_study_in_synthetic_seat(topic, *, canonical_mounted):
+    """Run the FULL pipeline inside a synthesised seat and return its stdout.
+
+    WHY A FIXTURE AND NOT AN ENVIRONMENT BRANCH (2026-08-09).
+
+    `find_canonical_spec_roots()` resolves by probing SIBLINGS of the agent
+    root, so whether the canonical tier is reachable is a property of the
+    checkout topology, not of this repository. Two weaker designs were tried
+    and rejected:
+
+      1. Assert unconditionally that the definitional spec surfaces. This is
+         what shipped first. It encoded the author's workstation layout as a
+         repository invariant and failed CI on 3.10/3.11/3.12 from its first
+         push, never green on a runner.
+      2. Branch on the ambient environment — assert the spec when a root
+         happens to resolve, assert UNAVAILABLE when none does. Green
+         everywhere, but each environment then exercises only ONE polarity, so
+         no single run ever proves both. A regression in the branch the local
+         host does not take is invisible until it reaches CI.
+
+    Synthesising both topologies makes both polarities run in EVERY
+    environment, which is what the sibling files
+    (`test_study_topic_canonical_surface.py`,
+    `test_study_topic_canonical_pattern_tier.py`) already do — they were
+    hermetic and passing in CI while this file was red.
+    """
+    tmp = Path(tempfile.mkdtemp())
+    try:
+        root = tmp / "instance"
+        (root / "scripts").mkdir(parents=True)
+        shutil.copy2(SCRIPT, root / "scripts" / "study_topic.py")
+        # Minimal instance-local corpus so the pipeline has a tree to walk.
+        (root / ".aget" / "evolution").mkdir(parents=True)
+        (root / ".aget" / "evolution" / "L001_seed.md").write_text(
+            "# L001\nproposal handling\n"
+        )
+        if canonical_mounted:
+            canonical = tmp / "framework-copy" / "specs"
+            canonical.mkdir(parents=True)
+            # The marker file IS the resolver's contract.
+            (canonical / "AGET_SESSION_SPEC.md").write_text("session spec")
+            (canonical / "AGET_CHANGE_PROPOSAL_SPEC.md").write_text(
+                "# AGET_CHANGE_PROPOSAL_SPEC\n" + ("proposal " * 40)
+            )
+        proc = subprocess.run(
+            [sys.executable, str(root / "scripts" / "study_topic.py"),
+             "--topic", topic],
+            cwd=str(root), capture_output=True, text=True, timeout=180,
+        )
+        assert proc.returncode == 0, (
+            f"synthetic seat failed: {proc.stderr[-800:]}"
+        )
+        return proc.stdout
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
 
 # A topic guaranteed to hit the spec tier: AGET_CHANGE_PROPOSAL_SPEC and
 # AGET_INITIATIVE_SPEC both carry it heavily.
@@ -99,12 +159,47 @@ class TestSpecsTierSurvivesScoring:
         A tier could pass the count assertion while ranking the one spec a
         reader needs below the render cutoff. This pins the specific artifact
         whose absence produced the wrong peer answer.
+
+        POLARITY 1 of 2 — MOUNTED. Runs hermetically in every environment
+        against a synthesised seat with an adjacent canonical checkout, so
+        this assertion is exercised on CI runners too. See
+        `run_study_in_synthetic_seat` for why a fixture replaced both the
+        original unconditional assertion and the environment-branching form
+        that briefly succeeded it.
         """
-        report = run_study(HIT_TOPIC)
+        report = run_study_in_synthetic_seat(HIT_TOPIC, canonical_mounted=True)
         assert "AGET_CHANGE_PROPOSAL_SPEC" in report, (
-            "AGET_CHANGE_PROPOSAL_SPEC is the only formal definition of a "
-            "proposal class in the framework. If a study on 'proposal' cannot "
-            "surface it, the study will report that no formal definition exists."
+            "A canonical spec root IS mounted in this fixture, and "
+            "AGET_CHANGE_PROPOSAL_SPEC carries the topic heavily. If a study "
+            "on 'proposal' cannot surface it with the tier reachable, the "
+            "study will report that no formal definition exists — the exact "
+            "false answer gh#1580 produced at a peer seat."
+        )
+
+    def test_unreachable_canonical_tier_is_declared_not_silently_zero(self):
+        """Verifies CAP-SESSION-007-06 (gh#1580 manufactured-absence). POLARITY 2 of 2 — UNMOUNTED.
+
+        The mirror assertion, and the one that matters more. With no adjacent
+        checkout the definitional spec is legitimately out of reach — but the
+        report must SAY the tier is unreachable. Absent that line the reader
+        sees a spec count computed over instance-local specs alone and reads
+        it as the whole corpus.
+
+        Reporting an unreachable tier as a confident number is not a milder
+        version of the gh#1580 defect; it IS the defect. This polarity is the
+        one a CI runner would have exercised naturally, and the one the
+        original test could never reach.
+        """
+        report = run_study_in_synthetic_seat(HIT_TOPIC, canonical_mounted=False)
+        assert "canonical framework spec tier: UNAVAILABLE" in report, (
+            "No canonical spec root resolves in this fixture, so the report "
+            "must withdraw the claim explicitly. A silent zero here is "
+            "manufactured absence."
+        )
+        assert "AGET_CHANGE_PROPOSAL_SPEC" not in report, (
+            "The unmounted fixture surfaced a canonical spec, which means the "
+            "test is not hermetic — it reached a real checkout outside the "
+            "temporary seat and proves nothing about the unmounted case."
         )
 
     def test_specs_are_rendered_not_merely_counted(self):
