@@ -38,6 +38,20 @@ producer's hooks, permission model, release gates, or structural enforcement.
 Steps 1–4 must be performed by an independent downstream seat for the Gate-4 receipt. Producer rehearsal
 does not satisfy the Goal.
 
+## Context for External Fleets
+
+v3.30.0 is an additive minor release. External fleets should consume the public package manifest,
+conformance validator, package guide, deployment specification, and this handoff; private release ledgers
+are not part of the delivery contract.
+
+The package provides a bounded manual cross-client path. It does not provide marketplace registration, a
+one-command installer, automatic client discovery, or portable hooks, permissions, release gates, and
+structural enforcement. Preserve local governance and trust settings, and require the independent Gate-4
+receipt before treating publication as downstream delivery.
+
+The immutable v3.30.0 tag contains the shipped package. Post-tag corrections to mutable instructions are
+read from `main`; tags are never moved to conceal a correction.
+
 ## Rollback
 
 Restore the prior pinned tag/version and remove only the manifest-listed v3.30 additive files. A manually
