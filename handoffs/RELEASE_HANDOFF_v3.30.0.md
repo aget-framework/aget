@@ -48,4 +48,4 @@ copied skill may be removed independently. Preserve local extensions and operati
 | Seat | v3.30 received state | Conformance | Manual invocation | Evidence |
 |---|---|---|---|---|
 | framework producer | candidate built | producer PASS; not downstream | producer documentation only | Gate 0A receipt |
-| independent receiver | pending Gate 4 | pending | pending | R14 receipt required |
+| independent receiver | pending Gate 4 | pending | pending | Independent-seat receipt required: package digest, conformance exit 0, one documented manual-path invocation, and seat named |
