@@ -55,7 +55,7 @@
       "verification_sources": [
         {
           "path": "tests/test_study_topic_canonical_pattern_tier.py",
-          "sha256_at_v3.30.0": "249278d40da6d6875bf535dc0d44aff1d78d0ec0691975de0cd423d43796d225"
+          "sha256_at_v3.30.0": "56e05465fb4add999c794030ad0f82d6d1464fc444ce7be555a0f12261face9d"
         },
         {
           "path": "tests/test_study_topic_canonical_surface.py",
