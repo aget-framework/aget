@@ -438,6 +438,13 @@ class TestCISpecIntegration:
             'template-consultant-aget',
         ]
 
+        template_paths = [aget_framework_path / template for template in templates_with_ci]
+        if not any(template_path.is_dir() for template_path in template_paths):
+            pytest.skip(
+                "UNAVAILABLE: sibling template repositories are not present; "
+                "set AGET_FRAMEWORK_DIR to their parent to run this integration test"
+            )
+
         critical_issues = []
         warnings = []
 

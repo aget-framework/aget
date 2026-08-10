@@ -66,6 +66,7 @@ CLI_COMMAND = "gemini"
 MIN_VERSION = "0.20.0"
 
 
+@skip_if_no_gemini
 class TestCLIAvailability:
     """Pre-flight checks for Gemini CLI."""
 

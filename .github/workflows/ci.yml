@@ -83,6 +83,14 @@ jobs:
       - name: Run tests
         run: python -m pytest tests -q
 
+      - name: C6 focused contract evidence suite
+        run: |
+          python -m pytest -vv \
+            tests/test_study_topic_canonical_pattern_tier.py \
+            tests/test_study_topic_canonical_surface.py \
+            tests/test_study_topic_purpose_recency_rendering.py \
+            tests/test_study_topic_specs_tier.py
+
   # CAP-CI-003-02: Lint_Job.
   lint:
     name: lint

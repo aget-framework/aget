@@ -65,6 +65,7 @@ CLI_COMMAND = "codex"
 MIN_VERSION = "0.70.0"
 
 
+@skip_if_no_codex
 class TestCLIAvailability:
     """Pre-flight checks for Codex CLI."""
 

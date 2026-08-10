@@ -65,6 +65,7 @@ CLI_COMMAND = "claude"
 MIN_VERSION = "2.0.0"
 
 
+@skip_if_no_claude
 class TestCLIAvailability:
     """Pre-flight checks for Claude Code CLI."""
 
