@@ -10,6 +10,7 @@ The negative control mutates one digest in memory and proves the predicate can
 detect the exact drift it is meant to prevent.
 """
 
+import ast
 import copy
 import hashlib
 import json
@@ -20,6 +21,7 @@ REPO = Path(__file__).resolve().parents[1]
 CONTRACT = REPO / "handoffs" / "FLEET_MIGRATION_CONTRACT_v3.30.0.json"
 DIGEST_FIELD = "sha256_at_v3.30.0"
 DECLARATION_SECTIONS = ("runtime_payload", "verification_sources")
+SKIP_NAMES = frozenset({"skipTest", "skip", "skipIf", "skipUnless"})
 
 
 def declared_artifacts(contract):
@@ -80,3 +82,117 @@ def test_injected_one_byte_digest_mismatch_is_detected():
         "declared": artifact[DIGEST_FIELD],
         "actual": original,
     }
+
+
+# --- Portability of the declared verification sources -----------------------
+#
+# Digest equality proves a declared source is the file it names. It does NOT
+# prove that file can decide anything on a machine other than the author's.
+#
+# The 2026-08-10 case: the contract declared four verification sources; the
+# published evidence bound only one of them; the unbound one asserted against
+# the ambient host and was green on every developer workstation while failing
+# on a bare runner. Digest checks were green throughout, because the digest was
+# never the property in question.
+#
+# The predicate below is AST-based on purpose. A substring scan for "skipTest"
+# cannot distinguish a *call* from a docstring that explains why the skips were
+# removed, so it rejects the very repairs it should accept — and the cheapest
+# way to satisfy it is to stop documenting the decision. Match at statement and
+# decorator position instead, and prove both polarities.
+
+
+def environment_conditional_skips(source: str):
+    """Return (lineno, name) for every skip CALL or skip DECORATOR in a module.
+
+    A mention inside a docstring, comment, or string literal is not a skip and
+    must not be reported — that false positive penalises documentation.
+    """
+    # A skip DECORATOR written as a call (@unittest.skipIf(...)) is reachable
+    # from both branches below, so collect into a set keyed by position — the
+    # first draft of this predicate double-counted it, and its own negative
+    # control is what caught that.
+    found = set()
+    tree = ast.parse(source)
+
+    def name_of(node):
+        if isinstance(node, ast.Attribute):
+            return node.attr
+        if isinstance(node, ast.Name):
+            return node.id
+        return None
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call):
+            called = name_of(node.func)
+            if called in SKIP_NAMES:
+                found.add((node.lineno, called))
+        elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            for decorator in node.decorator_list:
+                target = decorator.func if isinstance(decorator, ast.Call) else decorator
+                decorated = name_of(target)
+                if decorated in SKIP_NAMES:
+                    found.add((decorator.lineno, decorated))
+    return sorted(found)
+
+
+def declared_verification_sources(contract):
+    for row_id, section, artifact in declared_artifacts(contract):
+        if section == "verification_sources":
+            yield row_id, artifact["path"]
+
+
+def test_every_declared_verification_source_is_environment_independent():
+    """No declared source may decide its own applicability from the host."""
+    offenders = {}
+    checked = 0
+    for row_id, relative_path in declared_verification_sources(load_contract()):
+        source_file = REPO / relative_path
+        assert source_file.is_file(), f"{row_id}: declared source missing: {relative_path}"
+        skips = environment_conditional_skips(source_file.read_text())
+        checked += 1
+        if skips:
+            offenders[relative_path] = skips
+    assert checked, "no verification sources were checked — predicate reached nothing"
+    assert not offenders, json.dumps(offenders, indent=2, sort_keys=True)
+
+
+def test_a_skip_call_is_detected():
+    """Negative control: the predicate detects the construct it forbids."""
+    module = (
+        "import unittest\n"
+        "class T(unittest.TestCase):\n"
+        "    def test_a(self):\n"
+        "        if not host_has_it():\n"
+        "            self.skipTest('no adjacent checkout on this host')\n"
+    )
+    assert [name for _, name in environment_conditional_skips(module)] == ["skipTest"]
+
+
+def test_a_skip_decorator_is_detected():
+    module = (
+        "import unittest\n"
+        "class T(unittest.TestCase):\n"
+        "    @unittest.skipIf(not host_has_it(), 'ambient')\n"
+        "    def test_a(self):\n"
+        "        pass\n"
+    )
+    assert [name for _, name in environment_conditional_skips(module)] == ["skipIf"]
+
+
+def test_a_documented_mention_is_not_a_skip():
+    """The other polarity, and the reason this is AST-based.
+
+    A file that removed its skips and says so in prose must PASS. A substring
+    matcher fails this test, which is how it turns documentation into a defect.
+    """
+    module = (
+        '"""This module used to call self.skipTest(...) when no checkout was\n'
+        'adjacent; every test now synthesises its own topology instead.\n'
+        '"""\n'
+        "SKIP_DOC = 'skipIf and skipUnless are deliberately unused here'\n"
+        "# self.skipTest('historical form, retained in a comment only')\n"
+        "def test_a():\n"
+        "    assert True\n"
+    )
+    assert environment_conditional_skips(module) == []
