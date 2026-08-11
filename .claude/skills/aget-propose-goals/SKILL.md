@@ -1,3 +1,8 @@
+---
+name: aget-propose-goals
+description: Propose N ranked candidate session-goals scored ex-ante by RUBRIC_goal_selection_v1.0 and recorded for retrospective audit. The goal-altitude sibling of /aget-propose-actions.
+---
+
 # /aget-propose-goals
 
 Propose N ranked **candidate session-goals** scored ex-ante by `RUBRIC_goal_selection_v1.0`, recorded for retrospective audit. The goal-altitude sibling of `/aget-propose-actions` (action-altitude).

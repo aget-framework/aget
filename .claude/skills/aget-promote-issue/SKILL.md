@@ -1,3 +1,8 @@
+---
+name: aget-promote-issue
+description: Promote issues from the private tracker to the public tracker through governed content sanitization and principal approval. Prevents private information leakage at the promotion boundary.
+---
+
 # /aget-promote-issue
 
 Promote issues from the private tracker (gmelli/aget-aget) to the public tracker (aget-framework/aget) through governed content sanitization and principal approval. Prevents private information leakage at the promotion boundary.

@@ -1,3 +1,8 @@
+---
+name: aget-ask
+description: Ask clarifying questions as an entropy-reduction instrument for next-action prediction. Quality is measured by pre/post confidence delta on the top-1 interpretation of principal intent, not by question count or category coverage.
+---
+
 # aget-ask
 
 Ask clarifying questions as a measurement instrument for next-action prediction. Default: `--clarification`.

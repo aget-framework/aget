@@ -1,6 +1,6 @@
 ---
 name: aget-create-goal
-description: Commit a selected candidate goal into a durable, governed Goal artifact. The D71-Strict singular committer of the propose-goals→create-goal verb pair (L1067/L1085). Two-tier (REQ-3): committed goals = a structured section in governance/GOALS.md; aspirational = agent-internal .aget/goals/aspirational.jsonl. Direct authoring of a committed-Goal section is PROHIBITED once this skill is invoked. Implements AGET_GOAL_SPEC v0.2.0 (CAP-GOAL-001..011).
+description: "Commit a selected candidate goal into a durable, governed Goal artifact. The D71-Strict singular committer of the propose-goals→create-goal verb pair (L1067/L1085). Two-tier (REQ-3): committed goals = a structured section in governance/GOALS.md; aspirational = agent-internal .aget/goals/aspirational.jsonl. Direct authoring of a committed-Goal section is PROHIBITED once this skill is invoked. Implements AGET_GOAL_SPEC v0.2.0 (CAP-GOAL-001..011)."
 ---
 
 # /aget-create-goal
