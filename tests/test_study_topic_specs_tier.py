@@ -38,7 +38,6 @@ exists to suppress. See feedback: "a check whose predicate cannot detect its
 subject" and "assert both polarities".
 """
 
-import json
 import shutil
 import subprocess
 import sys

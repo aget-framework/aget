@@ -67,7 +67,7 @@
         },
         {
           "path": "tests/test_study_topic_specs_tier.py",
-          "sha256_at_v3.30.0": "b3427ce2e71a69d6d2e56176f6f51abb5b423235b4171699a0a12b3e4b119816"
+          "sha256_at_v3.30.0": "bc7157e2261e172b58341ed1056d28cbfc680de7df9871b3b82caf1841f7370c"
         }
       ],
       "v_test": "python3 -m pytest -q tests/test_study_topic_canonical_pattern_tier.py tests/test_study_topic_canonical_surface.py tests/test_study_topic_purpose_recency_rendering.py tests/test_study_topic_specs_tier.py",
