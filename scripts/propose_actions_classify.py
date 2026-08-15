@@ -34,6 +34,19 @@ Usage:
   python3 scripts/propose_actions_classify.py --self-test     # exit 0 on PASS
   python3 scripts/propose_actions_classify.py --classify "Audit stream-stamps ..."
   python3 scripts/propose_actions_classify.py --check-batch path/to/batch.json
+
+Exit codes (CAP-SCRIPT-004-03) — verified against behaviour, not asserted:
+  0  PASS — --classify printed a class, or --self-test passed, or the batch satisfies
+     REQ-PA-013 pairing
+  1  --self-test failed
+  2  UNMET — a same-artifact group carries only synthesis-class actions (Healthy
+     Friction surface; blocking is principal-elected, not automatic)
+  3  MALFORMED INPUT — unreadable/invalid batch file, or a batch whose actions carry
+     none of the required keys {"text", "artifact"}. Deliberately NOT 0 and NOT 2:
+     such a batch used to return pairing_status=PASS over zero groups, so the gate
+     reported healthy on input it had never read. UNKNOWN is not PASS, and it is not
+     UNMET either — conflating them would make a schema bug look like a governance
+     finding.
 """
 from __future__ import annotations
 
@@ -44,9 +57,27 @@ import sys
 from pathlib import Path
 
 # CAP-PA-013-01: primary-source re-derivation verbs (audit-class signal)
+#
+# NB: "reconcile" REMOVED 2026-08-15 — it was the one entry here that is not a
+# re-derivation. "Reconcile" is ambiguous between *compare against source* (audit)
+# and *make agree by editing* (synthesis), and the second sense is the common one on
+# a governed artifact ("reconcile the INDEX counts" = write to the INDEX). Because it
+# carried no synthesis verb, CAP-PA-013-04's masquerade guard never fired, so a batch
+# of two writes to one artifact satisfied the pairing gate outright:
+#
+#   [{"artifact": "planning/initiatives/INDEX.md", "text": "update the stream rows"},
+#    {"artifact": "planning/initiatives/INDEX.md", "text": "reconcile the counts"}]
+#   -> pairing_status: PASS, has_audit: true, vacuous: false      (measured pre-fix)
+#
+# That is the L980 vector the gate exists to close, passing through the gate. Removed
+# rather than moved to SYNTHESIS_VERBS: the word genuinely has both senses, and the
+# fail-safe (matches neither set -> synthesis, CAP-PA-013-04) is the correct disposition
+# for an ambiguous verb. An action that really does re-derive should say so —
+# "re-derive", "cross-check", "verify-from-source" all remain and all still match.
+# Pinned both polarities: tests/test_propose_actions_classify_hardening.py.
 AUDIT_VERBS = (
     r"re-?count", r"re-?deriv", r"re-?grep", r"re-?read", r"re-?verif",
-    r"audit", r"verify[- ]from[- ]source", r"reconcile", r"cross-?check",
+    r"audit", r"verify[- ]from[- ]source", r"cross-?check",
     r"re-?sum", r"re-?tally", r"re-?check",
 )
 
@@ -55,10 +86,43 @@ AUDIT_VERBS = (
 # (false-matched the audit example "Audit stream-stamps ..."); the verb sense of
 # stamping a status is covered by update/annotate, and the fail-safe default (neither
 # verb-set -> synthesis) catches any residual stamp-only action.
+# EXPANDED 2026-08-15. The 16-entry list below used to end at `\bmerge\b`, and that
+# under-coverage made CAP-PA-013-04's masquerade guard almost inert. Measured before
+# the expansion: of 32 ordinary composition verbs, **32/32** produced a false audit
+# when paired with an audit verb —
+#
+#   classify("re-verify and rewrite the INDEX counts")  ->  "audit"     (pre-fix)
+#
+# `\bwrite\b` did not even match "rewrite", the most obvious composition verb there is.
+# The asymmetry to hold onto: AUDIT_VERBS may stay narrow, because it is the *claim*;
+# SYNTHESIS_VERBS must be broad, because it is the *guard*. A missing audit verb costs
+# a legitimate action its audit-class (fail-safe, more friction). A missing synthesis
+# verb lets a write buy audit-class (fail-open, the L980 vector).
+#
+# Over-matching here is therefore the SAFE direction: a false synthesis hit demotes an
+# action to synthesis, which can only make the pairing gate harder to satisfy.
+#
+# Residual bound, stated rather than hidden: this is still an enumeration, so an
+# unlisted verb still slips. `stamp` remains deliberately absent (it false-matched the
+# domain noun "stream-stamp" in the audit example; see the note above), so "re-stamp"
+# is a known live gap. The list approach has a floor it cannot cross — tracked, not
+# silently relied upon. Both polarities pinned in
+# tests/test_propose_actions_classify_hardening.py.
 SYNTHESIS_VERBS = (
+    # original 16
     r"compos", r"\bwrite\b", r"\bwrote\b", r"\bfold\b", r"\bfolds?\b", r"update",
     r"narrat", r"summar", r"\bdraft", r"populat", r"integrat",
     r"annotat", r"add[- ]row", r"add a row", r"multi-?row", r"\bmerge\b",
+    # re-write family — the gap that let "re-verify and rewrite" read as audit
+    r"re-?writ", r"re-?word", r"re-?work", r"re-?format", r"restructur", r"refactor",
+    # edit / amend family
+    r"revis", r"\bamend", r"\bedit", r"\bcorrect(?:s|ed|ing|ions?)?\b", r"\bfix",
+    r"\bpatch", r"adjust", r"\bbump", r"tidy", r"clean[- ]?up", r"normaliz",
+    # add / remove family
+    r"replac", r"insert", r"append", r"\bdelet", r"\bremov", r"expand", r"extend",
+    r"backfill", r"migrat",
+    # authoring family
+    r"generat", r"\bcreat", r"\bauthor", r"\brecord",
 )
 
 # Governed artifact path prefixes / files (CAP-PA-013-02 scope)
@@ -113,11 +177,35 @@ def check_pairing(actions: list[dict]) -> dict:
     Returns a report dict: per-artifact groups touched by >=2 actions, whether each
     group has an audit-class action, and overall pairing_status PASS|UNMET.
     """
+    # Schema gate — fail CLOSED, not silently PASS.
+    #
+    # 2026-07-29: a batch submitted with keys {"desc","path"} instead of {"text","artifact"}
+    # returned `pairing_status: PASS` with zero groups. Every artifact read as "", so nothing
+    # was governed, so no group had >=2 members, so nothing could be unpaired. The L980
+    # Layer-5 gate reported healthy on a batch it had not looked at. An optional check must
+    # not default to healthy: a malformed batch is UNKNOWN, and UNKNOWN is not PASS.
+    KNOWN = {"text", "artifact"}
+    malformed = [
+        i for i, a in enumerate(actions)
+        if not isinstance(a, dict) or not KNOWN & set(a)
+    ]
+    if malformed:
+        raise ValueError(
+            f"check_pairing: {len(malformed)} action(s) at indices {malformed} carry none of "
+            f"the required keys {sorted(KNOWN)}. Refusing to report a pairing status for a "
+            f"batch that was not read (would emit a vacuous PASS). Got keys: "
+            + "; ".join(
+                sorted(set(k for a in actions if isinstance(a, dict) for k in a)) or ["<none>"]
+            )
+        )
+
     # group action indices by normalized governed artifact path
     groups: dict[str, list[int]] = {}
+    ungoverned: list[int] = []
     for i, a in enumerate(actions):
         art = a.get("artifact", "")
         if not is_governed(art):
+            ungoverned.append(i)
             continue
         groups.setdefault(normalize_path(art), []).append(i)
 
@@ -136,6 +224,16 @@ def check_pairing(actions: list[dict]) -> dict:
         "same_artifact_groups": detail,
         "unpaired_artifacts": unpaired,
         "pairing_status": status,
+        # Make the check's OWN SCOPE visible, so a PASS can be read for what it covered
+        # (vg2:R3 — the instrument's view is not its output). A PASS over 0 governed
+        # artifacts is trivially true and must not look like a clean bill of health.
+        "scope": {
+            "actions_seen": len(actions),
+            "governed_actions": len(actions) - len(ungoverned),
+            "ungoverned_action_indices": ungoverned,
+            "same_artifact_group_count": len(same_artifact_groups),
+            "vacuous": not same_artifact_groups,
+        },
     }
 
 
@@ -205,8 +303,18 @@ def main(argv=None) -> int:
         print(classify(args.classify))
         return 0
     if args.check_batch:
-        actions = json.loads(Path(args.check_batch).read_text())
-        rep = check_pairing(actions)
+        try:
+            actions = json.loads(Path(args.check_batch).read_text())
+        except (OSError, json.JSONDecodeError) as exc:
+            print(f"MALFORMED INPUT: cannot read batch {args.check_batch!r}: {exc}")
+            return 3
+        try:
+            rep = check_pairing(actions)
+        except (ValueError, AttributeError, TypeError) as exc:
+            # A schema failure is not a governance finding — keep the codes distinct so a
+            # caller cannot read "wrong keys" as "unpaired synthesis".
+            print(f"MALFORMED INPUT: {exc}")
+            return 3
         print(json.dumps(rep, indent=2))
         return 0 if rep["pairing_status"] == "PASS" else 2
     ap.print_help()

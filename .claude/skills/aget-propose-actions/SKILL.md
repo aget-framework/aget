@@ -77,6 +77,20 @@ This is REQ-PA-011 (closes L962 structural-defense gap; gh#1414).
 
 ### Step 2.6: HANDOFF-Deferral Scan (REQ-PA-012; L961 Channel 2 wiring v3.18 G4.A)
 
+> **Note on what lifts a deferral.** A HANDOFF marks a deferral, not an invitation. Where a local
+> governance ruling states that a bare principal-typed `go` carries full continuation authority,
+> that ruling governs over this step's demand for a subject-naming re-authorization phrase — a
+> principal ruling outranks a skill.
+>
+> Such a ruling lifts **deferrals** only. It does **not** satisfy a review or precondition that
+> another ruling requires: a content gate inside a ruling is not a deferral pending authorization.
+> Distinguish *"this was parked"* from *"this needs an input that has not arrived."*
+>
+> This does not repeal the deferral discipline — that still defines what a deferral *is*. The
+> ruling changes only what *lifts* one.
+>
+> Instances are seat-local; consult your own `planning/RULINGS_*` before relying on this.
+
 Before generating NBAs, scan `docs/HANDOFF_*.md` files modified within the last 14 days. For each candidate Action subject (skill name, PROJECT_PLAN name, initiative name, issue number):
 
 1. **Match check**: Does the candidate Action subject appear in any HANDOFF file's body or title? (substring match on skill name / plan slug / issue number)
@@ -99,7 +113,7 @@ For each proposed Action, identify its target governed-artifact path (under `pla
 
 | CAP | Heuristic |
 |-----|-----------|
-| CAP-PA-013-01 (audit-class) | description contains a primary-source re-derivation verb (re-count / re-derive / re-grep / re-read / re-verify / audit / verify-from-source / reconcile / cross-check) |
+| CAP-PA-013-01 (audit-class) | description contains a primary-source re-derivation verb (re-count / re-derive / re-grep / re-read / re-verify / audit / verify-from-source / cross-check / re-sum / re-tally / re-check). **`reconcile` removed 2026-08-15** — ambiguous between *compare against source* and *make agree by editing*, and it carried no synthesis verb, so the CAP-PA-013-04 guard never fired. Measured: a two-write batch on one artifact returned `pairing_status: PASS`, `has_audit: true`. An ambiguous verb belongs in neither set; the fail-safe routes it to synthesis. |
 | CAP-PA-013-02 (synthesis-class) | description contains a composition verb (compose / write / fold / update / narrate / summarize / draft / populate / integrate / annotate / add-row / merge) on a governed-artifact path |
 | CAP-PA-013-03 (same-artifact detection) | normalized path equality (repo-relative, leading-`./` stripped, lowercased extension) across Actions in the batch |
 | CAP-PA-013-04 (ambiguity, fail-safe) | when neither verb-set matches OR both match, default to **synthesis** — `audit` is returned only when an audit verb is present AND no synthesis verb is present, so a synthesis Action cannot masquerade as audit to satisfy the pairing |
@@ -174,6 +188,20 @@ Rank by value-to-time ratio. Total estimated time MUST fit within budget.
 | 8 | **Same-day-reframe bias** | For public-facing / irreversible actions, is a soak/wait the right default before acting on a same-session reframe? | obs096 |
 | 9 | **Target verification** | Are referenced targets (URLs, files, identifiers) verified to exist? | obs102 |
 | 10 | **Baseline / measurement** | Is a measurement baseline missing that a measurement action should establish first? | obs104/105 |
+| 11 | **Verify-before-assert class** | Does any Action's description or Evidence cell state (a) an **absence** ("X does not exist / is unenforced"), (b) a **count/census** ("N of M"), or (c) a **registry/approval status** ("unregistered", "bypass", "stale")? If so: was it derived by a **named route**, not a hand-rolled query? Counts over a governed enumeration → resolve members from the **register**, never a path glob. Absence → search the behavior, not the identifier. Registry status → check BOTH the spec surface and the implementing surface. | principal ruling; verification-route discipline |
+| **11a** | **Disclosure is not a remedy** | Does any Action's Evidence cell, or any self-critique disclosure, *name* a point-11 defect instead of *fixing* it — "this is a glob, not a register read", "honest bound: I did not search X"? **If the row cannot be derived by its named route, the row does not ship.** Re-derive it or drop it; a disclosure that lets the row through has converted this control into a formality. | measured: point 11 was run, the defect was disclosed verbatim, and the row shipped anyway with a materially incomplete denominator. Two independent lineages, same day. A peer's guard hook caught it; this checklist did not. |
+
+**Naming caveat on point 11.** Do not mandate a specific script as *the* named route for a census.
+Two failure modes make that wrong: (a) the prescribed script may be **absent at the seat most likely
+to run the census**, so the remedy is unavailable exactly where it is needed; and (b) a script may
+ignore fields the register carries, such as an entry's `status:`.
+
+**Name the register, not a script.** Resolve each active member's declared location from the register
+and read that path. A filesystem glob over a naming convention is never a register read — it silently
+misses members whose location does not match the convention, and it misses them differently from
+different vantage points.
+
+If a named instrument is cited, verify it exists **at the seat that will run it** before relying on it.
 
 **Structural enforcement (budget ≥ 1 day)** — these two points are not advisory at longer budgets:
 - **REQ-PA-019 (named-person)**: at least ONE named-person leverage check MUST appear in the output — either as an executed outreach Action OR as an explicit "no named-person fit for this focus" note. The check is mandatory; proposing outreach is not.
@@ -265,7 +293,8 @@ Do NOT ask "which ones?" for Autonomous items — the default is full execution.
 | REQ-PA-011 | Pre-flight (Step 2.5) SHALL evaluate each candidate Action against AGENTS.md §Structural Skill Routing (D71). If a trigger is met for an un-invoked STRUCTURAL skill, the skill SHALL REFUSE the batch with explicit redirect. Principal override permitted per L178. | L962, gh#1414, AGENTS.md D71 |
 | REQ-PA-012 | Pre-flight (Step 2.6) SHALL scan `docs/HANDOFF_*.md` files (≤14 days old) for matches against each candidate Action subject. If matched AND no re-authorization phrase appears in the current session's trigger prompt, the skill SHALL REFUSE the candidate with explicit redirect to fresh `/aget-go --reason 'deferral lift'` invocation. Principal override permitted per L178. | L961 (HANDOFF-deferral cross-session L908), L467 (multi-channel propagation), AGENTS.md §HANDOFF-Deferral Discipline |
 | REQ-PA-013 | Pre-flight (Step 2.7) SHALL classify each proposed Action targeting a governed artifact as synthesis-class or audit-class per CAP-PA-013-01/02 and detect same-artifact groups per CAP-PA-013-03. WHEN ≥2 Actions target the same normalized governed-artifact path, at least one SHALL classify as audit-class; if UNMET, the skill SHALL surface a Healthy Friction violation (AskUserQuestion: add-audit-Action / re-scope / L178-override / skip). Ambiguity defaults to synthesis (CAP-PA-013-04, fail-safe). Reference classifier: `scripts/propose_actions_classify.py`. | L980 (audit-after-synthesis self-catch), gh#1476 (Layer 5), L908/L939/L960 (verification chain), L467 (Channel-2 sibling at ceremony layer = SOP G1.AUDIT) |
-| CAP-PA-013-01 | audit-class heuristic: description contains a primary-source re-derivation verb (re-count/re-derive/re-grep/re-read/re-verify/audit/verify-from-source/reconcile/cross-check) | REQ-PA-013, L939 |
+| CAP-PA-013-01 | audit-class heuristic: description contains a primary-source re-derivation verb (re-count/re-derive/re-grep/re-read/re-verify/audit/verify-from-source/cross-check/re-sum/re-tally/re-check). `reconcile` removed 2026-08-15 — it made the pairing gate satisfiable by a write | REQ-PA-013, L939 |
+| CAP-PA-013-02 | synthesis-class heuristic (the **guard**, expanded 16 → 46 patterns on 2026-08-15). Measured before the expansion: **32 of 32** ordinary composition verbs — rewrite, revise, amend, edit, correct, fix, replace, insert, append, delete, restructure, refactor, backfill, migrate, … — produced a false audit-class when paired with an audit verb, because none of them was listed. `\bwrite\b` did not even match "rewrite". **Asymmetry to preserve**: the audit list may stay narrow because it is the *claim*; the synthesis list must stay broad because it is the *guard*. A missing audit verb costs a legitimate action its class (fail-safe); a missing synthesis verb lets a write buy audit-class (fail-open). Over-matching here is therefore the safe direction. Residual: `stamp`/`re-stamp` remain deliberately absent (they false-match the domain noun "stream-stamp") — a known, asserted bound, not a hidden one | REQ-PA-013, L980 |
 | CAP-PA-013-02 | synthesis-class heuristic: description contains a composition verb (compose/write/fold/update/narrate/summarize/draft/populate/integrate/annotate/add-row/merge) on a governed-artifact path | REQ-PA-013, L980 |
 | CAP-PA-013-03 | same-artifact detection: normalized path equality (repo-relative, leading-`./` stripped, lowercased extension) | REQ-PA-013 |
 | CAP-PA-013-04 | ambiguity fail-safe: neither-match OR both-match → synthesis; `audit` only when audit-verb present AND synthesis-verb absent (synthesis cannot masquerade as audit) | REQ-PA-013, L908 |
