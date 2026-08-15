@@ -123,6 +123,24 @@ SYNTHESIS_VERBS = (
     r"backfill", r"migrat",
     # authoring family
     r"generat", r"\bcreat", r"\bauthor", r"\brecord",
+    # stamp family — HALF the known gap closed 2026-08-15; the other half stays open
+    # deliberately, and the reason is worth keeping.
+    #
+    # `re-?stamp` is safe and unambiguously the verb: "stream-stamp" contains "m-stamp",
+    # not "re-stamp", so it cannot false-match. Added.
+    #
+    # A bare `stamp` was tried and REVERTED. `(?<![-\w])stamps?\b` does dodge the
+    # hyphenated domain noun "stream-stamp", but it still swallows the SPACED form —
+    # measured: "audit the stream stamps" flipped from audit to synthesis, which is a
+    # real phrasing here and an existing test fixture. That is the fail-SAFE direction,
+    # so it would not have opened a hole; it would have made the gate unsatisfiable for
+    # legitimate audit wording and pushed authors to reword. Not worth it for one rare
+    # phrasing ("re-verify and stamp X") whose verb sense is already covered by
+    # update/annotate, per the original exclusion note above.
+    #
+    # Residual masquerade after this change: bare "stamp" only, 1 of 32 measured.
+    # Asserted as a bound in the hardening tests, not hidden.
+    r"re-?stamp",
 )
 
 # Governed artifact path prefixes / files (CAP-PA-013-02 scope)

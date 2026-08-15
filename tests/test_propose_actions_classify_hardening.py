@@ -126,12 +126,18 @@ COMPOSITION_VERBS = [
     "record", "expand", "extend", "generate", "create", "author", "reword",
     "adjust", "bump", "migrate", "backfill", "tidy", "clean up", "normalize",
     "reformat",
+    # closed 2026-08-15 — `re-?stamp` is safe where a bare `stamp` is not, because
+    # "stream-stamp" contains "m-stamp" and cannot match "re-stamp"
+    "re-stamp",
 ]
 
-# Known, documented residual: `stamp` is deliberately absent from SYNTHESIS_VERBS
-# because it false-matched the domain noun "stream-stamp" in the audit example.
-# Listed here so the gap is asserted rather than discovered.
-KNOWN_MASQUERADE_GAPS = ["stamp", "re-stamp"]
+# Known, documented residual: a BARE `stamp` is deliberately absent from
+# SYNTHESIS_VERBS. Every pattern tried for it also swallowed the domain noun in its
+# spaced form — measured, "audit the stream stamps" flipped audit -> synthesis, which
+# is fail-safe but makes the gate unsatisfiable for legitimate audit wording. The verb
+# sense is already covered by update/annotate. Listed here so the residual is asserted
+# rather than rediscovered.
+KNOWN_MASQUERADE_GAPS = ["stamp"]
 
 
 def test_composition_verbs_paired_with_an_audit_verb_do_not_read_as_audit():
@@ -167,7 +173,7 @@ def test_the_known_stamp_gap_is_still_exactly_the_known_gap():
         if classify(f"re-verify and {v} the INDEX counts") == "audit"
     ]
     assert set(still_gapped) <= set(KNOWN_MASQUERADE_GAPS)
-    assert len(still_gapped) <= 2, (
+    assert len(still_gapped) <= 1, (
         f"the known-gap set grew to {still_gapped} — an enumeration control is only "
         "honest while its documented bound is accurate"
     )
