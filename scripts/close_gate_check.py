@@ -14,6 +14,10 @@ Invoked by /aget-close-project and /aget-close-session before a status->COMPLETE
 transition. Advisory (ADR-008): reports violations + nonzero exit; the principal
 may override with reason (L178).
 
+Usage:
+  python3 scripts/close_gate_check.py <PROJECT_PLAN or session .md>
+  python3 scripts/close_gate_check.py --quiet <path>
+
 Exit codes:
   0 = clean (no blocking unchecked conformance signals)
   2 = violations found (block COMPLETE)
@@ -27,8 +31,16 @@ import sys
 from pathlib import Path
 
 # Closure/Finalization checklist section headers whose unchecked items block COMPLETE.
+#
+# gh#2223 blind spot 1 (re-derived 2026-08-13): this pattern formerly matched ONLY the
+# two literal headings "Closure Checklist" / "Finalization Checklist". A plan whose
+# closure section is headed "## Closure", "## Exit Conditions", or "## Gate 4 Closure"
+# had every unchecked box under it invisible to the guard. Falsifier held both
+# polarities: "## Closure Checklist" + one unchecked box -> exit 2; "## Closure" +
+# the same box -> exit 0. Widened to the closure-class alias set.
 _CLOSURE_SECTION_RE = re.compile(
-    r'^#{1,4}\s*(Closure Checklist|Finalization Checklist)\b', re.IGNORECASE)
+    r'^#{1,4}\s*(Closure Checklist|Finalization Checklist|Closure|Finalization'
+    r'|Exit Conditions|Exit Criteria|Completion Checklist|Gate Closure)\b', re.IGNORECASE)
 _ANY_SECTION_RE = re.compile(r'^#{1,4}\s+\S')
 _UNCHECKED_RE = re.compile(r'^\s*[-*]\s*\[\s*\]\s+(.*)$')
 _GATE_STATUS_PENDING_RE = re.compile(
@@ -104,6 +116,85 @@ _ATTESTED_RE = re.compile(
     re.IGNORECASE)
 
 
+# gh#2223 blind spots 2 and 3 (re-derived 2026-08-13). Two independent literalisms
+# let a non-terminal STATUS TABLE pass:
+#
+#   2. Gate status was read only from the bold prose form `**Gate_Status**: Pending`.
+#      A gate carried as a TABLE ROW -- the form every fleet-migration plan actually
+#      uses -- was never read. Falsifier both polarities: the bold form -> exit 2, the
+#      equivalent table row -> exit 0.
+#   3. The V-test row pattern required the literal token PENDING *and* a first cell
+#      beginning "Gate". A row reading `Open`/`Blocked`/`Incomplete`/⏳, or one keyed
+#      `V3R.1` instead of `Gate 1`, was invisible. Falsifier both polarities: `| Gate 1
+#      | x | PENDING |` -> exit 2; the same row with `Open`, and the same PENDING row
+#      keyed `V3R.1`, -> exit 0.
+#
+# Scoped deliberately: fires only inside a markdown table whose HEADER row carries a
+# status column alongside a gate/V-test/deliverable column, so prose tables and
+# unrelated matrices cannot trip it.
+_TABLE_ROW_RE = re.compile(r'^\s*\|(?P<cells>.+)\|\s*$')
+_TABLE_SEP_RE = re.compile(r'^\s*\|[\s:|-]+\|\s*$')
+_STATUS_HEADER_RE = re.compile(r'\bstatus\b|\bverdict\b|\bstate\b', re.IGNORECASE)
+_SUBJECT_HEADER_RE = re.compile(r'\bgate\b|\bv-?test\b|\bdeliverable\b|\bexit\b', re.IGNORECASE)
+_NONTERMINAL_STATUS_RE = re.compile(
+    r'^(?:\W*)(PENDING|IN[\s-]?PROGRESS|OPEN|INCOMPLETE|BLOCKED|TODO|TO[\s-]DO'
+    r'|NOT[\s-]STARTED|DEFERRED|PARTIAL|DRAFT|STOPPED|OWED|UNMET|FAIL(?:ED)?)\b',
+    re.IGNORECASE)
+_HOURGLASS_RE = re.compile(r'[⏳⏸🚧]')
+# Blind spot 4, found only by running the rule against the REAL corpus (2026-08-13):
+# the synthetic fixtures used word statuses, but this fleet's plans carry gate status
+# as a CHECKBOX CELL -- `| -1.1 | ... | [x] | ... |`. An unchecked `[ ]` in a Status
+# column sits outside any closure-named section, so `_UNCHECKED_RE` (which requires a
+# `- [ ]` list item) never sees it and neither did the word-token rule above. This is
+# the form the guard is most likely to meet on a plan being marked COMPLETE.
+_UNCHECKED_CELL_RE = re.compile(r'^\[\s*\]$')
+
+
+def _split_row(line: str):
+    m = _TABLE_ROW_RE.match(line)
+    if not m:
+        return None
+    return [c.strip() for c in m.group('cells').split('|')]
+
+
+def scan_status_table_rows(text: str):
+    """Return (kind, detail) violations for non-terminal rows in gate/V-test status tables.
+
+    Closes gh#2223 blind spots 2 and 3: the guard previously read gate status only from
+    the bold prose form and V-test status only from a PENDING-token row keyed "Gate".
+    """
+    violations = []
+    header = None
+    status_idx = None
+    for raw in text.splitlines():
+        line = raw.rstrip('\n')
+        cells = _split_row(line)
+        if cells is None:
+            header, status_idx = None, None
+            continue
+        if _TABLE_SEP_RE.match(line):
+            continue
+        if header is None:
+            # Candidate header row: needs both a status-ish and a subject-ish column.
+            joined = ' '.join(cells)
+            if _STATUS_HEADER_RE.search(joined) and _SUBJECT_HEADER_RE.search(joined):
+                header = cells
+                for i, c in enumerate(cells):
+                    if _STATUS_HEADER_RE.search(c):
+                        status_idx = i
+                        break
+            continue
+        if status_idx is None or status_idx >= len(cells):
+            continue
+        status = cells[status_idx]
+        if (_NONTERMINAL_STATUS_RE.match(status) or _HOURGLASS_RE.search(status)
+                or _UNCHECKED_CELL_RE.match(status)):
+            subject = cells[0][:40] if cells else ''
+            violations.append(('status_row_nonterminal',
+                               f"{subject} -> {status[:40]}"))
+    return violations
+
+
 def scan_dual_status_mask(text: str):
     """gh#1791 (v3.27 G3.5.2): a plan carrying BOTH legacy header **Status**: and
     **Plan_Status**: can mask a non-terminal state — a scanner reading one field
@@ -164,6 +255,7 @@ def main(argv=None):
 
     content = fp.read_text(encoding='utf-8', errors='replace')
     violations = scan(content)
+    violations.extend(scan_status_table_rows(content))
     violations.extend(scan_dual_status_mask(content))
     warnings = scan_independence_warnings(content)
 
@@ -205,6 +297,7 @@ def main(argv=None):
     if not args.quiet:
         kinds = {'gate_status_pending': 'Gate still Pending/In-Progress',
                  'vtest_pending': 'V-test row PENDING',
+                 'status_row_nonterminal': 'Gate/V-test table row non-terminal (gh#2223)',
                  'unchecked_closure_item': 'Unchecked closure/finalization item',
                  'placeholder_substance': 'Closure-section placeholder prose (substance, #1568)',
                  'release_close_guard_block': 'Release-completion guard BLOCK (#1554)',
