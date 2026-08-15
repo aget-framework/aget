@@ -65,7 +65,83 @@ ROOT = Path(__file__).resolve().parents[1]
 
 # Scripts whose NAME marks them as a control. A control asserts something about
 # the world; an orphaned control asserts it to nobody.
+#
+# DEMOTED FROM GATE TO HINT, 2026-08-08. This tuple was the corpus predicate:
+# `if not p.name.startswith(CONTROL_PREFIXES): continue`. Anything named otherwise
+# never entered the census at all.
+#
+# Measured at the moment of demotion: scripts/*.py = 151, prefix-matched = 72,
+# EXCLUDED = 79 — of which **50 assert a verdict** (`exit 1` / `FAIL` / `assert`).
+# The excluded set included `close_authorization_guard.py`, `codex_git_guard.py`,
+# `close_gate_check.py`, `capture_friction.py`, `deployment_monitor.py`. Two have
+# "guard" in the name. They are controls by any behavioural test and were invisible
+# to this census by construction.
+#
+# WHY THIS IS WORSE THAN A MISS, and why the fix is a removed predicate rather than
+# a widened one. An excluded item is not a false negative. A false negative occupies
+# a slot in the denominator and can be audited. An excluded item occupies no slot —
+# not numerator, not denominator, not the orphan backlog — so it is strictly less
+# visible than the failure this census exists to detect. (vp_of_ai, 2026-08-08.)
+#
+# A naming convention also drifts GENERATIVELY: it misses every future control whose
+# author names it after its subject rather than its category. The gap grew without
+# anyone acting.
+#
+# Error direction is chosen deliberately. Behavioural detection over-includes, and
+# over-inclusion is this instrument's documented failure mode. That is the correct
+# trade anyway: false positives occupy slots and can be adjudicated DOWN via
+# NOT_A_CONTROL; exclusions cannot be adjudicated UP, because nobody sees them.
 CONTROL_PREFIXES = ("check_", "validate_", "audit_", "verify_", "d71_", "goal_link_")
+
+# Behavioural corpus predicate: does the script ASSERT a verdict about the world?
+# This is the gate now; the name is only a hint that raises confidence.
+_ASSERTS = re.compile(
+    r"sys\.exit\(1\)|(?<![\w.])exit\(1\)|\breturn 1\b|[\"']FAIL[\"']|\bassert\s",
+)
+
+# Shell twin of _ASSERTS. A shell control asserts with `exit 1`, a `[FAIL]` marker,
+# or `return 1` — `assert` is not shell, and `sys.exit` never appears.
+_ASSERTS_SH = re.compile(
+    r"\bexit\s+1\b|\breturn\s+1\b|\[FAIL\]|[\"']FAIL[\"']",
+)
+
+
+def _corpus():
+    """Every file that could BE a control — `.py` and `.sh`, scripts/ and hooks/.
+
+    EXTENSION PREDICATE REMOVED, 2026-08-13. The line was
+    `sorted((ROOT / "scripts").glob("*.py"))`, and it is the 2026-08-08 lesson above
+    surviving on a second axis: that fix removed the *name* predicate and left the
+    *extension* predicate untouched, so an entire file class stayed excluded — and
+    the argument for why that is worse than a miss is unchanged, word for word. An
+    excluded item occupies no slot: not numerator, not denominator, not the orphan
+    backlog.
+
+    ASYMMETRY THIS CLOSES: `.sh` files were already read as ACTUATORS (see
+    `_actuator_blob` / `_wired_commands`, which parse `release_gate_battery.sh` and
+    `.claude/hooks/*.sh`) but never as SUBJECTS. A shell script could wire other
+    controls and could never itself be found unwired.
+
+    Measured at the moment of removal: scripts/*.py = 167, scripts/*.sh = 6,
+    .claude/hooks/*.sh = 8. The `.sh` set contained TWO zero-caller controls
+    (`check_template_conformance.sh`, `prepare_impact_aget_migration.sh`), one of
+    which had been reporting `templates=13 failures=13` to nobody since its rename.
+    The other known instance of this class, `.claude/hooks/delegated_mutation_guard.sh`
+    (gh#2117), had to be found by hand — this census could not have surfaced it.
+    """
+    files = sorted((ROOT / "scripts").glob("*.py"))
+    files += sorted((ROOT / "scripts").glob("*.sh"))
+    files += sorted((ROOT / ".claude" / "hooks").glob("*.sh"))
+    return files
+
+
+# Adjudicated NON-controls: behaviourally assertive, deliberately NOT censused,
+# WITH A STATED REASON. This is the residue the behavioural pass over-includes.
+# An entry here is a claim under test, exactly like ORPHAN_EXEMPTIONS below.
+NOT_A_CONTROL = {
+    "aget_init.py": "scaffolder; its exit 1 is a setup failure, not a verdict about repo state",
+    "deploy_skill.py": "deployer; exit 1 reports a failed copy, not a governance assertion",
+}
 
 # Deliberately unwired, WITH A STATED REASON. This exists so the census can tell
 # "nobody thought about this" apart from "we thought about it and here is why" —
@@ -190,9 +266,26 @@ def census() -> tuple[list, list]:
     blob = _actuator_blob()
     wired = _wired_commands()
     controls, orphans = [], []
-    for p in sorted((ROOT / "scripts").glob("*.py")):
-        if not p.name.startswith(CONTROL_PREFIXES):
+    unadjudicated = []
+    for p in _corpus():
+        # Corpus predicate: name-hint OR behavioural assertion. The name alone no
+        # longer gates entry (see CONTROL_PREFIXES note).
+        by_name = p.name.startswith(CONTROL_PREFIXES)
+        asserts = _ASSERTS_SH if p.suffix == ".sh" else _ASSERTS
+        try:
+            by_behaviour = bool(asserts.search(p.read_text(errors="ignore")))
+        except OSError:
+            by_behaviour = False
+        if not (by_name or by_behaviour):
             continue
+        if p.name in NOT_A_CONTROL:
+            continue
+        # A behaviour-only candidate with no adjudication is the residue this fix
+        # exists to surface. It FAILS rather than silently joining or leaving the
+        # corpus — "the system reports until someone decides", not "someone must
+        # remember to look".
+        if by_behaviour and not by_name and p.name not in ORPHAN_EXEMPTIONS:
+            unadjudicated.append(p.name)
         found = [k for k, text in blob.items() if p.name in text]
         # LOAD-BEARING TEST: named is not wired. If we know the exact invocation,
         # run it; a usage error demotes the control to orphaned regardless of how
@@ -209,7 +302,7 @@ def census() -> tuple[list, list]:
         controls.append((p.name, found))
         if not found:
             orphans.append(p.name)
-    return controls, orphans
+    return controls, orphans, unadjudicated
 
 
 def main() -> int:
@@ -223,23 +316,31 @@ def main() -> int:
         global CONTROL_PREFIXES
         CONTROL_PREFIXES = ("",)
 
-    controls, orphans = census()
+    controls, orphans, unadjudicated = census()
     total = len(controls)
     wired = total - len(orphans)
 
     if args.json:
         print(json.dumps({
             "total_controls": total, "actuated": wired, "orphans": orphans,
+            "unadjudicated": unadjudicated,
             "edge": "invoked-by",
         }, indent=2))
-        return 1 if orphans else 0
+        return 1 if (orphans or unadjudicated) else 0
 
     print("=" * 62)
     print("ACTUATOR CENSUS — edge: `invoked-by`")
     print("=" * 62)
     print(f"\n  controls found : {total}")
     print(f"  actuated       : {wired}")
-    print(f"  ORPHANED       : {len(orphans)}\n")
+    print(f"  ORPHANED       : {len(orphans)}")
+    print(f"  UNADJUDICATED  : {len(unadjudicated)}  (behaviourally a control, not yet classified)\n")
+    if unadjudicated:
+        print("  These assert a verdict but carry no control-name and no adjudication.")
+        print("  Classify each: wire it, add to ORPHAN_EXEMPTIONS, or add to NOT_A_CONTROL.")
+        for n in unadjudicated:
+            print(f"    ? {n}")
+        print()
 
     for name, found in controls:
         if found:
