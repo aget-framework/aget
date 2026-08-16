@@ -144,7 +144,7 @@ The helper is best-effort (a recording failure warns + exits 1 but MUST NOT abor
 
 **▶ Recommended pivot target**: G3 (13/15)
 **Tie-break (if any)**: [principal preference / beneficiary-tag priority]
-**Shape-it gate (E8)**: [if the recommended target is `aspirational` or has no governed vehicle → name the shape-it action, e.g. "G2 is aspirational + unshaped → next action is `/aget-propose-project`, not direct execution"]
+**Shape-it gate (E8)**: [if the recommended target is `aspirational` or has no governed vehicle → name the shape-it action, e.g. "G2 is aspirational + unshaped → next action is `/aget-propose-project` *(not yet in this package — manager-seat skill)*, not direct execution"]
 ```
 
 ## Relationship to `/aget-propose-actions`
@@ -168,7 +168,7 @@ The two compose: `propose-goals` picks direction; `propose-actions` executes wit
 - **C4**: N ≤ 7 — beyond 7 exceeds principal working memory (Miller 1956); if more candidates exist, cluster first.
 - **C5**: Ties MUST be broken explicitly (principal preference or documented heuristic) — never left ambiguous.
 - **C6** (E7 — commitment-type honesty): Each candidate MUST carry a commitment-type tag (`committed` | `aspirational`). An `aspirational` goal MUST NOT be presented as `committed` — a high score does not make a want a commitment (folded from `SOP_near_term_ambition_projection`, L1090).
-- **C7** (E8 — unshaped→shape-it gate): A recommended target that is `aspirational` OR lacks a governed vehicle (no owning `planning/PROJECT_PLAN_*` / `planning/initiatives/INIT-*` / spec) MUST route to a **shape-it** action (`/aget-propose-project` / `/aget-propose-initiative` / `/aget-create-project`), never to direct execution (L174 ambition–governance inversion).
+- **C7** (E8 — unshaped→shape-it gate): A recommended target that is `aspirational` OR lacks a governed vehicle (no owning `planning/PROJECT_PLAN_*` / `planning/initiatives/INIT-*` / spec) MUST route to a **shape-it** action (`/aget-propose-project` *(not yet in this package — manager-seat skill)* / `/aget-propose-initiative` / `/aget-create-project`), never to direct execution (L174 ambition–governance inversion).
 
 ## Dependencies
 
@@ -184,12 +184,12 @@ The two compose: `propose-goals` picks direction; `propose-actions` executes wit
 | "Propose tomorrow's main goals" | Yes — ex-ante goal selection for next session |
 | Choosing among ≥2 session directions | Yes — divergent-proposal mode |
 | Individual steps within a chosen goal | No — use `/aget-propose-actions` |
-| Committing to a single named goal | No — use `/aget-propose-project` (or `create-goal` when the tier lands) |
+| Committing to a single named goal | No — use `/aget-propose-project` *(not yet in this package — manager-seat skill)* (or `create-goal` when the tier lands) |
 
 ## Related Skills
 
 - `/aget-propose-actions` — action-altitude sibling (executes within a selected goal)
-- `/aget-propose-project` — singular commitment-pipeline (single-goal artifact)
+- `/aget-propose-project` *(not yet in this package — manager-seat skill)* — singular commitment-pipeline (single-goal artifact)
 - `/aget-create-rubric` — authored the scoring engine this skill invokes
 
 ## Traceability

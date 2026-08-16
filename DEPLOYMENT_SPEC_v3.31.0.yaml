@@ -1,0 +1,67 @@
+version: "3.31.0"
+spec_version: "2.1.0"
+created: "2026-08-16"
+status: released
+supersedes: "DEPLOYMENT_SPEC_v3.30.0.yaml"
+breaking_release: false
+
+verification_script:
+  file: "scripts/verify_deployment.py"
+  usage: "python3 scripts/verify_deployment.py --version 3.31.0 --path /path/to/agent"
+  behavioral_smoke: "handoffs/RELEASE_HANDOFF_v3.31.0.md"
+
+detection_context: "Run the conformance check from the receiving checkout before invoking a promoted instrument. Producer validation, public availability, received state, and downstream behavior are separate facts. For this release the distinction is load-bearing: the one confirmed downstream seat took the version stamp and did NOT install the promoted instruments, so v3.31.0 has confirmed received state and NO confirmed downstream behavior."
+
+mandatory_changes:
+  - id: "M-3.31-1"
+    outcome: "VERSION_SCOPE_v3.31.0 R1"
+    description: "five verification instruments reach canonical, each with its test — the promotion leg that produced 37 scripts and shipped none"
+    blocking: false
+    detection: "python3 -m pytest -q tests/test_skill_route_contract.py tests/test_deprecation_removal_check.py tests/test_release_cadence_gap.py tests/test_validate_changelogs_inventory.py tests/test_validate_changelogs_zero_denominator.py tests/test_validate_initiative_proposal.py"
+    detection_verified: "executed at canonical 2026-08-16 — 47 passed, 2 skipped, 11 subtests passed. Test filenames do NOT mirror their script names; an earlier draft of this spec guessed three of them and named files that do not exist. Executed, not inferred."
+    distribution_point: "scripts/check_skill_route_contract.py + scripts/check_deprecation_removals.py + scripts/release_cadence_gap.py + scripts/validate_changelogs.py + scripts/validate_initiative_proposal.py, each with its named test"
+    tagged_origins: "aget"
+    applies_to: "AGET seats that own a multi-repository fleet layout. NOT blocking for single-repo seats — see layout_dependency below."
+
+  - id: "M-3.31-2"
+    outcome: "VERSION_SCOPE_v3.31.0 R4"
+    description: "skill descriptions made routable, so every shipped skill is selectable by its description"
+    blocking: false
+    detection: "python3 scripts/check_skill_route_contract.py"
+    distribution_point: ".claude/skills/*/SKILL.md frontmatter descriptions"
+    tagged_origins: "aget"
+    applies_to: "all AGET repositories carrying packaged skills"
+
+layout_dependency:
+  disclosure: "3 of the 5 instruments in M-3.31-1 resolve against a sibling-repo fleet layout that a worker-archetype seat does not have."
+  guidance: "A seat without that layout should take the version bump and NOT install those instruments. Installing tools that cannot run is dead scaffolding."
+  provenance: "adoption guidance from the confirming downstream seat, endorsed by the producer, 2026-08-15"
+
+fleet_migration_contract: null
+fleet_migration_contract_disclosure: "No FLEET_MIGRATION_CONTRACT_v3.31.0.json was produced. v3.31.0 carries no mandatory blocking change, so no migration contract is owed. Recorded explicitly rather than left as an unexplained gap in the v3.6.0->v3.30.0 series."
+
+runtime_boundary:
+  portable: false
+  substrate: "AGET repository"
+  receiver_owned: "scripts/, .aget/, AGENTS.md, planning/, and sessions/ as used by the selected instrument"
+  disclosure: "the promoted instruments are not digest-bound to receiver invocation targets; three of them additionally assume a sibling-repo layout (see layout_dependency)"
+
+delivery_boundary:
+  producer: "VERSION_SCOPE_v3.31.0 value gate, assigned by judgment and disclosed as such — no executable scorer for that rubric exists"
+  distribution_point: "public v3.31.0 tag payload, 14/14 repositories"
+  received_state: "private-ccb-AGET at 3.31.0, verified in its own .aget/version.json 2026-08-16"
+  downstream_behavior: "NOT ESTABLISHED — the confirming seat deliberately did not install the instruments. Behavioral proof is owed under principal ruling PR-331-10."
+  inference_prohibited: true
+  fleet_convergence: "not claimed for this release; one confirmation is the ruled bar and is not fleet coverage"
+
+assurance_disclosure:
+  independent_verification: "NOT RUN"
+  detail: "No independent cross-engine verification ran for v3.31.0, and none has run in any cycle. A scoped review of the five promoted instruments is elected under PR-331-9 and must be recorded as a scoped partial, never as a discharge of POLICY_mandatory_independent_verification.md."
+
+non_portable_controls:
+  - hooks
+  - permission settings
+  - release gates
+  - D71 structural routing
+
+rollback: "restore v3.30.0 pins and remove any of the five instruments installed on the receiving seat; preserve instance-owned state; no registry, installer, data migration, or destructive conversion. v3.31.0 introduces no schema or format change, so rollback is a version-pin reversal."

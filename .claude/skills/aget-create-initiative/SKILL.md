@@ -274,7 +274,7 @@ D71 Strict promotion: parallels `/aget-create-project` Strict. Future hook enfor
 `/aget-propose-initiative` (Advisory) → `/aget-create-initiative` (Strict — this skill)
 
 Mirrors:
-- `/aget-propose-project` (Advisory) → `/aget-create-project` (Strict)
+- `/aget-propose-project` *(not yet in this package — manager-seat skill)* (Advisory) → `/aget-create-project` (Strict)
 - `/aget-propose-skill` (Advisory) → skill-implementation flow
 
 The verb-pair is the canonical pattern per AGENTS.md §"Structural Skill Routing" (D71).

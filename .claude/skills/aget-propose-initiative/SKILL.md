@@ -14,7 +14,7 @@ Prevent direct authoring of `INIT-*.md` manifests without a proposal gate. Per *
 
 **Evidence**:
 - 2026-04-19 INIT-REQ-SPEC-TEST-DEFINED authored via direct Write — no proposal gate, no cross-initiative overlap check (`planning/skill-proposals/PROPOSAL_aget-create-initiative.md`)
-- 7 existing `PROPOSAL_init_*.md` files (PP-014, 016, 017, 018, 019, 020, 027) authored via `/aget-propose-project` — 0/7 contain Channels, Contributors, or Cross-Initiative Overlap sections (empirical grep 2026-05-14)
+- 7 existing `PROPOSAL_init_*.md` files (PP-014, 016, 017, 018, 019, 020, 027) authored via `/aget-propose-project` *(not yet in this package — manager-seat skill)* — 0/7 contain Channels, Contributors, or Cross-Initiative Overlap sections (empirical grep 2026-05-14)
 - gh#1193 INIT-PRINCIPLED-EXECUTION referenced in scope tables without file — decorative-reference anti-pattern
 
 **Governing Spec**: `../aget/specs/AGET_INITIATIVE_SPEC.md` v1.0.1 (canonical commit `7bb93f0`)
@@ -117,7 +117,7 @@ LAST=$(grep -oE 'PP-[0-9]+' planning/project-proposals/INDEX.md | grep -oE '[0-9
 NEW_PP=$(printf "PP-%03d" $((LAST + 1)))
 ```
 
-The PP-### sequence is **shared** with `/aget-propose-project` (CAP-INIT-PROP-002-02). No separate sub-sequence.
+The PP-### sequence is **shared** with `/aget-propose-project` *(not yet in this package — manager-seat skill)* (CAP-INIT-PROP-002-02). No separate sub-sequence.
 
 Verify the proposed INIT-ID is unique (CAP-INIT-PROP-002-03):
 ```bash
@@ -344,7 +344,7 @@ Run mechanically via `python3 scripts/validate_initiative_proposal.py --file <pa
 
 ## Related Skills
 
-- **`/aget-propose-project`** — sibling verb-pair (propose-side) for cycle-bounded work (`PROPOSAL_*.md` → `PROJECT_PLAN_*.md`)
+- **`/aget-propose-project`** *(not yet in this package — manager-seat skill)* — sibling verb-pair (propose-side) for cycle-bounded work (`PROPOSAL_*.md` → `PROJECT_PLAN_*.md`)
 - **`/aget-propose-skill`** — sibling verb-pair (propose-side) for new skills (`planning/skill-proposals/PROPOSAL_aget-*.md`)
 - **`/aget-create-initiative`** — successor verb-pair (create-side) for INIT-*.md manifest scaffolding. **PROPOSED 2026-04-19, not yet implemented**. When implemented, will be Strict per D71.
 - **`/aget-check-initiative`** — read-only cross-system coherence check for an existing initiative (post-creation)

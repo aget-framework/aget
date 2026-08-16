@@ -188,7 +188,7 @@ When user says:
 **Does NOT**:
 - Detect issues (delegated to `/aget-check-health`)
 - Modify specs (delegated to `/aget-enhance-spec`)
-- Remediate cross-artifact coherence (delegated to `/aget-enhance-coherence`)
+- Remediate cross-artifact coherence (would be delegated to `/aget-enhance-coherence`; not built)
 - Remediate CI/test failures (out of scope; future `/aget-enhance-ci` candidate)
 - Modify files outside the invoking agent's tree (governance boundary — CAP-SESSION-014-07)
 - Invoke `gh issue create` directly (D71 STRUCTURAL — route via `/aget-file-issue`)
@@ -242,8 +242,8 @@ If any phase is SKIP, the signal MUST state the reason. If any phase is FAIL, th
 
 - `/aget-check-health` (SKILL-003) — pair sibling, detect layer (Advisory); consumed by this skill
 - `/aget-enhance-spec` (SKILL-041) — parallel pattern (artifact-level L622 enhancement lifecycle)
-- `/aget-enhance-config` (#614, in-dev) — config-level sibling (enhance-verb family)
-- `/aget-enhance-coherence` (VERSION_SCOPE v3.15.0 P2 #13) — framework-level sibling
+- `/aget-enhance-config` (#614, planned — not in this package) — config-level sibling (enhance-verb family)
+- `/aget-enhance-coherence` (VERSION_SCOPE v3.15.0 P2 #13; planned — not built) — framework-level sibling
 - `/aget-file-issue` — Tier-C escalation (STRUCTURAL per D71)
 - `/aget-create-project` — invoked if Tier-B accumulates beyond backlog threshold
 

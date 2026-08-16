@@ -28,7 +28,7 @@ Validate the skill name follows S-V-O convention:
 | Pattern | Valid | Examples |
 |---------|-------|----------|
 | `/aget-<verb>-<object>` | ✓ Default | `/aget-create-skill`, `/aget-check-health` |
-| `/aget-<verb>` | ✓ Intransitive | `/aget-learn`, `/aget-checkpoint` |
+| `/aget-<verb>` | ✓ Intransitive | `/aget-learn`, `/aget-checkpoint` *(grammar examples only; `/aget-checkpoint` was renamed to `/aget-save-state`, `/aget-learn` was never built)* |
 | `/aget-<phrasal-verb>` | ✓ Exception | `/aget-wake-up`, `/aget-wind-down` |
 | Other patterns | ✗ Invalid | `/aget-skill-create` (O-V not S-V-O) |
 

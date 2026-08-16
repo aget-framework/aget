@@ -16,7 +16,7 @@ Provide deep analysis of ontology health for agents managing vocabularies and sp
 - `check-*` = Lightweight monitoring. Threshold pass/fail, health status, ~5 seconds. (e.g., `aget-check-kb`, `aget-check-health`)
 - `analyze-*` = Deep qualitative analysis. Cross-references, coverage percentages, recommendations, ~30 seconds. (e.g., `aget-analyze-kb`, `aget-analyze-ontology`)
 
-KB has both: `aget-check-kb` (quick health) and `aget-analyze-kb` (deep quality). Ontology currently has only `analyze-`. If fleet ontology adoption grows beyond 2 operational agents, consider splitting:
+KB has `aget-check-kb` (quick health); a deep-quality `aget-analyze-kb` does not exist. Ontology currently has only `analyze-`. If fleet ontology adoption grows beyond 2 operational agents, consider splitting:
 - `aget-check-ontology` = Steps 7-8 only (tier compliance + ratio check)
 - `aget-analyze-ontology` = Steps 1-8 (full vocabulary analysis)
 
@@ -154,7 +154,7 @@ Tier Assessment:
   Tier: operational (from version.json)
   Status: COMPLIANT
   Domain terms: 8 (SKOS)
-  Consuming skills: 2 (aget-analyze-ontology, aget-analyze-kb)
+  Consuming skills: 1 (aget-analyze-ontology)
   Lifecycle: wake_up.py ontology line present
 
 Concept-to-Requirement Ratio:
@@ -194,9 +194,9 @@ python3 scripts/record_invocation.py aget-analyze-ontology
 ```
 ## Related Skills
 
-- `/aget-healthcheck-kb` - Quick KB threshold check
-- `/aget-analyze-kb` - Deep KB quality analysis
-- `/aget-healthcheck-evolution` - Evolution directory health
+- `/aget-check-kb` - Quick KB threshold check *(`/aget-healthcheck-kb` was renamed to this)*
+- `/aget-analyze-kb` - Deep KB quality analysis *(proposed; does not exist in this package)*
+- `/aget-check-evolution` - Evolution directory health *(`/aget-healthcheck-evolution` was renamed to this)*
 
 ## Traceability
 
