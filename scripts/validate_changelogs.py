@@ -104,7 +104,28 @@ def main():
             print(f"  - {repo}")
         return 1
 
-    print(f"PASS: All {len(found)} repos have CHANGELOG entry for v{args.version}.")
+    # A zero denominator is not a pass. Skipped repos leave BOTH the numerator and
+    # the denominator empty, so the success branch was reachable having opened no
+    # file at all -- it printed "PASS: All 0 repos have CHANGELOG entry" and exited 0.
+    # A consumer who clones this repo alone, or into a directory laid out differently,
+    # got a green light from a check that inspected nothing.
+    #
+    # This is the zero-denominator family the sibling instrument's own docstring
+    # already forbids: "an unparseable row must not read as a clean one." The rule was
+    # written down next door and not applied here.
+    if not found:
+        print(f"\nFAIL: 0 of {len(REPOS)} repos were readable, so nothing was verified.")
+        print("  A check that inspected no files has not passed -- it has not run.")
+        print("  Likely cause: the repos are not laid out where this expects them.")
+        print(f"  Expected siblings of: {Path(__file__).resolve().parent.parent}")
+        return 1
+
+    if len(found) < len(REPOS):
+        print(f"\nFAIL: only {len(found)} of {len(REPOS)} repos were readable.")
+        print("  Partial coverage is not a pass; the unread repos are unknown, not clean.")
+        return 1
+
+    print(f"PASS: All {len(found)}/{len(REPOS)} repos have CHANGELOG entry for v{args.version}.")
     return 0
 
 
