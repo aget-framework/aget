@@ -73,9 +73,30 @@ def test_zero_readable_repos_is_a_failure_not_a_pass():
 
 
 def test_partial_coverage_is_a_failure():
-    """Unread repos are unknown, not clean."""
+    """Unread repos are unknown, not clean.
+
+    The exit-code assertion runs everywhere: partial coverage must never exit 0,
+    and that holds whether one repo resolves or none do.
+
+    The coverage-string assertion needs one repo to actually resolve, so it is
+    guarded the same way as the two tests below. At the producing seat the sibling
+    `aget/` is on disk and '1 of 14' is real; from a consumer's clone there are no
+    siblings, nothing resolves, and asserting '1 of 14' fails on the environment
+    rather than on the behaviour.
+
+    Found 2026-08-15 by re-running the consumer rehearsal against the re-cut tag:
+    passed at the producing seat, failed from a clean --no-local clone. Fourth
+    instance in this release of the class its own notes disclose -- a promoted test
+    that passes where it was written and fails where it lands -- and this one guards
+    the release's headline fix, so it would have been the first thing a consumer saw
+    break.
+    """
+    mod = _load()
+    root = pathlib.Path(mod.__file__).resolve().parent.parent.parent
     rc, out = _run(["aget"] + [f"nonexistent-repo-{i}" for i in range(13)])
-    assert rc != 0, "1-of-14 coverage reported success"
+    assert rc != 0, "partial coverage reported success"
+    if not (root / "aget").is_dir():
+        pytest.skip("no sibling repo resolves in this checkout; the exit-code half above still ran")
     assert "1 of 14" in out or "1/14" in out, "the failure must state the actual coverage"
 
 
