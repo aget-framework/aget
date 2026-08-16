@@ -10,33 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 
-## [3.31.0] - 2026-08-15 - "Ship What Was Already Built"
-
-### Added
-- Five verification instruments promoted from the framework seat to canonical, each with its test:
-  `check_skill_route_contract` (do routes named by skills resolve to real skills),
-  `check_deprecation_removals` (actuator for overdue deprecation removals),
-  `release_cadence_gap` (release-gap SLO reading),
-  `validate_changelogs` (CHANGELOG presence across release repos), and
-  `validate_initiative_proposal` (initiative-proposal conformance).
-- Skill descriptions made routable, so every shipped skill is selectable by description.
-
-### Fixed
-- `study_topic` ontology tier never opened the vocabulary, suppressing matches (gh#2257).
-- The audit-pairing gate was satisfiable by a write rather than an audit (3 defects).
-- Close-gate guard widened to closure-class headings and table-row status (gh#2223).
-- Actuator-census corpus predicate no longer gated on filename and extension.
-- Declared verification sources made host- and topology-independent.
-- Three portability defects in promoted tests that passed at the producing seat and failed at a
-  consumer: a fixture directory assumed to exist, a live-registry assertion that failed on absence
-  rather than skipping, and an instance-scoped regression asserting one named skill on disk.
-
-### Changed
-- Stamp-masquerade gap half closed, with the remaining half documented rather than silently carried.
-- v3.30 post-release disclosure, citation, and handoff repairs.
-
----
-
 ## [3.30.0] - 2026-08-09 - "Portable Skills, Continuous Cadence"
 
 ### Added
