@@ -148,7 +148,7 @@ done
 This pattern was independently designed by two separate fleet supervisors:
 
 1. **Main fleet supervisor** (private-supervisor-AGET): designed weekly RemoteTrigger routine during FLEET-UPG-013 post-mortem analysis (2026-04-26)
-2. **a downstream fleet fleet supervisor**: independently designed identical routine design during FLEET-UPG-014 analysis (2026-04-26), including the same three checks and same cadence
+2. **a downstream fleet's supervisor**: independently designed identical routine design during FLEET-UPG-014 analysis (2026-04-26), including the same three checks and same cadence
 
 Neither supervisor was aware of the other's design. Independent convergence to the same architecture is the L831 "Cross-Agent Question Convergence = Spec Signal" pattern — both agents hit the same gap (no post-migration health feedback loop) and produced the same solution independently. This confidence level is sufficient to promote from local pattern to framework recommendation.
 

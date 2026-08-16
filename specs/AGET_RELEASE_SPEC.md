@@ -1212,7 +1212,7 @@ python3 scripts/post_release_changelog_validator.py --version 3.16.0 && \
 | ID | Pattern | Statement | Rationale |
 |----|---------|-----------|-----------|
 | R-REL-031-01 | ubiquitous | The release manager SHALL verify, post-tag-push, that `git ls-remote origin v{VERSION}` returns the tag for every released repo | Verifies tag is reachable on remote; not just locally created |
-| R-REL-031-02 | ubiquitous | The validator SHALL verify that `git show v{VERSION}:handoffs/RELEASE_HANDOFF_v{VERSION}.md` resolves for the framework repo (aget/) | #1154 closure: tag-pinned handoff must be readable; closes the a downstream fleet #1152 root cause class |
+| R-REL-031-02 | ubiquitous | The validator SHALL verify that `git show v{VERSION}:handoffs/RELEASE_HANDOFF_v{VERSION}.md` resolves for the framework repo (aget/) | #1154 closure: tag-pinned handoff must be readable; closes the downstream-fleet #1152 root cause class |
 | R-REL-031-03 | conditional | IF the release publishes `DEPLOYMENT_SPEC_v{VERSION}.yaml` THEN the validator SHALL verify `git show v{VERSION}:DEPLOYMENT_SPEC_v{VERSION}.yaml` (or `git show v{VERSION}:aget/DEPLOYMENT_SPEC_v{VERSION}.yaml` per L910 path canonicalization) resolves | Tag-pinned deployment spec required for remote fleet supervisors checking out tag |
 | R-REL-031-04 | ubiquitous | The validator SHALL verify that tag annotation message includes the version string and a non-empty release-notes pointer | R-REL-035 GitHub Release pair: tag without annotation degrades discoverability |
 | R-REL-031-05 | ubiquitous | The validator SHALL emit per-repo tag-resolvability PASS/FAIL to `sessions/post_release_tag_audit_{VERSION}_{DATE}.md` | Audit trail; pair with CAP-REL-030's CHANGELOG audit |
