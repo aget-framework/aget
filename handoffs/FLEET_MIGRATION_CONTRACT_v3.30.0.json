@@ -45,11 +45,13 @@
     {
       "id": "CI-3000-01",
       "applies_to": "every in-scope AGET fleet seat that owns scripts/study_topic.py",
-      "outcome": "study_topic reaches canonical spec and pattern tiers when available and reports them UNAVAILABLE rather than manufacturing coverage when absent",
+      "outcome": "study_topic reaches canonical spec and pattern tiers when available and reports them UNAVAILABLE rather than manufacturing coverage when absent; and the knowledge/ontology tier opens .yaml as well as .md, so declared vocabulary coverage is real rather than manufactured (gh#2257)",
       "runtime_payload": [
         {
           "path": "scripts/study_topic.py",
-          "sha256_at_v3.30.0": "26b309bfcb0a7f921317f16cb05f5a2326a506af4366c736e718aa64064a452d"
+          "sha256_at_v3.30.0": "26b309bfcb0a7f921317f16cb05f5a2326a506af4366c736e718aa64064a452d",
+          "sha256_current": "8953417ad3b560472638a77657f2eef86f9f69c00fd30b8c5b9a889971e19985",
+          "amended_post_tag": "gh#2257 (2026-08-15): the knowledge/ontology tier globbed '*.md' only, so ONTOLOGY_*.yaml was never searched. Fix applied to the payload BEFORE this wave dispatched (contract state was HOLD_PENDING_SUPERVISOR_WAVE_PLAN, so no seat had verified a receipt against the v3.30.0 digest). Dispatching unchanged would have propagated the defect to every remaining seat. sha256_at_v3.30.0 is left INTACT as the record of what v3.30.0 shipped; sha256_current is the digest a destination must now match."
         }
       ],
       "verification_sources": [
@@ -72,7 +74,7 @@
       ],
       "v_test": "python3 -m pytest -q tests/test_study_topic_canonical_pattern_tier.py tests/test_study_topic_canonical_surface.py tests/test_study_topic_purpose_recency_rendering.py tests/test_study_topic_specs_tier.py",
       "receipt": [
-        "destination script digest matches the declared v3.30.0 digest",
+        "destination script digest matches sha256_current (the amended payload), not the superseded v3.30.0 digest",
         "focused tests pass on the executed destination surface",
         "a fresh-process study reports a canonical path or explicit UNAVAILABLE state"
       ]

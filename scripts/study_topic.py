@@ -575,7 +575,13 @@ def find_knowledge(topic: str, domain_keywords: list = None) -> list:
         base = agent_root / area
         if not base.exists():
             continue
-        for file in base.rglob('*.md'):
+        # BOTH extensions (gh#2257). This globbed '*.md' only from the day the
+        # surface was declared (v3.25, C-25-14) until 2026-08-15, while
+        # SURFACES_SEARCHED advertised 'knowledge/** + ontology/**'. Governed
+        # vocabulary lives in ONTOLOGY_*.yaml, so the tier never opened the file
+        # it exists to expose -- emitting a zero that reads as evidence of
+        # absence. find_specs() below has globbed both since gh#1580.
+        for file in sorted(base.rglob('*.md')) + sorted(base.rglob('*.yaml')):
             match = search_file_for_topic(file, topic, domain_keywords=domain_keywords)
             if match:
                 results.append({

@@ -20,8 +20,27 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 CONTRACT = REPO / "handoffs" / "FLEET_MIGRATION_CONTRACT_v3.30.0.json"
 DIGEST_FIELD = "sha256_at_v3.30.0"
+
+# A payload may be amended AFTER the v3.30.0 tag and BEFORE its wave dispatches.
+# When that happens the two facts are different and both must survive:
+#
+#   sha256_at_v3.30.0 - what the tag shipped. Historical. Never rewritten, or
+#                       the field name becomes a lie and published evidence is
+#                       silently restated.
+#   sha256_current    - what a destination must match TODAY. Authoritative for
+#                       verification whenever present.
+#
+# First amendment: gh#2257 (2026-08-15), CI-3000-01. Overwriting the tag digest
+# in place would have been the cheap move and the wrong one -- it erases the
+# record of what v3.30.0 actually was while the field still claims to hold it.
+CURRENT_DIGEST_FIELD = "sha256_current"
 DECLARATION_SECTIONS = ("runtime_payload", "verification_sources")
 SKIP_NAMES = frozenset({"skipTest", "skip", "skipIf", "skipUnless"})
+
+
+def effective_digest_field(artifact):
+    """The field a destination must match: the amendment if any, else the tag."""
+    return CURRENT_DIGEST_FIELD if CURRENT_DIGEST_FIELD in artifact else DIGEST_FIELD
 
 
 def declared_artifacts(contract):
@@ -44,7 +63,7 @@ def digest_mismatches(repo, contract):
             if source.is_file()
             else None
         )
-        declared = artifact[DIGEST_FIELD]
+        declared = artifact[effective_digest_field(artifact)]
         if actual != declared:
             mismatches.append(
                 {
@@ -70,8 +89,13 @@ def test_every_declared_artifact_digest_matches_its_named_file():
 def test_injected_one_byte_digest_mismatch_is_detected():
     contract = copy.deepcopy(load_contract())
     row_id, section, artifact = next(declared_artifacts(contract))
-    original = artifact[DIGEST_FIELD]
-    artifact[DIGEST_FIELD] = ("0" if original[0] != "0" else "1") + original[1:]
+    # Mutate whichever field is AUTHORITATIVE for this artifact. Mutating the
+    # tag field on an amended row would prove nothing -- the comparison no
+    # longer reads it, so the negative control would pass while detecting
+    # nothing, which is the exact failure this control exists to rule out.
+    field = effective_digest_field(artifact)
+    original = artifact[field]
+    artifact[field] = ("0" if original[0] != "0" else "1") + original[1:]
 
     mismatches = digest_mismatches(REPO, contract)
     assert len(mismatches) == 1
@@ -79,9 +103,54 @@ def test_injected_one_byte_digest_mismatch_is_detected():
         "row_id": row_id,
         "section": section,
         "path": artifact["path"],
-        "declared": artifact[DIGEST_FIELD],
+        "declared": artifact[field],
         "actual": original,
     }
+
+
+def test_an_amended_row_is_verified_against_the_amendment_not_the_tag():
+    """An amended payload must be checked against sha256_current.
+
+    Both polarities, because a one-sided version of this is what would let the
+    amendment be cosmetic: the live digest must DECIDE the comparison, and the
+    tag digest must be INERT for verification while still being present as the
+    historical record.
+    """
+    contract = copy.deepcopy(load_contract())
+    amended = [
+        (rid, art)
+        for rid, _section, art in declared_artifacts(contract)
+        if CURRENT_DIGEST_FIELD in art
+    ]
+    assert amended, "no amended rows — this guard would be vacuous"
+
+    for _rid, artifact in amended:
+        assert artifact[DIGEST_FIELD] != artifact[CURRENT_DIGEST_FIELD], (
+            "an amended row must record two DIFFERENT digests; equal values mean "
+            "the tag record was overwritten rather than preserved"
+        )
+        assert artifact.get("amended_post_tag"), (
+            "an amendment must say why it happened — a digest that changed with "
+            "no recorded reason is indistinguishable from tampering"
+        )
+
+    # POLARITY 1: corrupting the tag digest must NOT be reported (it is inert).
+    tag_corrupted = copy.deepcopy(contract)
+    for _rid, _s, art in declared_artifacts(tag_corrupted):
+        if CURRENT_DIGEST_FIELD in art:
+            art[DIGEST_FIELD] = "f" * 64
+    assert not digest_mismatches(REPO, tag_corrupted), (
+        "the tag digest must not decide verification on an amended row"
+    )
+
+    # POLARITY 2: corrupting the current digest MUST be reported.
+    current_corrupted = copy.deepcopy(contract)
+    for _rid, _s, art in declared_artifacts(current_corrupted):
+        if CURRENT_DIGEST_FIELD in art:
+            art[CURRENT_DIGEST_FIELD] = "f" * 64
+    assert len(digest_mismatches(REPO, current_corrupted)) == len(amended), (
+        "the current digest must decide verification on an amended row"
+    )
 
 
 # --- Portability of the declared verification sources -----------------------
