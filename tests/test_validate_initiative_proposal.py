@@ -45,7 +45,7 @@ CONFORMANT_BODY = dedent("""\
     # Initiative Proposal: Synthetic Test
 
     **Date**: 2026-05-14
-    **Author**: private-aget-framework-AGET
+    **Author**: example-framework-agent
     **Status**: PROPOSED
     **Proposal ID**: PP-9999
     **Proposed Initiative ID**: INIT-SYNTHETIC-TEST-FIXTURE
@@ -87,7 +87,7 @@ CONFORMANT_BODY = dedent("""\
     | Role | Primary Value Dimensions | Availability |
     |---|---|---|
     | Principal | decision quality | On-demand |
-    | private-aget-framework-AGET | artifact production | Full |
+    | example-framework-agent | artifact production | Full |
 
     ## Cross-Initiative Overlap
 
