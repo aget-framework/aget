@@ -1,11 +1,11 @@
 # AGET PROJECT_PLAN Specification
 
-**Version**: 1.3.1
+**Version**: 1.4.0
 **Status**: Active
 **Category**: Process (Planning)
 **Format Version**: 1.2
 **Created**: 2026-01-04
-**Updated**: 2026-05-02
+**Updated**: 2026-08-16
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_PROJECT_PLAN_SPEC.md`
 **Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.7, Issue #30
@@ -144,7 +144,7 @@ vocabulary:
 # PROJECT_PLAN: {Title}
 
 **Version**: {M}.{m}.{p}
-**Status**: {Draft|In Progress|Complete|Abandoned}
+**Plan_Status**: {Draft|In Progress|Complete|Abandoned}
 **Theme**: {Short description}
 **Tracking**: {GitHub milestone or issue}
 
@@ -218,6 +218,11 @@ vocabulary:
 | CAP-PP-003-01 | Plan status SHALL use standard values | Draft, In Progress, Complete, Abandoned | Header |
 | CAP-PP-003-02 | Gate status SHALL use standard values | Pending, In Progress, Complete, Blocked, Skipped | Gate header |
 | CAP-PP-003-03 | Status transitions SHALL be documented | In execution log | Audit trail |
+
+> **Field and comparison semantics (v1.4.0)**: the authoritative field carrying CAP-PP-003-01's enum is
+> **`Plan_Status`**; `**Status**` is a recognized legacy alias. How the enum is *resolved* when both
+> fields are present, and how two values are *normalized* before comparison, are specified by
+> **CAP-PP-013-11** and **CAP-PP-013-13** respectively. This enum is consumed by CAP-PP-013-13(e).
 
 **Status Transitions:**
 
@@ -496,7 +501,7 @@ PROJECT_PLAN_v3.2.0 (25,088 tokens, 1,641 lines) exceeded the Read tool's 25,000
 | CAP-PP-013-01 | PROJECT_PLAN SHALL have Closure Checklist section | Completeness |
 | CAP-PP-013-02 | Closure SHALL verify all V-tests passed | Verification |
 | CAP-PP-013-03 | Closure SHALL record actual vs estimated effort | Learning |
-| CAP-PP-013-04 | Closure SHALL update status to Complete or Abandoned | State management |
+| CAP-PP-013-04 | Closure SHALL update **`Plan_Status`** to Complete or Abandoned | State management (field named per CAP-PP-013-11, v1.4.0 — "status" was ambiguous once two status-bearing fields existed) |
 
 ---
 
@@ -815,6 +820,12 @@ authority:
 
 ## Changelog
 
+### v1.4.0 (2026-08-16)
+
+- **Amendment v1.4.0 — Evaluation Mode, Explicit Supersession, and Status Resolution** (gh#2250): adds CAP-PP-013-05..13 and V-PP-026..038. Gives the conformance evaluator a `closure`/`audit` mode, makes gate supersession explicit metadata rather than an inference from heading text, and specifies authoritative-status resolution plus the normalization applied before two status values are compared.
+- **Corrections to existing surfaces** (not additive-only): the §Required Sections example header now shows `**Plan_Status**` rather than `**Status**`; CAP-PP-013-04 now names `Plan_Status` explicitly instead of the ambiguous "status"; CAP-PP-003 gains a forward reference to CAP-PP-013-11/-13 for field and comparison semantics.
+- **Not implemented at publication**: `close_gate_check.py` honours none of CAP-PP-013-05..13 as of this version. Specification-level change only; the implementing repair is separately authorized.
+
 ### v1.2.2 (2026-05-02)
 
 - **V-PP-007 dual fix** (gmelli/aget-aget#1180): (a) enum value rewrite `{PROPOSED/IN_PROGRESS/COMPLETE/SUPERSEDED}` → `{Draft/In Progress/Complete/Abandoned}` to align with CAP-PP-003-01 (line 214 — the canonical status-enum requirement); (b) CAP binding correction `CAP-PP-019` → `CAP-PP-003` (CAP-PP-019 is "EARS System-Level Requirements," not status enum). The two defects were independent but discovered together; resolution is one V-test row edit.
@@ -876,3 +887,99 @@ WHEN a PROJECT_PLAN transitions to a terminal state via `/aget-close-project`, t
 
 - V-PP-020: `/aget-create-project` scaffolds refuse-or-warn on a missing benefit-hypothesis block (template ships the stub).
 - V-PP-021: `close_gate_check` flags a terminal close whose Retrospective lacks a value-resolution verdict; verdicts citing no observable are placeholder-substance (existing #1568 class).
+
+---
+
+## Amendment v1.4.0 — Evaluation Mode, Explicit Supersession, and Status Resolution (gh#2250; principal rulings 2026-08-16)
+
+**Why**: a conformance evaluator that answers only one question — *"may this plan close?"* — cannot also
+answer *"is this plan's record tidy?"* without one of the two answers being wrong. `/aget-close-project`
+enforced exit criteria at the entry position and had no verification step after the closer's task, which
+is an **ETVX** violation (IBM, 1980s — Entry / Task / Verification / eXit). The requirements below give
+the evaluator a mode, make supersession explicit rather than inferred, and specify how two status-bearing
+fields are resolved and compared.
+
+**Scope note**: this amendment also *corrects* two pre-existing surfaces rather than only adding to them —
+the §Required Sections example header (`**Status**` → `**Plan_Status**`) and CAP-PP-013-04's unnamed
+status field. Both were legacy drift made ambiguous by CAP-PP-013-11.
+
+### CAP-PP-013-05: Mode is an evaluator invocation input, not plan metadata
+
+WHEN a conformance evaluator is invoked against a PROJECT_PLAN, the invocation SHALL specify mode ∈ {`closure`, `audit`}. WHERE no mode is specified, the evaluator SHALL use `closure`.
+
+*Mode is deliberately not plan metadata: a plan carrying its own mode could set itself to `audit` and escape closure blocking. Mode is a property of the question, not of the thing questioned.*
+
+### CAP-PP-013-06: Closure mode
+
+IF mode is `closure` THEN the evaluator SHALL return a blocking verdict for any live non-terminal gate OR any contradictory plan state, irrespective of a terminal status declared in the header.
+
+### CAP-PP-013-07: `legitimately-terminal` (reusable predicate)
+
+A plan is `legitimately-terminal` IFF ALL of: **(a)** authoritative status resolves to exactly one terminal value of the CAP-PP-003 enum; **(b)** no second status-bearing field declares a different normalized exact state (per CAP-PP-013-11; normalization per CAP-PP-013-13 — class comparison is insufficient); **(c)** closure-checklist items are checked and V-tests recorded.
+
+### CAP-PP-013-08: Audit mode, with fallback
+
+IF mode is `audit` AND the plan is `legitimately-terminal` THEN the evaluator SHALL report non-terminal gate stamps as HYGIENE and SHALL NOT block. WHERE the plan is NOT `legitimately-terminal`, audit SHALL fall back to closure behaviour.
+
+*The fallback is what makes a contradictory plan block in both modes — not a separate rule.*
+
+### CAP-PP-013-09: Supersession explicit; absence means live, immediately
+
+A gate SHALL be treated as superseded ONLY WHERE it carries a valid `superseded_by`. The evaluator SHALL NOT infer supersession from heading text, ordering, position, or dates. WHERE absent, the gate SHALL be treated as live. Legacy plans remain parseable; a migration warning MAY accompany the verdict and SHALL NOT alter it.
+
+*No grace period. Warnings accompany, never weaken.*
+
+### CAP-PP-013-10: `superseded_by` validity
+
+A `superseded_by` reference is valid IFF: (a) it uniquely resolves to exactly one gate; (b) that gate is in the same plan; (c) it is non-self; (d) the resulting reference graph is acyclic. A valid reference exempts **only the declaring gate**. IF any condition fails THEN the reference is INVALID and the declaring gate SHALL be treated as live.
+
+### CAP-PP-013-11: Authoritative-status resolution
+
+**`Plan_Status` is the canonical, authoritative field.** `**Status**` is a recognized **legacy alias**. WHERE only `Plan_Status` is present, it governs. WHERE only `**Status**` is present, the evaluator SHALL resolve it as authoritative and emit a migration warning that SHALL NOT alter the verdict. WHERE both are present, the evaluator SHALL compare their normalized exact states (per CAP-PP-013-13) — NOT their terminal/non-terminal classes. IF the normalized states differ THEN the plan state is contradictory and SHALL NOT satisfy `legitimately-terminal`, **irrespective of which field is authoritative**.
+
+*Two normative sources establish `Plan_Status`: `templates/PROJECT_PLAN_TEMPLATE.md` line 4, and this spec's own `status_vocabulary` block. The §Required Sections example previously showed `**Status**` and is corrected in this amendment. Prevalence was explicitly rejected as evidence of authority — a large population using the alias is equally consistent with a large population having drifted.*
+
+*Exact-state comparison, not class comparison: `Complete` vs `Abandoned` are BOTH terminal and are the paradigm contradiction. Class comparison is a lossy projection that discards the disagreement the predicate exists to detect. Precedence must not hide disagreement — authority decides which value governs, never whether a conflict exists.*
+
+### CAP-PP-013-12: Blocking / HYGIENE emission
+
+Three separate obligations: **(a)** WHEN the evaluator emits a blocking finding, it SHALL return a nonzero exit status. **(b)** WHEN the evaluator emits a HYGIENE finding, that finding SHALL NOT alter the exit status. **(c)** The rendered output SHALL label HYGIENE findings distinctly from blocking findings.
+
+*Distinguishability comes from (c); the exit status carries blocking-vs-non-blocking, which is a different question. An earlier draft required distinguishability "in both the exit status and the rendered output" while also requiring hygiene not to alter the exit status — it named a distinguisher and disabled it one sentence later.*
+
+### CAP-PP-013-13: Status normalization
+
+WHEN the evaluator compares two status-bearing fields, it SHALL normalize each value by applying, in order: **(a)** removal of markdown emphasis and Unicode symbol characters; **(b)** case folding; **(c)** collapse of internal whitespace and trimming; **(d)** retention of only the leading clause, terminated by the first narrative delimiter; and **(e)** WHERE the resulting clause begins with a value of the CAP-PP-003 status enum, resolution to that enum value, longest match first. The evaluator SHALL NOT consult any synonym, alias, or equivalence list beyond the CAP-PP-003 enum itself. WHERE step (e) does not resolve, the leading clause from (d) SHALL be compared literally.
+
+*Measured against 510 plans across three repositories (30 dual-carriers) before this requirement was written: steps (a)–(c) alone read 25 of 30 as contradictory — flagging `COMPLETE (2026-07-12)` against `COMPLETE`, which is a date in a prose tail, not a difference in meaning. With (d)–(e) the figure is 5 of 30, and all five are genuine (three are a **gate** value occupying a **plan**-status field).*
+
+*The prohibition in sentence two is deliberate and load-bearing: a synonym table (`Done → Complete`) was considered and rejected, because a wrong entry in such a table silently hides a real contradiction and nobody re-reads it. The CAP-PP-003 enum is closed and already normative, so (e) consumes an existing definition rather than creating a list anyone must maintain.*
+
+*Values that are not enum members deliberately do NOT normalize away: they compare by leading clause and can therefore remain contradictory. A plan whose header carries a gate value in a plan-status field is genuinely malformed, and normalizing that away would hide a real defect class.*
+
+### Verification Tests — V-PP-026..038
+
+| ID | Covers | Assertion |
+|----|--------|-----------|
+| V-PP-026 | CAP-PP-013-05 | undeclared mode defaults to closure |
+| V-PP-027 | CAP-PP-013-06 | stale gate stamp under terminal header, closure mode → BLOCK |
+| V-PP-028 | CAP-PP-013-08 | same plan, audit mode → HYGIENE, exit 0 |
+| V-PP-029 | CAP-PP-013-06 | contradictory plan state, closure mode → BLOCK |
+| V-PP-030 | CAP-PP-013-08 | contradictory plan state, audit mode → BLOCK via fallback |
+| V-PP-031 | CAP-PP-013-09/10 | valid supersession exempts only the declaring gate |
+| V-PP-032 | CAP-PP-013-10 | dangling / self / cyclic reference → declaring gate live |
+| V-PP-033 | CAP-PP-013-08 | audit falls back when not `legitimately-terminal` |
+| V-PP-034 | CAP-PP-013-11 | resolution: `Plan_Status` alone · legacy `Status` alone (+ non-verdict-changing warning) · both agreeing · both differing |
+| V-PP-034a | CAP-PP-013-11 | exact-state contradiction: `Complete` vs `Abandoned` — both terminal — MUST read contradictory |
+| V-PP-034b | CAP-PP-013-11 | precedence does not mask: authoritative field terminal, alias disagreeing → still contradictory |
+| V-PP-035 | CAP-PP-013-12 | blocking finding → nonzero exit |
+| V-PP-035a | CAP-PP-013-12 | hygiene-only → exit unchanged (0) |
+| V-PP-035b | CAP-PP-013-12 | rendered output labels HYGIENE distinctly from blocking |
+| V-PP-036 | CAP-PP-013-07 | `legitimately-terminal` direct — (a), (b), (c) each independently falsified |
+| V-PP-037 | CAP-PP-013-13 | equivalence: `Complete` · `complete` · `" Complete "` · `✅ Complete` · `**COMPLETE — closed 2026-06-28 (gh#123)**` resolve to one state, AND `Complete` vs `Abandoned` does not (both polarities in one test) |
+| V-PP-038 | CAP-PP-013-13 | bounds: `Done` does NOT resolve to `Complete` (no synonym list); a non-enum value (`gate 2`) compares by leading clause and stays contradictory against `in progress` |
+
+**Enforcement status at publication**: specification-level only. `scripts/close_gate_check.py` implements
+none of CAP-PP-013-05..13 as of v1.4.0 — the implementing repair is tracked at gh#2250 and is a separate,
+separately-authorized change. This is disclosed rather than left to be discovered: a reader MUST NOT infer
+from this amendment that a deployed evaluator honours these modes today.
