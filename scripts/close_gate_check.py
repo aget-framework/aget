@@ -328,10 +328,20 @@ def _header_block(text: str) -> str:
 
     No line cap: real headers carry long prose blocks and a cap silently
     under-reads them.
+
+    Terminates on ANY level-2-or-deeper heading, not on the literal `"## "`.
+    The first version tested `line.startswith("## ")`, so a `### Gate 0:` never
+    ended the header block, the whole document was treated as header, and the
+    GATE's `**Status**:` line was read as a second PLAN-level field — producing a
+    false "contradictory plan state" on any plan combining `**Plan_Status**` with
+    `###`-level gates. Found by executing the PUBLISHED artifact against a probe
+    rather than trusting a digest match; the labeled corpus could not see it,
+    because its Class C fixtures carry only one status field and the dual-status
+    check needs two.
     """
     out = []
     for line in text.splitlines():
-        if line.startswith("## "):
+        if re.match(r'^#{2,}\s+\S', line):
             break
         out.append(line)
     return "\n".join(out)
