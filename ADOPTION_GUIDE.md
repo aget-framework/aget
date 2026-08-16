@@ -1,7 +1,8 @@
 # AGET Adoption Guide
 
-**Version**: 3.15.0
-**Last Updated**: 2026-04-26
+**Version**: 3.31.0
+**Last Updated**: 2026-08-15
+**Currency note**: Part 1 (new adoption) and the component table are current as of 3.31.0. **Part 2 is the historical v3.15.0 migration** and is retained as-is — it documents breaking changes specific to that upgrade. It is NOT a 3.31.0 migration guide, and nothing in it should be read as describing an upgrade to the current version.
 **Audience**: External users and fleets adopting AGET
 
 ---
@@ -9,8 +10,8 @@
 ## Overview
 
 This guide covers:
-1. **New Adoption** — Starting fresh with AGET v3.15.0
-2. **Migration** — Upgrading to v3.15.0 (including breaking changes)
+1. **New Adoption** — Starting fresh with AGET v3.31.0
+2. **Migration** — the historical v3.15.0 upgrade and its breaking changes (retained; not current)
 3. **Fleet Adoption** — Deploying AGET across multiple agents
 4. **Customization** — Extending archetypes for your domain
 
@@ -47,13 +48,13 @@ New to AGET? Start with the audio introduction — a narrated walkthrough coveri
 |-----------|-------------|
 | `.aget/` | Agent configuration and evolution tracking |
 | `ontology/` | Domain concepts for your archetype |
-| `.claude/skills/` | 32 universal + 4-6 archetype skills |
+| `.claude/skills/` | 38 universal + archetype skills (38-44 per template at v3.31.0) |
 | `tests/` | Contract tests for validation |
 | `AGENTS.md` / `CLAUDE.md` | CLI tool configuration |
 
 ---
 
-## Part 2: Migration to v3.15.0
+## Part 2: Migration to v3.15.0 (historical — retained, not a current-version guide)
 
 ### Breaking Changes
 
@@ -358,4 +359,4 @@ When filing issues:
 
 ---
 
-*ADOPTION_GUIDE.md — External adoption guide for AGET v3.15.0*
+*ADOPTION_GUIDE.md — External adoption guide for AGET v3.31.0*
