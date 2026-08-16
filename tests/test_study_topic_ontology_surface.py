@@ -1,6 +1,6 @@
 """Two-polarity guard: the knowledge/ontology tier must reach BOTH .md and .yaml.
 
-Defect this closes (gh#2257, found by private-legalon-contributor-reinvent-AGET
+Defect this closes (gh#2257, reported by a downstream consuming agent
 2026-08-15, corroborated here): `find_knowledge()` globbed `rglob('*.md')` only,
 while `SURFACES_SEARCHED` advertised `knowledge/** + ontology/**` and has since
 v3.25 (C-25-14, 2026-07-04). Governed vocabulary lives in `ONTOLOGY_*.yaml`, so
