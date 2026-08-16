@@ -2130,7 +2130,7 @@ done
 
 > **⚠️ For v3.16+ releases**: Tag-cut and GitHub Release creation execute at **[Phase 6.4.5](#645-tag--release-authoritative-position-for-v316)** (after handoff artifacts are present in the working tree). Phase 3 is retained ONLY as historical context for v3.15 and earlier releases.
 >
-> **Why moved (#1154 Option A)**: Tagging at this phase produced tags whose `git show vX.Y.Z:handoffs/RELEASE_HANDOFF_vX.Y.Z.md` returned "not found" because handoff artifacts did not yet exist in the working tree (created later at Phase 6.2). Remote fleet supervisors fetching the tag could not access tag-pinned handoff/DEPLOYMENT_SPEC/BREAKING_CHANGES — confirmed root cause for legalon supervisor #1152 incident.
+> **Why moved (#1154 Option A)**: Tagging at this phase produced tags whose `git show vX.Y.Z:handoffs/RELEASE_HANDOFF_vX.Y.Z.md` returned "not found" because handoff artifacts did not yet exist in the working tree (created later at Phase 6.2). Remote fleet supervisors fetching the tag could not access tag-pinned handoff/DEPLOYMENT_SPEC/BREAKING_CHANGES — confirmed root cause for a downstream fleet supervisor #1152 incident.
 >
 > **For v3.16+ canonical execution order**: Phase 1 → Phase 2 → Phase 4 (commit-level validation; tag-resolvable checks deferred) → Phase 5 → Phase 6.1 → Phase 6.2 → Phase 6.3 → Phase 6.3.1 → Phase 6.4 → **Phase 6.4.5 (tag + GitHub Release)** → Phase 6.5 → Phase 7.
 >
@@ -2716,7 +2716,7 @@ for repo in $RELEASED_REPOS; do
   # Extract the [VERSION] block from CHANGELOG.md (between this version's heading and the next)
   awk "/^## \\[$VERSION\\]/,/^## \\[/" CHANGELOG.md | sed '$d' > /tmp/${repo}_v${VERSION}_body.md
   # L909 re-verify (defense in depth; CHANGELOG was sanitized at G3.4 but verify before public push)
-  for pat in 'private-[a-z]+-(aget|AGET)' 'gmelli/' '[0-9]+ agents( in| across)?' 'FLEET-[A-Z]+-[0-9]+' 'SESSION_2026-[0-9]' 'legalon'; do
+  for pat in 'private-[a-z]+-(aget|AGET)' 'gmelli/' '[0-9]+ agents( in| across)?' 'FLEET-[A-Z]+-[0-9]+' 'SESSION_2026-[0-9]' 'a downstream fleet'; do
     grep -qiE "$pat" /tmp/${repo}_v${VERSION}_body.md && { echo "❌ L909 FAIL ($repo): $pat"; exit 1; }
   done
   gh release create "v$VERSION" \
@@ -2785,7 +2785,7 @@ git show "v${VERSION}:aget/DEPLOYMENT_SPEC_v${VERSION}.yaml" >/dev/null 2>&1 || 
   { echo "⚠️ DEPLOYMENT_SPEC not tag-resolvable (verify path)"; }
 ```
 
-**Implements**: #1154 (tag-vs-HEAD fleet artifact gap), root-caused from legalon #1152 (FLEET-UPG-014). v3.15 was the last release with the deprecated ordering; v3.16 is the first release exercising the corrected ordering.
+**Implements**: #1154 (tag-vs-HEAD fleet artifact gap), root-caused from a downstream fleet #1152 (FLEET-UPG-014). v3.15 was the last release with the deprecated ordering; v3.16 is the first release exercising the corrected ordering.
 
 **Rationale**: Tags are immutable references. Remote fleet supervisors checking out vX.Y.Z must be able to read the handoff/spec from the tagged commit, not from a moving HEAD that may have advanced. Cutting tag AFTER Phase 6.4 ensures all handoff state is captured in the tag commit.
 

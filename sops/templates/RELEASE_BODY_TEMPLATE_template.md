@@ -141,7 +141,7 @@ Target: ~400-500 bytes.
 Same patterns as RELEASE_BODY_TEMPLATE_core.md:
 
 ```bash
-for pat in 'private-[a-z]+-(aget|AGET)' 'gmelli/' '[0-9]+ agents( in| across)?' 'FLEET-[A-Z]+-[0-9]+' 'SESSION_2026-[0-9]' 'legalon'; do
+for pat in 'private-[a-z]+-(aget|AGET)' 'gmelli/' '[0-9]+ agents( in| across)?' 'FLEET-[A-Z]+-[0-9]+' 'SESSION_2026-[0-9]' 'a downstream fleet'; do
   grep -qiE "$pat" <body-file> && { echo "❌ L909 FAIL: $pat"; exit 1; }
 done
 echo "✅ L909 PASS"

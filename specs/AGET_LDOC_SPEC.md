@@ -256,7 +256,7 @@ Qualified L-Doc IDs are prefixed with the agent's short name from `version.json`
 Examples:
 - `framework-L638` — L638 in private-aget-framework-AGET
 - `supervisor-L638` — L638 in private-supervisor-AGET
-- `legalon-L638` — L638 in legalon-vp-AGET
+- `downstream-L638` — L638 in a downstream fleet seat
 
 ### Backward Compatibility
 
@@ -266,7 +266,7 @@ Unqualified IDs (`L638`) remain valid **within a single agent's scope**. Agents 
 |------------------|--------|---------|
 | Agent's own L-doc, internal reference | Unqualified (legacy) | `See L638` |
 | Cross-agent / cross-fleet reference | Qualified (NEW) | `See framework-L638` |
-| Cross-fleet table or citation index | Qualified | `[supervisor-L807, legalon-L394]` |
+| Cross-fleet table or citation index | Qualified | `[supervisor-L807, downstream-L394]` |
 | Authored by THIS agent for OTHER agents | Qualified | "We file as `framework-L805`..." |
 
 ### When Qualification Is Required

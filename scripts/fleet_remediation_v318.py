@@ -34,7 +34,13 @@ from pathlib import Path
 
 # ─── Configuration ─────────────────────────────────────────────────────────────
 
-SUPERVISOR_ROOT = Path.home() / "github" / "private-supervisor-AGET"
+# Supervisor repository location. Configurable rather than hardcoded: the
+# published copy should not name a private repository, and an operator
+# running this against their own fleet needs to point it somewhere else
+# anyway.
+SUPERVISOR_ROOT = Path(
+    os.environ.get("AGET_SUPERVISOR_ROOT", Path.home() / "github" / "supervisor-aget")
+)
 CANONICAL_SKILL = SUPERVISOR_ROOT / ".claude" / "skills" / "aget-create-initiative"
 INDEX_CSV = SUPERVISOR_ROOT / "workspace" / "FU016R_INDEX_2026-05-17.csv"
 EXT_VERIFY_DIR = SUPERVISOR_ROOT / "workspace"
@@ -63,41 +69,23 @@ PROHIBITED_PATH_PATTERNS = [
 ]
 
 # Cohort definitions (per G0 manifest §3.4)
-COHORT_DEFINITIONS = {
-    "wave1": [
-        ("private-code-analyzer-aget", "private-code-analyzer-aget"),
-        ("private-CCB-bridge-aget", "GM-CCB/private-CCB-bridge-aget"),
-        ("private-family-friends-aget", "GM-CCB/private-family-friends-aget"),
-        ("private-felix-aget", "GM-CCB/private-felix-aget"),
-        ("private-marco-aget", "GM-CCB/private-marco-aget"),
-        ("private-melissa-aget", "GM-CCB/private-melissa-aget"),
-        ("private-contracts-aget", "private-contracts-aget"),
-        ("private-docx-aget", "private-docx-aget"),
-        ("private-executive-coach-aget", "private-executive-coach-aget"),
-        ("private-insurance-aget", "private-insurance-aget"),
-        ("private-mesh-aget", "private-mesh-aget"),
-        ("public-OpenAI-DeepResearch-aget", "public-OpenAI-DeepResearch-aget"),
-        ("public-llm-connectivity-aget", "public-llm-connectivity-aget"),
-    ],
-    "wave2": [
-        ("private-cli-aget", "aget-framework/private-cli-aget"),
-        ("private-github-aget", "private-github-aget"),
-    ],
-    # FU016F routine cohort (per FU016F G0 INSPECT manifest §2)
-    "fg21-routine": [
-        ("private-alexander-aget", "GM-CCB/private-alexander-aget"),
-        ("private-mom-aget", "GM-CCB/private-mom-aget"),
-        ("private-financial-management-aget", "private-financial-management-aget"),
-        ("private-healthcare-aget", "private-healthcare-aget"),
-        ("private-PREDICTIONWORKS-ACCOUNTING-aget", "GM-PREDICTIONWORKS/private-PREDICTIONWORKS-ACCOUNTING-aget"),
-    ],
-    # Tier 1+2 adoption cohort (already at v3.18.0 but 0/5 adoption)
-    "tier12-adopt": [
-        ("private-impact-aget", "private-impact-aget"),
-        ("private-it-consultant-aget", "private-it-consultant-aget"),
-        ("private-github-aget", "private-github-aget"),
-        ("private-cli-aget", "aget-framework/private-cli-aget"),
-    ],
+COHORT_DEFINITIONS: dict[str, list[tuple[str, str]]] = {
+    # Roster intentionally empty in the published copy.
+    #
+    # This file is a one-off migration helper retained for reference. Its
+    # cohort roster paired deployment names with the accounts that own them,
+    # which discloses how a private fleet is organised rather than merely what
+    # it is called. That has no function for anyone outside the fleet it was
+    # written for: an external reader has none of those targets, and the
+    # migration it supported is long finished.
+    #
+    # The keys are kept so the cohort vocabulary and every consumer below
+    # (COHORT_DEFINITIONS.items(), .get(args.cohort, [])) still resolve. An
+    # operator running this against their own fleet supplies their own roster.
+    "wave1": [],
+    "wave2": [],
+    "fg21-routine": [],
+    "tier12-adopt": [],
 }
 
 

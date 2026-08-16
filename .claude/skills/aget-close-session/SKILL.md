@@ -184,15 +184,15 @@ Expected prompts: wind_down.py (1) + git commit (1) = 2.
 | Proposal | SP-008 (planning/skill-proposals/PROPOSAL_aget-close-session.md) |
 | Verb vocabulary | DESIGN_DIRECTION_skill_verb_vocabulary.md (close: proposed, Common category) |
 | Upstream issues | #925 ({verb}_by), #926 (friction budget), #297 (v4.0 rename) |
-| Cross-fleet evidence | Legalon FLEET_CLOSE_SESSION_SPEC v1.1.0 (9 CAPs, 8 scored sessions, 0.74 avg) |
-| L-docs | L670, L699, L605 (framework); L157, L159, L160, L162 (Legalon) |
+| Cross-fleet evidence | a downstream fleet's FLEET_CLOSE_SESSION_SPEC v1.1.0 (9 CAPs, 8 scored sessions, 0.74 avg) |
+| L-docs | L670, L699, L605 (framework); L157, L159, L160, L162 (a downstream fleet) |
 | Session observations | OBS-5 through OBS-11 (SESSION_2026-04-10) |
 
 ## Changelog
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.0.0 | 2026-04-10 | Initial creation. Composition architecture (orchestrates wind-down). 3 phases: pre-close triage, wind-down delegation, session enrichment. Governed by CAP-SESSION-013. Cross-fleet evidence from Legalon v1.0-v1.3 (8 sessions, 0.50→0.74). |
+| 1.0.0 | 2026-04-10 | Initial creation. Composition architecture (orchestrates wind-down). 3 phases: pre-close triage, wind-down delegation, session enrichment. Governed by CAP-SESSION-013. Cross-fleet evidence from a downstream fleet, v1.0-v1.3 (8 sessions, 0.50→0.74). |
 
 ---
 

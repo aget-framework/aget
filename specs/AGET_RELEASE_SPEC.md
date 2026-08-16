@@ -1205,14 +1205,14 @@ python3 scripts/post_release_changelog_validator.py --version 3.16.0 && \
 
 **Implementation**: `scripts/post_release_tag_validator.py` — multi-repo audit script with `--version` + `--repos` CLI; iterates the 14-repo `RELEASE_REPOS_DEFAULT` list (aget + 13 templates including uppercase `template-document-processor-AGET`) per CAP-REL-030/031 enumeration symmetry. Implements R-REL-031-01..05 (`git ls-remote` + `git show {tag}:{path}` + `git cat-file -p {tag}` + per-repo audit emission to `sessions/post_release_tag_audit_{VERSION}_{DATE}.md`). R-REL-031-02 is aget-core-only (handoffs/ artifacts live only at aget/); templates correctly return N/A for that check. Sibling to SOP_release_process.md v1.30 Phase 6.4.5 BLOCKING V-test (the SOP runs the check at tag time; this script runs it as standalone audit + closes the spec-vs-procedure L671 split). **F-V317-G1-CRITIC-009 + F-V317-G1-CRITIC-019 closed v3.17 G1 batch-3 2026-05-09**: implementation now iterates "every released repo" per spec; CAP-REL-030/031 enumeration symmetry achieved.
 
-**Threat-Class Anchor**: Post-release verification that tags are correctly cut, pushed, and resolve handoff artifacts. #1154 (tag-vs-HEAD fleet artifact gap, root-caused from legalon #1152) confirmed that tags cut at SOP Phase 3 (pre-handoff) returned "not found" for `git show vX.Y.Z:handoffs/RELEASE_HANDOFF_vX.Y.Z.md`. SOP_release_process.md v1.30 (G1.3) moved tag-cut to Phase 6.4.5 procedurally; this CAP makes the tag-resolvability invariant spec-bound (procedure → contract per L671 progression).
+**Threat-Class Anchor**: Post-release verification that tags are correctly cut, pushed, and resolve handoff artifacts. #1154 (tag-vs-HEAD fleet artifact gap, root-caused from a downstream fleet #1152) confirmed that tags cut at SOP Phase 3 (pre-handoff) returned "not found" for `git show vX.Y.Z:handoffs/RELEASE_HANDOFF_vX.Y.Z.md`. SOP_release_process.md v1.30 (G1.3) moved tag-cut to Phase 6.4.5 procedurally; this CAP makes the tag-resolvability invariant spec-bound (procedure → contract per L671 progression).
 
 #### Requirement Set
 
 | ID | Pattern | Statement | Rationale |
 |----|---------|-----------|-----------|
 | R-REL-031-01 | ubiquitous | The release manager SHALL verify, post-tag-push, that `git ls-remote origin v{VERSION}` returns the tag for every released repo | Verifies tag is reachable on remote; not just locally created |
-| R-REL-031-02 | ubiquitous | The validator SHALL verify that `git show v{VERSION}:handoffs/RELEASE_HANDOFF_v{VERSION}.md` resolves for the framework repo (aget/) | #1154 closure: tag-pinned handoff must be readable; closes the legalon #1152 root cause class |
+| R-REL-031-02 | ubiquitous | The validator SHALL verify that `git show v{VERSION}:handoffs/RELEASE_HANDOFF_v{VERSION}.md` resolves for the framework repo (aget/) | #1154 closure: tag-pinned handoff must be readable; closes the a downstream fleet #1152 root cause class |
 | R-REL-031-03 | conditional | IF the release publishes `DEPLOYMENT_SPEC_v{VERSION}.yaml` THEN the validator SHALL verify `git show v{VERSION}:DEPLOYMENT_SPEC_v{VERSION}.yaml` (or `git show v{VERSION}:aget/DEPLOYMENT_SPEC_v{VERSION}.yaml` per L910 path canonicalization) resolves | Tag-pinned deployment spec required for remote fleet supervisors checking out tag |
 | R-REL-031-04 | ubiquitous | The validator SHALL verify that tag annotation message includes the version string and a non-empty release-notes pointer | R-REL-035 GitHub Release pair: tag without annotation degrades discoverability |
 | R-REL-031-05 | ubiquitous | The validator SHALL emit per-repo tag-resolvability PASS/FAIL to `sessions/post_release_tag_audit_{VERSION}_{DATE}.md` | Audit trail; pair with CAP-REL-030's CHANGELOG audit |
@@ -1247,7 +1247,7 @@ git show v3.16.0:handoffs/RELEASE_HANDOFF_v3.16.0.md >/dev/null 2>&1 && \
 - **R-REL-035**: GitHub Release pair (Releases require tags; this CAP audits tag side, R-REL-035 audits Release side)
 - **R-REL-038**: DEPLOYMENT_SPEC pair (spec must exist before tag; this CAP verifies tag resolves it)
 - **SOP_release_process.md v1.30 Phase 6.4.5**: This CAP is the spec-layer pair to the SOP-layer fix; SOP enforces ordering at release time, this CAP audits invariant post-release
-- **#1154 + legalon #1152**: Root cause class spec-bound here
+- **#1154 + a downstream fleet #1152**: Root cause class spec-bound here
 
 ---
 

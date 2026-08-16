@@ -125,7 +125,7 @@ This release applies uniformly across all 13 archetype templates: **no per-arche
 |-------------|:------:|:--------------:|--------------|-------|
 | Framework manager agent (self) | ✅ Running v3.18.0 | 2026-05-17 | `N/A (direct-commit)` | First confirmed deployment (framework-manager archetype self-deploy at Gate 8 close). Self-tick caveat acknowledged (L656 + L908): self-confirmation does NOT satisfy fleet-deployment-verification per supervisor coordination. |  [instance-only per L600]
 | Supervisor agent (upstream) | ⏳ Pending | — | — | Awaits supervisor-side pilot upgrade; cross-AGENT verification required per L656 |  [instance-only per L600]
-| LegalOn portfolio (LO-SUPRV cohort) | ⏳ Pending | — | — | Cross-portfolio pilot awaiting supervisor disposition |
+| a downstream portfolio | ⏳ Pending | — | — | Cross-portfolio pilot awaiting supervisor disposition |
 | (additional pilot agents) | ⏳ Pending | — | — | Per supervisor disposition |
 
 **Migration PR backfill note** (PP-035 `Migration PR` column per gh#1392 closure 2026-05-16): v3.18.0 backfill row 1 = `N/A (direct-commit)` (framework-manager self-deploy). Column populates non-`N/A` once a branched-PR "heavyweight" route per gh#1392 is adopted at a future cycle.

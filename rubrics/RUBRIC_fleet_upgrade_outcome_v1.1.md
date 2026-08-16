@@ -4,7 +4,7 @@
 **Created**: 2026-04-26
 **Updated**: 2026-04-26 (v1.1.0 — calibration from two scored instances)
 **Author**: private-aget-framework-AGET v3.15.0
-**Cross-Agent Source**: private-supervisor-AGET (v1.0.0 original, FLEET-UPG-013), private-legalon-supervisor-AGET (FLEET-UPG-014 calibration feedback, #1165)
+**Cross-Agent Source**: private-supervisor-AGET (v1.0.0 original, FLEET-UPG-013), a downstream fleet's supervisor (FLEET-UPG-014 calibration feedback, #1165)
 **Domain**: Conformance — fleet upgrade release outcome (FLEET-UPG-NNN close-out)
 **Status**: Active (two scored instances: 13/15 Exemplary, 10/15 Compliant)
 **Governing Spec**: `aget/specs/AGET_RELEASE_SPEC.md` CAP-REL-016 R-REL-024-03
@@ -35,7 +35,7 @@ Evaluate the quality and completeness of a fleet upgrade release outcome. Closes
 | Instance | Score | Band | Scored By | Notes |
 |----------|:-----:|------|-----------|-------|
 | FLEET-UPG-013, v3.15.0 (main fleet, 34/34) | 13/15 | Exemplary | private-supervisor-AGET | D4=1/3: G3/G4 gate Status retroactive; motivates v3.16 structural enforcement candidates |
-| FLEET-UPG-014, v3.15.0 (legalon fleet, 7/7) | 10/15 | Compliant | private-legalon-supervisor-AGET | D5=low: no fleet upgrade scripts/L-docs; drove format-agnostic calibration in v1.1 |
+| FLEET-UPG-014, v3.15.0 (downstream fleet, 7/7) | 10/15 | Compliant | a downstream fleet's supervisor | D5=low: no fleet upgrade scripts/L-docs; drove format-agnostic calibration in v1.1 |
 
 **Version history**:
 - v1.0.0 (2026-04-26): Initial draft; first scored instance FLEET-UPG-013. Draft status pending calibration.
@@ -53,7 +53,7 @@ Evaluate the quality and completeness of a fleet upgrade release outcome. Closes
 | Residual filing and meta-pattern analysis | Issue content quality |
 | Upstream value (L-docs, SOPs, templates) | Framework-AGET implementation work |
 
-**FLEET-UPG-NNN namespace note**: The FLEET-UPG-NNN identifier is maintained per-fleet. Two fleets may each have a FLEET-UPG-013 that refers to different migration events. When citing scores across fleets, always qualify with fleet name (e.g., "main fleet FLEET-UPG-013" vs "legalon fleet FLEET-UPG-013"). This rubric scores a single fleet's upgrade; cross-fleet comparison requires fleet-qualified identifiers.
+**FLEET-UPG-NNN namespace note**: The FLEET-UPG-NNN identifier is maintained per-fleet. Two fleets may each have a FLEET-UPG-013 that refers to different migration events. When citing scores across fleets, always qualify with fleet name (e.g., "main fleet FLEET-UPG-013" vs "downstream fleet FLEET-UPG-013"). This rubric scores a single fleet's upgrade; cross-fleet comparison requires fleet-qualified identifiers.
 
 ## Theoretical Basis
 

@@ -365,7 +365,7 @@ remained discriminating.
 ### M7. Receiving-seat critique is an independent falsification channel
 
 Invite the pilot seat to challenge the proposed merge, baseline, V-test, and expected result, and verify
-its correction at source before accepting or disputing it. In the v3.29 Legalon migration, four receiving-
+its correction at source before accepting or disputing it. In the v3.29 a downstream fleet migration, four receiving-
 seat corrections were confirmed: relocation instead of append, name-list instead of count, incoming-
 checker expectation capture, and claimed-version baseline classification.
 

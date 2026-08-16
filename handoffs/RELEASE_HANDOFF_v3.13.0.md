@@ -68,7 +68,7 @@ python3 -c "import json; v=json.load(open('.aget/version.json')); print('PASS' i
 | Fleet | Supervisor | Status | Date | Notes |
 |-------|-----------|:------:|------|-------|
 | Main | fleet supervisor | **COMPLETE** | 2026-04-12 | 34/34 upgraded + hotfix + baseline gap fix. 31 skills/agent. |
-| WorkCo | legalon-supervisor | Pending | — | See "Lessons from Main Fleet" below |
+| WorkCo | a downstream fleet's supervisor | Pending | — | See "Lessons from Main Fleet" below |
 
 ---
 

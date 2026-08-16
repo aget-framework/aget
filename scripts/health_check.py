@@ -620,7 +620,7 @@ def call_extension_hook(agent_path, data, verbose=False):
     dict, returns an augmented dict (additive-only per L464); absence = no-op;
     failure = warning + continue (ADR-004). Root cause this closes: instances
     needing agent-specific checks had no hook point and patched the
-    Framework_Artifact itself, which the next upgrade clobbered (legalon
+    Framework_Artifact itself, which the next upgrade clobbered (a downstream fleet
     GATE-0 halt class).
     """
     ext_path = agent_path / 'scripts' / 'health_check_ext.py'

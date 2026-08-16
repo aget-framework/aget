@@ -7,7 +7,7 @@ Verifies tag-resolvability invariants after release tag-cut + push.
 Requirements implemented (per AGET_RELEASE_SPEC.md §CAP-REL-031):
   R-REL-031-01: tag reachable on remote via `git ls-remote origin v{VERSION}`
   R-REL-031-02: `git show v{VERSION}:handoffs/RELEASE_HANDOFF_v{VERSION}.md` resolves
-                (the headline #1154 invariant — closes legalon #1152 root cause class)
+                (the headline #1154 invariant — closes a downstream fleet #1152 root cause class)
   R-REL-031-03: IF DEPLOYMENT_SPEC published THEN tag resolves it
                 (canonical: aget/DEPLOYMENT_SPEC_v{V}.yaml; legacy: DEPLOYMENT_SPEC_v{V}.yaml)
   R-REL-031-04: tag annotation includes version string + non-empty release-notes pointer

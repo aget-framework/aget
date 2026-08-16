@@ -141,7 +141,7 @@ After writing the lesson, test BOTH triggers; if either fires, OFFER the lesson-
 
 If YES to either → file via `/aget-file-issue` with `routing_mode: lesson_first` (CAP-ISSUE-011..014), citing this L-doc as substrate. The tracker's `lesson_first` label is the **cross-namespace join key** the supervisors' weekly lessons-miners match on — a lesson that stays only in this repo's evolution/ is invisible fleet-wide (L467 discovery-lottery at fleet scale).
 
-**Worked example (the motivating triple, 2026-07-10)**: three seats independently derived "authorization doesn't travel across seats, sessions, or quotations" from three different incidents — main-SUP L681, legalon-SUP L249, FWK persistent memory — each invisible to the others except via principal relay. All three had multi-seat evidence; zero used lesson-first mode (3-for-3 non-invocation of a shipped capability = L962 habit-channel gap). One lesson-first filing by any seat would have made the other two derivations dedup-hits instead of re-derivations.
+**Worked example (the motivating triple, 2026-07-10)**: three seats independently derived "authorization doesn't travel across seats, sessions, or quotations" from three different incidents — main-SUP L681, downstream-SUP L249, FWK persistent memory — each invisible to the others except via principal relay. All three had multi-seat evidence; zero used lesson-first mode (3-for-3 non-invocation of a shipped capability = L962 habit-channel gap). One lesson-first filing by any seat would have made the other two derivations dedup-hits instead of re-derivations.
 
 ### Step 5: Update Index (Framework only)
 
