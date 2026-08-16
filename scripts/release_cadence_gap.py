@@ -49,7 +49,46 @@ import subprocess
 import sys
 from datetime import datetime, timedelta
 
-CANONICAL = "../aget"
+def _default_repo():
+    """Resolve the canonical repo without assuming a fleet checkout layout.
+
+    Was the bare literal "../aget". At the producing seat a sibling `aget/`
+    exists and it worked; at a consumer -- a single clone with no fleet around
+    it -- there is no sibling, so this exited 1 with "cannot read tags" and the
+    instrument was dead on arrival. Measured 2026-08-15 by a downstream seat
+    installing v3.31.0 from a clean clone.
+
+    The same sibling-checkout assumption was fixed in a promoted TEST hours
+    before that release shipped, and survived here. Fixing one instance of a
+    class and shipping another instance of the same class is what makes this
+    worth a comment rather than a one-word diff.
+
+    Resolution order, first hit wins:
+      1. AGET_CANONICAL_ROOT           -- explicit operator override
+      2. this file's own repo root     -- the common case: we ARE canonical
+      3. ../aget sibling               -- the fleet-checkout layout
+    """
+    import os
+    import pathlib
+
+    env = os.environ.get("AGET_CANONICAL_ROOT")
+    if env and (pathlib.Path(env) / ".git").exists():
+        return env
+
+    here = pathlib.Path(__file__).resolve().parent.parent
+    if (here / ".git").exists():
+        return str(here)
+
+    sibling = here.parent / "aget"
+    if (sibling / ".git").exists():
+        return str(sibling)
+
+    # Absence is reported by the caller as UNRESOLVED, distinct from a breached
+    # cadence -- the disclosed exit-1 ambiguity this release shipped with.
+    return str(here)
+
+
+CANONICAL = _default_repo()
 CAP_SATURDAYS = 3               # R-REL-CAD-007 parameter (principal-tunable, D-RP-7)
 POLICY_IN_FORCE = "2026-06-26"  # commit that introduced R-REL-CAD-007
 
