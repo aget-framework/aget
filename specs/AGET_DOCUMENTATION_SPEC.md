@@ -1,11 +1,11 @@
 # AGET Documentation Specification
 
-**Version**: 1.0.1
+**Version**: 1.1.0
 **Status**: Active
 **Category**: Format (Documentation Standards)
 **Format Version**: 1.2
 **Created**: 2026-01-04
-**Updated**: 2026-01-04
+**Updated**: 2026-08-16 (v1.1.0 — Enforcement surface separates instrument-exists from instrument-is-reached; see Changelog)
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_DOCUMENTATION_SPEC.md`
 **Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.3
@@ -388,14 +388,47 @@ Example:
 
 ## Enforcement
 
-| Requirement | Validator | Status |
-|-------------|-----------|--------|
-| CAP-DOC-001-* | validate_readme.py | Planned |
-| CAP-DOC-002-* | validate_cli_settings.py | Implemented |
-| CAP-DOC-003-* | pylint docstring checks | Manual |
-| CAP-DOC-004-* | Manual review | Manual |
-| CAP-DOC-005-* | validate_spec_format.py | Planned |
-| CAP-DOC-006-* | CI version checks | Planned |
+> **Why this table has four columns instead of two.** The previous form recorded a single
+> `Status` per requirement, which merged two independent facts: whether the named instrument
+> *exists*, and whether anything *runs* it. Those come apart. `validate_cli_settings.py` was
+> recorded `Implemented` while having zero callers — true as a statement about the file,
+> false as a statement about enforcement. A reader could not tell which claim was being made.
+>
+> `Exists` and `Callers` are each independently checkable. `Enforcement` is **derived** from
+> them, never asserted on its own: a requirement is `ENFORCED` only where an instrument
+> exists **and** something invokes it.
+
+| Requirement | Named instrument | Exists | Callers | Enforcement |
+|-------------|------------------|:------:|:-------:|-------------|
+| CAP-DOC-001-* | `validate_readme.py` | ✗ | — | **NONE** — instrument absent (build-or-remove: 2026-11-16) |
+| CAP-DOC-002-* | `scripts/validate_cli_settings.py` | ✓ | **0** | **NONE** — exists, never invoked |
+| CAP-DOC-003-* | pylint docstring checks | ✗ | — | **NONE** — no instrument in this repository |
+| CAP-DOC-004-* | *(none — human review)* | n/a | n/a | MANUAL by design |
+| CAP-DOC-005-* | `verification/validate_spec_format.py` | ✓ | **0** | **NONE** — exists, never invoked |
+| CAP-DOC-006-* | *(none named)* | ✗ | — | **NONE** |
+
+**Measured** 2026-08-16 at canonical HEAD, clean tree. `Callers` counts **invocation
+contexts** (`python3 X`, `run: X`, `import X`), not mentions — a spec table, a changelog or
+a registry entry naming an instrument is not a caller. Predicate, including its known
+limitations and a positive control, is recorded with the measurement.
+
+**Two corrections this table makes to the previous form:**
+
+- `CAP-DOC-002-*` read `Implemented`. The instrument exists and has **zero** callers, so
+  nothing enforced that requirement. The old value overstated.
+- `CAP-DOC-005-*` read `Planned`. `verification/validate_spec_format.py` **already exists**.
+  The old value understated. Drift ran in both directions, which is what a single merged
+  column hides.
+
+**A validator that passes on an empty view is not enforcement.** `validate_cli_settings.py`
+run against this repository reports `0 found, 0 passed` and exits **0** — canonical has no
+`AGENTS.md` at its root. Wiring it here as-is would produce a green gate that proves
+nothing. Any future `Callers` entry for it must be accompanied by a non-empty view.
+
+**`NONE` is a statement of fact, not a to-do.** It records that the requirement is currently
+unenforced. Where a build is intended, the row carries a **build-or-remove date**: on that
+date the requirement either gains a working instrument or the enforcement claim is deleted.
+A date that passes with neither is itself a detectable defect.
 
 ---
 
@@ -550,6 +583,43 @@ grep -roh "AGET_[A-Z_]*_SPEC\.md" aget/specs/ | sort -u | while read spec; do [ 
 
 - Added CAP-DOC-007: EARS System-Level Requirements (L682 L0→L1 uplift)
 - 3 requirements with SYSTEM subject, ubiquitous/event-driven/conditional patterns
+
+### v1.1.0 (2026-08-16)
+
+**Enforcement surface: separate what exists from what runs.**
+
+The `Enforcement` table recorded one `Status` per requirement, merging two independent
+facts — whether the named instrument exists, and whether anything invokes it. Measured at
+canonical HEAD, that merge was hiding drift in **both** directions:
+
+- `CAP-DOC-002-*` read `Implemented`. The instrument exists and has **zero** callers, so the
+  requirement was not enforced. Overstated.
+- `CAP-DOC-005-*` read `Planned`. The instrument **already exists**. Understated.
+- `CAP-DOC-001-*` names `validate_readme.py`, which is **absent from the repository**, while
+  four of its V-tests are labelled `automated`.
+
+Changes:
+
+- Table gains `Exists` and `Callers` columns, each independently checkable. `Enforcement` is
+  now **derived** from them rather than asserted — `ENFORCED` requires both.
+- `Callers` counts **invocation contexts**, not mentions. A spec table, changelog or registry
+  entry naming an instrument is not a caller.
+- Rows intending a future instrument carry a **build-or-remove date**. A date that passes
+  with neither outcome is itself detectable.
+- Records that a validator passing on an empty view is not enforcement:
+  `validate_cli_settings.py` exits 0 against this repository, which has no `AGENTS.md` at
+  root.
+
+No CAP-DOC requirement changed. This amendment changes only how the spec reports its own
+enforcement — the claims it makes about itself are now falsifiable.
+
+Basis: principal ruling of 2026-08-16 — *a claim the framework makes about itself must be
+checkable or removed*; disclosure does not discharge it.
+
+**Known and deliberately out of scope**: `AGET_SPEC_FORMAT` defines the Enforcement field as
+free text and says capabilities `SHOULD` have enforcement, not `SHALL`. It therefore permits
+every defect corrected here, in any spec. That is filed separately rather than folded in, so
+a fleet-wide finding does not get buried in a single-spec repair.
 
 ### v1.0.0 (2026-01-04)
 

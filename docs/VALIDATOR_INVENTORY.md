@@ -83,7 +83,7 @@ These validators are referenced in specs but not yet implemented. Specs should b
 | validate_governance_traceability.py | AGET_GOVERNANCE_SPEC | P2 | Planned |
 | validate_tool_alignment.py | AGET_TOOL_SPEC | P3 | Planned |
 | validate_agents_md_size.py | AGET_MIGRATION_SPEC | P3 | Planned |
-| validate_cli_settings.py | AGET_DOCUMENTATION_SPEC | P2 | Planned |
+| validate_cli_settings.py | AGET_DOCUMENTATION_SPEC | P2 | **Built, uncalled** (exists at `scripts/`; 0 invocation callers, measured 2026-08-16) |
 | validate_public_content.py | AGET_SECURITY_SPEC | P2 | Planned |
 | validate_contract_tests.py | AGET_TESTING_SPEC | P2 | Planned |
 | validate_test_naming.py | AGET_TESTING_SPEC | P3 | Planned |
