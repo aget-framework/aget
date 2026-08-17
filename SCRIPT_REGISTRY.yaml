@@ -491,6 +491,16 @@ scripts:
     spec: AGET_RELEASE_SPEC.md
     implements: CAP-REL-025
 
+  - path: scripts/check_enforcement_claims.py
+    description: Checks canonical spec-enforcement declarations for exact resolution, operational reachability, and governed gaps
+    category: validator
+    version: 1.0.0
+    created: 2026-08-17
+    flags: [--help, --root, --spec-glob, --json, --self-check]
+    exit_codes: [0, 1]
+    validates: Named enforcement declarations in specs
+    spec: AGET_SPEC_FORMAT.md
+
   - path: scripts/study_topic.py
     description: Focused KB research on a specific topic before proposing changes
     category: tool
@@ -512,12 +522,12 @@ scripts:
 
 # Summary statistics
 summary:
-  total_scripts: 50
+  total_scripts: 51
   by_category:
-    validator: 25
+    validator: 26
     tool: 13
     pattern: 12
   by_status:
-    active: 44
+    active: 45
     skeleton: 3
     planned: 3

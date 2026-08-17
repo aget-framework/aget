@@ -1,0 +1,101 @@
+[
+  {
+    "id": "section-active-absent",
+    "body": "## Enforcement\n\n| R | ghost.py | Implemented |\n",
+    "files": {},
+    "expected": ["OVERCLAIM_ABSENT"]
+  },
+  {
+    "id": "declared-path-is-not-basename",
+    "body": "## Enforcement\n\n| R | validation/tool.py | Implemented |\n",
+    "files": {
+      "verification/tool.py": "# actual file at a different path\n",
+      "runner.sh": "python3 verification/tool.py\n"
+    },
+    "expected": ["OVERCLAIM_ABSENT"]
+  },
+  {
+    "id": "yaml-field-is-implicit-active-claim",
+    "body": "enforcement: scripts/tool.py\n",
+    "files": {
+      "scripts/tool.py": "# validator\n",
+      "runner.sh": "python3 scripts/tool.py\n"
+    },
+    "expected": ["VERIFIED_REACHED"]
+  },
+  {
+    "id": "markdown-field-is-visible",
+    "body": "**Enforcement**: missing.py (active)\n",
+    "files": {},
+    "expected": ["OVERCLAIM_ABSENT"]
+  },
+  {
+    "id": "wired-prose-is-visible",
+    "body": "Wired into scripts/tool.py as a blocking validator.\n",
+    "files": {
+      "scripts/tool.py": "# validator\n",
+      "workflow.yml": "steps:\n  - run: python3 scripts/tool.py\n"
+    },
+    "expected": ["VERIFIED_REACHED"]
+  },
+  {
+    "id": "registry-is-not-a-caller",
+    "body": "## Enforcement\n\n| R | tool.py | Active |\n",
+    "files": {
+      "tool.py": "# validator\n",
+      "SCRIPT_REGISTRY.yaml": "- path: tool.py\n  status: catalogued\n"
+    },
+    "expected": ["OVERCLAIM_UNCALLED"]
+  },
+  {
+    "id": "test-only-is-not-operational",
+    "body": "## Enforcement\n\n| R | scripts/tool.py | Active |\n",
+    "files": {
+      "scripts/tool.py": "# validator\n",
+      "tests/test_tool.py": "import tool\n"
+    },
+    "expected": ["OVERCLAIM_TEST_ONLY"]
+  },
+  {
+    "id": "monitored-gap",
+    "body": "## Enforcement\n\n| R | future.py | Planned (build-or-remove: 2099-01-01) |\n",
+    "files": {},
+    "expected": ["DISCLOSED_GAP_MONITORED"]
+  },
+  {
+    "id": "ungoverned-gap",
+    "body": "## Enforcement\n\n| R | someday.py | Planned |\n",
+    "files": {},
+    "expected": ["DISCLOSED_GAP_UNGOVERNED"]
+  },
+  {
+    "id": "expired-gap",
+    "body": "## Enforcement\n\n| R | late.py | NONE (build-or-remove: 2000-01-01) |\n",
+    "files": {},
+    "expected": ["EXPIRED_GAP"]
+  },
+  {
+    "id": "principal-elected-gap",
+    "body": "## Enforcement\n\n| R | elected.py | Planned; principal election PR-1 |\n",
+    "files": {},
+    "expected": ["DISCLOSED_GAP_ELECTED"]
+  },
+  {
+    "id": "stale-underclaim",
+    "body": "## Enforcement\n\n| R | scripts/live.py | Planned |\n",
+    "files": {
+      "scripts/live.py": "# validator\n",
+      "runner.sh": "python3 scripts/live.py\n"
+    },
+    "expected": ["STALE_UNDERCLAIM"]
+  },
+  {
+    "id": "bare-name-ambiguity",
+    "body": "## Enforcement\n\n| R | duplicate.py | Active |\n",
+    "files": {
+      "a/duplicate.py": "# first\n",
+      "b/duplicate.py": "# second\n"
+    },
+    "expected": ["OVERCLAIM_AMBIGUOUS"]
+  }
+]

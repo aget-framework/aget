@@ -503,6 +503,52 @@ def check_reliance_manifest(agent_path: Path) -> CheckResult:
                            severity='warning')
 
 
+def check_spec_enforcement_truthfulness(agent_path: Path) -> CheckResult:
+    """Check canonical spec-enforcement declarations when the corpus is present.
+
+    Most downstream agents do not ship the public specification corpus or this
+    validator, so absence of either surface is an explicit not-applicable pass.
+    Repositories that carry both surfaces receive a warning-only truthfulness
+    result; the existing baseline is non-conformant and must remain remediable.
+    """
+    specs = agent_path / 'specs'
+    checker = agent_path / 'scripts' / 'check_enforcement_claims.py'
+    if not specs.is_dir() or not checker.is_file():
+        return CheckResult(
+            'spec_enforcement_truthfulness',
+            True,
+            'not applicable (spec corpus or checker absent)',
+        )
+
+    scripts_dir = str(checker.parent)
+    if scripts_dir not in sys.path:
+        sys.path.insert(0, scripts_dir)
+    try:
+        from check_enforcement_claims import scan
+
+        result = scan(agent_path, r'specs/.*\.md$')
+    except Exception as exc:
+        return CheckResult(
+            'spec_enforcement_truthfulness',
+            False,
+            f'checker unavailable: {type(exc).__name__}',
+            severity='warning',
+        )
+
+    passed = result['status'] == 'PASS'
+    message = (
+        f"{result['status']}: {len(result['findings'])} finding(s) across "
+        f"{result['claims_checked']} named claim(s) in "
+        f"{result['specs_scanned']} spec(s); scope=this repository"
+    )
+    return CheckResult(
+        'spec_enforcement_truthfulness',
+        passed,
+        message,
+        severity='info' if passed else 'warning',
+    )
+
+
 def run_housekeeping(agent_path: Path, verbose: bool = False) -> Dict[str, Any]:
     """
     Run all housekeeping checks.
@@ -537,6 +583,7 @@ def run_housekeeping(agent_path: Path, verbose: bool = False) -> Dict[str, Any]:
         check_config_size,
         check_structural_skill_frontmatter,
         check_reliance_manifest,
+        check_spec_enforcement_truthfulness,
         check_permission_accumulation,
     ]
 
