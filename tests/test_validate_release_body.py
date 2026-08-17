@@ -86,15 +86,17 @@ Skill definitions carried forward without edit across the upgrade.
 # --- SC-2: both renderings are conformant -----------------------------------------------
 
 def test_bullet_form_passes():
+    """CAP-REL-006-02-02 — both-polarity contract test."""
     assert check(run(BULLET_BODY), "02").startswith("PASS")
 
 
 def test_bold_lead_form_passes():
-    """The v3.28.0 regression: 16 bounded bold-lead items failed a bullet-only check (L1264)."""
+    """CAP-REL-006-02-02: The v3.28.0 regression: 16 bounded bold-lead items failed a bullet-only check (L1264)."""
     assert check(run(BOLD_LEAD_BODY), "02").startswith("PASS")
 
 
 def test_mixed_rendering_passes():
+    """CAP-REL-006-02-02 — both-polarity contract test."""
     mixed = BULLET_BODY.replace(
         "- Fifth delivered capability landed this cycle.",
         "**Fifth capability** — landed this cycle.",
@@ -103,6 +105,7 @@ def test_mixed_rendering_passes():
 
 
 def test_prose_paragraph_is_not_a_scannable_item():
+    """CAP-REL-006-02-02 — both-polarity contract test."""
     prose = BULLET_BODY.replace(
         "- First delivered capability landed this cycle.",
         "This release delivers a capability, described here in prose without a bold lead.",
@@ -112,6 +115,7 @@ def test_prose_paragraph_is_not_a_scannable_item():
 
 @pytest.mark.parametrize("count,expect", [(4, "FAIL"), (5, "PASS"), (10, "PASS"), (11, "FAIL")])
 def test_item_count_bounds_both_polarities(count, expect):
+    """CAP-REL-006-02-02 — both-polarity contract test."""
     items = "\n".join(f"- Delivered capability number {i}." for i in range(count))
     body = f"""**Theme**: Bounds
 
@@ -130,6 +134,7 @@ Skill definitions carry forward without edit.
 
 
 def test_overlong_item_fails():
+    """CAP-REL-006-02-02 — both-polarity contract test."""
     body = BULLET_BODY.replace(
         "- First delivered capability landed this cycle.",
         "- First capability\n  continued onto a second line\n  and then a third line.",
@@ -140,27 +145,31 @@ def test_overlong_item_fails():
 # --- SC-3: core pair required, no fixed total-section count -----------------------------
 
 def test_core_pair_present_passes():
+    """CAP-REL-006-02-08 — both-polarity contract test."""
     assert check(run(BULLET_BODY), "08").startswith("PASS")
 
 
 def test_two_sections_passes_no_fixed_count():
-    """The old rule demanded exactly 3 H2s; 2 is conformant when both are core (v3.26.0)."""
+    """CAP-REL-006-02-08: The old rule demanded exactly 3 H2s; 2 is conformant when both are core (v3.26.0)."""
     result = run(BULLET_BODY)
     assert check(result, "08").startswith("PASS")
 
 
 def test_four_sections_passes_no_fixed_count():
+    """CAP-REL-006-02-08 — both-polarity contract test."""
     body = BULLET_BODY + "\n## Migration\n\nFollow the upgrade note.\n\n## Known gaps\n\nOne gap remains.\n"
     assert check(run(body), "08").startswith("PASS")
 
 
 def test_missing_whats_new_fails():
+    """CAP-REL-006-02-08 — both-polarity contract test."""
     body = BULLET_BODY.replace("## What's New", "## Overview")
     assert "what's new" in check(run(body), "08").lower()
     assert check(run(body), "08").startswith("FAIL")
 
 
 def test_missing_compatibility_fails():
+    """CAP-REL-006-02-08 — both-polarity contract test."""
     body = BULLET_BODY.replace("## Compatibility", "## Notes").replace("No breaking changes. ", "")
     assert check(run(body), "08").startswith("FAIL")
 
@@ -168,22 +177,25 @@ def test_missing_compatibility_fails():
 # --- -04: registered vocabulary ---------------------------------------------------------
 
 def test_registered_disclosure_passes():
+    """CAP-REL-006-02-04 — both-polarity contract test."""
     body = BULLET_BODY + "\n## Known gaps\n\nOne limitation ships with this release.\n"
     assert check(run(body), "04").startswith("PASS")
 
 
 def test_registered_alternate_label_passes():
+    """CAP-REL-006-02-04 — both-polarity contract test."""
     body = BULLET_BODY + "\n## Disclosed limitations\n\nOne limitation ships.\n"
     assert check(run(body), "04").startswith("PASS")
 
 
 def test_unregistered_section_name_fails():
-    """'(or equivalent)' was withdrawn in v1.18.0 — an unlisted name is a FAIL, not a variant."""
+    """CAP-REL-006-02-04: '(or equivalent)' was withdrawn in v1.18.0 — an unlisted name is a FAIL, not a variant."""
     body = BULLET_BODY + "\n## Honest disclosure\n\nSomething undisclosed.\n"
     assert check(run(body), "04").startswith("FAIL")
 
 
 def test_sleeping_caps_mentioned_without_section_fails():
+    """CAP-REL-006-02-04 — both-polarity contract test."""
     body = BULLET_BODY.replace(
         "- First delivered capability landed this cycle.",
         "- One SPEC-LANDED-IMPL-DEFERRED capability ships asleep.",
@@ -192,7 +204,7 @@ def test_sleeping_caps_mentioned_without_section_fails():
 
 
 def test_migration_is_structural_not_disclosure():
-    """v3.28.0-v3.30.0 carry ## Migration; a disclosure-only registry would fail all three."""
+    """CAP-REL-006-02-04: v3.28.0-v3.30.0 carry ## Migration; a disclosure-only registry would fail all three."""
     body = BULLET_BODY + "\n## Migration\n\nFollow the upgrade note.\n"
     assert check(run(body), "04").startswith("PASS")
     assert check(run(body), "08").startswith("PASS")
@@ -201,26 +213,29 @@ def test_migration_is_structural_not_disclosure():
 # --- -09: title, both polarities --------------------------------------------------------
 
 def test_title_conformant_passes():
+    """CAP-REL-006-02-09 — both-polarity contract test."""
     assert check(run(BULLET_BODY, title="v3.31.0 — Ship What Was Already Built"), "09").startswith("PASS")
 
 
 def test_title_hyphen_form_passes():
+    """CAP-REL-006-02-09 — both-polarity contract test."""
     assert check(run(BULLET_BODY, title="v3.31.0 - Ship What Was Already Built"), "09").startswith("PASS")
 
 
 def test_title_duplicated_version_fails():
-    """The v3.17 anomaly: 'v3.17.0 - v3.17.0 — Theme C3...'."""
+    """CAP-REL-006-02-09: The v3.17 anomaly: 'v3.17.0 - v3.17.0 — Theme C3...'."""
     assert check(run(BULLET_BODY, title="v3.31.0 - v3.31.0 — Ship It"), "09").startswith("FAIL")
 
 
 def test_title_missing_version_fails():
+    """CAP-REL-006-02-09 — both-polarity contract test."""
     assert check(run(BULLET_BODY, title="Ship What Was Already Built"), "09").startswith("FAIL")
 
 
 # --- SC-1: coverage — the check that would have caught the -09 stub ----------------------
 
 def test_all_eight_live_subrequirements_emit_a_result():
-    """
+    """V-CAP-REL-006-02: 
     The shipped validator emitted seven checks and silently omitted -09, so a reader counting
     green checks saw PASS with no signal a requirement went unevaluated (L671).
     """
@@ -231,11 +246,12 @@ def test_all_eight_live_subrequirements_emit_a_result():
 
 
 def test_withdrawn_06_is_not_emitted():
+    """CAP-REL-006-02-06 — both-polarity contract test."""
     assert not any("-06" in k for k in run(BULLET_BODY)["checks"])
 
 
 def test_absent_title_emits_unavailable_not_omission():
-    """An unevaluable check must announce itself rather than vanish."""
+    """CAP-REL-006-02-09: An unevaluable check must announce itself rather than vanish."""
     result = run(BULLET_BODY, title=None)
     assert check(result, "09").startswith("UNAVAILABLE")
     assert len(result["checks"]) == 8
@@ -245,14 +261,17 @@ def test_absent_title_emits_unavailable_not_omission():
 # --- -05 link resolution, both polarities -----------------------------------------------
 
 def test_link_resolves_passes():
+    """CAP-REL-006-02-05 — both-polarity contract test."""
     assert check(run(BULLET_BODY, resolver=always_resolves), "05").startswith("PASS")
 
 
 def test_link_unresolvable_fails():
+    """CAP-REL-006-02-05 — both-polarity contract test."""
     assert check(run(BULLET_BODY, resolver=never_resolves), "05").startswith("FAIL")
 
 
 def test_no_link_fails():
+    """CAP-REL-006-02-05 — both-polarity contract test."""
     body = BULLET_BODY.replace(f"[CHANGELOG]({CHANGELOG})", "the changelog")
     assert check(run(body), "05").startswith("FAIL")
 
@@ -260,15 +279,18 @@ def test_no_link_fails():
 # --- -01 / -07 --------------------------------------------------------------------------
 
 def test_theme_present_passes():
+    """CAP-REL-006-02-01 — both-polarity contract test."""
     assert check(run(BULLET_BODY), "01").startswith("PASS")
 
 
 def test_theme_absent_fails():
+    """CAP-REL-006-02-01 — both-polarity contract test."""
     assert check(run(BULLET_BODY.replace("**Theme**: Ship What Was Already Built", "Ship it")), "01").startswith("FAIL")
 
 
 @pytest.mark.parametrize("filler,expect", [(0, "FAIL"), (8, "PASS")])
 def test_length_bounds_both_polarities(filler, expect):
+    """CAP-REL-006-02-07 — both-polarity contract test."""
     body = f"""**Theme**: Bounds
 
 ## What's New
@@ -284,3 +306,60 @@ def test_length_bounds_both_polarities(filler, expect):
 No breaking changes. See [CHANGELOG]({CHANGELOG}).
 """ + "".join(f"Additional compatibility note number {i}.\n" for i in range(filler))
     assert check(run(body), "07").startswith(expect)
+
+
+# --- audit 2026-08-17: mutation testing left three checks unexercised --------------------
+# 15 mutants, 12 killed. These close the three that survived.
+
+def test_overall_is_FAIL_when_any_check_fails():
+    """
+    V-CAP-REL-006-02: the aggregate verdict must go FAIL when any sub-check fails.
+
+    `overall` is what main() converts into the process exit code, and it was asserted
+    exactly once in this suite — on the UNAVAILABLE branch. Deleting the FAIL aggregation
+    left all 33 tests green: the rare path was covered and the common one was not.
+    """
+    body = BULLET_BODY.replace("**Theme**: Ship What Was Already Built", "no theme line here")
+    result = run(body)
+    assert check(result, "01").startswith("FAIL")
+    assert result["overall"] == "FAIL", "a failing sub-check must drive overall to FAIL"
+
+
+def test_compatibility_check_itself_fails_not_only_the_core_pair():
+    """
+    CAP-REL-006-02-03: -03 must fail on its own predicate, not via its -08 sibling.
+
+    test_missing_compatibility_fails asserts on "08", so -03 could be made
+    unconditionally PASS with the suite still green.
+    """
+    body = BULLET_BODY.replace("## Compatibility", "## Notes").replace("No breaking changes. ", "")
+    assert check(run(body), "03").startswith("FAIL")
+
+
+def test_compat_prose_without_h2_separates_03_from_08():
+    """
+    CAP-REL-006-02-03 vs -08: the two predicates genuinely diverge and must be seen to.
+
+    -03 accepts a bare "No breaking changes" statement anywhere in the body; -08 requires
+    the literal H2. A body carrying the prose but not the heading splits them.
+    """
+    body = BULLET_BODY.replace("## Compatibility\n\n", "")
+    assert check(run(body), "03").startswith("PASS"), "-03 accepts the prose form"
+    assert check(run(body), "08").startswith("FAIL"), "-08 still requires the H2"
+
+
+@pytest.mark.parametrize("title", [
+    "v3.31.0: Ship It",           # colon, not a dash
+    "Release v3.31.0 — Ship It",  # version not in leading position
+    "v3.31.0",                    # no theme at all
+    "v3.31.0—Ship It",            # em-dash without surrounding space
+])
+def test_title_wrong_shape_fails(title):
+    """
+    CAP-REL-006-02-09: the shape clause must be exercised, not only the occurrence clauses.
+
+    Both prior negative title tests trip the occurrence checks (missing / duplicated) before
+    reaching the shape regex, so the regex could be deleted with the suite still green.
+    Each title here contains the version exactly once and is still non-conformant.
+    """
+    assert check(run(BULLET_BODY, title=title), "09").startswith("FAIL")
