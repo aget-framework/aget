@@ -1,11 +1,11 @@
 # AGET PROJECT_PLAN Specification
 
-**Version**: 1.4.0
+**Version**: 1.5.0
 **Status**: Active
 **Category**: Process (Planning)
 **Format Version**: 1.2
 **Created**: 2026-01-04
-**Updated**: 2026-08-16
+**Updated**: 2026-08-17
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_PROJECT_PLAN_SPEC.md`
 **Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.7, Issue #30
@@ -57,7 +57,7 @@ L186 (PROJECT_PLAN Not TodoWrite), L426 (Effort Estimation), and L440 (Gate Veri
 vocabulary:
   meta:
     domain: "planning"
-    version: "1.0.0"
+    version: "1.1.0"
     inherits: "aget_core"
 
   plan_structure:
@@ -86,7 +86,7 @@ vocabulary:
   status_vocabulary:
     Plan_Status:
       skos:definition: "Overall PROJECT_PLAN status"
-      aget:values: ["Draft", "In Progress", "Complete", "Abandoned"]
+      aget:values: ["Draft", "In Progress", "Staged", "Implemented-Awaiting-Deployment-Evidence", "Piloted", "Complete", "Closed", "Closed (Partial)", "Abandoned", "Superseded"]
       skos:related: ["CAP-PP-003"]
 
     Gate_Status:
@@ -144,7 +144,8 @@ vocabulary:
 # PROJECT_PLAN: {Title}
 
 **Version**: {M}.{m}.{p}
-**Plan_Status**: {Draft|In Progress|Complete|Abandoned}
+**Plan_Status**: {Draft|In Progress|Staged|Implemented-Awaiting-Deployment-Evidence|Piloted|Complete|Closed|Closed (Partial)|Abandoned|Superseded}
+**Plan_Status_Annotation**: {optional provenance metadata; never a state selector}
 **Theme**: {Short description}
 **Tracking**: {GitHub milestone or issue}
 
@@ -215,21 +216,23 @@ vocabulary:
 
 | ID | Requirement | Values | Usage |
 |----|-------------|--------|-------|
-| CAP-PP-003-01 | Plan status SHALL use standard values | Draft, In Progress, Complete, Abandoned | Header |
+| CAP-PP-003-01 | Plan status SHALL use the closed standard enumeration | Draft, In Progress, Staged, Implemented-Awaiting-Deployment-Evidence, Piloted, Complete, Closed, Closed (Partial), Abandoned, Superseded | Header |
 | CAP-PP-003-02 | Gate status SHALL use standard values | Pending, In Progress, Complete, Blocked, Skipped | Gate header |
 | CAP-PP-003-03 | Status transitions SHALL be documented | In execution log | Audit trail |
 
-> **Field and comparison semantics (v1.4.0)**: the authoritative field carrying CAP-PP-003-01's enum is
+> **Field and comparison semantics (v1.5.0)**: the authoritative field carrying CAP-PP-003-01's enum is
 > **`Plan_Status`**; `**Status**` is a recognized legacy alias. How the enum is *resolved* when both
 > fields are present, and how two values are *normalized* before comparison, are specified by
-> **CAP-PP-013-11** and **CAP-PP-013-13** respectively. This enum is consumed by CAP-PP-013-13(e).
+> **CAP-PP-013-11** and **CAP-PP-013-13** respectively. `Plan_Status_Annotation` is separate,
+> non-authoritative provenance metadata. This specification is the sole normative vocabulary source;
+> conventions, skills, and evaluators consume it and SHALL NOT add, absorb, or alias a state.
 
 **Status Transitions:**
 
 ```
-Plan: Draft → In Progress → Complete
-              ↓
-           Abandoned
+Plan: Draft → In Progress → Staged / Implemented-Awaiting-Deployment-Evidence / Piloted
+         ↓          ↓
+  Abandoned / Superseded     Complete / Closed / Closed (Partial) / Abandoned / Superseded
 
 Gate: Pending → In Progress → Complete
                     ↓
@@ -499,9 +502,9 @@ PROJECT_PLAN_v3.2.0 (25,088 tokens, 1,641 lines) exceeded the Read tool's 25,000
 | ID | Requirement | Rationale |
 |----|-------------|-----------|
 | CAP-PP-013-01 | PROJECT_PLAN SHALL have Closure Checklist section | Completeness |
-| CAP-PP-013-02 | Closure SHALL verify all V-tests passed | Verification |
+| CAP-PP-013-02 | Closure SHALL record every V-test result; `Complete` requires all to pass, while a reasoned disposition SHALL account every non-pass under CAP-PP-013-18 | Verification |
 | CAP-PP-013-03 | Closure SHALL record actual vs estimated effort | Learning |
-| CAP-PP-013-04 | Closure SHALL update **`Plan_Status`** to Complete or Abandoned | State management (field named per CAP-PP-013-11, v1.4.0 — "status" was ambiguous once two status-bearing fields existed) |
+| CAP-PP-013-04 | Closure SHALL update **`Plan_Status`** to the selected terminal disposition only after CAP-PP-013-22 succeeds | State management |
 
 ---
 
@@ -804,6 +807,47 @@ authority:
 
 ---
 
+## Inviolables
+
+- A gate SHALL NOT be represented complete without its V-test evidence, plan update, and the commit that
+  records that update.
+- A decision point SHALL NOT be crossed without the approval required by the governing plan.
+- A terminal disposition SHALL NOT be asserted while an error, integrity finding, closure-record finding,
+  or unmatched finding occurrence remains unresolved.
+- A closer-authored requirement SHALL NOT be enforced as an entry criterion before the closer is allowed
+  to author it.
+- A consumer SHALL NOT create, absorb, or alias a plan state outside CAP-PP-003.
+
+---
+
+## Structural Requirements
+
+```yaml
+structure:
+  plan_artifact:
+    path_pattern: "planning/PROJECT_PLAN_*.md"
+    authoritative_status_field: "Plan_Status"
+    optional_annotation_field: "Plan_Status_Annotation"
+  required_sections:
+    - "Executive Summary"
+    - "Scope"
+    - "Success Criteria"
+    - "Gates"
+    - "References"
+    - "Closure Checklist"
+  gate_structure:
+    required_components: ["Objective", "Deliverables", "V-tests", "Checklist", "Decision Point"]
+  close_record:
+    reasoned_disposition_section: "Unfinished at Close"
+    finding_identity: ["reason_key", "affected_subject", "evidence_location"]
+    verification_order: ["entry", "author", "reparse", "exit", "reconcile", "transition", "commit"]
+  validators:
+    format: "verification/validate_spec_format.py"
+    project_plan: "scripts/close_gate_check.py"
+```
+
+---
+
 ## References
 
 - L42: Gate Boundary Discipline
@@ -819,6 +863,18 @@ authority:
 ---
 
 ## Changelog
+
+### v1.5.0 (2026-08-17)
+
+- **Joint lifecycle contract** (gh#2250 + gh#2223): widens CAP-PP-003 to one authoritative state
+  vocabulary and adds CAP-PP-013-14..22 plus V-PP-039..047 for ETVX lifecycle classes, explicit target
+  disposition, finding identity/classes, `Unfinished at Close`, lawful transitions, disposition evidence,
+  bounded legacy migration, and ordered close invariants.
+- **Same-day correction to v1.4.0**: replaces lossy leading-clause truncation with separate
+  `Plan_Status_Annotation` metadata and fail-safe legacy qualifier handling.
+- **Format self-compliance**: adds the required Inviolables and Structural Requirements sections.
+- **Publication constraint**: candidate only until the coherent Gate-3 implementation and Gate-3V
+  independent verification are ready; no spec-only push.
 
 ### v1.4.0 (2026-08-16)
 
@@ -915,7 +971,7 @@ IF mode is `closure` THEN the evaluator SHALL return a blocking verdict for any 
 
 ### CAP-PP-013-07: `legitimately-terminal` (reusable predicate)
 
-A plan is `legitimately-terminal` IFF ALL of: **(a)** authoritative status resolves to exactly one terminal value of the CAP-PP-003 enum; **(b)** no second status-bearing field declares a different normalized exact state (per CAP-PP-013-11; normalization per CAP-PP-013-13 — class comparison is insufficient); **(c)** closure-checklist items are checked and V-tests recorded.
+A plan is `legitimately-terminal` IFF ALL of: **(a)** authoritative status resolves to exactly one terminal disposition of the CAP-PP-003 enum; **(b)** no second status-bearing field declares a different normalized exact state (per CAP-PP-013-11; normalization per CAP-PP-013-13 — class comparison is insufficient); **(c)** closure-checklist items are checked and V-tests recorded; and **(d)** exit-phase reconciliation has run with no unresolved blocking or error finding. Implementations SHALL NOT add another terminality condition.
 
 ### CAP-PP-013-08: Audit mode, with fallback
 
@@ -935,7 +991,7 @@ A `superseded_by` reference is valid IFF: (a) it uniquely resolves to exactly on
 
 ### CAP-PP-013-11: Authoritative-status resolution
 
-**`Plan_Status` is the canonical, authoritative field.** `**Status**` is a recognized **legacy alias**. WHERE only `Plan_Status` is present, it governs. WHERE only `**Status**` is present, the evaluator SHALL resolve it as authoritative and emit a migration warning that SHALL NOT alter the verdict. WHERE both are present, the evaluator SHALL compare their normalized exact states (per CAP-PP-013-13) — NOT their terminal/non-terminal classes. IF the normalized states differ THEN the plan state is contradictory and SHALL NOT satisfy `legitimately-terminal`, **irrespective of which field is authoritative**.
+**`Plan_Status` is the sole canonical, authoritative state field and SHALL contain exactly one CAP-PP-003 enum value.** `**Status**` is a recognized **legacy alias**. `Plan_Status_Annotation` is separate, non-authoritative provenance metadata and SHALL NOT select, change, or establish terminality. WHERE only `Plan_Status` is present, it governs. WHERE only `**Status**` is present, the evaluator SHALL resolve it under CAP-PP-013-13 and emit a migration warning that SHALL NOT alter a verdict for a clean value. WHERE both state carriers are present, the evaluator SHALL compare their normalized exact states — NOT their terminal/non-terminal classes. IF the normalized states differ THEN the plan state is contradictory and SHALL NOT satisfy `legitimately-terminal`, **irrespective of which field is authoritative**.
 
 *Two normative sources establish `Plan_Status`: `templates/PROJECT_PLAN_TEMPLATE.md` line 4, and this spec's own `status_vocabulary` block. The §Required Sections example previously showed `**Status**` and is corrected in this amendment. Prevalence was explicitly rejected as evidence of authority — a large population using the alias is equally consistent with a large population having drifted.*
 
@@ -949,13 +1005,9 @@ Three separate obligations: **(a)** WHEN the evaluator emits a blocking finding,
 
 ### CAP-PP-013-13: Status normalization
 
-WHEN the evaluator compares two status-bearing fields, it SHALL normalize each value by applying, in order: **(a)** removal of markdown emphasis and Unicode symbol characters; **(b)** case folding; **(c)** collapse of internal whitespace and trimming; **(d)** retention of only the leading clause, terminated by the first narrative delimiter; and **(e)** WHERE the resulting clause begins with a value of the CAP-PP-003 status enum, resolution to that enum value, longest match first. The evaluator SHALL NOT consult any synonym, alias, or equivalence list beyond the CAP-PP-003 enum itself. WHERE step (e) does not resolve, the leading clause from (d) SHALL be compared literally.
+WHEN an evaluator reads a canonical state value, it SHALL normalize only markdown emphasis, Unicode symbols, case, and whitespace before exact matching against CAP-PP-003. A legacy value with a narrative suffix remains parseable with a migration warning. Its enum prefix MAY establish state only when the suffix matches the bounded provenance grammar `terminal-verb? ISO-date reference*`, the verb agrees with the disposition (`Complete→completed|closed`, `Closed→closed`, `Closed (Partial)→closed-partial`, `Abandoned→abandoned`, `Superseded→superseded`), and each reference is `gh#digits` or an absolute HTTPS URI. Any other suffix is ambiguous or meaning-changing and SHALL NOT establish terminality. The evaluator SHALL NOT consult a synonym, alias, or equivalence list.
 
-*Measured against 510 plans across three repositories (30 dual-carriers) before this requirement was written: steps (a)–(c) alone read 25 of 30 as contradictory — flagging `COMPLETE (2026-07-12)` against `COMPLETE`, which is a date in a prose tail, not a difference in meaning. With (d)–(e) the figure is 5 of 30, and all five are genuine (three are a **gate** value occupying a **plan**-status field).*
-
-*The prohibition in sentence two is deliberate and load-bearing: a synonym table (`Done → Complete`) was considered and rejected, because a wrong entry in such a table silently hides a real contradiction and nobody re-reads it. The CAP-PP-003 enum is closed and already normative, so (e) consumes an existing definition rather than creating a list anyone must maintain.*
-
-*Values that are not enum members deliberately do NOT normalize away: they compare by leading clause and can therefore remain contradictory. A plan whose header carries a gate value in a plan-status field is genuinely malformed, and normalizing that away would hide a real defect class.*
+*This corrects v1.4.0's lossy leading-clause truncation. `Complete — closed 2026-06-28 gh#123` is descriptive legacy provenance; `Complete — validation failed` is meaning-changing and cannot certify terminality.*
 
 ### Verification Tests — V-PP-026..038
 
@@ -975,11 +1027,161 @@ WHEN the evaluator compares two status-bearing fields, it SHALL normalize each v
 | V-PP-035 | CAP-PP-013-12 | blocking finding → nonzero exit |
 | V-PP-035a | CAP-PP-013-12 | hygiene-only → exit unchanged (0) |
 | V-PP-035b | CAP-PP-013-12 | rendered output labels HYGIENE distinctly from blocking |
-| V-PP-036 | CAP-PP-013-07 | `legitimately-terminal` direct — (a), (b), (c) each independently falsified |
-| V-PP-037 | CAP-PP-013-13 | equivalence: `Complete` · `complete` · `" Complete "` · `✅ Complete` · `**COMPLETE — closed 2026-06-28 (gh#123)**` resolve to one state, AND `Complete` vs `Abandoned` does not (both polarities in one test) |
+| V-PP-036 | CAP-PP-013-07 | `legitimately-terminal` direct — (a), (b), (c), (d) each independently falsified; no additional condition |
+| V-PP-037 | CAP-PP-013-13 | descriptive legacy provenance resolves with warning; `Complete — validation failed` cannot establish terminality; `Complete` vs `Abandoned` remains contradictory |
 | V-PP-038 | CAP-PP-013-13 | bounds: `Done` does NOT resolve to `Complete` (no synonym list); a non-enum value (`gate 2`) compares by leading clause and stays contradictory against `in progress` |
 
 **Enforcement status at publication**: specification-level only. `scripts/close_gate_check.py` implements
 none of CAP-PP-013-05..13 as of v1.4.0 — the implementing repair is tracked at gh#2250 and is a separate,
 separately-authorized change. This is disclosed rather than left to be discovered: a reader MUST NOT infer
 from this amendment that a deployed evaluator honours these modes today.
+
+---
+
+## Amendment v1.5.0 — Joint Lifecycle, Evaluation, and Close-Gate Contract (gh#2250 + gh#2223)
+
+**Why**: v1.4.0 discarded every status suffix before interpreting it, so a meaning-changing value such as
+`Complete — validation failed` could be read as clean. The close workflow also accepted five terminal
+dispositions while CAP-PP-003 governed only two, and it evaluated closer-authored outputs as entry
+criteria. This same-day correction joins the ruled status semantics, rich lifecycle vocabulary, finding
+identity, document roundtrip, and ETVX ordering in one contract.
+
+### CAP-PP-013-14: Lifecycle-class attribute (ETVX)
+
+Every CAP-PP-013 requirement SHALL declare exactly one lifecycle class: `creator-scaffolded`,
+`pre-close-verifiable`, or `closer-authored`. Creator-scaffolded material is structure or input supplied
+before close; pre-close-verifiable conditions may block entry before mutation; closer-authored material
+is produced by the close task and SHALL be verified only at exit. A requirement spanning classes SHALL
+be decomposed.
+
+| Requirement | Lifecycle class | Requirement | Lifecycle class |
+|---|---|---|---|
+| CAP-PP-013-01 | creator-scaffolded | CAP-PP-013-12 | pre-close-verifiable |
+| CAP-PP-013-02 | closer-authored | CAP-PP-013-13 | pre-close-verifiable |
+| CAP-PP-013-03 | closer-authored | CAP-PP-013-14 | pre-close-verifiable |
+| CAP-PP-013-04 | closer-authored | CAP-PP-013-15 | pre-close-verifiable |
+| CAP-PP-013-05 | pre-close-verifiable | CAP-PP-013-16 | pre-close-verifiable |
+| CAP-PP-013-06 | pre-close-verifiable | CAP-PP-013-17 | pre-close-verifiable |
+| CAP-PP-013-07 | closer-authored | CAP-PP-013-18 | closer-authored |
+| CAP-PP-013-08 | pre-close-verifiable | CAP-PP-013-19 | pre-close-verifiable |
+| CAP-PP-013-09 | creator-scaffolded | CAP-PP-013-20 | closer-authored |
+| CAP-PP-013-10 | pre-close-verifiable | CAP-PP-013-21 | creator-scaffolded |
+| CAP-PP-013-11 | creator-scaffolded | CAP-PP-013-22 | closer-authored |
+
+This table is the machine-readable classification source. Consumers SHALL derive it rather than keep a
+literal copy. The classes instantiate ETVX: entry, task, verification, exit remain distinct.
+
+### CAP-PP-013-15: Explicit target disposition
+
+WHEN a close is invoked, the invocation SHALL provide exactly one terminal disposition from CAP-PP-003.
+No default exists. Free-form reason text explains a selection and SHALL NOT select or infer it. A CLI MAY
+spell `Closed (Partial)` as `CLOSED-PARTIAL`; comparison and document storage use the canonical form.
+
+### CAP-PP-013-16: Finding occurrence identity and semantic class
+
+Each finding SHALL carry `reason_key`, `affected_subject`, optional `evidence_location`,
+`source_requirement`, and the lifecycle class derived from CAP-PP-013-14. The first three fields establish
+occurrence identity; source requirement and lifecycle class govern entry/exit routing. Matching is a
+deterministic one-to-one bijection; set membership SHALL NOT consume duplicate occurrences. Every raw key
+SHALL map to exactly one class:
+
+| Semantic class | Raw finding keys |
+|---|---|
+| `substantive_work` | `gate_status_pending`, `vtest_pending`, `status_row_nonterminal`, `gate_heading_nonterminal` |
+| `closure_record` | `unchecked_closure_item`, `placeholder_substance` |
+| `integrity` | `dual_status_mask`, `supersession_not_explicit`, `release_close_guard_block`, `release_close_guard_error` |
+
+An unknown raw key is an uncovered declared surface and SHALL fail closed until mapped here.
+
+### CAP-PP-013-17: Waivability and evaluator-mode boundary
+
+`closure_record` and `integrity` findings are never waivable. At exit, a reasoned disposition (`Closed`,
+`Closed (Partial)`, `Abandoned`, `Superseded`) MAY account for each `substantive_work` occurrence through
+CAP-PP-013-18. The raw `status_row_nonterminal` finding denotes an unchecked deliverable and SHALL block
+in closure and audit mode under every disposition. HYGIENE is limited to stale gate-status presentation
+on a plan that already satisfies CAP-PP-013-07; it SHALL NOT absorb closure-record, integrity, or
+unchecked-deliverable findings.
+
+### CAP-PP-013-18: `Unfinished at Close` document roundtrip
+
+For a reasoned disposition with surviving `substantive_work` findings, the closer SHALL author exactly one
+`## Unfinished at Close` table with header `| reason_key | affected_subject | disposition | note |` and
+one row per finding occurrence. Row disposition is `deferred`, `obsolete`, or `accepted-incomplete`.
+Deferred rows name a governed vehicle and reason; obsolete rows name a reason; accepted-incomplete rows
+name authority, approval receipt, and reason. Pipes are escaped as `\|`. Empty fields, unknown or
+duplicate note keys, duplicate headings, malformed escapes, orphan rows, and unmatched findings are
+errors or blocking findings. The exit verifier SHALL reparse the mutated document and reconcile it
+one-to-one before transition. `Complete` prohibits this section; a reasoned disposition with no surviving
+finding omits it.
+
+### CAP-PP-013-19: Lawful lifecycle transitions
+
+| Source state | Lawful terminal targets |
+|---|---|
+| `Draft` | `Abandoned`, `Superseded` |
+| `In Progress` | `Complete`, `Closed`, `Closed (Partial)`, `Abandoned`, `Superseded` |
+| `Staged` | `Complete`, `Closed`, `Closed (Partial)`, `Abandoned`, `Superseded` |
+| `Implemented-Awaiting-Deployment-Evidence` | `Complete`, `Closed`, `Closed (Partial)`, `Abandoned`, `Superseded` |
+| `Piloted` | `Complete`, `Closed`, `Closed (Partial)`, `Abandoned`, `Superseded` |
+
+Terminal dispositions are immutable; correction requires an explicitly recorded reopen to `In Progress`.
+The three waiting states require an advancement pointer. `Complete` is unlawful while a required
+downstream deployment observable is absent; the plan remains
+`Implemented-Awaiting-Deployment-Evidence` under L656.
+
+### CAP-PP-013-20: Disposition-specific assertion and evidence
+
+| Disposition | Assertion | Required evidence |
+|---|---|---|
+| `Complete` | all scoped outcomes and exit criteria realized | live gates and V-tests complete; closure record complete; no `Unfinished at Close`; value verdict and actual effort |
+| `Closed` | work terminated and all remainder rerouted or retired | reason and per-occurrence accounting; every deferred item names a vehicle |
+| `Closed (Partial)` | a named realized subset is retained and all remainder accounted | realized-subset statement and at least one reconciled unfinished occurrence |
+| `Abandoned` | work stopped without claiming success or replacement | abandonment reason and per-occurrence accounting; no successor assertion |
+| `Superseded` | a unique named successor owns the remaining intent | valid non-self successor and per-occurrence accounting to it or an explicit obsolete ruling |
+
+All dispositions also satisfy the non-waivable closure-record and integrity rules.
+
+### CAP-PP-013-21: Separate annotation and bounded migration
+
+New or mutated plans SHALL store only the canonical enum in `Plan_Status` and MAY store provenance in
+`Plan_Status_Annotation`. Legacy annotated values remain readable per CAP-PP-013-13. Before the supervisor
+proceeds, migration is REQUIRED only for evaluated critical-path plans; other legacy plans form a backlog
+and SHALL NOT be mass-rewritten as a prerequisite.
+
+### CAP-PP-013-22: Ordered close protocol and invariants
+
+The close protocol SHALL: **(1)** validate explicit disposition and source transition; **(2)** scan
+creator-scaffolded and pre-close-verifiable inputs—integrity findings always block; `Complete` blocks on
+substantive work; a reasoned disposition may carry substantive work forward to per-occurrence accounting,
+except `status_row_nonterminal`, which blocks until the deliverable row is explicitly dispositioned;
+**(3)** author closer-owned outputs; **(4)** reparse
+the mutated document and evaluate exit findings; **(5)** reconcile every finding occurrence; **(6)**
+transition status and commit only after a CLEAN or governed reasoned-disposition verdict. It preserves:
+
+- **I1** — closure-record and integrity findings are never laundered through a reasoned disposition;
+- **I2** — acceptance traverses invocation → mutation → parse → verdict;
+- **I3** — identity and accounting are per occurrence;
+- **I4** — declared-surface completeness is the union across normative and consuming sources, with this
+  spec resolving disagreements and consumers forbidden to invent values.
+
+The generated disposition × finding-kind × mode × phase product SHALL have exactly one outcome per cell
+and zero unresolved cells. Verdict precedence is `ERROR > BLOCK > HYGIENE > CLEAN`; HYGIENE does not
+alter exit status.
+
+### Verification Tests — V-PP-039..047
+
+| ID | Covers | Assertion |
+|---|---|---|
+| V-PP-039 | CAP-PP-013-14 | every CAP-PP-013-01..22 requirement has exactly one instrument-derived lifecycle class |
+| V-PP-040 | CAP-PP-013-07/-11/-13/-21 | descriptive qualifier resolves with warning; negating/ambiguous qualifier cannot establish terminality; implementation adds no IFF condition |
+| V-PP-041 | CAP-PP-003, CAP-PP-013-19/-20 | each state has one class; every lawful transition has target evidence; no terminal disposition is provisional |
+| V-PP-042 | CAP-PP-013-15 | missing/unknown disposition errors; reason cannot select; CLI partial spelling roundtrips |
+| V-PP-043 | CAP-PP-013-16/-17/-22 | every raw key maps once; product coverage has zero gaps/conflicts; a synthetic key/disposition fails closed |
+| V-PP-044 | CAP-PP-013-16/-18 | two same-key findings require two acknowledgement rows |
+| V-PP-045 | CAP-PP-013-18/-22 | actual write→parse→reconcile predicts verdict and rejects malformed/orphan/non-waivable rows |
+| V-PP-046 | CAP-PP-013-17/-22 | unchecked deliverables and closure-record/integrity findings block in both modes; only bounded stale presentation can be HYGIENE |
+| V-PP-047 | CAP-PP-013-19/-20/-22 | all five dispositions traverse invocation→document→parse→verdict; invalid source transition blocks |
+
+**Enforcement status at publication**: specification candidate only. Gate 3 implements this contract and
+Gate 3V independently exercises V-PP-040 and V-PP-042..047. Publication of this specification SHALL ride
+with the coherent implementation; v1.5.0 MUST NOT be pushed as a spec-only intermediate.
