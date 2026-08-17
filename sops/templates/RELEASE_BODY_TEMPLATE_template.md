@@ -173,3 +173,15 @@ echo "✅ L909 PASS"
 ---
 
 *RELEASE_BODY_TEMPLATE_template.md — authored 2026-05-02 to close the core-vs-template release-body distinction gap. v3.16.0 archetype-templates calibration history: 138 (under-floor; original L671 anti-pattern) → 1155 (over-cap; verbatim CHANGELOG paste anti-pattern) → 766 (correct; skeleton 2 norm).*
+
+## Contract bounds (CAP-REL-006-02, spec v1.18.0)
+
+Template bodies obey the same contract as core, at template density:
+
+- `## What's New` carries **5-10 scannable items**, each ≤2 rendered lines. A scannable item is a
+  list item OR a bold-lead paragraph. Do not pad to reach 5 — if a template genuinely received fewer
+  than five distinct changes, use the explicit-notes path rather than fabricating items.
+- Core pair `## What's New` + `## Compatibility` both required; **no fixed total-section count**.
+- Every H2 must be a registered name (CAP-REL-006-02-04). `(or equivalent)` is withdrawn.
+- Release title: `vX.Y.Z - {theme}`, version appearing exactly once (CAP-REL-006-02-09).
+- The inverse-of-core principle is unchanged: a verbose core body MUST NOT inflate templates.

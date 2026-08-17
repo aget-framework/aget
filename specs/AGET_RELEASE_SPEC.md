@@ -1,11 +1,11 @@
 # AGET Release Specification
 
-**Version**: 1.17.1
+**Version**: 1.18.0
 **Status**: Active
 **Category**: Process (Release Management)
 **Format Version**: 1.2
 **Created**: 2026-01-04
-**Updated**: 2026-05-02
+**Updated**: 2026-08-17
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_RELEASE_SPEC.md`
 **Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.2
@@ -343,16 +343,57 @@ python3 -c "import json; v=json.load(open('.aget/version.json')); print('PASS' i
 | CAP-REL-006-01 | Every tag SHALL have corresponding GitHub Release | User visibility |
 | CAP-REL-006-02 | Release notes SHALL summarize CHANGELOG | Accessibility |
 | CAP-REL-006-02-01 | Release body SHALL include `**Theme**:` line summarizing the cycle's theme/title | Headline accessibility |
-| CAP-REL-006-02-02 | Release body SHALL include `## What's New` section with **5-10 bullet items, each ≤2 lines** summarizing CHANGELOG `### Added` and/or `### Changed` sections | Substantive summarization with precedent-grounded bounds (v3.15: 10 bullets; v3.16: 7 bullets; ≤2-line bullets per precedent compactness; closes "verbose ballooning" anti-pattern surfaced at v3.17 release-day audit) |
+| CAP-REL-006-02-02 | Release body SHALL include a `## What's New` section carrying **5-10 scannable items, each ≤2 rendered lines**, summarizing CHANGELOG `### Added` and/or `### Changed` sections. A **scannable item** is a bounded change summary rendered EITHER as a markdown list item (`-`/`*`) OR as a bold-lead paragraph (`**Lead** — detail`). Both renderings are conformant; MIXING them within one `## What's New` section is conformant. Prose paragraphs without a bold lead are NOT scannable items. | Substantive summarization with precedent-grounded bounds (v3.15: 10 items; v3.16: 7 items; ≤2-line compactness closes the "verbose ballooning" anti-pattern from the v3.17 release-day audit). **Rendering-neutral since v1.18.0**: the bounded-item *invariant* is what the bound was measuring; bullet syntax was incidental. v3.28.0 shipped 16 bounded bold-lead items and failed a bullet-only check — improvement read as regression (L1264). |
 | CAP-REL-006-02-03 | Release body SHALL include `## Compatibility` section stating either "No breaking changes" or referencing BREAKING_CHANGES_v{X.Y}.md | Migration clarity |
-| CAP-REL-006-02-04 | If release ships any SPEC-LANDED-IMPL-DEFERRED capabilities OR sleeping requirements, release body SHALL include `## Sleeping-CAPs Disclosure` (or equivalent) section | Honest spec-truthfulness per ADR-007 |
+| CAP-REL-006-02-04 | A release body SHALL carry one disclosure section for each applicable honesty class, named from the CLOSED set in the table below. `(or equivalent)` is **WITHDRAWN as of v1.18.0** — an unlisted section name is a FAIL, not a variant. Where no class applies, no disclosure section is required. | Honest spec-truthfulness per ADR-007, plus vocabulary-first naming (#800 / L954) applied to the framework's most public artifact. `(or equivalent)` admitted eight unregistered names across the corpus which read as synonyms but are **distinct speech acts**. |
 | CAP-REL-006-02-05 | Release body SHALL reference the canonical CHANGELOG entry with a resolvable link (verified to return HTTP 200 at publication time) | Avoids broken links (closes 17-cycle AGET_DELTA chronic) |
 | ~~CAP-REL-006-02-06~~ | ~~Release body length SHALL be ≥ 30 lines~~ | **WITHDRAWN at authoring time** (CAP-REL-006-02-07 below replaces with precedent-grounded bounds) |
 | CAP-REL-006-02-07 | Release body total length SHALL be **12-25 non-blank lines** (~1500-2500 bytes) for minor releases; **5-15 lines** for patch releases. Range derived from v3.15+v3.16 precedent measurement (v3.15=22 lines/1922 bytes; v3.16=13 lines/1678 bytes). Bodies outside range FAIL the V-test as either too-thin (presence-only) OR too-long (verbose ballooning). | Precedent-grounded bounds (NOT aspirational architecture; per L289 evidence-first design at spec-authoring layer); closes recursive Theme C3 V-test scope-of-validation gap at spec-authoring scope (6th in-cycle recurrence) |
-| CAP-REL-006-02-08 | Release body SHALL contain exactly **3 H2 sections**: What's New + (Sleeping-CAPs Disclosure if applicable / Compatibility) + Compatibility. References (links) MAY be inline with sections; no separate ## References section. | Precedent (v3.15: 3 sections; v3.16: 3 sections); rejects "extra section" verbosity pattern |
+| CAP-REL-006-02-08 | A release body SHALL carry the **core pair** — `## What's New` AND `## Compatibility` — each independently required. It MAY carry `## Migration` and zero or more disclosure sections, every H2 being a registered name per CAP-REL-006-02-04. There is **no fixed total-section count**. References (links) MAY be inline with sections; a separate `## References` section SHALL NOT be used. | **Corpus-derived, re-measured 2026-08-17** over the v3.17.0-v3.31.0 template era (n=18, `gh release view --json body`): the core pair holds at **16/18 (89%)** while exactly-three-H2 holds at only **7/18 (39%)**. The prior "exactly 3" was never precedent-grounded — a clause the majority of its own governed corpus violates is measuring the wrong thing (L742: the specification is at fault). The variation it read as drift lives **entirely in the disclosure sections**, which -04 now governs by name; the prior rule conflated *core sections* with *total sections*. Both remaining failures (v3.24.0, v3.25.0) are genuine missing-core defects the old rule buried among false positives. |
 | CAP-REL-006-02-09 | Release title SHALL be `v{X.Y.Z} - {theme}` (or `v{X.Y.Z} — {theme}` em-dash; precedent allows both). Title SHALL NOT contain `v{X.Y.Z}` more than once. | Precedent (v3.14.1: "v3.14.1 — #979 installer"; v3.15: "v3.15.0 — Two-Level Model"; v3.16: "v3.16.0 - Framework-Discipline Closure"); closes v3.17 duplication anomaly ("v3.17.0 - v3.17.0 — Theme C3..." caught at release-day audit). Either `tag_release.py:create_release()` SHALL detect leading-version-in-description and strip it, OR caller SHALL NOT include version in --description. V-CAP-REL-006-02 enforces via `gh release view --json name` regex match. |
 | CAP-REL-006-03 | Pre-releases SHALL be marked as such | Stability signaling |
-| **V-CAP-REL-006-02** | **paired V-test** | **`aget/verification/validate_release_body.py`** fetches each repo's `gh release view --json body` post-publication AND validates conformance to CAP-REL-006-02-01..06; FAIL on any non-conforming release. Closes 17-cycle chronic gap. |
+| **V-CAP-REL-006-02** | **paired V-test** | **`aget/verification/validate_release_body.py`** fetches each repo's `gh release view --json body` **and `--json name`** post-publication and validates conformance to the **eight live sub-requirements** — `-01`, `-02`, `-03`, `-04`, `-05`, `-07`, `-08`, `-09` (`-06` is WITHDRAWN and is not validated). The validator SHALL emit one keyed result per live sub-requirement; a sub-requirement that cannot be evaluated SHALL emit an explicit `UNAVAILABLE` result and SHALL NOT be silently omitted. FAIL on any non-conforming release. Closes 17-cycle chronic gap. |
+
+**CAP-REL-006-02-04 registered section vocabulary** (normative; referenced by `-04` and `-08`).
+Every H2 in a release body SHALL be a registered name. Names carry a **preferred label** and optional
+**alternate labels** in the SKOS sense — an alternate is the same speech act under an attested name, NOT
+a licence to coin new ones. An unregistered H2 is a FAIL.
+
+*Structural sections*
+
+| Role | Preferred label | Required when |
+|---|---|---|
+| Core | `## What's New` | always (CAP-REL-006-02-02) |
+| Core | `## Compatibility` | always (CAP-REL-006-02-03) |
+| Conditional | `## Migration` | the release ships breaking changes |
+
+*Disclosure sections — one per applicable honesty class*
+
+| Honesty class | Preferred label | Registered alternates | Fires when |
+|---|---|---|---|
+| Deferred capability | `## Sleeping-CAPs Disclosure` | — | any SPEC-LANDED-IMPL-DEFERRED CAP or sleeping requirement ships |
+| Carried debt | `## What This Release Doesn't Change` | `## Known issues (pre-existing)` | known defects exist that this release neither introduced nor fixed |
+| Scope reduction | `## Deferred` | — | planned scope was cut in-cycle |
+| Post-tag amendment | `## Post-tag repairs` | — | release-coupled paths changed after the tag |
+| Ship-time limitation | `## Known gaps` | `## Disclosed limitations` | a limitation is known AT ship time and is not a deferred CAP |
+
+**Derivation (2026-08-17, live `gh release view` census over v3.17.0-v3.31.0, n=18).** This registry is
+corpus-derived, not designed. Seventeen distinct H2 names are attested; the eleven above are registered
+and the remaining six (`Notes`, `Summary`, `Propagation`, `Overview`, `Honest disclosure`,
+`Cycle Discipline Highlight — Honest Defect Acknowledgment`, plus the bare CHANGELOG headings `Added` and
+`Changed`) are not. Under this registry v3.26.0-v3.31.0 — every release of the last six cycles —
+conforms without edit. Earlier non-conforming bodies are dated artifacts, not current failures (L944):
+this clause governs releases published after v1.18.0.
+
+**Two corrections to the staged 2026-07-26 delta, both forced by re-measurement.** That delta proposed a
+closed FOUR-name set and cited v3.28.0's `Disclosed limitations` as the falsifier proving a fifth class
+was owed. **At source today v3.28.0 carries no such section** — its H2s are What's New / Compatibility /
+Migration. The body was rewritten during the 2026-08-16 manager-side remediation, so the delta's corpus
+evidence describes bodies that no longer exist. The fifth class is nonetheless real and is registered
+above, now grounded in v3.31.0's live `Known gaps`. Separately, `## Migration` — carried by three of the
+last four releases and already mandated by `TEMPLATE_RELEASE_BODY.md`'s checklist — is **not a disclosure
+class at all**; it is a conditional structural section, and a closed disclosure set that omitted it would
+have failed v3.28.0, v3.29.0 and v3.30.0 on a category error.
 
 ### CAP-REL-007: Release Documentation
 
@@ -1681,6 +1722,37 @@ Per the two-level model (L742): requirements define principal intent (human leve
 ---
 
 ## Changelog
+
+### v1.18.0 (2026-08-17)
+
+Release-body contract alignment — spec, three authoring templates, SOP, and canonical validator made
+to state one executable contract. Tracking `gh#2004`.
+
+- **CAP-REL-006-02-02 is rendering-neutral.** "5-10 bullet items" becomes "5-10 **scannable items**",
+  where an item is a list item OR a bold-lead paragraph, each ≤2 rendered lines. Both renderings are
+  conformant and may be mixed. The bounded-item invariant is what the bound always measured; bullet
+  syntax was incidental. v3.28.0 shipped 16 bounded bold-lead items and failed a bullet-only check —
+  improvement read as regression (L1264).
+- **CAP-REL-006-02-04 closes the `(or equivalent)` escape hatch** with a registered section vocabulary
+  carrying SKOS preferred/alternate labels. Corpus-derived from a live census over v3.17.0-v3.31.0
+  (n=18, 17 distinct H2 names attested). Structural sections (core pair + conditional `## Migration`)
+  are separated from disclosure sections; five honesty classes are registered. An unregistered heading
+  is a FAIL, not a variant.
+- **CAP-REL-006-02-08 drops the fixed section count.** "Exactly 3 H2 sections" held for only 7/18
+  template-era bodies and was never precedent-grounded; the core pair (`What's New` AND `Compatibility`)
+  holds at 16/18. The prior rule conflated core sections with total sections and manufactured false
+  failures, while the two genuine defects (v3.24.0, v3.25.0) stayed buried among them. Per L742 the
+  specification was at fault, not the corpus.
+- **V-CAP-REL-006-02 states its true coverage.** It claimed `01..06`; the live set is
+  `-01,-02,-03,-04,-05,-07,-08,-09` (`-06` is WITHDRAWN). The validator now emits one keyed result per
+  live sub-requirement, and a check that cannot be evaluated emits `UNAVAILABLE` rather than being
+  omitted — the shipped validator silently dropped `-09`, so seven green checks read as a complete pass
+  (L671).
+- **CAP-REL-006-02-09 is enforced for the first time.** Title validation existed as a comment claiming
+  `main()` would populate it; `main()` never did.
+
+Conformance effect: v3.26.0-v3.31.0 conform without edit. Earlier bodies remain dated artifacts under
+L944 — this clause governs releases published after v1.18.0.
 
 ### v1.16.1 (2026-05-02)
 

@@ -1,14 +1,23 @@
 #!/usr/bin/env python3
 """
-V-CAP-REL-006-02: Validate GitHub Release body conforms to CAP-REL-006-02-01..06.
+V-CAP-REL-006-02: Validate a GitHub Release against the eight live CAP-REL-006-02 sub-requirements.
 
-Implements:
+Implements (per AGET_RELEASE_SPEC v1.18.0):
 - CAP-REL-006-02-01: Theme line present
-- CAP-REL-006-02-02: What's New section with ≥3 bullets
+- CAP-REL-006-02-02: What's New with 5-10 scannable items, each <=2 rendered lines
+                     (a scannable item is a list item OR a bold-lead paragraph)
 - CAP-REL-006-02-03: Compatibility section
-- CAP-REL-006-02-04: Sleeping-CAPs Disclosure (if applicable)
+- CAP-REL-006-02-04: every H2 is a registered name; required disclosure section per applicable class
 - CAP-REL-006-02-05: CHANGELOG link resolves (HTTP 200)
-- CAP-REL-006-02-06: Body length ≥ 30 lines
+- CAP-REL-006-02-07: body length 12-25 non-blank lines
+- CAP-REL-006-02-08: core pair present (What's New AND Compatibility); no fixed total-section count
+- CAP-REL-006-02-09: release title format
+
+CAP-REL-006-02-06 is WITHDRAWN and is deliberately not validated.
+
+Every live sub-requirement emits exactly one keyed result. A check that cannot be evaluated emits
+UNAVAILABLE and names what was missing -- it is never silently omitted, because a consumer counting
+green checks cannot distinguish an absent check from a passing one.
 
 Usage:
     python3 validate_release_body.py --version 3.17.0 [--repo aget-framework/aget] [--strict] [--json]
@@ -16,7 +25,7 @@ Usage:
 
 Exit codes:
     0 = all PASS
-    1 = any FAIL
+    1 = any FAIL or UNAVAILABLE
     2 = validator error (e.g., gh CLI unavailable)
 """
 
@@ -45,16 +54,70 @@ ALL_REPOS = [
     "aget-framework/template-worker-aget",
 ]
 
+# CAP-REL-006-02-04 registered section vocabulary, corpus-derived 2026-08-17 over v3.17.0-v3.31.0.
+# Keys are normalized labels; values are the honesty/structural class.
+CORE_SECTIONS = {
+    "what's new": "core",
+    "compatibility": "core",
+}
+CONDITIONAL_STRUCTURAL = {
+    "migration": "migration",
+}
+DISCLOSURE_SECTIONS = {
+    # preferred label            class
+    "sleeping-caps disclosure": "deferred_capability",
+    "what this release doesn't change": "carried_debt",
+    "known issues (pre-existing)": "carried_debt",          # registered alternate
+    "deferred": "scope_reduction",
+    "post-tag repairs": "post_tag_amendment",
+    "known gaps": "ship_time_limitation",
+    "disclosed limitations": "ship_time_limitation",        # registered alternate
+}
+REGISTERED_SECTIONS = {**CORE_SECTIONS, **CONDITIONAL_STRUCTURAL, **DISCLOSURE_SECTIONS}
 
-def fetch_release_body(repo: str, version: str) -> str:
-    """Fetch release body via gh CLI."""
+LIVE_SUBREQUIREMENTS = ["01", "02", "03", "04", "05", "07", "08", "09"]
+
+
+def normalize_heading(text: str) -> str:
+    """Normalize an H2 label for registry lookup: case, whitespace, and apostrophe variants."""
+    t = text.strip().lower()
+    t = t.replace("’", "'").replace("‘", "'")
+    t = re.sub(r"\s+", " ", t)
+    return t
+
+
+def extract_h2_labels(body: str) -> list:
+    """Return normalized H2 labels in document order."""
+    return [normalize_heading(m) for m in re.findall(r"^##\s+(.+?)\s*$", body, re.MULTILINE)]
+
+
+def extract_scannable_items(section_text: str) -> list:
+    """
+    Return each scannable item's text.
+
+    A scannable item is a bounded change summary rendered EITHER as a markdown list item
+    (- or *) OR as a bold-lead paragraph (**Lead** - detail). Both are conformant and may be
+    mixed; the bounded-item invariant is what the count was ever measuring, not bullet syntax.
+    """
+    item_start = r"(?:^[ \t]*[-*][ \t]+|^[ \t]*\*\*)"
+    pattern = rf"{item_start}(.+?)(?=\n[ \t]*[-*][ \t]+|\n[ \t]*\*\*|\Z)"
+    return re.findall(pattern, section_text, re.MULTILINE | re.DOTALL)
+
+
+def rendered_line_count(item: str) -> int:
+    """Non-blank rendered lines occupied by one item."""
+    return len([ln for ln in item.strip().split("\n") if ln.strip()])
+
+
+def fetch_release_field(repo: str, version: str, field: str) -> str:
+    """Fetch a single field of a release via gh CLI."""
     tag = f"v{version}"
     result = subprocess.run(
-        ["gh", "release", "view", tag, "--repo", repo, "--json", "body", "-q", ".body"],
+        ["gh", "release", "view", tag, "--repo", repo, "--json", field, "-q", f".{field}"],
         capture_output=True, text=True
     )
     if result.returncode != 0:
-        raise RuntimeError(f"gh release view failed for {repo} {tag}: {result.stderr}")
+        raise RuntimeError(f"gh release view --json {field} failed for {repo} {tag}: {result.stderr}")
     return result.stdout.strip()
 
 
@@ -67,89 +130,146 @@ def url_resolves(url: str, timeout: int = 10) -> bool:
         return False
 
 
-def validate_body(repo: str, version: str, body: str) -> dict:
-    """Run all CAP-REL-006-02-NN sub-requirement checks."""
+def validate_body(repo, version, body, title=None, link_resolver=url_resolves):
+    """
+    Run every live CAP-REL-006-02-NN check.
+
+    title=None means the caller could not supply a title; -09 then emits UNAVAILABLE rather than
+    being omitted. link_resolver is injectable so tests need no network.
+    """
     results = {"repo": repo, "version": version, "checks": {}, "overall": "PASS"}
+    checks = results["checks"]
+    h2_labels = extract_h2_labels(body)
 
-    # CAP-REL-006-02-01: Theme line
-    has_theme = bool(re.search(r'\*\*Theme\*\*:', body))
-    results["checks"]["CAP-REL-006-02-01_theme"] = "PASS" if has_theme else "FAIL"
+    # -01: Theme line
+    checks["CAP-REL-006-02-01_theme"] = (
+        "PASS" if re.search(r"\*\*Theme\*\*:", body) else "FAIL (no **Theme**: line)"
+    )
 
-    # CAP-REL-006-02-02: What's New section with 5-10 bullets, each ≤2 lines (precedent-grounded)
-    whats_new_section = re.search(r'##\s+What\'s New\s*\n((?:.|\n)+?)(?=\n##\s|\Z)', body, re.IGNORECASE)
-    bullets = []
-    if whats_new_section:
-        # Extract each bullet's full content (until next bullet or section end)
-        section_text = whats_new_section.group(1)
-        bullet_blocks = re.findall(r'^\s*[-*]\s+(.+?)(?=\n\s*[-*]\s|\Z)', section_text, re.MULTILINE | re.DOTALL)
-        bullets = bullet_blocks
-    bullet_count = len(bullets)
-    bullets_under_2_lines = all(b.count('\n') <= 1 for b in bullets) if bullets else False
-    if 5 <= bullet_count <= 10 and bullets_under_2_lines:
-        results["checks"]["CAP-REL-006-02-02_whats_new"] = "PASS"
-    elif bullet_count < 5:
-        results["checks"]["CAP-REL-006-02-02_whats_new"] = f"FAIL (found {bullet_count} bullets; need 5-10)"
-    elif bullet_count > 10:
-        results["checks"]["CAP-REL-006-02-02_whats_new"] = f"FAIL (found {bullet_count} bullets; need 5-10 — too verbose)"
+    # -02: What's New with 5-10 scannable items, each <=2 rendered lines
+    section = re.search(r"##\s+What's New\s*\n((?:.|\n)+?)(?=\n##\s|\Z)", body, re.IGNORECASE)
+    if not section:
+        checks["CAP-REL-006-02-02_whats_new"] = "FAIL (no ## What's New section)"
     else:
-        long_bullets = sum(1 for b in bullets if b.count('\n') > 1)
-        results["checks"]["CAP-REL-006-02-02_whats_new"] = f"FAIL ({bullet_count} bullets but {long_bullets} exceed 2 lines)"
+        items = extract_scannable_items(section.group(1))
+        n = len(items)
+        overlong = [i for i in items if rendered_line_count(i) > 2]
+        if not 5 <= n <= 10:
+            adjective = "too thin" if n < 5 else "too verbose"
+            checks["CAP-REL-006-02-02_whats_new"] = (
+                f"FAIL (found {n} scannable items; need 5-10 — {adjective})"
+            )
+        elif overlong:
+            checks["CAP-REL-006-02-02_whats_new"] = (
+                f"FAIL ({n} scannable items but {len(overlong)} exceed 2 rendered lines)"
+            )
+        else:
+            checks["CAP-REL-006-02-02_whats_new"] = f"PASS ({n} scannable items, each <=2 lines)"
 
-    # CAP-REL-006-02-03: Compatibility section
-    has_compat = bool(re.search(r'##\s+Compatibility|##\s+No\s+breaking\s+changes|No breaking changes\.', body, re.IGNORECASE))
-    results["checks"]["CAP-REL-006-02-03_compatibility"] = "PASS" if has_compat else "FAIL (no Compatibility section or 'No breaking changes' statement)"
+    # -03: Compatibility section
+    has_compat = "compatibility" in h2_labels or bool(
+        re.search(r"No breaking changes", body, re.IGNORECASE)
+    )
+    checks["CAP-REL-006-02-03_compatibility"] = (
+        "PASS" if has_compat
+        else "FAIL (no Compatibility section or 'No breaking changes' statement)"
+    )
 
-    # CAP-REL-006-02-04: Sleeping-CAPs Disclosure (CONDITIONAL — required if SPEC-LANDED-IMPL-DEFERRED present)
-    mentions_sleeping = bool(re.search(r'SPEC-LANDED|sleeping[\s-]*CAP|grace[\s-]*extend', body, re.IGNORECASE))
-    has_disclosure = bool(re.search(r'##\s+Sleeping[\s-]*CAPs?', body, re.IGNORECASE))
-    if mentions_sleeping:
-        results["checks"]["CAP-REL-006-02-04_sleeping_disclosure"] = "PASS" if has_disclosure else "FAIL (mentions sleeping CAPs but lacks dedicated disclosure section)"
+    # -04: registered section vocabulary + required disclosure per applicable class
+    unregistered = [h for h in h2_labels if h not in REGISTERED_SECTIONS]
+    mentions_sleeping = bool(
+        re.search(r"SPEC-LANDED|sleeping[\s-]*CAP|grace[\s-]*extend", body, re.IGNORECASE)
+    )
+    has_sleeping_section = any(
+        DISCLOSURE_SECTIONS.get(h) == "deferred_capability" for h in h2_labels
+    )
+    if unregistered:
+        checks["CAP-REL-006-02-04_disclosure"] = (
+            f"FAIL (unregistered section name(s): {unregistered}; "
+            f"'(or equivalent)' withdrawn in v1.18.0)"
+        )
+    elif mentions_sleeping and not has_sleeping_section:
+        checks["CAP-REL-006-02-04_disclosure"] = (
+            "FAIL (mentions sleeping CAPs but lacks a Sleeping-CAPs Disclosure section)"
+        )
     else:
-        results["checks"]["CAP-REL-006-02-04_sleeping_disclosure"] = "PASS (not applicable)"
+        classes = sorted({
+            DISCLOSURE_SECTIONS[h] for h in h2_labels if h in DISCLOSURE_SECTIONS
+        })
+        detail = ", ".join(classes) if classes else "no disclosure class applicable"
+        checks["CAP-REL-006-02-04_disclosure"] = f"PASS ({detail})"
 
-    # CAP-REL-006-02-05: CHANGELOG link resolves
-    changelog_links = re.findall(r'https?://[^\s\)]+(?:CHANGELOG|AGET_DELTA|release-notes)[^\s\)]*\.(?:md|html)?', body)
-    if changelog_links:
-        # Check at least one resolves
-        resolves = any(url_resolves(url) for url in changelog_links[:3])  # cap at 3 to limit network calls
-        results["checks"]["CAP-REL-006-02-05_link_resolves"] = "PASS" if resolves else f"FAIL (links found but none resolve: {changelog_links[:3]})"
+    # -05: CHANGELOG link resolves
+    links = re.findall(
+        r"https?://[^\s\)]+(?:CHANGELOG|AGET_DELTA|release-notes)[^\s\)]*\.(?:md|html)?", body
+    )
+    if not links:
+        checks["CAP-REL-006-02-05_link_resolves"] = (
+            "FAIL (no CHANGELOG/AGET_DELTA/release-notes link found)"
+        )
+    elif any(link_resolver(u) for u in links[:3]):
+        checks["CAP-REL-006-02-05_link_resolves"] = "PASS"
     else:
-        results["checks"]["CAP-REL-006-02-05_link_resolves"] = "FAIL (no CHANGELOG/AGET_DELTA/release-notes link found)"
+        checks["CAP-REL-006-02-05_link_resolves"] = f"FAIL (links found but none resolve: {links[:3]})"
 
-    # CAP-REL-006-02-06: WITHDRAWN at authoring (replaced by 02-07 precedent-grounded)
+    # -06 is WITHDRAWN: intentionally not validated, and intentionally not emitted.
 
-    # CAP-REL-006-02-07: Body length 12-25 non-blank lines (precedent v3.15+v3.16 range)
-    nonblank = len([line for line in body.split('\n') if line.strip()])
-    byte_size = len(body.encode('utf-8'))
+    # -07: body length 12-25 non-blank lines
+    nonblank = len([ln for ln in body.split("\n") if ln.strip()])
+    byte_size = len(body.encode("utf-8"))
     if 12 <= nonblank <= 25:
-        results["checks"]["CAP-REL-006-02-07_length"] = f"PASS ({nonblank} nonblank lines, {byte_size} bytes within precedent 12-25/1500-2500)"
-    elif nonblank < 12:
-        results["checks"]["CAP-REL-006-02-07_length"] = f"FAIL ({nonblank} nonblank lines; need 12-25 — too thin)"
+        checks["CAP-REL-006-02-07_length"] = (
+            f"PASS ({nonblank} nonblank lines, {byte_size} bytes within precedent 12-25/1500-2500)"
+        )
     else:
-        results["checks"]["CAP-REL-006-02-07_length"] = f"FAIL ({nonblank} nonblank lines; need 12-25 — too verbose, exceeds precedent)"
+        adjective = "too thin" if nonblank < 12 else "too verbose, exceeds precedent"
+        checks["CAP-REL-006-02-07_length"] = (
+            f"FAIL ({nonblank} nonblank lines; need 12-25 — {adjective})"
+        )
 
-    # CAP-REL-006-02-08: Exactly 3 H2 sections
-    h2_sections = re.findall(r'^##\s+', body, re.MULTILINE)
-    h2_count = len(h2_sections)
-    if h2_count == 3:
-        results["checks"]["CAP-REL-006-02-08_sections"] = "PASS (3 H2 sections per precedent)"
+    # -08: core pair present; no fixed total-section count
+    missing_core = [label for label in ("what's new", "compatibility") if label not in h2_labels]
+    if missing_core:
+        checks["CAP-REL-006-02-08_sections"] = (
+            f"FAIL (missing required core section(s): {missing_core})"
+        )
     else:
-        results["checks"]["CAP-REL-006-02-08_sections"] = f"FAIL ({h2_count} H2 sections; need exactly 3)"
+        checks["CAP-REL-006-02-08_sections"] = (
+            f"PASS (core pair present; {len(h2_labels)} H2 sections, no fixed count)"
+        )
 
-    # CAP-REL-006-02-09: Title format (no duplicated v{X.Y.Z} prefix)
-    # Note: title not in body; this check requires gh release view --json name separately.
-    # When called from main() with repo+version context, fetch title and validate.
-    # Stub here returns PASS-deferred; main() will populate via gh CLI.
+    # -09: release title format
+    if title is None:
+        checks["CAP-REL-006-02-09_title"] = (
+            "UNAVAILABLE (no release title supplied; pass title= or use main(), "
+            "which fetches `gh release view --json name`)"
+        )
+    else:
+        checks["CAP-REL-006-02-09_title"] = _validate_title(title, version)
 
-    # Overall verdict
-    if any(check.startswith("FAIL") for check in results["checks"].values()):
+    if any(v.startswith("FAIL") for v in checks.values()):
         results["overall"] = "FAIL"
+    elif any(v.startswith("UNAVAILABLE") for v in checks.values()):
+        results["overall"] = "UNAVAILABLE"
 
     return results
 
 
+def _validate_title(title: str, version: str) -> str:
+    """CAP-REL-006-02-09: title is `v{X.Y.Z} - {theme}` or em-dash; version appears exactly once."""
+    tag = f"v{version}"
+    occurrences = len(re.findall(re.escape(tag), title))
+    if occurrences == 0:
+        return f"FAIL (title does not contain {tag}: {title!r})"
+    if occurrences > 1:
+        return f"FAIL (title contains {tag} {occurrences} times; must appear exactly once: {title!r})"
+    if not re.match(rf"^{re.escape(tag)}\s+[-–—]\s+\S", title.strip()):
+        return f"FAIL (title must be `{tag} - theme` or `{tag} — theme`: {title!r})"
+    return f"PASS ({title!r})"
+
+
 def main():
-    parser = argparse.ArgumentParser(description="Validate GitHub Release body per CAP-REL-006-02-NN")
+    parser = argparse.ArgumentParser(description="Validate a GitHub Release per CAP-REL-006-02-NN")
     parser.add_argument("--version", required=True, help="Version to validate (e.g., 3.17.0)")
     parser.add_argument("--repo", help="Single repo (e.g., aget-framework/aget); default = all 14")
     parser.add_argument("--all-repos", action="store_true", help="Validate all 14 repos")
@@ -163,13 +283,19 @@ def main():
 
     for repo in repos:
         try:
-            body = fetch_release_body(repo, args.version)
-            result = validate_body(repo, args.version, body)
+            body = fetch_release_field(repo, args.version, "body")
+            try:
+                title = fetch_release_field(repo, args.version, "name")
+            except RuntimeError:
+                title = None  # -09 will emit UNAVAILABLE rather than vanish
+            result = validate_body(repo, args.version, body, title=title)
             all_results.append(result)
-            if result["overall"] == "FAIL":
+            if result["overall"] != "PASS":
                 any_fail = True
         except Exception as e:
-            all_results.append({"repo": repo, "version": args.version, "error": str(e), "overall": "ERROR"})
+            all_results.append(
+                {"repo": repo, "version": args.version, "error": str(e), "overall": "ERROR"}
+            )
             any_fail = True
 
     if args.json:
@@ -181,9 +307,13 @@ def main():
                 print(f"  ERROR: {r['error']}")
             else:
                 for check_id, status in r["checks"].items():
-                    marker = "✅" if status.startswith("PASS") else "❌"
-                    print(f"  {marker} {check_id}: {status}")
-        print(f"\n{'='*50}\nSummary: {sum(1 for r in all_results if r['overall'] == 'PASS')}/{len(all_results)} repos PASS")
+                    marker = "PASS" if status.startswith("PASS") else (
+                        "WARN" if status.startswith("UNAVAILABLE") else "FAIL"
+                    )
+                    print(f"  [{marker}] {check_id}: {status}")
+                print(f"  ({len(r['checks'])}/{len(LIVE_SUBREQUIREMENTS)} live sub-requirements emitted)")
+        passing = sum(1 for r in all_results if r["overall"] == "PASS")
+        print(f"\n{'='*50}\nSummary: {passing}/{len(all_results)} repos PASS")
 
     sys.exit(1 if any_fail else 0)
 

@@ -1,6 +1,6 @@
 # SOP: Release Process
 
-**Version**: 1.33
+**Version**: 1.34
 **Created**: 2025-11-30
 **Updated**: 2026-05-09
 **Owner**: private-aget-framework-AGET
@@ -2409,7 +2409,7 @@ See: `docs/COMMUNICATION_STANDARDS.md` for full template
 
 ### Phase 5.5: Compose Release Body (CAP-REL-006-02-NN per v3.18; NEW)
 
-**Purpose**: Author release-body markdown content conforming to CAP-REL-006-02-01..05 BEFORE `tag_release.py --release-only` runs.
+**Purpose**: Author release-body markdown content conforming to the eight live CAP-REL-006-02 sub-requirements (`-01`,`-02`,`-03`,`-04`,`-05`,`-07`,`-08`,`-09`; `-06` is WITHDRAWN) BEFORE `tag_release.py --release-only` runs.
 
 **When**: AFTER tag cut (Phase 5) AND BEFORE GitHub Release creation.
 
@@ -2419,9 +2419,9 @@ See: `docs/COMMUNICATION_STANDARDS.md` for full template
 
 **Starting point**: copy [`templates/TEMPLATE_RELEASE_BODY.md`](../templates/TEMPLATE_RELEASE_BODY.md) (effective v3.18+; first worked example v3.17.0 refresh 2026-05-10). The template encodes the enhanced structure derived from L941-L944 lessons: lead-with-outcome bullet pattern, trailing `*Traceability:*` IDs, mandatory "What This Release Doesn't Change" section for honest gap recording. Voice requirement: REQ-HOM-Q-001 (no em-dash compounds; majority ≤15-word sentences).
 
-For aget/ canonical: rich body matching CAP-REL-006-02-01..05 — Theme line + What's New section with ≥3 bullets summarizing CHANGELOG Added/Changed + Compatibility section + Sleeping-CAPs Disclosure (if applicable) + resolvable CHANGELOG/AGET_DELTA link.
+For aget/ canonical: rich body matching the eight live sub-requirements — Theme line + What's New with **5-10 scannable items** (list items OR bold-lead paragraphs, each ≤2 rendered lines) summarizing CHANGELOG Added/Changed + Compatibility section + any applicable **registered** disclosure section + resolvable CHANGELOG/AGET_DELTA link + conformant release title.
 
-For 13 templates: slim body matching same schema with ≥3 bullets framework-aligned (each template's CHANGELOG entry is shorter than aget/'s; bullets summarize the template-specific changes per template-CHANGELOG.md `## [X.Y.Z]` section).
+For 13 templates: slim body matching same schema with 5-10 scannable items framework-aligned (each template's CHANGELOG entry is shorter than aget/'s; bullets summarize the template-specific changes per template-CHANGELOG.md `## [X.Y.Z]` section).
 
 Author location (private workspace; NOT committed canonical):
 - `release-notes/v{X.Y.Z}_release_body_aget.md` — rich body
@@ -2828,7 +2828,7 @@ grep -q "Pilot.*Status\|private-supervisor-AGET" \
 python3 aget/verification/validate_release_body.py --version X.Y.Z --all-repos
 ```
 
-Validates: Theme line + What's New ≥3 bullets + Compatibility section + Sleeping-CAPs Disclosure (if applicable) + resolvable CHANGELOG link, across 14 repos.
+Validates all eight live sub-requirements across 14 repos: Theme line + What's New with 5-10 scannable items + Compatibility + registered-name section vocabulary + resolvable CHANGELOG link + body length + core-pair presence + release title. Each live sub-requirement emits a keyed result; an unevaluable check emits UNAVAILABLE rather than being omitted.
 
 **Failure**: BLOCKING — Phase 7 SHALL NOT proceed if any repo fails. Remediation: revise release-body content via `gh release edit --notes-file <revised>` until V-test PASSes.
 
