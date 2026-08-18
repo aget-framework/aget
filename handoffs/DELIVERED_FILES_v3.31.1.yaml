@@ -5,7 +5,7 @@ generated: "2026-08-18"
 scope: "complete ordered close-gate correction package; not evidence of downstream receipt or adoption"
 digest_algorithm: "sha256(canonical-json ordered [path, identity] tuples; compact separators; UTF-8)"
 self_identity: "SELF@v3.31.1 resolves to this manifest blob through the annotated tag's peeled commit"
-tuple_digest: "700d3458faa38fb848b0a56d6838ed0c13863b04fb275e5df5d0b9303f3a226e"
+tuple_digest: "92b74d42ffa10442b57b4f4f1d2641a078cf30ee1259e8c353fa9f59e94af996"
 
 ordered_package:
   - ordinal: 1
@@ -25,19 +25,22 @@ ordered_package:
     sha256: "8ee20d6e7a52a99773145858a6f4452b7c6730113858569eb19d7ce6c164c9d4"
   - ordinal: 6
     path: "tests/test_close_gate_receiver_contract.py"
-    sha256: "67ec722ca29b6d74283259ac7105c4b7fc426171491b394e315d57658a7369cb"
+    sha256: "41e39ee1844952c0290f8631a56ddcf571dc80562932069362ea8892a6808401"
   - ordinal: 7
     path: "handoffs/DELIVERED_FILES_v3.31.1.yaml"
     identity: "SELF@v3.31.1"
   - ordinal: 8
     path: "handoffs/REMOTE_MIGRATION_MESSAGE_v3.31.1.md"
-    sha256: "ecbbe01889ddc9c35de533e43ff198e1ef38f971c7610103a30c6a3b7d6cb2c9"
+    sha256: "be60e0311051a6626c65f147a65726cf206e0133e95d4604216fb8b1c7230f39"
   - ordinal: 9
     path: "handoffs/RELEASE_HANDOFF_v3.31.1.md"
-    sha256: "58b2c2051bd86f7c2a393163adf474fe4fa263593339835bb442518037da439d"
+    sha256: "5cbf4a03aff13b491c44808fbc0f480cae890ace604b5fa49ec8f2363b82046f"
   - ordinal: 10
+    path: "handoffs/TRACEABILITY_EXCEPTION_v3.31.1.md"
+    sha256: "a239804363d89b6040b8aa59fdbe94b2b7db416dad728a1543d75bd197c5e2b0"
+  - ordinal: 11
     path: "DEPLOYMENT_SPEC_v3.31.1.yaml"
-    sha256: "9c68320e9670f41e3ff5d7e18ae667dc0422a3dc0c8a7fd188fb6163da409c3e"
+    sha256: "4df0aff6b9bbc247ba116e1c689f8090f9b72f8838f6cd0d0b0f74a2e26b965e"
 
 forbidden_required_paths:
   - "legacy instance-owned lifecycle extension"

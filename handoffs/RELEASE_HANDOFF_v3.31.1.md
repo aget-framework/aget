@@ -12,12 +12,15 @@ receiver-verifiable release. It supersedes v3.31.0 for consumers waiting on this
 - Invalid lifecycle mutations preserve the target; valid mutations commit by atomic replacement.
 - The public receiver oracle covers channels, dispositions, errors, mutation, and clean-room topology.
 - The ordered release manifest binds the complete executable, normative, test, and handoff package.
+- A public, one-release traceability exception records the waived percentage, critical-subset check,
+  remediation owner, deadline, proof requirement, and missed-deadline consequence.
 
 ## Context for External Fleets
 
 Use the `v3.31.1` tag because a public main-branch commit is mutable and v3.31.0 does not contain the
 complete correction. Verify the manifest and oracle from a fresh clone before any local adoption.
 Availability is not receipt, receipt is not installation, and installation is not behavioral acceptance.
+Read `handoffs/TRACEABILITY_EXCEPTION_v3.31.1.md`; the exception does not waive receiver verification.
 
 ## Critical Mitigations
 

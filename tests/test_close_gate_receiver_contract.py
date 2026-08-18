@@ -3,6 +3,7 @@
 import json
 import hashlib
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -15,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 GUARD = ROOT / "scripts" / "close_gate_check.py"
 LIFECYCLE = ROOT / "scripts" / "close_gate_lifecycle.py"
 MANIFEST = ROOT / "handoffs" / "DELIVERED_FILES_v3.31.1.yaml"
+TRACEABILITY_EXCEPTION = ROOT / "handoffs" / "TRACEABILITY_EXCEPTION_v3.31.1.md"
 
 
 def run_guard(path, *args, as_json=False, env=None, guard=GUARD, cwd=ROOT):
@@ -204,6 +206,7 @@ def test_release_package_has_public_receiver_surfaces():
         ROOT / "DEPLOYMENT_SPEC_v3.31.1.yaml",
         ROOT / "handoffs" / "REMOTE_MIGRATION_MESSAGE_v3.31.1.md",
         ROOT / "handoffs" / "RELEASE_HANDOFF_v3.31.1.md",
+        TRACEABILITY_EXCEPTION,
         MANIFEST,
     ]
     assert all(path.is_file() for path in required)
@@ -213,6 +216,25 @@ def test_release_package_has_public_receiver_surfaces():
         assert f"## {heading}" in remote
     assert "private-" not in remote
     assert "v3.31.1" in remote
+
+
+def test_traceability_exception_is_bounded_public_and_arithmetically_reproducible():
+    text = TRACEABILITY_EXCEPTION.read_text(encoding="utf-8")
+    for required in (
+        "bounded one-release exception",
+        "747",
+        "1,739",
+        "42.956%",
+        "60.772%",
+        "before any public AGET release after v3.31.1",
+        "the next release is blocked",
+        "cannot be renewed",
+        "does not waive receiver verification",
+    ):
+        assert required in text
+    assert round(100 * 747 / 1739, 3) == 42.956
+    assert round(100 * 189 / 311, 3) == 60.772
+    assert round(100 * (747 - 189) / (1739 - 311), 3) == 39.076
 
 
 def test_release_manifest_binds_ordered_complete_package():
@@ -226,6 +248,7 @@ def test_release_manifest_binds_ordered_complete_package():
         "tests/test_close_gate_receiver_contract.py",
         "handoffs/REMOTE_MIGRATION_MESSAGE_v3.31.1.md",
         "handoffs/RELEASE_HANDOFF_v3.31.1.md",
+        "handoffs/TRACEABILITY_EXCEPTION_v3.31.1.md",
         "DEPLOYMENT_SPEC_v3.31.1.yaml",
     ]
     offsets = [text.index(f'path: "{path}"') for path in expected]
@@ -234,3 +257,10 @@ def test_release_manifest_binds_ordered_complete_package():
     for path in expected:
         digest = hashlib.sha256((ROOT / path).read_bytes()).hexdigest()
         assert f'sha256: "{digest}"' in text
+    identities = re.findall(
+        r'^\s+path: "([^"]+)"\n\s+(?:sha256|identity): "([^"]+)"$', text, re.M)
+    assert len(identities) == len(expected) + 1  # expected paths plus the self-bound manifest
+    tuple_digest = hashlib.sha256(
+        json.dumps(identities, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    ).hexdigest()
+    assert f'tuple_digest: "{tuple_digest}"' in text

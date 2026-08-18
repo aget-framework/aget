@@ -11,6 +11,7 @@ rollback_ref: "v3.31.0"
 manifest: "handoffs/DELIVERED_FILES_v3.31.1.yaml"
 release_notes: "release-notes/v3.31.1.md"
 remote_migration: "handoffs/REMOTE_MIGRATION_MESSAGE_v3.31.1.md"
+traceability_exception: "handoffs/TRACEABILITY_EXCEPTION_v3.31.1.md"
 
 mandatory_changes:
   - id: "CG-3311-01"
@@ -33,6 +34,11 @@ mandatory_changes:
       - "handoffs/REMOTE_MIGRATION_MESSAGE_v3.31.1.md"
       - "handoffs/RELEASE_HANDOFF_v3.31.1.md"
       - "DEPLOYMENT_SPEC_v3.31.1.yaml"
+    detection: "python3 -m pytest -q tests/test_close_gate_receiver_contract.py"
+  - id: "CG-3311-04"
+    description: "Public bounded traceability exception and expiring remediation contract"
+    paths:
+      - "handoffs/TRACEABILITY_EXCEPTION_v3.31.1.md"
     detection: "python3 -m pytest -q tests/test_close_gate_receiver_contract.py"
 
 receiver_acceptance:

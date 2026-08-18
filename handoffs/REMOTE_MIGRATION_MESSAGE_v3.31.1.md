@@ -12,7 +12,8 @@ change permissions, or authorize migration.
 1. Use only public `aget-framework/aget` materials. Fetch the annotated `v3.31.1` tag and record its
    peeled commit; do not use a private relay or an untagged main-branch commit.
 2. Read `release-notes/v3.31.1.md`, `DEPLOYMENT_SPEC_v3.31.1.yaml`, and
-   `handoffs/DELIVERED_FILES_v3.31.1.yaml` at that tag.
+   `handoffs/DELIVERED_FILES_v3.31.1.yaml` at that tag. Read
+   `handoffs/TRACEABILITY_EXCEPTION_v3.31.1.md` before deciding whether to adopt.
 3. Verify every ordered manifest path and SHA-256 before installing or invoking the correction.
 4. Preserve receiver-owned extensions and local governance. Install only through the receiver's governed
    migration procedure.
