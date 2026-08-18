@@ -1,6 +1,7 @@
 """Receiver-shaped acceptance oracle for the close-gate correction package."""
 
 import json
+import hashlib
 import os
 import shutil
 import subprocess
@@ -13,6 +14,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 GUARD = ROOT / "scripts" / "close_gate_check.py"
 LIFECYCLE = ROOT / "scripts" / "close_gate_lifecycle.py"
+MANIFEST = ROOT / "handoffs" / "DELIVERED_FILES_v3.31.1.yaml"
 
 
 def run_guard(path, *args, as_json=False, env=None, guard=GUARD, cwd=ROOT):
@@ -194,3 +196,41 @@ def test_public_skill_has_no_stale_unconditional_gate_rule():
     assert "REFUSE close if any gate `[ ]`" not in skill
     assert "transactional writer" in skill
     assert "preserves the target bytes unchanged" in skill
+
+
+def test_release_package_has_public_receiver_surfaces():
+    required = [
+        ROOT / "release-notes" / "v3.31.1.md",
+        ROOT / "DEPLOYMENT_SPEC_v3.31.1.yaml",
+        ROOT / "handoffs" / "REMOTE_MIGRATION_MESSAGE_v3.31.1.md",
+        ROOT / "handoffs" / "RELEASE_HANDOFF_v3.31.1.md",
+        MANIFEST,
+    ]
+    assert all(path.is_file() for path in required)
+    remote = required[2].read_text(encoding="utf-8")
+    for heading in ("Breaking Changes", "Upgrade Guide", "Deployment Requirements",
+                    "Smoke Test", "Rollback"):
+        assert f"## {heading}" in remote
+    assert "private-" not in remote
+    assert "v3.31.1" in remote
+
+
+def test_release_manifest_binds_ordered_complete_package():
+    text = MANIFEST.read_text(encoding="utf-8")
+    expected = [
+        "specs/AGET_PROJECT_PLAN_SPEC.md",
+        "docs/CONVENTION_terminal_state_vocabulary.md",
+        "scripts/close_gate_check.py",
+        "scripts/close_gate_lifecycle.py",
+        ".claude/skills/aget-close-project/SKILL.md",
+        "tests/test_close_gate_receiver_contract.py",
+        "handoffs/REMOTE_MIGRATION_MESSAGE_v3.31.1.md",
+        "handoffs/RELEASE_HANDOFF_v3.31.1.md",
+        "DEPLOYMENT_SPEC_v3.31.1.yaml",
+    ]
+    offsets = [text.index(f'path: "{path}"') for path in expected]
+    assert offsets == sorted(offsets)
+    assert "scripts/close_gate_lifecycle_ext.py" not in text
+    for path in expected:
+        digest = hashlib.sha256((ROOT / path).read_bytes()).hexdigest()
+        assert f'sha256: "{digest}"' in text

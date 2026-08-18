@@ -1,0 +1,52 @@
+# DELIVERED_FILES_v3.31.1.yaml — immutable receiver-safe close-gate package
+version: "3.31.1"
+source_ref: "v3.31.1"
+generated: "2026-08-18"
+scope: "complete ordered close-gate correction package; not evidence of downstream receipt or adoption"
+digest_algorithm: "sha256(canonical-json ordered [path, identity] tuples; compact separators; UTF-8)"
+self_identity: "SELF@v3.31.1 resolves to this manifest blob through the annotated tag's peeled commit"
+tuple_digest: "700d3458faa38fb848b0a56d6838ed0c13863b04fb275e5df5d0b9303f3a226e"
+
+ordered_package:
+  - ordinal: 1
+    path: "specs/AGET_PROJECT_PLAN_SPEC.md"
+    sha256: "97b813abac137b3ddd9d24b668e5c35c36591dd4fb944811af76c24e5e9ece0e"
+  - ordinal: 2
+    path: "docs/CONVENTION_terminal_state_vocabulary.md"
+    sha256: "c185985ddc4408ff9425d0393c2f53b935c7ff7ef4a1a7055d148723cccd4228"
+  - ordinal: 3
+    path: "scripts/close_gate_check.py"
+    sha256: "d175f34f241d518c38995e532e27014c9f24dc37e789380cbf5a27243966cef0"
+  - ordinal: 4
+    path: "scripts/close_gate_lifecycle.py"
+    sha256: "d7ef0deb3c2789d44ae2943a714f8d05db02d3222a70b82b84dd7faa9f9699d1"
+  - ordinal: 5
+    path: ".claude/skills/aget-close-project/SKILL.md"
+    sha256: "8ee20d6e7a52a99773145858a6f4452b7c6730113858569eb19d7ce6c164c9d4"
+  - ordinal: 6
+    path: "tests/test_close_gate_receiver_contract.py"
+    sha256: "67ec722ca29b6d74283259ac7105c4b7fc426171491b394e315d57658a7369cb"
+  - ordinal: 7
+    path: "handoffs/DELIVERED_FILES_v3.31.1.yaml"
+    identity: "SELF@v3.31.1"
+  - ordinal: 8
+    path: "handoffs/REMOTE_MIGRATION_MESSAGE_v3.31.1.md"
+    sha256: "ecbbe01889ddc9c35de533e43ff198e1ef38f971c7610103a30c6a3b7d6cb2c9"
+  - ordinal: 9
+    path: "handoffs/RELEASE_HANDOFF_v3.31.1.md"
+    sha256: "58b2c2051bd86f7c2a393163adf474fe4fa263593339835bb442518037da439d"
+  - ordinal: 10
+    path: "DEPLOYMENT_SPEC_v3.31.1.yaml"
+    sha256: "9c68320e9670f41e3ff5d7e18ae667dc0422a3dc0c8a7fd188fb6163da409c3e"
+
+forbidden_required_paths:
+  - "legacy instance-owned lifecycle extension"
+  - "../aget/specs/AGET_PROJECT_PLAN_SPEC.md"
+  - "private repository paths"
+
+verification: |
+  Resolve this file and every ordered path from the same peeled v3.31.1 tag commit. Verify each SHA-256,
+  substitute the literal SELF@v3.31.1 marker for this manifest row, recompute the tuple digest, and run
+  python3 -m pytest -q tests/test_close_gate_receiver_contract.py. These checks prove received package
+  integrity and behavior only; downstream installation, adoption, and migration authorization remain
+  separate receiver-owned predicates.

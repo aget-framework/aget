@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.31.1] - 2026-08-18 - "Receiver-Safe Close Gates"
+
+### Fixed
+- Shipped the complete close-gate lifecycle implementation as a framework-owned, same-repository module.
+- Made JSON and human output share one decision, including orphan and non-waivable accounting failures.
+- Made closure-table mutation validate before an atomic replacement; rejected writes preserve target bytes.
+- Removed the stale unconditional gate rule and surfaced independence and value warnings in human output.
+- Made public CI fetch the annotated-tag denominator required by the release-cadence contract.
+
+### Added
+- Added a receiver-shaped oracle spanning channels, phases, dispositions, mutations, errors, and clean-room topology.
+- Added an immutable ordered package manifest, deployment specification, public handoff, and remote migration instructions.
+
 
 ## [3.31.0] - 2026-08-15 - "Ship What Was Already Built"
 

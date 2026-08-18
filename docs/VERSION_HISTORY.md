@@ -12,6 +12,18 @@ This document provides a complete timeline of AGET Framework versions and their 
 
 ## Current Version
 
+**v3.31.1** (2026-08-18) - Receiver-Safe Close Gates
+
+Core `aget/` at v3.31.1: patch correction packaging the complete close-gate lifecycle, a receiver-shaped
+oracle, transactional mutation, channel-equivalent decisions, and public-only migration instructions.
+The immutable tag and GitHub Release are the distribution point; downstream receipt and adoption remain
+separate predicates. See `release-notes/v3.31.1.md`.
+
+**v3.31.0** (2026-08-16) - Ship What Was Already Built
+
+Core `aget/` at v3.31.0: ✅ GitHub Release, superseded for close-gate migration use by v3.31.1 because the
+later public-main correction was not contained in the v3.31.0 tag.
+
 **v3.30.0** (2026-08-09) - Portable Skills, Continuous Cadence
 
 Core `aget/` at v3.30.0: release candidate. A bounded, digest-addressed Agent Skills package adds an
@@ -47,6 +59,16 @@ Core `aget/` at v3.24.0: ✅ (GitHub Release live). Reliance feature (schema + v
 ---
 
 ## Version Timeline
+
+### v3.31.1 (2026-08-18)
+
+**Theme**: Receiver-Safe Close Gates — complete executable packaging, portable defaults, transactional
+mutation, channel-equivalent verdicts, and receiver-shaped public verification.
+
+### v3.31.0 (2026-08-16) ✅
+
+**Theme**: Ship What Was Already Built — verification-instrument promotion. Superseded by v3.31.1 for
+the close-gate correction dependency.
 
 ### v3.30.0 (2026-08-09)
 

@@ -1,0 +1,45 @@
+version: "3.31.1"
+spec_version: "1.0.0"
+created: "2026-08-18"
+status: released
+supersedes: "DEPLOYMENT_SPEC_v3.30.0.yaml"
+breaking_release: false
+
+purpose: "Provide one immutable, receiver-safe close-gate correction package without conflating publication, receipt, verification, or adoption."
+source_ref: "v3.31.1"
+rollback_ref: "v3.31.0"
+manifest: "handoffs/DELIVERED_FILES_v3.31.1.yaml"
+release_notes: "release-notes/v3.31.1.md"
+remote_migration: "handoffs/REMOTE_MIGRATION_MESSAGE_v3.31.1.md"
+
+mandatory_changes:
+  - id: "CG-3311-01"
+    description: "Framework-owned lifecycle implementation and same-checkout specification default"
+    paths:
+      - "scripts/close_gate_check.py"
+      - "scripts/close_gate_lifecycle.py"
+      - "specs/AGET_PROJECT_PLAN_SPEC.md"
+    detection: "python3 -m pytest -q tests/test_close_gate_receiver_contract.py"
+  - id: "CG-3311-02"
+    description: "Disposition-aware close workflow and terminal vocabulary"
+    paths:
+      - ".claude/skills/aget-close-project/SKILL.md"
+      - "docs/CONVENTION_terminal_state_vocabulary.md"
+    detection: "python3 -m pytest -q tests/test_close_gate_receiver_contract.py"
+  - id: "CG-3311-03"
+    description: "Immutable receiver package identity and public-only handoff"
+    paths:
+      - "handoffs/DELIVERED_FILES_v3.31.1.yaml"
+      - "handoffs/REMOTE_MIGRATION_MESSAGE_v3.31.1.md"
+      - "handoffs/RELEASE_HANDOFF_v3.31.1.md"
+      - "DEPLOYMENT_SPEC_v3.31.1.yaml"
+    detection: "python3 -m pytest -q tests/test_close_gate_receiver_contract.py"
+
+receiver_acceptance:
+  acquire: "Fetch the public v3.31.1 annotated tag and record its peeled commit."
+  integrity: "Verify every ordered manifest digest before execution."
+  clean_room: "Run the receiver oracle from a fresh clone with no sibling framework checkout dependency."
+  behavioral: "Require both human and JSON channels to block orphan and non-waivable accounting while accepting fully reconciled unfinished work."
+  adoption: "Receiver-owned; release publication does not imply installation, V4.0 PASS, or migration authorization."
+
+rollback: "Restore the receiving seat's pre-upgrade commit or v3.31.0 pin, preserve instance-owned state and the failed fixture, and keep migration parked."
