@@ -34,11 +34,11 @@ from pathlib import Path
 if str(Path(__file__).resolve().parent) not in sys.path:
     sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from close_gate_lifecycle_ext import (
+from close_gate_lifecycle import (
     LifecycleContractError, REASONED_DISPOSITIONS, canonical_disposition,
-    enrich_findings, entry_partition, is_release_completion_plan, load_schema,
-    parse_status, parse_unfinished, reconcile, without_unfinished_section,
-    write_unfinished,
+    commit_unfinished, enrich_findings, entry_partition,
+    is_release_completion_plan, load_schema, load_unfinished_rows, parse_status,
+    parse_unfinished, reconcile, render_unfinished, without_unfinished_section,
 )
 
 # Closure/Finalization checklist section headers whose unchecked items block COMPLETE.
@@ -294,7 +294,15 @@ def scan_status_table_rows(text: str, exempt=frozenset()):
 # rather than against this file's own prose.
 # --------------------------------------------------------------------------
 
-_LIFECYCLE_SCHEMA = load_schema()
+_LIFECYCLE_SCHEMA = None
+
+
+def lifecycle_schema():
+    """Load the normative schema lazily so CLI errors remain controlled."""
+    global _LIFECYCLE_SCHEMA
+    if _LIFECYCLE_SCHEMA is None:
+        _LIFECYCLE_SCHEMA = load_schema()
+    return _LIFECYCLE_SCHEMA
 
 
 def _normalize_base(value: str) -> str:
@@ -306,7 +314,7 @@ def _normalize_base(value: str) -> str:
 
 def normalize_status(value: str) -> str:
     """CAP-PP-013-13 exact-enum/bounded-legacy comparison semantics."""
-    state, _warning = parse_status(value, legacy=True, schema=_LIFECYCLE_SCHEMA)
+    state, _warning = parse_status(value, legacy=True, schema=lifecycle_schema())
     return state.casefold() if state else _normalize_base(value)
 
 
@@ -360,11 +368,11 @@ def resolve_authoritative_status(text: str):
     s = _STATUS_FIELD_RE.search(head)
     ps = _PLAN_STATUS_FIELD_RE.search(head)
     if ps:
-        state, warning = parse_status(ps.group(1), legacy=False, schema=_LIFECYCLE_SCHEMA)
+        state, warning = parse_status(ps.group(1), legacy=False, schema=lifecycle_schema())
         return (state.casefold() if state else _normalize_base(ps.group(1)),
                 "Plan_Status", warning)
     if s:
-        state, warning = parse_status(s.group(1), legacy=True, schema=_LIFECYCLE_SCHEMA)
+        state, warning = parse_status(s.group(1), legacy=True, schema=lifecycle_schema())
         message = "plan uses legacy **Status**; `Plan_Status` is canonical (CAP-PP-013-11)"
         if warning:
             message += f"; {warning}"
@@ -795,8 +803,42 @@ def scan_value_resolution(text: str):
     return warnings
 
 
+class _CliUsageError(ValueError):
+    pass
+
+
+class _CloseGateArgumentParser(argparse.ArgumentParser):
+    def error(self, message):
+        raise _CliUsageError(message)
+
+
+def _emit_error(as_json, message, *, path=None):
+    if as_json:
+        import json as _json
+        print(_json.dumps({
+            "schema": "close_gate_check/error/v1",
+            "path": str(path) if path is not None else None,
+            "exit_code": 3,
+            "error": str(message),
+        }, indent=2))
+    else:
+        print(f"close-gate: ERROR — {message}", file=sys.stderr)
+    return 3
+
+
+def _print_advisories(warnings, value_warnings, quiet):
+    if quiet:
+        return
+    for key, detail in warnings:
+        print(f"close-gate: ⚠ INDEPENDENCE [{key}] — {detail}")
+    for key, detail in value_warnings:
+        print(f"close-gate: ⚠ VALUE [{key}] — {detail}")
+
+
 def main(argv=None):
-    p = argparse.ArgumentParser(description="Close-gate conformance guard (C-P1).")
+    raw_argv = list(sys.argv[1:] if argv is None else argv)
+    as_json_hint = '--json' in raw_argv
+    p = _CloseGateArgumentParser(description="Close-gate conformance guard (C-P1).")
     p.add_argument('path', help="PROJECT_PLAN or session markdown file being closed")
     p.add_argument('--quiet', '-q', action='store_true', help="Only print the verdict line")
     # CAP-PP-013-05: mode is an EVALUATOR INVOCATION INPUT, never plan metadata.
@@ -827,34 +869,47 @@ def main(argv=None):
                    help="required terminal target (CLOSED-PARTIAL is accepted spelling)")
     p.add_argument('--write-unfinished-json', type=Path,
                    help="exit-only JSON row list to persist before reparsing/reconciliation")
-    args = p.parse_args(argv)
+    try:
+        args = p.parse_args(raw_argv)
+    except _CliUsageError as exc:
+        return _emit_error(as_json_hint, f"E-INVOCATION: {exc}")
 
     if args.phase is None:
-        print("close-gate: ERROR — --phase is required; no default exists", file=sys.stderr)
-        return 3
+        return _emit_error(args.as_json, "E-PHASE-MISSING: --phase is required; no default exists",
+                           path=args.path)
     try:
-        disposition = canonical_disposition(args.disposition, _LIFECYCLE_SCHEMA)
+        schema = lifecycle_schema()
+    except (LifecycleContractError, OSError, ValueError) as exc:
+        return _emit_error(args.as_json, f"E-SCHEMA: {exc}", path=args.path)
+    try:
+        disposition = canonical_disposition(args.disposition, schema)
     except LifecycleContractError as exc:
-        print(f"close-gate: ERROR — {exc}", file=sys.stderr)
-        return 3
+        return _emit_error(args.as_json, exc, path=args.path)
 
     fp = Path(args.path)
     if not fp.is_file():
-        print(f"close-gate: ERROR — file not found: {fp}", file=sys.stderr)
-        return 3
+        return _emit_error(args.as_json, f"E-FILE-NOT-FOUND: {fp}", path=fp)
 
+    try:
+        content = fp.read_text(encoding='utf-8', errors='replace')
+    except OSError as exc:
+        return _emit_error(args.as_json, f"E-FILE-READ: {exc}", path=fp)
+
+    pending_rows = None
+    mutation_status = "not-requested"
     if args.write_unfinished_json is not None:
         if args.phase != 'exit' or disposition not in REASONED_DISPOSITIONS:
-            print("close-gate: ERROR — --write-unfinished-json requires an exit-phase reasoned "
-                  "disposition", file=sys.stderr)
-            return 3
+            return _emit_error(
+                args.as_json,
+                "E-WRITE-PHASE: --write-unfinished-json requires an exit-phase reasoned disposition",
+                path=fp)
         try:
-            write_unfinished(fp, args.write_unfinished_json)
+            pending_rows = load_unfinished_rows(args.write_unfinished_json)
+            content = render_unfinished(content, pending_rows)
+            mutation_status = "staged-in-memory"
         except (LifecycleContractError, OSError, ValueError) as exc:
-            print(f"close-gate: ERROR — {exc}", file=sys.stderr)
-            return 3
+            return _emit_error(args.as_json, exc, path=fp)
 
-    content = fp.read_text(encoding='utf-8', errors='replace')
     scan_content = without_unfinished_section(content)
 
     # CAP-PP-013-09/10 — resolve supersession ONCE, BEFORE any verdict is
@@ -879,17 +934,17 @@ def main(argv=None):
     # CAP-PP-013-11: the legacy-alias migration warning accompanies the verdict
     # and SHALL NOT alter it.
     _source_normalized, _, _status_migration_warn = resolve_authoritative_status(content)
-    _source_state = next((s for s in _LIFECYCLE_SCHEMA["states"]
+    _source_state = next((s for s in schema["states"]
                           if s.casefold() == (_source_normalized or "")), None)
     transition_block = None
     if _source_normalized is not None and _source_state is None:
         transition_block = (f"status value {_source_normalized!r} does not establish a "
                             "CAP-PP-003 state")
     elif args.mode == 'closure' and args.phase == 'entry':
-        if _source_state not in _LIFECYCLE_SCHEMA["transitions"]:
+        if _source_state not in schema["transitions"]:
             transition_block = (f"source state {_source_state or _source_normalized!r} has no lawful "
                                 "terminal transition (terminal states are immutable)")
-        elif disposition not in _LIFECYCLE_SCHEMA["transitions"][_source_state]:
+        elif disposition not in schema["transitions"][_source_state]:
             transition_block = f"{_source_state} -> {disposition} is not a lawful transition"
 
     # Release-class BLOCKING guard (#1554, v3.25 C-25-06): when the instance
@@ -921,13 +976,13 @@ def main(argv=None):
              'release_close_guard_error': 'Release-completion guard error'}
 
     try:
-        findings = enrich_findings(violations, str(fp), _LIFECYCLE_SCHEMA)
+        findings = enrich_findings(violations, str(fp), schema)
     except LifecycleContractError as exc:
-        print(f"close-gate: ERROR — {exc}", file=sys.stderr)
-        return 3
+        return _emit_error(args.as_json, exc, path=fp)
 
     blocking, carried, hygiene, accounting = [], [], [], {
         "unaccounted": [], "orphan": [], "nonwaivable": []}
+    rows = []
     document_error = None
 
     if args.phase == 'entry':
@@ -940,17 +995,17 @@ def main(argv=None):
         reconcilable = [f for f in findings if f.semantic_class == "substantive_work"
                         and f.reason_key != "status_row_nonterminal"]
         try:
-            rows = parse_unfinished(content)
+            rows = pending_rows if pending_rows is not None else parse_unfinished(content)
             if disposition == "Complete":
                 if rows:
                     blocking.append(enrich_findings(
                         [('placeholder_substance', 'Unfinished at Close is forbidden under Complete')],
-                        str(fp), _LIFECYCLE_SCHEMA)[0])
+                        str(fp), schema)[0])
             elif reconcilable or rows:
                 accounting = reconcile(findings, rows)
                 if accounting["unaccounted"] or accounting["orphan"] or accounting["nonwaivable"]:
                     blocking.extend(reconcilable)
-            carried = reconcilable if accounting["unaccounted"] else []
+            carried = reconcilable
         except LifecycleContractError as exc:
             document_error = str(exc)
 
@@ -970,6 +1025,18 @@ def main(argv=None):
     exit_code = 3 if document_error else (2 if transition_block or blocking or accounting["unaccounted"]
                                            or accounting["orphan"]
                                            or accounting["nonwaivable"] else 0)
+
+    # A requested mutation is a transaction: the candidate is built and judged
+    # in memory, and only a clean decision may cross the atomic replace boundary.
+    if pending_rows is not None:
+        if exit_code == 0:
+            try:
+                commit_unfinished(fp, content, len(pending_rows))
+                mutation_status = "committed-atomically"
+            except (LifecycleContractError, OSError, ValueError) as exc:
+                return _emit_error(args.as_json, f"E-WRITE-COMMIT: {exc}", path=fp)
+        else:
+            mutation_status = "rejected-target-preserved"
 
     if args.as_json:
         # Structured channel. Exit code is identical to the human path — this mode
@@ -998,6 +1065,7 @@ def main(argv=None):
             "warnings": [{"key": k, "detail": d} for k, d in warnings],
             "value_resolution": [{"key": k, "detail": d} for k, d in value_warnings],
             "migration_warning": _status_migration_warn,
+            "mutation": mutation_status,
         }, indent=2))
         return exit_code
 
@@ -1011,26 +1079,44 @@ def main(argv=None):
         print(f"close-gate: ERROR — {document_error}")
         return 3
 
-    if not blocking and not transition_block:
+    if exit_code == 0:
         # CAP-PP-013-12(a) contrapositive: no blocking finding => exit 0, and a
         # hygiene-only run stays here.
-        print(f"close-gate: PASS — no unchecked conformance signals in {fp.name} "
-              f"[mode={args.mode} phase={args.phase} disposition={disposition}]")
+        if rows:
+            print(f"close-gate: CLEAN — {len(rows)} unfinished finding occurrence(s) "
+                  f"fully accounted in {fp.name} "
+                  f"[mode={args.mode} phase={args.phase} disposition={disposition}]")
+        else:
+            print(f"close-gate: PASS — no unchecked conformance signals in {fp.name} "
+                  f"[mode={args.mode} phase={args.phase} disposition={disposition}]")
         if hygiene:
             print(f"close-gate: ◷ HYGIENE — {len(hygiene)} stale presentation finding(s) "
                   f"(non-blocking, CAP-PP-013-08):")
             for f in hygiene:
                 print(f"  ◷ [{kinds.get(f.reason_key, f.reason_key)}] {f.detail}")
+        _print_advisories(warnings, value_warnings, args.quiet)
         return 0
 
     # CAP-PP-013-12(a): a blocking finding SHALL return a nonzero exit status.
-    print(f"close-gate: BLOCK — {len(blocking)} unchecked conformance signal(s) in {fp.name} "
+    reason_count = (len(blocking) + bool(transition_block)
+                    + len(accounting["unaccounted"]) + len(accounting["orphan"])
+                    + len(accounting["nonwaivable"]))
+    print(f"close-gate: BLOCK — {reason_count} decision reason(s) in {fp.name} "
           f"[mode={args.mode} phase={args.phase} disposition={disposition}]:")
     if transition_block:
         print(f"  - [lawful-transition] {transition_block}")
     if not args.quiet:
         for f in blocking[:30]:
             print(f"  - [{kinds.get(f.reason_key, f.reason_key)}] {f.detail}")
+        for reason_key, subject in accounting["unaccounted"]:
+            print(f"  - [accounting-unaccounted] {reason_key} :: {subject}")
+        for reason_key, subject in accounting["orphan"]:
+            print(f"  - [accounting-orphan] {reason_key} :: {subject}")
+        for row in accounting["nonwaivable"]:
+            print(f"  - [accounting-nonwaivable] {row.reason_key} :: {row.affected_subject}")
+        if pending_rows is not None:
+            print("  - [mutation] proposed accounting was not committed; target bytes are preserved")
+    _print_advisories(warnings, value_warnings, args.quiet)
     return 2
 
 

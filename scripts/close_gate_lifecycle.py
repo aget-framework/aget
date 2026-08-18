@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Executable CAP-PP-013-14..22 lifecycle contract for close_gate_check.
+"""Framework-owned CAP-PP-013-14..22 lifecycle contract for close_gate_check.
 
-This is an Instance_Artifact extension while AGET_PROJECT_PLAN_SPEC v1.5.0 is a
-local publication candidate.  The canonical guard imports it; Gate 4A may fold
-the implementation into the Framework_Artifact after publication approval.
+This module is part of the canonical close-gate package.  It deliberately does
+not use the ``*_ext.py`` suffix: that suffix denotes instance-owned state which
+upgrade procedures preserve rather than overwrite.
 """
 
 from __future__ import annotations
@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import tempfile
 import unicodedata
 from collections import Counter
 from dataclasses import asdict, dataclass
@@ -20,7 +21,7 @@ from typing import Iterable
 
 SPEC = Path(os.environ.get(
     "AGET_PROJECT_PLAN_SPEC",
-    Path(__file__).resolve().parents[2] / "aget" / "specs" / "AGET_PROJECT_PLAN_SPEC.md"))
+    Path(__file__).resolve().parent.parent / "specs" / "AGET_PROJECT_PLAN_SPEC.md"))
 LIFECYCLE_CLASSES = frozenset({"creator-scaffolded", "pre-close-verifiable", "closer-authored"})
 TERMINAL_DISPOSITIONS = (
     "Complete", "Closed", "Closed (Partial)", "Abandoned", "Superseded",
@@ -359,27 +360,68 @@ def escape_field(value: str):
     return value.replace("|", "\\|")
 
 
-def write_unfinished(path: Path, rows_json: Path):
-    """Write the sanctioned section, then reparse the bytes actually persisted."""
-    payload = json.loads(rows_json.read_text(encoding="utf-8"))
-    rows = [AccountingRow(r["reason_key"], r["affected_subject"], r["disposition"], r["note"], i)
-            for i, r in enumerate(payload, 1)]
+def load_unfinished_rows(rows_json: Path):
+    """Parse and validate a proposed accounting-row payload without mutation."""
+    try:
+        payload = json.loads(rows_json.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise LifecycleContractError(f"E-WRITE-PAYLOAD: {exc}") from exc
+    if not isinstance(payload, list) or not payload:
+        raise LifecycleContractError("E-WRITE-PAYLOAD: expected a non-empty JSON row list")
+    try:
+        rows = [AccountingRow(r["reason_key"], r["affected_subject"],
+                              r["disposition"], r["note"], i)
+                for i, r in enumerate(payload, 1)]
+    except (KeyError, TypeError) as exc:
+        raise LifecycleContractError(f"E-WRITE-PAYLOAD: malformed row: {exc}") from exc
     for row in rows:
         if row.disposition not in ROW_DISPOSITIONS:
             raise LifecycleContractError(f"E-ROW-DISP: {row.disposition!r}")
         _validate_note(row.disposition, row.note)
-    text = path.read_text(encoding="utf-8")
+    return rows
+
+
+def render_unfinished(text: str, rows: Iterable[AccountingRow]):
+    """Return candidate document bytes; validate their round-trip before any write."""
+    rows = list(rows)
     if re.search(r"(?m)^## Unfinished at Close\s*$", text):
         raise LifecycleContractError("E-SECTION-DUPLICATE: writer will not overwrite an existing section")
     rendered = ["## Unfinished at Close", "", "| reason_key | affected_subject | disposition | note |",
                 "|---|---|---|---|"]
     rendered.extend("| " + " | ".join(escape_field(v) for v in (
         r.reason_key, r.affected_subject, r.disposition, r.note)) + " |" for r in rows)
-    path.write_text(text.rstrip() + "\n\n" + "\n".join(rendered) + "\n", encoding="utf-8")
-    parsed = parse_unfinished(path.read_text(encoding="utf-8"))
+    candidate = text.rstrip() + "\n\n" + "\n".join(rendered) + "\n"
+    parsed = parse_unfinished(candidate)
     if len(parsed) != len(rows):
-        raise LifecycleContractError("E-GRAMMAR: persisted section did not roundtrip")
-    return parsed
+        raise LifecycleContractError("E-GRAMMAR: candidate section did not roundtrip")
+    return candidate
+
+
+def commit_unfinished(path: Path, candidate: str, expected_rows: int):
+    """Atomically persist a previously validated candidate and verify received bytes."""
+    mode = path.stat().st_mode
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(
+                mode="w", encoding="utf-8", dir=path.parent,
+                prefix=f".{path.name}.", suffix=".tmp", delete=False) as stream:
+            temporary = Path(stream.name)
+            stream.write(candidate)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.chmod(temporary, mode)
+        os.replace(temporary, path)
+        temporary = None
+        parsed = parse_unfinished(path.read_text(encoding="utf-8"))
+        if len(parsed) != expected_rows:
+            raise LifecycleContractError("E-GRAMMAR: persisted section did not roundtrip")
+        return parsed
+    finally:
+        if temporary is not None:
+            try:
+                temporary.unlink()
+            except FileNotFoundError:
+                pass
 
 
 def is_release_completion_plan(text: str):

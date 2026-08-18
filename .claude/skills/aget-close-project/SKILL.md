@@ -49,9 +49,9 @@ Parse $ARGUMENTS:
 >
 > **Named externally: this was an ETVX violation** (IBM, 1980s — Entry / Task / Verification / eXit).
 > Exit criteria were being enforced at the Entry position, with no Verification step after the Task. The
-> repair is not a weaker gate; it is **the same gate at the correct position**, plus a new one at the exit
-> (Step 4.5). Nothing that blocked before stops blocking — it blocks *later*, on the closer's output
-> rather than its input.
+> repair is not a weaker gate; it places each predicate at its lifecycle phase and adds a receiver-visible
+> exit decision (Step 4.5). Unfinished work never escapes silently: `Complete` blocks it, while a reasoned
+> disposition must account for every eligible occurrence on the closer's output.
 
 **Automate the scan, don't eyeball it** (C-P1 guard, v3.20; L736 assert-before-verify):
 ```bash
@@ -184,7 +184,9 @@ Generate or update these sections in the plan body (per AGET_PROJECT_PLAN_SPEC t
 
 > **The verification step ETVX requires and this skill never had.** Step 2 confirms the plan may *enter*
 > closure; this confirms closure is *finished*. It runs the identical instrument on the closer's
-> **output**, and here **every** violation kind blocks — including the two Step 2 deliberately tolerates.
+> **output**. Under `Complete`, every finding blocks. Under a reasoned disposition, closure-record and
+> integrity findings block while eligible substantive findings must reconcile one-to-one with the
+> sanctioned accounting table.
 
 ```bash
 python3 scripts/close_gate_check.py planning/PROJECT_PLAN_<name>.md --json \
@@ -226,10 +228,23 @@ These are **reachable with findings outstanding** — that is what they mean. Th
 findings *unaccounted for*. The gate becomes an accounting check rather than a completeness check:
 
 1. Run the same guard and capture the surviving findings.
-2. Author exactly one **`## Unfinished at Close`** table using the CAP-PP-013-18 header and one row per
-   finding occurrence. Use `deferred` (`vehicle`, `reason`), `obsolete` (`reason`), or
-   `accepted-incomplete` (`authority`, `receipt`, `reason`) note keys.
-3. Re-run the exit command. It reparses the mutated document and reconciles occurrences one-to-one.
+2. Prepare a JSON list with exactly one row per eligible finding occurrence. Use `deferred` (`vehicle`,
+   `reason`), `obsolete` (`reason`), or `accepted-incomplete` (`authority`, `receipt`, `reason`) note keys.
+3. Submit the proposal through the transactional writer:
+
+   ```bash
+   python3 scripts/close_gate_check.py planning/PROJECT_PLAN_<name>.md --json \
+     --phase exit --disposition <the-same-explicit-target> \
+     --write-unfinished-json <rows.json>
+   ```
+
+   The guard renders and reconciles the candidate in memory. It atomically persists exactly one
+   **`## Unfinished at Close`** table only when the resulting decision is clean; any malformed, orphan,
+   unmatched, non-waivable, or otherwise blocking proposal preserves the target bytes unchanged.
+4. Re-run the exit command without the writer option as a received-state check.
+
+The table uses the exact CAP-PP-013-18 header. The received-state check reparses the persisted document
+and reconciles occurrences one-to-one.
    Duplicate same-key findings require duplicate rows; closure-record and integrity findings are never
    waivable; orphan, malformed, or unmatched rows block/error.
 
@@ -363,7 +378,10 @@ Emit terminal block:
 
 ## Constraints
 
-- **C-CLOSE-001 (Strict gate)**: REFUSE close if any gate `[ ]` or any V-test missing. Override path L178 with `--reason`.
+- **C-CLOSE-001 (Strict, disposition-aware gate)**: REFUSE `Complete` while any finding remains. For
+  `Closed`, `Closed (Partial)`, `Abandoned`, or `Superseded`, REFUSE closure-record/integrity findings and
+  any substantive occurrence not reconciled one-to-one in `Unfinished at Close`. A reason explains the
+  selected disposition; it never waives an exit finding. The L178 `--override` path is entry-only.
 - **C-CLOSE-002 (Closure checklist completeness)**: All template sections must be non-empty before write.
 - **C-CLOSE-003 (Verifiable assertion)**: Status transition requires V-test SHA mapping + timestamp + agent identity. Text-edit alone is insufficient.
 - **C-CLOSE-004 (Deferred-surface scan mandatory)**: Step 6 MUST execute. Output is consumed by `/aget-propose-actions` (L913 closure).
