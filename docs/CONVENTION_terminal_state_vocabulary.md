@@ -16,7 +16,7 @@ The lifecycle vocabularies have no state between "built" and "verified running d
 | `IMPLEMENTED-AWAITING-DEPLOYMENT-EVIDENCE` | artifact built + committed; ≥1 independent downstream confirmation NOT yet on record (L656 interval as data) | NO — a waiting state, scans as open |
 | `PILOTED` | ≥1 non-author agent has applied/run it with evidence on record (L1113 satisfied); fleet propagation not yet done | NO |
 | `STAGED` | committed locally / queued for a push window (L735); not yet public | NO |
-| `COMPLETE` / `CLOSED (PARTIAL)` / `ABANDONED` / `SUPERSEDED` | per AGET_PROJECT_PLAN_SPEC — unchanged | YES |
+| `COMPLETE` / `CLOSED` / `CLOSED (PARTIAL)` / `ABANDONED` / `SUPERSEDED` | per AGET_PROJECT_PLAN_SPEC v1.5.0 candidate | YES |
 
 Usage rule: these states are ONLY valid with a pointer to what would advance them (which pilot, which window, which evidence). A waiting state with no advancement pointer is the Loading Dock anti-pattern wearing a new label.
 
