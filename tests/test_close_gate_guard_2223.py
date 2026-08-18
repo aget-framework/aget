@@ -161,7 +161,8 @@ _TERMINAL = re.compile(
     r"^\*\*Plan_Status\*\*:\s*(COMPLETE|CLOSED|ABANDONED|SUPERSEDED)", re.M | re.I)
 
 
-@pytest.mark.skipif(not (_REPO / "planning").is_dir(), reason="no planning/ corpus")
+@pytest.mark.skipif(not any((_REPO / "planning").glob("PROJECT_PLAN*.md")),
+                    reason="no PROJECT_PLAN corpus")
 def test_rule_fires_on_real_nonterminal_plans():
     """A rule that never fires on real data is inert, however green its fixtures.
 
@@ -175,7 +176,8 @@ def test_rule_fires_on_real_nonterminal_plans():
     assert live > 0, "rule is inert on the real non-terminal corpus"
 
 
-@pytest.mark.skipif(not (_REPO / "planning").is_dir(), reason="no planning/ corpus")
+@pytest.mark.skipif(not any((_REPO / "planning").glob("PROJECT_PLAN*.md")),
+                    reason="no PROJECT_PLAN corpus")
 def test_rule_is_silent_on_already_closed_plans():
     """Control on the same corpus: measured 0 of 22 terminal plans."""
     noisy = [p.name for p in _plans()

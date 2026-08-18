@@ -31,6 +31,16 @@ import sys
 import unicodedata
 from pathlib import Path
 
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from close_gate_lifecycle_ext import (
+    LifecycleContractError, REASONED_DISPOSITIONS, canonical_disposition,
+    enrich_findings, entry_partition, is_release_completion_plan, load_schema,
+    parse_status, parse_unfinished, reconcile, without_unfinished_section,
+    write_unfinished,
+)
+
 # Closure/Finalization checklist section headers whose unchecked items block COMPLETE.
 #
 # gh#2223 blind spot 1 (re-derived 2026-08-13): this pattern formerly matched ONLY the
@@ -284,32 +294,20 @@ def scan_status_table_rows(text: str, exempt=frozenset()):
 # rather than against this file's own prose.
 # --------------------------------------------------------------------------
 
-#: CAP-PP-003-01 status enum. Closed and normative -- CAP-PP-013-13(e) resolves
-#: against THIS and nothing else. Adding a synonym here violates -13 sentence 2.
-_PP003_ENUM = ("Draft", "In Progress", "Complete", "Abandoned")
+_LIFECYCLE_SCHEMA = load_schema()
 
-#: -13(d): the first narrative delimiter terminating the leading clause.
-_CLAUSE_DELIM_RE = re.compile(r"\s*[—–\-(\[.;,:/]|\s+see\s+", re.IGNORECASE)
+
+def _normalize_base(value: str) -> str:
+    """Strip emphasis/symbols, case-fold, and collapse whitespace."""
+    v = re.sub(r"\*+", "", value.strip())
+    v = "".join(c for c in v if not unicodedata.category(c).startswith("So"))
+    return re.sub(r"\s+", " ", v.casefold()).strip(" \t*_-–—:•")
 
 
 def normalize_status(value: str) -> str:
-    """CAP-PP-013-13 — normalize a status value for comparison.
-
-    Steps (a)-(e) in the order the requirement specifies. Measured before it was
-    written: (a)-(c) alone read 25 of 30 live dual-carriers as contradictory by
-    flagging prose tails such as `COMPLETE (2026-07-12)` against `COMPLETE`;
-    with (d)-(e) that is 5 of 30, all genuine.
-    """
-    v = value.strip()
-    v = re.sub(r"\*+", "", v)                                     # (a) emphasis
-    v = "".join(c for c in v if not unicodedata.category(c).startswith("So"))  # (a) symbols
-    v = v.casefold()                                              # (b)
-    v = re.sub(r"\s+", " ", v).strip(" \t*_-–—:•")                # (c)
-    v = _CLAUSE_DELIM_RE.split(v, 1)[0].strip()                   # (d)
-    for e in sorted(_PP003_ENUM, key=len, reverse=True):          # (e) longest first
-        if v.startswith(e.casefold()):
-            return e.casefold()
-    return v                                                      # unresolved -> literal
+    """CAP-PP-013-13 exact-enum/bounded-legacy comparison semantics."""
+    state, _warning = parse_status(value, legacy=True, schema=_LIFECYCLE_SCHEMA)
+    return state.casefold() if state else _normalize_base(value)
 
 
 _STATUS_FIELD_RE = re.compile(r"^\*\*Status\*\*:\s*(.+)$", re.M)
@@ -346,11 +344,9 @@ def _header_block(text: str) -> str:
         out.append(line)
     return "\n".join(out)
 
-#: Terminal members of the CAP-PP-003 enum, plus the terminal values real plans
-#: use that the enum does not carry. Kept separate from _PP003_ENUM on purpose:
-#: -13(e) must resolve ONLY against the enum, while terminality is a different
-#: question asked of an already-normalized value.
-_TERMINAL_NORMALIZED = ("complete", "abandoned", "closed", "superseded")
+#: Terminal members used only after the schema-derived parser resolves a value.
+_TERMINAL_NORMALIZED = tuple(d.casefold() for d in (
+    "Complete", "Closed", "Closed (Partial)", "Abandoned", "Superseded"))
 
 
 def resolve_authoritative_status(text: str):
@@ -364,10 +360,15 @@ def resolve_authoritative_status(text: str):
     s = _STATUS_FIELD_RE.search(head)
     ps = _PLAN_STATUS_FIELD_RE.search(head)
     if ps:
-        return normalize_status(ps.group(1)), "Plan_Status", None
+        state, warning = parse_status(ps.group(1), legacy=False, schema=_LIFECYCLE_SCHEMA)
+        return (state.casefold() if state else _normalize_base(ps.group(1)),
+                "Plan_Status", warning)
     if s:
-        return (normalize_status(s.group(1)), "Status",
-                "plan uses legacy **Status**; `Plan_Status` is canonical (CAP-PP-013-11)")
+        state, warning = parse_status(s.group(1), legacy=True, schema=_LIFECYCLE_SCHEMA)
+        message = "plan uses legacy **Status**; `Plan_Status` is canonical (CAP-PP-013-11)"
+        if warning:
+            message += f"; {warning}"
+        return (state.casefold() if state else _normalize_base(s.group(1)), "Status", message)
     return None, None, None
 
 
@@ -641,6 +642,7 @@ def legitimately_terminal(text: str, closure_violations):
         return False, "(a) no status-bearing field"
     if value not in _TERMINAL_NORMALIZED:
         return False, f"(a) authoritative {source} normalizes to {value!r}, not terminal"
+
     if scan_dual_status_mask(text):
         return False, "(b) a second status-bearing field declares a different state"
     blocking_c = {'unchecked_closure_item', 'placeholder_substance', 'vtest_pending'}
@@ -687,6 +689,112 @@ def scan_independence_warnings(text: str):
     return warnings
 
 
+#: C-CLOSE-009 / CAP-PP-021 verdict vocabulary. `NO-HYPOTHESIS` is the legible
+#: escape the skill mandates for pre-v1.3.0 plans — recorded, never skipped.
+#:
+#: ANCHORED TO A DECLARING CONTEXT, NOT A BARE TOKEN. The first cut of this
+#: scanner matched the bare enum anywhere in the file and immediately produced a
+#: false reading: `PARTIAL` is ordinary gate vocabulary ("this gate is PARTIAL
+#: until it does"), so a plan matched on a gate status and the scanner reported a
+#: verdict that was not there. Worse, the same omission ran the other way in the
+#: session that motivated this wiring — a hand grep of the enum that left `PARTIAL`
+#: out scored a fully compliant plan as the lone violator (measured 7/7, reported
+#: 6/7). The verdict is a DECLARED section, so match the declaration.
+#: Derived from the real corpus, not from the skill's prose: plans in this repo
+#: declare the verdict as a `### Value-Resolution Verdict` heading, as a bolded
+#: `**Verdict: X**` lead, or as `**Value verdict (…)**:` with a parenthetical
+#: qualifier between the label and the colon. All three are the same act.
+_VERDICT_CONTEXT_RE = re.compile(
+    r'(?:'
+    r'#{1,6}[^\S\n]*(?:Value[-\s])?Resolution[-\s]?Verdict'   # heading form
+    r'|#{1,6}[^\S\n]*Value[-\s]?verdict'                      # heading, short form
+    r'|\*{0,2}(?:Value[-\s])?(?:Resolution[-\s])?Verdict\*{0,2}'
+    r'[^\S\n]*(?:\([^)\n]{0,200}\))?[^\S\n]*\*{0,2}[:=]'      # label (paren)? :
+    r')', re.IGNORECASE)
+_VERDICT_TOKEN_RE = re.compile(
+    r'\b(REALIZED|NOT-REALIZED|PARTIAL|UNMEASURABLE-YET|NO-HYPOTHESIS)\b')
+#: The cost side is MANDATORY: "net value is never asserted from the benefit
+#: numerator alone" (RQ9, 4-seat critique 2026-07-19). Look for effort/cost
+#: accounting, not for a number — a plan may state cost in hours, in velocity
+#: rows, or as governance overhead.
+#: NOTE the absence of a trailing \b. It was there in the first cut and it silently
+#: disabled every alternative ending in a non-word character: after matching
+#: "Cost:" the next char is a space, and \b between ':' and ' ' is false, so a
+#: verdict reading "Cost: 1.03h measured gate effort" scored as costless. A word
+#: boundary belongs where a word actually ends.
+_COST_RE = re.compile(
+    r'\b(?:velocity|actual effort|effort[- ]actual|governance[ /]?\w*\s*overhead|'
+    r'cost side|costs?\b|cost[:\s]|hours? spent|estimated effort|\d+(?:\.\d+)?\s*h\b)',
+    re.IGNORECASE)
+#: A verdict with no observable is placeholder-substance (#1568 class), which is
+#: exactly what the skill says it must not be.
+_OBSERVABLE_RE = re.compile(
+    r'\b(observable|evidence|measured|verif\w+|resolves? it|resolved by|'
+    r'instrument|receipt|V-[A-Z]+-\d+|gh#\d+|#\d{3,})\b', re.IGNORECASE)
+
+
+def scan_value_resolution(text: str):
+    """Return (kind, detail) WARNs for C-CLOSE-009 / CAP-PP-021 (V-PP-021).
+
+    WHY THIS EXISTS. `/aget-close-project` Step 5.7 has required a value-resolution
+    verdict at every terminal close since 2026-07-19, and its own SKILL.md carried
+    the line "V-PP-021 wiring pending". Measured 2026-08-17: this 907-line module
+    contained ZERO references to benefit / hypothesis / value-resolution, so the
+    requirement was discharged entirely by model-following. Compliance was in fact
+    high (6 of 7 post-rule terminal closures carried a verdict) — but the one that
+    did not, `PROJECT_PLAN_public_artifact_sanitization_actuation_v1.0.md`, closed
+    2026-08-15 with neither a hypothesis nor a verdict and nothing observed it.
+
+    SCOPE. Fires ONLY on a terminal plan. A mid-flight plan has nothing to resolve
+    yet, so warning there would train the reader to ignore the channel.
+
+    CLASS. WARN, never BLOCK. C-CLOSE-009 says a verdict-free terminal close is
+    "flagged by close_gate_check" — flagged, not refused. Making this blocking
+    would also silently change the verdict of every existing terminal-plan test in
+    five modules, which is a behaviour change this wiring is not authorized to make.
+    """
+    status, _src, _warn = resolve_authoritative_status(text)
+    if status is None or not status.startswith(_TERMINAL_NORMALIZED):
+        return []
+
+    warnings = []
+    # Find a verdict DECLARATION that actually names a verdict value. Iterate all
+    # declaring contexts: a plan may carry a per-gate "Verdict:" line before the
+    # closure one, and only the one bearing an enum member is the CAP-PP-021 record.
+    verdict = None
+    window = ''
+    for cm in _VERDICT_CONTEXT_RE.finditer(text):
+        seg = text[cm.start():cm.end() + 2000]
+        tm = _VERDICT_TOKEN_RE.search(seg)
+        if tm:
+            verdict = tm.group(1)
+            window = text[max(0, cm.start() - 500):cm.end() + 2500]
+            break
+
+    if verdict is None:
+        warnings.append((
+            'value_resolution_absent',
+            'terminal plan records no benefit-hypothesis verdict under a declaring '
+            'heading/label (REALIZED / PARTIAL / NOT-REALIZED / UNMEASURABLE-YET / '
+            'NO-HYPOTHESIS) — C-CLOSE-009 Step 5.7'))
+        return warnings
+
+    # Companion checks stay inside the verdict's own neighbourhood: a plan that
+    # mentions "cost" in Gate 2 prose has not thereby recorded a cost side for its
+    # closure verdict.
+    if not _COST_RE.search(window):
+        warnings.append((
+            'value_resolution_costless',
+            f'verdict "{verdict}" recorded with no cost side in scope — net value '
+            'may not be asserted from the benefit numerator alone (RQ9)'))
+    if not _OBSERVABLE_RE.search(window):
+        warnings.append((
+            'value_resolution_unobservable',
+            f'verdict "{verdict}" cites no observable that resolves it '
+            '(a verdict with no observable is placeholder-substance, #1568 class)'))
+    return warnings
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description="Close-gate conformance guard (C-P1).")
     p.add_argument('path', help="PROJECT_PLAN or session markdown file being closed")
@@ -694,68 +802,102 @@ def main(argv=None):
     # CAP-PP-013-05: mode is an EVALUATOR INVOCATION INPUT, never plan metadata.
     # A plan carrying its own mode could set itself to `audit` and escape closure
     # blocking; mode is a property of the question, not of the thing questioned.
+    # 1R.3 (gh#2250): expose STABLE MACHINE REASON KEYS.
+    #
+    # Consumers were partitioning findings by the *rendered label*, which is a
+    # presentation string and not an API. It bit exactly as you would expect: the
+    # close-project skill tolerated `Closure-section placeholder prose` while the
+    # guard rendered `Closure-section placeholder prose (substance, #1568)`, so a
+    # declared tolerance silently never took effect and a test passed on the
+    # mismatch. Labels carry issue numbers and prose and are edited freely; the
+    # dict keys below are the stable identifiers and have been all along.
+    #
+    # Deliberately ADDITIVE. Five existing test modules parse the human output, so
+    # its format is unchanged; --json is a separate channel.
+    p.add_argument('--json', action='store_true', dest='as_json',
+                   help="emit structured findings with stable machine reason keys "
+                        "(the partition API; the human output is presentation, not contract)")
     p.add_argument('--mode', choices=('closure', 'audit'), default='closure',
                    help="closure (default, CAP-PP-013-05/06) blocks any live non-terminal "
                         "gate or contradictory state; audit (CAP-PP-013-08) reports stale "
                         "stamps under a legitimately-terminal plan as HYGIENE")
+    p.add_argument('--phase', choices=('entry', 'exit'),
+                   help="required ETVX phase; no phase is inferred")
+    p.add_argument('--disposition',
+                   help="required terminal target (CLOSED-PARTIAL is accepted spelling)")
+    p.add_argument('--write-unfinished-json', type=Path,
+                   help="exit-only JSON row list to persist before reparsing/reconciliation")
     args = p.parse_args(argv)
+
+    if args.phase is None:
+        print("close-gate: ERROR — --phase is required; no default exists", file=sys.stderr)
+        return 3
+    try:
+        disposition = canonical_disposition(args.disposition, _LIFECYCLE_SCHEMA)
+    except LifecycleContractError as exc:
+        print(f"close-gate: ERROR — {exc}", file=sys.stderr)
+        return 3
 
     fp = Path(args.path)
     if not fp.is_file():
         print(f"close-gate: ERROR — file not found: {fp}", file=sys.stderr)
         return 3
 
+    if args.write_unfinished_json is not None:
+        if args.phase != 'exit' or disposition not in REASONED_DISPOSITIONS:
+            print("close-gate: ERROR — --write-unfinished-json requires an exit-phase reasoned "
+                  "disposition", file=sys.stderr)
+            return 3
+        try:
+            write_unfinished(fp, args.write_unfinished_json)
+        except (LifecycleContractError, OSError, ValueError) as exc:
+            print(f"close-gate: ERROR — {exc}", file=sys.stderr)
+            return 3
+
     content = fp.read_text(encoding='utf-8', errors='replace')
+    scan_content = without_unfinished_section(content)
 
     # CAP-PP-013-09/10 — resolve supersession ONCE, BEFORE any verdict is
     # generated, and hand the exempt set to every gate-oriented scan. Order is
     # the requirement here, not a style choice: a scan that runs before
     # resolution cannot honour an exemption, which is precisely how a validly
     # superseded gate came to be reported as live in both encodings.
-    exempt, supersession_violations = resolve_supersession(content)
+    exempt, supersession_violations = resolve_supersession(scan_content)
 
-    violations = scan(content)
-    violations.extend(scan_status_table_rows(content, exempt))
-    violations.extend(scan_gate_heading_sections(content, exempt))
-    violations.extend(scan_dual_status_mask(content))
+    violations = scan(scan_content)
+    violations.extend(scan_status_table_rows(scan_content, exempt))
+    violations.extend(scan_gate_heading_sections(scan_content, exempt))
+    violations.extend(scan_dual_status_mask(scan_content))
     violations.extend(supersession_violations)
     warnings = scan_independence_warnings(content)
+    # C-CLOSE-009 / CAP-PP-021 (V-PP-021). Deliberately a SEPARATE list from
+    # `warnings`: the independence channel is about who verified, this one is
+    # about what the work was worth. Merging them would make the JSON consumer
+    # unable to partition the two, which is the mistake 1R.3 already fixed once.
+    value_warnings = scan_value_resolution(content)
 
     # CAP-PP-013-11: the legacy-alias migration warning accompanies the verdict
     # and SHALL NOT alter it.
-    _, _, _status_migration_warn = resolve_authoritative_status(content)
-
-    # CAP-PP-013-08: audit mode downgrades STALE STAMPS to HYGIENE -- but only
-    # WHERE the plan is legitimately-terminal. Otherwise audit falls back to
-    # closure behaviour, which is what makes a contradictory plan block in BOTH
-    # modes without needing a separate rule.
-    hygiene = []
-    if args.mode == 'audit':
-        ok, why = legitimately_terminal(content, violations)
-        if ok:
-            hygiene = [v for v in violations if v[0] in _STALE_STAMP_KINDS]
-            violations = [v for v in violations if v[0] not in _STALE_STAMP_KINDS]
-        else:
-            print(f"close-gate: audit → closure fallback — plan is not legitimately-terminal: {why} "
-                  f"(CAP-PP-013-08)")
-
-    def _print_independence_warn():
-        # Surface independence-WARNs (L1047) — non-silent PASS. Never blocks.
-        if not warnings:
-            return
-        print(f"close-gate: ⚠ INDEPENDENCE-WARN — {len(warnings)} checked item(s) in "
-              f"{fp.name} assert independence-requiring claims without attestation "
-              f"(non-blocking; attest producer-pilot/carry/supervisor-lane/OPEN or verify independently):")
-        if not args.quiet:
-            for _, detail in warnings:
-                print(f"  - {detail}")
+    _source_normalized, _, _status_migration_warn = resolve_authoritative_status(content)
+    _source_state = next((s for s in _LIFECYCLE_SCHEMA["states"]
+                          if s.casefold() == (_source_normalized or "")), None)
+    transition_block = None
+    if _source_normalized is not None and _source_state is None:
+        transition_block = (f"status value {_source_normalized!r} does not establish a "
+                            "CAP-PP-003 state")
+    elif args.mode == 'closure' and args.phase == 'entry':
+        if _source_state not in _LIFECYCLE_SCHEMA["transitions"]:
+            transition_block = (f"source state {_source_state or _source_normalized!r} has no lawful "
+                                "terminal transition (terminal states are immutable)")
+        elif disposition not in _LIFECYCLE_SCHEMA["transitions"][_source_state]:
+            transition_block = f"{_source_state} -> {disposition} is not a lawful transition"
 
     # Release-class BLOCKING guard (#1554, v3.25 C-25-06): when the instance
     # carries scripts/release_close_guard.py and the plan is release-class,
     # the guard's verdict joins the violation set (exit 2 => BLOCK). Absence
     # of the guard is expected pre-adoption (L601) — no penalty.
     guard = Path('scripts/release_close_guard.py')
-    if guard.is_file() and re.search(r'release', fp.name, re.IGNORECASE):
+    if guard.is_file() and is_release_completion_plan(content):
         import subprocess
         try:
             r = subprocess.run([sys.executable, str(guard), str(fp)],
@@ -778,38 +920,117 @@ def main(argv=None):
              'release_close_guard_block': 'Release-completion guard BLOCK (#1554)',
              'release_close_guard_error': 'Release-completion guard error'}
 
-    def _print_hygiene():
-        # CAP-PP-013-12(b)+(c): HYGIENE is labelled DISTINCTLY from blocking and
-        # SHALL NOT alter the exit status. Distinguishability comes from the
-        # rendering; the exit code answers a different question.
-        if not hygiene:
-            return
-        print(f"close-gate: ◷ HYGIENE — {len(hygiene)} stale gate stamp(s) in {fp.name} under a "
-              f"legitimately-terminal plan (audit mode; non-blocking, CAP-PP-013-08):")
-        if not args.quiet:
-            for kind, detail in hygiene:
-                print(f"  ◷ [{kinds.get(kind, kind)}] {detail}")
+    try:
+        findings = enrich_findings(violations, str(fp), _LIFECYCLE_SCHEMA)
+    except LifecycleContractError as exc:
+        print(f"close-gate: ERROR — {exc}", file=sys.stderr)
+        return 3
+
+    blocking, carried, hygiene, accounting = [], [], [], {
+        "unaccounted": [], "orphan": [], "nonwaivable": []}
+    document_error = None
+
+    if args.phase == 'entry':
+        blocking, carried = entry_partition(findings, disposition)
+    else:
+        blocking = [f for f in findings if (
+            f.semantic_class in {"closure_record", "integrity"}
+            or f.reason_key == "status_row_nonterminal"
+            or disposition == "Complete")]
+        reconcilable = [f for f in findings if f.semantic_class == "substantive_work"
+                        and f.reason_key != "status_row_nonterminal"]
+        try:
+            rows = parse_unfinished(content)
+            if disposition == "Complete":
+                if rows:
+                    blocking.append(enrich_findings(
+                        [('placeholder_substance', 'Unfinished at Close is forbidden under Complete')],
+                        str(fp), _LIFECYCLE_SCHEMA)[0])
+            elif reconcilable or rows:
+                accounting = reconcile(findings, rows)
+                if accounting["unaccounted"] or accounting["orphan"] or accounting["nonwaivable"]:
+                    blocking.extend(reconcilable)
+            carried = reconcilable if accounting["unaccounted"] else []
+        except LifecycleContractError as exc:
+            document_error = str(exc)
+
+    # Audit can downgrade only bounded stale presentation on an already-terminal
+    # plan.  Integrity, closure records, and unchecked deliverable rows never move.
+    audit_fallback = None
+    if args.mode == 'audit' and args.phase == 'exit' and not document_error:
+        ok, _why = legitimately_terminal(content, violations)
+        if ok:
+            stale = [f for f in blocking if f.reason_key in _STALE_STAMP_KINDS
+                     and f.reason_key != 'status_row_nonterminal']
+            hygiene.extend(stale)
+            blocking = [f for f in blocking if f not in stale]
+        else:
+            audit_fallback = _why
+
+    exit_code = 3 if document_error else (2 if transition_block or blocking or accounting["unaccounted"]
+                                           or accounting["orphan"]
+                                           or accounting["nonwaivable"] else 0)
+
+    if args.as_json:
+        # Structured channel. Exit code is identical to the human path — this mode
+        # changes what is REPORTED, never what is DECIDED.
+        import json as _json
+        print(_json.dumps({
+            "schema": "close_gate_check/findings/v2",
+            "path": str(fp),
+            "mode": args.mode,
+            "phase": args.phase,
+            "disposition": disposition,
+            "exit_code": exit_code,
+            "findings": [dict(f.to_dict(), key=f.reason_key,
+                              label=kinds.get(f.reason_key, f.reason_key)) for f in blocking],
+            "carried": [f.to_dict() for f in carried],
+            "hygiene": [dict(f.to_dict(), key=f.reason_key,
+                             label=kinds.get(f.reason_key, f.reason_key)) for f in hygiene],
+            "accounting": {
+                "unaccounted": accounting["unaccounted"],
+                "orphan": accounting["orphan"],
+                "nonwaivable": [r.__dict__ for r in accounting["nonwaivable"]],
+            },
+            "document_error": document_error,
+            "transition_block": transition_block,
+            "audit_fallback": audit_fallback,
+            "warnings": [{"key": k, "detail": d} for k, d in warnings],
+            "value_resolution": [{"key": k, "detail": d} for k, d in value_warnings],
+            "migration_warning": _status_migration_warn,
+        }, indent=2))
+        return exit_code
 
     if _status_migration_warn:
         print(f"close-gate: ⚠ MIGRATION — {_status_migration_warn} (verdict unaffected)")
+    if audit_fallback:
+        print(f"close-gate: audit → closure fallback — plan is not legitimately-terminal: "
+              f"{audit_fallback} (CAP-PP-013-08)")
 
-    if not violations:
+    if document_error:
+        print(f"close-gate: ERROR — {document_error}")
+        return 3
+
+    if not blocking and not transition_block:
         # CAP-PP-013-12(a) contrapositive: no blocking finding => exit 0, and a
         # hygiene-only run stays here.
         print(f"close-gate: PASS — no unchecked conformance signals in {fp.name} "
-              f"[mode={args.mode}]")
-        _print_hygiene()
-        _print_independence_warn()
+              f"[mode={args.mode} phase={args.phase} disposition={disposition}]")
+        if hygiene:
+            print(f"close-gate: ◷ HYGIENE — {len(hygiene)} stale presentation finding(s) "
+                  f"(non-blocking, CAP-PP-013-08):")
+            for f in hygiene:
+                print(f"  ◷ [{kinds.get(f.reason_key, f.reason_key)}] {f.detail}")
         return 0
 
     # CAP-PP-013-12(a): a blocking finding SHALL return a nonzero exit status.
-    print(f"close-gate: BLOCK — {len(violations)} unchecked conformance signal(s) in {fp.name} "
-          f"[mode={args.mode}] (L178 override available with reason):")
+    print(f"close-gate: BLOCK — {len(blocking)} unchecked conformance signal(s) in {fp.name} "
+          f"[mode={args.mode} phase={args.phase} disposition={disposition}]:")
+    if transition_block:
+        print(f"  - [lawful-transition] {transition_block}")
     if not args.quiet:
-        for kind, detail in violations[:30]:
-            print(f"  - [{kinds.get(kind, kind)}] {detail}")
-    _print_hygiene()
-    _print_independence_warn()
+        for f in blocking[:30]:
+            print(f"  - [{kinds.get(f.reason_key, f.reason_key)}] {f.detail}")
     return 2
 
 
