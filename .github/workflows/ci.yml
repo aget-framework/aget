@@ -67,6 +67,14 @@ jobs:
         python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The cadence contract's denominator is the canonical annotated-tag
+          # history.  A depth-1 checkout supplies a .git directory but no release
+          # series, making the live test observe an empty corpus and fail for the
+          # wrong reason.  Fetch the declared source rather than weakening the
+          # instrument or converting the assertion to a presence-only test.
+          fetch-depth: 0
+          fetch-tags: true
 
       - uses: actions/setup-python@v5
         with:
