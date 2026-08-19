@@ -35,10 +35,12 @@
 
 name: CI
 
-# CAP-CI-004-01/02/03: push to main and develop, PR to main.
+# CAP-CI-004-01/02/03 and CAP-CICD-003-01: push to main/develop,
+# version tags, and PRs to main. A tag push binds the run to the tagged SHA.
 on:
   push:
     branches: [main, develop]
+    tags: ['v*']
   pull_request:
     branches: [main]
   workflow_dispatch:

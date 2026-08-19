@@ -1,21 +1,21 @@
 # AGET CI Specification
 
-**Version**: 1.2.0
+**Version**: 1.4.0
 **Status**: Active
 **Category**: Standards (Quality Assurance)
 **Format Version**: 1.2
 **Created**: 2025-12-28
-**Updated**: 2026-04-25
+**Updated**: 2026-08-18
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_CI_SPEC.md`
 **Change Origin**: L404 (CI Test Isolation Requirements)
-**Related Specs**: AGET_VALIDATION_SPEC, AGET_TEMPLATE_SPEC
+**Related Specs**: AGET_VALIDATION_SPEC, AGET_TEMPLATE_SPEC, AGET_RELEASE_SPEC
 
 ---
 
 ## Abstract
 
-This specification defines the Continuous Integration (CI) requirements for AGET templates and agent repositories. It establishes standards for test isolation, package configuration, CI workflow structure, and validation to prevent import errors and ensure consistent CI behavior across the framework.
+This specification defines the Continuous Integration (CI) requirements for the canonical AGET framework repository, AGET templates, and managed agent repositories that declare CI substrate. It establishes standards for test isolation, package configuration, workflow structure, exact-commit evidence, repository enforcement, and validation.
 
 ## Motivation
 
@@ -30,13 +30,16 @@ This specification formalizes CI patterns validated during the remediation and p
 
 ## Scope
 
-**Applies to**: All AGET templates and agent repositories with CI.
+**Applies to**: The canonical AGET framework repository and all AGET templates or managed agent repositories where CI substrate is declared. Repositories without CI substrate remain governed by the optional-posture work reserved in the v1.3.0 draft outline; absence of substrate does not exempt the canonical framework repository.
 
 **Defines**:
 - Test isolation requirements
 - Package configuration requirements
 - CI workflow structure
 - CI trigger patterns
+- Exact-SHA release evidence
+- Declared prerequisite topology
+- Required-check repository policy and governed override
 - Validation and enforcement
 
 **Does NOT Define**:
@@ -105,6 +108,14 @@ vocabulary:
       skos:definition: "CI trigger on git push to branch"
     PR_Trigger:
       skos:definition: "CI trigger on pull request"
+    Exact_SHA_Evidence:
+      skos:definition: "A settled workflow result whose head_sha equals an explicit full commit SHA"
+    Required_Check_Set:
+      skos:definition: "The enumerated CI job contexts that must all be present and successful"
+    Evidence_Unavailable:
+      skos:definition: "The CI evidence source cannot be read or the exact-SHA run has not settled"
+    Governed_CI_Override:
+      skos:definition: "A principal-authorized, logged, time-bounded policy suspension with before and after receipts"
 ```
 
 ---
@@ -276,6 +287,78 @@ The SYSTEM shall enumerate framework-level validators that consumer CI workflows
 
 ---
 
+### CAP-CICD-001: Exact-SHA CI Evidence
+
+Public release evidence shall bind to the commit being evaluated rather than to a nearby branch or workflow result.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-CICD-001-01 | event-driven | WHEN a public release candidate or correction commit is evaluated, the SYSTEM shall bind Public CI evidence to the caller-supplied full 40-character commit SHA. |
+| CAP-CICD-001-02 | conditional | IF no named workflow run exists for the required SHA THEN the SYSTEM shall return `NONCONFORMANT` and shall not borrow a run from another SHA. |
+| CAP-CICD-001-03 | conditional | IF the evidence source cannot be read or the latest exact-SHA run is unsettled THEN the SYSTEM shall return `UNAVAILABLE` and shall block a release-complete verdict. |
+| CAP-CICD-001-04 | state-driven | WHILE exact-SHA release verification is active, the SYSTEM shall require every job in the declared Required_Check_Set to be present and successful. |
+
+**Enforcement**: `public_ci_release_gate_ext.py verify-live` at the framework-manager seat; repository Required_Check_Set policy.
+
+### CAP-CICD-002: Declared Prerequisite Topology
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-CICD-002-01 | ubiquitous | The SYSTEM shall declare and install every third-party package consumed by the workflow or its tests. |
+| CAP-CICD-002-02 | conditional | IF a CI check consumes Git history or annotated tags THEN the SYSTEM shall fetch the history and tags required by that check's predicate. |
+| CAP-CICD-002-03 | conditional | IF a CI check consumes a sibling repository or external CLI THEN the SYSTEM shall provision that dependency explicitly or replace it with a hermetic fixture. |
+| CAP-CICD-002-04 | prohibited | The SYSTEM shall not convert an unavailable prerequisite into a passing or skipped required check. |
+
+**Enforcement**: workflow inspection plus both-polarity prerequisite fixtures in the exact-SHA verifier suite.
+
+### CAP-CICD-003: Release Trigger and Consumer Semantics
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-CICD-003-01 | event-driven | WHEN a release tag is pushed or a GitHub release is created, the SYSTEM shall execute or reuse Public CI for the identical tagged commit SHA. |
+| CAP-CICD-003-02 | event-driven | WHEN release Definition of Done is evaluated, the SYSTEM shall consume a `PASS` exact-SHA Public CI receipt as a blocking prerequisite. |
+| CAP-CICD-003-03 | prohibited | The SYSTEM shall not interpret Public CI success as receiver acknowledgment, installation, prior-version closure, or migration authorization. |
+
+**Enforcement**: version-tag workflow trigger and release Definition-of-Done consumer verification.
+
+### CAP-CICD-004: Repository Enforcement and Override
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-CICD-004-01 | state-driven | WHILE the public default branch is protected, the SYSTEM shall require the declared Required_Check_Set before merge. |
+| CAP-CICD-004-02 | ubiquitous | The SYSTEM shall apply required-check policy to administrators and shall expose no silent bypass actor. |
+| CAP-CICD-004-03 | conditional | IF emergency policy suspension is required THEN the SYSTEM shall require principal authorization, capture the prior state, record reason and expiry, and restore and verify the policy. |
+| CAP-CICD-004-04 | event-driven | WHEN required-check names change, the SYSTEM shall update the policy only after reading the live job names from an exact-SHA run. |
+
+**Enforcement**: active repository ruleset on `refs/heads/main`, API readback, and governed rollback packet.
+
+> **Identifier compatibility note**: `AGET_CONTENT_INTEGRITY_SPEC` also defines a different `CAP-CI-*` series. New requirements use the collision-free `CAP-CICD-*` namespace; migration of the legacy collision is separate compatibility work.
+
+---
+
+## Inviolables
+
+1. Exact-SHA evidence shall never be borrowed from another commit (CAP-CICD-001-02).
+2. Unreadable or unsettled CI evidence shall never be represented as `PASS` (CAP-CICD-001-03).
+3. An unavailable prerequisite shall never be converted into a passing or skipped required check (CAP-CICD-002-04).
+4. Required-check enforcement shall expose no silent bypass actor; any temporary suspension requires the governed override receipt (CAP-CICD-004-02/-03).
+5. Public CI success shall never be represented as receiver acknowledgment, installation, prior-version closure, or migration authorization (CAP-CICD-003-03).
+
+## Structural Requirements
+
+The canonical framework repository shall maintain:
+
+- one readable workflow under `.github/workflows/` containing the declared test matrix, lint job, and security job;
+- push triggers for `main`, `develop`, and version tags matching `v*`, plus pull-request verification for `main`;
+- complete Git history and annotated tags wherever a required check consumes release history;
+- a seven-context Required_Check_Set: `test (py3.10)` through `test (py3.14)`, `lint`, and `security`;
+- an active default-branch ruleset requiring that set, pull-request mediation, review-thread resolution, non-fast-forward protection, deletion protection, and no bypass actors; and
+- a machine-readable exact-SHA verifier with `PASS`, `NONCONFORMANT`, and `UNAVAILABLE` outcomes.
+
+Changes to job context names shall update the Required_Check_Set only after live exact-SHA job-name readback (CAP-CICD-004-04).
+
+---
+
 ## Authority Model
 
 ```yaml
@@ -298,6 +381,8 @@ authority:
         approver: "principal"
       - action: "Change CI trigger branches"
         approver: "principal"
+      - action: "Suspend or weaken required-check policy"
+        approver: "principal"
 
   conformance:
     validator: "spec_readiness_validator.py"
@@ -318,6 +403,10 @@ authority:
 | V-CI-006 | CAP-CI-005 | automated | Verify test collection succeeds without import errors before running tests |
 | V-CI-007 | CAP-CI-002 | inspection | Verify setup.py declares python_requires with minimum version |
 | V-CI-008 | CAP-CI-003 | automated | Verify CI workflow YAML syntax is valid |
+| V-CICD-001 | CAP-CICD-001 | automated | Verify all required checks are present and successful for the explicit full SHA; wrong or missing SHA fails closed |
+| V-CICD-002 | CAP-CICD-002 | automated | Verify workflow prerequisites and both historical topology-failure classes are explicit |
+| V-CICD-003 | CAP-CICD-003 | automated | Verify version-tag pushes trigger CI and release completion consumes an exact-SHA receipt without absorbing downstream closure states |
+| V-CICD-004 | CAP-CICD-004 | inspection | Read repository ruleset and confirm required checks, no bypass actors, PR mediation, and non-fast-forward/deletion protection |
 
 ### Validation Commands
 
@@ -371,6 +460,11 @@ print('pull_request:', 'PASS' if 'pull_request' in on else 'FAIL')"
 | CAP-CI-004-03 | test_ci_triggers | trigger validation |
 | CAP-CI-005-01 | test_ci_validation | collection check |
 | CAP-CI-005-03 | test_ci_validation | exit code check |
+| CAP-CICD-001-01..04 | public exact-SHA gate | GitHub Actions run/jobs API with explicit full SHA |
+| CAP-CICD-002-01..04 | prerequisite topology test | workflow inspection and offline failure fixtures |
+| CAP-CICD-003-01 | version-tag workflow trigger | `.github/workflows/ci.yml` trigger inspection |
+| CAP-CICD-003-02..03 | release consumer gate | release Definition-of-Done verification |
+| CAP-CICD-004-01..04 | repository ruleset | settings API before/after readback and rollback receipt |
 
 ---
 
@@ -398,6 +492,7 @@ print('pull_request:', 'PASS' if 'pull_request' in on else 'FAIL')"
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.4.0 | 2026-08-18 | Include the canonical framework repository; add exact-SHA evidence, declared prerequisite topology, version-tag trigger, release-consumer separation, and enforced required-check policy contracts. v1.3.0 remains reserved by its unratified optional-posture/feedback-loop/matrix-semantics outline. |
 | 1.1.0 | 2026-04-11 | Update Python matrix to 3.10-3.13 (drop EOL 3.8/3.9, add 3.13). L822 CI spec staleness gap. |
 | 1.0.0 | 2025-12-28 | Initial release (L404 remediation) |
 
