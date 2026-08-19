@@ -1,8 +1,8 @@
 # Fleet Upgrade Release Outcome Rubric
 
-**Version**: 1.2.1
+**Version**: 1.3.0
 **Created**: 2026-04-26
-**Updated**: 2026-04-26 (v1.1.0 — calibration from two scored instances)
+**Updated**: 2026-08-19 (v1.3.0 — lifecycle-correct C-C terminal acceptance)
 **Author**: private-aget-framework-AGET v3.15.0
 **Cross-Agent Source**: private-supervisor-AGET (v1.0.0 original, FLEET-UPG-013), a downstream fleet's supervisor (FLEET-UPG-014 calibration feedback, #1165)
 **Domain**: Conformance — fleet upgrade release outcome (FLEET-UPG-NNN close-out)
@@ -19,7 +19,7 @@ Evaluate the quality and completeness of a fleet upgrade release outcome. Closes
 3. **Framework signal**: Does this release generate upstream improvements that benefit future upgrades?
 
 **Subjects evaluated**:
-- FLEET-UPG-NNN PROJECT_PLAN (all gates completed)
+- FLEET-UPG-NNN PROJECT_PLAN (pre-close eligible, then terminally accepted)
 - FLEET_STATE.yaml coherence post-upgrade
 - DEPLOYMENT_SPEC published at governed path
 - Residuals captured, filed, and tracked
@@ -42,6 +42,7 @@ Evaluate the quality and completeness of a fleet upgrade release outcome. Closes
 - v1.1.0 (2026-04-26): Active status after second scored instance. Five calibration fixes applied (C-A timing, C-D format-agnostic, D3.3 L100 vocabulary, D4.1 format-agnostic, D4.3 clarification). FLEET-UPG-NNN namespacing note added.
 - v1.2.0 (2026-05-30): C-A made conditional on `breaking_release` (#1517 D3 ruling R1, requested via private-supervisor-AGET reconciliation memo). Non-breaking releases satisfy C-A via an explicitly-inherited, origin/main-published spec (3-part proviso); breaking releases still require a version-specific spec; documenting absence still fails. Closes the text-vs-intent gap where Option-B-inherit (v3.20 → v3.16.0) failed C-A literally despite meeting its intent. Note: the prior #1517 ruling comment misattributed "13/15 Exemplary" to v3.16 — 13/15 is FLEET-UPG-013/v3.15.0 (main fleet) per the calibration table above; v3.16 (FLEET-UPG-014) is a distinct per-fleet id (§FLEET-UPG-NNN namespace note); immaterial to C-A (v3.16 passes either way).
 - v1.2.1 (2026-05-30): C-A **read-site clarification** — the v1.2.0 clause keyed to `breaking_release` but did not specify *where* the grader reads it for a release with no own spec (the v3.20 case: its non-breaking signal is prose in release-notes/CHANGELOG, not a structured field). v1.2.1 specifies: read `breaking_release` from the **inherited governing spec**, corroborated by proviso (3) + the handoff/CHANGELOG non-breaking declaration. Closes the mechanization gap in v1.2.0's own amendment (self-caught by framework-owner pre-Gate-3). No semantic change to the breaking/non-breaking branches.
+- v1.3.0 (2026-08-19): C-C changed from a pre-close `Plan_Status: COMPLETE` prerequisite to a commit-bound post-close confirmation. Pre-close eligibility now produces a provisional score and evidence receipt; the governed close changes the plan and generated index; deterministic received-state verification must pass before the score is final or downstream work is authorized. Pre-set and same-transaction terminal states cannot pass. `Closed (Partial)` requires a separate authorized transaction and exact unfinished-work accounting. D1–D5 scoring is unchanged.
 
 ## Scope
 
@@ -83,14 +84,46 @@ Evaluate the quality and completeness of a fleet upgrade release outcome. Closes
 
 ## Constraints (Binary Eligibility Gates)
 
-These pass/fail before the release is eligible for graduated scoring. **Any constraint failed → outcome scored 0 (Non-Conformant) regardless of dimension scores.**
+C-A, C-B, and C-D are evaluated before the governed close transition. A failure blocks provisional scoring and the transition. C-C is evaluated only after the transition, against the committed received state. A C-C failure withholds the final score and downstream authorization; it does not rewrite a valid provisional score to zero.
 
 | ID | Constraint | Pass Criterion |
 |----|------------|----------------|
 | C-A | **DEPLOYMENT_SPEC governing the release published before rollout** | **Conditional on release type** (keyed to the `breaking_release` field in the **governing** DEPLOYMENT_SPEC — **read-site**: for a release with its own `aget/DEPLOYMENT_SPEC_vX.Y.Z.yaml`, read its field; for a release with **no own spec**, read `breaking_release` from the **inherited** governing spec it names, corroborated by proviso (3) below AND the release's non-breaking declaration in its handoff/CHANGELOG — so a non-breaking inherit like v3.20→v3.16.0 is determinable without a v3.20-specific file). **Breaking** (`breaking_release: true`): a version-specific `aget/DEPLOYMENT_SPEC_vX.Y.Z.yaml` (X.Y.Z = release version) committed + pushed to `origin/main` before any agent upgraded. **Non-breaking** (`breaking_release: false`): satisfied by the most-recent published DEPLOYMENT_SPEC the release **explicitly inherits**, PROVIDED **(1)** that inherited spec is committed + pushed to `origin/main` before rollout, **(2)** the release **names** the inherited source spec in its handoff/Gate-0, AND **(3)** the deployment contract is genuinely unchanged (no new install/verify/sleeping-requirement steps). Documenting the **absence** of any governing spec does **NOT** satisfy C-A (the declined β-path, #1517). Tag-vs-HEAD: the governing artifact need not be in the release tag — `origin/main` having it before the adopter's upgrade started suffices. (Amended v1.2.0 per #1517 D3 ruling R1, 2026-05-30.) |
-| C-B | **All known residuals filed before close-out** | Every identified issue has a GitHub issue number filed before `Plan_Status: COMPLETE` is set |
-| C-C | **Plan_Status field is COMPLETE** | The plan-level `**Plan_Status**:` field reads `COMPLETE` (distinct from per-gate `**Status**:` or `**Gate_Status**:` fields) |
+| C-B | **All known residuals filed before close-out** | Every identified issue has a GitHub issue number filed before the selected terminal disposition is committed |
+| C-C | **Terminal disposition is accepted from the received committed state** | PASS only when a fresh pre-close eligibility receipt exists, the plan was nonterminal at that receipt's commit, a later authorized close commit contains the selected terminal disposition, and `ACCEPTED_TERMINAL(disposition)` passes for that exact commit. A terminal status set before eligibility or in the eligibility transaction cannot pass. |
 | C-D | **All V-test outcomes recorded at time of report** | All V-tests in each gate block have a recorded outcome at time this report is authored. For checkbox-format plans: zero unchecked `- [ ]` V-test rows. For execution-log-format plans: every V-test item has a prose outcome entry (PASS/FAIL/SKIP with rationale). Format determines representation; the constraint is outcome coverage, not checkbox state. |
+
+---
+
+## C-C Lifecycle Contract
+
+The scorer applies C-C through four ordered phases:
+
+1. **Eligibility** — while the plan is nonterminal, evaluate C-A, C-B, C-D, D1–D5, and every separately governed pre-close predicate. A PASS produces a provisional score and an eligibility receipt binding the plan, rubric, close guard, generated index, source manifest, authorization, target disposition, and allowed transition paths by digest.
+2. **Transition** — an authorized close transaction creates a single-parent successor commit containing the selected terminal disposition. The plan and generated index are expected outputs and must change; immutable eligibility inputs must not change; every changed path must have been declared in the receipt.
+3. **Confirmation** — deterministically re-derive the received state from the closing commit, not the authoring worktree. Re-run the exit guard and generated-index check, and establish exact live-remote parity.
+4. **Acceptance** — finalize the provisional score and permit the preauthorized downstream transition only when the confirmation receipt satisfies `ACCEPTED_TERMINAL(disposition)`.
+
+```text
+ACCEPTED_TERMINAL(disposition) =
+  authorized terminal transition committed after eligibility
+  AND pre-close plan/index digests match the eligibility receipt
+  AND immutable rubric/guard/manifest/authorization digests remain unchanged
+  AND changed paths stay within the receipt's declared transition boundary
+  AND post-close plan/index digests bind to the confirmation receipt
+  AND exit guard PASS on the closing commit
+  AND generated project index current on the closing commit
+  AND live remote ref equals the closing commit
+```
+
+The verifier may run on the authoring seat when it is deterministic over the committed tree; this is separate re-derivation, not organizational independence.
+
+Failure consequences are deterministic:
+
+- Eligibility failure blocks entry into the close transaction.
+- Mutation, persistence, exit-guard, index, freshness, or remote-parity failure means no accepted terminal claim.
+- Confirmation failure preserves the attempted close for audit and withholds the final score and every downstream authorization. Repair proceeds through a forward corrective transaction; this contract promises no post-push rollback.
+- `Closed (Partial)` is never an automatic downgrade. It requires a separate authorized transaction, completion of every closer-authored row, and one-to-one accounting for every unfinished occurrence.
 
 ---
 
@@ -233,15 +266,17 @@ These pass/fail before the release is eligible for graduated scoring. **Any cons
 
 ## Scoring Procedure
 
-1. **Constraint check**: Verify all four constraints (C-A through C-D) pass. If any fail → deliverable is Non-Conformant, score = 0, do not proceed.
-2. **Dimension scoring**: For each of D1–D5, assess against the level criteria and assign 0–3.
+1. **Pre-close constraints**: Verify C-A, C-B, C-D, and any separately governed pre-close predicate. If any fail, record BLOCK and do not enter the close transaction.
+2. **Provisional dimension scoring**: For each of D1–D5, assess against the level criteria and assign 0–3.
 3. **Critical criterion check**: If any "Critical? = Yes" criterion is unmet at L0, penalize that dimension to L0 regardless of other criteria in it.
-4. **Aggregate**: Sum dimension scores. Map to overall band per the Scale Design table above.
-5. **Document**: Record per-dimension reasoning (2–3 sentences each) in the release outcome report. Do not collapse to a bare number.
+4. **Provisional aggregate**: Sum dimension scores and map to the overall band. Bind the result to the eligibility receipt; do not publish it as final.
+5. **Governed close**: Commit the selected terminal transition as a successor of the eligibility commit.
+6. **C-C confirmation**: Re-derive the committed received state and evaluate `ACCEPTED_TERMINAL(disposition)`.
+7. **Finalize or block**: On PASS, finalize and document the score. On BLOCK, preserve the attempt and withhold the final score and downstream authorization.
 
 ## Recommended Cadence
 
-- **Self-check** (every FLEET-UPG close-out): Apply before filing the final close-out commit. Target: ≥10 (Compliant). Below 10 → flag explicitly or rework before declaring complete.
+- **Self-check** (every FLEET-UPG close-out): Produce the provisional assessment before the close commit, then finalize it only after C-C confirms the received committed state. Target: ≥10 (Compliant). Below 10 → flag explicitly or rework before entering closure.
 - **Principal meta-assessment** (per release): Apply retrospectively. Use to calibrate release quality standards across FLEET-UPG-NNN history.
 - **Trajectory tracking** (FLEET-UPG-011 and later): Plot scores over time. Drift downward → process degradation; drift upward → process maturation.
 
