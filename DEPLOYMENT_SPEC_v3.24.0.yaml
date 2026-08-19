@@ -95,7 +95,7 @@ breaking_changes:
 
 completion_response:
   release_outcome_report_required: true
-  rubric: "aget/rubrics/RUBRIC_fleet_upgrade_outcome_v1.1.md"
+  rubric: "aget/rubrics/RUBRIC_fleet_upgrade_outcome_v1.3.md"
   minimum_score: 10
   c_a_note: "This back-fill spec is the C-A artifact RUBRIC_fleet_upgrade_outcome requires; authored retrospectively because v3.24 shipped without it (the R-REL-038 lapse this plan remedies)."
 

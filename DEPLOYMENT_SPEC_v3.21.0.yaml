@@ -127,7 +127,7 @@ breaking_changes:
 
 completion_response:
   release_outcome_report_required: true
-  rubric: "aget/rubrics/RUBRIC_fleet_upgrade_outcome_v1.1.md"   # file _v1.1.md; content v1.2.1 (gh#1599)
+  rubric: "aget/rubrics/RUBRIC_fleet_upgrade_outcome_v1.3.md"
   minimum_score: 10
   c_a_note: "C-A (non-breaking branch): satisfied by THIS spec being committed + pushed to origin/main before any agent upgrades. The 3 additive artifacts change the deploy contract, so v3.21 required its own spec (the inherit path did NOT apply) — this file is it."
   fields_required:

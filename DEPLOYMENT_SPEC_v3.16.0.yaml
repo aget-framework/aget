@@ -149,7 +149,7 @@ sleeping_requirements:
 
 completion_response:
   release_outcome_report_required: true
-  rubric: "aget/rubrics/RUBRIC_fleet_upgrade_outcome_v1.1.md"
+  rubric: "aget/rubrics/RUBRIC_fleet_upgrade_outcome_v1.3.md"
   minimum_score: 10
   fields_required:
     - fleet_coverage
