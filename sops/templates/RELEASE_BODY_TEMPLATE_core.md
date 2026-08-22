@@ -38,10 +38,19 @@ NOT for template-{archetype}-aget release bodies — those use `RELEASE_BODY_TEM
 
 - **{Headline change 1}** — {one-line description with version delta or capability summary}
 - **{Headline change 2}** — {...}
-- **{...}** — typically 5-10 bullets for non-breaking minor; up to 12 for substantive
+- **{...}** — **5-10 scannable items** (CAP-REL-006-02-02, normative bound). A scannable item is
+  a list item OR a bold-lead paragraph; both conformant, may be mixed. Each ≤2 rendered lines.
+  The former "up to 12 for substantive" guidance is WITHDRAWN — it contradicted the spec bound.
 - {Optional: SOP/spec amendments worth surfacing publicly}
 
 ## Sleeping-CAPs Disclosure (CONDITIONAL — include ONLY if release ships SPEC-LANDED-DEFERRED contracts)
+
+<!-- Registered section names only (CAP-REL-006-02-04; `(or equivalent)` withdrawn in spec v1.18.0):
+     What's New | Compatibility | Migration | Sleeping-CAPs Disclosure |
+     What This Release Doesn't Change (alt: Known issues (pre-existing)) | Deferred |
+     Post-tag repairs | Known gaps (alt: Disclosed limitations).
+     An unregistered heading FAILS validation. Core pair (What's New + Compatibility) always required;
+     there is NO fixed total-section count. -->
 
 {1-2 sentence summary of which CAPs are spec-only-deferred, R-DEP-010 grace cite, removal threshold, procedural enforcement note if applicable}
 

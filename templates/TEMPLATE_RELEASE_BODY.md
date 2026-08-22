@@ -18,7 +18,13 @@ TEMPLATE INSTRUCTIONS:
 ## What's New
 
 <!--
-Bullet-form. Each bullet:
+5-10 SCANNABLE ITEMS, each at most 2 rendered lines (CAP-REL-006-02-02).
+A scannable item is EITHER a list item (- or *) OR a bold-lead paragraph
+(**Lead** — detail). Both renderings are conformant and may be mixed; the
+bounded-item invariant is what the count measures, not bullet syntax.
+A prose paragraph with no bold lead is NOT a scannable item.
+
+Each item:
   1. Lead with plain-language outcome in **bold** (≤15 words)
   2. Follow with 1-2 sentences of context, technical detail, theoretical basis
   3. Optional trailing `*Traceability: T-IDs, gh#NNN*` line for internal references
@@ -99,10 +105,18 @@ Before publishing a release body authored from this template:
 
 - [ ] Theme line present and starts with `**Theme**:` (case-sensitive)
 - [ ] For: reader line present — names the intended reader (lifts D1 Intent Clarity; advisory, not a hard validator marker)
-- [ ] What's New section has ≥1 bullet
-- [ ] Compatibility section present
+- [ ] What's New section has **5-10 scannable items**, each ≤2 rendered lines (CAP-REL-006-02-02)
+- [ ] Compatibility section present — the core pair is What's New **and** Compatibility, both required
+- [ ] Every H2 is a **registered** section name (CAP-REL-006-02-04). `(or equivalent)` was withdrawn in
+      spec v1.18.0: an unregistered heading is a FAIL, not a variant. Registered names are
+      `What's New`, `Compatibility`, `Migration`, `Sleeping-CAPs Disclosure`,
+      `What This Release Doesn't Change` (alt: `Known issues (pre-existing)`), `Deferred`,
+      `Post-tag repairs`, `Known gaps` (alt: `Disclosed limitations`)
+- [ ] No fixed total-section count — carry the core pair plus whatever registered sections apply
 - [ ] If breaking changes declared, Migration section present
 - [ ] If sleeping CAPs exist (newly added or inherited), Sleeping-CAPs Disclosure present
+- [ ] Release **title** is `vX.Y.Z - {theme}` or `vX.Y.Z — {theme}`, with the version appearing
+      exactly once (CAP-REL-006-02-09)
 - [ ] Voice check: <20% sentences exceed 15 words; no em-dash compound clauses leading bullets
 - [ ] Evidence check: each capability claim has artifact link OR `(experimental)`/`(planned)` qualifier
 - [ ] Internal-link integrity: all hyperlinks resolve (run `post_release_validation.py` post-publish)
