@@ -378,6 +378,9 @@ Phase 2: Graduation (Skip - consolidation path)
 
 Phase 3: Creation
 - Created sops/SOP_cross_aget_communication.md
+  *(fleet-internal — maintained in the framework manager's private repository and **not** shipped in
+  this public package. Annotated 2026-08-22: the bare reference read as a pointer to a file in this
+  repo, which does not exist here.)*
 - Included all required sections
 - Referenced all 5 L-docs
 

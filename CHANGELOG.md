@@ -269,7 +269,7 @@ Defects found by *executing* the gates rather than reading them — each had shi
 - **`/aget-create-initiative`** deployed to canonical core (STRICT, D71). **⚠️ Errata (2026-06-07, gh#1461):** this does **not** close the verb-pair gap as originally stated — the producer half (`/aget-propose-initiative` skill) and `SOP_initiative.md` are **not** shipped in canonical at this tag, so the STRICT route is **non-functional** (it refuses without an APPROVED `PROPOSAL_init_*.md` and `cat`s an absent SOP). The route is **gated (not enforced)** until the producer half ships. See gh#1461.
 
 ### Changed
-- **IAC SOP** (`SOP_cross_aget_communication.md`) per-pattern maturity reconciliation (P1 Relay + P1.5 Read-at-Source → Implemented; cross-machine patterns honestly Pending).
+- **IAC SOP** (`SOP_cross_aget_communication.md` — *fleet-internal, not shipped in this package*) per-pattern maturity reconciliation (P1 Relay + P1.5 Read-at-Source → Implemented; cross-machine patterns honestly Pending).
 - **Release observability** (C-21-16): release-metrics ledger now live-captures real build-gate data; `deployment_monitor.py` outcome-record crash fixed (gh#1589).
 
 ---
