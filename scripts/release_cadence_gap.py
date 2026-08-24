@@ -138,9 +138,30 @@ def _tags(repo):
         if otype != "tag" or not tdate:
             skipped.append({"tag": name, "reason": "lightweight tag — no tag object to date"})
             continue
-        rows.append((name, datetime.fromisoformat(tdate)))
+        rows.append((name, _parse_tagger_date(tdate)))
     rows.sort(key=lambda r: r[1])
     return rows, skipped
+
+
+
+def _parse_tagger_date(value):
+    """Parse a git taggerdate across Python versions.
+
+    Python 3.11 accepts a terminal `Z` and colon-less UTC offsets; 3.10 does not
+    and raises ValueError. git emits either form depending on log.date / config,
+    so the shipped script parsed fine on 3.11+ and died on 3.10 -- exiting 1 with
+    empty stdout, which the caller could not distinguish from a real BREACHED
+    result. Normalizing here keeps the version difference out of every call site.
+    """
+    s = (value or "").strip()
+    if not s:
+        raise ValueError("empty taggerdate")
+    if s.endswith(("Z", "z")):
+        s = s[:-1] + "+00:00"
+    # colon-less offset: "+0000" / "-0730" -> "+00:00" / "-07:30"
+    if len(s) >= 5 and s[-5] in "+-" and s[-3] != ":":
+        s = s[:-2] + ":" + s[-2:]
+    return datetime.fromisoformat(s)
 
 
 def _is_release_tag(name):

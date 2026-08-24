@@ -36,6 +36,72 @@ def _run(env_root, *args):
     )
 
 
+def _breached_or_ok(r):
+    """An exit code alone cannot be read as a verdict.
+
+    EXIT_BREACHED is 1, and so is the exit code of almost any crash. The shipped
+    test asserted `returncode in (EXIT_OK, EXIT_BREACHED)` and then parsed stdout;
+    on Python 3.10 the script died in date parsing, exited 1 with EMPTY stdout, and
+    the assertion passed VACUOUSLY -- the real failure surfaced downstream as a
+    JSONDecodeError, one layer away from its cause.
+
+    So: exit 1 may be interpreted as a legitimate BREACHED result only when stdout
+    also carries non-empty, valid JSON. Otherwise it is a crash and is reported as
+    one, at the point it happened.
+    """
+    assert r.returncode in (EXIT_OK, EXIT_BREACHED), (
+        f"unexpected exit {r.returncode}\nstdout:\n{r.stdout}\nstderr:\n{r.stderr}"
+    )
+    assert r.stdout.strip(), (
+        f"exit {r.returncode} with EMPTY stdout is a crash, not a verdict "
+        f"(EXIT_BREACHED collides with a crash's exit 1)\nstderr:\n{r.stderr}"
+    )
+    try:
+        return json.loads(r.stdout)
+    except json.JSONDecodeError as e:
+        raise AssertionError(
+            f"exit {r.returncode} with non-JSON stdout is a crash, not a verdict: {e}"
+            f"\nstdout:\n{r.stdout}\nstderr:\n{r.stderr}"
+        ) from None
+
+
+def _payload_of(r, expect_exit):
+    """Same discipline as `_breached_or_ok`, for the UNAVAILABLE polarity.
+
+    exit 2 is UNAVAILABLE and does NOT collide with a crash the way exit 1 does,
+    but the JSON requirement is identical: a verdict whose stdout is empty or
+    unparseable is a crash wearing a verdict's exit code.
+    """
+    assert r.returncode == expect_exit, (
+        f"expected exit {expect_exit}, got {r.returncode}\nstdout:\n{r.stdout}\nstderr:\n{r.stderr}"
+    )
+    assert r.stdout.strip(), f"exit {r.returncode} with EMPTY stdout\nstderr:\n{r.stderr}"
+    try:
+        return json.loads(r.stdout)
+    except json.JSONDecodeError as e:
+        raise AssertionError(f"exit {r.returncode} with non-JSON stdout: {e}\nstdout:\n{r.stdout}") from None
+
+
+def test_utc_z_taggerdate_parses_deterministically():
+    """Regression for the Python 3.10 CI failure. Deterministic: the tag date is
+    pinned via env, so this asserts parsing, not the clock."""
+    from datetime import datetime, timezone
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("_rcg", SCRIPT)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+
+    expected = datetime(2026, 8, 15, 18, 29, 0, tzinfo=timezone.utc)
+    for form in ("2026-08-15T18:29:00Z", "2026-08-15T18:29:00+0000", "2026-08-15T18:29:00+00:00"):
+        got = mod._parse_tagger_date(form)
+        assert got == expected, f"{form!r} parsed to {got!r}, expected {expected!r}"
+
+    import pytest as _pytest
+    with _pytest.raises(ValueError):
+        mod._parse_tagger_date("")
+
+
 def test_rejected_explicit_root_is_unavailable_not_success():
     """RED on 4ac6b576: returned 0. An operator-named subject that cannot be
     read must never be reported as a successful measurement."""
@@ -56,7 +122,7 @@ def test_rejected_explicit_root_discloses_the_rejection():
     """RED on 4ac6b576: disclosed nothing. Source disclosure, not just source
     selection -- a reader must be able to tell which rule won."""
     r = _run("/nonexistent/xyz", "--json")
-    payload = json.loads(r.stdout)
+    payload = _payload_of(r, EXIT_UNAVAILABLE)
     assert payload["status"] == "UNAVAILABLE"
     assert "AGET_CANONICAL_ROOT" in payload["source_strategy"]
     assert "no fallback applied" in payload["source_strategy"]
@@ -66,7 +132,7 @@ def test_rejected_explicit_root_never_substitutes_another_subject():
     """The sharpest form of the defect: 4ac6b576 reported a throwaway scratch
     directory as the canonical public repo and exited 0."""
     r = _run("/nonexistent/xyz", "--json")
-    payload = json.loads(r.stdout)
+    payload = _payload_of(r, EXIT_UNAVAILABLE)
     assert payload["source_repo"] is None, (
         f"a rejected explicit input must not be replaced; got {payload['source_repo']!r}"
     )
@@ -92,8 +158,7 @@ def test_valid_explicit_root_still_measures_and_discloses_strategy():
     )
     repo = str(repo_root)
     r = _run(repo, "--json")
-    assert r.returncode in (EXIT_OK, EXIT_BREACHED), r.stdout
-    payload = json.loads(r.stdout)
+    payload = _breached_or_ok(r)
     assert payload["source_strategy"] == "explicit:AGET_CANONICAL_ROOT"
     assert payload["source_repo"] == repo
 
@@ -130,8 +195,7 @@ def test_absent_explicit_input_still_discovers(tmp_path):
     r = subprocess.run(
         [sys.executable, str(landed), "--json"], capture_output=True, text=True, env=env
     )
-    assert r.returncode in (EXIT_OK, EXIT_BREACHED), r.stdout + r.stderr
-    payload = json.loads(r.stdout)
+    payload = _breached_or_ok(r)
     assert payload["source_strategy"] == "discovered:own-repo-root"
     assert payload["source_repo"] == str(landing)
 
@@ -153,7 +217,7 @@ def test_staged_depth_is_unavailable_and_says_so_rather_than_substituting(tmp_pa
         [sys.executable, str(landed), "--json"], capture_output=True, text=True, env=env
     )
     assert r.returncode == EXIT_UNAVAILABLE
-    payload = json.loads(r.stdout)
+    payload = _payload_of(r, EXIT_UNAVAILABLE)
     assert payload["source_repo"] is None
     assert payload["source_strategy"].startswith("UNAVAILABLE:")
 

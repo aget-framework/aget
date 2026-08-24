@@ -9,6 +9,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.32.0] - 2026-08-23 - "Truthful Release Evidence"
+
+Two repairs to controls that report on releases. Both failed at their shipped public subjects in v3.31.1.
+
+### Fixed
+
+- **`release_cadence_gap.py` no longer answers about a subject nobody asked for.** An explicit source that
+  did not resolve was silently replaced with a different one, and the tool reported success (exit 0). An
+  explicit input that cannot be read is now `UNAVAILABLE` (exit 2) — never substituted, and never conflated
+  with `BREACHED` (exit 1, which means the subject *was* read). Discovery applies only when no explicit
+  input was given, and the winning strategy is disclosed in the output.
+- **Terminal-`Z` tagger dates now parse on Python 3.10.** `datetime.fromisoformat` rejects a trailing `Z`
+  and colon-less UTC offsets before 3.11; the script crashed with exit 1 and empty stdout, which callers
+  could not distinguish from a legitimate `BREACHED` verdict.
+- **`check_deprecation_removals.py` reports three states over a real population.** The checker takes an
+  injectable subject and names it in its output.
+
+### Added
+
+- **`governance/DEPRECATIONS.md`** — the public deprecation registry. Before this, the default invocation
+  of the deprecation checker exited 2 against a public checkout because there was nothing to read.
+- **`tests/test_release_cadence_gap_source_contract.py`** — both-polarity source-resolution contract,
+  including a deterministic UTC tagger-date regression, and a guard that refuses to read exit 1 as a
+  verdict unless stdout carries valid JSON.
+
+---
+
 ## [3.31.1] - 2026-08-18 - "Receiver-Safe Close Gates"
 
 ### Fixed
