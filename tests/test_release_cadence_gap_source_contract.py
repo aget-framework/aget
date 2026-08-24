@@ -82,14 +82,6 @@ def _payload_of(r, expect_exit):
         raise AssertionError(f"exit {r.returncode} with non-JSON stdout: {e}\nstdout:\n{r.stdout}") from None
 
 
-def _run_argv(argv):
-    """Run the script with argv, inheriting a clean environment."""
-    env = dict(os.environ)
-    env.pop("AGET_CANONICAL_ROOT", None)
-    return subprocess.run([sys.executable, str(SCRIPT), *argv],
-                          capture_output=True, text=True, env=env)
-
-
 def test_utc_z_taggerdate_parses_deterministically():
     """Regression for the Python 3.10 CI failure. Deterministic: the tag date is
     pinned via env, so this asserts parsing, not the clock."""
@@ -169,6 +161,50 @@ def test_valid_explicit_root_still_measures_and_discloses_strategy():
     payload = _breached_or_ok(r)
     assert payload["source_strategy"] == "explicit:AGET_CANONICAL_ROOT"
     assert payload["source_repo"] == repo
+
+
+def test_invalid_explicit_repo_is_structured_unavailable_not_crash():
+    """The Phase-3 review falsifier: --repo used to exit 1 with empty stdout."""
+    declared = "/nonexistent/v332-explicit-repo"
+    r = _run(None, "--repo", declared, "--json")
+    payload = _payload_of(r, EXIT_UNAVAILABLE)
+
+    assert payload["status"] == "UNAVAILABLE"
+    assert payload["source_repo"] is None
+    assert "explicit --repo" in payload["source_strategy"]
+    assert declared in payload["source_strategy"]
+    assert "no fallback applied" in payload["source_strategy"]
+    assert payload["reason"]
+
+
+def test_invalid_explicit_repo_is_not_conflated_with_breach():
+    """UNAVAILABLE(2) stays distinct from the BREACHED(1) verdict namespace."""
+    r = _run(None, "--repo", "/nonexistent/v332-explicit-repo", "--json")
+    assert r.returncode == EXIT_UNAVAILABLE
+    assert r.returncode != EXIT_BREACHED
+    assert r.stdout.strip(), "structured UNAVAILABLE must not have empty stdout"
+
+
+def test_valid_explicit_repo_wins_over_environment_and_reports_cli_strategy():
+    """--repo is the measured subject even when the environment names another one."""
+    repo_root = Path(__file__).resolve().parents[1]
+    assert (repo_root / ".git").exists(), "fixture cannot locate a git repository"
+
+    r = _run(
+        "/nonexistent/environment-must-not-win",
+        "--repo", str(repo_root), "--json",
+    )
+    payload = _breached_or_ok(r)
+    assert payload["source_repo"] == str(repo_root)
+    assert payload["source_strategy"] == "explicit:--repo"
+
+
+def test_valid_explicit_repo_human_output_reports_cli_strategy():
+    """The operator-facing path must distinguish --repo from discovery."""
+    repo_root = Path(__file__).resolve().parents[1]
+    r = _run(None, "--repo", str(repo_root))
+    assert r.returncode in (EXIT_OK, EXIT_BREACHED), r.stderr
+    assert "resolved by : explicit:--repo" in r.stdout
 
 
 def test_absent_explicit_input_still_discovers(tmp_path):
@@ -269,78 +305,4 @@ def test_human_output_discloses_strategy_not_only_path(tmp_path):
 
     assert "explicit:" not in discovered.stdout, (
         "a discovered subject must not render as an explicitly-named one"
-    )
-
-
-# --- CLI channel (--repo) -----------------------------------------------------
-# Added v3.32 Phase 3. The independent review falsified four propositions against
-# the --repo channel and noted the cause: "the cadence source-contract tests do not
-# exercise either valid or invalid explicit --repo input". Five green matrix cells
-# passed a payload whose headline claim was false through its own CLI flag. Every
-# channel is now covered, because fixing only the named instance is how this
-# defect reached a review in the first place.
-
-def test_invalid_explicit_repo_is_unavailable_not_breach():
-    """F1+F2: an unresolvable --repo is UNAVAILABLE (2), never BREACHED (1)."""
-    r = _run_argv(["--repo", "/nonexistent/xyz", "--json"])
-    assert r.returncode == EXIT_UNAVAILABLE, (
-        f"expected exit 2, got {r.returncode}. Exit 1 here is indistinguishable from "
-        f"BREACHED, which is the conflation this module exists to end.\n{r.stdout}{r.stderr}"
-    )
-    payload = _payload_of(r, EXIT_UNAVAILABLE)
-    assert payload["source_repo"] is None, "a rejected subject must not be substituted"
-    assert "--repo" in payload["source_strategy"], "the rejection must name the channel"
-
-
-def test_invalid_explicit_repo_emits_json_not_empty_stdout():
-    """F2 corollary: the failure is a verdict, not a crash."""
-    r = _run_argv(["--repo", "/nonexistent/xyz", "--json"])
-    assert r.stdout.strip(), "exit with empty stdout is a crash wearing a verdict's exit code"
-    json.loads(r.stdout)
-
-
-def test_valid_explicit_repo_discloses_the_channel_that_selected_it(tmp_path):
-    """F4: the disclosed strategy must be the strategy that chose the subject.
-
-    The shipped defect reported 'discovered:own-repo-root' for a repo supplied via
-    --repo -- measuring one repository and disclosing a different basis for it.
-    """
-    repo = tmp_path / "r"
-    (repo).mkdir()
-    subprocess.run(["git", "init", "-q", str(repo)], check=True)
-    for k, v in (("user.email", "f@example.com"), ("user.name", "F")):
-        subprocess.run(["git", "-C", str(repo), "config", k, v], check=True)
-    (repo / "s.txt").write_text("s\n")
-    subprocess.run(["git", "-C", str(repo), "add", "s.txt"], check=True)
-    subprocess.run(["git", "-C", str(repo), "commit", "-qm", "s"], check=True)
-    subprocess.run(["git", "-C", str(repo), "tag", "-a", "v3.31.0", "-m", "r"], check=True)
-
-    r = _run_argv(["--repo", str(repo), "--json"])
-    payload = _breached_or_ok(r)
-    assert payload["source_repo"] == str(repo), "must measure the repo it was given"
-    assert payload["source_strategy"] == "explicit:--repo", (
-        f"disclosed strategy {payload['source_strategy']!r} is not the channel that "
-        "selected the subject -- source disclosure, not merely source selection"
-    )
-
-
-def test_explicit_repo_outranks_environment(tmp_path):
-    """F3: discovery and env must not run when --repo was given."""
-    repo = tmp_path / "r2"
-    repo.mkdir()
-    subprocess.run(["git", "init", "-q", str(repo)], check=True)
-    for k, v in (("user.email", "f@example.com"), ("user.name", "F")):
-        subprocess.run(["git", "-C", str(repo), "config", k, v], check=True)
-    (repo / "s.txt").write_text("s\n")
-    subprocess.run(["git", "-C", str(repo), "add", "s.txt"], check=True)
-    subprocess.run(["git", "-C", str(repo), "commit", "-qm", "s"], check=True)
-    subprocess.run(["git", "-C", str(repo), "tag", "-a", "v3.31.0", "-m", "r"], check=True)
-
-    env = dict(os.environ)
-    env["AGET_CANONICAL_ROOT"] = "/nonexistent/should-be-ignored"
-    r = subprocess.run([sys.executable, str(SCRIPT), "--repo", str(repo), "--json"],
-                       capture_output=True, text=True, env=env)
-    payload = _breached_or_ok(r)
-    assert payload["source_strategy"] == "explicit:--repo", (
-        "an explicit --repo must outrank the environment variable"
     )
