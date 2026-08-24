@@ -20,6 +20,10 @@ core:
   release_metadata:
     - path: .aget/version.json
       change: modified
+    - path: codemeta.json
+      change: modified
+    - path: CITATION.cff
+      change: modified
     - path: CHANGELOG.md
       change: modified
     - path: DEPLOYMENT_SPEC_v3.32.0.yaml
