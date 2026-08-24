@@ -67,28 +67,52 @@ def _default_repo():
       1. AGET_CANONICAL_ROOT           -- explicit operator override
       2. this file's own repo root     -- the common case: we ARE canonical
       3. ../aget sibling               -- the fleet-checkout layout
+
+    REPAIRED 2026-08-21 (v3.32 AC-3). The ladder above was correct; its FAILURE
+    MODE was not. An explicit AGET_CANONICAL_ROOT that does not resolve fell
+    silently through to rule 2 and the tool measured a DIFFERENT repository,
+    reported it as the canonical public repo, and exited 0.
+
+    Measured on the shipped blob 4ac6b576268b31d4ea580ea12293d7a8bbc95d1e:
+      AGET_CANONICAL_ROOT=/nonexistent ... --json  ->  exit 0
+      "source_repo": "<whatever repo the script happened to live in>"
+      disclosure of the rejected input: none
+
+    An operator who names a subject and is silently given another subject gets a
+    confident answer about the wrong thing. That is worse than an error.
+
+    Two rules, and they are different in kind:
+      - An explicit input that does not resolve is UNAVAILABLE (exit 2). It is
+        never silently replaced, and never conflated with FAIL (exit 1), which
+        means "the subject was read and the cadence is breached."
+      - Discovery (rules 2 and 3) applies only when NO explicit input was given.
+
+    Returns (repo, strategy). The strategy is disclosed in output so a reader can
+    always tell which rule won -- source disclosure, not just source selection.
     """
     import os
     import pathlib
 
     env = os.environ.get("AGET_CANONICAL_ROOT")
-    if env and (pathlib.Path(env) / ".git").exists():
-        return env
+    if env is not None and env != "":
+        if (pathlib.Path(env) / ".git").exists():
+            return env, "explicit:AGET_CANONICAL_ROOT"
+        # Explicit and unresolvable. Do NOT fall through: the operator named a
+        # subject, and substituting another one is the defect being repaired.
+        return None, f"UNAVAILABLE:explicit AGET_CANONICAL_ROOT={env!r} is not a git repository (rejected, no fallback applied)"
 
     here = pathlib.Path(__file__).resolve().parent.parent
     if (here / ".git").exists():
-        return str(here)
+        return str(here), "discovered:own-repo-root"
 
     sibling = here.parent / "aget"
     if (sibling / ".git").exists():
-        return str(sibling)
+        return str(sibling), "discovered:sibling-aget"
 
-    # Absence is reported by the caller as UNRESOLVED, distinct from a breached
-    # cadence -- the disclosed exit-1 ambiguity this release shipped with.
-    return str(here)
+    return None, "UNAVAILABLE:no canonical repo found by explicit input, own repo root, or sibling aget/"
 
 
-CANONICAL = _default_repo()
+CANONICAL, CANONICAL_STRATEGY = _default_repo()
 CAP_SATURDAYS = 3               # R-REL-CAD-007 parameter (principal-tunable, D-RP-7)
 POLICY_IN_FORCE = "2026-06-26"  # commit that introduced R-REL-CAD-007
 
@@ -167,6 +191,7 @@ def compute(repo=CANONICAL, cap=CAP_SATURDAYS, in_force=POLICY_IN_FORCE):
         "cap_saturdays": cap,
         "policy_in_force": in_force,
         "source_repo": repo,
+        "source_strategy": CANONICAL_STRATEGY,
         "tags_considered": len(rows),
         "tags_skipped": skipped,
         "intervals_total": len(intervals),
@@ -187,6 +212,25 @@ def main():
     ap.add_argument("--all", action="store_true", help="print every interval, not just binding ones")
     args = ap.parse_args()
 
+    # UNAVAILABLE gate (v3.32 AC-3). Fires BEFORE any measurement, because a
+    # measurement of a substituted subject is worse than no measurement.
+    # Exit 2 is deliberately distinct from exit 1: 1 means "read the subject,
+    # cadence is BREACHED"; 2 means "never read the declared subject at all".
+    # Collapsing them to "nonzero" is the conflation this repair exists to end.
+    if args.repo is None:
+        msg = CANONICAL_STRATEGY.split("UNAVAILABLE:", 1)[-1]
+        if args.json:
+            print(json.dumps({
+                "metric": "AGET-Release_gap (Saturdays between consecutive public releases)",
+                "status": "UNAVAILABLE",
+                "source_repo": None,
+                "source_strategy": CANONICAL_STRATEGY,
+                "reason": msg,
+            }, indent=2))
+        else:
+            print(f"UNAVAILABLE: {msg}", file=sys.stderr)
+        return 2
+
     r = compute(repo=args.repo, cap=args.cap)
 
     if args.json:
@@ -199,6 +243,14 @@ def main():
     print(f"{r['metric']}")
     print(f"  requirement : {r['requirement']} — cap {r['cap_saturdays']} consecutive Saturdays")
     print(f"  source      : {r['source_repo']} annotated tags ({r['tags_considered']} releases)")
+    # Source SELECTION without source STRATEGY is the half-disclosure this module's
+    # own docstring forbids: "a reader can always tell which rule won". Both --json
+    # paths carried source_strategy from the start; this path, the one an operator
+    # actually reads, printed only the path. An explicitly-named subject and a
+    # discovered one rendered identically, which is precisely the distinction the
+    # 2026-08-21 repair exists to make visible. Found by rehearsing the shipped
+    # instrument end to end, 2026-08-23.
+    print(f"  resolved by : {r['source_strategy']}")
     print(f"  in force    : {r['policy_in_force']} — {r['intervals_binding']} binding "
           f"of {r['intervals_total']} intervals")
     if r["tags_skipped"]:
