@@ -112,6 +112,52 @@ def _default_repo():
     return None, "UNAVAILABLE:no canonical repo found by explicit input, own repo root, or sibling aget/"
 
 
+def resolve_source(cli_repo=None):
+    """Resolve the subject across EVERY input channel, with one rule.
+
+    Precedence: explicit --repo > explicit AGET_CANONICAL_ROOT > discovery.
+
+    v3.32 Phase-3 review repair. The prior version gated only the environment
+    variable. `--repo` defaulted to the module-level CANONICAL computed at IMPORT
+    time, so an explicit `--repo` never reached this gate at all:
+
+      * an unresolvable --repo fell through to _tags(), which raised and exited 1
+        with EMPTY stdout -- indistinguishable from BREACHED, which is the exact
+        conflation this module exists to end (findings 1, 2);
+      * discovery had already run at import regardless of --repo (finding 3);
+      * and source_strategy reported how DISCOVERY resolved even when --repo chose
+        the subject, so the tool measured one repository and disclosed a different
+        strategy for choosing it (finding 4) -- a false headline claim, since this
+        module promises source DISCLOSURE, not merely source selection.
+
+    Fixing only --repo would repeat the original error one channel over, so every
+    channel now returns through this one function.
+    """
+    import os
+    import pathlib as _pl
+
+    if cli_repo is not None and cli_repo != "":
+        if (_pl.Path(cli_repo) / ".git").exists():
+            return str(cli_repo), "explicit:--repo"
+        return None, (f"UNAVAILABLE:explicit --repo={cli_repo!r} is not a git repository "
+                      "(rejected, no fallback applied)")
+
+    env = os.environ.get("AGET_CANONICAL_ROOT")
+    if env is not None and env != "":
+        if (_pl.Path(env) / ".git").exists():
+            return env, "explicit:AGET_CANONICAL_ROOT"
+        return None, (f"UNAVAILABLE:explicit AGET_CANONICAL_ROOT={env!r} is not a git repository "
+                      "(rejected, no fallback applied)")
+
+    here = _pl.Path(__file__).resolve().parent.parent
+    if (here / ".git").exists():
+        return str(here), "discovered:own-repo-root"
+    sibling = here.parent / "aget"
+    if (sibling / ".git").exists():
+        return str(sibling), "discovered:sibling-aget"
+    return None, "UNAVAILABLE:no canonical repo found by explicit input, own repo root, or sibling aget/"
+
+
 CANONICAL, CANONICAL_STRATEGY = _default_repo()
 CAP_SATURDAYS = 3               # R-REL-CAD-007 parameter (principal-tunable, D-RP-7)
 POLICY_IN_FORCE = "2026-06-26"  # commit that introduced R-REL-CAD-007
@@ -184,7 +230,7 @@ def _saturdays_between(a, b):
     return n
 
 
-def compute(repo=CANONICAL, cap=CAP_SATURDAYS, in_force=POLICY_IN_FORCE):
+def compute(repo=CANONICAL, cap=CAP_SATURDAYS, in_force=POLICY_IN_FORCE, strategy=None):
     rows, skipped = _tags(repo)
     in_force_date = datetime.fromisoformat(in_force).date()
 
@@ -212,7 +258,7 @@ def compute(repo=CANONICAL, cap=CAP_SATURDAYS, in_force=POLICY_IN_FORCE):
         "cap_saturdays": cap,
         "policy_in_force": in_force,
         "source_repo": repo,
-        "source_strategy": CANONICAL_STRATEGY,
+        "source_strategy": strategy if strategy is not None else CANONICAL_STRATEGY,
         "tags_considered": len(rows),
         "tags_skipped": skipped,
         "intervals_total": len(intervals),
@@ -227,32 +273,37 @@ def compute(repo=CANONICAL, cap=CAP_SATURDAYS, in_force=POLICY_IN_FORCE):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--repo", default=CANONICAL, help="canonical public repo path")
+    ap.add_argument("--repo", default=None,
+                    help="canonical public repo path (explicit; rejected loudly if not a git repo)")
     ap.add_argument("--cap", type=int, default=CAP_SATURDAYS)
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--all", action="store_true", help="print every interval, not just binding ones")
     args = ap.parse_args()
+
+    # Every channel resolves here, after parsing. Resolving at import time is what
+    # let --repo bypass the gate entirely.
+    repo, strategy = resolve_source(args.repo)
 
     # UNAVAILABLE gate (v3.32 AC-3). Fires BEFORE any measurement, because a
     # measurement of a substituted subject is worse than no measurement.
     # Exit 2 is deliberately distinct from exit 1: 1 means "read the subject,
     # cadence is BREACHED"; 2 means "never read the declared subject at all".
     # Collapsing them to "nonzero" is the conflation this repair exists to end.
-    if args.repo is None:
-        msg = CANONICAL_STRATEGY.split("UNAVAILABLE:", 1)[-1]
+    if repo is None:
+        msg = strategy.split("UNAVAILABLE:", 1)[-1]
         if args.json:
             print(json.dumps({
                 "metric": "AGET-Release_gap (Saturdays between consecutive public releases)",
                 "status": "UNAVAILABLE",
                 "source_repo": None,
-                "source_strategy": CANONICAL_STRATEGY,
+                "source_strategy": strategy,
                 "reason": msg,
             }, indent=2))
         else:
             print(f"UNAVAILABLE: {msg}", file=sys.stderr)
         return 2
 
-    r = compute(repo=args.repo, cap=args.cap)
+    r = compute(repo=repo, cap=args.cap, strategy=strategy)
 
     if args.json:
         print(json.dumps(r, indent=2))
