@@ -1,0 +1,51 @@
+schema_version: "1.0"
+version: "3.32.0"
+released: "2026-08-23"
+name: "Truthful Release Evidence"
+type: corrective
+
+breaking_changes: NONE
+
+scope:
+  product_items: 2
+  description: >
+    Two repairs to release-evidence controls. No new capability, no API change,
+    no migration required.
+
+exit_code_semantics:
+  release_cadence_gap:
+    0: OK
+    1: BREACHED — the subject was read and the cadence gap exceeds the rule
+    2: UNAVAILABLE — the named subject could not be read; never substituted
+    note: >
+      Exit 1 alone is not a verdict. A caller must require non-empty valid JSON
+      on stdout before reading exit 1 as BREACHED, because a crash also exits 1.
+  check_deprecation_removals:
+    0: PASS
+    1: FAIL
+    2: UNAVAILABLE
+
+deployment_requirements:
+  - Python >= 3.10 (terminal-Z tagger dates parse on 3.10 as of this release)
+  - No configuration change required
+  - No data migration required
+
+smoke_test:
+  - "python3 scripts/release_cadence_gap.py --json   # exits 0/1/2, always emits JSON"
+  - "python3 scripts/check_deprecation_removals.py --json   # resolves governance/DEPRECATIONS.md"
+
+rollback:
+  method: revert-on-main
+  note: >
+    History rewrite is barred by the non_fast_forward rule on main. Rollback is a
+    revert commit, not a force-push.
+
+not_delivered:
+  - id: C-32-03
+    reason: >
+      Verified private candidate. No canonical counterpart; awaits a governed
+      public name, path, and consumer. NOT publicly delivered.
+  - id: C-32-04
+    reason: >
+      The public templates lack the cited surface. Full template modernization is
+      outside this corrective release. Private fix preserved, NOT shipped.

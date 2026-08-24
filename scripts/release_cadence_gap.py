@@ -42,6 +42,7 @@ Usage:
 Exit codes:
     0  cap HELD (or no binding intervals yet)
     1  cap BREACHED -- on every output path, --json included
+    2  source UNAVAILABLE -- the declared repository was not measured
 """
 import argparse
 import json
@@ -67,30 +68,57 @@ def _default_repo():
       1. AGET_CANONICAL_ROOT           -- explicit operator override
       2. this file's own repo root     -- the common case: we ARE canonical
       3. ../aget sibling               -- the fleet-checkout layout
+
+    REPAIRED 2026-08-21 (v3.32 AC-3). The ladder above was correct; its FAILURE
+    MODE was not. An explicit AGET_CANONICAL_ROOT that does not resolve fell
+    silently through to rule 2 and the tool measured a DIFFERENT repository,
+    reported it as the canonical public repo, and exited 0.
+
+    Measured on the shipped blob 4ac6b576268b31d4ea580ea12293d7a8bbc95d1e:
+      AGET_CANONICAL_ROOT=/nonexistent ... --json  ->  exit 0
+      "source_repo": "<whatever repo the script happened to live in>"
+      disclosure of the rejected input: none
+
+    An operator who names a subject and is silently given another subject gets a
+    confident answer about the wrong thing. That is worse than an error.
+
+    Two rules, and they are different in kind:
+      - An explicit input that does not resolve is UNAVAILABLE (exit 2). It is
+        never silently replaced, and never conflated with FAIL (exit 1), which
+        means "the subject was read and the cadence is breached."
+      - Discovery (rules 2 and 3) applies only when NO explicit input was given.
+
+    Returns (repo, strategy). The strategy is disclosed in output so a reader can
+    always tell which rule won -- source disclosure, not just source selection.
     """
     import os
     import pathlib
 
     env = os.environ.get("AGET_CANONICAL_ROOT")
-    if env and (pathlib.Path(env) / ".git").exists():
-        return env
+    if env is not None and env != "":
+        if (pathlib.Path(env) / ".git").exists():
+            return env, "explicit:AGET_CANONICAL_ROOT"
+        # Explicit and unresolvable. Do NOT fall through: the operator named a
+        # subject, and substituting another one is the defect being repaired.
+        return None, f"UNAVAILABLE:explicit AGET_CANONICAL_ROOT={env!r} is not a git repository (rejected, no fallback applied)"
 
     here = pathlib.Path(__file__).resolve().parent.parent
     if (here / ".git").exists():
-        return str(here)
+        return str(here), "discovered:own-repo-root"
 
     sibling = here.parent / "aget"
     if (sibling / ".git").exists():
-        return str(sibling)
+        return str(sibling), "discovered:sibling-aget"
 
-    # Absence is reported by the caller as UNRESOLVED, distinct from a breached
-    # cadence -- the disclosed exit-1 ambiguity this release shipped with.
-    return str(here)
+    return None, "UNAVAILABLE:no canonical repo found by explicit input, own repo root, or sibling aget/"
 
 
-CANONICAL = _default_repo()
 CAP_SATURDAYS = 3               # R-REL-CAD-007 parameter (principal-tunable, D-RP-7)
 POLICY_IN_FORCE = "2026-06-26"  # commit that introduced R-REL-CAD-007
+
+
+class RepositoryUnavailable(RuntimeError):
+    """The declared repository could not be measured."""
 
 
 def _tags(repo):
@@ -101,7 +129,7 @@ def _tags(repo):
          "refs/tags"],
         capture_output=True, text=True)
     if out.returncode != 0:
-        raise SystemExit(f"cannot read tags from {repo}: {out.stderr.strip()}")
+        raise RepositoryUnavailable(f"cannot read tags from {repo}: {out.stderr.strip()}")
 
     rows, skipped = [], []
     for line in out.stdout.splitlines():
@@ -114,9 +142,30 @@ def _tags(repo):
         if otype != "tag" or not tdate:
             skipped.append({"tag": name, "reason": "lightweight tag — no tag object to date"})
             continue
-        rows.append((name, datetime.fromisoformat(tdate)))
+        rows.append((name, _parse_tagger_date(tdate)))
     rows.sort(key=lambda r: r[1])
     return rows, skipped
+
+
+
+def _parse_tagger_date(value):
+    """Parse a git taggerdate across Python versions.
+
+    Python 3.11 accepts a terminal `Z` and colon-less UTC offsets; 3.10 does not
+    and raises ValueError. git emits either form depending on log.date / config,
+    so the shipped script parsed fine on 3.11+ and died on 3.10 -- exiting 1 with
+    empty stdout, which the caller could not distinguish from a real BREACHED
+    result. Normalizing here keeps the version difference out of every call site.
+    """
+    s = (value or "").strip()
+    if not s:
+        raise ValueError("empty taggerdate")
+    if s.endswith(("Z", "z")):
+        s = s[:-1] + "+00:00"
+    # colon-less offset: "+0000" / "-0730" -> "+00:00" / "-07:30"
+    if len(s) >= 5 and s[-5] in "+-" and s[-3] != ":":
+        s = s[:-2] + ":" + s[-2:]
+    return datetime.fromisoformat(s)
 
 
 def _is_release_tag(name):
@@ -139,7 +188,19 @@ def _saturdays_between(a, b):
     return n
 
 
-def compute(repo=CANONICAL, cap=CAP_SATURDAYS, in_force=POLICY_IN_FORCE):
+def compute(repo=None, cap=CAP_SATURDAYS, in_force=POLICY_IN_FORCE,
+            source_strategy=None):
+    if repo is None:
+        repo, resolved_strategy = _default_repo()
+        if repo is None:
+            raise RepositoryUnavailable(resolved_strategy.split("UNAVAILABLE:", 1)[-1])
+        if source_strategy is None:
+            source_strategy = resolved_strategy
+    elif source_strategy is None:
+        # Library callers that supply a repository are explicit too. The CLI
+        # passes its more specific channel name below.
+        source_strategy = "explicit:compute(repo)"
+
     rows, skipped = _tags(repo)
     in_force_date = datetime.fromisoformat(in_force).date()
 
@@ -167,6 +228,7 @@ def compute(repo=CANONICAL, cap=CAP_SATURDAYS, in_force=POLICY_IN_FORCE):
         "cap_saturdays": cap,
         "policy_in_force": in_force,
         "source_repo": repo,
+        "source_strategy": source_strategy,
         "tags_considered": len(rows),
         "tags_skipped": skipped,
         "intervals_total": len(intervals),
@@ -181,13 +243,65 @@ def compute(repo=CANONICAL, cap=CAP_SATURDAYS, in_force=POLICY_IN_FORCE):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--repo", default=CANONICAL, help="canonical public repo path")
+    # None is intentional: it preserves whether the operator supplied --repo.
+    # Defaulting this argument to a discovered path made the explicit and
+    # discovered channels indistinguishable and caused the v3.32 review defect.
+    ap.add_argument("--repo", default=None, help="canonical public repo path")
     ap.add_argument("--cap", type=int, default=CAP_SATURDAYS)
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--all", action="store_true", help="print every interval, not just binding ones")
     args = ap.parse_args()
 
-    r = compute(repo=args.repo, cap=args.cap)
+    # Resolve only after argparse establishes whether --repo was supplied.
+    # Explicit CLI selection outranks environment/discovery; the existing
+    # AGET_CANONICAL_ROOT -> own-root -> sibling precedence remains unchanged
+    # when --repo is absent.
+    if args.repo is not None:
+        repo = args.repo
+        source_strategy = "explicit:--repo"
+    else:
+        repo, source_strategy = _default_repo()
+
+    # UNAVAILABLE gate (v3.32 AC-3). Fires BEFORE any measurement, because a
+    # measurement of a substituted subject is worse than no measurement.
+    # Exit 2 is deliberately distinct from exit 1: 1 means "read the subject,
+    # cadence is BREACHED"; 2 means "never read the declared subject at all".
+    # Collapsing them to "nonzero" is the conflation this repair exists to end.
+    if repo is None:
+        msg = source_strategy.split("UNAVAILABLE:", 1)[-1]
+        if args.json:
+            print(json.dumps({
+                "metric": "AGET-Release_gap (Saturdays between consecutive public releases)",
+                "status": "UNAVAILABLE",
+                "source_repo": None,
+                "source_strategy": source_strategy,
+                "reason": msg,
+            }, indent=2))
+        else:
+            print(f"UNAVAILABLE: {msg}", file=sys.stderr)
+        return 2
+
+    try:
+        r = compute(repo=repo, cap=args.cap, source_strategy=source_strategy)
+    except RepositoryUnavailable as exc:
+        if args.repo is not None:
+            unavailable_strategy = (
+                f"UNAVAILABLE:explicit --repo={args.repo!r} could not be read "
+                "(rejected, no fallback applied)"
+            )
+        else:
+            unavailable_strategy = f"UNAVAILABLE:{source_strategy} could not be read"
+        if args.json:
+            print(json.dumps({
+                "metric": "AGET-Release_gap (Saturdays between consecutive public releases)",
+                "status": "UNAVAILABLE",
+                "source_repo": None,
+                "source_strategy": unavailable_strategy,
+                "reason": str(exc),
+            }, indent=2))
+        else:
+            print(f"UNAVAILABLE: {exc}", file=sys.stderr)
+        return 2
 
     if args.json:
         print(json.dumps(r, indent=2))
@@ -199,6 +313,14 @@ def main():
     print(f"{r['metric']}")
     print(f"  requirement : {r['requirement']} — cap {r['cap_saturdays']} consecutive Saturdays")
     print(f"  source      : {r['source_repo']} annotated tags ({r['tags_considered']} releases)")
+    # Source SELECTION without source STRATEGY is the half-disclosure this module's
+    # own docstring forbids: "a reader can always tell which rule won". Both --json
+    # paths carried source_strategy from the start; this path, the one an operator
+    # actually reads, printed only the path. An explicitly-named subject and a
+    # discovered one rendered identically, which is precisely the distinction the
+    # 2026-08-21 repair exists to make visible. Found by rehearsing the shipped
+    # instrument end to end, 2026-08-23.
+    print(f"  resolved by : {r['source_strategy']}")
     print(f"  in force    : {r['policy_in_force']} — {r['intervals_binding']} binding "
           f"of {r['intervals_total']} intervals")
     if r["tags_skipped"]:

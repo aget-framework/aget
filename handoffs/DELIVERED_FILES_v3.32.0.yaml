@@ -1,0 +1,58 @@
+schema_version: "1.0"
+version: "3.32.0"
+released: "2026-08-23"
+
+core:
+  repo: aget-framework/aget
+  payload:
+    - path: scripts/release_cadence_gap.py
+      change: modified
+      item: C-32-01
+    - path: tests/test_release_cadence_gap_source_contract.py
+      change: added
+      item: C-32-01
+    - path: scripts/check_deprecation_removals.py
+      change: modified
+      item: C-32-02
+    - path: governance/DEPRECATIONS.md
+      change: added
+      item: C-32-02
+  release_metadata:
+    - path: .aget/version.json
+      change: modified
+    - path: codemeta.json
+      change: modified
+    - path: CITATION.cff
+      change: modified
+    - path: CHANGELOG.md
+      change: modified
+    - path: DEPLOYMENT_SPEC_v3.32.0.yaml
+      change: added
+    - path: release-notes/v3.32.0.md
+      change: added
+    - path: handoffs/RELEASE_HANDOFF_v3.32.0.md
+      change: added
+    - path: handoffs/REMOTE_MIGRATION_MESSAGE_v3.32.0.md
+      change: added
+    - path: handoffs/DELIVERED_FILES_v3.32.0.yaml
+      change: added
+
+templates:
+  registered_count: 13
+  delivered_count: 0
+  rationale: >
+    No template payload in this release. Both repairs are core-only scripts with
+    no template counterpart. The standard release topology is core plus 13
+    registered templates (14 repos); this cycle touches core alone, and that is
+    a scope fact rather than an omission.
+  registry_note: >
+    13 is the registered template count, derived from the template repository
+    register. It is not a directory glob.
+
+not_delivered:
+  - id: C-32-03
+    state: verified private candidate
+    reason: no canonical counterpart; awaits governed public name, path, consumer
+  - id: C-32-04
+    state: verified private fix
+    reason: public templates lack the cited surface; modernization out of scope
