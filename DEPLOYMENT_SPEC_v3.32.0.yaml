@@ -1,51 +1,53 @@
-schema_version: "1.0"
 version: "3.32.0"
-released: "2026-08-23"
-name: "Truthful Release Evidence"
-type: corrective
+spec_version: "1.0.0"
+created: "2026-08-23"
+status: released
+supersedes: "DEPLOYMENT_SPEC_v3.31.1.yaml"
+breaking_release: false
 
-breaking_changes: NONE
+purpose: "Deliver two measurement controls to consuming seats and make their correctness checkable there. This release is incremental and its value is downstream: a control that does not reach a seat is not delivered."
+source_ref: "v3.32.0"
+rollback_ref: "v3.31.1"
 
-scope:
-  product_items: 2
-  description: >
-    Two repairs to release-evidence controls. No new capability, no API change,
-    no migration required.
+# Promoted to the public monorepo inside the v3.32.0 release process (Gate 2, 2026-08-23),
+# replacing an interim descriptive file authored without the mandatory_changes consumers parse.
 
-exit_code_semantics:
-  release_cadence_gap:
-    0: OK
-    1: BREACHED — the subject was read and the cadence gap exceeds the rule
-    2: UNAVAILABLE — the named subject could not be read; never substituted
-    note: >
-      Exit 1 alone is not a verdict. A caller must require non-empty valid JSON
-      on stdout before reading exit 1 as BREACHED, because a crash also exits 1.
-  check_deprecation_removals:
-    0: PASS
-    1: FAIL
-    2: UNAVAILABLE
+manifest: "handoffs/DELIVERED_FILES_v3.32.0.yaml"
+release_notes: "release-notes/v3.32.0.md"
+remote_migration: "handoffs/REMOTE_MIGRATION_MESSAGE_v3.32.0.md"
 
-deployment_requirements:
-  - Python >= 3.10 (terminal-Z tagger dates parse on 3.10 as of this release)
-  - No configuration change required
-  - No data migration required
+mandatory_changes:
+  - id: "CD-332-01"
+    description: "Cadence measurement names the source it actually measured, and fails on an unresolvable one instead of silently measuring a different repository"
+    paths:
+      - "scripts/release_cadence_gap.py"
+    detection: "python3 -m pytest -q tests/test_release_cadence_gap.py"
+    why_mandatory: "Producer-exercised failure path CONFIRMS the defect: with no explicit source, the default is a relative path reported verbatim, so the instrument measured a throwaway repository, exited 0, reported a binding maximum of zero, and identified its subject by a string equally true of both. Evidence: planning/artifacts/V332_FALSIFIER_EXERCISE_RESULTS.md"
+  - id: "CD-332-02"
+    description: "Deprecation removal check reports pass, fail, or unavailable, and unavailable affects the exit code"
+    paths:
+      - "scripts/check_deprecation_removals.py"
+    detection: "python3 -m pytest -q tests/test_deprecation_removal_check.py"
+    why_mandatory: "Producer-exercised and SOUND across all three states plus the advisory interaction. Its outstanding work is delivery, not repair: it is present at one seat of the thirty-two active seats resolved from the fleet register, and in none of the thirteen templates. (Corrected 2026-08-23: this read 'one seat of thirty-five scanned on local disk'. Thirty-five was a directory count over a local path glob, which is structurally blind to the portfolio-nested seats -- the register resolves 32 active, 0 unresolved, across four portfolios. The numerator was right; the denominator and the method were not. Re-derived at source from the register, counting only instruments at a runnable location, excluding prepared deltas.)"
 
-smoke_test:
-  - "python3 scripts/release_cadence_gap.py --json   # exits 0/1/2, always emits JSON"
-  - "python3 scripts/check_deprecation_removals.py --json   # resolves governance/DEPRECATIONS.md"
+# The reason this section exists at all. The previous cycle's delivery obligation is still open,
+# and the mechanical cause was that the instruments never reached a seat that could run them.
+delivery_precondition:
+  rule: "A release may not claim a control as delivered unless that control reaches at least one consuming seat."
+  measured_gap: "Fleet-register read 2026-08-23, resolving each active seat's declared location: 32 active entries, 0 unresolved. Both controls together present at 1 seat (the producer). One other carries one of the two. Neither appears in any of the 13 templates. Corrected from an earlier 1-of-35 figure whose denominator was a directory count rather than a register read."
+  consequence: "Without this spec's mandatory_changes reaching a seat, the behavioural acceptance below cannot be attempted by anyone."
 
-rollback:
-  method: revert-on-main
-  note: >
-    History rewrite is barred by the non_fast_forward rule on main. Rollback is a
-    revert commit, not a force-push.
+receiver_acceptance:
+  acquire: "Fetch the public v3.32.0 annotated tag and record its peeled commit."
+  integrity: "Verify every ordered manifest digest before execution."
+  clean_room: "Run both controls from the receiving seat's own checkout, against that seat's own real data."
+  behavioral: "For each control: the instrument names the subject it measured; its output is compared against an independent re-derivation of the same fact; the control's FAILURE PATH is exercised with a constructed case and observed to fail; a human records the verdict and any context the instrument could not see. A clean exit is not acceptance. A version stamp is not acceptance."
+  falsifiers_to_exercise:
+    cadence: "Run it with no explicit source from a working directory where a different repository sits where the default resolves. It must name the repository it actually measured, or fail. Silently reporting a confident number is the defect."
+    deprecation: "Add a registry row overdue for removal and confirm it fails. Then add a row whose removal cell carries no version and confirm it reports unavailable AND that this changes the exit code. Use fixtures; never mutate a live registry."
+  terminals: ["ACCEPTED", "REJECTED", "CANNOT-RUN"]
+  adoption: "Receiver-owned. Publication does not imply installation, acceptance, or migration authorization. CANNOT-RUN is a legitimate and informative terminal."
 
-not_delivered:
-  - id: C-32-03
-    reason: >
-      Verified private candidate. No canonical counterpart; awaits a governed
-      public name, path, and consumer. NOT publicly delivered.
-  - id: C-32-04
-    reason: >
-      The public templates lack the cited surface. Full template modernization is
-      outside this corrective release. Private fix preserved, NOT shipped.
+criteria_reference: "planning/artifacts/V332_DOWNSTREAM_ACCEPTANCE.md — RATIFIED by the principal 2026-08-23 (this read 'DRAFT, ratification owed' until 2026-08-23, after the artifact was ratified). Its predecessor has been unratified since 2026-08-16, which is why the previous cycle had no bar to judge against."
+
+rollback: "Restore the receiving seat's pre-upgrade commit or v3.31.1 pin, preserve instance-owned state and any constructed fixture, and keep migration parked."
