@@ -1,7 +1,7 @@
 {
-  "aget_version": "3.32.0",
+  "aget_version": "3.33.0",
   "created": "2025-09-21",
-  "updated": "2026-08-23",
+  "updated": "2026-08-30",
   "component": "core",
   "description": "AGET Framework Core - Specifications, templates, and validation",
   "repository": "aget-framework/aget",
@@ -51,7 +51,8 @@
     "v3.29.0 -> v3.30.0: 2026-08-08",
     "v3.31.0: 2026-08-15 (promotion leg \u2014 five verification instruments reach canonical)",
     "v3.31.0 -> v3.31.1: 2026-08-18 (receiver-safe close-gate correction package)",
-    "v3.31.1 -> v3.32.0: 2026-08-23 (two-item corrective release: cadence source disclosure, three-state deprecation evidence)"
+    "v3.31.1 -> v3.32.0: 2026-08-23 (two-item corrective release: cadence source disclosure, three-state deprecation evidence)",
+    "v3.32.0 -> v3.33.0: 2026-08-30 (staged on the release candidate; declared before tag so the template tier can converge against a real target rather than a promised one)"
   ],
   "contents": {
     "specs/": "Canonical specifications (AGET_VERSIONING_CONVENTIONS, etc.)",
