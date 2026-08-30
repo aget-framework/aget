@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.33.0] - 2026-08-30 - "Make the next migration cost less"
+
+### Added
+- Repository homes for git hooks, executable patterns, and planning templates. Their absence
+  meant a whole class of built control had nowhere to land and could not travel at all.
+- Archetype register parity check, and a conformance self-assessment, each with its test.
+- A referent registry with audience-scoped resolution.
+
+### Changed
+- Search now decomposes URLs into terms and reaches the initiatives surface, so a study on a
+  link no longer reports a novel topic.
+- The release handoff template no longer carries any operator's agent roster. It carries shape.
+
+### Fixed
+- The content sanitizer fails closed on its machine-readable path.
+- A fleet migration contract digest was amended, preserving the tagged digest as the historical
+  record so receipts issued against it remain readable.
+
 ## [3.32.0] - 2026-08-23 - "Truthful Release Evidence"
 
 Two repairs to controls that report on releases. Both failed at their shipped public subjects in v3.31.1.

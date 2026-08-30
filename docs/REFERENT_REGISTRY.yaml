@@ -1,0 +1,177 @@
+# Referent Registry — identifier class -> resolver -> visibility
+#
+# Authored 2026-08-27. Consumed by scripts/resolve_referents_ext.py.
+#
+# WHY THIS EXISTS
+# A deliverable that names governed identifiers without resolving them is a closed
+# document: the reader is told `CAP-IAC-006` and `INIT-INTER-AGET-COMMUNICATION` and
+# given no way to reach either. Measured on the artifact published 2026-08-27:
+# 20 distinct governed referents named, 10 resolvable (50%) -- and all 10 were
+# hand-written GitHub links. Ontology concepts, L-docs, CAPs, V-tests, initiatives
+# and specs all resolved at 0%.
+#
+# THE TWO CLASSES, AND WHY THEY MUST NOT BE MERGED
+# `visibility: public`  -- resolves for anyone; safe in a shared surface.
+# `visibility: private` -- resolves only for someone with repo access, AND naming it
+#                         in a shareable surface is a promotion-boundary disclosure
+#                         (R-ISSUE-011..014). The sanitizer's PRIVATE_PATTERNS list
+#                         exists for exactly this leak.
+#
+# The trap the baseline exposed: on the 2026-08-27 artifact the ONLY resolvable
+# referents were private-tracker issue links. Making a document "clickable" without
+# a visibility gate makes it *more* dangerous to share, not less. So a resolver that
+# reads this file MUST branch on visibility, never just on template presence.
+#
+# NOT A CLAIM THAT THESE ALL WORK. `resolves_today` records measured state, not
+# intent. A template with `resolves_today: false` is a known gap with a named blocker.
+
+version: 0.1.0
+status: Draft
+authored: 2026-08-27
+measured_at: 2026-08-27
+
+# ---------------------------------------------------------------------------
+# PUBLIC CLASSES -- safe to linkify into a shareable surface
+# ---------------------------------------------------------------------------
+public:
+
+  ontology_concept:
+    pattern: '\bC(\d{3,4})\b'
+    prefLabel_source: ontology/ONTOLOGY_personal_ai_systems_v1.0.yaml
+    template: 'https://w3id.org/aget/vocab#{prefLabel_underscored}'
+    resolves_today: false
+    blocker: >
+      ONE gap, not two. COVERAGE: 16 of 1043 live concepts carry a published_at URI
+      in ontology/publication_manifest.yaml -- 1.5%. Zero of the 40 Cluster-22
+      (inter-Aget communication) concepts are published, which is why the 2026-08-27
+      artifact could not link a single concept it named.
+    corrected_2026-08-27: >
+      This entry first claimed a SECOND gap -- "the published HTML carries ZERO
+      per-concept anchors". THAT WAS FALSE, and the error was mine: I grepped for
+      id="..." with double quotes while publish_engine.py:196 emits id='...' with
+      single quotes. Verified live: 16 anchors present, one per published concept,
+      and https://w3id.org/aget/vocab#Agent_Fleet does land on
+      "id='Agent_Fleet'><h2>Agent Fleet</h2>". Addressability WORKS. Content
+      negotiation works (w3id -> 302 -> index.html for text/html, vocab.ttl for
+      text/turtle). Nothing in the generator needs fixing. Second predicate error of
+      the identical class in one session -- the first was a line-anchored To: regex.
+    owner: INIT-ONTOLOGY-MATURATION / /aget-promote-concept
+    note: >
+      The identifier a reader sees is CNNN, but the URI is built from prefLabel.
+      A resolver MUST look the label up rather than templating the C-number, and
+      MUST verify the concept is in the publication manifest before emitting a link.
+
+  canonical_spec:
+    pattern: '\b(AGET_[A-Z_]+_SPEC|TEMPLATE_AGENTS_MD_SPEC)\b'
+    template: 'https://github.com/aget-framework/aget/blob/main/specs/{name}.md'
+    resolves_today: true
+    denominator: 48 top-level specs (64 recursive) at ../aget/specs/
+    note: Verify the file exists at the pinned ref; a citation is not a definition site.
+
+  canonical_sop:
+    pattern: '\b(SOP_[a-z_]+)\b'
+    template: 'https://github.com/aget-framework/aget/blob/main/sops/{name}.md'
+    resolves_today: partial
+    blocker: >
+      20 canonical SOPs exist, but SOP_cross_aget_communication is NOT among them
+      (V-IAC-005 FAIL, measured 2026-08-27). A resolver must check membership, not
+      assume the canonical tier mirrors the private tier.
+
+  public_issue:
+    pattern: 'aget-framework/aget#(\d+)'
+    template: 'https://github.com/aget-framework/aget/issues/{n}'
+    resolves_today: true
+
+# ---------------------------------------------------------------------------
+# PRIVATE CLASSES -- resolvable for the owner; a DISCLOSURE in a shared surface
+# ---------------------------------------------------------------------------
+private:
+
+  private_issue:
+    pattern: '(?<![\w/])#(\d{1,4})\b'
+    template: 'https://github.com/{private-org}/{private-tracker}/issues/{n}'
+    resolves_today: true
+    visibility_hazard: >
+      Highest-risk class, because it is the one that ALREADY works and therefore
+      the one most likely to be linked by habit. The 2026-08-27 artifact carried
+      10 of these and zero of anything else. the private-org pattern is an explicit
+      PRINCIPAL_PATTERNS entry in the issue sanitizer.
+
+  ldoc:
+    pattern: '\bL(\d{3,4})\b'
+    template: 'file://{repo}/.aget/evolution/L{n}_*.md'
+    resolves_today: false
+    blocker: >
+      No web-resolvable target. 1113 L-docs, all private. Cross-seat IDs are not
+      unique either (CAP-LDOC-010 requires <seat>:LNNN qualification), so a bare
+      LNNNN has no single referent even locally -- a resolver that guesses one
+      produces the mis-resolving citation that is worse than a dangling one.
+
+  cap_requirement:
+    pattern: '\bCAP-[A-Z]+-\d+\b'
+    template: null
+    resolves_today: false
+    blocker: >
+      Requirements live at three tiers with no single definition site: canonical
+      specs (public), initiative manifests (private, e.g. CAP-IAC-001..009 in
+      planning/initiatives/), and skill SKILL.md files. check_export_resolvability.py
+      already reports AMBIGUOUS-MULTI-REFERENT at >1 definition site -- run it before
+      minting any resolver for this class.
+
+  vtest:
+    pattern: '\bV-[A-Z]+-\d+\b'
+    template: null
+    resolves_today: false
+    blocker: Same multi-tier ambiguity as cap_requirement; paired 1:1 with it.
+
+  initiative:
+    pattern: '\bINIT-[A-Z][A-Z-]+\b'
+    template: 'file://{repo}/planning/initiatives/{name}.md'
+    resolves_today: false
+    blocker: >
+      28 initiatives, all private. Principal-requested class (2026-08-27): the ask
+      was to click INIT-INTER-AGET-COMMUNICATION from a published artifact. That
+      requires either a public initiative summary tier (does not exist) or accepting
+      that the link only works for the owner and marks the artifact unshareable.
+    decision_owed: >
+      Which of those two? A public summary tier is new governed surface; owner-only
+      links are cheap but make shareability a per-artifact judgement. PRINCIPAL.
+
+  project_plan:
+    pattern: '\bPROJECT_PLAN_[a-z0-9_.]+\b'
+    template: 'file://{repo}/planning/{name}.md'
+    resolves_today: false
+    blocker: 111 plans, all private. Same shape as initiative.
+
+  script:
+    pattern: '\b([a-z_]+_ext\.py|[a-z_]+\.py)\b'
+    template: 'file://{repo}/scripts/{name}'
+    resolves_today: false
+    blocker: Private. Framework_Artifacts have public twins at ../aget/scripts/; Instance_Artifacts (*_ext.py) do not.
+
+# ---------------------------------------------------------------------------
+# RESOLVER CONTRACT
+# ---------------------------------------------------------------------------
+contract:
+  three_state: [PASS, FAIL, UNAVAILABLE]
+  rules:
+    - >
+      A class with `resolves_today: false` MUST NOT be linked. Emit it as plain text
+      and report it as an unresolved referent. Never emit a link that 404s -- a
+      dangling link is worse than an unlinked identifier, because it implies a
+      target was checked.
+    - >
+      A `private` class MUST NOT be linked when the target surface is shareable
+      unless the caller passes an explicit acknowledgement. Default is refuse.
+    - >
+      `resolves_today` values are MEASURED, dated, and decay. Re-derive before
+      relying on them; this file is a snapshot, not standing fact (L1254/L1285).
+    - >
+      Never template a URI from the identifier the reader sees when the real URI is
+      built from another field (see ontology_concept).
+
+traceability:
+  measured_baseline: 20 distinct referents / 10 resolvable (50%) on the 2026-08-27 published artifact
+  related_issues: []   # private-tracker refs removed at the public boundary
+  instruments: [scripts/resolve_referents_ext.py, scripts/check_export_resolvability.py]
+  rulings_owed: [initiative visibility tier (PRINCIPAL), ontology publication coverage target (PRINCIPAL)]
