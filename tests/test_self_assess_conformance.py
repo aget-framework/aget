@@ -30,6 +30,11 @@ REPO = pathlib.Path(__file__).resolve().parent.parent
 SCRIPT = REPO / "scripts" / "self_assess_conformance.py"
 
 
+def _seat_token(*middle):
+    """Build a private-seat-shaped falsifier without publishing one verbatim."""
+    return "-".join(("private", *middle, "aget"))
+
+
 def _load():
     spec = importlib.util.spec_from_file_location("self_assess_conformance", SCRIPT)
     mod = importlib.util.module_from_spec(spec)
@@ -53,8 +58,9 @@ def test_declared_self_test_passes():
 def test_seat_token_detects_a_foreign_seat():
     """POLARITY 1 -- the incriminating answer must be reachable."""
     mod = _load()
-    found = mod.foreign_seat_tokens("a line naming private-somewhere-else-aget here", own=set())
-    assert "private-somewhere-else-aget" in found
+    foreign = _seat_token("somewhere", "else")
+    found = mod.foreign_seat_tokens(f"a line naming {foreign} here", own=set())
+    assert foreign in found
 
 
 def test_seat_token_does_not_flag_this_seats_own_identifier():
@@ -64,14 +70,16 @@ def test_seat_token_does_not_flag_this_seats_own_identifier():
     unusable: flagging everything is the same defect as flagging nothing.
     """
     mod = _load()
-    own = {"private-example-aget"}
-    assert mod.foreign_seat_tokens("mentions private-example-aget only", own=own) == []
+    own_token = _seat_token("example")
+    own = {own_token}
+    assert mod.foreign_seat_tokens(f"mentions {own_token} only", own=own) == []
 
 
 def test_seat_token_pattern_is_not_satisfied_by_a_near_miss():
     """The pattern must bind the shape, not a substring of it."""
     mod = _load()
-    assert mod.foreign_seat_tokens("private-partial and privateaget", own=set()) == []
+    partial = "-".join(("private", "partial"))
+    assert mod.foreign_seat_tokens(f"{partial} and privateaget", own=set()) == []
 
 
 def test_sanitizer_verdict_is_unavailable_when_the_sanitizer_is_absent(tmp_path):
