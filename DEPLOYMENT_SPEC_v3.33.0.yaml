@@ -1,0 +1,116 @@
+version: "3.33.0"
+spec_version: "1.0.0"
+created: "2026-08-30"
+status: prepared
+supersedes: "DEPLOYMENT_SPEC_v3.32.0.yaml"
+breaking_release: false
+
+purpose: >-
+  Publish only the v3.33 work that has a truthful canonical form, add destination contracts for three
+  previously homeless artifact classes, and preserve explicit deferrals for work that remains
+  instance-only or not landed.
+source_ref: "v3.33.0"
+rollback_ref: "v3.32.0"
+authored_from_ref: "2e7d11bc4af32fdd29655d516b24210723987b28"
+release_notes: "release-notes/v3.33.0.md"
+release_handoff: "handoffs/RELEASE_HANDOFF_v3.33.0.md"
+remote_migration: "handoffs/REMOTE_MIGRATION_MESSAGE_v3.33.0.md"
+
+publication_boundary: >-
+  This prepared artifact does not prove that v3.33.0 is tagged, published, installed, or accepted. A
+  receiver may use source_ref only after the annotated tag resolves and its peeled commit is recorded.
+
+mandatory_changes:
+  - id: "TRAVEL-333-01"
+    description: >-
+      Canonical destination contracts for executable patterns, repository-managed git hooks, and shared
+      planning templates. These README files create homes only; they do not claim the deferred R1 control
+      payload has landed.
+    paths:
+      - ".aget/patterns/README.md"
+      - ".githooks/README.md"
+      - "planning/README.md"
+    detection: "test -f .aget/patterns/README.md && test -f .githooks/README.md && test -f planning/README.md"
+
+  - id: "REFERENT-333-02"
+    description: >-
+      Public referent-class registry with explicit public/private visibility. The instance-local resolver
+      from R5 is not included.
+    paths:
+      - "docs/REFERENT_REGISTRY.yaml"
+    detection: "grep -q '^public:' docs/REFERENT_REGISTRY.yaml && grep -q '^private:' docs/REFERENT_REGISTRY.yaml"
+
+  - id: "PARITY-333-03"
+    description: >-
+      Archetype register parity instrument and its both-polarity reader, comparison, and CLI falsifiers.
+    paths:
+      - "scripts/check_archetype_register_parity.py"
+      - "tests/test_archetype_register_parity.py"
+    detection: "python3 -m pytest -q tests/test_archetype_register_parity.py"
+
+  - id: "ASSESS-333-04"
+    description: >-
+      Read-only conformance self-assessment plus an actuator that demonstrates discriminating PASS, FAIL,
+      and UNAVAILABLE behavior without asserting that the receiving seat is conformant.
+    paths:
+      - "scripts/self_assess_conformance.py"
+      - "tests/test_self_assess_conformance.py"
+    detection: "python3 -m pytest -q tests/test_self_assess_conformance.py"
+
+  - id: "STUDY-333-05"
+    description: >-
+      Study-topic search decomposes URL input, includes the initiatives surface, and opens ontology YAML;
+      the still-live v3.30 migration contract records the new current digest while preserving its tagged
+      digest and historical receipts.
+    paths:
+      - "scripts/study_topic.py"
+      - "handoffs/FLEET_MIGRATION_CONTRACT_v3.30.0.json"
+    detection: 'python3 -m pytest -q tests/test_study_topic_ontology_surface.py tests/test_fleet_migration_contract_digests.py && python3 -c "import sys; sys.path.insert(0, ''scripts''); import study_topic as s; words=set(s.prepare_keywords(''https://example.org/Concept_Page_Creation_Task'')); assert {''Concept'', ''Page'', ''Creation'', ''Task''} <= words"'
+
+  - id: "HANDOFF-333-06"
+    description: >-
+      Public release-handoff template retains reusable receiver governance and evidence shape without an
+      operator's private fleet roster.
+    paths:
+      - "sops/templates/RELEASE_HANDOFF_TEMPLATE.md"
+    detection: 'python3 -c "import pathlib,re; text=pathlib.Path(''sops/templates/RELEASE_HANDOFF_TEMPLATE.md'').read_text(); assert not re.search(r''private-[a-z0-9-]+-aget'', text, re.I)"'
+
+deferred_scope:
+  - rows: ["R1"]
+    disposition: "DEFERRED_IN_FULL"
+    reason: >-
+      The boundary-control payload is not in the candidate. TRAVEL-333-01 supplies destination contracts
+      only and must not be counted as that control landing.
+  - rows: ["R4", "R5"]
+    disposition: "SHIPPED_PARTIAL"
+    reason: >-
+      Only the public handoff template and referent registry travel; their instance-local scripts do not.
+  - rows: ["R2", "R3", "R8", "R9", "R12"]
+    disposition: "DEFERRED_INSTANCE_ONLY"
+    reason: "Their landed implementations are instance artifacts, not canonical framework payload."
+  - rows: ["R11"]
+    disposition: "DEFERRED_NOT_LANDED"
+    reason: >-
+      The checker still has no detection reference for the terminal row; removal of the flag does not
+      satisfy the locked row's claim.
+
+receiver_acceptance:
+  acquire: >-
+    Fetch the public v3.33.0 annotated tag, record its peeled commit, and confirm it contains this
+    deployment specification plus the release handoff and remote-migration message.
+  integrity: >-
+    Derive the changed path set from the peeled tag and verify every mandatory_changes path against that
+    immutable tree. This specification does not claim a separate delivered-files manifest.
+  clean_room: >-
+    Run focused checks from the receiving checkout without importing files from a sibling private seat.
+  behavioral: >-
+    Run each promoted instrument on the receiver's reachable population. Preserve the instrument verdict
+    separately from its test result: a test PASS proves discrimination, not receiver conformance.
+  terminals: ["ACCEPTED", "REJECTED", "CANNOT-RUN"]
+  adoption: >-
+    Receiver-owned. Publication does not imply installation, acceptance, migration authorization, or
+    completion of the supervisor-owned v3.30 migration wave.
+
+rollback: >-
+  Restore the receiving seat's v3.32.0 pin or prior commit, preserve instance-owned state and the failing
+  fixture/output, and keep adoption parked. Never move or reinterpret the v3.33.0 tag.
