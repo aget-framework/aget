@@ -39,6 +39,7 @@ import json
 import os
 import re
 import sys
+import urllib.parse
 from datetime import datetime
 from pathlib import Path
 
@@ -164,7 +165,9 @@ SURFACES_SEARCHED = [
     '— 2026-07-25 fix; "both roots" read as complete coverage until 2026-08-08)',
     'canonical framework pattern tier (resolved from a local sibling checkout; '
     'reported as unavailable when absent)',
-    'planning/PROJECT_PLAN*.md', 'sops/SOP_*.md', 'governance/*.md',
+    'planning/PROJECT_PLAN*.md',
+    'planning/initiatives/INIT-*.md + PROPOSAL_init_*.md (2026-08-14 fix — see below)',
+    'sops/SOP_*.md', 'governance/*.md',
     'knowledge/** + ontology/** (v3.25 C-25-14)',
     'specs/** + .aget/specs/** (gh#1580 — instance-local spec tier)',
     'canonical framework spec tier (resolved from a local sibling checkout; '
@@ -174,9 +177,32 @@ SURFACES_SEARCHED = [
 SURFACES_EXCLUDED = [
     'sessions/, workspace/, data/ (deliberate — 2026-07-04 scope decision, noise at study-time; '
     'sessions/ is reachable on request via --include-sessions)',
-    'docs/ outside patterns/, planning/initiatives/, handoffs/, release-notes/, .claude/skills/ '
+    'docs/ outside patterns/, handoffs/, release-notes/, .claude/skills/ '
     '(unconfigured — candidates for a future scope ruling)',
 ]
+# 2026-08-14: planning/initiatives/ moved from EXCLUDED to SEARCHED.
+#
+# Why. A study of "AGET's support for connectors and MCP" ran this script and got 13
+# artifacts across 5 surfaces. The single most load-bearing artifact in the whole answer
+# — planning/initiatives/INIT-CROSS-CLI-PORTABILITY.md, which carries CAP-CCP-017, the
+# normative requirement governing the exact question asked — was NOT among them. It was
+# found by a hand-rolled grep afterwards, and the script had faithfully printed it under
+# "NOT searched". The banner was accurate and the study was still wrong.
+#
+# This is the surface where ACTIVE capability contracts live. PROJECT_PLANs are vehicles;
+# initiatives are the scope-and-requirement layer above them (AGET_INITIATIVE_SPEC), and
+# a CAP-/V- requirement lands in an initiative manifest, not in a plan. Excluding it made
+# the script structurally unable to surface the governing requirement for any topic whose
+# scope is owned by an initiative — the precise failure mode /aget-study-topic exists to
+# prevent (L467 layer 3: "searchable index").
+#
+# Bounded like the other additions: manifests and their proposals only (INIT-*.md,
+# PROPOSAL_init_*.md), not the whole planning/ tree — planning/artifacts/ is receipt
+# spew and would reproduce the sessions/ noise problem the 2026-07-04 ruling avoided.
+#
+# Guarded: tests/test_session_protocol.py::TestStudyTopicProtocol
+#   ::test_study_topic_searches_initiatives_surface asserts BOTH polarities — the surface
+#   is reachable, AND planning/artifacts/ is still excluded. See L1388.
 SURFACES_OUT_OF_UNIVERSE = (
     'this list is REPO-INTERNAL ONLY. Two classes lie outside it and are never searched: '
     'the WORK REPO this agent contributes to, and the WEB / external prior art. '
@@ -185,7 +211,126 @@ SURFACES_OUT_OF_UNIVERSE = (
 )
 
 
-def prepare_keywords(topic: str) -> list:
+# Keywords whose corpus document-frequency is too low to GATE a match. They are
+# still searched, still contribute match counts, and still rank — they simply do not
+# enter the majority-coverage denominator. Populated once by
+# compute_nongating_keywords() in main(). Module-level because the denominator is
+# applied per-file inside search_file_for_topic() and threading a parameter through
+# every finder would touch every call site for no behavioural gain.
+_NONGATING_KEYWORDS = set()
+
+# A keyword is non-gating when its document frequency is at or below
+# max(_GATING_DF_MIN, _GATING_DF_RATIO * corpus_size). Overridable via
+# .aget/config.json -> study_topic.gating_df_ratio.
+_GATING_DF_RATIO = 0.005
+_GATING_DF_MIN = 3
+
+# Roots probed for document-frequency. Mirrors SURFACES_SEARCHED; deliberately a
+# separate cheap list because the DF probe only needs "does this token occur at all",
+# not per-surface attribution.
+_DF_PROBE_ROOTS = ('.aget/evolution', '.aget/specs', 'docs', 'planning', 'sops',
+                   'governance', 'knowledge', 'ontology', 'specs', 'patterns', 'inbox')
+_DF_PROBE_EXTS = ('.md', '.yaml', '.yml')
+
+
+def compute_nongating_keywords(topic: str, root: Path = None,
+                               ratio: float = None) -> tuple:
+    """Return (non_gating_keywords, df_map, corpus_size) for the topic (ST-010).
+
+    Why this exists (gh#1876 / RQ-378 "IDF-vs-floor"): STOPWORDS is a fixed
+    function-word list with no corpus-rarity term. A token that is not a function
+    word but is vanishingly rare ("8hrs" df=1, "esp" df=11 of 2900 docs) survives
+    hygiene and then inflates the denominator of the >=50% majority-coverage filter
+    in search_file_for_topic(), SUPPRESSING genuinely relevant artifacts. Measured
+    2026-08-14: the same topic returned 55 artifacts with two such tokens appended
+    and 715 without — a 13x collapse, in the direction that reads to a human as
+    "novel topic, no precedent".
+
+    That polarity is the dangerous one and is NOT what gh#2211 records (there the
+    distinguishing token is STRIPPED, yielding falsely HIGH coverage). Both are
+    hygiene defects; they fail in opposite directions, and a fix for one can cause
+    the other.
+
+    Which is why these keywords are made NON-GATING rather than dropped. Dropping a
+    rare token would break the narrow-lookup case that gh#2211 is about: a specific
+    identifier ("L1013") is legitimately rare AND is the whole point of the query.
+    Removing it from the denominator only ever RELAXES the filter (min_required
+    falls), so recall cannot decrease; the token still searches, still contributes
+    match_count, and still earns FILENAME_BOOST. Precision is held by the relevance
+    floor and composite ranking, not by the denominator.
+
+    Cost: one extra read pass over _DF_PROBE_ROOTS. Bounded by corpus size.
+    """
+    keywords = prepare_keywords(topic, apply_df_filter=False)
+    if len(keywords) < 2:
+        return set(), {}, 0              # denominator is 1; nothing to distort
+    root = root or get_agent_root()
+    ratio = _GATING_DF_RATIO if ratio is None else ratio
+    patterns = {kw: _token_pattern(kw) for kw in keywords}
+    df = {kw: 0 for kw in keywords}
+    corpus = 0
+    for rel in _DF_PROBE_ROOTS:
+        base = root / rel
+        if not base.exists():
+            continue
+        for path in base.rglob('*'):
+            if not path.is_file() or path.suffix.lower() not in _DF_PROBE_EXTS:
+                continue
+            try:
+                text = path.read_text(encoding='utf-8', errors='ignore')
+            except (OSError, UnicodeDecodeError):
+                continue
+            corpus += 1
+            for kw, pat in patterns.items():
+                if re.search(pat, text, re.IGNORECASE):
+                    df[kw] += 1
+    if not corpus:
+        return set(), df, 0
+    threshold = max(_GATING_DF_MIN, ratio * corpus)
+    non_gating = {kw for kw, count in df.items() if count <= threshold}
+    # Never make every keyword non-gating: if the whole topic is rare, the topic IS
+    # the rare thing and the ordinary majority rule should apply to it.
+    if len(non_gating) == len(keywords):
+        return set(), df, corpus
+    return non_gating, df, corpus
+
+
+_URLISH = re.compile(r'^(?:[a-z][a-z0-9+.\-]*://|www\.)', re.I)
+
+# Web mechanics only. Deliberately NOT domain vocabulary: a path segment like
+# "WhatLinksHere" is part of what the caller asked about, and rarity is handled at the
+# majority-coverage denominator (compute_nongating_keywords), not by discarding tokens.
+_URL_NOISE = {
+    'http', 'https', 'ftp', 'www', 'com', 'org', 'net', 'io', 'edu', 'gov', 'co',
+    'html', 'htm', 'php', 'aspx', 'jsp', 'index', 'api', 'cgi', 'bin',
+}
+
+
+def _decompose_url(token: str) -> list:
+    """Split a URL-shaped token into its meaningful path/query segments.
+
+    Why this exists (2026-08-28): keyword hygiene tokenized on whitespace alone, and a
+    URL contains none. The entire URL therefore survived as ONE keyword, matched
+    nothing, and the report announced "0 artifacts found ... This appears to be a novel
+    topic". That is a false absence generated by the instrument -- the worst kind,
+    because the output is a confident negative rather than an error.
+
+    Observed: /aget-study-topic on a wiki URL returned 0; the same subject typed as
+    words returned 74 artifacts across 8 surfaces.
+    """
+    decoded = urllib.parse.unquote(token)
+    out = []
+    # Underscore is a SEPARATOR here, not a word character: wiki and doc URLs encode
+    # spaces as "_", so \w-based splitting leaves "Concept_Page_Creation_Task" as one
+    # unmatchable token -- the same false-absence one level down.
+    for part in re.split(r'[^A-Za-z0-9]+', decoded):
+        if not part or part.isdigit() or part.lower() in _URL_NOISE:
+            continue
+        out.append(part)
+    return out
+
+
+def prepare_keywords(topic: str, apply_df_filter: bool = True) -> list:
     """Token hygiene (audit M1-M3): tokenize, drop punctuation-only tokens and
     stopwords, dedupe case-insensitively (order-preserving), fold trailing
     possessive ("supervisor's" -> "supervisor"). Light folds only — not a stemmer.
@@ -195,8 +340,19 @@ def prepare_keywords(topic: str) -> list:
     handling — a trailing comma ("health,") previously survived into the token
     and broke word-boundary matching silently. Internal punctuation survives
     ("v3.26" is untouched; only token edges are stripped).
+
+    ST-010 (2026-08-14): the returned list is UNCHANGED by document frequency —
+    every hygiened keyword is still searched. Rarity is applied at the
+    majority-coverage denominator instead (see _NONGATING_KEYWORDS and
+    compute_nongating_keywords). apply_df_filter is retained for call-site clarity
+    and is a no-op on the returned tokens.
     """
-    raw = [kw for kw in topic.split() if re.search(r'\w', kw)]
+    raw = []
+    for kw in topic.split():
+        if not re.search(r'\w', kw):
+            continue
+        # A URL is one whitespace token but many search terms (2026-08-28).
+        raw.extend(_decompose_url(kw) if _URLISH.match(kw) else [kw])
     seen, out = set(), []
     for kw in raw:
         kw = kw.strip('.,;:!?"\'`()[]{}<>*_-/\\')  # edges only (gh#1876)
@@ -273,9 +429,17 @@ def search_file_for_topic(file_path: Path, topic: str, case_insensitive: bool = 
                 if kw_matches:
                     keyword_matches[kw] = len(kw_matches)
                     all_matches.extend(kw_matches)
-            # Require at least 50% of (hygiened) keywords present
-            min_required = max(1, (len(keywords) + 1) // 2) if len(keywords) >= 2 else 1
-            if len(keyword_matches) < min(min_required, len(keywords)):
+            # Require at least 50% of the GATING keywords present. Vanishingly-rare
+            # tokens are excluded from the denominator (ST-010): they are still
+            # searched above and still counted in all_matches / coverage numerator,
+            # they just cannot raise the bar. Without this, appending two noise
+            # tokens to a 4-keyword topic silently moved the requirement from
+            # 2-of-4 real tokens to 4-of-6 including two unsatisfiable ones —
+            # measured as a 13x coverage collapse on 2026-08-14.
+            gating = [kw for kw in keywords if kw not in _NONGATING_KEYWORDS] or keywords
+            gating_hits = sum(1 for kw in keyword_matches if kw in gating)
+            min_required = max(1, (len(gating) + 1) // 2) if len(gating) >= 2 else 1
+            if gating_hits < min(min_required, len(gating)):
                 return None
             matches = all_matches
 
@@ -320,9 +484,15 @@ def search_file_for_topic(file_path: Path, topic: str, case_insensitive: bool = 
             'match_count': len(matches),
             'contexts': contexts
         }
-        # Add keyword coverage for multi-word ranking
+        # Add keyword coverage for multi-word ranking. Denominator is the GATING
+        # set, matching the filter above (ST-010) — otherwise a non-gating token
+        # that cannot realistically match still depresses every artifact's score
+        # and pushes it under the relevance floor, reintroducing the same
+        # suppression through the back door.
         if len(keywords) > 1:
-            result['keyword_coverage'] = len(keyword_matches) / len(keywords)
+            _gating = [kw for kw in keywords if kw not in _NONGATING_KEYWORDS] or keywords
+            _hits = sum(1 for kw in keyword_matches if kw in _gating)
+            result['keyword_coverage'] = _hits / len(_gating)
         # Add domain boost if keywords provided (CAP-SESSION-007-07)
         if domain_keywords:
             result['domain_boost'] = compute_domain_boost(content, domain_keywords)
@@ -530,6 +700,77 @@ def find_project_plans(topic: str, domain_keywords: list = None) -> list:
     return results
 
 
+def find_initiatives(topic: str, domain_keywords: list = None) -> list:
+    """Find initiative manifests and their proposals related to topic.
+
+    Added 2026-08-14 (L1388). planning/initiatives/ is the scope-and-requirement tier:
+    CAP-/V- requirements live in INIT-*.md manifests, not in PROJECT_PLANs. Excluding it
+    made this script structurally unable to return the governing requirement for any topic
+    an initiative owns — measured that day on the connector/MCP study, where CAP-CCP-017
+    was the answer and was not returned.
+
+    Scope is deliberately narrow: manifests (INIT-*.md) and their proposals
+    (PROPOSAL_init_*.md). planning/artifacts/ stays out — it is receipt/JSON spew and
+    would reproduce the noise problem the 2026-07-04 sessions/ ruling avoided.
+
+    Args:
+        topic: Topic to search for
+        domain_keywords: Optional domain keywords for boosting
+
+    Returns:
+        List of matching initiative info, highest score first
+    """
+    agent_root = get_agent_root()
+    results = []
+
+    candidates = []
+    initiatives_path = agent_root / 'initiatives'
+    if (agent_root / 'planning' / 'initiatives').exists():
+        initiatives_path = agent_root / 'planning' / 'initiatives'
+        candidates.extend(sorted(initiatives_path.glob('INIT-*.md')))
+    proposals_path = agent_root / 'planning' / 'project-proposals'
+    if proposals_path.exists():
+        candidates.extend(sorted(proposals_path.glob('PROPOSAL_init_*.md')))
+
+    for file in candidates:
+        match = search_file_for_topic(file, topic, domain_keywords=domain_keywords)
+        if not match:
+            continue
+
+        # Initiative lifecycle is a declared field, NOT the PROJECT_PLAN vocabulary.
+        # AGET_INITIATIVE_SPEC states: NASCENT / ACTIVE / DORMANT / COMPLETE / CLOSED /
+        # FOLDED / GRADUATED. Reporting one of these as "[inactive]" (the plan predicate)
+        # would mislabel every NASCENT initiative — including the one whose omission
+        # motivated this function. Read the field; do not infer it.
+        # The value is frequently BOLDED -- "**Status**: **ACTIVE** (rescoped ...)".
+        # An earlier version of this line excluded '*' from the capture class, which
+        # made a bolded value capture the empty string and report UNDECLARED. Caught
+        # 2026-08-14 by running the instrument against source the same session it was
+        # written: it reported INIT-FRAMEWORK-COHERENCE and INIT-ALWAYS-ON-HOST as
+        # UNDECLARED when both declare **ACTIVE**. Capture to end-of-line, then strip
+        # emphasis and any trailing parenthetical rationale.
+        status = 'UNDECLARED'
+        try:
+            content = file.read_text()
+            m = re.search(r'\*\*(?:Initiative_)?Status\*\*:\s*([^\n]*)', content)
+            if m:
+                raw = m.group(1).split('(')[0]
+                status = raw.replace('*', '').replace('_', ' ').strip() or 'UNDECLARED'
+        except Exception:
+            pass
+
+        results.append({
+            'initiative': file.name,
+            'file': match['file'],
+            'match_count': match['match_count'],
+            'status': status,
+            'score': match.get('score', 0.0),
+        })
+
+    results.sort(key=lambda x: x['score'], reverse=True)
+    return results
+
+
 def find_sops(topic: str, domain_keywords: list = None) -> list:
     """Find SOPs related to topic.
 
@@ -561,6 +802,50 @@ def find_sops(topic: str, domain_keywords: list = None) -> list:
     return results
 
 
+KNOWLEDGE_AREAS = ('knowledge', 'ontology')
+
+# The ONE place the knowledge/ontology tier's reach is defined. The banner row
+# in SURFACES_SEARCHED is DERIVED from this tuple by
+# refresh_knowledge_surface(), so the declaration cannot drift from the glob
+# again (L1300: a declared scope must be derived from the executed scope, never
+# asserted alongside it). Before gh#2257 the row read 'knowledge/** + ontology/**'
+# while the glob read '*.md' -- two globs, same file, disagreeing.
+#
+# .ttl / .jsonld / .wiki are deliberately EXCLUDED, and that is a scope decision
+# rather than an oversight: at this seat they live under
+# ontology/publication_staging/ and are SERIALIZATIONS GENERATED FROM the .yaml
+# source. Searching them would return the same concept twice from a generated
+# mirror -- inflating hit counts and manufacturing duplicate derivations, which
+# is the failure gh#2063 names. Source of truth is searched; its exports are not.
+KNOWLEDGE_EXTENSIONS = ('*.md', '*.yaml')
+
+
+def _knowledge_files(base: Path):
+    """Every file the knowledge/ontology tier actually opens, in stable order."""
+    files = []
+    for pattern in KNOWLEDGE_EXTENSIONS:
+        files.extend(sorted(base.rglob(pattern)))
+    return files
+
+
+def refresh_knowledge_surface() -> None:
+    """Rewrite the knowledge/ontology banner row to state the executed globs.
+
+    L1300 applied to this row: the two canonical rows have been derived since
+    2026-08-05, but the remaining rows stayed hand-asserted literals. This is
+    the row that fell over (gh#2257). Deriving it means a future edit narrowing
+    KNOWLEDGE_EXTENSIONS narrows the printed claim in the same motion.
+    """
+    exts = ' + '.join(e.lstrip('*') for e in KNOWLEDGE_EXTENSIONS)
+    areas = ' + '.join(f'{a}/**' for a in KNOWLEDGE_AREAS)
+    surface = (f'{areas} filtered to {exts} (v3.25 C-25-14; extension set '
+               f'closed gh#2257 — generated exports .ttl/.jsonld/.wiki excluded)')
+    for index, value in enumerate(SURFACES_SEARCHED):
+        if value.startswith('knowledge/'):
+            SURFACES_SEARCHED[index] = surface
+            break
+
+
 def find_knowledge(topic: str, domain_keywords: list = None) -> list:
     """Find knowledge-base notes related to topic (v3.25 C-25-14, gh#1809).
 
@@ -568,20 +853,35 @@ def find_knowledge(topic: str, domain_keywords: list = None) -> list:
     ontology/ join the search surface — they are curated KB areas an agent is
     expected to consult. sessions/, workspace/, and data/ stay OUT: transient
     or bulk surfaces whose hits are noise at study-time (revisit on evidence).
+
+    BOTH EXTENSIONS, and the .yaml half is the one that matters (gh#2257).
+    This tier globbed '*.md' only from the day the surface was declared until
+    2026-08-15, while SURFACES_SEARCHED advertised 'knowledge/** + ontology/**'.
+    Governed vocabulary lives in ONTOLOGY_*.yaml, so the tier never opened the
+    file it exists to expose. Measured at this seat pre-fix: 82 yaml files /
+    3,678,886 bytes unreachable against 3 md / 53,726 bytes reachable — 1.4% of
+    ontology bytes. `FrameworkManagerArchetype`, this agent's OWN archetype
+    concept (C610, cited in its own AGENTS.md), occurred 31 times and returned 0.
+
+    Why that is worse than a plain miss: a declared-but-unsearched surface emits
+    a zero that reads as evidence of absence, so callers concluded "the
+    vocabulary does not contain this" when the truth was "the vocabulary was
+    never opened" — false novelty, at review time, with the instrument that
+    would have caught it reporting a confident zero. find_specs() below has
+    globbed BOTH extensions since gh#1580, which is the argument that this was
+    an oversight rather than a scope decision.
+
+    Guarded: tests/test_study_topic_ontology_surface.py (four polarities, and
+    the positive ones assert a NON-ZERO count — a fix verified only by "the
+    suite still passes" cannot distinguish repaired from unchanged).
     """
     agent_root = get_agent_root()
     results = []
-    for area in ('knowledge', 'ontology'):
+    for area in KNOWLEDGE_AREAS:
         base = agent_root / area
         if not base.exists():
             continue
-        # BOTH extensions (gh#2257). This globbed '*.md' only from the day the
-        # surface was declared (v3.25, C-25-14) until 2026-08-15, while
-        # SURFACES_SEARCHED advertised 'knowledge/** + ontology/**'. Governed
-        # vocabulary lives in ONTOLOGY_*.yaml, so the tier never opened the file
-        # it exists to expose -- emitting a zero that reads as evidence of
-        # absence. find_specs() below has globbed both since gh#1580.
-        for file in sorted(base.rglob('*.md')) + sorted(base.rglob('*.yaml')):
+        for file in _knowledge_files(base):
             match = search_file_for_topic(file, topic, domain_keywords=domain_keywords)
             if match:
                 results.append({
@@ -915,6 +1215,52 @@ def find_inbox(topic: str, domain_keywords: list = None, window_days: int = 14) 
     return results
 
 
+def find_skills(topic: str, domain_keywords: list = None) -> list:
+    """Find skill definitions when explicitly requested — OPT-IN (--include-skills).
+
+    `.claude/skills/` was a DECLARED-EXCLUDED surface ("unconfigured — candidates
+    for a future scope ruling"). Field failure 2026-08-17: a study on the topic
+    `skill` returned 672 artifacts and could not search the 53-skill corpus — the
+    single most relevant body of text for that topic. Same shape as the 2026-07-26
+    `sessions/` failure that produced `--include-sessions`, and resolved the same
+    way: the default surface list is unchanged, the omission becomes recoverable.
+
+    Opt-in rather than default for the reason sessions/ is: SKILL.md files are long,
+    procedural, and dense in governance vocabulary, so on a generic topic they would
+    dominate the ranking without adding research value. When skills ARE the subject,
+    they are the whole point.
+
+    Covers all three skill roots, not just `.claude/` — a skill resolves from any of
+    them, and a search that sees one root while the agent obeys three is the
+    identity-is-not-invocation error in miniature.
+    """
+    agent_root = get_agent_root()
+    results = []
+    seen = set()
+    roots = (agent_root / '.claude' / 'skills',
+             agent_root / '.agents' / 'skills',
+             agent_root / '.codex' / 'skills')
+    for base in roots:
+        if not base.exists():
+            continue
+        for file in sorted(base.rglob('*.md')):
+            if not file.is_file():
+                continue
+            resolved = file.resolve()
+            if resolved in seen:
+                continue
+            seen.add(resolved)
+            match = search_file_for_topic(file, topic, domain_keywords=domain_keywords)
+            if match:
+                results.append({'doc': str(file.relative_to(agent_root)),
+                                'file': match['file'],
+                                'match_count': match['match_count'],
+                                'keyword_coverage': match.get('keyword_coverage', 1.0),
+                                'score': match.get('score', 0.0)})
+    results.sort(key=lambda x: x['score'], reverse=True)
+    return results
+
+
 def find_instruments(topic: str, domain_keywords: list = None) -> list:
     """Find executable instruments when explicitly requested.
 
@@ -968,6 +1314,14 @@ def generate_report(topic: str, findings: dict, floor_info: dict = None,
     lines.append(f"**Search Date**: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
     lines.append(f"**Topic**: {topic}")
     lines.append(f"**Keywords (after hygiene)**: {', '.join(prepare_keywords(topic))}")
+    if _NONGATING_KEYWORDS:
+        # Reported, not silent: the gating set determines what could match at all,
+        # and the reader is entitled to see the query that actually ran (ST-010).
+        lines.append(
+            f"**Non-gating (too rare to require)**: "
+            f"{', '.join(sorted(_NONGATING_KEYWORDS))} — still searched and still "
+            f"ranked, but excluded from the coverage denominator so they cannot "
+            f"suppress relevant artifacts (gh#1876 / RQ-378)")
     lines.append(f"**Purpose**: {purpose or 'exploration'}; priority globs: "
                  f"{', '.join(purpose_globs or []) or 'none configured'}")
     lines.append("")
@@ -988,7 +1342,9 @@ def generate_report(topic: str, findings: dict, floor_info: dict = None,
 
     for key, items in findings.items():
         if isinstance(items, list) and items:
-            top = items[0].get('ldoc') or items[0].get('pattern') or items[0].get('plan') or items[0].get('sop') or items[0].get('doc') or 'N/A'
+            top = (items[0].get('ldoc') or items[0].get('pattern') or items[0].get('plan')
+                   or items[0].get('initiative') or items[0].get('sop')
+                   or items[0].get('doc') or 'N/A')
             lines.append(f"| {key.replace('_', ' ').title()} | {len(items)} | {top} |")
         elif isinstance(items, list):
             lines.append(f"| {key.replace('_', ' ').title()} | 0 | - |")
@@ -1020,6 +1376,16 @@ def generate_report(topic: str, findings: dict, floor_info: dict = None,
         for item in findings['project_plans'][:5]:
             status = "ACTIVE" if item['is_active'] else "inactive"
             lines.append(f"- {item['plan']} [{status}] ({item['match_count']} matches)")
+        lines.append("")
+
+    # Initiatives section (2026-08-14, L1388 — the scope-and-requirement tier)
+    if findings.get('initiatives'):
+        lines.append("### Related Initiatives")
+        lines.append("")
+        for item in findings['initiatives'][:5]:
+            lines.append(
+                f"- {item['initiative']} [{item['status']}] ({item['match_count']} matches)"
+            )
         lines.append("")
 
     # SOPs section
@@ -1124,6 +1490,7 @@ def main():
     # generate_report() prints SURFACES_SEARCHED verbatim.
     refresh_canonical_spec_surface(get_agent_root())
     refresh_canonical_pattern_surface(get_agent_root())
+    refresh_knowledge_surface()
 
     parser = argparse.ArgumentParser(
         description='Study Topic Protocol - Focused Topic Research',
@@ -1151,8 +1518,16 @@ Examples:
                              'decision). Use when sessions are the SUBJECT of the study.')
     parser.add_argument('--session-days', type=int, default=90, metavar='N',
                         help='Recency window for --include-sessions (default 90)')
+    parser.add_argument('--include-skills', action='store_true',
+                        help='Also search .claude/.agents/.codex skills/ (OFF by default; '
+                             'the skill corpus is dense and dominates generic topics). '
+                             'Use when skills are the SUBJECT of the study.')
     parser.add_argument('--include-instruments', action='store_true',
                         help='Also search scripts/tests/hooks (OFF by default; executable surface)')
+    parser.add_argument('--web', action='store_true',
+                        help='Search external prior art. The script has no retrieval '
+                             'capability, so this reports UNAVAILABLE and names the '
+                             'capable layer rather than silently omitting the surface')
 
     args = parser.parse_args()
 
@@ -1176,11 +1551,19 @@ Examples:
     # Domain keywords: explicit flag > config > none
     domain_keywords = args.domain_keywords or config.get('domain_keywords')
 
+    # ST-010 / RQ-378: drop zero-document-frequency tokens BEFORE any finder runs,
+    # so they never enter the majority-coverage denominator. Must precede the
+    # finders — prepare_keywords() is consulted per-file inside them.
+    global _NONGATING_KEYWORDS
+    _NONGATING_KEYWORDS, _kw_df, _kw_corpus = compute_nongating_keywords(
+        args.topic, ratio=config.get('gating_df_ratio'))
+
     # Perform focused research with epistemic parameters
     findings = {
         'ldocs': find_ldocs(args.topic, domain_keywords=domain_keywords),
         'patterns': find_patterns(args.topic, domain_keywords=domain_keywords),
         'project_plans': find_project_plans(args.topic, domain_keywords=domain_keywords),
+        'initiatives': find_initiatives(args.topic, domain_keywords=domain_keywords),
         'sops': find_sops(args.topic, domain_keywords=domain_keywords),
         'governance': find_governance(args.topic, domain_keywords=domain_keywords),
         'specs': find_specs(args.topic, domain_keywords=domain_keywords),
@@ -1199,11 +1582,46 @@ Examples:
                 SURFACES_EXCLUDED[i] = (
                     'workspace/, data/ (deliberate — 2026-07-04 scope decision, noise at '
                     'study-time). sessions/ is INCLUDED this run via --include-sessions')
+    if args.include_skills:
+        findings['skills'] = find_skills(args.topic, domain_keywords=domain_keywords)
+        SURFACES_SEARCHED.append(
+            '.claude/skills/** + .agents/skills/** + .codex/skills/** '
+            '(OPT-IN via --include-skills)')
+        # Keep the excluded-surface line honest: it must not still claim the skills
+        # tree is unsearched on a run that searched it.
+        for i, s in enumerate(SURFACES_EXCLUDED):
+            if '.claude/skills/' in s:
+                SURFACES_EXCLUDED[i] = s.replace(
+                    '.claude/skills/',
+                    '(skills/ INCLUDED this run via --include-skills; normally .claude/skills/)')
     if args.include_instruments:
         findings['instruments'] = find_instruments(args.topic, domain_keywords=domain_keywords)
         SURFACES_SEARCHED.append(
             'scripts/** + tests/** + .claude/hooks/** + .codex/hooks/** '
             '(OPT-IN via --include-instruments)')
+
+    # ST-009 / gh#1643 / gh#2063: --web is a DECLARED BOUNDARY, not a feature.
+    #
+    # For three weeks the report carried a banner telling the reader to "pair this
+    # study with an explicit search of the web" while offering no way to do it —
+    # a capability gap converted into a reader obligation, then reported as rigour.
+    # The remediation that shipped for the gap was the sentence admitting it.
+    #
+    # This script cannot retrieve: it has no network dependency and must run in
+    # offline and CI contexts. So it does the one honest thing available to it —
+    # returns UNAVAILABLE naming the layer that CAN retrieve. An UNAVAILABLE is a
+    # reportable state a downstream reader can act on; an unread paragraph is not.
+    web_status = None
+    if args.web:
+        web_status = {
+            'requested': True,
+            'state': 'UNAVAILABLE',
+            'missing_capability': 'external retrieval (no network client in this script)',
+            'capable_layer': '/aget-study-topic SKILL.md External Prior Art step, which '
+                             'uses the invoking harness web tools when present',
+            'consequence': 'external prior art was NOT searched; a topic settled in '
+                           'external literature will read as novel here',
+        }
 
     # Purpose weighting is applied after all default and opt-in finders have run,
     # so no result tier can silently bypass the advertised epistemic parameter.
@@ -1244,6 +1662,9 @@ Examples:
             'total_artifacts': sum(len(v) for v in findings.values() if isinstance(v, list)),
             'search_contract': {
                 'keywords': prepare_keywords(args.topic),
+                'keywords_nongating_low_df': sorted(_NONGATING_KEYWORDS),
+                'keyword_document_frequency': _kw_df,
+                'df_corpus_size': _kw_corpus,
                 'surfaces_searched': SURFACES_SEARCHED,
                 'surfaces_excluded': SURFACES_EXCLUDED,
                 'surfaces_out_of_universe': SURFACES_OUT_OF_UNIVERSE,
@@ -1251,7 +1672,9 @@ Examples:
                 'sessions': {'included': args.include_sessions,
                              'recency_days': args.session_days if args.include_sessions else None,
                              'date_basis': 'filename date; undated files included'},
+                'skills_included': args.include_skills,
                 'instruments_included': args.include_instruments,
+                'web': web_status or {'requested': False, 'state': 'NOT_REQUESTED'},
                 'relevance_floor': floor,
                 'suppressed_below_floor': suppressed if floor is not None else None
             }
@@ -1263,6 +1686,15 @@ Examples:
     report = generate_report(args.topic, findings, floor_info=floor_info,
                              purpose=purpose, purpose_globs=purpose_globs)
     print(report)
+
+    if web_status:
+        print()
+        print("### External Prior Art — UNAVAILABLE")
+        print()
+        print(f"`--web` was requested. Missing capability: "
+              f"{web_status['missing_capability']}.")
+        print(f"Capable layer: {web_status['capable_layer']}.")
+        print(f"Consequence: {web_status['consequence']}.")
 
     return 0
 
