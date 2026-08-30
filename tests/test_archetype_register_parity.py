@@ -35,6 +35,7 @@ def _kinds(findings):
 
 
 def test_unregistered_role_flags():
+    """Satisfies: R-BND-001-05 — divergence from the declared register is detectable."""
     findings, _ = parity.compare(["worker"], ["worker", "ghost"], UNAVAILABLE, UNAVAILABLE)
     assert "unregistered" in _kinds(findings)
     assert findings[0]["values"] == ["ghost"]

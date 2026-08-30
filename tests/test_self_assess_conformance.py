@@ -104,7 +104,9 @@ def test_every_check_returns_a_declared_state(key):
 
 
 def test_check_b_can_return_the_incriminating_answer():
-    """The orphan-control check must be able to FAIL, not only to run.
+    """Satisfies: R-BND-001-05 — deployed divergence must be detectable.
+
+    The orphan-control check must be able to FAIL, not only to run.
 
     This is the falsifier the module exists for. If check B could only ever pass,
     wiring it would add an actuator edge and no verification -- which is precisely
