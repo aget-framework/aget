@@ -1,0 +1,68 @@
+version: "3.33.1"
+spec_version: "1.0.0"
+created: "2026-08-30"
+status: prepared
+supersedes: "DEPLOYMENT_SPEC_v3.33.0.yaml"
+breaking_release: false
+
+purpose: >-
+  Publish the forward integrity correction for the v3.33 release train: a complete external-fleet
+  receiver handoff, governed document-template routing and write scope, coherent template identities,
+  and current public discovery surfaces.
+source_ref: "v3.33.1"
+rollback_ref: "v3.33.0"
+release_notes: "release-notes/v3.33.1.md"
+release_handoff: "handoffs/RELEASE_HANDOFF_v3.33.1.md"
+remote_migration: "handoffs/REMOTE_MIGRATION_MESSAGE_v3.33.1.md"
+
+publication_boundary: >-
+  This prepared artifact does not prove that v3.33.1 is tagged, published, installed, or accepted. A
+  receiver may use source_ref only after the annotated tag resolves and its peeled commit is recorded.
+
+mandatory_changes:
+  - id: "HANDOFF-3331-01"
+    description: >-
+      A tag-bound receiver handoff with the required Context for External Fleets section and explicit
+      separation of publication, installation, behavioral verification, and acceptance.
+    paths:
+      - "handoffs/RELEASE_HANDOFF_v3.33.1.md"
+      - "handoffs/REMOTE_MIGRATION_MESSAGE_v3.33.1.md"
+    detection: >-
+      grep -q '^## Context for External Fleets' handoffs/RELEASE_HANDOFF_v3.33.1.md
+
+  - id: "HISTORY-3331-02"
+    description: >-
+      Durable version history for both the original v3.33.0 publication and this forward correction.
+    paths:
+      - "docs/VERSION_HISTORY.md"
+    detection: >-
+      grep -q '^### v3.33.0 ' docs/VERSION_HISTORY.md && grep -q '^### v3.33.1 ' docs/VERSION_HISTORY.md
+
+  - id: "DOCUMENT-TEMPLATE-3331-03"
+    description: >-
+      The document-processor template adds substantive Skill Routing and Write Scope while preserving
+      its specialized processing behavior. All thirteen templates advance their release identity.
+    template_paths:
+      - "AGENTS.md"
+      - ".aget/version.json"
+      - "CHANGELOG.md"
+      - "README.md"
+    detection: >-
+      python3 scripts/check_config.py --dir ../template-document-processor-AGET --json
+
+receiver_acceptance:
+  acquire: >-
+    Fetch the public v3.33.1 annotated core and matching template tags, record both peeled commits, and
+    verify this deployment specification plus both v3.33.1 handoff artifacts at the core commit.
+  integrity: >-
+    Verify the selected receiver paths against the immutable tag and preserve local extensions.
+  behavioral: >-
+    Run the receiving agent's complete suite and wake-up after content installation and version update.
+  terminals: ["ACCEPTED", "REJECTED", "CANNOT-RUN"]
+  adoption: >-
+    Receiver-owned. Publication does not imply installation, acceptance, migration authorization, or
+    fleet deployment.
+
+rollback: >-
+  Restore the receiver's saved pre-upgrade commit or v3.33.0 pin, preserve failure evidence and
+  receiver-owned state, and keep adoption parked. Never move or reinterpret a v3.33.0 or v3.33.1 tag.

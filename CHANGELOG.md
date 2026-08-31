@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.33.1] - 2026-08-30 - "Receiver-visible integrity"
+
+### Fixed
+- Added the required `Context for External Fleets` contract to the immutable v3.33.1 receiver handoff.
+- Brought the document-processor template's Skill Routing and Write Scope into governed conformance.
+- Restored version-history and organization-homepage currency through the v3.33.1 forward patch.
+
+### Release Integrity
+- Preserved every v3.33.0 tag and Release object unchanged; consumers should use v3.33.1 for new upgrades.
+- Packages one core correction with thirteen template version-coherence candidates and no breaking change.
+
 ## [3.33.0] - 2026-08-30 - "Make the next migration cost less"
 
 ### Added

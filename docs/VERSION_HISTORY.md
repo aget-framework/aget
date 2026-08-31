@@ -12,6 +12,20 @@ This document provides a complete timeline of AGET Framework versions and their 
 
 ## Current Version
 
+**v3.33.1** (2026-08-30) - Receiver-visible integrity
+
+Core `aget/` at v3.33.1: forward patch for the v3.33 release train. It restores the required
+external-fleet handoff context, prepares a governed document-template correction, advances all thirteen
+template identities coherently, and prepares the post-publication homepage update. That homepage update
+becomes current only after the v3.33.1 Release objects are verified. The immutable v3.33.0 payloads remain
+unchanged. See `release-notes/v3.33.1.md`.
+
+**v3.33.0** (2026-08-30) - Make the Next Migration Cost Less
+
+Core `aget/` at v3.33.0: fourteen tags and Releases were published, but post-release validation held on
+a missing external-fleet handoff section, document-template governance drift, and a stale organization
+homepage. The payload remains immutable and is superseded for new receiver upgrades by v3.33.1.
+
 **v3.31.1** (2026-08-18) - Receiver-Safe Close Gates
 
 Core `aget/` at v3.31.1: patch correction packaging the complete close-gate lifecycle, a receiver-shaped
@@ -59,6 +73,16 @@ Core `aget/` at v3.24.0: ✅ (GitHub Release live). Reliance feature (schema + v
 ---
 
 ## Version Timeline
+
+### v3.33.1 (2026-08-30) — prepared candidate
+
+**Theme**: Receiver-visible integrity — forward-only repair of the v3.33.0 post-release HOLD, with one
+core correction, thirteen coherent template packages, and a current organization homepage.
+
+### v3.33.0 (2026-08-30) ✅
+
+**Theme**: Make the Next Migration Cost Less — shipped the bounded v3.33.0 payload, then remained held
+on three post-release integrity predicates that require the v3.33.1 correction.
 
 ### v3.31.1 (2026-08-18)
 
