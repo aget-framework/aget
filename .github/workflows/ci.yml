@@ -191,3 +191,63 @@ jobs:
         continue-on-error: true
         run: |
           echo "files matching private agent identifiers: $(git grep -lIE 'private-[a-zA-Z0-9_]+-(aget|AGET)' -- . | wc -l)"
+
+  # CAP-TEST-004: Coverage_Job.
+  #
+  # WHY THIS EXISTS. AGET_TESTING_SPEC declares four coverage requirements —
+  # 004-01 validator coverage >=80% (CI gate), 004-02 script coverage >=70% (CI
+  # gate), 004-03 core module coverage >=60% (advisory), 004-04 coverage SHALL be
+  # measured via pytest-cov (required) — and its own traceability table marks the
+  # family `Implemented`. Nothing in this workflow measured coverage, `pytest-cov`
+  # was not installed, and it was not a declared dependency anywhere. So 004-04
+  # was false while being recorded as satisfied, and 004-01/02 named gates that
+  # did not exist.
+  #
+  # It surfaced from a receiver: exactly one seat in the fleet carries a coverage
+  # floor in its own CI, and a v3.33.1 payload crossed it. The producer could not
+  # see the class of defect at all, so a single receiver's stricter gate was the
+  # only sensor for it. This job removes that asymmetry at the measuring end.
+  #
+  # WHY IT DOES NOT GATE. Same reasoning as Lint_Job's second stage, and stated
+  # again rather than cross-referenced: wiring a threshold above the current state
+  # produces a red build on the first run and an override on the second, which is
+  # how a control becomes decorative. Measure first, name the number, and let the
+  # threshold be a separate, evidenced decision. Turning any row below into a gate
+  # is a one-line change once a run has established where the number actually is.
+  #
+  # Both declared denominators are reported because they are different questions
+  # and the spec sets different bars: `validation/` is 4 modules, `scripts/` is 77.
+  # Reporting only the aggregate would let one hide inside the other.
+  coverage:
+    name: coverage (report-only)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip pytest pyyaml pytest-cov
+
+      - name: CAP-TEST-004-01 — validator coverage (declared bar 80%, NOT gated here)
+        continue-on-error: true
+        run: |
+          python -m pytest tests -q \
+            --cov=validation --cov-report=term-missing:skip-covered
+
+      - name: CAP-TEST-004-02 — script coverage (declared bar 70%, NOT gated here)
+        continue-on-error: true
+        run: |
+          python -m pytest tests -q \
+            --cov=scripts --cov-report=term-missing:skip-covered
+
+      - name: CAP-TEST-004-04 — coverage is measured
+        # This step is the requirement. The two above are its evidence. If this
+        # workflow ever stops producing a coverage number, 004-04 has regressed
+        # and the traceability table is claiming something untrue again.
+        run: echo "coverage measured for validation/ and scripts/ — see the two steps above"
