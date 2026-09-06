@@ -5,7 +5,7 @@ validate_initiative_proposal.py
 Mechanical verification runner for initiative proposals
 (PROPOSAL_init_*.md files at planning/project-proposals/).
 
-Implements V-INIT-PROP-001..014 from AGET_INITIATIVE_SPEC v1.0.1 §7.
+Implements V-INIT-PROP-001..014 from AGET_INITIATIVE_SPEC v1.2.0 §7.
 
 Usage:
     python3 scripts/validate_initiative_proposal.py --file <path>
@@ -16,7 +16,7 @@ Exit codes:
     1 — at least one V-test fails
     2 — usage error or file not readable
 
-Governing spec: ../aget/specs/AGET_INITIATIVE_SPEC.md v1.0.1
+Governing spec: ../aget/specs/AGET_INITIATIVE_SPEC.md v1.2.0
 Implementing skill: .claude/skills/aget-propose-initiative/SKILL.md v1.0.0
 PROJECT_PLAN: planning/PROJECT_PLAN_aget_propose_initiative_v1.0.md Gate 2
 """
@@ -26,8 +26,9 @@ import argparse
 import json
 import os
 import re
+import subprocess
 import sys
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, field, asdict
 from pathlib import Path
 
 
@@ -41,11 +42,70 @@ VERSION_JSON = REPO_ROOT / ".aget" / "version.json"
 
 @dataclass
 class VResult:
-    """Single V-test result."""
+    """Single V-test result.
+
+    Three-state (IPVR Gate 2, D5). ``result`` accepts a bool for the twelve
+    unchanged verifiers, or one of PASS/FAIL/UNAVAILABLE. ``passed`` is retained
+    as a property so existing consumers keep working; UNAVAILABLE is NOT a pass.
+    """
     v_id: str
     cap_ids: list[str]
-    passed: bool
+    result: object
     detail: str
+    outcome: str = field(init=False, default="FAIL")
+
+    def __post_init__(self) -> None:
+        if isinstance(self.result, bool):
+            self.outcome = "PASS" if self.result else "FAIL"
+        else:
+            candidate = str(self.result).upper()
+            if candidate not in {"PASS", "FAIL", "UNAVAILABLE"}:
+                raise ValueError(f"invalid outcome: {self.result!r}")
+            self.outcome = candidate
+
+    @property
+    def passed(self) -> bool:
+        return self.outcome == "PASS"
+
+
+DECLARED_ID_RE = re.compile(
+    r"^\*\*Proposed Initiative ID\*\*:\s*(INIT-[A-Z][A-Z0-9-]*)(.*)$", re.MULTILINE
+)
+
+
+def declared_init_id(text: str) -> tuple[str | None, bool, int]:
+    """Return (declared id, is_amendment, number of declarations).
+
+    CAP-INIT-PROP-013-01/02: the id comes from the declared field ONLY. A
+    first-match scan over document text is prohibited -- ``CAP-INIT-PROP-002-03``
+    contains a substring matching any unanchored ``INIT-*`` pattern.
+    """
+    matches = DECLARED_ID_RE.findall(text)
+    if not matches:
+        return None, False, 0
+    amendment = any("amendment" in m[1].lower() for m in matches)
+    # Count DECLARATIONS, not distinct values (IPVR Gate 2, reviewer D2): two identical
+    # declarations are still an ambiguous artifact, and de-duplicating them hid that.
+    return matches[0][0], amendment, len(matches)
+
+
+def staged_initiative_manifests() -> tuple[list[str], str]:
+    """Return (staged INIT-*.md paths, observability note).
+
+    CAP-INIT-PROP-014-03/04: this is the released spec predicate
+    (``git diff --name-only --staged planning/initiatives/INIT-*.md``), scoped to
+    REPO_ROOT. Present filesystem state is never a substitute.
+    """
+    try:
+        out = subprocess.run(
+            ["git", "-C", str(REPO_ROOT), "diff", "--name-only", "--staged", "--",
+             "planning/initiatives"],
+            capture_output=True, text=True, check=True,
+        ).stdout
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return [], "no-git-worktree"
+    staged = [ln for ln in out.splitlines() if re.search(r"INIT-[A-Z][A-Z0-9-]*\.md$", ln)]
+    return staged, "staged-diff"
 
 
 def _section_body(text: str, heading: str) -> str:
@@ -161,29 +221,39 @@ def verify_v_init_prop_003(_file_path: Path, text: str) -> VResult:
 
 
 def verify_v_init_prop_004(file_path: Path, text: str) -> VResult:
-    """V-INIT-PROP-004: Proposed INIT-ID uniqueness.
+    """V-INIT-PROP-004: Proposed INIT-ID uniqueness (field-bound, mode-aware).
 
-    Verifies: CAP-INIT-PROP-002-03 (INIT-ID format + no collision).
+    Verifies: CAP-INIT-PROP-002-03, CAP-INIT-PROP-013-*, CAP-INIT-PROP-014-*.
     """
-    m = re.search(r"INIT-[A-Z][A-Z0-9-]+", text)
-    if not m:
-        return VResult("V-INIT-PROP-004", ["CAP-INIT-PROP-002-03"], False, "no INIT-{UPPER-KEBAB} reference found")
-    init_id = m.group(0)
-    manifest_path = INITIATIVES_DIR / f"{init_id}.md"
-    manifest_exists = manifest_path.exists()
-    other_proposals = []
+    caps = ["CAP-INIT-PROP-002-03", "CAP-INIT-PROP-013-01", "CAP-INIT-PROP-013-03"]
+    init_id, amendment, declarations = declared_init_id(text)
+
+    if init_id is None:
+        return VResult("V-INIT-PROP-004", caps, "FAIL",
+                       "no declared **Proposed Initiative ID** field (CAP-INIT-PROP-001-02)")
+    if declarations > 1:
+        return VResult("V-INIT-PROP-004", caps, "FAIL",
+                       f"declared field is ambiguous: {declarations} declarations")
+    if amendment:
+        return VResult("V-INIT-PROP-004", caps, "UNAVAILABLE",
+                       f"init_id={init_id} amendment mode: creation-time uniqueness is not "
+                       "evaluable (CAP-INIT-PROP-014-03)")
+
+    manifest_exists = (INITIATIVES_DIR / f"{init_id}.md").exists()
+    # CAP-INIT-PROP-013-04: only DECLARED fields of other proposals are competing claims.
+    others = []
     if PROPOSALS_DIR.exists():
-        for p in PROPOSALS_DIR.glob("PROPOSAL_init_*.md"):
-            if p.resolve() == file_path.resolve():
+        for other in sorted(PROPOSALS_DIR.glob("PROPOSAL_init_*.md")):
+            if other.resolve() == file_path.resolve():
                 continue
-            if init_id in p.read_text():
-                other_proposals.append(p.name)
-    passed = (not manifest_exists) and (not other_proposals)
-    detail = (
-        f"init_id={init_id} manifest_exists={manifest_exists} "
-        f"other_proposals_referencing={other_proposals}"
-    )
-    return VResult("V-INIT-PROP-004", ["CAP-INIT-PROP-002-03"], passed, detail)
+            other_id, _, _ = declared_init_id(other.read_text())
+            if other_id == init_id:
+                others.append(other.name)
+
+    passed = (not manifest_exists) and (not others)
+    detail = (f"init_id={init_id} manifest_exists={manifest_exists} "
+              f"other_declared_claims={others}")
+    return VResult("V-INIT-PROP-004", caps, passed, detail)
 
 
 def verify_v_init_prop_005(_file_path: Path, text: str) -> VResult:
@@ -200,7 +270,13 @@ def verify_v_init_prop_005(_file_path: Path, text: str) -> VResult:
 
 
 TYPED_CITATION_RE = re.compile(
-    r"L\d+|gh#\d+|session_|aget/|\.aget/|planning/|sops/|governance/|docs/|#\d+",
+    # CAP-INIT-PROP-015-01/02 (IPVR Gate 2). A whitelist of roots is not a path grammar
+    # (gh#1526); but bare "slash-shaped prose" is not a citation either (reviewer D4).
+    # Accept a repo-relative path that stays inside the root AND ends in a file
+    # extension or a directory slash. Reject traversal and prose like "a/b thing".
+    r"L\d+|gh#\d+|session_|#\d+"
+    r"|(?<!\.\./)\b[A-Za-z0-9_][A-Za-z0-9_.-]*/(?:[A-Za-z0-9_.-]+/)*"
+    r"(?:[A-Za-z0-9_-]+\.[A-Za-z0-9]{1,6})?(?=[`\s)\],]|$)",
     re.IGNORECASE,
 )
 
@@ -315,22 +391,35 @@ def verify_v_init_prop_012(_file_path: Path, text: str) -> VResult:
 
 
 def verify_v_init_prop_013(_file_path: Path, text: str) -> VResult:
-    """V-INIT-PROP-013: No INIT-*.md authored by skill (separation of concerns).
+    """V-INIT-PROP-013: no INIT-*.md authored by THIS invocation.
 
-    Verifies: CAP-INIT-PROP-011-01 (propose skill MUST NOT create INIT-*.md manifest).
-    Interpretation: the proposed INIT-ID has no corresponding INIT-{ID}.md file
-    in planning/initiatives/. (The skill produces a proposal; the manifest is
-    /aget-create-initiative's responsibility.)
+    Verifies: CAP-INIT-PROP-011-01 via the released staged-diff predicate
+    (AGET_INITIATIVE_SPEC line 381), not manifest existence.
     """
-    m = re.search(r"INIT-[A-Z][A-Z0-9-]+", text)
-    if not m:
-        return VResult("V-INIT-PROP-013", ["CAP-INIT-PROP-011-01"], True,
-                       "no INIT-ID referenced (vacuously passes)")
-    init_id = m.group(0)
-    manifest_path = INITIATIVES_DIR / f"{init_id}.md"
-    passed = not manifest_path.exists()
-    detail = f"manifest {init_id}.md {'absent (OK)' if passed else 'PRESENT (separation violated)'}"
-    return VResult("V-INIT-PROP-013", ["CAP-INIT-PROP-011-01"], passed, detail)
+    caps = ["CAP-INIT-PROP-011-01", "CAP-INIT-PROP-014-04"]
+    init_id, _, declarations = declared_init_id(text)
+    if init_id is None:
+        return VResult("V-INIT-PROP-013", caps, "FAIL",
+                       "no declared **Proposed Initiative ID** field (CAP-INIT-PROP-001-02)")
+    if declarations > 1:
+        # D2: same guard as V-004 -- the two verifiers must not disagree on one input.
+        return VResult("V-INIT-PROP-013", caps, "FAIL",
+                       f"declared field is ambiguous: {declarations} declarations")
+    staged, observability = staged_initiative_manifests()
+    if observability != "staged-diff":
+        # CAP-INIT-PROP-014-03/04 + contract `unavailable_discipline`: the declared
+        # evidence source was attempted and did not resolve. An unobserved surface is
+        # UNAVAILABLE. Returning PASS here would be an inferred verdict -- the exact
+        # defect this repair removes. (IPVR Gate 2, reviewer D3.)
+        return VResult("V-INIT-PROP-013", caps, "UNAVAILABLE",
+                       f"invocation surface not observable [{observability}]; "
+                       "no verdict is inferable from present filesystem state")
+    if staged:
+        return VResult("V-INIT-PROP-013", caps, "FAIL",
+                       f"this invocation staged {staged} (separation violated)")
+    return VResult("V-INIT-PROP-013", caps, "PASS",
+                   "no INIT-*.md staged by this invocation [staged-diff]; "
+                   "manifest existence is NOT consulted")
 
 
 def verify_v_init_prop_014(_file_path: Path, text: str) -> VResult:
@@ -383,7 +472,7 @@ def run_all(file_path: Path) -> list[VResult]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Validate an initiative proposal against AGET_INITIATIVE_SPEC v1.0.1 §7"
+        description="Validate an initiative proposal against AGET_INITIATIVE_SPEC v1.2.0 §7"
     )
     parser.add_argument("--file", "-f", required=True, type=Path, help="Path to PROPOSAL_init_*.md")
     parser.add_argument("--json", action="store_true", help="Emit JSON output")
@@ -402,7 +491,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.json:
         out = {
             "file": str(args.file),
-            "spec": "AGET_INITIATIVE_SPEC v1.0.1 §7",
+            "spec": "AGET_INITIATIVE_SPEC v1.2.0 §7",
             "n_pass": n_pass,
             "n_total": n_total,
             "all_pass": all_pass,
@@ -410,7 +499,7 @@ def main(argv: list[str] | None = None) -> int:
         }
         print(json.dumps(out, indent=2))
     else:
-        print(f"=== Validating {args.file} against AGET_INITIATIVE_SPEC v1.0.1 §7 ===")
+        print(f"=== Validating {args.file} against AGET_INITIATIVE_SPEC v1.2.0 §7 ===")
         if not args.quiet:
             for r in results:
                 marker = "PASS" if r.passed else "FAIL"
