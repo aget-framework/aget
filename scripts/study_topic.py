@@ -654,7 +654,7 @@ def find_patterns(topic: str, domain_keywords: list = None) -> list:
 
 
 # --- plan-status classification -------------------------------------------------
-# gh#2487. The prior rule was `'IN PROGRESS' in probe.upper()` — containment on ONE
+# gh#2491. The prior rule was `'IN PROGRESS' in probe.upper()` — containment on ONE
 # spelling. It is correct for plans that say "In Progress" and silently wrong for every
 # other live vocabulary, and the wrongness is invisible: a live plan renders [inactive]
 # with no warning.
