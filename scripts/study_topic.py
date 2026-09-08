@@ -653,6 +653,38 @@ def find_patterns(topic: str, domain_keywords: list = None) -> list:
     return results
 
 
+# --- plan-status classification -------------------------------------------------
+# gh#2491. The prior rule was `'IN PROGRESS' in probe.upper()` — containment on ONE
+# spelling. It is correct for plans that say "In Progress" and silently wrong for every
+# other live vocabulary, and the wrongness is invisible: a live plan renders [inactive]
+# with no warning.
+#
+# Measured 2026-09-06 at two seats, same canonical blob:
+#   private-aget-framework-AGET   18 of 80 non-terminal plans misread as inactive (22%)
+#   private-aof1-aof-supervisor   104 of 104 misread (100% — that seat uses "Draft")
+# The blast radius depends entirely on the receiver's status vocabulary, which is why
+# one seat can carry this for months without noticing while another is fully blind.
+#
+# Inverted deliberately: classify TERMINAL, treat everything else as active. Terminal
+# states are a closed, governed set (CONVENTION_terminal_state_vocabulary.md); live
+# states are open-ended prose. Enumerating the closed set fails safe — an unrecognised
+# status reads active, which surfaces a plan for a human rather than hiding it.
+_TERMINAL_PLAN_STATUS = re.compile(
+    r"^\W*(COMPLETE[DX]?|CLOSED|ABANDONED|SUPERSEDED|DONE|CANCELL?ED|ARCHIVED|WITHDRAWN)\b",
+    re.IGNORECASE,
+)
+
+
+def _plan_is_active(probe: str) -> bool:
+    r"""True unless the status opens with a governed terminal keyword.
+
+    `^\W*` skips leading emoji, bullets and bold markers without swallowing words, so
+    "**COMPLETE**" is terminal while "NOT COMPLETE" is active — the scan stops at the
+    first letter, and "NOT" is not a terminal keyword.
+    """
+    return not _TERMINAL_PLAN_STATUS.match((probe or "").strip())
+
+
 def find_project_plans(topic: str, domain_keywords: list = None) -> list:
     """Find PROJECT_PLANs related to topic.
 
@@ -684,7 +716,7 @@ def find_project_plans(topic: str, domain_keywords: list = None) -> list:
                 m = (re.search(r'\*\*Plan_Status\*\*:\s*([^\n]*)', content)
                      or re.search(r'\*\*Status\*\*:\s*([^\n]*)', content))
                 probe = m.group(1) if m else content
-                is_active = 'IN PROGRESS' in probe.upper()
+                is_active = _plan_is_active(probe)
             except Exception:
                 is_active = False
 
