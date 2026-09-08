@@ -133,7 +133,7 @@ def read_declared(register=FLEET_REGISTER):
             "FLEET_STATE.yaml to enable population 4"
         ), []
     if not register.exists():
-        return UNAVAILABLE, f"fleet register not found at the configured path", []
+        return UNAVAILABLE, "fleet register not found at the configured path", []
     try:
         doc = yaml.safe_load(register.read_text())
     except Exception as exc:
