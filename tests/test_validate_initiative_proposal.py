@@ -45,7 +45,7 @@ CONFORMANT_BODY = dedent("""\
     # Initiative Proposal: Synthetic Test
 
     **Date**: 2026-05-14
-    **Author**: example-framework-agent
+    **Author**: private-aget-framework-AGET
     **Status**: PROPOSED
     **Proposal ID**: PP-9999
     **Proposed Initiative ID**: INIT-SYNTHETIC-TEST-FIXTURE
@@ -87,7 +87,7 @@ CONFORMANT_BODY = dedent("""\
     | Role | Primary Value Dimensions | Availability |
     |---|---|---|
     | Principal | decision quality | On-demand |
-    | example-framework-agent | artifact production | Full |
+    | private-aget-framework-AGET | artifact production | Full |
 
     ## Cross-Initiative Overlap
 
@@ -370,3 +370,90 @@ def test_cli_json_mode(tmp_path, capsys):
         assert rc in (0, 1)
     finally:
         _cleanup(file_path)
+
+
+# ---------------------------------------------------------------------------
+# Falsifiers for V-INIT-PROP-004 / -013 (2026-08-29).
+#
+# Both checks were reported defective by a peer seat and both were found already
+# repaired here -- but neither had a negative arm, so nothing asserted the repair
+# held. A fixed instance with no falsifier is an unprotected class: the next edit
+# can silently restore the first-match scan that CAP-INIT-PROP-013-01 prohibits.
+# ---------------------------------------------------------------------------
+
+def _proposal(init_id: str, body: str = "", preamble: str = "") -> str:
+    """Preamble goes BEFORE the declared field on purpose.
+
+    A fixture that puts the declared id first cannot discriminate a first-match
+    scan from a field-bound read -- both land on the same token. Mutation-tested
+    2026-08-29: with the preamble the mutant fails, without it the mutant passes.
+    """
+    return (f"# Proposal\n{preamble}\n"
+            f"**Proposed Initiative ID**: {init_id}\n\n{body}\n")
+
+
+def test_v004_cross_reference_in_body_is_not_a_duplicate_claim(tmp_path, monkeypatch):
+    """V-INIT-PROP-004 / CAP-INIT-PROP-013-01: only the DECLARED field is a claim.
+
+    The reported false positive: an overlap analysis naming other initiatives must
+    not be read as claiming their ids."""
+    inits = tmp_path / "initiatives"; inits.mkdir()
+    props = tmp_path / "proposals"; props.mkdir()
+    (inits / "INIT-EXISTING-ONE.md").write_text("# existing\n")
+    monkeypatch.setattr(vip, "INITIATIVES_DIR", inits)
+    monkeypatch.setattr(vip, "PROPOSALS_DIR", props)
+
+    text = _proposal(
+        "INIT-BRAND-NEW",
+        body="## Overlap analysis\nDoes not duplicate INIT-EXISTING-ONE.",
+        preamble="## Summary\nThis supersedes nothing; INIT-EXISTING-ONE stays as is.",
+    )
+    r = vip.verify_v_init_prop_004(tmp_path / "p.md", text)
+    assert r.outcome == "PASS", r.detail
+    assert "INIT-BRAND-NEW" in r.detail
+
+
+def test_v004_declared_id_matching_an_existing_manifest_fails(tmp_path, monkeypatch):
+    """V-INIT-PROP-004 / CAP-INIT-PROP-002-03: positive control.
+
+    A falsifier that cannot fail is decorative; this arm proves it can."""
+    inits = tmp_path / "initiatives"; inits.mkdir()
+    props = tmp_path / "proposals"; props.mkdir()
+    (inits / "INIT-EXISTING-ONE.md").write_text("# existing\n")
+    monkeypatch.setattr(vip, "INITIATIVES_DIR", inits)
+    monkeypatch.setattr(vip, "PROPOSALS_DIR", props)
+
+    r = vip.verify_v_init_prop_004(tmp_path / "p.md", _proposal("INIT-EXISTING-ONE"))
+    assert r.outcome == "FAIL", r.detail
+
+
+def test_v004_two_declarations_are_ambiguous_not_first_wins(tmp_path, monkeypatch):
+    """V-INIT-PROP-004 / CAP-INIT-PROP-013-01: two declarations are ambiguous.
+
+    First-match-wins is the prohibited behaviour, not a tolerated fallback."""
+    inits = tmp_path / "initiatives"; inits.mkdir()
+    props = tmp_path / "proposals"; props.mkdir()
+    monkeypatch.setattr(vip, "INITIATIVES_DIR", inits)
+    monkeypatch.setattr(vip, "PROPOSALS_DIR", props)
+
+    text = ("# Proposal\n**Proposed Initiative ID**: INIT-ONE\n"
+            "**Proposed Initiative ID**: INIT-TWO\n")
+    r = vip.verify_v_init_prop_004(tmp_path / "p.md", text)
+    assert r.outcome == "FAIL" and "ambiguous" in r.detail
+
+
+def test_v013_and_v004_agree_on_an_ambiguous_input():
+    """V-INIT-PROP-004 and V-INIT-PROP-013 must not disagree on one input.
+
+    D2 guard: two verifiers reading the same declared field."""
+    text = ("# Proposal\n**Proposed Initiative ID**: INIT-ONE\n"
+            "**Proposed Initiative ID**: INIT-TWO\n")
+    a = vip.verify_v_init_prop_004(Path("p.md"), text)
+    b = vip.verify_v_init_prop_013(Path("p.md"), text)
+    assert a.outcome == b.outcome == "FAIL"
+
+
+def test_v013_missing_declared_field_fails_rather_than_passing_vacuously():
+    """V-INIT-PROP-013 / CAP-INIT-PROP-011-01: absence fails, never passes."""
+    r = vip.verify_v_init_prop_013(Path("p.md"), "# Proposal\nno id here\n")
+    assert r.outcome == "FAIL", r.detail
