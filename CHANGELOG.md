@@ -119,7 +119,7 @@ Two repairs to controls that report on releases. Both failed at their shipped pu
 
 ## [Unreleased]
 
-Items confirmed in-flight for a future release (latest released: **3.31.1**). Per Keep a Changelog 1.1.0 forward-work convention.
+Items confirmed in-flight for a future release (latest released: **3.33.1**). Per Keep a Changelog 1.1.0 forward-work convention.
 
 - Issue-governance spec delta for the `/aget-file-issue` pre-filing probes (skill layer shipped in 3.26.0; formal requirement rides the next spec pass).
 - Template `/aget-file-issue` structural refresh (routing + probe steps to all templates; fleet routing propagation staged per the 3.26.0 rollout decision).
