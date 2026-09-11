@@ -221,9 +221,96 @@ def render_human(result: dict) -> str:
     return "\n".join(lines)
 
 
+
+# --------------------------------------------------------------------------- C-34-01
+def agent_skill_defects(agent_path: Path) -> list:
+    """The same predicate as skill_description_defects, scoped to ONE agent directory.
+
+    C-34-01 / gh#2445. The scaffold validates the agent it just created, not the tree of
+    repositories around it, so the sweeping function cannot be reused directly: pointing
+    it at agent_path.parent would fail an instantiation because of an unrelated sibling.
+
+    Paths are reported relative to agent_path. This is the single predicate; the repo
+    sweep below delegates to it so the scaffold gate and the audit can never drift apart.
+    """
+    defects = []
+    skills_dir = agent_path / ".claude" / "skills"
+    if not skills_dir.is_dir():
+        return defects
+    for skill in sorted(q for q in skills_dir.iterdir() if q.is_dir()):
+        f = skill / "SKILL.md"
+        if not f.is_file():
+            continue
+        text = f.read_text(encoding="utf-8", errors="replace")
+        rel = str(f.relative_to(agent_path))
+        if not text.startswith("---"):
+            defects.append({"path": rel, "skill": skill.name, "defect": "frontmatter-absent"})
+            continue
+        parts = text.split("---", 2)
+        if len(parts) < 3:
+            defects.append({"path": rel, "skill": skill.name, "defect": "frontmatter-unterminated"})
+            continue
+        try:
+            import yaml
+            meta = yaml.safe_load(parts[1])
+        except Exception as exc:
+            defects.append({"path": rel, "skill": skill.name,
+                            "defect": "frontmatter-unparseable", "detail": str(exc)[:120]})
+            continue
+        if not isinstance(meta, dict):
+            defects.append({"path": rel, "skill": skill.name, "defect": "frontmatter-not-a-mapping"})
+        else:
+            # `str(...)` coercion was the hole. It turned YAML null into "None", True into
+            # "True", 42 into "42" and a mapping into "{'a': 'b'}" -- all non-empty after
+            # strip, so six invalid shapes (explicit null, implicit null, boolean, integer,
+            # mapping, list) were ACCEPTED and copied into new agents. A consumer asking for
+            # a description string gets a non-string or nothing in every one of those cases.
+            # scripts/validate_agent_skill_package.py never had this hole: it has always
+            # required isinstance(description, str). This aligns with that.
+            desc = meta.get("description")
+            if desc is None:
+                defects.append({"path": rel, "skill": skill.name,
+                                "defect": "description-empty-or-absent"})
+            elif not isinstance(desc, str):
+                defects.append({"path": rel, "skill": skill.name,
+                                "defect": "description-not-a-string",
+                                "detail": type(desc).__name__})
+            elif not desc.strip():
+                defects.append({"path": rel, "skill": skill.name,
+                                "defect": "description-empty-or-absent"})
+    return defects
+
+
+def skill_description_defects(root: Path) -> list:
+    """Every shipped SKILL.md must carry a STRICTLY-PARSEABLE, non-empty description.
+
+    C-34-01 / gh#2445. Presence was already audited; parseability was not, so a skill
+    could ship with no frontmatter at all, or with frontmatter whose description is an
+    unquoted YAML scalar containing ': ' — which YAML reads as a mapping separator and
+    rejects, making the whole block unparseable. Both shipped in all 13 registered
+    templates: six skills with no frontmatter, and aget-create-goal unparseable.
+
+    A consumer that routes on `description` sees nothing in either case, so the skill is
+    invisible to routing while appearing present to a presence-only audit. That gap
+    between "the file is there" and "the router can read it" is the defect.
+
+    Returns one dict per defect; empty list means every shipped skill is routable.
+    """
+    defects = []
+    for skills_dir in sorted(root.glob("*/.claude/skills")):
+        agent_path = skills_dir.parent.parent
+        prefix = agent_path.relative_to(root)
+        for d in agent_skill_defects(agent_path):
+            defects.append({**d, "path": str(prefix / d["path"])})
+    return defects
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[1])
     parser.add_argument("--json", action="store_true", help="JSON output")
+    parser.add_argument("--descriptions", action="store_true",
+                        help="C-34-01: audit shipped SKILL.md frontmatter descriptions "
+                             "under strict YAML parsing (exit 1 on any defect)")
     parser.add_argument("--root", type=Path, help="aget-framework root (auto-detect if omitted)")
     parser.add_argument(
         "--baseline-template",
@@ -237,6 +324,20 @@ def main() -> int:
         msg = f"Could not locate aget-framework root from {Path.cwd()}"
         print(json.dumps({"error": msg}) if args.json else msg, file=sys.stderr)
         return 2
+
+    if args.descriptions:
+        defects = skill_description_defects(root)
+        payload = {"check": "skill_description_conformance",
+                   "defects": defects, "defect_count": len(defects)}
+        if args.json:
+            print(json.dumps(payload, indent=2))
+        elif defects:
+            print(f"skill descriptions: {len(defects)} DEFECT(S)")
+            for d in defects:
+                print(f"  [{d['defect']}] {d['path']}")
+        else:
+            print("skill descriptions: all shipped skills carry a parseable description")
+        return 0 if not defects else 1
 
     result = audit(root, args.baseline_template)
     if "error" in result:

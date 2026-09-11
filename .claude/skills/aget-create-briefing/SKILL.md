@@ -90,7 +90,19 @@ Apply format rules based on `--medium`:
 - Target: 800-1500 words
 
 **share-draft** (public-safe):
-- Apply VOICE.md anti-patterns if available, otherwise use neutral professional tone
+- **Compose in the principal's voice from `knowledge/voice/`**, whose contract is stated in
+  `knowledge/voice/README.md`. Apply its five layers in the prescribed order, each filtering and
+  never inventing: **Specification** (registers, traits, anti-patterns) → **Evidence Bank**
+  (annotated positive exemplars to pattern-match against) → **Enforcement** → **Calibration
+  Memory** (corrections the principal has already made) → **Ontology**. The scaffold names the
+  file each layer is populated into; read `knowledge/voice/README.md` for the current mapping
+  rather than assuming a filename here.
+  Mechanical constraints are universal and are never relaxed; a channel-specific spec may add to
+  them and may never contradict them. **A layer that is not yet populated is skipped, not
+  substituted** — fall back to a neutral professional register for that layer alone, never for the
+  whole composition, and never report an unpopulated layer as applied.
+  *(Provenance: `knowledge/voice/README.md`, INIT-VOICE-FRAMEWORK Stream 2. Binding verified by
+  `scripts/check_voice_consumer_binding.py`.)*
 - **MANDATORY**: Run classification safety check (Step 5) before writing output
 - Include `[DRAFT — requires principal review before external use]` watermark at top
 - Target: 500-2000 words depending on source density

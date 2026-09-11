@@ -172,8 +172,15 @@ def scan(file_path: Path, concepts):
         for label, label_class in concept_labels(c):
             if not is_specific(label):
                 continue
-            # whole-phrase, word-boundary match (case-sensitive — labels are TitleCase nouns)
-            pat = re.compile(r"(?<![\w-])" + re.escape(label) + r"(?![\w-])")
+            # Whole-phrase, word-boundary match. CASE-INSENSITIVE since C-34-23:
+            # the prior comment justified case-sensitivity with "labels are TitleCase
+            # nouns", which is true of the LABEL and irrelevant to the ARTIFACT. Prose
+            # writes "scope lock" mid-sentence for the concept whose prefLabel is
+            # "Scope Lock", so the exact class of phrase this tool exists to find was
+            # the class it could not see. Word boundaries and whole-phrase matching are
+            # UNCHANGED -- only the case dimension is relaxed, so "rescope locked" and
+            # "scope-locking" still do not match.
+            pat = re.compile(r"(?<![\w-])" + re.escape(label) + r"(?![\w-])", re.IGNORECASE)
             hit = None
             for i, line in enumerate(lines, 1):
                 # don't suggest where this exact URI already sits on the line
@@ -260,7 +267,19 @@ def main():
         print(f"=== ground-artifact: {rel} ===")
         print(f"Ontology: {len(concepts)} concepts | Existing inline bindings: {existing}")
         if not top:
-            print("No un-bound specific prefLabels found — artifact is grounded or vocabulary-light.")
+            # C-34-23: the prior single line read "artifact is grounded OR
+            # vocabulary-light" -- one optimistic sentence covering two opposite
+            # states, so a file with zero ontology overlap read the same as a fully
+            # bound one. Distinguish them from the evidence already in hand.
+            if existing:
+                print(f"Already grounded — {existing} inline binding(s) present and no "
+                      "further un-bound specific label matched.")
+            else:
+                print("HONEST NO-MATCH — zero inline bindings AND zero specific labels "
+                      f"matched across {len(concepts)} concepts. This is an absence of "
+                      "match, not evidence of grounding: either the artifact's subject "
+                      "is outside the ontology's current coverage, or its vocabulary "
+                      "differs from every prefLabel and altLabel searched.")
         else:
             print(f"Suggested bindings ({len(top)} of {len(suggestions)}, ranked by specificity):\n")
             for s in top:
