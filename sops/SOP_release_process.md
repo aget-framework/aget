@@ -2087,12 +2087,12 @@ python3 scripts/public_surface_audit.py --version X.Y.Z
 for repo in aget template-supervisor-aget template-worker-aget \
             template-advisor-aget template-consultant-aget \
             template-developer-aget template-spec-engineer-aget; do
-  cd /Users/gabormelli/github/aget-framework/$repo
+  cd ~/github/aget-framework/$repo
   git add . && git commit -m "Release vX.Y.Z: description"
 done
 
 # 2. Verify version consistency
-grep '"aget_version"' /Users/gabormelli/github/aget-framework/*/.aget/version.json
+grep '"aget_version"' ~/github/aget-framework/*/.aget/version.json
 
 # 3. Run contract tests
 cd "$AGET_HOME"   # this agent's own repository root
@@ -2290,21 +2290,21 @@ fi
 
 ```bash
 # 1. Push aget/ core first (dependency root)
-cd /Users/gabormelli/github/aget-framework/aget
+cd ~/github/aget-framework/aget
 git push origin main
 
 # 2. Push templates alphabetically
 for repo in template-advisor-aget template-consultant-aget \
             template-developer-aget template-spec-engineer-aget \
             template-supervisor-aget template-worker-aget; do
-  cd /Users/gabormelli/github/aget-framework/$repo
+  cd ~/github/aget-framework/$repo
   git push origin main
 done
 
 # 3. Verify all pushes succeeded
 for repo in aget template-*-aget; do
   echo "=== $repo ==="
-  cd /Users/gabormelli/github/aget-framework/$repo
+  cd ~/github/aget-framework/$repo
   git status
 done
 ```
@@ -2386,7 +2386,7 @@ The script dynamically discovers all repos (no hardcoded list) and implements AD
 
    **Manual fallback** (if script unavailable — note: bare `test -f` checks working-dir state, not tagged tree; less rigorous):
    ```bash
-   cd /Users/gabormelli/github/aget-framework/aget
+   cd ~/github/aget-framework/aget
    echo "=== CHANGELOG entry ===" && grep -c "## \[X.Y.Z\]\|## \[vX.Y.Z\]" CHANGELOG.md
    echo "=== Public handoff ===" && git ls-tree HEAD:handoffs/RELEASE_HANDOFF_vX.Y.Z.md >/dev/null 2>&1 && echo PRESENT || echo ABSENT
    echo "=== DEPLOYMENT_SPEC ===" && git ls-tree HEAD:DEPLOYMENT_SPEC_vX.Y.Z.yaml >/dev/null 2>&1 && echo PRESENT || echo ABSENT
@@ -2431,7 +2431,7 @@ The script dynamically discovers all repos (no hardcoded list) and implements AD
 #### 3.1. Create Tags (All Repos)
 
 ```bash
-cd /Users/gabormelli/github/aget-framework
+cd ~/github/aget-framework
 
 # Tag ALL repos (core + 13 templates = 14 total) — L727: must enumerate all, not subset
 for repo in aget template-advisor-aget template-analyst-aget template-architect-aget template-consultant-aget template-developer-aget template-document-processor-AGET template-executive-aget template-operator-aget template-researcher-aget template-reviewer-aget template-spec-engineer-aget template-supervisor-aget template-worker-aget; do
