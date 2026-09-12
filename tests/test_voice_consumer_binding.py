@@ -101,7 +101,9 @@ def test_scanning_can_be_scoped_to_a_subdirectory(tmp_path):
     root = agent(tmp_path, consumer_text=(
         "Compose from `knowledge/voice/README.md`.\n" + ORDER))
     assert cvcb.assess(root, [".claude/skills"])["ec2_satisfied"] is True
-    assert cvcb.assess(root, ["docs"])["overall"] == ABSENT
+    missing = cvcb.assess(root, ["docs"])
+    assert missing["overall"] == cvcb.UNAVAILABLE
+    assert missing["ec2_satisfied"] is None and cvcb.exit_code(missing) == 3
 
 
 def test_a_missing_root_is_an_input_error_never_a_pass(tmp_path):

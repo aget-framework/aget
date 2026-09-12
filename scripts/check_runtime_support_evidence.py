@@ -55,8 +55,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import shutil
+import stat
 import subprocess
 import sys
 from pathlib import Path
@@ -265,13 +267,42 @@ def level3_governed(name: str, receipts: Path | None) -> dict[str, Any]:
     # M4. This was `if name in f.read_text()` -- a substring match on any file. A receipt
     # reading "antigravity was NOT invoked" scored YES, and pointing --receipts at this
     # command's own JSON output made it certify itself. A receipt must DECLARE an invocation.
-    hits, malformed = [], []
-    for f in sorted(receipts.rglob("*")):
-        if not f.is_file():
-            continue
+    hits, malformed, failures = [], [], []
+    files: list[Path] = []
+    visited: set[tuple[int, int]] = set()
+    root = receipts.resolve()
+    def walk(p: Path) -> None:
+        rel = str(p.relative_to(root))
         try:
+            s = p.lstat()
+        except OSError as exc:
+            failures.append(f"{rel}: lstat failed: {exc}"); return
+        if stat.S_ISLNK(s.st_mode):
+            failures.append(f"{rel}: symlink entry is not receipt evidence"); return
+        if stat.S_ISDIR(s.st_mode):
+            key = (s.st_dev, s.st_ino)
+            if key in visited: return
+            visited.add(key)
+            if s.st_mode & 0o500 != 0o500:
+                failures.append(f"{rel or '.'}: directory lacks owner read/traverse permission"); return
+            try:
+                with os.scandir(p) as it:
+                    children = sorted((Path(e.path) for e in it), key=lambda q: q.name)
+            except OSError as exc:
+                failures.append(f"{rel or '.'}: enumeration failed: {exc}"); return
+            for child in children: walk(child)
+        elif stat.S_ISREG(s.st_mode):
+            files.append(p)
+        else:
+            failures.append(f"{rel}: unsupported receipt entry type")
+    walk(root)
+    for f in files:
+        try:
+            if not f.stat().st_mode & 0o400:
+                raise PermissionError("owner-read bit is not set")
             doc = json.loads(f.read_text())
-        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+            failures.append(f"{f.relative_to(root)}: unreadable/malformed: {exc}")
             continue
         for rec in (doc if isinstance(doc, list) else [doc]):
             if not isinstance(rec, dict) or rec.get("runtime") != name:
@@ -287,16 +318,19 @@ def level3_governed(name: str, receipts: Path | None) -> dict[str, Any]:
                 malformed.append(f"{f.name}: invoked with no outcome recorded")
                 continue
             hits.append(str(f))
-    detail = {"receipts": hits[:5], "malformed": malformed[:5]}
+    detail = {"receipts": hits[:5], "malformed": malformed[:5],
+              "fully_read": not failures, "read_failures": sorted(set(failures))[:20]}
     if hits:
         return Verdict.yes(
             warrant=f"{len(hits)} receipt(s) declare a governed invocation of {name!r} with a "
                     f"recorded outcome", **detail).as_dict()
     return Verdict.unknown(
-        limit=(f"{len(malformed)} file(s) name '{name}' without recording a governed invocation"
+        limit=((f"could not fully read receipt subject {root}: " + "; ".join(sorted(set(failures))))
+               if failures else
+               (f"{len(malformed)} file(s) name '{name}' without recording a governed invocation"
                if malformed else
                f"no receipt in {receipts} declares a governed invocation of '{name}'; absence "
-               f"of a receipt is a LIMIT of this reading, not a demonstrated NO"),
+               f"of a receipt is a LIMIT of this reading, not a demonstrated NO")),
         **detail).as_dict()
 
 

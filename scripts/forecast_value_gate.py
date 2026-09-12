@@ -116,6 +116,25 @@ class PacketError(Exception):
     """The packet could not be read or is structurally unusable."""
 
 
+def bind_emission_contract(limbs: dict[str, dict[str, Any]], subject: str) -> None:
+    """Attach the ruled four limbs to each independently emitted proposition."""
+    for name, limb in limbs.items():
+        state = limb["verdict"]
+        indefinite = state in {UNAVAILABLE, INERT}
+        why = limb.get("why")
+        evidence = {k: v for k, v in limb.items() if k not in {"verdict", "why", "contract", "limit"}}
+        limb["contract"] = {
+            "subject": f"{subject}:{name}",
+            "subject_bound": True,
+            "subject_reached": not indefinite,
+            "affirming_evidence": evidence if not indefinite else None,
+            "predicate_discriminating": not indefinite,
+            "definite": not indefinite,
+        }
+        if indefinite:
+            limb["limit"] = why or f"predicate for {name} did not fire"
+
+
 def _pct(num: float, den: float) -> float:
     return 0.0 if den == 0 else num / den * 100.0
 
@@ -184,9 +203,10 @@ def read_within_root(root: Path, rel: str) -> str | None:
     at each call site is a guard that will be missed at one of them.
     """
     try:
-        target = (root / rel).resolve()
-        target.relative_to(root.resolve())
-        if not target.is_file():
+        root = root.resolve(strict=True)
+        target = (root / rel).resolve(strict=True)
+        target.relative_to(root)
+        if not target.is_file() or not target.stat().st_mode & 0o400:
             return None
         return target.read_text()
     except (OSError, UnicodeDecodeError, ValueError):
@@ -302,6 +322,7 @@ def forecast(data: dict[str, Any], cap_override: float | None, repo_root: Path) 
         for key in ("CON-FLOOR-1", "CON-FLOOR-2", "CON-CAPABILITY-SHARE",
                     "CON-AMBITION-1", "CON-AMBITION-2", "CON-AMBITION", "CAP-CEILING", "CON-EVIDENCE"):
             limbs[key] = {"verdict": UNAVAILABLE, "why": "packet selects no Tier-1 rows"}
+        bind_emission_contract(limbs, "selected Tier-1 packet")
         return {"selected_count": 0, "selected_su": 0, "functional_su": 0, "l3_selected": [],
                 "selected_ids": [], "limbs": limbs, "notes": notes, "overall": UNAVAILABLE}
 
@@ -407,6 +428,7 @@ def forecast(data: dict[str, Any], cap_override: float | None, repo_root: Path) 
         "detail": {k: v for k, v in ev.items() if v["state"] != "RESOLVED"},
     }
 
+    bind_emission_contract(limbs, "selected Tier-1 packet")
     verdicts = [v["verdict"] for v in limbs.values()]
     overall = FAIL if FAIL in verdicts else (UNAVAILABLE if UNAVAILABLE in verdicts else PASS)
     return {

@@ -65,6 +65,18 @@ def test_every_limb_is_reported_not_just_the_failing_one(root):
     for limb in ("CON-FLOOR-1", "CON-FLOOR-2", "CON-CAPABILITY-SHARE", "CON-AMBITION-1",
                  "CON-AMBITION-2", "CON-AMBITION", "CAP-CEILING", "CON-EVIDENCE"):
         assert limb in res["limbs"], f"{limb} missing from the forecast"
+        assert set(res["limbs"][limb]["contract"]) >= {
+            "subject_bound", "subject_reached", "affirming_evidence",
+            "predicate_discriminating", "definite"}
+
+
+def test_unavailable_and_inert_limbs_are_indefinite_and_name_their_limit(root):
+    pkt = packet([row("A", 4, "L3", "capability")])
+    del pkt["cap_su"]
+    _, res = fc(root, pkt)
+    for name in ("CON-AMBITION-1", "CAP-CEILING"):
+        assert not res["limbs"][name]["contract"]["definite"]
+        assert res["limbs"][name]["limit"]
 
 
 # --- negative: it must not abort at the first failure ---------------------------

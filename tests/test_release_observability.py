@@ -27,6 +27,17 @@ def get_scripts_dir() -> Path:
 SCRIPTS_DIR = get_scripts_dir()
 
 
+def isolated_script(script: Path, tmp_path: Path) -> Path:
+    """Copy a self-tested script beneath an isolated agent root."""
+    agent_root = tmp_path / script.stem
+    scripts_dir = agent_root / 'scripts'
+    scripts_dir.mkdir(parents=True)
+    (agent_root / '.aget').mkdir()
+    isolated = scripts_dir / script.name
+    shutil.copy2(script, isolated)
+    return isolated
+
+
 # ============================================================
 # CAP-REL-021: Persistent Validation Logging
 # ============================================================
@@ -49,10 +60,10 @@ class TestValidationLogger:
         assert result.returncode == 0
         assert 'CAP-REL-021' in result.stdout
 
-    def test_self_test_passes(self):
+    def test_self_test_passes(self, tmp_path):
         """validation_logger.py --test passes."""
         result = subprocess.run(
-            [sys.executable, str(self.SCRIPT), '--test'],
+            [sys.executable, str(isolated_script(self.SCRIPT, tmp_path)), '--test'],
             capture_output=True, text=True, timeout=30
         )
         assert result.returncode == 0, f"Self-test failed: {result.stdout}\n{result.stderr}"
@@ -91,10 +102,10 @@ class TestRunGate:
         assert result.returncode == 0
         assert 'CAP-REL-022' in result.stdout
 
-    def test_self_test_passes(self):
+    def test_self_test_passes(self, tmp_path):
         """run_gate.py --test passes."""
         result = subprocess.run(
-            [sys.executable, str(self.SCRIPT), '--test'],
+            [sys.executable, str(isolated_script(self.SCRIPT, tmp_path)), '--test'],
             capture_output=True, text=True, timeout=30
         )
         assert result.returncode == 0, f"Self-test failed: {result.stdout}\n{result.stderr}"
