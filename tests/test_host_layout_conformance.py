@@ -181,6 +181,33 @@ def test_a_well_formed_envelope_is_conformant(tmp_path):
 
 # --- input hygiene ------------------------------------------------------------------
 
+@pytest.mark.parametrize("value", [[], None, 1, "layout"])
+def test_json_non_mapping_is_controlled_unavailable(tmp_path, capsys, value):
+    source = tmp_path / "layout.json"
+    source.write_text(json.dumps(value))
+    assert chlc.main(["--manifest", str(source), "--root", str(tmp_path), "--json"]) == 3
+    assert "UNAVAILABLE" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("cls,tier", [("cache", "exhaust"), ("data", "exhaust"),
+                                     ("config", "record"), ("runtime", "exhaust"),
+                                     ("state", "exhaust"), ("logs", "exhaust")])
+def test_observed_artifact_must_match_class_location(tmp_path, cls, tier):
+    root = tmp_path / "repo"
+    write(root, "data/node/object.json")
+    control = [{"pattern": "data/node/object.json", "class": "data", "tier": "record"}]
+    assert chlc.check_manifest(control, root)[0]["outcome"] == OK
+    misplaced = [{"pattern": "data/node/object.json", "class": cls, "tier": tier}]
+    result = chlc.check_manifest(misplaced, root)[0]
+    assert result["outcome"] == DRIFT
+    assert result["misplaced"] == ["data/node/object.json"]
+
+
+def test_record_telemetry_summary_uses_record_location(tmp_path):
+    write(tmp_path, "data/node/digest.json")
+    rules = [{"pattern": "data/node/digest.json", "class": "telemetry", "tier": "record"}]
+    assert chlc.check_manifest(rules, tmp_path)[0]["outcome"] == OK
+
 def test_an_unparseable_manifest_is_an_input_error_never_a_pass(tmp_path):
     bad = tmp_path / "m.json"
     bad.write_text("{[not valid")

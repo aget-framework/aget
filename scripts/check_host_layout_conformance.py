@@ -74,12 +74,16 @@ def load_mapping(path: Path) -> dict[str, Any]:
     """Accept JSON or YAML. A manifest we cannot parse is an input error, never a pass."""
     try:
         text = path.read_text()
-    except OSError as exc:
+    except (OSError, UnicodeDecodeError) as exc:
         raise InputError(f"cannot read {path}: {exc}") from exc
     try:
-        return json.loads(text)
+        data = json.loads(text)
     except json.JSONDecodeError:
         pass
+    else:
+        if not isinstance(data, dict):
+            raise InputError(f"{path} must parse to a mapping")
+        return data
     try:
         import yaml  # optional
     except ImportError as exc:
@@ -100,7 +104,7 @@ def manifest_rules(manifest: dict[str, Any]) -> list[dict[str, Any]]:
         raise InputError("manifest has no 'paths' list (CAP-HFL-002)")
     rules = []
     for i, rule in enumerate(paths):
-        if not isinstance(rule, dict) or not rule.get("pattern"):
+        if not isinstance(rule, dict) or not isinstance(rule.get("pattern"), str) or not rule["pattern"]:
             raise InputError(f"manifest paths[{i}] has no pattern")
         rules.append(rule)
     return rules
@@ -133,6 +137,22 @@ def check_manifest(rules: list[dict[str, Any]], root: Path) -> list[dict[str, An
             findings.append({"subject": subject, "outcome": MISSING,
                              "why": "manifest declares this path; no artifact observed under root"})
             continue
+        misplaced = []
+        for path in matches:
+            parts = path.relative_to(root).parts
+            under_data = len(parts) >= 3 and parts[0] == "data"
+            # Section 4 admits durable state/telemetry summaries as record outputs.
+            record_summary = cls in {"state", "telemetry"} and tier == "record"
+            correct = under_data and (cls == "data" or record_summary or (
+                cls == "config" and len(parts) >= 4 and parts[2] == "config"))
+            if not correct or tier == "exhaust":
+                misplaced.append(str(path.relative_to(root)))
+        if misplaced:
+            findings.append({"subject": subject, "outcome": DRIFT,
+                             "why": "observed artifact is outside its lifecycle-class/tier "
+                                    "location (CAP-HFL-001/004/005)",
+                             "expected": CLASS_LOCATIONS[cls], "misplaced": misplaced})
+            continue
         findings.append({"subject": subject, "outcome": OK,
                          "why": None, "observed": len(matches)})
 
@@ -162,8 +182,12 @@ def check_roster(roster: dict[str, Any] | None, repo_markers: list[str]) -> list
         return [{"subject": "roster", "outcome": MISSING, "why": "roster has no 'daemons' list"}]
     out = []
     for d in daemons:
+        if not isinstance(d, dict):
+            out.append({"subject": "daemon", "outcome": MISSING,
+                        "why": "roster entry is not a mapping"})
+            continue
         name, exec_path = d.get("name", "<unnamed>"), d.get("exec_path")
-        if not exec_path:
+        if not isinstance(exec_path, str) or not exec_path:
             out.append({"subject": f"daemon:{name}", "outcome": MISSING,
                         "why": "roster entry declares no exec_path"})
             continue
@@ -199,12 +223,15 @@ def check_envelope(rules: list[dict[str, Any]], root: Path) -> list[dict[str, An
         unreadable, rows, bad = [], 0, 0
         for m in matches:
             try:
+                if not m.stat().st_mode & 0o400:
+                    raise PermissionError("stream is not readable")
                 for line in m.read_text().splitlines():
                     if not line.strip():
                         continue
                     rows += 1
                     try:
-                        if field not in json.loads(line):
+                        row = json.loads(line)
+                        if not isinstance(row, dict) or field not in row:
                             bad += 1
                     except json.JSONDecodeError:
                         bad += 1
@@ -213,6 +240,9 @@ def check_envelope(rules: list[dict[str, Any]], root: Path) -> list[dict[str, An
         if unreadable:
             out.append({"subject": subject, "outcome": MISSING,
                         "why": f"envelope not readable: {unreadable[:3]}"})
+        elif not rows:
+            out.append({"subject": subject, "outcome": MISSING,
+                        "why": "no stream rows observed; row classification is unverified"})
         elif bad:
             out.append({"subject": subject, "outcome": DRIFT,
                         "why": f"{bad} of {rows} rows lack the declared record-predicate field "

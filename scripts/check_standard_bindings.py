@@ -72,9 +72,13 @@ def load(path: Path) -> dict[str, Any]:
     except (OSError, UnicodeDecodeError) as exc:
         raise InputError(f"bindings unreadable: {exc}") from exc
     try:
-        return json.loads(text)
+        doc = json.loads(text)
     except json.JSONDecodeError:
         pass
+    else:
+        if not isinstance(doc, dict):
+            raise InputError("bindings must parse to a mapping")
+        return doc
     try:
         import yaml
     except ImportError as exc:

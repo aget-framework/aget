@@ -22,6 +22,14 @@ OK, OVERCLAIM, MALFORMED = csb.OK, csb.OVERCLAIM, csb.MALFORMED
 SHIPPED = REPO / "ontology" / "EXTERNAL_STANDARD_BINDINGS_receipt_v1.0.yaml"
 
 
+@pytest.mark.parametrize("value", [[], None, 1, "binding"])
+def test_json_binding_document_requires_mapping(tmp_path, value):
+    path = tmp_path / "bindings.json"
+    path.write_text(json.dumps(value))
+    with pytest.raises(csb.InputError):
+        csb.load(path)
+
+
 def b(**kw):
     base = {"concept": "C1 Thing", "predicate": "closeMatch",
             "source": "ISO/IEC 13888-1:2020",

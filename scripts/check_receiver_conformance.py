@@ -48,6 +48,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -66,9 +67,13 @@ def load_manifest(path: Path) -> dict[str, Any]:
     except (OSError, UnicodeDecodeError) as exc:
         raise InputError(f"manifest unreadable: {exc}") from exc
     try:
-        return json.loads(text)
+        doc = json.loads(text)
     except json.JSONDecodeError:
         pass
+    else:
+        if not isinstance(doc, dict):
+            raise InputError("manifest must parse to a mapping")
+        return doc
     try:
         import yaml
     except ImportError as exc:
@@ -86,7 +91,9 @@ def manifest_entries(doc: dict[str, Any]) -> list[dict[str, Any]]:
     for key in ("files", "payload", "entries", "delivered"):
         v = doc.get(key)
         if isinstance(v, list):
-            return [e for e in v if isinstance(e, dict)]
+            if not v or any(not isinstance(e, dict) for e in v):
+                raise InputError("manifest entries must be a nonempty list of mappings")
+            return v
     raise InputError("manifest carries no ordered file list "
                      "(looked for files/payload/entries/delivered)")
 
@@ -94,9 +101,14 @@ def manifest_entries(doc: dict[str, Any]) -> list[dict[str, Any]]:
 def check_integrity(entries: list[dict[str, Any]], repo: Path) -> dict[str, Any]:
     """Every ordered entry must carry a digest the receiver can verify."""
     carried, missing, mismatched, unreadable = [], [], [], []
-    for e in entries:
+    invalid = []
+    for index, e in enumerate(entries):
+        if not isinstance(e, dict):
+            invalid.append(index)
+            continue
         rel = e.get("path")
         if not isinstance(rel, str) or not rel.strip():
+            invalid.append(index)
             continue
         field = next((f for f in DIGEST_FIELDS if str(e.get(f, "")).strip()), None)
         if field is None:
@@ -111,7 +123,9 @@ def check_integrity(entries: list[dict[str, Any]], repo: Path) -> dict[str, Any]
             continue
         if got.lower() != str(e[field]).strip().lower():
             mismatched.append(rel)
-    if mismatched:
+    if not entries or invalid:
+        state, why = UNVERIFIABLE, "empty manifest or ordered entries without valid paths"
+    elif mismatched:
         state, why = INCOMPLETE, f"{len(mismatched)} payload digest(s) do not match"
     elif missing:
         # The spec says "verify every ordered manifest digest". An entry with no digest field
@@ -125,6 +139,7 @@ def check_integrity(entries: list[dict[str, Any]], repo: Path) -> dict[str, Any]
     else:
         state, why = COMPLETE, None
     return {"state": state, "digest_fields": len(carried), "entries": len(entries),
+            "invalid_entries": invalid,
             "missing_digest": missing[:10], "mismatched": mismatched[:10],
             "unreadable": unreadable[:10], "why": why}
 
@@ -137,25 +152,34 @@ def check_acceptance(acceptance_dir: Path | None) -> dict[str, Any]:
     if not acceptance_dir.is_dir():
         return {"state": INCOMPLETE, "terminal": "ABSENT",
                 "why": f"no acceptance record at {acceptance_dir}"}
-    terminal = None
+    terminals, evidence, failures = set(), [], []
+    declaration = re.compile(
+        r"^\s*(?:\*\*)?(?:Acceptance(?:\s+terminal)?|Terminal)(?:\*\*)?\s*:\s*"
+        r"(?:\*\*)?(PENDING|ACCEPTED|REJECTED)(?:\*\*)?\s*$", re.IGNORECASE)
     for f in sorted(acceptance_dir.rglob("*")):
         if not f.is_file():
             continue
         try:
+            if not f.stat().st_mode & 0o400:
+                raise PermissionError("acceptance file lacks owner-read permission")
             text = f.read_text()
-        except (OSError, UnicodeDecodeError):
+        except (OSError, UnicodeDecodeError) as exc:
+            failures.append(f"{f}: {exc}")
             continue
-        for line in text.splitlines():
-            low = line.lower()
-            if "terminal" in low or "acceptance" in low:
-                for word in ("PENDING", "ACCEPTED", "REJECTED"):
-                    if word in line:
-                        terminal = terminal or word
-    terminal = terminal or "PENDING"
+        for number, line in enumerate(text.splitlines(), 1):
+            match = declaration.fullmatch(line)
+            if match:
+                terminals.add(match.group(1).upper())
+                evidence.append({"path": str(f), "line": number, "declaration": line})
+    terminal = next(iter(terminals)) if len(terminals) == 1 else (
+        "CONFLICT" if terminals else "PENDING")
     return {
-        "state": COMPLETE if terminal == "ACCEPTED" else INCOMPLETE,
+        "state": UNVERIFIABLE if failures else COMPLETE if terminal == "ACCEPTED" else INCOMPLETE,
         "terminal": terminal,
-        "why": None if terminal == "ACCEPTED" else
+        "evidence": evidence, "read_failures": failures,
+        "scope": "terminal declarations only; signer and release identity require caller verification",
+        "why": "acceptance population was not fully read" if failures else
+               None if terminal == "ACCEPTED" else
                f"acceptance terminal is {terminal}. This is the principal's signature line and "
                f"is deliberately not the agent's to write. Repairing every other row does NOT "
                f"clear it.",
@@ -169,9 +193,15 @@ def assess(manifest_path: Path, repo: Path, acceptance: Path | None,
     rows: dict[str, Any] = {}
 
     for d in (detection or []):
-        name = d.get("name", "detection")
-        skipped = int(d.get("skipped", 0) or 0)
-        exit_code_ = int(d.get("exit", 0) or 0)
+        if not isinstance(d, dict) or not isinstance(d.get("name"), str) or not d["name"].strip():
+            raise InputError("every detection row must name its check")
+        name = d["name"]
+        if f"detection:{name}" in rows:
+            raise InputError(f"duplicate detection name: {name}")
+        skipped = d.get("skipped", 0)
+        exit_code_ = d.get("exit")
+        if type(exit_code_) is not int or type(skipped) is not int or skipped < 0:
+            raise InputError(f"detection {name} requires an integer exit and nonnegative skipped count")
         if skipped:
             rows[f"detection:{name}"] = {
                 "state": INCOMPLETE, "skipped": skipped,

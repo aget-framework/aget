@@ -179,11 +179,14 @@ def evaluate(receipt: dict[str, Any], manifest: dict[str, Any], repo: Path,
             checks["current_target_matches"] = {"state": UNAVAILABLE, "why": str(exc)}
         if got is not None:
             rc5, dirty = git(repo, "status", "--porcelain", "--", target)
-            target_dirty = bool(dirty.strip())
+            target_dirty = bool(dirty.strip()) if rc5 == 0 else None
             ok = got == digest and not target_dirty
             checks["current_target_matches"] = {
-                "state": HOLDS if ok else FAILS, "observed": got, "target_dirty": target_dirty,
-                "why": None if ok else ("target has a staged/unstaged diff" if target_dirty
+                "state": (FAILS if got != digest else UNAVAILABLE if rc5 != 0
+                          else HOLDS if ok else FAILS),
+                "observed": got, "target_dirty": target_dirty,
+                "why": "could not read target status" if rc5 != 0 else
+                       None if ok else ("target has a staged/unstaged diff" if target_dirty
                                         else "current target bytes are not the accepted digest")}
 
     # (6) the installed route. Absent instruction = UNAVAILABLE, never an assumed pass.
@@ -206,10 +209,12 @@ def evaluate(receipt: dict[str, Any], manifest: dict[str, Any], repo: Path,
     states = [checks[k]["state"] for k in continuity_keys]
     continuity = FAILS if FAILS in states else (UNAVAILABLE if UNAVAILABLE in states else HOLDS)
 
-    _, wt = git(repo, "status", "--porcelain")
+    wt_rc, wt = git(repo, "status", "--porcelain")
     dirt = [l for l in wt.splitlines() if l.strip()]
     worktree = {
-        "dirty_entries": len(dirt), "sample": dirt[:5],
+        "state": HOLDS if wt_rc == 0 else UNAVAILABLE,
+        "dirty_entries": len(dirt) if wt_rc == 0 else None,
+        "sample": dirt[:5] if wt_rc == 0 else None,
         # (7) The one thing this command must never say.
         "claim": "NO WHOLE-WORKTREE-CLEAN CLAIM IS MADE. Unrelated dirt neither invalidates an "
                  "accepted receipt nor is converted into a clean-worktree assertion.",
@@ -217,12 +222,15 @@ def evaluate(receipt: dict[str, Any], manifest: dict[str, Any], repo: Path,
 
     pending_state = None
     if pending:
-        _, head = git(repo, "rev-parse", "HEAD")
-        exact = head == accepted
+        head_rc, head = git(repo, "rev-parse", "HEAD")
+        exact = head == accepted if head_rc == 0 else None
+        quiescent = not dirt if wt_rc == 0 else None
+        state = (FAILS if exact is False or quiescent is False else
+                 UNAVAILABLE if exact is None or quiescent is None else HOLDS)
         pending_state = {
-            "state": HOLDS if (exact and not dirt) else FAILS,
-            "exact_head": exact, "worktree_quiescent": not dirt,
-            "why": None if (exact and not dirt) else
+            "state": state,
+            "exact_head": exact, "worktree_quiescent": quiescent,
+            "why": None if state == HOLDS else
                    "a PENDING transaction still requires exact HEAD and a quiescent worktree; "
                    "this is deliberately stricter than accepted continuity",
         }
@@ -259,7 +267,11 @@ def exit_code(res: dict[str, Any]) -> int:
         return 1
     if res["pending_transaction"] and res["pending_transaction"]["state"] == FAILS:
         return 1
-    return 2 if res["overall"] == UNAVAILABLE else 0
+    if res["overall"] == UNAVAILABLE or (
+            res["pending_transaction"] and
+            res["pending_transaction"]["state"] == UNAVAILABLE):
+        return 2
+    return 0
 
 
 def main(argv: list[str] | None = None) -> int:

@@ -27,6 +27,36 @@ SCAFFOLD = "# Principal Voice\n\nThis directory holds the characterization.\n"
 ORDER = ("Specification -> Evidence Bank -> Enforcement -> Calibration Memory -> Ontology")
 
 
+def test_unreadable_cited_target_is_unavailable_not_dangling(tmp_path):
+    root = agent(tmp_path, consumer_text="knowledge/voice/README.md " + ORDER)
+    assert cvcb.assess(root, [])["overall"] == BOUND
+    target = root / "knowledge/voice/README.md"
+    target.chmod(0)
+    try:
+        result = cvcb.assess(root, [])
+        assert result["overall"] == cvcb.UNAVAILABLE
+        assert result["ec2_satisfied"] is None
+        assert result["counts"][DANGLING] == 0
+        assert cvcb.exit_code(result) == 3
+    finally:
+        target.chmod(0o600)
+
+
+def test_unreadable_citation_does_not_hide_observed_dangling(tmp_path):
+    root = agent(tmp_path, consumer_text="knowledge/voice/README.md MISSING/VOICE.md " + ORDER)
+    target = root / "knowledge/voice/README.md"
+    target.chmod(0)
+    try:
+        result = cvcb.assess(root, [])
+        assert result["overall"] == DANGLING
+        assert result["counts"][DANGLING] == 1
+        assert result["consumers"][0]["unresolved"] == ["MISSING/VOICE.md"]
+        assert result["fully_read"] is False
+        assert result["limit"]
+    finally:
+        target.chmod(0o600)
+
+
 def agent(tmp: Path, *, with_scaffold=True, consumer_text=None) -> Path:
     root = tmp / "agent"
     if with_scaffold:

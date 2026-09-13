@@ -47,6 +47,8 @@ from __future__ import annotations
 import argparse
 import ast
 import json
+import os
+import stat
 import sys
 from pathlib import Path
 from typing import Any
@@ -65,15 +67,27 @@ def capabilities_of(source: str) -> tuple[set[str], set[str]]:
     def record(name: str, kind: str) -> None:
         (priv if name.startswith("_") else pub).add(f"{kind}:{name}")
 
-    for node in tree.body:
+    # Module guards do not create a Python scope. Definitions/imported bindings
+    # inside if/try/with still become consumer-visible module attributes.
+    pending = list(tree.body)
+    while pending:
+        node = pending.pop()
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             record(node.name, "def")
         elif isinstance(node, ast.ClassDef):
             record(node.name, "class")
+        elif isinstance(node, ast.ImportFrom) and node.module != "__future__":
+            for alias in node.names:
+                if alias.name == "*":
+                    raise ValueError("wildcard exports require provider resolution")
+                record(alias.asname or alias.name, "reexport")
         elif isinstance(node, ast.Assign):
             for tgt in node.targets:
                 if isinstance(tgt, ast.Name) and tgt.id.isupper():
                     record(tgt.id, "const")
+        else:
+            pending.extend(child for child in ast.iter_child_nodes(node)
+                           if isinstance(child, (ast.stmt, ast.ExceptHandler, ast.match_case)))
     # CLI surfaces, wherever they are declared in the module
     for node in ast.walk(tree):
         if not isinstance(node, ast.Call):
@@ -95,14 +109,38 @@ def scan(root: Path) -> tuple[dict[str, set[str]], dict[str, set[str]], list[str
     pub: dict[str, set[str]] = {}
     priv: dict[str, set[str]] = {}
     unparsed: list[str] = []
-    for p in sorted(root.rglob("*.py")):
-        if not p.is_file():
-            continue
+    paths = []
+
+    def visit(path):
+        rel = str(path.relative_to(root))
+        try:
+            mode = path.lstat().st_mode
+            if stat.S_ISLNK(mode):
+                if path.suffix == ".py" or path.is_dir():
+                    unparsed.append(f"{rel}: symlink population is not traversed")
+            elif stat.S_ISDIR(mode):
+                if mode & 0o500 != 0o500:
+                    raise PermissionError("directory lacks read/traverse permission")
+                with os.scandir(path) as entries:
+                    children = sorted(Path(entry.path) for entry in entries)
+                for child in children:
+                    visit(child)
+            elif path.suffix == ".py":
+                if not stat.S_ISREG(mode) or not mode & 0o400:
+                    raise PermissionError("Python entry is not a readable regular file")
+                paths.append(path)
+        except OSError as exc:
+            unparsed.append(f"{rel}: {exc}")
+
+    visit(root)
+    if not paths:
+        unparsed.append("no readable Python files in declared population")
+    for p in paths:
         rel = str(p.relative_to(root))
         try:
             a, b = capabilities_of(p.read_text())
-        except (OSError, UnicodeDecodeError, SyntaxError, ValueError):
-            unparsed.append(rel)
+        except (OSError, UnicodeDecodeError, SyntaxError, ValueError) as exc:
+            unparsed.append(f"{rel}: {exc}")
             continue
         pub[rel], priv[rel] = a, b
     return pub, priv, unparsed
@@ -114,9 +152,21 @@ def assess(before: Path, after: Path, allowed: set[str]) -> dict[str, Any]:
     pub_b, priv_b, unparsed_b = scan(before)
     pub_a, priv_a, unparsed_a = scan(after)
 
+    def absent(path):
+        try:
+            path.lstat()
+        except FileNotFoundError:
+            return True
+        except OSError:
+            return False
+        return False
+
     removed: dict[str, sorted] = {}
     for rel, names in pub_b.items():
         if rel not in pub_a:
+            if not absent(after / rel):
+                # Present but unreadable/unparseable is not a removed module.
+                continue
             # A whole module gone is the loudest form of the defect.
             gone = sorted(names)
             if gone:
@@ -127,9 +177,12 @@ def assess(before: Path, after: Path, allowed: set[str]) -> dict[str, Any]:
         if gone:
             removed[rel] = gone
     private_removed = {rel: sorted(names - priv_a.get(rel, set()))
-                       for rel, names in priv_b.items() if names - priv_a.get(rel, set())}
+                       for rel, names in priv_b.items()
+                       if (rel in priv_a or absent(after / rel))
+                       and names - priv_a.get(rel, set())}
     added = {rel: sorted(names - pub_b.get(rel, set()))
-             for rel, names in pub_a.items() if names - pub_b.get(rel, set())}
+             for rel, names in pub_a.items()
+             if (rel in pub_b or absent(before / rel)) and names - pub_b.get(rel, set())}
 
     if unparsed_b or unparsed_a:
         state = "UNAVAILABLE"
@@ -147,6 +200,7 @@ def assess(before: Path, after: Path, allowed: set[str]) -> dict[str, Any]:
     return {"state": state, "why": why, "removed": removed, "added": added,
             "private_removed": private_removed,
             "unparsed": unparsed_b + unparsed_a,
+            "counts_complete": not unparsed_b and not unparsed_a,
             "counts": {"before": sum(len(v) for v in pub_b.values()),
                        "after": sum(len(v) for v in pub_a.values())}}
 
@@ -163,7 +217,8 @@ def render(res: dict[str, Any]) -> str:
         out.append(f"  {sum(len(v) for v in res['private_removed'].values())} private name(s) "
                    f"removed -- reported, not failed: consumers were never entitled to them")
     c = res["counts"]
-    out.append(f"  public capabilities {c['before']} -> {c['after']}")
+    qualifier = "" if res.get("counts_complete", True) else "observed only; incomplete population: "
+    out.append(f"  {qualifier}public capabilities {c['before']} -> {c['after']}")
     out.append("  Byte-hash equality and lint both pass through a deletion. This does not.")
     return "\n".join(out)
 

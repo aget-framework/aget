@@ -30,6 +30,62 @@ canon = _load("canonroot", "scripts/canonical_root.py")
 COMPLETE, INCOMPLETE, UNVERIFIABLE = crc.COMPLETE, crc.INCOMPLETE, crc.UNVERIFIABLE
 
 
+@pytest.mark.parametrize("entries", [[], [None], ["bad"], [{"sha256": "abc"}]])
+def test_invalid_ordered_entries_cannot_certify_integrity(tmp_path, entries):
+    assert crc.check_integrity(entries, tmp_path)["state"] == UNVERIFIABLE
+
+
+@pytest.mark.parametrize("entries", [[], [None], ["bad"], [{"path": "a.py"}, None]])
+def test_manifest_reader_does_not_silently_drop_entries(entries):
+    with pytest.raises(crc.InputError):
+        crc.manifest_entries({"files": entries})
+
+
+def test_json_manifest_requires_mapping(tmp_path):
+    source = tmp_path / "manifest.json"
+    source.write_text("[]")
+    with pytest.raises(crc.InputError):
+        crc.load_manifest(source)
+
+
+@pytest.mark.parametrize("detection", [
+    [{"name": "check", "exit": 1}, {"name": "check", "exit": 0}],
+    [{"name": "check"}], [{"name": "check", "exit": False}], [None],
+])
+def test_detection_population_cannot_discard_or_invent_results(tmp_path, detection):
+    manifest, repo = payload(tmp_path)
+    with pytest.raises(crc.InputError):
+        crc.assess(manifest, repo, accept(tmp_path, "ACCEPTED"), detection)
+
+
+def test_acceptance_prose_and_conflicting_terminals_cannot_pass(tmp_path):
+    folder = tmp_path / "records"
+    folder.mkdir()
+    record = folder / "receipt.md"
+    record.write_text("The acceptance was NOT ACCEPTED\n")
+    assert crc.check_acceptance(folder)["state"] == INCOMPLETE
+    record.write_text("**Acceptance terminal**: ACCEPTED\n")
+    assert crc.check_acceptance(folder)["state"] == COMPLETE
+    (folder / "other.md").write_text("Acceptance terminal: REJECTED\n")
+    result = crc.check_acceptance(folder)
+    assert result["state"] == INCOMPLETE
+    assert result["terminal"] == "CONFLICT"
+    assert len(result["evidence"]) == 2
+
+
+def test_unreadable_acceptance_record_prevents_complete_population(tmp_path):
+    folder = accept(tmp_path, "ACCEPTED")
+    record = folder / "unreadable.md"
+    record.write_text("Acceptance terminal: REJECTED\n")
+    record.chmod(0)
+    try:
+        result = crc.check_acceptance(folder)
+        assert result["state"] == UNVERIFIABLE
+        assert result["read_failures"]
+    finally:
+        record.chmod(0o600)
+
+
 def payload(tmp: Path, *, with_digests=True, corrupt=False):
     repo = tmp / "recv"
     (repo / "scripts").mkdir(parents=True)

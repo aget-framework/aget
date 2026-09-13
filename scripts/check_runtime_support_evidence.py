@@ -51,6 +51,7 @@ EXIT CODES
   2  at least one level is UNKNOWN and nothing is a definite NO
   3  inputs unusable
 """
+
 from __future__ import annotations
 
 import argparse
@@ -64,8 +65,9 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from warranted_verdict import Verdict  # noqa: E402
 from typing import Any
+
+from warranted_verdict import Verdict  # noqa: E402
 
 YES, NO, UNKNOWN = "YES", "NO", "UNKNOWN"
 
@@ -106,17 +108,25 @@ def level1_installed(name: str) -> dict[str, Any]:
     # reported L1 YES and could reach SUPPORTED-TARGET with exit 0. The scope note is explicit
     # that the launcher reading is "insufficient evidence of successor CLI installation", so it
     # cannot be a YES about a terminal agent. It is UNKNOWN: we learned about an .app bundle.
-    detail = {"path": path, "resolved": str(resolved), "version": version,
-              "is_desktop_launcher": in_app_bundle}
+    detail = {
+        "path": path,
+        "resolved": str(resolved),
+        "version": version,
+        "is_desktop_launcher": in_app_bundle,
+    }
     if in_app_bundle:
         return Verdict.unknown(
             limit="resolves into a macOS .app bundle: this is a DESKTOP LAUNCHER. Its version "
-                  "is not evidence about a terminal agent.", **detail).as_dict()
+            "is not evidence about a terminal agent.",
+            **detail,
+        ).as_dict()
     if not version:
         return Verdict.unknown(
-            limit="executable resolves but reported no version", **detail).as_dict()
+            limit="executable resolves but reported no version", **detail
+        ).as_dict()
     return Verdict.yes(
-        warrant=f"resolves on PATH and reports version {version}", **detail).as_dict()
+        warrant=f"resolves on PATH and reports version {version}", **detail
+    ).as_dict()
 
 
 # L2 claims a NON-INTERACTIVE surface. Declaring a prompt-taking subcommand does not establish
@@ -130,13 +140,11 @@ def level1_installed(name: str) -> dict[str, Any]:
 # "To read from stdin, append '-' (e.g. 'ps aux | grep code | antigravity -')", which pipes
 # content INTO A GUI EDITOR and still opens a window. A predicate whose extension is wider
 # than its subject produces exactly the false YES this check exists to stop.
-NONINTERACTIVE_EVIDENCE = re.compile(
-    r"non-?interactive|headless|--print\b|\bbatch mode\b", re.I)
+NONINTERACTIVE_EVIDENCE = re.compile(r"non-?interactive|headless|--print\b|\bbatch mode\b", re.I)
 # Options that mark a surface as DRIVING A DESKTOP UI rather than running headless.
 DESKTOP_OPTION = re.compile(r"--(maximize|reuse-window|new-window|goto|diff|merge)\b", re.I)
 
-SUBCOMMAND_HEADINGS = re.compile(
-    r"^\s*(sub)?commands?\s*:?\s*$", re.I)
+SUBCOMMAND_HEADINGS = re.compile(r"^\s*(sub)?commands?\s*:?\s*$", re.I)
 
 
 def parse_help_surfaces(out: str) -> dict[str, list[str]]:
@@ -164,7 +172,7 @@ def parse_help_surfaces(out: str) -> dict[str, list[str]]:
         indent = len(raw) - len(raw.lstrip())
         if in_block:
             if indent == 0:
-                in_block = False           # a new unindented heading ends the block
+                in_block = False  # a new unindented heading ends the block
             else:
                 if block_indent is None:
                     block_indent = indent
@@ -174,7 +182,16 @@ def parse_help_surfaces(out: str) -> dict[str, list[str]]:
                     # F6: "Commands:\n  exec was removed in 2.0" still declared `exec`. A real
                     # entry is a token plus a description; a sentence is a sentence.
                     looks_like_prose = len(parts) > 1 and parts[1] in {
-                        "was", "is", "are", "has", "have", "will", "can", "cannot", "not"}
+                        "was",
+                        "is",
+                        "are",
+                        "has",
+                        "have",
+                        "will",
+                        "can",
+                        "cannot",
+                        "not",
+                    }
                     if tok and not tok.startswith("-") and not looks_like_prose:
                         subs.append(tok)
                 continue
@@ -191,7 +208,7 @@ def parse_help_surfaces(out: str) -> dict[str, list[str]]:
                     subs.append(word)
                     break
                 if not word.startswith("-"):
-                    break        # <PROMPT>, [paths...] etc. end the subcommand position
+                    break  # <PROMPT>, [paths...] etc. end the subcommand position
             continue
         # An OPTION is declared where it begins the line's content, not where prose names it.
         if stripped.startswith("-"):
@@ -203,67 +220,94 @@ def parse_help_surfaces(out: str) -> dict[str, list[str]]:
 def level2_instructable(name: str) -> dict[str, Any]:
     """One schema on every path. Three different shapes made --json unparseable by field."""
     tokens = INSTRUCTION_SURFACES.get(name)
-    base = {"verdict": UNKNOWN, "surface_tokens_sought": tokens or [],
-            "surface_tokens_found": [], "declared_surfaces": {},
-            # one schema on EVERY path -- adding this key only to the YES branch reintroduced
-            # the MINOR-12 defect the round-two repair closed.
-            "noninteractive_evidence": None, "why": None}
+    base = {
+        "verdict": UNKNOWN,
+        "surface_tokens_sought": tokens or [],
+        "surface_tokens_found": [],
+        "declared_surfaces": {},
+        # one schema on EVERY path -- adding this key only to the YES branch reintroduced
+        # the MINOR-12 defect the round-two repair closed.
+        "noninteractive_evidence": None,
+        "why": None,
+    }
     if not shutil.which(name):
-        return {**base, **Verdict.no(
-            warrant=f"{name} does not resolve on PATH, so it exposes no surface at all"
-        ).as_dict()}
+        return {
+            **base,
+            **Verdict.no(
+                warrant=f"{name} does not resolve on PATH, so it exposes no surface at all"
+            ).as_dict(),
+        }
     code, out = _run([name, "--help"])
     if code != 0 and not out.strip():
         return {**base, "why": "--help produced no readable output"}
     surfaces = parse_help_surfaces(out)
     base["declared_surfaces"] = surfaces
     if tokens is None:
-        return {**base, "why": f"no instruction surface declared for '{name}'; the help text "
-                               f"itself declares {surfaces}. Report, do not guess."}
-    found = [tok for tok in tokens
-             if tok in surfaces["subcommands"] or tok in surfaces["options"]]
+        return {
+            **base,
+            "why": f"no instruction surface declared for '{name}'; the help text "
+            f"itself declares {surfaces}. Report, do not guess.",
+        }
+    found = [tok for tok in tokens if tok in surfaces["subcommands"] or tok in surfaces["options"]]
     parsed_anything = bool(surfaces["subcommands"] or surfaces["options"])
 
     if found:
         # F1. A declared token is not a non-interactive surface. Require the help to SAY so.
         noninteractive = NONINTERACTIVE_EVIDENCE.search(out)
         if noninteractive:
-            return {**base, "surface_tokens_found": found,
-                    "noninteractive_evidence": noninteractive.group(0),
-                    **Verdict.yes(warrant=f"--help declares {found} and states "
-                                          f"{noninteractive.group(0)!r}").as_dict()}
+            return {
+                **base,
+                "surface_tokens_found": found,
+                "noninteractive_evidence": noninteractive.group(0),
+                **Verdict.yes(
+                    warrant=f"--help declares {found} and states {noninteractive.group(0)!r}"
+                ).as_dict(),
+            }
         desktop = DESKTOP_OPTION.findall(out)
-        return {**base, "verdict": UNKNOWN, "surface_tokens_found": found,
-                "why": f"declares {found}, but nothing in --help establishes a NON-INTERACTIVE "
-                       f"surface, which is what L2 claims" +
-                       (f"; and its options include desktop-window controls "
-                        f"{sorted(set(desktop))[:5]}, which point the other way" if desktop
-                        else "") +
-                       ". Declaration is not capability."}
+        return {
+            **base,
+            "verdict": UNKNOWN,
+            "surface_tokens_found": found,
+            "why": f"declares {found}, but nothing in --help establishes a NON-INTERACTIVE "
+            f"surface, which is what L2 claims"
+            + (
+                f"; and its options include desktop-window controls "
+                f"{sorted(set(desktop))[:5]}, which point the other way"
+                if desktop
+                else ""
+            )
+            + ". Declaration is not capability.",
+        }
 
     # F2. NO is a claim about the RUNTIME and must never be reachable from OUR parser failing.
     # Measured: gcloud, npm and brew -- all subcommand-rich -- reached the old NO branch simply
     # because their help layout was not recognised.
     if parsed_anything:
-        return {**base, "verdict": UNKNOWN,
-                "why": f"none of {tokens} matched, but the help DECLARES surfaces we did not "
-                       f"seek: subcommands={surfaces['subcommands'][:8]}, "
-                       f"options={surfaces['options'][:8]}. An unmatched token list is an "
-                       f"unproven expectation, not a demonstrated absence."}
-    return {**base, "verdict": UNKNOWN,
-            "why": "this parser recognised no subcommand block and no option lines in --help. "
-                   "That is a statement about the parser, not about the runtime: a NO here "
-                   "would be our failure reported as the tool's incapacity."}
+        return {
+            **base,
+            "verdict": UNKNOWN,
+            "why": f"none of {tokens} matched, but the help DECLARES surfaces we did not "
+            f"seek: subcommands={surfaces['subcommands'][:8]}, "
+            f"options={surfaces['options'][:8]}. An unmatched token list is an "
+            f"unproven expectation, not a demonstrated absence.",
+        }
+    return {
+        **base,
+        "verdict": UNKNOWN,
+        "why": "this parser recognised no subcommand block and no option lines in --help. "
+        "That is a statement about the parser, not about the runtime: a NO here "
+        "would be our failure reported as the tool's incapacity.",
+    }
 
 
 def level3_governed(name: str, receipts: Path | None) -> dict[str, Any]:
     """Read from a receipt. NEVER produced here -- running the runtime is state-changing."""
     if receipts is None:
         return Verdict.unknown(
-            limit="no receipt directory supplied; L3 is never inferred").as_dict()
+            limit="no receipt directory supplied; L3 is never inferred"
+        ).as_dict()
     if not receipts.is_dir():
-        return Verdict.unknown(
-            limit=f"receipt directory does not resolve: {receipts}").as_dict()
+        return Verdict.unknown(limit=f"receipt directory does not resolve: {receipts}").as_dict()
     # M4. This was `if name in f.read_text()` -- a substring match on any file. A receipt
     # reading "antigravity was NOT invoked" scored YES, and pointing --receipts at this
     # command's own JSON output made it certify itself. A receipt must DECLARE an invocation.
@@ -271,30 +315,38 @@ def level3_governed(name: str, receipts: Path | None) -> dict[str, Any]:
     files: list[Path] = []
     visited: set[tuple[int, int]] = set()
     root = receipts.resolve()
+
     def walk(p: Path) -> None:
         rel = str(p.relative_to(root))
         try:
             s = p.lstat()
         except OSError as exc:
-            failures.append(f"{rel}: lstat failed: {exc}"); return
+            failures.append(f"{rel}: lstat failed: {exc}")
+            return
         if stat.S_ISLNK(s.st_mode):
-            failures.append(f"{rel}: symlink entry is not receipt evidence"); return
+            failures.append(f"{rel}: symlink entry is not receipt evidence")
+            return
         if stat.S_ISDIR(s.st_mode):
             key = (s.st_dev, s.st_ino)
-            if key in visited: return
+            if key in visited:
+                return
             visited.add(key)
             if s.st_mode & 0o500 != 0o500:
-                failures.append(f"{rel or '.'}: directory lacks owner read/traverse permission"); return
+                failures.append(f"{rel or '.'}: directory lacks owner read/traverse permission")
+                return
             try:
                 with os.scandir(p) as it:
                     children = sorted((Path(e.path) for e in it), key=lambda q: q.name)
             except OSError as exc:
-                failures.append(f"{rel or '.'}: enumeration failed: {exc}"); return
-            for child in children: walk(child)
+                failures.append(f"{rel or '.'}: enumeration failed: {exc}")
+                return
+            for child in children:
+                walk(child)
         elif stat.S_ISREG(s.st_mode):
             files.append(p)
         else:
             failures.append(f"{rel}: unsupported receipt entry type")
+
     walk(root)
     for f in files:
         try:
@@ -304,7 +356,7 @@ def level3_governed(name: str, receipts: Path | None) -> dict[str, Any]:
         except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
             failures.append(f"{f.relative_to(root)}: unreadable/malformed: {exc}")
             continue
-        for rec in (doc if isinstance(doc, list) else [doc]):
+        for rec in doc if isinstance(doc, list) else [doc]:
             if not isinstance(rec, dict) or rec.get("runtime") != name:
                 continue
             if rec.get("invoked") is not True:
@@ -318,20 +370,31 @@ def level3_governed(name: str, receipts: Path | None) -> dict[str, Any]:
                 malformed.append(f"{f.name}: invoked with no outcome recorded")
                 continue
             hits.append(str(f))
-    detail = {"receipts": hits[:5], "malformed": malformed[:5],
-              "fully_read": not failures, "read_failures": sorted(set(failures))[:20]}
+    detail = {
+        "receipts": hits[:5],
+        "malformed": malformed[:5],
+        "fully_read": not failures,
+        "read_failures": sorted(set(failures))[:20],
+    }
     if hits:
         return Verdict.yes(
             warrant=f"{len(hits)} receipt(s) declare a governed invocation of {name!r} with a "
-                    f"recorded outcome", **detail).as_dict()
+            f"recorded outcome",
+            **detail,
+        ).as_dict()
     return Verdict.unknown(
-        limit=((f"could not fully read receipt subject {root}: " + "; ".join(sorted(set(failures))))
-               if failures else
-               (f"{len(malformed)} file(s) name '{name}' without recording a governed invocation"
-               if malformed else
-               f"no receipt in {receipts} declares a governed invocation of '{name}'; absence "
-               f"of a receipt is a LIMIT of this reading, not a demonstrated NO")),
-        **detail).as_dict()
+        limit=(
+            (f"could not fully read receipt subject {root}: " + "; ".join(sorted(set(failures))))
+            if failures
+            else (
+                f"{len(malformed)} file(s) name '{name}' without recording a governed invocation"
+                if malformed
+                else f"no receipt in {receipts} declares a governed invocation of '{name}'; absence "
+                f"of a receipt is a LIMIT of this reading, not a demonstrated NO"
+            )
+        ),
+        **detail,
+    ).as_dict()
 
 
 def assess(name: str, receipts: Path | None) -> dict[str, Any]:
@@ -347,17 +410,24 @@ def assess(name: str, receipts: Path | None) -> dict[str, Any]:
         overall = "NOT-DEMONSTRATED"
     else:
         overall = "PARTIAL-EVIDENCE"
-    return {"runtime": name, "L1_installed": l1, "L2_instructable": l2,
-            "L3_governed": l3, "overall": overall}
+    return {
+        "runtime": name,
+        "L1_installed": l1,
+        "L2_instructable": l2,
+        "L3_governed": l3,
+        "overall": overall,
+    }
 
 
 def render(results: list[dict[str, Any]]) -> str:
     out = ["runtime support evidence -- three levels, reported separately", ""]
     for r in results:
         out.append(f"{r['runtime']}: {r['overall']}")
-        for key, label in (("L1_installed", "L1 installed   "),
-                           ("L2_instructable", "L2 instructable"),
-                           ("L3_governed", "L3 governed    ")):
+        for key, label in (
+            ("L1_installed", "L1 installed   "),
+            ("L2_instructable", "L2 instructable"),
+            ("L3_governed", "L3 governed    "),
+        ):
             lv = r[key]
             bits = ""
             if key == "L1_installed" and lv.get("version"):
@@ -373,8 +443,11 @@ def render(results: list[dict[str, Any]]) -> str:
 
 
 def exit_code(results: list[dict[str, Any]]) -> int:
-    verdicts = [lv["verdict"] for r in results for lv in
-                (r["L1_installed"], r["L2_instructable"], r["L3_governed"])]
+    verdicts = [
+        lv["verdict"]
+        for r in results
+        for lv in (r["L1_installed"], r["L2_instructable"], r["L3_governed"])
+    ]
     if all(v == YES for v in verdicts):
         return 0
     if NO in verdicts:
@@ -386,8 +459,12 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Report runtime support evidence at three levels.")
     ap.add_argument("--runtime", action="append", default=[], help="runtime name; repeatable")
     ap.add_argument("--config", type=Path, help="JSON file with a 'runtimes' list")
-    ap.add_argument("--receipts", type=Path, default=None,
-                    help="directory of governed-invocation receipts (L3 is read, never produced)")
+    ap.add_argument(
+        "--receipts",
+        type=Path,
+        default=None,
+        help="directory of governed-invocation receipts (L3 is read, never produced)",
+    )
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
 
@@ -406,13 +483,19 @@ def main(argv: list[str] | None = None) -> int:
             return 3
         listed = doc.get("runtimes", [])
         if not isinstance(listed, list):
-            print(f"UNAVAILABLE: {args.config}: 'runtimes' must be a list, got "
-                  f"{type(listed).__name__}", file=sys.stderr)
+            print(
+                f"UNAVAILABLE: {args.config}: 'runtimes' must be a list, got "
+                f"{type(listed).__name__}",
+                file=sys.stderr,
+            )
             return 3
         bad = [r for r in listed if not isinstance(r, str) or not r.strip()]
         if bad:
-            print(f"UNAVAILABLE: {args.config}: every runtime must be a non-empty string; "
-                  f"got {bad!r}", file=sys.stderr)
+            print(
+                f"UNAVAILABLE: {args.config}: every runtime must be a non-empty string; "
+                f"got {bad!r}",
+                file=sys.stderr,
+            )
             return 3
         names += listed
     if not names:

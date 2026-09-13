@@ -62,10 +62,15 @@ def ruff_version() -> str | None:
 
 def run_ruff(repo: Path, paths: list[str]) -> dict[str, int] | None:
     """Per-file finding counts under the repo's OWN ruff.toml. Returns None if ruff cannot run."""
-    targets = [str(repo / p) for p in paths if (repo / p).exists()]
-    if not targets:
-        return {}
+    repo = repo.resolve()
+    targets = [str(repo / p) for p in paths]
+    if not targets or any(not Path(p).exists() for p in targets):
+        return None
     try:
+        population = subprocess.run(["ruff", "check", "--show-files", *targets],
+                                    cwd=repo, capture_output=True, text=True, timeout=300)
+        if population.returncode != 0 or not population.stdout.strip():
+            return None
         p = subprocess.run(["ruff", "check", "--output-format", "json", *targets],
                            cwd=repo, capture_output=True, text=True, timeout=300)
     except (OSError, subprocess.SubprocessError):
@@ -75,6 +80,8 @@ def run_ruff(repo: Path, paths: list[str]) -> dict[str, int] | None:
     try:
         rows = json.loads(p.stdout or "[]")
     except json.JSONDecodeError:
+        return None
+    if not isinstance(rows, list) or any(not isinstance(r, dict) for r in rows):
         return None
     counts: dict[str, int] = {}
     for r in rows:
@@ -108,7 +115,12 @@ def assess(repo: Path, baseline_path: Path, paths: list[str]) -> dict[str, Any]:
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
         return {"state": "UNAVAILABLE", "why": f"baseline unreadable: {exc}"}
 
-    base_counts = base.get("files", {})
+    if not isinstance(base, dict) or not isinstance(base.get("files"), dict):
+        return {"state": "UNAVAILABLE", "why": "baseline must contain a files mapping"}
+    base_counts = base["files"]
+    if any(not isinstance(k, str) or type(v) is not int or v < 0
+           for k, v in base_counts.items()):
+        return {"state": "UNAVAILABLE", "why": "baseline counts must be nonnegative integers"}
     base_version = base.get("ruff_version")
     regressions = {f: (base_counts.get(f, 0), n) for f, n in current.items()
                    if n > base_counts.get(f, 0)}

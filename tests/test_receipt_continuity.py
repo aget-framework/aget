@@ -13,6 +13,7 @@ import hashlib
 import importlib.util
 import json
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -25,6 +26,38 @@ SPEC.loader.exec_module(crc)
 
 HOLDS, FAILS, UNAVAILABLE = crc.HOLDS, crc.FAILS, crc.UNAVAILABLE
 TARGET = "governed/target.txt"
+
+
+@pytest.mark.parametrize("unavailable", ["target", "worktree", "head"])
+def test_unreadable_git_state_is_not_clean_or_quiescent(repo, monkeypatch, unavailable):
+    r, accepted, digest = repo
+    receipt = {"path": TARGET, "commit": accepted, "digest": digest}
+    route = f"{sys.executable} -c 'from pathlib import Path; assert Path(\"{TARGET}\").is_file()'"
+    control = crc.evaluate(receipt, receipt, r, route, True)
+    assert crc.exit_code(control) == 0
+    original_git = crc.git
+    failed_args = {"target": ("status", "--porcelain", "--", TARGET),
+                   "worktree": ("status", "--porcelain"),
+                   "head": ("rev-parse", "HEAD")}[unavailable]
+
+    def failed_read(root, *args):
+        return (128, "") if args == failed_args else original_git(root, *args)
+
+    monkeypatch.setattr(crc, "git", failed_read)
+    result = crc.evaluate(receipt, receipt, r, route, True)
+    assert crc.exit_code(result) == 2
+    if unavailable == "target":
+        check = result["target_continuity"]["checks"]["current_target_matches"]
+        assert check["state"] == UNAVAILABLE
+        assert check["target_dirty"] is None
+    else:
+        assert result["overall"] == HOLDS
+        assert result["pending_transaction"]["state"] == UNAVAILABLE
+        if unavailable == "worktree":
+            assert result["pending_transaction"]["worktree_quiescent"] is None
+            assert result["current_worktree"]["dirty_entries"] is None
+        else:
+            assert result["pending_transaction"]["exact_head"] is None
 
 
 def run(repo: Path, *args: str) -> str:
