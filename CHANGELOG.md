@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.34.0] - 2026-09-13 — Evidence that reaches its subject
+
+### Added
+- Receipt continuity, receiver conformance, host-layout, runtime-evidence and voice-consumer checks.
+- Non-mutating value-gate forecast, frozen triage cohorts, and receipt standards bindings.
+- Payload lint ratchet and semantic capability-retention checks.
+
+### Fixed
+- Canonical discovery across portfolio layouts and case-aware ontology grounding.
+- Template skill descriptions, version coherence, and the worker's dangling housekeeping link.
+- Health lesson-ID normalization, governance enumeration, and inert repair guidance.
+
+### Limitations
+- The original acceptance recorded four mutation classes missed by shipped tests; their disclosure remains carried pending successor class-by-class verification. The inherited lint backlog remains. See [release notes](release-notes/v3.34.0.md) for coverage and independence limits.
+- Publication and downstream adoption require separate evidence.
+
 ## [3.33.1] - 2026-08-30 - "Receiver-visible integrity"
 
 ### Fixed

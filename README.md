@@ -13,6 +13,10 @@ AGET fixes this. It gives your agents persistent knowledge, shared memory, fleet
 
 **New to AGET?** Listen to the [audio introduction](https://youtu.be/zLSFeT9TF8E) — a narrated walkthrough of session rhythm, key skills, and fleet creation.
 
+## v3.34.0 release candidate
+
+See the [release notes](release-notes/v3.34.0.md) and [migration handoff](handoffs/RELEASE_HANDOFF_v3.34.0.md). Availability and receiver acceptance require separate verification.
+
 ## Quick Start
 
 Start with the [Supervisor template](https://github.com/aget-framework/template-supervisor-aget). It coordinates your fleet and can create new agents.

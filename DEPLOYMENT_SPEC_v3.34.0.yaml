@@ -1,0 +1,169 @@
+version: 3.34.0
+spec_version: 1.0.0
+created: '2026-09-13'
+status: prepared
+supersedes: DEPLOYMENT_SPEC_v3.33.1.yaml
+breaking_release: false
+source_ref: v3.34.0
+rollback_ref: v3.33.1
+release_notes: release-notes/v3.34.0.md
+release_handoff: handoffs/RELEASE_HANDOFF_v3.34.0.md
+remote_migration: handoffs/REMOTE_MIGRATION_MESSAGE_v3.34.0.md
+payload_manifest: handoffs/V334_PAYLOAD_MANIFEST.json
+publication_boundary: Prepared content is not publication, installation or acceptance
+  evidence. Record the annotated tag and peeled commit before consuming.
+mandatory_changes:
+- id: C-34-01
+  description: Strict YAML descriptions and scaffold validation reject absent or invalid
+    metadata.
+  paths:
+  - verification/validate_archetype_skills.py
+  source_test: tests/test_scaffold_skill_description_integration.py
+  detection: python3 -m pytest -q tests/test_scaffold_skill_description_integration.py
+  detection_scope: Shipped source test only; receiver-owned behavior/acceptance and
+    final template/public parity require separate evidence.
+- id: C-34-02
+  description: Unrelated history and dirt do not expire an accepted receipt; target-touching
+    history, including touch-and-revert, rejects continuity.
+  paths:
+  - scripts/check_receipt_continuity.py
+  source_test: tests/test_receipt_continuity.py
+  detection: python3 -m pytest -q tests/test_receipt_continuity.py
+  detection_scope: Shipped source test only; receiver-owned behavior/acceptance and
+    final template/public parity require separate evidence.
+- id: C-34-03
+  description: Producer lint ratchet rejects regression against the shipped baseline;
+    capability retention rejects destructive removal. The inherited lint backlog is
+    not cleaned.
+  paths:
+  - scripts/check_payload_lint.py
+  source_test: tests/test_payload_lint_and_retention.py
+  detection: python3 -m pytest -q tests/test_payload_lint_and_retention.py
+  detection_scope: Shipped source test only; receiver-owned behavior/acceptance and
+    final template/public parity require separate evidence.
+- id: C-34-04
+  description: Study-topic resolves explicit and portfolio-parent canonical sources
+    and discloses the searched scope on a miss.
+  paths:
+  - scripts/study_topic.py
+  source_test: tests/test_study_topic_canonical_portfolio_resolution.py
+  detection: python3 -m pytest -q tests/test_study_topic_canonical_portfolio_resolution.py
+  detection_scope: Shipped source test only; receiver-owned behavior/acceptance and
+    final template/public parity require separate evidence.
+- id: C-34-05
+  description: Core and all 13 registered templates carry matching release payload
+    and version metadata. Publication must preserve exact reviewed commits.
+  paths:
+  - scripts/health_check.py
+  source_test: tests/test_skill_description_conformance.py
+  detection: python3 -m pytest -q tests/test_skill_description_conformance.py
+  detection_scope: Shipped source test only; receiver-owned behavior/acceptance and
+    final template/public parity require separate evidence.
+- id: C-34-06
+  description: Removes the provenance-confirmed vestigial worker housekeeping symlink;
+    packaging must retain no dangling script links.
+  paths:
+  - scripts/instantiate_template.py
+  source_test: tests/test_instantiate_template.py
+  detection: python3 -m pytest -q tests/test_instantiate_template.py
+  detection_scope: Shipped source test only; receiver-owned behavior/acceptance and
+    final template/public parity require separate evidence.
+- id: C-34-08
+  description: Resolves explicit canonical sources, checks declared payload digests,
+    and retains INCOMPLETE when actual receipt acceptance is pending.
+  paths:
+  - scripts/check_receiver_conformance.py
+  source_test: tests/test_receiver_conformance.py
+  detection: python3 -m pytest -q tests/test_receiver_conformance.py
+  detection_scope: Shipped source test only; receiver-owned behavior/acceptance and
+    final template/public parity require separate evidence.
+- id: C-34-17
+  description: Non-mutating forecast reports all declared limbs, including unavailable
+    evidence and non-firing conditions.
+  paths:
+  - scripts/forecast_value_gate.py
+  source_test: tests/test_forecast_value_gate.py
+  detection: python3 -m pytest -q tests/test_forecast_value_gate.py
+  detection_scope: Shipped source test only; receiver-owned behavior/acceptance and
+    final template/public parity require separate evidence.
+- id: C-34-18
+  description: Separates executable discovery, instruction discovery and exercised
+    runtime behavior; a desktop launcher does not establish terminal-agent support.
+  paths:
+  - scripts/check_runtime_support_evidence.py
+  source_test: tests/test_runtime_support_evidence.py
+  detection: python3 -m pytest -q tests/test_runtime_support_evidence.py
+  detection_scope: Shipped source test only; receiver-owned behavior/acceptance and
+    final template/public parity require separate evidence.
+- id: C-34-23
+  description: Case-aware matching binds canonical concepts while preserving boundaries,
+    aliases and honest no-match reporting.
+  paths:
+  - scripts/ground_artifact.py
+  source_test: tests/test_ground_artifact_case_and_no_match.py
+  detection: python3 -m pytest -q tests/test_ground_artifact_case_and_no_match.py
+  detection_scope: Shipped source test only; receiver-owned behavior/acceptance and
+    final template/public parity require separate evidence.
+- id: C-34-24
+  description: Checks declared manifest, roster and readable host envelope; does not
+    claim remote deployment from fixture results.
+  paths:
+  - scripts/check_host_layout_conformance.py
+  source_test: tests/test_host_layout_conformance.py
+  detection: python3 -m pytest -q tests/test_host_layout_conformance.py
+  detection_scope: Shipped source test only; receiver-owned behavior/acceptance and
+    final template/public parity require separate evidence.
+- id: C-34-25
+  description: Binds the briefing skill to governed voice inputs and checks consumer
+    references; downstream receiver adoption still requires receiver-owned evidence.
+  paths:
+  - scripts/check_voice_consumer_binding.py
+  source_test: tests/test_voice_consumer_binding.py
+  detection: python3 -m pytest -q tests/test_voice_consumer_binding.py
+  detection_scope: Shipped source test only; receiver-owned behavior/acceptance and
+    final template/public parity require separate evidence.
+- id: C-34-26
+  description: Freezes and verifies an explicitly named repository cohort, including
+    digest and label reconciliation.
+  paths:
+  - scripts/freeze_triage_cohort.py
+  source_test: tests/test_freeze_triage_cohort.py
+  detection: python3 -m pytest -q tests/test_freeze_triage_cohort.py
+  detection_scope: Shipped source test only; receiver-owned behavior/acceptance and
+    final template/public parity require separate evidence.
+- id: C-34-27
+  description: Checks declared receipt vocabulary mappings and rejects equivalence
+    claims unsupported by scope or cryptographic properties.
+  paths:
+  - scripts/check_standard_bindings.py
+  source_test: tests/test_standard_bindings.py
+  detection: python3 -m pytest -q tests/test_standard_bindings.py
+  detection_scope: Shipped source test only; receiver-owned behavior/acceptance and
+    final template/public parity require separate evidence.
+- id: C-34-30
+  description: Normalizes lesson IDs, reports the measured governance population,
+    and removes the inert repair flag and stale guidance.
+  paths:
+  - scripts/health_check.py
+  source_test: tests/test_health_check_c3430_bounded_repairs.py
+  detection: python3 -m pytest -q tests/test_health_check_c3430_bounded_repairs.py
+  detection_scope: Shipped source test only; receiver-owned behavior/acceptance and
+    final template/public parity require separate evidence.
+receiver_acceptance:
+  ownership: Receiver-authored and receiver-revision verified; commissioning owned
+    by receiving manager
+  returned: Acknowledged transmission plus verification at receiver source revision
+  behaviour_verified: Credited capability and exercised rejection path pass; no blocking
+    delivery defect
+  producer_written: Never counts as receiver acceptance
+  terminals:
+  - ACCEPTED
+  - BEHAVIOUR_VERIFIED
+  - REJECTED
+  - CANNOT-RUN
+rollback: Preserve unrelated state; revert only committed migration changes or restore
+  only the recorded migration path set from the saved baseline. Never move published
+  tags.
+publication_hold: 'Candidate repair acceptance is complete at 1a87e074; lint PASS at
+  436 findings versus unchanged 437 baseline. Final assembly pins, release Critic,
+  phase-correct publication checks and exact-SHA CI remain required.'
