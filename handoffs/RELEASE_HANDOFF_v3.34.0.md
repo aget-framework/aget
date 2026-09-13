@@ -30,21 +30,31 @@ and a rollback stable cut are required. Missing evidence is `HOLD`, never an inf
 
 ## Upgrade Guide
 
+Run this block as one Bash script; stop on any failed command. Both source checkouts must be clean, including untracked files, before selecting the tag-bound bytes. Preserve any existing edits separately under your own governance; this guide does not discard them.
+
 ```bash
+set -euo pipefail
 export SOURCE=/path/to/aget-v3.34.0
 export TEMPLATE=/path/to/matching-template
 export AGENT=/path/to/receiving-agent
 
+test -z "$(git -C "$SOURCE" status --porcelain --untracked-files=all)"
 git -C "$SOURCE" fetch --tags origin
-git -C "$SOURCE" checkout --detach v3.34.0
-CORE_SHA=$(git -C "$SOURCE" rev-parse 'v3.34.0^{commit}')
 test "$(git -C "$SOURCE" cat-file -t refs/tags/v3.34.0)" = tag
+CORE_SHA=$(git -C "$SOURCE" rev-parse --verify 'v3.34.0^{commit}')
+git -C "$SOURCE" checkout --detach "$CORE_SHA"
+test "$(git -C "$SOURCE" rev-parse HEAD)" = "$CORE_SHA"
+test -z "$(git -C "$SOURCE" status --porcelain --untracked-files=all)"
 test "$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["aget_version"])' "$SOURCE/.aget/version.json")" = 3.34.0
 test -f "$SOURCE/DEPLOYMENT_SPEC_v3.34.0.yaml"
 
+test -z "$(git -C "$TEMPLATE" status --porcelain --untracked-files=all)"
 git -C "$TEMPLATE" fetch --tags origin
 test "$(git -C "$TEMPLATE" cat-file -t refs/tags/v3.34.0)" = tag
-TEMPLATE_SHA=$(git -C "$TEMPLATE" rev-parse 'v3.34.0^{commit}')
+TEMPLATE_SHA=$(git -C "$TEMPLATE" rev-parse --verify 'v3.34.0^{commit}')
+git -C "$TEMPLATE" checkout --detach "$TEMPLATE_SHA"
+test "$(git -C "$TEMPLATE" rev-parse HEAD)" = "$TEMPLATE_SHA"
+test -z "$(git -C "$TEMPLATE" status --porcelain --untracked-files=all)"
 
 BEFORE_SHA=$(git -C "$AGENT" rev-parse HEAD)
 git -C "$AGENT" status --short
