@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""capture_friction.py — template-shippable friction-capture hook (UserPromptSubmit).
+r"""capture_friction.py — template-shippable friction-capture hook (UserPromptSubmit).
 
 Implements AGET_FRICTION_SPEC v0.1.0 CAP-FRIC-001 (capture) + CAP-FRIC-002 (persist).
 
@@ -14,7 +14,7 @@ non-propagating (gitignored) location is single-agent by construction. Shipped h
 propagates via template to every scaffolded agent. Wire it in `.claude/settings.json`:
 
     {"hooks": {"UserPromptSubmit": [{"hooks": [
-        {"type": "command", "command": "python3 scripts/capture_friction.py"}]}]}}
+        {"type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/scripts/capture_friction.py\" || true"}]}]}}
 
 Contract: never blocks the prompt. Exit 0 always. Silent unless a note was captured.
 Self-test (V-FRIC-001): `python3 scripts/capture_friction.py --self-test` (exit 0 = PASS).
