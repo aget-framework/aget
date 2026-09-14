@@ -57,7 +57,7 @@ def test_a_fully_conforming_layout_with_roster_exits_zero(tmp_path):
     m = manifest(tmp_path, [{"pattern": "data/node1/config/*.toml", "class": "config",
                              "tier": "record"}])
     r = tmp_path / "roster.json"
-    r.write_text(json.dumps({"daemons": [{"name": "beat", "exec_path": "/Users/x/.local/bin/beat"}]}))
+    r.write_text(json.dumps({"daemons": [{"name": "beat", "exec_path": "/Users/username/.local/bin/beat"}]}))
     res = chlc.assess(m, root, r, ["/github/"])
     assert res["overall"] == OK and chlc.exit_code(res) == 0
 
@@ -136,8 +136,8 @@ def test_a_daemon_running_from_a_repo_checkout_is_DRIFT(tmp_path):
     m = manifest(tmp_path, [{"pattern": "x/*.txt", "class": "data", "tier": "record"}])
     r = tmp_path / "roster.json"
     r.write_text(json.dumps({"daemons": [
-        {"name": "from-repo", "exec_path": "/Users/x/github/some-aget/scripts/d.py"},
-        {"name": "deployed", "exec_path": "/Users/x/.local/bin/d"},
+        {"name": "from-repo", "exec_path": "/Users/username/github/some-aget/scripts/d.py"},
+        {"name": "deployed", "exec_path": "/Users/username/.local/bin/d"},
     ]}))
     res = chlc.assess(m, root, r, ["/github/"])
     o = outcomes(res, "daemon:")
