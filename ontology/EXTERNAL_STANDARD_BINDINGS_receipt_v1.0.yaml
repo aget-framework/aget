@@ -1,0 +1,108 @@
+# Receipt-family bindings to named external standards.
+#
+# C-34-27. The concepts already cited ISO/IEC 13888-1, RFC 4998 and IETF SCITT in a prose
+# `source:` field. Prose cannot carry the thing a binding must carry: HOW STRONG the
+# correspondence is. "Receipt" names a different object in each of these documents, and the
+# distance between them is the whole point.
+#
+# Validated by scripts/check_standard_bindings.py. Every binding states what it does NOT
+# cover, because a binding that states only coverage is an equivalence claim in disguise.
+
+version: "1.0.0"
+date: "2026-09-09"
+governs: "aget receipt-family vocabulary"
+
+bindings:
+  - concept: "C1888 Receipt"
+    predicate: closeMatch
+    source: "ISO/IEC 13888-1:2020 (Non-repudiation, Part 1: General) — 'evidence'"
+    external_is_cryptographic: false
+    local_is_cryptographic: false
+    scope:
+      covers: >-
+        Both name a durable artifact whose purpose is to establish that a particular event or
+        action occurred, and to make that fact checkable after the moment has passed.
+      does_not_cover: >-
+        ISO/IEC 13888-1 scopes evidence to NON-REPUDIATION between identified parties, with
+        an evidence generator and a verifier as defined roles. C1888 has no party model and no
+        adjudication procedure: it is a record of occurrence, not a defence against a later
+        denial by a counterparty.
+
+  - concept: "C1888 Receipt"
+    predicate: relatedMatch
+    source: "IETF RFC 4998 (2007) — Evidence Record Syntax (ERS)"
+    external_is_cryptographic: true
+    local_is_cryptographic: false
+    scope:
+      covers: >-
+        Both address long-term demonstrability of existence: that a thing was so, at a time,
+        and can still be shown to have been so later.
+      does_not_cover: >-
+        ERS achieves this with hash trees and renewable timestamps whose validity survives
+        algorithm ageing. C1888 carries no hash chain, no timestamp authority, and no renewal
+        procedure. relatedMatch, not closeMatch: the shared concern is real and the mechanism
+        is absent.
+
+  - concept: "C1890 ReceiptType"
+    predicate: closeMatch
+    source: "IETF draft-ietf-scitt-architecture — Statement / envelope typing"
+    external_is_cryptographic: true
+    local_is_cryptographic: false
+    scope:
+      covers: >-
+        Both separate the envelope that binds a record to its subject from the payload that
+        states what was observed, so a consumer can validate fields rather than parse prose.
+      does_not_cover: >-
+        SCITT's typing governs signed statements whose envelope is cryptographically bound to
+        the payload. C1890's typing is a schema identifier with no binding force: a consumer
+        learns which fields to expect, not that the payload is the one that was signed.
+
+  - concept: "C1893 IndependentlyVerifiableReceipt"
+    predicate: closeMatch
+    source: "IETF draft-ietf-scitt-architecture — Receipt (a signature over verifiable data structure proofs)"
+    external_is_cryptographic: true
+    local_is_cryptographic: false
+    scope:
+      covers: >-
+        Both require that validity be checkable by a party other than the issuer, and both
+        locate that property in the receipt's CONSTRUCTION rather than in the issuer's good
+        faith.
+      does_not_cover: >-
+        SCITT discharges it cryptographically: a signature over an inclusion proof against an
+        append-only log, verifiable with no access to the issuer at all. C1893 admits any
+        construction a third party can check, including non-cryptographic ones such as a claim
+        checkable against public version-control history.
+        CONSEQUENCE, recorded because this framework has already tripped over it (M-3.1,
+        2026-09-09): a self-asserted JSON record of the form {actor, invoked: true, outcome}
+        satisfies NEITHER. Every field is written by the issuer and nothing in the artifact's
+        construction lets anyone else check it. Such a record is a C1888 Receipt at most; it
+        is not a C1893 IndependentlyVerifiableReceipt, and it is emphatically not a SCITT
+        Receipt. exactMatch is refused here for exactly this reason.
+
+  - concept: "C1893 IndependentlyVerifiableReceipt"
+    predicate: relatedMatch
+    source: "https://slsa.dev — SLSA provenance attestation"
+    external_is_cryptographic: true
+    local_is_cryptographic: false
+    scope:
+      covers: >-
+        Both distinguish a claim made BY the producing system from a claim a downstream
+        consumer can verify without trusting that system.
+      does_not_cover: >-
+        SLSA binds provenance to a build platform's identity and to the produced artifact's
+        digest, at defined levels. C1893 makes no claim about builds, platforms, or levels,
+        and carries no digest requirement.
+
+  - concept: "C1893 IndependentlyVerifiableReceipt"
+    predicate: relatedMatch
+    source: "https://in-toto.io — in-toto attestation framework"
+    external_is_cryptographic: true
+    local_is_cryptographic: false
+    scope:
+      covers: >-
+        Both treat a verifiable statement about a step as separable from the step's own
+        reporting of itself.
+      does_not_cover: >-
+        in-toto attestations are signed by keys bound to declared functionaries within a
+        layout that specifies who may attest to what. C1893 has no key material, no
+        functionary model, and no layout.

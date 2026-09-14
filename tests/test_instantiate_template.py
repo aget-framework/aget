@@ -52,7 +52,14 @@ def temp_framework(tmp_path):
     # .claude/skills/ with a test skill
     skills_dir = template_dir / ".claude" / "skills" / "aget-wake-up"
     skills_dir.mkdir(parents=True)
-    (skills_dir / "SKILL.md").write_text("# wake-up skill\n")
+    # Frontmatter is required, not decorative: C-34-01 makes the scaffold REFUSE a
+    # template whose skills are unroutable, so this shared fixture must ship a real
+    # description or every test using it fails at Step 0. Repairing the fixture is the
+    # correct response; relaxing the gate for it would be the wrong one.
+    (skills_dir / "SKILL.md").write_text(
+        '---\nname: aget-wake-up\ndescription: "Initialize the session with agent identity."\n---\n\n'
+        '# wake-up skill\n'
+    )
 
     # Create canonical scripts in aget/scripts/
     scripts_dir = tmp_path / "aget" / "scripts"

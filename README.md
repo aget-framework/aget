@@ -13,6 +13,10 @@ AGET fixes this. It gives your agents persistent knowledge, shared memory, fleet
 
 **New to AGET?** Listen to the [audio introduction](https://youtu.be/zLSFeT9TF8E) — a narrated walkthrough of session rhythm, key skills, and fleet creation.
 
+## v3.34.0 release candidate
+
+See the [release notes](release-notes/v3.34.0.md) and [migration handoff](handoffs/RELEASE_HANDOFF_v3.34.0.md). Availability and receiver acceptance require separate verification.
+
 ## Quick Start
 
 Start with the [Supervisor template](https://github.com/aget-framework/template-supervisor-aget). It coordinates your fleet and can create new agents.
@@ -63,7 +67,7 @@ See [CLI Support Matrix](docs/AGET_CLI_SUPPORT_MATRIX.md) for details.
 
 ## Templates
 
-12 archetypes, each with specialized skills and formal ontology:
+12 core archetypes across 13 registered templates, including the specialized document-processor variant:
 
 | Template | Use Case |
 |----------|----------|
@@ -79,8 +83,9 @@ See [CLI Support Matrix](docs/AGET_CLI_SUPPORT_MATRIX.md) for details.
 | [template-executive-aget](https://github.com/aget-framework/template-executive-aget) | Executive advisory |
 | [template-reviewer-aget](https://github.com/aget-framework/template-reviewer-aget) | Quality review |
 | [template-spec-engineer-aget](https://github.com/aget-framework/template-spec-engineer-aget) | Specification authoring |
+| [template-document-processor-AGET](https://github.com/aget-framework/template-document-processor-AGET) | Document pipelines (worker-derived variant) |
 
-All templates include 15 universal skills. See [Archetype Ecosystem](docs/ARCHETYPE_ECOSYSTEM.md) for details.
+All templates include the 29 required universal skills listed in [the template specification](specs/AGET_TEMPLATE_SPEC.md#universal-skills-v3150). The shipped templates contain 38–44 installed skill definitions in total, including additional and archetype-specific skills; the required baseline is not the installed total. See [Archetype Ecosystem](docs/ARCHETYPE_ECOSYSTEM.md) for details.
 
 ## Session Protocols
 

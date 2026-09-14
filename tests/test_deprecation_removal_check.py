@@ -13,6 +13,12 @@ import pathlib
 
 import pytest
 
+import sys as _sys
+from pathlib import Path as _P
+_sys.path.insert(0, str(_P(__file__).resolve().parents[1] / 'scripts'))
+import canonical_root  # noqa: E402
+REPO = _P(__file__).resolve().parents[1]
+
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location(
     "cdr", ROOT / "scripts" / "check_deprecation_removals.py"
@@ -80,8 +86,22 @@ def test_live_registry_parses_and_reports_a_denominator():
     ABSENT registry skips. A registry that is PRESENT but unparseable still fails --
     that is the defect this test exists for.
     """
-    if not cdr.REGISTRY.exists():
-        pytest.skip(f"live-corpus test: no registry at {cdr.REGISTRY}; nothing to assert")
+    # gh#2429: CD-332-02 had TWO registry expectations for one change -- this test wanted a
+    # SEAT-LOCAL governance/POLICY_deprecation.md that receivers were never told to create,
+    # while the live control for the same change read the CANONICAL registry and passed 3/3.
+    # Fall back to canonical, so a receiver without a seat-local policy is not stuck on a row
+    # it cannot clear. Only a genuinely absent registry on BOTH still skips.
+    registry = cdr.REGISTRY
+    if not registry.exists():
+        canon = canonical_root.resolve(REPO if "REPO" in dir() else None)
+        for candidate in ([canon / "governance" / "DEPRECATIONS.md",
+                           canon / "governance" / "POLICY_deprecation.md"] if canon else []):
+            if candidate.exists():
+                registry = candidate
+                break
+    if not registry.exists():
+        pytest.skip(f"live-corpus test: no registry at {cdr.REGISTRY} and none at canonical; "
+                    f"nothing to assert")
     live = cdr.rows()
     assert live is not None, "registry present but parser matched nothing"
     assert len(live) >= 3, f"parsed only {len(live)} rows — predicate likely drifted from the table format"

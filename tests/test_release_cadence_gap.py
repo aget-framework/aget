@@ -15,6 +15,10 @@ from pathlib import Path
 
 import pytest
 
+import sys as _sys
+_sys.path.insert(0, str(__import__('pathlib').Path(__file__).resolve().parents[1] / 'scripts'))
+import canonical_root  # noqa: E402
+
 REPO = Path(__file__).resolve().parents[1]
 SCRIPT = REPO / "scripts" / "release_cadence_gap.py"
 
@@ -147,9 +151,10 @@ def test_live_canonical_reading_is_wellformed():
 
     Satisfies: R-REL-CAD-007 — the instrument reports against the real corpus.
     """
-    canon = REPO.parent / "aget"
-    if not (canon / ".git").exists():
-        pytest.skip("canonical ../aget not present")
+    # gh#2429: this hardcoded `../aget` while the conformance harness honours
+    # AGET_CANONICAL_ROOT / AGET_FLEET_ROOT, so a receiver whose canonical the SCRIPT
+    # resolved correctly still saw this row skip -- an INCOMPLETE with no reachable remedy.
+    canon = canonical_root.resolve_or_skip(REPO, pytest)
     r, rc = _run(canon)
     assert r["requirement"] == "R-REL-CAD-007"
     assert r["cap_saturdays"] == 3

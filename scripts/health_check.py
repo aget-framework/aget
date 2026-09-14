@@ -205,10 +205,15 @@ def check_governance_directory(agent_path: Path) -> CheckResult:
             fixable=True
         )
 
+    # C-34-30 D2: report what was MEASURED, not the length of the requirement list.
+    # `len(required_files)` is a constant: it printed "3 files present" whether the
+    # directory held 3 files or 300, so the number carried no observation at all.
+    present = sorted(q.name for q in gov_dir.glob('*.md'))
     return CheckResult(
         name="governance_directory",
         passed=True,
-        message=f"{len(required_files)} files present"
+        message=(f"{len(required_files)}/{len(required_files)} required present; "
+                 f"{len(present)} governance .md file(s) enumerated")
     )
 
 
@@ -334,11 +339,19 @@ def check_duplicate_ldoc_ids(agent_path: Path) -> CheckResult:
         return CheckResult("duplicate_ldoc_ids", True,
                            "No evolution/ directory", "info")
 
+    # C-34-30 D1: NORMALIZE the numeric part before counting. The prior key was the
+    # literal matched text, so `L99_x.md` and `L099_y.md` were two different keys and
+    # a real duplicate ID reported clean. Zero-padding is a filename convention, not
+    # an identity: L99 and L099 are the same L-doc, and a duplicate-ID check that
+    # cannot see that is blind to the exact collision it exists to find.
     seen: Dict[str, int] = {}
+    variants: Dict[str, set] = {}
     for f in evolution_dir.glob('L*.md'):
-        m = re.match(r'(L\d+)_', f.name)
+        m = re.match(r'L(\d+)_', f.name)
         if m:
-            seen[m.group(1)] = seen.get(m.group(1), 0) + 1
+            key = f"L{int(m.group(1))}"          # L099 -> L99, L99 -> L99
+            seen[key] = seen.get(key, 0) + 1
+            variants.setdefault(key, set()).add(m.group(0).rstrip('_'))
 
     dups = sorted(k for k, v in seen.items() if v > 1)
     if dups:
@@ -635,7 +648,10 @@ def format_human_output(data: Dict[str, Any]) -> str:
     if summary['errors']:
         lines.append(f"Errors: {summary['errors']}")
     if summary['fixable']:
-        lines.append(f"Fixable: {summary['fixable']} (run with --fix)")
+        # C-34-30 D3: the previous advice told the operator to re-run with the repair
+        # flag, which was parsed and never read. Report the count; do not advertise a
+        # capability that does not exist.
+        lines.append(f"Fixable: {summary['fixable']} (no automatic fixer — repair manually)")
 
     lines.append("")
     lines.append("Checks:")
@@ -725,7 +741,7 @@ Exit codes:
     parser.add_argument(
         '--fix',
         action='store_true',
-        help='Attempt to fix issues (not implemented yet)'
+        help='REFUSED — no automatic fixer exists; the flag is rejected, not ignored'
     )
     parser.add_argument(
         '--verbose', '-v',
@@ -739,6 +755,15 @@ Exit codes:
     )
 
     args = parser.parse_args()
+
+    # C-34-30 D3: REFUSE rather than ignore. `--fix` was accepted and never read, so
+    # an operator running it got a clean report and believed something was repaired.
+    # A silently-ignored flag is worse than an absent one: it manufactures confidence.
+    if getattr(args, 'fix', False):
+        print("health_check: --fix is REFUSED — no automatic fixer is implemented.\n"
+              "               Findings are reported for manual repair. Re-run without --fix.",
+              file=sys.stderr)
+        return 2
 
     # L039: Diagnostic timing
     if args.verbose:

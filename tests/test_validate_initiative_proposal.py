@@ -14,7 +14,11 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
+import shutil
+import subprocess
 import sys
+from contextlib import contextmanager
 from pathlib import Path
 from textwrap import dedent
 
@@ -133,41 +137,104 @@ CONFORMANT_BODY = dedent("""\
 """)
 
 
-def _write_conformant(tmp_path: Path) -> Path:
+@contextmanager
+def _conformant_fixture(tmp_path: Path):
     """Write a synthetic conformant proposal that should pass all 14 V-tests.
 
     Builds the Cross-Initiative Overlap section dynamically to cover every
     INIT-*.md currently in planning/initiatives/ (V-INIT-PROP-009 requires
     full coverage of existing initiatives).
     """
-    initiatives_dir = REPO_ROOT / "planning" / "initiatives"
+    isolated_root = tmp_path / "validator-root"
+    initiatives_dir = isolated_root / "planning" / "initiatives"
+    source_initiatives = REPO_ROOT / "planning" / "initiatives"
+    if source_initiatives.exists():
+        shutil.copytree(source_initiatives, initiatives_dir)
+    else:
+        initiatives_dir.mkdir(parents=True)
+    proposals_dir = isolated_root / "planning" / "project-proposals"
+    proposals_dir.mkdir(parents=True, exist_ok=True)
+    source_index = REPO_ROOT / "planning" / "project-proposals" / "INDEX.md"
+    if source_index.exists() and not (proposals_dir / "INDEX.md").exists():
+        shutil.copy2(source_index, proposals_dir / "INDEX.md")
+    version_path = isolated_root / ".aget" / "version.json"
+    version_path.parent.mkdir(parents=True, exist_ok=True)
+    if not version_path.exists():
+        shutil.copy2(REPO_ROOT / ".aget" / "version.json", version_path)
+
+    # V-013's evidence is a real staged-diff observation.  Give it a disposable
+    # worktree, while excluding ambient Git configuration, hooks, and repository
+    # selectors from the observation.
+    git_env = {name: value for name, value in os.environ.items()
+               if not name.startswith("GIT_")}
+    git_env.update({"GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull})
+    subprocess.run(["git", "init", "--quiet", str(isolated_root)], check=True, env=git_env)
+    hooks_dir = isolated_root / ".git" / "disabled-hooks"
+    hooks_dir.mkdir()
+    subprocess.run(
+        ["git", "-C", str(isolated_root), "config", "core.hooksPath", str(hooks_dir)],
+        check=True,
+        env=git_env,
+    )
+
+    bindings = {
+        "REPO_ROOT": vip.REPO_ROOT,
+        "INITIATIVES_DIR": vip.INITIATIVES_DIR,
+        "PROPOSALS_DIR": vip.PROPOSALS_DIR,
+        "INDEX_PATH": vip.INDEX_PATH,
+        "VERSION_JSON": vip.VERSION_JSON,
+    }
+    old_git_env = {name: value for name, value in os.environ.items()
+                   if name.startswith("GIT_")}
+    for name in old_git_env:
+        os.environ.pop(name, None)
+    os.environ.update({"GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull})
+    vip.REPO_ROOT = isolated_root
+    vip.INITIATIVES_DIR = initiatives_dir
+    vip.PROPOSALS_DIR = proposals_dir
+    vip.INDEX_PATH = proposals_dir / "INDEX.md"
+    vip.VERSION_JSON = version_path
     overlap_rows = ["| Initiative | Relationship | Notes |", "|---|---|---|"]
     for p in sorted(initiatives_dir.glob("INIT-*.md")):
         overlap_rows.append(f"| {p.stem} | Independent | synthetic |")
     body = CONFORMANT_BODY.format(overlap_rows="\n".join(overlap_rows))
 
     # Use a unique INIT-ID and PP-### to avoid collisions with real artifacts
-    proposals_dir = REPO_ROOT / "planning" / "project-proposals"
-    # A consumer repo need not already have this directory. Assuming it exists made
-    # every test in this file fail with FileNotFoundError at canonical while passing
-    # at the producer seat -- green here, red there, which is the promotion defect
-    # this suite is supposed to help catch.
-    proposals_dir.mkdir(parents=True, exist_ok=True)
     file_path = proposals_dir / "PROPOSAL_init_synthetic_test_fixture.md"
     file_path.write_text(body)
+    try:
+        yield file_path
+    finally:
+        for name, value in bindings.items():
+            setattr(vip, name, value)
+        for name in tuple(os.environ):
+            if name.startswith("GIT_"):
+                os.environ.pop(name)
+        os.environ.update(old_git_env)
+
+
+_active_fixtures = {}
+
+
+def _write_conformant(tmp_path: Path) -> Path:
+    """Enter an isolated conformant fixture; paired with ``_cleanup`` below."""
+    manager = _conformant_fixture(tmp_path)
+    file_path = manager.__enter__()
+    _active_fixtures[file_path] = manager
     return file_path
 
 
 def _cleanup(file_path: Path) -> None:
-    if file_path.exists():
-        file_path.unlink()
+    """Leave the fixture, restoring every validator binding and Git env value."""
+    manager = _active_fixtures.pop(file_path)
+    manager.__exit__(None, None, None)
 
 
 # ---------------------------------------------------------------------------
 # Conformant fixture: all 14 should pass
 # ---------------------------------------------------------------------------
 
-def test_conformant_fixture_passes_v001_002_004_005_006_007_008_009_010_011_013():
+def test_conformant_fixture_passes_v001_002_004_005_006_007_008_009_010_011_013(tmp_path):
     """The conformant fixture passes all V-tests that don't depend on INDEX state.
 
     V-INIT-PROP-003 (PP-### monotonic vs INDEX) and V-INIT-PROP-012 (INDEX has
@@ -175,7 +242,7 @@ def test_conformant_fixture_passes_v001_002_004_005_006_007_008_009_010_011_013(
     repo-wide state we don't mutate in tests; they're tested separately with
     targeted assertions.
     """
-    file_path = _write_conformant(REPO_ROOT)
+    file_path = _write_conformant(tmp_path)
     try:
         results = vip.run_all(file_path)
         by_id = {r.v_id: r for r in results}
@@ -198,13 +265,47 @@ def test_conformant_fixture_passes_v001_002_004_005_006_007_008_009_010_011_013(
         _cleanup(file_path)
 
 
-def test_conformant_fixture_v014_passes_with_future_version():
+def test_conformant_fixture_v014_passes_with_future_version(tmp_path):
     """V-INIT-PROP-014: synthetic v9.0 start > current aget_version (3.17 today)."""
-    file_path = _write_conformant(REPO_ROOT)
+    file_path = _write_conformant(tmp_path)
     try:
         results = vip.run_all(file_path)
         v014 = next(r for r in results if r.v_id == "V-INIT-PROP-014")
         assert v014.passed, f"v9.0 should be > current version: {v014.detail}"
+    finally:
+        _cleanup(file_path)
+
+
+def test_conformant_fixture_is_scoped_and_observes_clean_staged_diff(tmp_path):
+    """Fixture state is synthetic, Git-observable, and restored at teardown."""
+    names = ("REPO_ROOT", "INITIATIVES_DIR", "PROPOSALS_DIR", "INDEX_PATH", "VERSION_JSON")
+    originals = {name: getattr(vip, name) for name in names}
+    file_path = _write_conformant(tmp_path)
+    try:
+        assert vip.REPO_ROOT != originals["REPO_ROOT"]
+        assert list(vip.INITIATIVES_DIR.glob("INIT-*.md")) == []
+        assert not vip.INDEX_PATH.exists()
+        staged, observation = vip.staged_initiative_manifests()
+        assert observation == "staged-diff"
+        assert staged == []
+    finally:
+        _cleanup(file_path)
+    assert {name: getattr(vip, name) for name in names} == originals
+
+
+def test_v013_fails_from_real_staged_manifest_observation(tmp_path):
+    """V-013's negative control stages fixture data in the disposable repository."""
+    file_path = _write_conformant(tmp_path)
+    try:
+        manifest = vip.INITIATIVES_DIR / "INIT-SYNTHETIC-STAGED.md"
+        manifest.write_text("# Synthetic staged manifest\n")
+        subprocess.run(
+            ["git", "-C", str(vip.REPO_ROOT), "add", "--", str(manifest.relative_to(vip.REPO_ROOT))],
+            check=True,
+        )
+        result = vip.verify_v_init_prop_013(file_path, file_path.read_text())
+        assert result.outcome == "FAIL", result.detail
+        assert "planning/initiatives/INIT-SYNTHETIC-STAGED.md" in result.detail
     finally:
         _cleanup(file_path)
 
@@ -216,7 +317,7 @@ def test_conformant_fixture_v014_passes_with_future_version():
 
 def test_v002_fails_when_section_missing(tmp_path):
     """Remove '## Channels' from a proposal; V-INIT-PROP-002 fails."""
-    file_path = _write_conformant(REPO_ROOT)
+    file_path = _write_conformant(tmp_path)
     try:
         text = file_path.read_text().replace("## Channels", "## NotChannels")
         file_path.write_text(text)
@@ -230,7 +331,7 @@ def test_v002_fails_when_section_missing(tmp_path):
 
 def test_v005_fails_when_evidence_under_three(tmp_path):
     """Trim Evidence to 1 data row; V-INIT-PROP-005 fails."""
-    file_path = _write_conformant(REPO_ROOT)
+    file_path = _write_conformant(tmp_path)
     try:
         text = file_path.read_text()
         # Drop 2 of the 3 evidence rows
@@ -246,7 +347,7 @@ def test_v005_fails_when_evidence_under_three(tmp_path):
 
 def test_v006_fails_when_evidence_source_untyped(tmp_path):
     """Replace a typed Source with 'anecdote'; V-INIT-PROP-006 fails."""
-    file_path = _write_conformant(REPO_ROOT)
+    file_path = _write_conformant(tmp_path)
     try:
         text = file_path.read_text().replace("| obs 1 | L760 | high |", "| obs 1 | anecdote | high |")
         file_path.write_text(text)
@@ -260,7 +361,7 @@ def test_v006_fails_when_evidence_source_untyped(tmp_path):
 
 def test_v008_fails_when_principal_missing(tmp_path):
     """Remove Principal row from Contributors; V-INIT-PROP-008 fails."""
-    file_path = _write_conformant(REPO_ROOT)
+    file_path = _write_conformant(tmp_path)
     try:
         text = file_path.read_text().replace(
             "| Principal | decision quality | On-demand |\n", ""
@@ -275,7 +376,7 @@ def test_v008_fails_when_principal_missing(tmp_path):
 
 def test_v010_fails_when_decision_option_missing(tmp_path):
     """Remove 'Fold into' option from Decision; V-INIT-PROP-010 fails."""
-    file_path = _write_conformant(REPO_ROOT)
+    file_path = _write_conformant(tmp_path)
     try:
         text = file_path.read_text().replace(
             "- [ ] Fold into INIT-OTHER", "- [ ] Some other thing"
@@ -291,7 +392,7 @@ def test_v010_fails_when_decision_option_missing(tmp_path):
 
 def test_v011_fails_when_status_not_proposed(tmp_path):
     """Set Status to APPROVED at file creation; V-INIT-PROP-011 fails."""
-    file_path = _write_conformant(REPO_ROOT)
+    file_path = _write_conformant(tmp_path)
     try:
         text = file_path.read_text().replace("**Status**: PROPOSED", "**Status**: APPROVED")
         file_path.write_text(text)
@@ -304,7 +405,7 @@ def test_v011_fails_when_status_not_proposed(tmp_path):
 
 def test_v014_fails_when_target_version_past_start(tmp_path):
     """Set Target Versions to v1.0 (way past current); V-INIT-PROP-014 fails."""
-    file_path = _write_conformant(REPO_ROOT)
+    file_path = _write_conformant(tmp_path)
     try:
         text = file_path.read_text().replace(
             "**Target Versions**: v9.0 – v9.2",
@@ -334,11 +435,11 @@ def test_fourteen_verify_functions_exist():
     assert len(fns) == 14, f"expected 14, got {len(fns)}: {sorted(fns)}"
 
 
-def test_each_verifier_returns_vresult_with_cap_citation():
+def test_each_verifier_returns_vresult_with_cap_citation(tmp_path):
     """Every verifier must return a VResult naming at least one CAP-INIT-PROP-* clause.
 
     Satisfies: V-INIT-PROP-001 — V-INIT-PROP-001 through V-INIT-PROP-014 validator coverage."""
-    file_path = _write_conformant(REPO_ROOT)
+    file_path = _write_conformant(tmp_path)
     try:
         results = vip.run_all(file_path)
         assert len(results) == 14
@@ -357,7 +458,7 @@ def test_each_verifier_returns_vresult_with_cap_citation():
 
 def test_cli_json_mode(tmp_path, capsys):
     """Satisfies: V-INIT-PROP-001 — V-INIT-PROP-001 through V-INIT-PROP-014 validator coverage."""
-    file_path = _write_conformant(REPO_ROOT)
+    file_path = _write_conformant(tmp_path)
     try:
         rc = vip.main(["--file", str(file_path), "--json"])
         captured = capsys.readouterr()

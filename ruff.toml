@@ -1,0 +1,21 @@
+# Declared, enforcing lint configuration for the AGET framework payload.
+#
+# ROOT FIX for a portability defect, not a style preference. Canonical carried NO ruff config
+# at all, and a count with no config is not a fact about the code: the same ruff binary returns
+# a wholly different number under a config than without one. Every receiver was therefore
+# measuring a different payload than the producer, and three consecutive releases shipped
+# lint-dirty because the producer's gate and the receiver's gate were not the same gate.
+#
+# gh#2464 (v3.33.1), gh#2041 (v3.28.0), gh#832 (v3.12.0) -- one class, three occurrences.
+# Adjacent: gh#2007 (linter pinning vs vendor rule expansion), gh#729 (pre-commit enforcement).
+
+line-length = 100
+
+[lint]
+# The rule set the release gate declares. Kept narrow deliberately: these are correctness and
+# import-hygiene rules, not formatting taste. Widening this set is a release-policy decision.
+select = ["E4", "E7", "E9", "F", "I", "W", "B008"]
+
+[lint.per-file-ignores]
+# Test modules legitimately import fixtures they do not directly reference.
+"tests/conftest.py" = ["F401"]

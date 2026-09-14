@@ -27,6 +27,26 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, Optional, List
 
+# C-34-01 / gh#2445 — the scaffold's skill-description gate. Imported, never re-implemented:
+# the audit and the gate must share one predicate or they drift, which is the gap that let
+# 92 unroutable skills ship across 13 registered templates while a presence-only audit
+# reported them present.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "verification"))
+from validate_archetype_skills import agent_skill_defects  # noqa: E402
+
+
+class SkillDescriptionDefect(Exception):
+    """A shipped skill carries absent or invalid frontmatter. Scaffolding is refused."""
+
+
+def _format_defects(defects: list, subject: str) -> str:
+    lines = [f"{len(defects)} shipped skill(s) in {subject} have absent or invalid "
+             f"frontmatter and would be invisible to description routing:"]
+    for d in defects:
+        lines.append(f"  [{d['defect']}] {d['path']}")
+    lines.append("Repair the SKILL.md frontmatter at source. C-34-01 / gh#2445.")
+    return "\n".join(lines)
+
 
 class TemplateInstantiator:
     """Converts template to agent instance."""
@@ -94,6 +114,12 @@ class TemplateInstantiator:
         }
 
         try:
+            # Step 0: Refuse a defective template BEFORE anything is written (C-34-01).
+            # Placed pre-copy deliberately: a rejection that still leaves a half-built
+            # agent on disk is not a rejection. Runs in dry-run too, so --dry-run reports
+            # the refusal it would make.
+            self._reject_defective_template()
+
             # Step 1: Copy template (excluding archive)
             self._copy_template(dry_run)
 
@@ -332,8 +358,24 @@ class TemplateInstantiator:
                 if src.exists() and not dst.exists():
                     shutil.copy2(src, dst)
 
+    def _reject_defective_template(self):
+        """C-34-01: refuse to scaffold from a template with unroutable skills.
+
+        Pre-copy, so a refusal creates nothing. Absent AND invalid frontmatter both
+        block, per the acceptance clause; there is deliberately no override flag.
+        """
+        defects = agent_skill_defects(self.template_path)
+        if defects:
+            raise SkillDescriptionDefect(
+                _format_defects(defects, f"template {self.template_path.name}"))
+
     def _validate_archetype_skills(self, dry_run: bool):
-        """Validate archetype skills are present (SOP G3.8). Warns but does not block."""
+        """Validate archetype skills (SOP G3.8).
+
+        Skill COUNT and SKILL.md EXISTENCE remain warnings. Description defects BLOCK
+        (C-34-01): a skill whose frontmatter is absent or unparseable is invisible to a
+        routing consumer, so shipping it is not a warning-grade condition.
+        """
         skills_dir = self.agent_path / ".claude" / "skills"
 
         action = {
@@ -357,6 +399,14 @@ class TemplateInstantiator:
                         action["warnings"].append(
                             f"Missing SKILL.md in {skill_dir.name}/"
                         )
+
+            # Blocking half: the created agent must be routable.
+            defects = agent_skill_defects(self.agent_path)
+            action["description_defects"] = defects
+            if defects:
+                self.actions.append(action)
+                raise SkillDescriptionDefect(
+                    _format_defects(defects, f"agent {self.agent_name}"))
 
         self.actions.append(action)
 

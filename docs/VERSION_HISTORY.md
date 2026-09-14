@@ -12,6 +12,10 @@ This document provides a complete timeline of AGET Framework versions and their 
 
 ## Current Version
 
+**v3.34.0** (2026-09-13) — Release candidate; publication unverified
+
+Evidence-bound capability checks and receiver verification. The original candidate and its disclosed regression-coverage limitations are preserved through one independently accepted repair successor. See `release-notes/v3.34.0.md` for the selected outcomes, acceptance scope and remaining deployment obligations. This entry records the candidate; it does not assert a public tag, Release object or receiver confirmation.
+
 **v3.33.1** (2026-08-30) - Receiver-visible integrity
 
 Core `aget/` at v3.33.1: forward patch for the v3.33 release train. It restores the required
