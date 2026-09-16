@@ -1,7 +1,7 @@
 ---
 name: aget-check-evolution
 description: Monitor .aget/evolution/ directory health. Validates file counts, naming conventions, disk usage, and returns health status with alerts on anomalies.
-version: 1.0.0
+version: 1.0.1
 ---
 
 # /aget-check-evolution
@@ -14,11 +14,14 @@ Provide self-diagnostic capability for AGET agents to assess their evolution dir
 
 ## Execution
 
-When invoked, perform these checks:
+When invoked, perform these checks. First verify `.aget/evolution/` is a readable directory and the required tools (`find`, `wc`, `du`, `jq`, Python 3) are available. If a tool or inventory operation fails, report **UNAVAILABLE** with the failed check; do not turn incomplete readings into an OK result. These checks inspect filenames and JSON syntax, not lesson schema conformance or index-to-file references.
+
+Run each shell block in Bash and inspect its exit status. A nonzero inventory/naming/disk exit means that reading is unavailable, regardless of partial stdout; discard its counts.
 
 ### 1. File Inventory
 
 ```bash
+set -euo pipefail
 # Count total files
 find .aget/evolution -type f | wc -l
 
@@ -30,28 +33,44 @@ find .aget/evolution -type f ! -name "*.md" ! -name "*.json" | wc -l
 
 ### 2. Naming Convention Check
 
-Valid L-doc pattern: `L###_*.md` (e.g., `L588_skill_invocation_control_semantics.md`)
+Expected L-doc prefix and number width: `L###_*.md` or `L####_*.md` (three or four digits, as specified by [AGET_LDOC_SPEC.md](https://github.com/aget-framework/aget/blob/v3.34.0/specs/AGET_LDOC_SPEC.md), CAP-LDOC-001). Examples: `L588_skill_invocation_control_semantics.md`, `L1000_example.md`. This check covers only the L prefix, three/four-digit number, underscore separator and .md extension. It does not validate snake_case titles, lesson contents, uniqueness or ID claims.
 
 ```bash
-# Count valid L-doc names
-find .aget/evolution -type f -name "L[0-9][0-9][0-9]_*.md" | wc -l
+set -euo pipefail
+# Count L-doc prefix/width matches (title conformance is not checked)
+find .aget/evolution -type f \( -name "L[0-9][0-9][0-9]_*.md" -o -name "L[0-9][0-9][0-9][0-9]_*.md" \) | wc -l
 
 # Find non-conforming files (excluding index.json)
-find .aget/evolution -type f ! -name "L[0-9][0-9][0-9]_*.md" ! -name "index.json" ! -name "README.md"
+find .aget/evolution -type f ! -name "L[0-9][0-9][0-9]_*.md" ! -name "L[0-9][0-9][0-9][0-9]_*.md" ! -name "index.json" ! -name "README.md"
 ```
 
 ### 3. Disk Usage
 
 ```bash
-du -sh .aget/evolution
+set -euo pipefail
+du -sk .aget/evolution
 ```
 
-### 4. Index Integrity
+Use the first output field (allocated KiB) divided by 1024 as `disk_mib` for the thresholds below.
 
-Check that `index.json` exists and is valid JSON:
+### 4. Index JSON Syntax
+
+Check that `index.json` contains exactly one JSON value. This syntax-only check permits any JSON value, including null; it does not validate the index schema:
 
 ```bash
-test -f .aget/evolution/index.json && jq empty .aget/evolution/index.json 2>/dev/null && echo "valid" || echo "invalid"
+if test ! -e .aget/evolution/index.json; then
+  echo "missing"
+elif test ! -f .aget/evolution/index.json || test ! -r .aget/evolution/index.json; then
+  echo "unavailable"
+elif jq -e -s 'length == 1' .aget/evolution/index.json >/dev/null; then
+  echo "valid"
+else
+  index_check_status=$?
+  case "$index_check_status" in
+    1|4|5) echo "invalid" ;; # zero/multiple values or parse failure (jq 1.7 uses 5)
+    *) echo "unavailable" ;; # tool, I/O or invocation failure; retain stderr
+  esac
+fi
 ```
 
 ## Thresholds
@@ -60,8 +79,8 @@ test -f .aget/evolution/index.json && jq empty .aget/evolution/index.json 2>/dev
 |--------|-----|------|----------|
 | Total files | <500 | 500-750 | >750 |
 | Non-standard files | 0-10 | 11-50 | >50 |
-| Disk size | <10MB | 10-25MB | >25MB |
-| Index integrity | valid | - | invalid |
+| Allocated disk size | <10 MiB | 10-25 MiB | >25 MiB |
+| Index JSON syntax | valid | - | invalid or missing |
 
 **Note**: Thresholds inherited from supervisor defaults. Research AGET baseline (2026-02-08): 94 files, 800K - well within OK range.
 
@@ -76,33 +95,41 @@ Directory: .aget/evolution/
 
 File Counts:
   Total:     [count]
-  L-docs:    [count] (.md matching L###_*.md)
+  L-prefix:  [count] (.md matching L###_*.md or L####_*.md)
   Index:     [1 if exists, 0 otherwise]
   Other:     [count] (non-conforming)
 
 Disk Usage: [size]
 
-Index Status: [valid/invalid/missing]
+Index JSON Syntax: [valid/invalid/missing/unavailable]
+Index-to-file references: NOT CHECKED
+L-doc title conformance: NOT CHECKED
 
 Non-Conforming Files:
   [list any files not matching expected patterns]
 
-Health Status: [OK | WARN | CRITICAL]
+Health Status: [OK | WARN | CRITICAL | UNAVAILABLE]
 Alerts:
   [list any threshold violations]
 ```
 
 ## Health Status Logic
 
-```
-IF index invalid OR index missing:
-  CRITICAL
-ELIF total_files > 750 OR disk > 25MB OR non_standard > 50:
-  CRITICAL
-ELIF total_files > 500 OR disk > 10MB OR non_standard > 10:
-  WARN
-ELSE:
-  OK
+Apply this function to the collected readings after the preflight checks. An unavailable reading takes precedence over a computed health result; report any independently observed critical findings as well.
+
+```python
+def health_status(total_files, non_standard, disk_mib, index_status):
+    if any(value is None for value in (total_files, non_standard, disk_mib)) or index_status == "unavailable":
+        return "UNAVAILABLE"
+    if index_status in ("invalid", "missing"):
+        return "CRITICAL"
+    if index_status != "valid":
+        return "UNAVAILABLE"
+    if total_files > 750 or disk_mib > 25 or non_standard > 50:
+        return "CRITICAL"
+    if total_files >= 500 or disk_mib >= 10 or non_standard > 10:
+        return "WARN"
+    return "OK"
 ```
 
 ## Constraints
@@ -128,6 +155,6 @@ ELSE:
 
 ---
 
-*aget-check-evolution v1.0.0*
+*aget-check-evolution v1.0.1*
 *Category: Monitoring*
 *POC-017 Phase 1*
