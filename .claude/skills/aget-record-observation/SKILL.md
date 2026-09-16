@@ -63,7 +63,7 @@ Classify the input and route to appropriate target:
 
 ### Output Format
 
-Append to current session file (if exists in `sessions/session_YYYY-MM-DD_*.md`):
+Append only to an **eligible current session** in `sessions/session_YYYY-MM-DD_*.md`. Eligible means the file exists, its `status:` is `open` or `active`, it has no `closed_by:` field, and it belongs to this invocation. Establish ownership from this invocation's session creation or explicit session binding; filename date, modification time and an open status alone do not establish ownership. If ownership or state is uncertain, treat the file as ineligible. This rule applies to all capture modes and targets above.
 
 ```markdown
 ### [Signal Type] - [ISO Timestamp]
@@ -76,7 +76,7 @@ Append to current session file (if exists in `sessions/session_YYYY-MM-DD_*.md`)
 **Status**: Captured (pending review at wind_down)
 ```
 
-If no session file exists, create capture note in scratchpad with timestamp.
+If no eligible current session exists (including closed, foreign, or uncertain sessions), create a fresh timestamped capture note in `sessions/scratchpad/`. Include an invocation-specific suffix if needed to avoid overwriting another capture. Do not reopen or alter another session to make it eligible.
 
 ### Constraints
 
@@ -86,8 +86,8 @@ These are INVIOLABLE - you MUST NOT violate these constraints:
 2. **NEVER** modify `specs/CLI_SUBSYSTEM_SPEC.md` - specs require deliberate enhancement session
 3. **NEVER** modify `planning/RESEARCH_BACKLOG.md` directly - use session capture, formalize at wind_down
 4. **NEVER** create L-docs directly - capture findings, create L-doc at wind_down if warranted
-5. **DO** append to current session file if one exists in `sessions/`
-6. **DO** create timestamped capture note if no session file exists
+5. **DO** append only to an eligible current session: exists, `status:` open or active, no `closed_by:`, and owned by this invocation.
+6. **DO** create a fresh timestamped note in `sessions/scratchpad/` whenever the eligibility predicate is false or uncertain; never overwrite a capture or append to a closed or foreign session.
 7. **DO** include source attribution for web findings
 8. **DO** tag with appropriate signal type from classification table
 9. **DO** use ISO 8601 timestamp format

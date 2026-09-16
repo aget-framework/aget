@@ -2,193 +2,75 @@
 
 **Audience**: Users upgrading between framework versions
 
-**Purpose**: Provide step-by-step procedures for safe version upgrades
+**Purpose**: Transfer and verify release artifacts while preserving agent-specific state.
 
----
+## Upgrade Sequence (All Versions)
 
-## Quick Upgrade (Non-Breaking Changes)
+A version edit is the final metadata step, not an upgrade. Minor and patch releases also require payload transfer. There is no universal overwrite command for an existing customized agent: use the target release's migration handoff and deployment contract to select the files for your archetype.
 
-For minor and patch releases with no breaking changes:
+### 1. Establish a recoverable baseline
 
-```bash
-# 1. Backup current state
-cd /path/to/your-agent
-git add . && git commit -m "Pre-upgrade snapshot"
+Work in your agent repository. Inspect `git status --short` and the current version. Commit or otherwise back up your existing work deliberately; review staged paths and exclude secrets. Begin the migration with a clean working tree. Record the baseline commit with `git rev-parse HEAD`. Back up any relevant untracked or external state separately; Git cannot restore it.
 
-# 2. Update version
-vim .aget/version.json
-# Change: "aget_version": "OLD" → "aget_version": "NEW"
+Read the target release's notes, breaking changes, migration handoff and deployment contract before changing files. For example, the [v3.34.0 migration handoff](https://github.com/aget-framework/aget/blob/v3.34.0/handoffs/RELEASE_HANDOFF_v3.34.0.md) and [deployment contract](https://github.com/aget-framework/aget/blob/v3.34.0/DEPLOYMENT_SPEC_v3.34.0.yaml) are pinned to that release. Use the corresponding artifacts for your chosen version. Missing source files or instructions are a stop condition; do not substitute a version bump.
 
-# 3. Verify
-python3 -m pytest tests/ -v
+### 2. Obtain a release-pinned source
 
-# 4. Check wake-up
-python3 scripts/wake_up.py
-# Should display new version
-```
-
-> **Verify SUBSTANCE, not just the version label.** The version reading the new number means the *label* is set — not that the release payload reached your source or the deployment contract is published. A version bump does **not** copy new artifacts. Before relying on the upgrade: (1) confirm `aget/DEPLOYMENT_SPEC_v<new>.yaml` exists and read it; (2) confirm your `template-{archetype}-aget` source actually contains the release's new files (an empty source pulls nothing); (3) post-upgrade, run the **full** `health_check` — *version-pass ≠ health-pass* — and check L444 coherence against the field your manifest actually uses (worker = top-level `version:`, researcher = `instance.version:`). Source: FLEET-UPG-023.
-
-**Time**: ~5 minutes
-
-**Risk**: Low (backwards compatible)
-
----
-
-## Safe Upgrade Process (All Versions)
-
-### Step 1: Pre-Upgrade Checklist
-
-Before upgrading:
-
-- [ ] Read [CHANGELOG.md](../CHANGELOG.md) for version you're upgrading to
-- [ ] Check if major version (vX.0.0) → Read migration guide mandatory
-- [ ] Backup your agent: `git add . && git commit -m "Pre-upgrade vOLD"`
-- [ ] Note current version: `cat .aget/version.json | grep aget_version`
-- [ ] Ensure working directory clean: `git status`
-
----
-
-### Step 2: Check for Breaking Changes
-
-**Quick Check**:
-```bash
-# Read CHANGELOG for target version
-curl https://raw.githubusercontent.com/aget-framework/aget/main/CHANGELOG.md | grep -A 20 "## \[X.Y.Z\]"
-```
-
-**Look For**:
-- "Breaking" keyword
-- "Removed" section
-- "Deprecated" warnings
-- "Migration" instructions
-
-**If NO breaking changes**: Proceed with quick upgrade (Step 3)
-
-**If breaking changes**: Read migration guide first (see version-specific guides below)
-
----
-
-### Step 3: Update version.json
+Clone the matching archetype template at the chosen release tag into a separate, new directory. This example uses the supervisor and v3.34.0; change both intentionally for your receiver:
 
 ```bash
-cd /path/to/your-agent
-
-# Edit version file
-vim .aget/version.json
+git clone --branch v3.34.0 --depth 1 https://github.com/aget-framework/template-supervisor-aget.git /path/to/new-template-source
+git -C /path/to/new-template-source rev-parse HEAD
 ```
 
-Change:
-```json
-{
-  "aget_version": "2.10.0"  ← OLD
-}
+Record the resolved source commit and compare it with the target release's source/deployment records. Inspect the actual selected files in this checkout. A core release tag does not establish that every template contains the same payload. Do not silently switch to `main` if the chosen template tag or payload is missing.
+
+### 3. Transfer the selected payload, preserving local state
+
+Build an explicit path list from the release handoff/contract and your archetype. Record each file as copy, merge, add or remove and retain a before/after diff. Review instruction and authorization surfaces through the receiver's approval process.
+
+- Copy unmodified framework-owned files from the pinned source.
+- Merge framework changes into locally customized files; do not replace agent identity, goals, knowledge, credentials or runtime configuration with template defaults.
+- Preserve instance hooks such as `scripts/wake_up_ext.py` and `scripts/wind_down_ext.py` unless the release specifically calls for a reviewed migration.
+- Apply required additions and removals explicitly. Do not copy the source repository's `.git` directory.
+
+For a single existing framework-owned file whose local contents are confirmed unmodified, the transfer looks like this (example only; include it only when selected by your release migration):
+
+```bash
+# Run inside the receiver repository after reviewing the selected path.
+cp /path/to/new-template-source/scripts/wake_up.py scripts/wake_up.py
+git diff -- scripts/wake_up.py
 ```
 
-To:
-```json
-{
-  "aget_version": "2.11.0"  ← NEW
-}
-```
+Repeat only for the reviewed path list, using a merge where local changes exist. Compare transferred files with the pinned source, or document intentional differences after merging. Resolve missing dependencies before proceeding. **Do not advance the receiver version while the payload is incomplete.**
 
-**Also Update** (if applicable):
-- `updated`: Current date (YYYY-MM-DD)
-- `migration_history`: Add entry for this upgrade
+### 4. Update metadata and verify the receiver
 
-**Example**:
-```json
-{
-  "aget_version": "2.11.0",
-  "updated": "2025-12-24",
-  "migration_history": [
-    "v2.10.0 -> v2.11.0: 2025-12-24 (Memory Architecture + L352)"
-  ]
-}
-```
+After the selected payload and dependencies are present, update `.aget/version.json` and any other version-bearing manifest identified by the release contract. Preserve the receiver's identity and migration history. Record target version, source commit, baseline commit, transferred paths and deliberate deviations.
 
----
-
-### Step 4: Verify Upgrade
-
-#### Run Contract Tests
+Run the release-specific acceptance checks and the receiver's supported checks. Where these scripts are supplied, include:
 
 ```bash
 python3 -m pytest tests/ -v
-```
-
-**Expected**: All tests pass
-
-**If tests fail**:
-- Read test output (what requirement failed)
-- Check if migration step missed
-- Consult delta spec: `aget/specs/deltas/AGET_DELTA_vX.Y.md`
-
----
-
-#### Check Wake-Up
-
-```bash
+python3 scripts/health_check.py
 python3 scripts/wake_up.py
 ```
 
-**Expected Output**:
-```
-**Session: your-agent-name**
-**Version**: vX.Y.Z (YYYY-MM-DD)
+Check exit codes and substantive output. A new version in wake-up output proves only the label was read. Missing checks or failures must be reported and resolved or explicitly dispositioned before claiming acceptance. Use the manifest fields actually present in the receiver when checking version consistency.
 
-Purpose: [your agent purpose]
-Ready.
-```
+### 5. Commit the complete migration and record acceptance
 
-**Verify**: Version shows NEW version (vX.Y.Z), not OLD
-
----
-
-#### Version Consistency (Multi-Template Agents)
-
-If managing multiple templates:
-
-```bash
-cd /path/to/your-agent
-python3 .aget/patterns/sync/version_consistency.py --expected X.Y.Z
-```
-
-**Expected**: "CONSISTENT - All repos at vX.Y.Z"
-
----
-
-### Step 5: Commit Upgrade
-
-```bash
-git add .aget/version.json
-git commit -m "chore: Upgrade to vX.Y.Z"
-```
-
-**Done!** Upgrade complete.
-
----
+Review `git diff` and stage the explicit migration paths, including the payload and metadata. Inspect `git diff --cached` before committing. Keep unrelated changes out of this commit. Record the migration commit and receiver acceptance evidence; a published release and a copied payload are distinct from a verified deployment.
 
 ## Rollback Procedure
 
-If upgrade fails or causes issues:
+Rollback must restore the payload and metadata together. For an isolated, committed migration, review and revert that migration commit with `git revert <migration-commit>`, then rerun the receiver checks. Do not reset shared history.
 
-```bash
-# 1. Revert version.json
-git checkout HEAD~1 .aget/version.json
+For an uncommitted migration, use the recorded baseline and path list to restore only migration changes; remove only new files introduced by that migration after reviewing them. Preserve unrelated or concurrent work. Restore any separately backed-up external state according to its own procedure. Recheck payload, version metadata, health and wake-up before declaring rollback successful. Capture the failure details before retrying.
 
-# 2. Verify rollback
-cat .aget/version.json | grep aget_version
-# Should show OLD version
+## Historical Examples
 
-# 3. Run tests
-python3 -m pytest tests/ -v
-
-# 4. Commit rollback
-git commit -m "rollback: Revert to vOLD due to [issue]"
-```
-
-**Then**: File issue with upgrade problem details
+The guides below describe older migrations. Their version-edit-only examples are historical, not a substitute for the payload-transfer and receiver-verification sequence above. Follow the target release's current migration artifacts when an older example conflicts.
 
 ---
 

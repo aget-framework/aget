@@ -13,9 +13,9 @@ AGET fixes this. It gives your agents persistent knowledge, shared memory, fleet
 
 **New to AGET?** Listen to the [audio introduction](https://youtu.be/zLSFeT9TF8E) — a narrated walkthrough of session rhythm, key skills, and fleet creation.
 
-## v3.34.0 release candidate
+## v3.34.0 release
 
-See the [release notes](release-notes/v3.34.0.md) and [migration handoff](handoffs/RELEASE_HANDOFF_v3.34.0.md). Availability and receiver acceptance require separate verification.
+See the [release notes](release-notes/v3.34.0.md) and [migration handoff](handoffs/RELEASE_HANDOFF_v3.34.0.md). The [v3.34.0 GitHub Release](https://github.com/aget-framework/aget/releases/tag/v3.34.0) was published on September 14, 2026. Receiver deployment and acceptance require separate verification.
 
 ## Quick Start
 
@@ -28,14 +28,17 @@ git clone https://github.com/aget-framework/template-supervisor-aget my-supervis
 # 2. Open in your CLI agent (Claude Code, Codex CLI, or Gemini CLI)
 cd my-supervisor
 
-# 3. Start your first session
+# 3. Configure identity in .aget/version.json
+# Set agent_name and domain for your supervisor (see the template README).
+
+# 4. Start your first session
 # Tell your agent: "wake up"
 
-# 4. Create a new agent from a template
+# 5. Create a new agent from a template
 # Tell your agent: "/aget-create-aget worker my-first-worker"
 ```
 
-See [GETTING_STARTED.md](GETTING_STARTED.md) for the full supervisor-first workflow.
+See [GETTING_STARTED.md](GETTING_STARTED.md) for archetype selection and setup guidance. Follow the [Supervisor template setup](https://github.com/aget-framework/template-supervisor-aget#quick-start) for identity configuration and verification.
 
 ## Key Features
 
