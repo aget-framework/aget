@@ -33,6 +33,8 @@ Exit codes:
     1 — invalid invocation (no --topic and no --verify), or --verify failed
 """
 
+from __future__ import annotations
+
 import argparse
 import importlib.util
 import json
