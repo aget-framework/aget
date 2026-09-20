@@ -14,6 +14,8 @@ Equally, the hedge heuristic must not swallow real promises. "delegated to
 /aget-enhance-ci candidate" is prose and must not.
 """
 
+from __future__ import annotations
+
 import sys
 import unittest
 from pathlib import Path

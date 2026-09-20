@@ -46,6 +46,10 @@ from __future__ import annotations
 
 import argparse
 import ast
+
+# Python 3.9 has no `ast.match_case` (added with `match` in 3.10). Build the tuple once so the
+# isinstance check below works on every interpreter a fleet host runs (CORRECTIONS_v3.34.0 row 6).
+_BLOCK_NODE_TYPES = tuple(t for t in (ast.stmt, ast.ExceptHandler, getattr(ast, "match_case", None)) if t is not None)
 import json
 import os
 import stat
@@ -87,7 +91,7 @@ def capabilities_of(source: str) -> tuple[set[str], set[str]]:
                     record(tgt.id, "const")
         else:
             pending.extend(child for child in ast.iter_child_nodes(node)
-                           if isinstance(child, (ast.stmt, ast.ExceptHandler, ast.match_case)))
+                           if isinstance(child, _BLOCK_NODE_TYPES))
     # CLI surfaces, wherever they are declared in the module
     for node in ast.walk(tree):
         if not isinstance(node, ast.Call):
