@@ -27,6 +27,8 @@ Usage:
 Exit codes: 0 ok / 1 (--strict) drift found / 2 usage-or-env error.
 """
 
+from __future__ import annotations
+
 import argparse
 import json
 import re

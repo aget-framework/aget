@@ -34,10 +34,45 @@ TERMINAL = re.compile(r"\b(CLOSED|COMPLETE|ABANDONED|SUPERSEDED)\b", re.I)
 NOT_A_CLOSE = re.compile(r"\b(REOPENED|IN PROGRESS|VOID|DRAFT|ACTIVE)\b", re.I)
 
 # --- principal attribution: the close leans on principal authority ------------
+# Repaired 2026-08-28. The first branch listed `ruled|rule` but not the plain
+# GERUND, and the second branch required a possessive (`principal'?s` -- the `s`
+# is mandatory). So "principal's ruling" matched and "principal ruling" did not.
+# Measured at repair time: 47 occurrences of the plain form in `governance/`
+# alone, every one of them reading as unattributed to this guard.
+#
+# The fix is `rul(?:e|ed|ing)` on the first branch plus an optional possessive on
+# the second, not a new branch -- a fourth spelling of the same idea is how this
+# pattern acquired a blind spot in the first place.
+#
+# Second blind spot, found the same hour by the both-polarity test written to pin
+# the first: `authoriz` did not match the British `-ise` spelling. 27 occurrences
+# in governed text here, 4 of them in the passive form this pattern's third branch
+# exists to catch. Same class as the gerund gap -- an unenumerated spelling variant
+# -- so it is fixed the same way, by widening the character class rather than
+# adding an alternation.
+# Third blind spot, found at a receiver 2026-09-19 (node-1, aof1). The pattern had no
+# branch for the fleet's most common authorization word: "GO". "Ceremony performed
+# under principal GO." matched nothing here, while EVENT_POINTER matched the dated GO,
+# so the guard reported a principal-authorized close as agent-autonomous and PASSED it
+# on the wrong ground. Fixed as a scoped case-SENSITIVE token `(?-i:GO)\b` on the
+# active, possessive and passive branches -- uppercase only, so "let the principal go"
+# and "principal go-live" stay unmatched (pinned in the negative cases).
+#
+# Divergence notice (RULINGS_2026-09-06b R2 `declare`): this local copy carries the
+# 2026-08-28 repair and this one; the v3.34.0 tag ships neither. Canonical repaired
+# 2026-09-19 from this file; ships at the next tag.
 PRINCIPAL_ATTRIB = re.compile(
-    r"principal[-\s]?(ruled|rule|approved|authoriz|decision|decided|chose|selected|elected|directed)"
-    r"|per\s+principal|principal'?s\s+(call|ruling|decision|selection|directive)"
-    r"|(ruled|approved|authoriz\w*|decided|directed|selected|chosen?)\s+by\s+(the\s+)?principal",  # passive
+    r"principal[-\s]?(rul(?:e|ed|ing)|approved|authori[sz]|decision|decided|chose|selected|elected|directed|typed|(?-i:GO)\b)"
+    r"|per\s+principal|principal(?:'?s)?\s+(call|ruling|decision|selection|directive|(?-i:GO)\b)"
+    # Passive. The separator class is `[\s*_:.\-]` and NOT `.*`: both rulings files write the
+    # header as `**Ruled by**: principal`, where markdown emphasis and a colon sit between "by"
+    # and "principal", and a bare `\s+` could not span them. Measured 2026-09-06 — the v3.34
+    # preparation ruling read as UNATTRIBUTED while carrying a textbook attribution header, and
+    # its sibling passed only because unrelated body prose happened to say "principal ruling".
+    # Separator set derived from the corpus, not invented: `**:` (2 files), `_` and `:`
+    # (`ruled_by: principal`), and `":"` (2 JSON authorization records). Nothing wider would match
+    # "a ruling was issued by the committee's principal architect", which the negative cases forbid.
+    r"|(ruled|approved|authori[sz]\w*|decided|directed|selected|chosen?|(?-i:GO)\b)[\s*_:.\"\-]+(by|from)[\s*_:.\"\-]+(the[\s*_:.\"\-]+)?principal",  # passive; GO from/by the principal
     re.I,
 )
 

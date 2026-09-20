@@ -28,6 +28,8 @@ Exit codes:
 See: AGET_TEMPLATE_SPEC CAP-TPL-016-04, L671, L656
 """
 
+from __future__ import annotations
+
 import argparse
 import json
 import sys
