@@ -47,7 +47,9 @@ def test_every_delivered_script_imports_on_the_oldest_fleet_interpreter():
     v = _sys_py_version()
     if v is None or v >= (3, 10):
         pytest.skip(f"UNAVAILABLE: no <3.10 interpreter at {SYS_PY} (found {v}); the PEP-604 class cannot be measured on this host")
-    out = subprocess.run([str(SYS_PY), "-c", PROBE, str(REPO / "scripts")], capture_output=True, text=True, timeout=600)
-    assert out.returncode == 0, out.stderr[-800:]
-    bad = [l for l in out.stdout.splitlines() if l.strip()]
+    bad = []
+    for d in ("scripts", "tests"):  # tests/ added 2026-09-20: a test module that cannot be collected on 3.9 is the same class
+        out = subprocess.run([str(SYS_PY), "-c", PROBE, str(REPO / d)], capture_output=True, text=True, timeout=600)
+        assert out.returncode == 0, out.stderr[-800:]
+        bad += [f"{d}/{l}" for l in out.stdout.splitlines() if l.strip()]
     assert not bad, f"fail to import on {v[0]}.{v[1]} (add `from __future__ import annotations`): {bad}"
