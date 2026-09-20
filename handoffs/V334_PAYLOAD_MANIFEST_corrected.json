@@ -51,7 +51,7 @@
     },
     {
       "path": "scripts/check_capability_retention.py",
-      "sha256": "02339dfe952f52f5e30a4e35b3ce8bc3a3de5eaf7a2bbcd1ef2c40855066e98a",
+      "sha256": "a5772e54ec1efcd3a473366a3459a4b160594231fb2bf334baf5c3fe233621c6",
       "mode": "0o644"
     },
     {
@@ -257,18 +257,23 @@
   ],
   "original_sealed_commit": "72633e6d1b58e94541a59892d30c0b4bbd9d20f1",
   "correction": {
-    "status": "ISSUED \u2014 separately addressable corrected manifest; the original handoffs/V334_PAYLOAD_MANIFEST.json is retained unchanged as provenance",
+    "status": "ISSUED (rebound 2026-09-20 to the tree it is published in; the 5cfc055 binding was stale by one digest because PR #103 edited scripts/check_capability_retention.py in the same PR \u2014 found by node-1, RELAY 2026-09-20 15:12)",
     "original_manifest_sha256": "f66dc6556f07b7c85907f3cdbccc53aba349262ed5c2043ac6ff90f94a0dd827",
     "source_binding": {
       "tag": "v3.34.0",
       "tag_commit": "43b35a3769c52ae8b8b2bdee087698659c62ecc1",
-      "corrected_at_commit": "5cfc055a6811acbd174c8b36b348ae4c0add2065"
+      "corrected_at_commit": "5bdd5184fbef62f1c359134c01ed5a11c626c822"
     },
     "substitutions": [
       {
         "path": "handoffs/FLEET_MIGRATION_CONTRACT_v3.30.0.json",
         "tag_sha256": "077aaaeac67cce6640815c3b074350eac31d76557a8444ba0f90caf458763ada",
         "corrected_sha256": "8d4cab207da43d07713d093dce44d4d5519a202a60273a95e581aa01aec7c2ee"
+      },
+      {
+        "path": "scripts/check_capability_retention.py",
+        "tag_sha256": "02339dfe952f52f5e30a4e35b3ce8bc3a3de5eaf7a2bbcd1ef2c40855066e98a",
+        "corrected_sha256": "a5772e54ec1efcd3a473366a3459a4b160594231fb2bf334baf5c3fe233621c6"
       },
       {
         "path": "scripts/study_topic.py",
@@ -286,7 +291,7 @@
         "corrected_sha256": "5c63ffac2b3b55b031b7d4ae686f865184673753d1df8363a58f5d651b1585d0"
       }
     ],
-    "rationale": "CORRECTIONS_v3.34.0.md rows 1 (W1: test file sealed pre-tag) and 2 (W3: future-import + contract resolver digest); W3b files are outside the manifest",
+    "rationale": "CORRECTIONS_v3.34.0.md rows 1 (W1), 2 (W3) and 6 (W3c: check_capability_retention.py); W3b files are outside the manifest",
     "prepared": "2026-09-20",
     "prepared_by": "private-aget-framework-AGET",
     "receiver_use": "python3 scripts/check_receiver_conformance.py --manifest handoffs/V334_PAYLOAD_MANIFEST_corrected.json --repo <receiver> --acceptance <dir> --json ; qualification instruments SHOULD prefer this file when present in the candidate tree and name it in the receipt",
