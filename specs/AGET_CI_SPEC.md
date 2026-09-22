@@ -1,14 +1,14 @@
 # AGET CI Specification
 
-**Version**: 1.4.0
+**Version**: 1.5.0
 **Status**: Active
 **Category**: Standards (Quality Assurance)
 **Format Version**: 1.2
 **Created**: 2025-12-28
-**Updated**: 2026-08-18
+**Updated**: 2026-09-22
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_CI_SPEC.md`
-**Change Origin**: L404 (CI Test Isolation Requirements)
+**Change Origin**: L404 (CI Test Isolation Requirements); v1.5.0 adds CAP-CI-010 Host Independence
 **Related Specs**: AGET_VALIDATION_SPEC, AGET_TEMPLATE_SPEC, AGET_RELEASE_SPEC
 
 ---
@@ -82,6 +82,20 @@ vocabulary:
     Test_Isolation:
       skos:definition: "Requirement for tests to be self-contained without external imports"
       skos:related: ["L404"]
+    Test_Outcome:
+      skos:definition: "The verdict a test execution produces: passed, failed, or skipped"
+      skos:scopeNote: "A skip under a declared precondition is a legitimate Test_Outcome, not an evasion"
+    Test_Hermeticity:
+      skos:definition: "Property of a test whose outcome does not depend on state outside the Repository_Checkout"
+      skos:broader: ["Test_Isolation"]
+      skos:scopeNote: "Test_Isolation governs IMPORTS; Test_Hermeticity governs FILESYSTEM and PROCESS reach"
+    Repository_Checkout:
+      skos:definition: "The directory tree the CI_System clones for the repository under test, and its declared sibling checkouts"
+    Distinct_Environment:
+      skos:definition: "An execution environment that does not reproduce the authoring host's ambient state"
+      skos:scopeNote: "A CI runner is distinct only to the extent it does not recreate the authoring layout"
+    CI_Environment:
+      skos:definition: "The execution environment provided by the CI_System for a workflow run"
     Collection_Error:
       skos:definition: "pytest failed to import test modules"
     Import_Error:
@@ -134,6 +148,11 @@ The SYSTEM shall ensure Test_Isolation for all template tests.
 | CAP-CI-001-04 | ubiquitous | The SYSTEM shall not use @patch decorators referencing non-existent modules |
 
 **Enforcement**: Contract test `test_ci_test_isolation`
+
+**Scope boundary**: this capability governs what a test IMPORTS. What a test REACHES — the filesystem
+beyond the Repository_Checkout, and resources obtained through a child process — is governed by
+CAP-CI-010 (Host Independence). A test can satisfy CAP-CI-001 completely and still be unable to pass
+on any runner.
 
 **Anti-Pattern** (L404):
 ```python
@@ -287,6 +306,56 @@ The SYSTEM shall enumerate framework-level validators that consumer CI workflows
 
 ---
 
+### CAP-CI-010: Host Independence
+
+The SYSTEM shall ensure Test_Hermeticity for tests executed by the CI_System.
+
+Test_Isolation (CAP-CI-001) governs what a test IMPORTS. This capability governs what a test
+REACHES: the filesystem beyond the Repository_Checkout, and resources obtained through a child
+process. A test can satisfy CAP-CI-001 completely and still be unable to pass on any runner.
+
+| ID | Pattern | Statement |
+|----|---------|-----------|
+| CAP-CI-010-01 | prohibited | The SYSTEM shall NOT allow a Test_Outcome to depend on a resource outside the Repository_Checkout unless the dependence is declared as a precondition |
+| CAP-CI-010-02 | conditional | IF a test depends on a resource that may be absent in the CI_Environment THEN the SYSTEM shall declare the precondition and skip, and shall NOT weaken the assertion |
+| CAP-CI-010-03 | ubiquitous | The SYSTEM shall establish Test_Hermeticity by execution in a Distinct_Environment, and shall NOT establish it by source inspection alone |
+
+**Enforcement**: **Advisory.** No validator implements these requirements today. They are stated so
+that conformance is checkable by inspection and so a future validator has a referent. Declaring
+Advisory is deliberate: a gate for this class was drafted and measured against five verified-correct
+test files, where it produced five false positives and zero true findings. A control whose every
+finding is wrong is worse than none.
+
+**Anti-Pattern** — weakening the assertion instead of declaring the precondition:
+```python
+# BAD: the assertion is loosened so it passes on a runner with no siblings.
+# This is a green over a degraded reading -- the test no longer checks what it exists to check.
+assert len(found_repos) >= 1        # was: >= 9
+```
+
+**Correct Pattern** — declare the precondition and skip:
+```python
+# GOOD: the assertion keeps its strength; the test states what it needs and stands down without it.
+CANONICAL = Path(__file__).resolve().parents[1] / ".." / "aget"
+pytestmark = pytest.mark.skipif(
+    not (CANONICAL / "specs").exists(),
+    reason="canonical checkout not present; precondition for this contract",
+)
+```
+
+**Assumption-debt (CAP-CI-010-03)**: this requirement assumes the CI_Environment is distinct from the
+authoring host. Where a workflow deliberately reproduces the authoring layout — for example by
+checking out sibling repositories to satisfy tests that resolve them — it is only PARTIALLY distinct,
+and the evidentiary value of a green run degrades accordingly. Recorded, not resolved.
+
+**Origin**: recurring host-dependent CI failure across the fleet; the precondition-and-skip remedy was
+independently derived at two agents on 2026-09-22 with no contact between them. The
+execution-over-inspection rule (CAP-CI-010-03) follows established build-system practice, where
+hermeticity is detected by sandboxed execution and by building in a different environment rather than
+by reading sources; an in-process file hook cannot observe a child process's reads.
+
+---
+
 ### CAP-CICD-001: Exact-SHA CI Evidence
 
 Public release evidence shall bind to the commit being evaluated rather than to a nearby branch or workflow result.
@@ -403,6 +472,9 @@ authority:
 | V-CI-006 | CAP-CI-005 | automated | Verify test collection succeeds without import errors before running tests |
 | V-CI-007 | CAP-CI-002 | inspection | Verify setup.py declares python_requires with minimum version |
 | V-CI-008 | CAP-CI-003 | automated | Verify CI workflow YAML syntax is valid |
+| V-CI-009 | CAP-CI-010-01 | inspection | Verify no test allows its outcome to depend on a resource outside the Repository_Checkout without a declared precondition |
+| V-CI-010 | CAP-CI-010-02 | inspection | Verify tests depending on possibly-absent resources declare the precondition and skip, rather than weakening the assertion |
+| V-CI-011 | CAP-CI-010-03 | automated | Verify the suite is executed in an environment that does not reproduce the authoring host before Test_Hermeticity is claimed |
 | V-CICD-001 | CAP-CICD-001 | automated | Verify all required checks are present and successful for the explicit full SHA; wrong or missing SHA fails closed |
 | V-CICD-002 | CAP-CICD-002 | automated | Verify workflow prerequisites and both historical topology-failure classes are explicit |
 | V-CICD-003 | CAP-CICD-003 | automated | Verify version-tag pushes trigger CI and release completion consumes an exact-SHA receipt without absorbing downstream closure states |
@@ -492,6 +564,7 @@ print('pull_request:', 'PASS' if 'pull_request' in on else 'FAIL')"
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.5.0 | 2026-09-22 | Add CAP-CI-010 Host Independence (Advisory): undeclared dependence on resources outside the checkout, the precondition-and-skip remedy, and hermeticity established by execution rather than source inspection. Vocabulary: Test_Hermeticity, Repository_Checkout, Distinct_Environment, CI_Environment. |
 | 1.4.0 | 2026-08-18 | Include the canonical framework repository; add exact-SHA evidence, declared prerequisite topology, version-tag trigger, release-consumer separation, and enforced required-check policy contracts. v1.3.0 remains reserved by its unratified optional-posture/feedback-loop/matrix-semantics outline. |
 | 1.1.0 | 2026-04-11 | Update Python matrix to 3.10-3.13 (drop EOL 3.8/3.9, add 3.13). L822 CI spec staleness gap. |
 | 1.0.0 | 2025-12-28 | Initial release (L404 remediation) |
