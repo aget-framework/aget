@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+Items confirmed in-flight for a future release (latest released: **3.34.0**). Per Keep a Changelog 1.1.0 forward-work convention.
+
+- Issue-governance spec delta for the `/aget-file-issue` pre-filing probes (skill layer shipped in 3.26.0; formal requirement rides the next spec pass).
+- Template `/aget-file-issue` structural refresh (routing + probe steps to all templates; fleet routing propagation staged per the 3.26.0 rollout decision).
+- **Traceability ratchet**: the test-requirement floor rises +5pp per minor release from the v3.29 measured floor.
+
 ## [3.34.0] - 2026-09-13 — Evidence that reaches its subject
 
 ### Added
@@ -132,14 +140,6 @@ Two repairs to controls that report on releases. Both failed at their shipped pu
 
 ### Documentation
 - Documented that hooks, permissions, release gates, and structural enforcement do not travel with the package.
-
-## [Unreleased]
-
-Items confirmed in-flight for a future release (latest released: **3.33.1**). Per Keep a Changelog 1.1.0 forward-work convention.
-
-- Issue-governance spec delta for the `/aget-file-issue` pre-filing probes (skill layer shipped in 3.26.0; formal requirement rides the next spec pass).
-- Template `/aget-file-issue` structural refresh (routing + probe steps to all templates; fleet routing propagation staged per the 3.26.0 rollout decision).
-- **Traceability ratchet**: the test-requirement floor rises +5pp per minor release from the v3.29 measured floor.
 
 ## [3.29.0] - 2026-08-01 - "Repair release truth and reduce principal decision work"
 
