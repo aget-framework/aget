@@ -117,7 +117,7 @@ python3 scripts/propose_actions_handoff_scan.py --subject "<subject 1>" --subjec
   - `UNAVAILABLE` (exit 2): the scan could not look (not a git work tree, no configured location exists, git failed or could not run, or a candidate could not be read and nothing matched). State it in the NBA preamble with the reason; never report it as a clean scan.
 - The false-positive risk (an incidental substring match) is accepted; a principal override via L178 closes it.
 
-This is REQ-PA-012 (closes L961 cross-session L908 propagation gap as Channel 2 wiring per L467 multi-channel propagation; v3.18 G4.A-2 deliverable). Empirical anchor: session_1730 H3 Critic finding where Action 6 violated session_1706 principal Decide despite explicit close-note deferral.
+This is REQ-PA-012 (closes L961 cross-session L908 propagation gap as Channel 2 wiring per L467 multi-channel propagation; v3.18 G4.A-2 deliverable). Empirical anchor: an independent Critic finding in which a proposed action violated a principal Decide recorded in an earlier session, despite an explicit close-note deferral.
 
 ### Step 2.7: Audit-After-Synthesis Pre-Check (REQ-PA-013; L980 / gh#1476 Layer 5)
 
@@ -188,7 +188,7 @@ Rank by value-to-time ratio. Total estimated time MUST fit within budget.
 
 ### Step 3.5: Self-Critique (REQ-PA-018/019/020; C-22-02 / #1094/#1095/#1096)
 
-**Before** presenting (Step 4), run the **10-point self-critique checklist** over the drafted Action set. The principal routinely prompts "critique this report" after emission; the resulting critique historically surfaces ~10 defects recoverable without new research (L025, session 2026-04-23, private-social-media-AGET — obs093–105). Running it inline pre-empts that round-trip. For each point, if the set fails, **re-ideate the offending action(s) before Step 4** — do not present a known-defective set.
+**Before** presenting (Step 4), run the **10-point self-critique checklist** over the drafted Action set. The principal routinely prompts "critique this report" after emission; the resulting critique historically surfaces ~10 defects recoverable without new research (L025, field observations obs093–105). Running it inline pre-empts that round-trip. For each point, if the set fails, **re-ideate the offending action(s) before Step 4** — do not present a known-defective set.
 
 | # | Checklist point | Test | Source |
 |---|-----------------|------|--------|
