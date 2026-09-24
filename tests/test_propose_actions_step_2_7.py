@@ -133,3 +133,13 @@ def test_scope_block_marks_a_vacuous_pass_as_vacuous():
     assert paired["pairing_status"] == "PASS"
     assert paired["scope"]["vacuous"] is False
     assert paired["scope"]["governed_actions"] == 2
+
+
+def test_a_declared_subject_cannot_split_a_same_artifact_group():
+    """Satisfies: REQ-PA-013 -- two writes to one artifact stay one group whatever subjects they declare (R1-04)."""
+    batch = [
+        {"text": "write the summary", "artifact": "planning/X.md", "subject_id": "x"},
+        {"text": "update the table", "artifact": "planning/X.md", "subject_id": "y"},
+    ]
+    rep = check_pairing(batch)
+    assert rep["pairing_status"] == "UNMET", rep

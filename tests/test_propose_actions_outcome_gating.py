@@ -99,3 +99,33 @@ def test_close_summary_splits_outcome_from_measurement():
                         gated_owed=["push the CI fixes (principal push approval)"])
     assert "outcome unchanged" in s and "measurement improved" in s, s
     assert "gated act owed: push the CI fixes" in s, s
+
+
+# ---- independent review round 1 (2026-09-24): regression cases ---------------------------------
+
+def test_non_object_action_is_unavailable_not_a_crash():
+    """Satisfies: REQ-PA-022 -- a malformed action list is UNAVAILABLE, never an exception (R1-05)."""
+    m = _load()
+    assert m.check_outcome_gating({"focus_kind": "outcome", "actions": ["x"]})["status"] == "UNAVAILABLE"
+
+
+def test_string_boolean_is_unavailable_not_truthy():
+    """Satisfies: REQ-PA-022 -- decision_listed "false" is not a boolean and cannot pass by truthiness (R1-05)."""
+    m = _load()
+    batch = {"focus_kind": "outcome", "actions": [CI_FIX, dict(PUSH, decision_listed="false")]}
+    assert m.check_outcome_gating(batch)["status"] == "UNAVAILABLE"
+
+
+def test_gated_outcome_step_without_a_gate_is_unavailable():
+    """Satisfies: REQ-PA-022 -- a gated step naming no gate has no exact change ready to approve (R1-05)."""
+    m = _load()
+    step = {"text": "push", "moves": "outcome", "gated": True, "decision_listed": True}
+    assert m.check_outcome_gating({"focus_kind": "outcome", "actions": [step]})["status"] == "UNAVAILABLE"
+
+
+def test_saying_the_batch_cannot_move_its_outcome_passes_that_leg():
+    """Satisfies: REQ-PA-022 -- the requirement is to say so; an explicit acknowledgement passes (R1-06)."""
+    m = _load()
+    batch = {"focus_kind": "outcome", "acknowledges_no_outcome_mover": True, "actions": [CI_FIX]}
+    r = m.check_outcome_gating(batch)
+    assert r["status"] == "PASS" and r["notes"], r

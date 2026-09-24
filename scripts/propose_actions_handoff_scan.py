@@ -54,7 +54,14 @@ SELECTOR = ("union(committed HANDOFF_*.md whose last author date is inside the w
 
 
 def _git(repo: Path, *args: str) -> subprocess.CompletedProcess:
-    return subprocess.run(["git", "-C", str(repo), *args], capture_output=True, text=True)
+    # A git that cannot be launched must surface as UNAVAILABLE, never as an uncaught
+    # exception: Python exits 1 on an uncaught error, which is this script's MATCHED code
+    # (independent review round 1, R1-02).
+    cmd = ["git", "-C", str(repo), *args]
+    try:
+        return subprocess.run(cmd, capture_output=True, text=True)
+    except OSError as exc:
+        return subprocess.CompletedProcess(cmd, 127, "", f"git could not be run: {exc}")
 
 
 def _configured_locations(repo: Path):
@@ -90,6 +97,8 @@ def scan(repo, subjects, days: int = 14, locations=None, now: float | None = Non
     }
 
     probe = _git(repo, "rev-parse", "--is-inside-work-tree")
+    if probe.returncode == 127:
+        return _unavailable(result, probe.stderr.strip() or "git could not be run")
     if probe.returncode != 0 or probe.stdout.strip() != "true":
         return _unavailable(result, f"not a git work tree: {repo}. The population is defined by git "
                                     "state (author dates, untracked status), so it cannot be enumerated")
@@ -107,19 +116,28 @@ def scan(repo, subjects, days: int = 14, locations=None, now: float | None = Non
     candidates = []
     for loc in present:
         spec = f":(glob){loc}/**/{PATTERN}"
-        st = _git(repo, "status", "--porcelain=v1", "-uall", "--", spec)
-        ls = _git(repo, "ls-files", "--", spec)
+        st = _git(repo, "status", "--porcelain=v1", "-z", "-uall", "--", spec)
+        ls = _git(repo, "ls-files", "-z", "--", spec)
         if st.returncode != 0 or ls.returncode != 0:
             return _unavailable(result, f"git could not enumerate {loc}: "
                                         f"{(st.stderr or ls.stderr).strip()[:200]}")
+        # -z records: "XY path\0"; a rename or copy is "XY new\0old\0", so the record after
+        # an R/C entry is the ORIGINAL path and is skipped. Without -z, git quotes paths that
+        # contain spaces and the quoted form matched no file (R1-01).
         changed = {}
-        for line in st.stdout.splitlines():
-            code, path = line[:2], line[3:]
-            if " -> " in path:
-                path = path.split(" -> ", 1)[1]
+        records = st.stdout.split("\0")
+        i = 0
+        while i < len(records):
+            rec = records[i]
+            i += 1
+            if len(rec) < 4:
+                continue
+            code, path = rec[:2], rec[3:]
+            if "R" in code or "C" in code:
+                i += 1
             changed[path] = code != "??"
         n = 0
-        for path in ls.stdout.splitlines():
+        for path in [p for p in ls.stdout.split("\0") if p]:
             if path in changed:
                 continue
             lg = _git(repo, "log", "-1", "--format=%at", "--", path)
@@ -157,11 +175,18 @@ def scan(repo, subjects, days: int = 14, locations=None, now: float | None = Non
             s = subj.lower()
             if s in text or s in name:
                 result["matches"].append(dict(cand, subject=subj))
-    if result["unreadable"] and len(result["unreadable"]) == len(candidates):
-        return _unavailable(result, "every candidate handoff was unreadable")
+    # An unreadable candidate could name a deferred subject, so it forbids a CLEAN verdict.
+    # Matches found elsewhere still refuse (MATCHED); with no match, the scan is UNAVAILABLE
+    # (independent review round 1, R1-03).
+    unread = len(result["unreadable"])
     if result["matches"]:
         result.update(verdict="MATCHED",
-                      reason=f"{len(result['matches'])} match(es) across {len(candidates)} candidate(s)")
+                      reason=f"{len(result['matches'])} match(es) across {len(candidates)} candidate(s)"
+                             + (f"; {unread} candidate(s) could not be read" if unread else ""))
+    elif unread:
+        return _unavailable(result, f"{unread} of {len(candidates)} candidate handoff(s) could not be read, "
+                                    "so a clean result cannot be claimed: "
+                                    + ", ".join(u["path"] for u in result["unreadable"]))
     else:
         result.update(verdict="NONE-MATCHED",
                       reason=f"{len(candidates)} candidate(s) searched; no subject named in any")

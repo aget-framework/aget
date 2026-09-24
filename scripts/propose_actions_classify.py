@@ -286,13 +286,16 @@ def check_pairing(actions: list[dict]) -> dict:
         if not is_governed(art):
             ungoverned.append(i)
             continue
+        # The path group is ALWAYS formed; a declared subject ADDS a second group and never
+        # replaces the path key. Replacing it let two writes to one artifact escape the
+        # same-artifact rule by declaring different subjects (independent review round 1,
+        # R1-04; REQ-PA-013, V-PA-013 falsifier).
+        groups.setdefault(normalize_path(art), []).append(i)
         subj = a.get("subject_id")
         if subj:
             key = f"subject:{subj}"
             subject_keyed.add(key)
-        else:
-            key = normalize_path(art)
-        groups.setdefault(key, []).append(i)
+            groups.setdefault(key, []).append(i)
 
     same_artifact_groups = {k: v for k, v in groups.items() if len(v) >= 2}
     unpaired = []
@@ -364,6 +367,7 @@ FOCUS_KINDS = ("outcome", "measurement", "other")
 
 def check_outcome_gating(batch: dict) -> dict:
     """REQ-PA-022. Batch: {"focus_kind": outcome|measurement|other, "focus": str,
+    "acknowledges_no_outcome_mover": bool (optional),
     "actions": [{"text", "moves": outcome|measurement, "gated": bool, "gate": str,
     "decision_listed": bool}]}. Returns {"status": PASS|UNMET|UNAVAILABLE, "reasons",
     "gated_owed", "outcome_movers"}. An undeclared focus kind is UNAVAILABLE, never PASS."""
@@ -375,6 +379,26 @@ def check_outcome_gating(batch: dict) -> dict:
     if not isinstance(actions, list) or not actions:
         return {"status": "UNAVAILABLE", "gated_owed": [], "outcome_movers": 0,
                 "reasons": ["the batch carries no actions"]}
+    # Strict shape check (independent review round 1, R1-05): a malformed action must be
+    # UNAVAILABLE, never PASS by truthiness ("false" as a string) and never a crash.
+    bad = []
+    ack = batch.get("acknowledges_no_outcome_mover", False)
+    if not isinstance(ack, bool):
+        bad.append("acknowledges_no_outcome_mover must be a boolean")
+    for i, a in enumerate(actions, start=1):
+        if not isinstance(a, dict):
+            bad.append(f"action {i} is not an object")
+            continue
+        if not isinstance(a.get("text"), str) or not a["text"].strip():
+            bad.append(f"action {i} has no text")
+        for flag in ("gated", "decision_listed"):
+            if flag in a and not isinstance(a[flag], bool):
+                bad.append(f"action {i}: {flag} must be a boolean")
+        if a.get("moves") == "outcome" and a.get("gated") is True and \
+                not (isinstance(a.get("gate"), str) and a["gate"].strip()):
+            bad.append(f"action {i} is a gated outcome step that names no gate, so no exact change is ready to approve")
+    if bad:
+        return {"status": "UNAVAILABLE", "gated_owed": [], "outcome_movers": 0, "reasons": bad}
     reasons, gated_owed, movers = [], [], 0
     for i, a in enumerate(actions, start=1):
         text = str(a.get("text", "")).strip()
@@ -388,10 +412,17 @@ def check_outcome_gating(batch: dict) -> dict:
                 gated_owed.append(f"{text} ({gate})")
                 if not a.get("decision_listed"):
                     reasons.append(f"gated outcome step not listed under Decisions needed: {text} ({gate})")
+    notes = []
     if batch["focus_kind"] == "outcome" and movers == 0:
-        reasons.append("no action moves the outcome: this batch cannot move its outcome. Say so, "
-                       "or list the gated outcome step under Decisions needed")
-    return {"status": "UNMET" if reasons else "PASS", "reasons": reasons,
+        # The requirement is to SAY it (REQ-PA-022 (3)); a batch that says so passes this leg
+        # (independent review round 1, R1-06). Silence is what fails.
+        if ack:
+            notes.append("the batch states that it cannot move its outcome")
+        else:
+            reasons.append("no action moves the outcome: this batch cannot move its outcome. Say so "
+                           "(acknowledges_no_outcome_mover: true), or list the gated outcome step "
+                           "under Decisions needed")
+    return {"status": "UNMET" if reasons else "PASS", "reasons": reasons, "notes": notes,
             "gated_owed": gated_owed, "outcome_movers": movers}
 
 

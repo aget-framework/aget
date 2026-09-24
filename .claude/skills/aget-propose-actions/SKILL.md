@@ -91,7 +91,7 @@ This is REQ-PA-011 (closes L962 structural-defense gap; gh#1414).
 >
 > Instances are seat-local; consult your own `planning/RULINGS_*` before relying on this.
 
-Before generating NBAs, scan `docs/HANDOFF_*.md` files modified within the last 14 days. For each candidate Action subject (skill name, PROJECT_PLAN name, initiative name, issue number):
+Before generating NBAs, run the deferral scan in **Implementation** below. It reads handoff documents on disk, not files selected by modification time. For each candidate Action subject (skill name, PROJECT_PLAN name, initiative name, issue number):
 
 1. **Match check**: Does the candidate Action subject appear in any HANDOFF file's body or title? (substring match on skill name / plan slug / issue number)
 2. **If MATCHED**:
@@ -114,7 +114,7 @@ python3 scripts/propose_actions_handoff_scan.py --subject "<subject 1>" --subjec
 - **Four verdicts, never rendered alike**:
   - `MATCHED` (exit 1): apply the refusal above to each matched subject.
   - `NONE-MATCHED` or `NO-CANDIDATES` (exit 0): proceed, and say which one in the preamble.
-  - `UNAVAILABLE` (exit 2): the scan could not look (not a git work tree, no configured location exists, or git failed). State it in the NBA preamble with the reason; never report it as a clean scan.
+  - `UNAVAILABLE` (exit 2): the scan could not look (not a git work tree, no configured location exists, git failed or could not run, or a candidate could not be read and nothing matched). State it in the NBA preamble with the reason; never report it as a clean scan.
 - The false-positive risk (an incidental substring match) is accepted; a principal override via L178 closes it.
 
 This is REQ-PA-012 (closes L961 cross-session L908 propagation gap as Channel 2 wiring per L467 multi-channel propagation; v3.18 G4.A-2 deliverable). Empirical anchor: session_1730 H3 Critic finding where Action 6 violated session_1706 principal Decide despite explicit close-note deferral.

@@ -194,3 +194,65 @@ def test_result_names_what_was_searched(tmp_path):
     r = m.scan(repo, subjects=["s"], days=14)
     assert r["window_days"] == 14 and r["selector"] and r["locations"], r
     assert any(loc["path"] == "docs" and loc["status"] == "present" for loc in r["locations"]), r
+
+
+# ---- independent review round 1 (2026-09-24): regression cases ---------------------------------
+
+def test_untracked_filename_with_spaces_is_found(tmp_path):
+    """Satisfies: REQ-PA-012 -- a path containing spaces is read exactly (R1-01: porcelain quoting hid it)."""
+    m = _load()
+    repo = _repo(tmp_path)
+    _commit_file(repo, "docs/README.md", "x\n", days_ago=1)
+    (repo / "docs" / "HANDOFF_has space.md").write_text("deferred: spaced-subject\n")
+    r = m.scan(repo, subjects=["spaced-subject"], days=14)
+    assert r["verdict"] == "MATCHED", r
+
+
+def test_old_modified_filename_with_spaces_is_found(tmp_path):
+    """Satisfies: REQ-PA-012 -- a locally modified old handoff with spaces is a candidate (R1-01)."""
+    m = _load()
+    repo = _repo(tmp_path)
+    p = _commit_file(repo, "docs/HANDOFF_old one.md", "old\n", days_ago=40)
+    p.write_text("old\nre-parked: spaced-old\n")
+    r = m.scan(repo, subjects=["spaced-old"], days=14)
+    assert r["verdict"] == "MATCHED", r
+
+
+def test_staged_rename_counts_the_new_path_only(tmp_path):
+    """Satisfies: REQ-PA-012 -- a rename record's original path is not read as a second candidate.
+
+    Guard, not reproduction: the pre-fix parser also passed this; it pins the -z parser's rename skip (R1-01).
+    """
+    m = _load()
+    repo = _repo(tmp_path)
+    _commit_file(repo, "docs/HANDOFF_a.md", "deferred: renamed-subject\n", days_ago=40)
+    _git(repo, "mv", "docs/HANDOFF_a.md", "docs/HANDOFF_b.md")
+    r = m.scan(repo, subjects=["renamed-subject"], days=14)
+    assert r["verdict"] == "MATCHED" and r["candidate_paths"] == ["docs/HANDOFF_b.md"], r
+
+
+def test_git_that_cannot_run_is_unavailable_exit_2(tmp_path):
+    """Satisfies: REQ-PA-012 -- a missing git is UNAVAILABLE (exit 2), never a crash that exits 1 (R1-02)."""
+    import sys as _sys
+    repo = _repo(tmp_path)
+    out = subprocess.run([_sys.executable, str(SCRIPT), "--repo", str(repo), "--subject", "x"],
+                         capture_output=True, text=True, env={"PATH": ""})
+    assert out.returncode == 2 and out.stdout.startswith("UNAVAILABLE"), (out.returncode, out.stdout, out.stderr)
+
+
+def test_one_unreadable_candidate_forbids_a_clean_result(tmp_path):
+    """Satisfies: REQ-PA-012 -- a candidate that cannot be read may hide the subject, so no clean verdict (R1-03)."""
+    if hasattr(os, "geteuid") and os.geteuid() == 0:
+        pytest.skip("root can read a mode-000 file")
+    m = _load()
+    repo = _repo(tmp_path)
+    _commit_file(repo, "docs/README.md", "x\n", days_ago=1)
+    (repo / "docs" / "HANDOFF_ok.md").write_text("unrelated\n")
+    locked = repo / "docs" / "HANDOFF_locked.md"
+    locked.write_text("deferred: hidden-subject\n")
+    locked.chmod(0)
+    try:
+        r = m.scan(repo, subjects=["hidden-subject"], days=14)
+    finally:
+        locked.chmod(0o644)
+    assert r["verdict"] == "UNAVAILABLE" and r["unreadable"], r
