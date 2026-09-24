@@ -101,7 +101,7 @@ def test_close_summary_splits_outcome_from_measurement():
     assert "gated act owed: push the CI fixes" in s, s
 
 
-# ---- independent review round 1 (2026-09-24): regression cases ---------------------------------
+# ---- independent review round 1: regression cases ---------------------------------
 
 def test_non_object_action_is_unavailable_not_a_crash():
     """Satisfies: REQ-PA-022 -- a malformed action list is UNAVAILABLE, never an exception (R1-05)."""

@@ -196,7 +196,7 @@ def test_result_names_what_was_searched(tmp_path):
     assert any(loc["path"] == "docs" and loc["status"] == "present" for loc in r["locations"]), r
 
 
-# ---- independent review round 1 (2026-09-24): regression cases ---------------------------------
+# ---- independent review round 1: regression cases ---------------------------------
 
 def test_untracked_filename_with_spaces_is_found(tmp_path):
     """Satisfies: REQ-PA-012 -- a path containing spaces is read exactly (R1-01: porcelain quoting hid it)."""
