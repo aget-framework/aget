@@ -13,9 +13,9 @@ AGET fixes this. It gives your agents persistent knowledge, shared memory, fleet
 
 **New to AGET?** Listen to the [audio introduction](https://youtu.be/zLSFeT9TF8E) — a narrated walkthrough of session rhythm, key skills, and fleet creation.
 
-## v3.34.0 release
+## v3.35.0 release candidate
 
-See the [release notes](release-notes/v3.34.0.md) and [migration handoff](handoffs/RELEASE_HANDOFF_v3.34.0.md). The [v3.34.0 GitHub Release](https://github.com/aget-framework/aget/releases/tag/v3.34.0) was published on September 14, 2026. Receiver deployment and acceptance require separate verification.
+See the [release notes](release-notes/v3.35.0.md) and [migration handoff](handoffs/RELEASE_HANDOFF_v3.35.0.md). Availability and receiver acceptance require separate verification.
 
 ## Quick Start
 

@@ -1,0 +1,103 @@
+version: 3.35.0
+spec_version: 1.0.0
+created: '2026-09-25'
+status: prepared
+supersedes: DEPLOYMENT_SPEC_v3.34.0.yaml
+breaking_release: false
+source_ref: v3.35.0
+rollback_ref: v3.34.0
+release_notes: release-notes/v3.35.0.md
+release_handoff: handoffs/RELEASE_HANDOFF_v3.35.0.md
+remote_migration: handoffs/REMOTE_MIGRATION_MESSAGE_v3.35.0.md
+corrections: handoffs/CORRECTIONS_v3.35.0.md
+payload_manifest: none
+publication_boundary: Prepared content is not publication, installation or acceptance
+  evidence. Record the annotated tag and peeled commit before consuming.
+publication_state_note: status stays prepared in this tagged file. The release procedure's
+  post-tag change to released is waived for v3.35.0 only, because its check reads this
+  immutable tagged file; the waiver does not extend to later versions. Publication is
+  evidenced by the annotated tag and the GitHub Release object. The corrections record
+  on main carries the waiver row.
+mandatory_changes:
+- id: M-3.35-1
+  description: Proposed actions are tagged as moving the outcome or only its measurement;
+    gated outcome steps surface as decisions; the deferral scan reads handoff documents
+    on disk from configurable locations and reports four distinct results.
+  surfaces: [core, templates]
+  blocking: true
+  paths:
+  - scripts/propose_actions_handoff_scan.py
+  - scripts/propose_actions_classify.py
+  - .claude/skills/aget-propose-actions/SKILL.md
+  source_tests:
+  - tests/test_propose_actions_handoff_scan.py
+  - tests/test_propose_actions_outcome_gating.py
+  - tests/test_propose_actions_step_2_7.py
+  - tests/test_propose_actions_classify_hardening.py
+  detection: |-
+    python3 scripts/propose_actions_handoff_scan.py --self-test && python3 scripts/propose_actions_classify.py --self-test
+  detection_core: |-
+    python3 -m pytest -q tests/test_propose_actions_handoff_scan.py tests/test_propose_actions_outcome_gating.py tests/test_propose_actions_step_2_7.py tests/test_propose_actions_classify_hardening.py
+  detection_scope: Self-tests and shipped source tests only; receiver-owned behaviour
+    and acceptance require separate evidence.
+- id: M-3.35-2
+  description: CAP-CI-010 Host Independence, advisory; no receiver action.
+  surfaces: [core]
+  blocking: false
+  paths:
+  - specs/AGET_CI_SPEC.md
+  source_tests:
+  - tests/test_ci_host_independence.py
+  detection: |-
+    python3 -c "import sys; t=open('specs/AGET_CI_SPEC.md').read(); sys.exit(0 if all('CAP-CI-010-0%d' % i in t for i in (1, 2, 3)) else 1)"
+  detection_scope: Presence of the three requirement rows; the V-CI-011 test partly checks
+    CAP-CI-010-03 in the CI workflow (not the claim-ordering part), not receivers.
+- id: M-3.35-3
+  description: The strict close gate runs in Agets created from templates; the lifecycle
+    module and project-plan specification ship with the gate, and the close-project skill
+    passes the phase and disposition it requires. The gate runs; it does not catch every
+    unfinished status wording.
+  surfaces: [templates]
+  blocking: true
+  paths:
+  - scripts/close_gate_check.py
+  - scripts/close_gate_lifecycle.py
+  - specs/AGET_PROJECT_PLAN_SPEC.md
+  - .claude/skills/aget-close-project/SKILL.md
+  detection: |-
+    F=$(mktemp -d)/PROJECT_PLAN_smoke.md && printf '%s\n' '# PROJECT_PLAN: smoke' '' '**Plan_Status**: In Progress' '' '**Gate_Status**: Pending' > "$F" && python3 scripts/close_gate_check.py --json --phase entry --disposition Complete "$F"; test $? -eq 2
+  detection_scope: Shows the gate imports, loads its schema and blocks a pending gate;
+    not evidence that it detects every unfinished row.
+hygiene_changes:
+- commit: e3073fc
+  path: governance/DEPRECATIONS.md
+  change: DEP-BASENAME-VPP-001 moved to Closed as Removed in 3.35.0.
+- commit: 659b4e5
+  path: .claude/skills/aget-propose-actions/SKILL.md
+  change: Two evidence notes drop internal session and agent references.
+- commit: 4b93592
+  path: specs/AGET_PROJECT_PLAN_SPEC.md
+  change: Two private-tracker references in the changelog replaced; no normative change.
+removals:
+- id: DEP-BASENAME-VPP-001
+  deprecated_in: 3.32.0
+  earliest_removal: 3.34.0
+  removed_in: 3.35.0
+  replacement: scripts/validate_execution_authorization.py (authorization gate); verification/validate_project_plan.py
+    (plan conformance)
+  breaking: false
+receiver_acceptance:
+  ownership: Receiver-authored and receiver-revision verified; commissioning owned
+    by receiving manager
+  returned: Acknowledged transmission plus verification at receiver source revision
+  behaviour_verified: Credited capability and exercised rejection path pass; no blocking
+    delivery defect
+  producer_written: Never counts as receiver acceptance
+  terminals:
+  - ACCEPTED
+  - BEHAVIOUR_VERIFIED
+  - REJECTED
+  - CANNOT-RUN
+rollback: Preserve unrelated state; revert only committed migration changes or restore
+  only the recorded migration path set from the saved baseline. Never move published
+  tags.

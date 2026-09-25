@@ -11,11 +11,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Items confirmed in-flight for a future release (latest released: **3.34.0**). Per Keep a Changelog 1.1.0 forward-work convention.
+Items confirmed in-flight for a future release (latest released: **3.35.0**). Per Keep a Changelog 1.1.0 forward-work convention.
 
 - Issue-governance spec delta for the `/aget-file-issue` pre-filing probes (skill layer shipped in 3.26.0; formal requirement rides the next spec pass).
 - Template `/aget-file-issue` structural refresh (routing + probe steps to all templates; fleet routing propagation staged per the 3.26.0 rollout decision).
 - **Traceability ratchet**: the test-requirement floor rises +5pp per minor release from the v3.29 measured floor.
+
+## [3.35.0] - 2026-09-26 — Receiver correctness
+
+### Added
+- **Proposed actions say what they move.** `/aget-propose-actions` v1.9.0 tags each proposed action as moving the outcome in focus or only its measurement. An outcome step that needs an approval is surfaced as a decision, and the close report states outcome and measurement separately. Check a batch with `scripts/propose_actions_classify.py --check-outcome-gating`.
+- **A deferral scan that reads what is on disk.** `scripts/propose_actions_handoff_scan.py` finds recent handoff documents by their authored date, plus any that are untracked or locally modified. It never uses file modification time. Locations are configurable through `.aget/config.json` (key `propose_actions.handoff_locations`; default `docs`, `planning`, `inbox/outbound`). The scan reports `MATCHED`, `NONE-MATCHED`, `NO-CANDIDATES` or `UNAVAILABLE`. `UNAVAILABLE` means it could not look, and it is never a pass.
+- **CI host independence (advisory).** `specs/AGET_CI_SPEC.md` v1.5.0 adds CAP-CI-010. A test's outcome must not depend, undeclared, on anything outside the repository checkout. The remedy is to declare the precondition and skip, never to weaken the assertion. Hermeticity is established by running in a distinct environment, not by reading sources. Landed on the release branch 2026-09-24 (`333bf2b`, cherry-picked from `8c951f2`, authored 2026-09-22).
+- `tests/test_ci_host_independence.py` partly checks CAP-CI-010-03. It verifies that the CI workflow runs the whole suite as a blocking step on a GitHub-hosted runner from a fresh checkout, and that a run inside GitHub Actions reports a GitHub-hosted runner. It does not check that a hermeticity claim waits for that run; that part is tracked.
+
+### Fixed
+- **The strict close gate runs in Agets created from templates.** The v3.34.0 template tags shipped `scripts/close_gate_check.py` without `scripts/close_gate_lifecycle.py`, the module it imports, so the gate stopped on import. All 13 templates now carry the lifecycle module and the project-plan specification it reads (`specs/AGET_PROJECT_PLAN_SPEC.md`). Their `/aget-close-project` skill now passes the `--phase` and `--disposition` arguments the gate requires. The gate now runs. It does not yet catch every unfinished-row wording (see Limitations).
+- **Classifier repairs that had not shipped.** The shipped `scripts/propose_actions_classify.py` includes four earlier fixes that the framework's producer had applied only to its own copy (see the release notes).
+- `tests/test_close_gate_receiver_contract.py` checks the 3.31.1 delivered-files manifest against that tag's bytes, not the working tree, and skips with a declared precondition when the tag is absent.
+
+### Removed
+- **DEP-BASENAME-VPP-001** is closed as Removed (`e3073fc`). It covered the deprecated script name `scripts/validate_project_plan.py`, deprecated in 3.32.0 with earliest removal 3.34.0. No shipped repository carried the shim. Use `scripts/validate_execution_authorization.py` for the authorization gate and `verification/validate_project_plan.py` for plan conformance.
+
+### Changed
+- Release hygiene, with no behaviour change. Two evidence notes in the propose-actions skill no longer carry internal session and agent references; their lesson and observation citations are kept (`659b4e5`). The project-plan specification's changelog replaces two private-tracker references with a neutral internal-tracker reference, with no normative change (`4b93592`).
+
+### Limitations
+- The close gate treats a status as unfinished only if the status word is on its list of unfinished words. An unlisted word, for example `HELD`, reads as finished. Its release-class guard runs only where an Aget carries `scripts/release_close_guard.py`, which the framework does not ship, so the gate skips that check. Both are tracked for a later release.
+- The `/aget-close-project` skill copied into the templates cites four requirement IDs and two tests that the framework does not ship. These are citations only; the gate's behaviour does not depend on them. Tracked.
+- CAP-CI-010 is advisory. The deployment specification at the tag records `prepared`, not `released` (see the release notes). Publication and downstream adoption require separate evidence.
 
 ## [3.34.0] - 2026-09-13 — Evidence that reaches its subject
 
