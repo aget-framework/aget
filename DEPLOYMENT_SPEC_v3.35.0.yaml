@@ -83,8 +83,7 @@ removals:
   deprecated_in: 3.32.0
   earliest_removal: 3.34.0
   removed_in: 3.35.0
-  replacement: scripts/validate_execution_authorization.py (authorization gate); verification/validate_project_plan.py
-    (plan conformance)
+  replacement: verification/validate_project_plan.py (plan conformance); the authorization gate is producer-internal and not shipped
   breaking: false
 receiver_acceptance:
   ownership: Receiver-authored and receiver-revision verified; commissioning owned

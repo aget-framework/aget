@@ -41,11 +41,11 @@ The payload is the same for all 13 archetypes. One existing gap closes: the docu
 
 ## Breaking Changes
 
-None. Two deprecation removals are described under Removals; neither removes a file that any shipped repository carried.
+None. One registry deprecation removal and the retirement of a producer-internal verification matrix are described under Removals; neither removes a file that any shipped repository carried.
 
 ## Removals
 
-**DEP-BASENAME-VPP-001, the script name `scripts/validate_project_plan.py`.** Originally deprecated in 3.32.0 and announced in the public registry `governance/DEPRECATIONS.md`, which first shipped with 3.32.0. Grace period satisfied: marked 3.32.0, carried 3.33, removable from 3.34.0, removed 3.35.0. Migration: use `scripts/validate_execution_authorization.py` for the authorization gate and `verification/validate_project_plan.py <path> --strict` for plan conformance. No shipped repository carried the shim. Not a breaking change.
+**DEP-BASENAME-VPP-001, the script name `scripts/validate_project_plan.py`.** Originally deprecated in 3.32.0 and announced in the public registry `governance/DEPRECATIONS.md`, which first shipped with 3.32.0. Grace period satisfied: marked 3.32.0, carried 3.33, removable from 3.34.0, removed 3.35.0. Migration: for plan conformance use `verification/validate_project_plan.py <path> --strict`. The execution-authorization gate (`scripts/validate_execution_authorization.py`) is producer-internal and is not shipped by the framework or any template. No shipped repository carried the shim. Not a breaking change.
 
 **A retired release-closure requirement.** A five-row behavioural-verification matrix in the producer's release procedure. Its closure force was withdrawn on 2026-08-29; it was carried through two minor releases and removed in 3.35.0 as scheduled. It was never part of the shipped framework; no migration is needed.
 
@@ -62,7 +62,7 @@ None. Two deprecation removals are described under Removals; neither removes a f
 
 Python 3.10 or later, immutable tag-bound sources, a matching archetype template, a recorded receiver baseline and a rollback reference are required. Missing evidence is `HOLD`, never an inferred pass.
 
-Install a skill only together with the scripts it calls. `/aget-propose-actions` needs `scripts/propose_actions_handoff_scan.py` and `scripts/propose_actions_classify.py`. `/aget-close-project` needs `scripts/close_gate_check.py`, `scripts/close_gate_lifecycle.py` and `specs/AGET_PROJECT_PLAN_SPEC.md`, all from the same tag; mixing versions makes the gate fail closed with a schema error (exit 3).
+Install a skill only together with the scripts it calls. `/aget-propose-actions` needs `scripts/propose_actions_handoff_scan.py` and `scripts/propose_actions_classify.py`. `/aget-close-project` needs `scripts/close_gate_check.py`, `scripts/close_gate_lifecycle.py` and `specs/AGET_PROJECT_PLAN_SPEC.md`, all from the same tag; if the specification is missing or lacks the lifecycle rows the gate reads, the gate fails closed with a schema error (exit 3).
 
 If your Aget installed the 3.31.1 close-gate package, it may carry its own copy of `tests/test_close_gate_receiver_contract.py` and `handoffs/DELIVERED_FILES_v3.31.1.yaml`, rebound to your repository. Taking the 3.35.0 `specs/AGET_PROJECT_PLAN_SPEC.md` turns such a copy red if it pins the earlier specification digest. Either refresh the test from this release, which reads the 3.31.1 tag and skips with a declared precondition where that tag is absent, or keep the local skip you already carry. Do not overwrite a local skip without replacing it. Record which you chose in your receipt.
 
@@ -135,7 +135,7 @@ Required:
 - the fixture plan returns exit status 2 with a finding keyed `gate_status_pending`, which shows the gate evaluated the plan;
 - no new receiver test failures against the baseline.
 
-A module-not-found error, or exit status 3 with a schema error, means the close-gate package is incomplete or mixed across versions. Preserve raw output; do not normalize an unavailable predicate into a pass. Run the test runner directly, not through a wrapper that writes into the Aget, and record it if the working tree changes during verification.
+A module-not-found error, or exit status 3 with a schema error, means the close-gate package is incomplete (a missing module, or a specification without the lifecycle rows). Preserve raw output; do not normalize an unavailable predicate into a pass. Run the test runner directly, not through a wrapper that writes into the Aget, and record it if the working tree changes during verification.
 
 ## Rollback
 

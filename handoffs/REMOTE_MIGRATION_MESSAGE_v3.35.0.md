@@ -31,7 +31,7 @@ Theme: receiver correctness.
 
 ## Breaking Changes
 
-None. There are two deprecation removals, neither of which removes a file any shipped repository carried; see the release handoff, section Removals.
+None. There is one registry deprecation removal (DEP-BASENAME-VPP-001), plus the retirement of a producer-internal verification matrix; neither removes a file any shipped repository carried; see the release handoff, section Removals.
 
 ## Deployment Requirements
 
@@ -46,6 +46,7 @@ None. There are two deprecation removals, neither of which removes a file any sh
 **Step 0: sync the framework clones.** Fetch tags; no checkout is needed.
 
 ```bash
+export FW=/path/to/your/aget-framework-clones   # the directory holding aget and template-* clones
 git -C "$FW/aget" fetch --tags origin
 git -C "$FW/aget" show v3.35.0:.aget/version.json | python3 -c 'import json,sys; print(json.load(sys.stdin)["aget_version"])'
 # Expected: 3.35.0
