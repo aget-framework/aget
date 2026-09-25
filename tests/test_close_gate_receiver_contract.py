@@ -254,8 +254,39 @@ def test_release_manifest_binds_ordered_complete_package():
     offsets = [text.index(f'path: "{path}"') for path in expected]
     assert offsets == sorted(offsets)
     assert "scripts/close_gate_lifecycle_ext.py" not in text
+    # The manifest is immutable and describes the package AT its source_ref, so each digest is
+    # checked against that release's bytes, not the working tree: a later legitimate edit to a
+    # package file (or to this test, which the manifest also pins) must not read as a false red.
+    found = re.search(r'^source_ref: "([^"]+)"$', text, re.M)
+    assert found, "manifest has no source_ref line"
+    source_ref = found.group(1)
+    assert source_ref == "v3.31.1"
+    has_tag = subprocess.run(
+        ["git", "-C", str(ROOT), "rev-parse", "-q", "--verify", f"refs/tags/{source_ref}"],
+        capture_output=True,
+    ).returncode == 0
+    if not has_tag:
+        # CAP-CI-010-02: a declared precondition, not a weakened assertion. Canonical CI checks
+        # out with tags (.github/workflows/ci.yml), so there a missing tag is a defect.
+        if os.environ.get("GITHUB_REPOSITORY") == "aget-framework/aget":
+            pytest.fail(f"{source_ref} tag missing in canonical CI; the checkout must fetch tags")
+        pytest.skip(f"precondition: a framework checkout carrying the {source_ref} tag")
+    tagged = subprocess.run(
+        ["git", "-C", str(ROOT), "show", f"{source_ref}:handoffs/{MANIFEST.name}"],
+        capture_output=True,
+    )
+    assert tagged.returncode == 0 and tagged.stdout == MANIFEST.read_bytes(), (
+        f"manifest differs from its copy at {source_ref}; it is immutable "
+        f"{tagged.stderr.decode(errors='replace').strip()}")
     for path in expected:
-        digest = hashlib.sha256((ROOT / path).read_bytes()).hexdigest()
+        at_ref = subprocess.run(
+            ["git", "-C", str(ROOT), "show", f"{source_ref}:{path}"],
+            capture_output=True,
+        )
+        assert at_ref.returncode == 0, (
+            f"{path} not readable at {source_ref}: "
+            f"{at_ref.stderr.decode(errors='replace').strip()}")
+        digest = hashlib.sha256(at_ref.stdout).hexdigest()
         assert f'sha256: "{digest}"' in text
     identities = re.findall(
         r'^\s+path: "([^"]+)"\n\s+(?:sha256|identity): "([^"]+)"$', text, re.M)

@@ -12,6 +12,10 @@ This document records selected AGET Framework releases and historical repository
 
 ## Current Version
 
+**v3.35.0** (2026-09-26 candidate) — Release candidate; publication unverified
+
+Receiver correctness: proposed actions say what they move and the deferral scan reads what is on disk; the strict close gate runs in Agets created from templates; CI host independence is specified (advisory).
+
 **v3.34.0** (2026-09-13 candidate; published 2026-09-14) — Published
 
 Evidence-bound capability checks and receiver verification. The original candidate and its disclosed regression-coverage limitations are preserved through one independently accepted repair successor. See `release-notes/v3.34.0.md` for the selected outcomes, acceptance scope and remaining deployment obligations. The [v3.34.0 GitHub Release](https://github.com/aget-framework/aget/releases/tag/v3.34.0) was published on 2026-09-14. Publication does not establish downstream deployment or receiver acceptance.
@@ -646,5 +650,5 @@ We acknowledge historical gaps transparently and focus on complete releases goin
 ---
 
 *VERSION_HISTORY.md - Selected release history for AGET Framework*
-*Last Updated: 2026-09-15 (v3.34.0 publication and coverage wording; historical rows not re-audited)*
+*Last Updated: 2026-09-26 (v3.35.0 candidate)*
 *Maintained by: aget-framework*

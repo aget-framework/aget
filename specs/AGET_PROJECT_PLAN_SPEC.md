@@ -884,9 +884,9 @@ structure:
 
 ### v1.2.2 (2026-05-02)
 
-- **V-PP-007 dual fix** (gmelli/aget-aget#1180): (a) enum value rewrite `{PROPOSED/IN_PROGRESS/COMPLETE/SUPERSEDED}` → `{Draft/In Progress/Complete/Abandoned}` to align with CAP-PP-003-01 (line 214 — the canonical status-enum requirement); (b) CAP binding correction `CAP-PP-019` → `CAP-PP-003` (CAP-PP-019 is "EARS System-Level Requirements," not status enum). The two defects were independent but discovered together; resolution is one V-test row edit.
+- **V-PP-007 dual fix** (internal tracker #1180): (a) enum value rewrite `{PROPOSED/IN_PROGRESS/COMPLETE/SUPERSEDED}` → `{Draft/In Progress/Complete/Abandoned}` to align with CAP-PP-003-01 (line 214 — the canonical status-enum requirement); (b) CAP binding correction `CAP-PP-019` → `CAP-PP-003` (CAP-PP-019 is "EARS System-Level Requirements," not status enum). The two defects were independent but discovered together; resolution is one V-test row edit.
 - Semantic absorption documented: `Draft` ⊇ both PROPOSED + Draft semantics; `Abandoned` ⊇ both SUPERSEDED + Abandoned semantics. Plans needing the distinction record it in plan-body free-text (e.g., "Status: Abandoned — superseded by `<other plan>`"). Premature 6-value enum violates L103.
-- See: gmelli/aget-aget#1180, MEMO_d_1179_1180_reconciliation_2026_05_02.md § Principal Disposition
+- See: internal tracker #1180, MEMO_d_1179_1180_reconciliation_2026_05_02.md § Principal Disposition
 
 ### v1.2.1 (2026-03-17)
 

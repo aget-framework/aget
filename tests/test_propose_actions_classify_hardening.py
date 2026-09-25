@@ -250,3 +250,98 @@ def test_vacuous_pass_is_labelled_vacuous():
 
 if __name__ == "__main__":
     raise SystemExit(pytest.main([__file__, "-v"]))
+
+
+# ---------------------------------------------------------------------------
+# The `populat` noun/verb defect — measured 2026-09-05, both polarities pinned.
+# ---------------------------------------------------------------------------
+# The bare stem `populat` swallowed the NOUN "population", which is this seat's own
+# governance word for a control set or denominator. Effect: census and audit actions
+# were forced to synthesis and could never satisfy the REQ-PA-013 pairing they exist
+# to supply. Same call as the reverted bare `stamp`, resolved the same way.
+
+def test_population_noun_does_not_force_synthesis():
+    """Satisfies: REQ-PA-013 — a census action must be able to reach audit-class.
+
+    Falsifier for the fail-CLOSED direction: if this returns synthesis, the pairing
+    gate has become unsatisfiable for accurately-worded audit actions again.
+    """
+    assert classify("audit the ceremony control population") == "audit"
+    assert classify("re-count the control population from source") == "audit"
+    assert classify("audit the population of seats in the register") == "audit"
+
+
+def test_populate_verb_forms_still_classify_as_synthesis():
+    """Satisfies: REQ-PA-013 — the fail-OPEN direction must stay closed.
+
+    Narrowing the stem must not let a genuine write buy audit-class (the L980 vector).
+    """
+    for text in ("populate the initiative index",
+                 "populates the table",
+                 "populated the roster",
+                 "populating the board"):
+        assert classify(text) == "synthesis", f"{text!r} escaped synthesis-class"
+
+
+def test_populate_narrowing_did_not_disturb_the_audit_asymmetry():
+    """A synthesis verb alongside an audit verb still yields synthesis (CAP-PA-013-04)."""
+    assert classify("audit the roster and populate the index") == "synthesis"
+
+
+# ---------------------------------------------------------------------------------------------
+# Added 2026-09-22. The file had already narrowed one bare stem (`populat`) for swallowing the
+# noun "population". Two more were found the same way seventeen days later: `\bauthor` swallowed
+# "authoritative" and `\brecord` swallowed "of record", so an audit action could not name its own
+# subject. Four word-by-word repairs in one layer is the signal, so this pair of tests is
+# deliberately CLASS-LEVEL rather than another per-word assertion.
+# ---------------------------------------------------------------------------------------------
+
+# Nouns this seat's governance vocabulary uses when DESCRIBING an audit. None of them is a verb in
+# that usage, so no synthesis pattern may swallow any of them. Extend this list, not the fix.
+GOVERNANCE_NOUNS = [
+    "the authoritative copy", "the authoritative source", "the authority",
+    "the register of record", "the record", "a record", "the system of record",
+    "the population", "the populations", "the denominator", "the manifest",
+    "the register", "the provenance", "the coverage",
+]
+
+
+def test_no_synthesis_pattern_swallows_a_governance_noun():
+    """Satisfies: CAP-PA-013-01 -- class-level guard: an audit verb plus a governance noun must still classify as audit.
+
+    This is the invariant behind three separate carrier repairs (`populat` 2026-09-05,
+    `author` + `record` 2026-09-22). Without it, each new collision is found only when an
+    operator notices their honest description will not pass the gate — which is how the
+    2026-09-22 instance was found, after three rewordings.
+    """
+    offenders = []
+    for noun in GOVERNANCE_NOUNS:
+        text = f"re-derive {noun}"
+        if classify(text) != "audit":
+            offenders.append((noun, text))
+    assert not offenders, (
+        "a synthesis pattern is swallowing a governance noun, so an audit action that names "
+        f"its own subject cannot classify as audit: {offenders}"
+    )
+
+
+def test_the_guard_is_not_weakened_by_that_exemption():
+    """Satisfies: CAP-PA-013-04 -- opposite polarity: freeing the nouns must not free the verbs they resemble.
+
+    Stated separately because the cheap way to pass the test above is to drop the patterns,
+    which would convert a friction defect into a hole. `author`/`record` as VERBS, and any
+    genuine write paired with an audit verb, must still read synthesis.
+    """
+    must_stay_synthesis = [
+        "author the spec",
+        "authors the delta",
+        "authored the release note",
+        "authoring the handoff",
+        "record the finding",
+        "recorded the decision",
+        "recording the session",
+        "re-derive and record the counts",
+        "cross-check the authoritative copy and then update it",
+    ]
+    leaks = [t for t in must_stay_synthesis if classify(t) != "synthesis"]
+    assert not leaks, f"the guard leaked — these must remain synthesis: {leaks}"

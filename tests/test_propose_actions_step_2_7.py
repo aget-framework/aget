@@ -89,3 +89,57 @@ def test_non_governed_artifact_not_grouped():
     rep = check_pairing(batch)
     assert rep["pairing_status"] == "PASS"
     assert rep["same_artifact_groups"] == {}
+
+
+# --- schema gate: an optional check must not default to healthy (2026-07-29) ---
+
+
+def test_malformed_batch_fails_closed_instead_of_vacuous_pass():
+    """A batch with the wrong keys used to return pairing_status=PASS over zero groups.
+
+    Every artifact read as "", so nothing was governed, so no group had >=2 members, so
+    nothing could be unpaired. The L980 Layer-5 gate reported healthy on a batch it had
+    never looked at. Caught live while proposing an action batch on 2026-07-29.
+    """
+    import pytest
+
+    wrong_keys = [
+        {"desc": "audit the counts", "path": "governance/GOALS.md"},
+        {"desc": "write the summary", "path": "governance/GOALS.md"},
+    ]
+    with pytest.raises(ValueError, match="vacuous PASS"):
+        check_pairing(wrong_keys)
+
+
+def test_partial_schema_is_accepted():
+    """Only one known key is required — 'text' alone is a legitimate (ungoverned) action."""
+    rep = check_pairing([{"text": "measure something"}])
+    assert rep["pairing_status"] == "PASS"
+    assert rep["scope"]["governed_actions"] == 0
+
+
+def test_scope_block_marks_a_vacuous_pass_as_vacuous():
+    """vg2:R3 — a PASS must carry what it actually covered."""
+    rep = check_pairing([{"text": "audit x", "artifact": "workspace/scratch.md"}])
+    assert rep["pairing_status"] == "PASS"
+    assert rep["scope"]["vacuous"] is True
+
+    paired = check_pairing(
+        [
+            {"text": "re-derive the counts", "artifact": "governance/GOALS.md"},
+            {"text": "write the rollup", "artifact": "governance/GOALS.md"},
+        ]
+    )
+    assert paired["pairing_status"] == "PASS"
+    assert paired["scope"]["vacuous"] is False
+    assert paired["scope"]["governed_actions"] == 2
+
+
+def test_a_declared_subject_cannot_split_a_same_artifact_group():
+    """Satisfies: REQ-PA-013 -- two writes to one artifact stay one group whatever subjects they declare (R1-04)."""
+    batch = [
+        {"text": "write the summary", "artifact": "planning/X.md", "subject_id": "x"},
+        {"text": "update the table", "artifact": "planning/X.md", "subject_id": "y"},
+    ]
+    rep = check_pairing(batch)
+    assert rep["pairing_status"] == "UNMET", rep
