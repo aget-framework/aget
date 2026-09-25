@@ -83,7 +83,7 @@ removals:
   deprecated_in: 3.32.0
   earliest_removal: 3.34.0
   removed_in: 3.35.0
-  replacement: verification/validate_project_plan.py (plan conformance); the authorization gate is producer-internal and not shipped
+  replacement: 'verification/validate_project_plan.py <path> --strict (plan conformance; core repository only, the templates do not ship it); the authorization gate is producer-internal and not shipped'
   breaking: false
 receiver_acceptance:
   ownership: Receiver-authored and receiver-revision verified; commissioning owned

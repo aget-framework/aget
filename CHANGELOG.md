@@ -31,7 +31,7 @@ Items confirmed in-flight for a future release (latest released: **3.35.0**). Pe
 - `tests/test_close_gate_receiver_contract.py` checks the 3.31.1 delivered-files manifest against that tag's bytes, not the working tree, and skips with a declared precondition when the tag is absent.
 
 ### Removed
-- **DEP-BASENAME-VPP-001** is closed as Removed (`e3073fc`). It covered the deprecated script name `scripts/validate_project_plan.py`, deprecated in 3.32.0 with earliest removal 3.34.0. No shipped repository carried the shim. For plan conformance use `verification/validate_project_plan.py <path> --strict`. The execution-authorization gate (`scripts/validate_execution_authorization.py`) is producer-internal and is not shipped by the framework or any template.
+- **DEP-BASENAME-VPP-001** is closed as Removed (`e3073fc`). It covered the deprecated script name `scripts/validate_project_plan.py`, deprecated in 3.32.0 with earliest removal 3.34.0. No shipped repository carried the shim. For plan conformance use `verification/validate_project_plan.py <path> --strict` from a clone of the core repository; the templates do not ship it. The execution-authorization gate (`scripts/validate_execution_authorization.py`) is producer-internal and is not shipped by the framework or any template.
 
 ### Changed
 - Release hygiene, with no behaviour change. Two evidence notes in the propose-actions skill no longer carry internal session and agent references; their lesson and observation citations are kept (`659b4e5`). The project-plan specification's changelog replaces two private-tracker references with a neutral internal-tracker reference, with no normative change (`4b93592`).

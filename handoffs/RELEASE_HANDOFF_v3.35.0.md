@@ -45,7 +45,7 @@ None. One registry deprecation removal and the retirement of a producer-internal
 
 ## Removals
 
-**DEP-BASENAME-VPP-001, the script name `scripts/validate_project_plan.py`.** Originally deprecated in 3.32.0 and announced in the public registry `governance/DEPRECATIONS.md`, which first shipped with 3.32.0. Grace period satisfied: marked 3.32.0, carried 3.33, removable from 3.34.0, removed 3.35.0. Migration: for plan conformance use `verification/validate_project_plan.py <path> --strict`. The execution-authorization gate (`scripts/validate_execution_authorization.py`) is producer-internal and is not shipped by the framework or any template. No shipped repository carried the shim. Not a breaking change.
+**DEP-BASENAME-VPP-001, the script name `scripts/validate_project_plan.py`.** Originally deprecated in 3.32.0 and announced in the public registry `governance/DEPRECATIONS.md`, which first shipped with 3.32.0. Grace period satisfied: marked 3.32.0, carried 3.33, removable from 3.34.0, removed 3.35.0. Migration: for plan conformance use `verification/validate_project_plan.py <path> --strict` from a clone of the core repository; the templates do not ship it. The execution-authorization gate (`scripts/validate_execution_authorization.py`) is producer-internal and is not shipped by the framework or any template. No shipped repository carried the shim. Not a breaking change.
 
 **A retired release-closure requirement.** A five-row behavioural-verification matrix in the producer's release procedure. Its closure force was withdrawn on 2026-08-29; it was carried through two minor releases and removed in 3.35.0 as scheduled. It was never part of the shipped framework; no migration is needed.
 

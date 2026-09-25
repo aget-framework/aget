@@ -31,7 +31,7 @@ Theme: receiver correctness.
 
 ## Breaking Changes
 
-None. There is one registry deprecation removal (DEP-BASENAME-VPP-001), plus the retirement of a producer-internal verification matrix; neither removes a file any shipped repository carried; see the release handoff, section Removals.
+None. There is one registry deprecation removal (DEP-BASENAME-VPP-001), plus the retirement of a producer-internal verification matrix. Neither removes a file any shipped repository carried. See the release handoff, section Removals.
 
 ## Deployment Requirements
 
