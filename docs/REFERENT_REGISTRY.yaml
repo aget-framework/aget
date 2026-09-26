@@ -38,13 +38,40 @@ public:
   ontology_concept:
     pattern: '\bC(\d{3,4})\b'
     prefLabel_source: ontology/ONTOLOGY_personal_ai_systems_v1.0.yaml
+    # ADDED 2026-09-25 (origin-scoped source). `prefLabel_source` is a REPO-RELATIVE path, and
+    # this entry propagates byte-identically to every Aget that adopts the registry, while the
+    # path exists only at the origin Aget named below (by role). Without these fields a receiver cannot
+    # tell "the source is not mine to have" from "the source is missing", so the absence is
+    # silent everywhere. Fidelity of text is not fidelity of reference: propagation copies the
+    # path and cannot copy the referent. (The origin Aget holds a receiver-side check that
+    # reports NOT-APPLICABLE for a legitimately absent origin_only source; it is not yet
+    # shipped in this repository.) The origin is named by ROLE at this public boundary: the
+    # Aget holding the framework-manager archetype, which publishes the vocabulary.
+    prefLabel_source_scope: origin_only
+    prefLabel_source_origin: framework-manager
+    # Resolution order a consumer SHOULD attempt. The published address is primary because
+    # a dereferenceable address propagates without breaking -- the referent travels with it
+    # -- while a filesystem path cannot. Standard practice, not a local preference:
+    # "persistence is purely a matter of service" (W3C Cool URIs; DPC Handbook).
+    resolution_order:
+      - published_uri
+      - local_prefLabel_source
     template: 'https://w3id.org/aget/vocab#{prefLabel_underscored}'
-    resolves_today: false
+    # MEASURED AT THE ORIGIN, then propagated -- it must not be read as a per-Aget fact.
+    resolves_today: partial
+    measured_2026-09-25: >
+      PARTIAL, not false. 24 of 1088 live concepts carry a published_at URI (2.2%); the
+      published vocabulary page carries 24 anchors, one per published concept, and its Turtle
+      and JSON-LD parse (234 triples each, isomorphic; the Turtle was unparseable until
+      2026-09-25). A link built from this template resolves for those 24 and for no other
+      concept, so a linker MUST check membership in the published set before emitting a link.
+      First public use: the org homepage links "fleet" to #Agent_Fleet (2026-09-25).
     blocker: >
       ONE gap, not two. COVERAGE: 16 of 1043 live concepts carry a published_at URI
       in ontology/publication_manifest.yaml -- 1.5%. Zero of the 40 Cluster-22
       (inter-Aget communication) concepts are published, which is why the 2026-08-27
-      artifact could not link a single concept it named.
+      artifact could not link a single concept it named. (Figures as of 2026-08-27;
+      superseded by measured_2026-09-25 above.)
     corrected_2026-08-27: >
       This entry first claimed a SECOND gap -- "the published HTML carries ZERO
       per-concept anchors". THAT WAS FALSE, and the error was mine: I grepped for
@@ -160,6 +187,12 @@ contract:
       and report it as an unresolved referent. Never emit a link that 404s -- a
       dangling link is worse than an unlinked identifier, because it implies a
       target was checked.
+    - >
+      A class with `resolves_today: partial` MAY be linked only for an identifier
+      verified to resolve (for ontology_concept: the concept is in the published set,
+      i.e. its anchor is on the published page). Every other identifier of that class
+      is treated as `false` under the rule above. (Rule added 2026-09-25; `partial`
+      was already in use without a stated meaning.)
     - >
       A `private` class MUST NOT be linked when the target surface is shareable
       unless the caller passes an explicit acknowledgement. Default is refuse.
