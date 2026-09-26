@@ -1,11 +1,11 @@
 # AGET Vocabulary Specification
 
-**Version**: 1.17.0
+**Version**: 1.18.0
 **Status**: Active
 **Category**: Core (Standards)
 **Format Version**: 1.2
 **Created**: 2026-01-04
-**Updated**: 2026-07-11
+**Updated**: 2026-09-26
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_VOCABULARY_SPEC.md`
 **Change Origin**: PROJECT_PLAN_standards_ontology_elevation_v1.0
@@ -154,13 +154,13 @@ Term_Name:
 
 ## Term Usage in Documents (L493)
 
-Per **L493 (Vocabulary_Prose_Marking_Pattern)**, all AGET Vocabulary terms MUST be self-disambiguating in prose through compound construction.
+Per **L493 (Vocabulary_Prose_Marking_Pattern)**, all terms in this spec's own vocabulary register MUST be self-disambiguating in prose through compound construction. Highlighting any registered term in prose follows CAP-VOC-006.
 
 ### Design Principle
 
 > **Self-disambiguation by construction eliminates context-dependent judgment.**
 
-If all AGET Vocabulary terms are compound (`Aget_Agent`, `Task_Entity`, `Session_Handoff`), they are unambiguous in ANY context without requiring human judgment.
+If all terms in this spec's own register are compound (`Aget_Agent`, `Task_Entity`, `Session_Handoff`), they are unambiguous in ANY context without requiring human judgment.
 
 ### Marking Convention
 
@@ -174,13 +174,21 @@ If all AGET Vocabulary terms are compound (`Aget_Agent`, `Task_Entity`, `Session
 | **Technical ID** | `kebab-case` | `capability-action-item-management` |
 | **Generic English** | `lowercase` | "tracking", "persistent", "work" |
 
+This table describes how this spec's own register *names* its entries (UPPER_CASE forms such as SOP are file and artifact-type names). A highlighted term in prose is a register label, per CAP-VOC-006.
+
 ### Prose Requirements
 
 | ID | Requirement |
 |----|-------------|
-| R-VOC-PROSE-001 | AGET Vocabulary references MUST use exact `skos:prefLabel` form |
+| R-VOC-PROSE-001 | Unhighlighted references to terms in **this spec's own vocabulary register** MUST use the exact `skos:prefLabel` form. Highlighted terms from either register follow CAP-VOC-006 |
 | R-VOC-PROSE-002 | Generic English MUST use lowercase |
-| R-VOC-PROSE-003 | Single-word Vocabulary terms are PROHIBITED (use compound forms) |
+| R-VOC-PROSE-003 | Single-word **preferred labels** are PROHIBITED for entries of this spec's own vocabulary register (use compound forms; CAP-VOC-004-02). This does not restrict highlights (CAP-VOC-006-02) |
+
+**Scope note (v1.18.0).** R-VOC-PROSE-001..003 were written (L493, 2026-01) for this spec's own compound vocabulary
+register. The fleet's ratified SKOS ontology is a second register whose preferred labels contain spaces, hyphens and
+single words. Highlighting a concept from either register in prose is governed by **CAP-VOC-006**. `R-VOC-TERM-001`,
+cited by `verification/validate_vocabulary_prose.py`, has no definition site in this spec; the check it names
+(`--check-terms`) enforces CAP-VOC-004-02 for this spec's register.
 
 ### Example
 
@@ -196,7 +204,7 @@ Enable Aget_Instances to track Action_Items that emerge from Aget_Sessions.
 
 ### Machine-Parseability
 
-Compound AGET Vocabulary terms match this regex:
+Compound AGET Vocabulary terms in **this spec's own register** match this regex (it is not a test for CAP-VOC-006 highlights, which admit single words and hyphens):
 ```regex
 [A-Z][a-z]+(_[A-Z][a-z]+)+
 ```
@@ -1140,7 +1148,7 @@ Aget_Agent:
   skos:broader: "Aget_Continuant"
   aget:theoretical_basis: "BDI Architecture (Bratman, Rao & Georgeff), L331"
   aget:core_entity: true
-  skos:narrower: ["Aget_Person", "Aget_AI_System", "Aget_Organization"]
+  skos:narrower: ["Aget_Person", "Aget_AI_System", "Aget_Organization", "Aget_Instance"]
   skos:example: "Alice is an Aget_Agent — she can form intentions and take autonomous actions."
 
 Aget_Person:
@@ -1161,16 +1169,15 @@ Aget_AI_System:
   aget:theoretical_basis: "BDI Architecture for artificial agents"
   aget:core_entity: true
   aget:dag_parents: ["Aget_Agent (primary)", "Aget_Technical_System (secondary)"]
-  skos:narrower: ["Aget_Instance"]
   skos:example: "Claude is an Aget_AI_System — an agent implemented as a technical system."
 
 Aget_Instance:
   skos:prefLabel: "Aget_Instance"
   skos:altLabel: ["Instance"]
-  skos:definition: "Aget_AI_System that is configured using the AGET framework (version.json + AGENTS.md)."
-  skos:broader: "Aget_AI_System"
+  skos:definition: "Concrete agent created from an Aget_Template (see the Part 2 Identity Terms table): the identity that an Aget_Fleet collects, configured by its version.json and AGENTS.md. Not an installed working copy of it on a host, and not the AI system it works with (Aget_AI_System)."
+  skos:broader: "Aget_Agent"
   aget:core_entity: true
-  skos:example: "my-framework-manager is an Aget_Instance — an AI system configured via AGET."
+  skos:example: "my-framework-manager is an Aget_Instance; each checkout of it on a host is a working copy, not a second instance."
 
 Aget_Organization:
   skos:prefLabel: "Aget_Organization"
@@ -2745,7 +2752,7 @@ Instruction_Asymmetry:
 |----|-------------|-----------|
 | CAP-VOC-002-01 | Specs SHALL use vocabulary terms | Consistency |
 | CAP-VOC-002-02 | New terms SHALL be added to vocabulary | Single source |
-| CAP-VOC-002-03 | Terms SHALL use Title_Case | Convention |
+| CAP-VOC-002-03 | Entries of this spec's own register SHALL use Title_Case | Convention |
 
 ### CAP-VOC-003: L440 Verification Terms
 
@@ -2760,7 +2767,7 @@ Instruction_Asymmetry:
 | ID | Pattern | Statement |
 |----|---------|-----------|
 | CAP-VOC-004-01 | ubiquitous | The SYSTEM shall require every vocabulary term to include skos:prefLabel and skos:definition properties. |
-| CAP-VOC-004-02 | prohibited | The SYSTEM shall NOT accept single-word vocabulary terms (R-VOC-PROSE-003). |
+| CAP-VOC-004-02 | prohibited | The SYSTEM shall NOT accept single-word vocabulary terms (R-VOC-PROSE-003) in this spec's own vocabulary register. Ratified-ontology concepts are outside this requirement (CAP-VOC-006-02). |
 | CAP-VOC-004-03 | conditional | IF a new specification introduces domain terms, THEN the SYSTEM shall add those terms to the controlled vocabulary. |
 
 ### CAP-VOC-005: Publication Provenance (L882/L1126)
@@ -2770,6 +2777,24 @@ Instruction_Asymmetry:
 | CAP-VOC-005-01 | event-driven | WHEN a concept is published to a public surface, THEN the publishing agent shall record `aget:published_at` on the fleet-local concept with the persistent public URI. |
 | CAP-VOC-005-02 | prohibited | Tooling shall NOT treat a published public copy as an authority, gate, or sync source for the fleet-local concept (L453). |
 | CAP-VOC-005-03 | ubiquitous | The `aget:published_at` URI shall use the persistent (PID-indirected) form, never a host-direct URL. |
+
+### CAP-VOC-006: Grounded Term Display Form (principal rulings, 2026-09-26)
+
+A highlighted term tells the reader that the word has one agreed definition that can be relied on. Where two readings of this rule differ, the less ambiguous one wins, then the more compact.
+
+**Definitions.** A *highlight* is an inline code span whose content has the shape of a term (one or more capitalised words joined by underscores or hyphens); code spans holding paths, commands, file names or identifiers such as CAP-VOC-006 are not highlights. The *named registers* are (1) the fleet's ratified SKOS ontology (`ONTOLOGY_personal_ai_systems`; fleet-local — its public projection at https://w3id.org/aget/vocab lists published concepts only and is not an authority, CAP-VOC-005-02), and (2) this spec's own register: the entries in this document that carry `skos:prefLabel`, and the rows of its term tables (a term name with a definition). Where a term has both a table row and a formal entry, the two definitions shall agree.
+
+| ID | Pattern | Requirement |
+|----|---------|-------------|
+| CAP-VOC-006-01 | ubiquitous | A highlight shall hold an entry's `skos:prefLabel`, or a `skos:altLabel` that points to exactly one entry, with each space replaced by an underscore and every other character, hyphens and letter case included, unchanged. |
+| CAP-VOC-006-02 | ubiquitous | When a single-word label is highlighted, the highlight shall hold that word unchanged; CAP-VOC-004-02 does not apply to highlights. |
+| CAP-VOC-006-03 | prohibited | A term with no entry in a named register shall NOT appear in a highlight, including when it is quoted as an example. Where the writer means it as a wanted term, it shall be written in italics in display form (for example *Pilot_Receiver*), which marks absence, not a definition; otherwise it is written as plain words or in quotation marks. |
+| CAP-VOC-006-04 | ubiquitous | Resolving a highlight to its entry shall treat underscore and space as the same separator and shall NOT fold letter case ("Aget" is not "AGET"). |
+| CAP-VOC-006-05 | conditional | IF a label names entries that do not state the same meaning (in two registers, or twice in one), THEN the writer shall use a more specific unshared label or plain words; only where neither serves shall the highlight be followed by a short qualifier in parentheses naming the sense meant, for example `Goal` (committed outcome). |
+| CAP-VOC-006-06 | ubiquitous | A highlight shall hold the most specific registered term the text means (for example `Project_Plan` rather than `Plan`). |
+| CAP-VOC-006-07 | ubiquitous | A plural shall be written as the highlighted singular label followed by its plural ending outside the code span (for example `Receipt`s); a plural inside a code span is not a label. Where the plural is not formed by adding an ending, the sentence is rephrased around the singular highlight. |
+
+Notes: a code span renders the same whether it quotes a form or marks a defined term, which is why -03 covers quotation. Italics play the part of the research knowledge base's red link: they make an absent term visible as a risk and an opportunity. Tools that suggest grounding for plain prose may fold case; -04 governs resolving a highlight. Which register is primary when entries differ is not settled here; -05 avoids the question in prose. -05's qualifier and -07's plural ending follow the research knowledge base's practice (qualified titles; plural outside the link).
 
 ---
 
@@ -2795,8 +2820,14 @@ Instruction_Asymmetry:
 | V-VOCAB-006 | CAP-VOC-003-01 | inspection | Verify V_Test term is used for gate verification in PROJECT_PLANs |
 | V-VOCAB-007 | CAP-VOC-003-02 | automated | Verify Declarative_Completion is marked as anti_pattern in vocabulary |
 | V-VOCAB-008 | CAP-VOC-004-01 | automated | Verify every vocabulary term has both skos:prefLabel and skos:definition |
-| V-VOCAB-009 | CAP-VOC-004-02 | automated | Verify no single-word vocabulary terms exist (compound forms required) |
+| V-VOCAB-009 | CAP-VOC-004-02 | automated | Verify no single-word vocabulary terms exist in this spec's own register (compound forms required) |
 | V-VOCAB-010 | CAP-VOC-004-03 | manual | Verify new spec domain terms are added to controlled vocabulary |
+| V-VOCAB-011 | CAP-VOC-006-01/02 | automated (canonical check owed) | Verify each highlight resolves to one register entry in display form (preferred label, or an alias pointing to exactly one entry), single words included |
+| V-VOCAB-012 | CAP-VOC-006-03 | automated (canonical check owed) | Verify no highlight names a term absent from every register, and that italic term-shaped forms name no entry (an italic form that has an entry should be a highlight) |
+| V-VOCAB-013 | CAP-VOC-006-04 | automated (canonical check owed) | Verify resolution treats underscore as space and does not fold case |
+| V-VOCAB-014 | CAP-VOC-006-05 | inspection | Verify that labels whose entries differ are replaced by an unshared label or plain words, or else followed by a qualifier in parentheses naming the sense meant |
+| V-VOCAB-015 | CAP-VOC-006-06 | manual | Verify the most specific registered term is highlighted |
+| V-VOCAB-016 | CAP-VOC-006-07 | automated (canonical check owed) | Verify no highlight holds a plural form of a label; plural endings sit outside the code span |
 
 ### Validation Commands
 
@@ -2832,6 +2863,13 @@ grep -E "^    [a-z]" aget/specs/AGET_VOCABULARY_SPEC.md | grep -v "skos:\|aget:\
 ---
 
 ## Changelog
+
+### v1.18.0 (2026-09-26)
+
+- **NEW**: CAP-VOC-006 Grounded Term Display Form (7 EARS requirements) + V-VOCAB-011..016
+- **SCOPED**: the L493 self-disambiguation lines, the Marking Convention table, R-VOC-PROSE-001 (unhighlighted references), R-VOC-PROSE-003 (preferred labels of entries), CAP-VOC-002-03, CAP-VOC-004-02, V-VOCAB-009 and the compound regex now state that they govern this spec's own register; highlights from either register follow CAP-VOC-006
+- **NOTE**: `R-VOC-TERM-001` (cited by the prose validator) has no definition site here
+- Origin: principal rulings of 2026-09-26 on grounded-term highlighting (a highlight is a trust sign; label with spaces as underscores; single words allowed; one definition when shared entries agree; case-sensitive resolution)
 
 ### v1.17.0 (2026-07-11)
 
