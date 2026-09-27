@@ -17,12 +17,16 @@
     {
       "path": "docs/AGET_CLI_SUPPORT_MATRIX.md",
       "sha256": "c72870583dad2c06fdd630cc3e3024c6b58b38c6be605de02f869b03a9419e22",
-      "mode": "0o644"
+      "mode": "0o644",
+      "sha256_current": "e88e1720b1952acda4657463bb9cdab211ffaa6a6a763cd2794562c2fe793527",
+      "amended_post_tag": "2026-09-26: Antigravity terminal-agent re-measurement (matrix v1.2.0: L1/L2 YES for agy 1.2.11; Gemini CLI retirement dated from the vendor notice). Post-v3.34 edit; sha256 stays the record of what v3.34 shipped."
     },
     {
       "path": "handoffs/FLEET_MIGRATION_CONTRACT_v3.30.0.json",
       "sha256": "8d4cab207da43d07713d093dce44d4d5519a202a60273a95e581aa01aec7c2ee",
-      "mode": "0o644"
+      "mode": "0o644",
+      "sha256_current": "03b23a38612c2e010036a702254804e55a9966a19c3ec45f52c96fbb23845d6f",
+      "amended_post_tag": "2026-09-26: the contract's scripts/study_topic.py row was re-amended (sha256_current + reason) for the gh#2777 minimum fix. Post-v3.34 edit; sha256 stays the record of what v3.34 shipped."
     },
     {
       "path": "knowledge/voice/README.md",
@@ -77,7 +81,9 @@
     {
       "path": "scripts/check_runtime_support_evidence.py",
       "sha256": "4ee75f4427c96ce510c1550f5888ff41ee913072878b5f7616b9ad532e4f5ff9",
-      "mode": "0o755"
+      "mode": "0o755",
+      "sha256_current": "0fec3e0422e486431a661ae7749573731a45c662e3a4f61c53c109a1263924b3",
+      "amended_post_tag": "2026-09-26: INSTRUCTION_SURFACES declares the agy terminal agent's --print surface (L2 read UNKNOWN without it). Post-v3.34 edit; sha256 stays the record of what v3.34 shipped."
     },
     {
       "path": "scripts/check_standard_bindings.py",
@@ -117,7 +123,9 @@
     {
       "path": "scripts/study_topic.py",
       "sha256": "671ce3ab4b8dce578b6b8ea80c61239eb8bf418a5482adcfd8adba2ca8434d21",
-      "mode": "0o644"
+      "mode": "0o644",
+      "sha256_current": "43f4c12ce969c216afdc2a40834547f193580595eda1157332ea5ee474455045",
+      "amended_post_tag": "2026-09-26: gh#2777 minimum fix, the zero-result branch reports floor-suppressed hits instead of 'novel topic'. Post-v3.34 edit; sha256 stays the record of what v3.34 shipped."
     },
     {
       "path": "scripts/warranted_verdict.py",
@@ -207,7 +215,9 @@
     {
       "path": "tests/test_runtime_support_evidence.py",
       "sha256": "f9359e9350903546c475b8577fdd958023442ecaa1f2378efc70b94dcd21f868",
-      "mode": "0o644"
+      "mode": "0o644",
+      "sha256_current": "731468316d438c5b4363670dad86193f884e83ca1b7796e10ea1234febd0ffae",
+      "amended_post_tag": "2026-09-26: two tests for the agy entry (terminal agent YES at L2; a launcher answering to agy does not borrow it). Post-v3.34 edit; sha256 stays the record of what v3.34 shipped."
     },
     {
       "path": "tests/test_scaffold_skill_description_integration.py",
