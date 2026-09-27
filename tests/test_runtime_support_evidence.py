@@ -92,6 +92,35 @@ def test_an_undeclared_runtime_family_is_UNKNOWN_at_L2_not_NO(onpath):
     assert r["verdict"] == UNKNOWN and "no instruction surface declared" in r["why"]
 
 
+AGY_TERMINAL_HELP = (
+    "Usage of agy:\n"
+    "  -p                              Short alias for --print\n"
+    "  --print                         Run a single prompt non-interactively and print the response\n"
+    "  --output-format                 Output format for print mode (text, json, stream-json)\n"
+)
+
+
+def test_the_antigravity_terminal_agent_is_YES_at_L2(onpath):
+    """The terminal agent states non-interactive operation for --print (agy 1.2.11, 2026-09-26)."""
+    fake_exe(onpath, "agy", version="1.2.11", help_text=AGY_TERMINAL_HELP)
+    r = crse.level2_instructable("agy")
+    assert r["verdict"] == YES and "--print" in r["surface_tokens_found"]
+
+
+def test_a_launcher_answering_to_agy_does_not_borrow_the_terminal_agents_L2(tmp_path, monkeypatch):
+    """The desktop launcher can also answer to `agy`. Neither L1 nor L2 may read YES for it."""
+    app = tmp_path / "Antigravity.app" / "Contents" / "Resources" / "app" / "bin"
+    app.mkdir(parents=True)
+    real = fake_exe(app, "antigravity", version="1.107.0",
+                    help_text="Usage: antigravity [options] [paths...]  --new-window  --reuse-window")
+    d = tmp_path / "bin"
+    d.mkdir()
+    (d / "agy").symlink_to(real)
+    monkeypatch.setenv("PATH", str(d))
+    assert crse.level1_installed("agy")["verdict"] != YES
+    assert crse.level2_instructable("agy")["verdict"] != YES
+
+
 # --- L3: read from a receipt, never produced ------------------------------------
 
 def test_L3_without_a_receipt_directory_is_UNKNOWN_never_NO(onpath):

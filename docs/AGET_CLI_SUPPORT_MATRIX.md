@@ -1,7 +1,7 @@
 # AGET CLI Support Matrix
 
-**Version**: 1.1.0
-**Date**: 2026-09-09 (v1.0.0 2026-01-16)
+**Version**: 1.2.0
+**Date**: 2026-09-26 (v1.1.0 2026-09-09; v1.0.0 2026-01-16)
 **Status**: ACTIVE
 **Implements**: PROJECT_PLAN_cli_independence_validation_v1.0
 
@@ -12,9 +12,10 @@
 AGET is designed to be CLI-agnostic, working with multiple AI coding assistants. This document tracks validation status and support levels for each CLI.
 
 **Validation Date**: 2026-01-16 for the Baseline/Compatible rows below; **2026-09-09** for the
-three-level evidence section and the Antigravity row.
+three-level evidence section; **2026-09-26** for the Antigravity and Gemini rows (see the
+re-measurement below).
 **AGET Version**: 3.4.0 at original validation. **The version-tested column is not re-measured here** —
-only the rows this cycle touched carry a 2026-09-09 reading.
+only the rows a cycle touched carry that cycle's reading.
 
 ---
 
@@ -24,8 +25,8 @@ only the rows this cycle touched carry a 2026-09-09 reading.
 |-----|--------|----------------|---------------|-------|-------|
 | **Claude Code** | Anthropic | 2.1.9 | **Baseline** | 24/24 | Primary development target |
 | **Codex CLI** | OpenAI | 0.77.0 | Compatible | 26/26 | Native AGENTS.md support |
-| **Gemini CLI** | Google | 0.23.0 | Compatible | 26/26 | Newest, expect changes — **see the 2026-09-09 re-scope below; individual free access is reported retired and a successor is named** |
-| **Antigravity CLI** | Google | 1.107.0 (launcher) | **Experimental** | — | **Announced successor for individual accounts.** Declares a prompt-taking `chat` subcommand; whether it can be driven **non-interactively** is unproven — `chat`'s options are all desktop-window controls. Experimental on three grounds: launcher-only L1, unproven L2, no governed receipt. See the retraction below |
+| **Gemini CLI** | Google | 0.23.0 | Compatible | 26/26 | **Stopped serving Code Assist for individuals, Google AI Pro and Google AI Ultra on 2026-06-18** (vendor deprecation notice); Standard and Enterprise subscriptions are unaffected. Successor: Antigravity CLI. See the 2026-09-26 re-measurement below |
+| **Antigravity CLI** | Google | 1.2.11 (terminal agent `agy`) | **Experimental** | — | **Successor to Gemini CLI for individual accounts.** L1 and L2 now **YES** for the terminal agent (`agy --print` runs non-interactively); L3 unproven, and the AGET compatibility suite has not been run. The 2026-09-09 reading measured the **desktop launcher**, a different binary. See the 2026-09-26 re-measurement below |
 | Cursor | Cursor | - | Experimental | - | Not validated |
 | Aider | Open Source | - | Experimental | - | Not validated |
 | Windsurf | - | - | Experimental | - | Not validated |
@@ -117,6 +118,47 @@ extension is wider than its subject produces exactly the false YES it was added 
 are reported unaffected. No installer, authentication flow, or configuration mutation was performed, and
 no pilot is claimed. Re-targeting the portability initiative itself is a separate governed act and is
 not performed here.
+
+### Re-measurement — 2026-09-26: the terminal agent is a different binary
+
+The 2026-09-09 section above measured Antigravity's **desktop launcher**. Antigravity also ships a
+**terminal agent**, a separate Go binary, and **both can answer to the name `agy`**. The terminal agent
+installs to `~/.local/bin/agy`. The launcher can place an `agy` symlink into the `.app` bundle
+(`~/.antigravity/antigravity/bin/agy`). Which one a context runs depends on that context's `PATH`: in one
+shell the launcher came first, in another it was not on `PATH` at all. Launchd jobs and scripts should use
+the absolute path. The terminal agent also **updates itself** on invocation, so record the version per run,
+not per session.
+
+Measured with the checker above (after declaring the terminal agent's instruction surface):
+
+| Runtime | L1 installed | L2 instructable | L3 governed | Reading |
+|---|---|---|---|---|
+| Antigravity CLI (terminal agent, `~/.local/bin/agy`) | **YES** 1.2.11 | **YES** — `--print`: *"Run a single prompt non-interactively and print the response"*; `--output-format text\|json\|stream-json` | UNKNOWN — no receipt | instructable; not yet governed |
+
+Also observed on the terminal agent (vendor documentation and bounded probes; not yet a governed receipt):
+
+- **Instruction file**: `AGENTS.md` (and `GEMINI.md`) load; `CLAUDE.md` does not. In AGET that file is a
+  symlink to `AGENTS.md`, so nothing is lost.
+- **Skills**: discovered only under `<workspace>/.agents/skills/`, a user-global directory, and installed
+  plugins ([vendor: skills](https://antigravity.google/docs/skills/)). Skills under `.claude/skills/` are
+  **not** listed. A `SKILL.md` without YAML frontmatter (`name:`, `description:`) is dropped from the listing
+  or mislabelled, where Claude Code falls back to the directory name.
+- **Headless denials exit 0**: a tool that needs approval is *soft-denied*, and the run still ends with exit
+  code 0 and `status: SUCCESS` ([vendor: headless mode](https://antigravity.google/docs/cli/headless/)). A
+  runner that maps exit code or status to PASS will score a run whose governed action never happened as a pass.
+- **Hooks and plugins**: `.agents/hooks.json` can deny a tool call (`PreToolUse`) and can keep the agent
+  running (`Stop` returning `continue`). `.agents/plugins/` can bundle skills, rules, MCP servers and hooks
+  ([vendor: hooks](https://antigravity.google/docs/hooks/), [plugins](https://antigravity.google/docs/plugins/)).
+  Both are workspace files that change agent behaviour and should be governed like `.claude/` and `.codex/`.
+
+**Gemini CLI**: the vendor's notice dates the retirement **2026-06-18** for Gemini Code Assist for individuals,
+Google AI Pro and Google AI Ultra, "also appl[ying] to usage of Gemini CLI". Standard and Enterprise
+subscriptions are unchanged ([vendor: deprecation](https://developers.google.com/gemini-code-assist/docs/deprecations/code-assist-individuals)).
+The 2026-09-09 phrasing "individual free access is reported retired" understated it: the paid individual
+tiers are included.
+
+**Still Experimental** on two grounds: no L3 receipt, and the compatibility suite has not been run on the
+terminal agent.
 
 ---
 

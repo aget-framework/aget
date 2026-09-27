@@ -82,6 +82,12 @@ INSTRUCTION_SURFACES = {
     # reported a confident L2 NO, and the matrix published "not currently instructable at this
     # seat" as a measured fact. Corrected 2026-09-09 against `antigravity --help` at source.
     "antigravity": ["chat", "exec", "agent", "--prompt"],
+    # `agy` is the Antigravity terminal agent -- a different binary from the desktop launcher
+    # above, although the launcher can also answer to `agy`. Its help states "--print  Run a
+    # single prompt non-interactively and print the response". Absent from this map, the checker
+    # read L2 UNKNOWN for it. Added 2026-09-26 against `agy --help` 1.2.11 at source. A launcher
+    # resolving as `agy` declares no `--print`, and L1 flags it, so it cannot borrow this entry.
+    "agy": ["--print", "-p"],
 }
 
 
