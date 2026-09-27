@@ -1,8 +1,8 @@
 # REQ-CORE: Critical Foundational Requirements
 
-**Version**: 0.1.0
-**Date**: 2026-04-18
-**Status**: proposed
+**Version**: 0.2.0
+**Date**: 2026-09-26 (refreshed from the principal's requirements ledger)
+**Status**: proposed (refreshed 2026-09-26)
 **Domain**: CORE (cross-cutting, foundational)
 **Specifications**: AGET_SPEC_FORMAT, REQUIREMENTS_FORMAT, ADR-001, ADR-004, ADR-005, ADR-008, AGET_SESSION_SPEC, AGET_ISSUE_GOVERNANCE_SPEC, AGET_RELEASE_SPEC, governance/MISSION.md
 **Author**: private-aget-framework-AGET
@@ -50,7 +50,6 @@ evidence:
   - "L748 (Requirements artifact storage gap)"
   - "L749 (Requirements-Rubric Duality)"
   - "ISO/IEC/IEEE 29148:2018 (StRS → SyRS traceability)"
-  - "C298 (Software System Requirement, ISO/IEC/IEEE 29148:2018)"
 fit_criterion: >
   Every REQ-* document with status >= proposed declares a non-empty
   `specifications:` field listing only identifiers of types CAP-*,
@@ -267,32 +266,37 @@ title: "Framework Reconstructability"
 type: quality
 category: Maintainability
 description: >
-  The framework's most authoritative layers (governance, specifications,
-  fleet topology) shall be reverse-engineerable from publicly visible
-  artifacts. What is most authoritative shall be most visible — the
-  authority gradient and the visibility gradient shall align.
+  An outsider can rebuild what the framework does and why from its
+  public side alone. The most authoritative layers are the most
+  visible: the requirements that drive the framework, and the decisions
+  behind them, are published — not only the specifications and tests
+  that follow from them.
 rationale: >
-  Today the inverse holds: requirements have 20% public coverage but
-  drive everything; fleet topology is internal but constrains
-  external integration. External readers cannot reconstruct the
-  framework's commitments from what they can see, blocking community
-  adoption and external review.
+  Public visibility has run opposite to authority: in April 2026
+  requirements had about 20% public coverage while tests were the most
+  complete layer, and by September 2026 the gap had widened. Outside
+  readers could see what the framework does but not why, which blocks
+  independent review and adoption. This requirement's first target
+  (v3.16.0) lapsed without an instrument or an owner; it is revived
+  with both.
 evidence:
-  - "L840 (Inverted authority gradient; reverse-engineerability study)"
-  - "INIT-FRAMEWORK-TRANSPARENCY (Theme #9, v3.14 cycle)"
-  - "Principal directive 2026-04-16: 'reverse-engineerability should be manifest'"
+  - "Principal directive 2026-04-16: reverse-engineerability should be manifest"
+  - "Inverted authority gradient, measured April 2026 and re-measured September 2026"
+  - "Principal rulings 2026-09-26: publish a plain decision log; refresh requirements from the ledger; judge at the next release"
 fit_criterion: >
-  Reconstructability rubric (per item #29j) scores >= 3/5 on each of
-  the dimensions {requirements coverage, specification EARS density,
-  test coverage, fleet formalization} for all 15 CAP-* domains by
-  v3.16.0. Baseline measured at v3.14.0; trajectory tracked per release.
+  At each release the framework openness measurement reports four
+  things: (1) the public decision log covers every framework decision
+  made since its start date, other than one-night operational ones;
+  (2) every principal requirement that is neither ruled private nor
+  routed to a specification has a public counterpart; (3) every public
+  specification area traces back to at least one public requirement;
+  (4) every highlighted term on a public page has a public definition.
+  Items 1 and 2 are first judged at the first release after
+  2026-09-26; items 3 and 4 at the release after that.
 priority: P1
-specifications:
-  - "CAP-FLEET-001 (PROPOSED — first capability spec within AGET_FLEET_SPEC.md, #29h in development)"
-  - "RUBRIC_reconstructability_v1.0 (PROPOSED — see PROPOSAL_rubric_reconstructability.md, #29j in development)"
 constraints:
-  - "DESIGN_DIRECTION_framework_transparency.md (#29k — design direction document)"
-  - "L840 (Inverted Authority Gradient — the diagnosis this REQ addresses)"
+  - "Framework openness measurement (not yet public)"
+  - "A release check that fails when public requirements fall behind the principal's requirements (proposed for the release specification)"
 status: proposed
 originator: principal
 ```
@@ -392,6 +396,149 @@ originator: principal
 
 ---
 
+## Added 2026-09-26 — from the principal's requirements ledger
+
+These requirements were ruled by the principal between July and September 2026 and held only in a private ledger until this refresh (framework openness rulings, 2026-09-26). Names of private agents, hosts and internal identifiers are stripped; each states the general principle. Three further ledger entries read as contract-level and are routed to specifications instead of this layer.
+
+```yaml
+id: REQ-CORE-F-011
+title: "A Home for Un-Adopted Wants"
+type: functional
+description: >
+  The framework keeps a first-class place for wants the principal has
+  not yet adopted as goals, above the goal layer, so that a hope is
+  recorded as a hope rather than lost or promoted into a commitment too
+  early.
+rationale: >
+  Without a place for un-adopted wants, they are either forgotten or
+  forced into goals the principal never committed to.
+evidence:
+  - "Principal ruling, recorded in the framework's requirements ledger, 2026-07-18"
+fit_criterion: >
+  A want can be recorded without creating a goal, and a later promotion
+  to a goal is a separate, recorded act.
+priority: P2
+status: proposed
+originator: principal
+```
+
+```yaml
+id: REQ-CORE-F-012
+title: "Concurrent Sessions Governed by Visibility"
+type: functional
+description: >
+  Several attended sessions working in one repository at once are
+  acceptable practice. They are governed by making each visible to the
+  others, not by prohibiting them.
+rationale: >
+  Parallel sessions are how the principal works; a prohibition would be
+  ignored, while visibility prevents collisions.
+evidence:
+  - "Principal ruling, recorded in the framework's requirements ledger, 2026-07-18"
+fit_criterion: >
+  A session starting while another is live in the same working tree is
+  told so at start-up, with enough detail to avoid overwriting its
+  work.
+priority: P1
+status: proposed
+originator: principal
+```
+
+```yaml
+id: REQ-CORE-F-013
+title: "Ambiguous Authorization Changes Nothing"
+type: functional
+description: >
+  When a principal authorization could plausibly refer to more than one
+  pending action, nothing is changed and the agent asks which one was
+  meant. A short approval binds directly only when exactly one action
+  is pending.
+rationale: >
+  Acting on a guessed referent spends the principal's authority on
+  something they may not have approved.
+evidence:
+  - "Principal ruling, recorded in the framework's requirements ledger, 2026-08-09"
+fit_criterion: >
+  Given two live candidates and a bare approval, the agent makes zero
+  changes and emits a request naming both candidates.
+priority: P0
+status: proposed
+originator: principal
+```
+
+```yaml
+id: REQ-CORE-Q-014
+title: "Self-Claims Are Checkable or Removed"
+type: quality
+category: Functional Suitability
+description: >
+  Any claim the framework makes about itself — in documentation,
+  release notes or records — can be checked by a reader, or it is
+  removed. This is the operative meaning of done for framework records.
+rationale: >
+  An uncheckable self-claim cannot be told apart from an error, and
+  accumulates into a record nobody can trust.
+evidence:
+  - "Principal ruling, recorded in the framework's requirements ledger, 2026-08-16"
+fit_criterion: >
+  Sampling claims from a release's public records, each names the check
+  or source that confirms it; a claim with neither is absent.
+priority: P1
+status: proposed
+originator: principal
+```
+
+```yaml
+id: REQ-CORE-Q-015
+title: "Counts Carry Their Population"
+type: quality
+category: Functional Suitability
+description: >
+  Every count, census or coverage figure the framework states carries
+  the exact population it was derived over: where it searched, how
+  deep, and what it included.
+rationale: >
+  A figure without its population cannot be reproduced, and the same
+  number can mean different things at different vantage points.
+evidence:
+  - "Principal ruling, recorded in the framework's requirements ledger, 2026-08-29 (ruled for one agent; proposed framework-wide)"
+fit_criterion: >
+  Each figure in a sampled public record is accompanied by its search
+  root, bound and inclusion rule, enough to re-run it.
+priority: P1
+status: proposed
+originator: principal
+```
+
+
+```yaml
+id: REQ-CORE-F-016
+title: "The Openness Position Is Stated"
+type: functional
+description: >
+  The framework states publicly, in plain words, what kind of open it is:
+  its code is released under the Apache 2.0 license; its deliberation is
+  private first; and the reasons for its decisions are published in a
+  public decision log at governance/DECISION_LOG.md.
+rationale: >
+  Measured against the Open Source Definition the framework is open source,
+  because that definition tests only the license. Measured against standards
+  that ask whether a system can be rebuilt, or whether it is developed in the
+  open, it is not. Saying only "open source" without that distinction reads as
+  open-washing; stating the position keeps the public claim true.
+evidence:
+  - "Principal ruling 2026-09-26: state the openness position as a public requirement"
+  - "Openness study 2026-09-26 against the Open Source Definition, the Open Source AI Definition, the Model Openness Framework and the Apache Way"
+fit_criterion: >
+  This requirements set carries the three-part statement (license,
+  private-first deliberation, public decision log), and the public decision
+  log exists at the location the statement names.
+priority: P1
+status: proposed
+originator: principal
+```
+---
+
 ## Constraints
 
 The following non-negotiable boundaries apply across all REQ-CORE-* requirements:
@@ -416,7 +563,7 @@ The following non-negotiable boundaries apply across all REQ-CORE-* requirements
 | REQ-CORE-F-005 | SKILL-024 (aget-propose-actions) | Action proposal |
 | REQ-CORE-F-006 | CAP-DEGRADE-001 (authored 2026-04-19) | All skills/commands |
 | REQ-CORE-F-007 | CAP-REL-022 (Gate Execution Enforcement); CAP-GATE-001 PROPOSED | All gated work |
-| REQ-CORE-Q-008 | AGET_FLEET_SPEC (PROPOSED), RUBRIC_reconstructability (PROPOSED) | Public framework |
+| REQ-CORE-Q-008 | (none yet — measured by the openness measurement; see its constraints) | Public framework |
 | REQ-CORE-Q-009 | AGET_ISSUE_GOVERNANCE_SPEC v2.1.0, R-ISSUE-011, SKILL-040 | All issue filing |
 | REQ-CORE-Q-010 | RUBRIC_session_outcome_value_v1.0, RUBRIC_cross_session_dialogue_depth_v1.0 | Design decisions |
 
@@ -433,7 +580,7 @@ The ten requirements above are grounded in operational evidence and architectura
 - **Memory architecture**: L335 (Extended Mind, Transactive Memory, Distributed Cognition, Stigmergy, Cybernetics)
 - **Authority and governance**: Decision Authority Matrix, L178, L42, L001, L002, ADR-005
 - **Degradation and portability**: ADR-004, L185
-- **Reconstructability**: L840, INIT-FRAMEWORK-TRANSPARENCY (v3.14 theme #9)
+- **Reconstructability**: inverted authority gradient measured April 2026, re-measured September 2026; public decision log started 2026-09-26
 - **Routing security**: L638, L520, R-ISSUE-011
 - **Foundational philosophy**: DESIGN_PHILOSOPHY, L99, L143, governance/MISSION.md
 
@@ -450,7 +597,7 @@ The ten requirements above are grounded in operational evidence and architectura
 | F-005 | `/aget-propose-actions` output schema check | VERIFIED (this session's output) |
 | F-006 | Skill spec degradation field audit | PENDING (#921 spec-coverage work) |
 | F-007 | Git history audit for gate IDs in commits | PARTIAL (D71 enforcement in progress) |
-| Q-008 | Reconstructability rubric scoring | PENDING (rubric in development, #29j) |
+| Q-008 | Openness measurement (four items; see the requirement) | PENDING (first judged at the first release after 2026-09-26) |
 | Q-009 | `validate_issue_destination.py --check` + sanitizer | VERIFIED (tooling exists) |
 | Q-010 | ADR review for collaboration-outcomes 5D tradeoff analysis | PENDING |
 

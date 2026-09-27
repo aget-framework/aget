@@ -6,7 +6,7 @@
 **Authority**: Active (normative, minor/patch allowed)
 **Author**: private-aget-framework-AGET
 **Parallel to**: AGET_SPEC_FORMAT.md v1.3.0 (specification-level meta-doc)
-**Evidence**: L748, L749, ISO/IEC/IEEE 29148:2018, Volere, ISO/IEC 25010:2023, C298 (Software System Requirement, ISO/IEC/IEEE 29148:2018 — added FWRK-2026-004)
+**Evidence**: L748, L749, ISO/IEC/IEEE 29148:2018, Volere, ISO/IEC 25010:2023
 **Tracking**: #725
 **v1.1 changes** (2026-04-19): (a) Added optional `constraints:` per-REQ field for ADRs/governance/meta-docs that bound the REQ but do not implement it; (b) Clarified acceptable `specifications:` types: CAP-*, R-*, SKILL-*, RUBRIC-* (rubrics-as-spec per L749 duality). Motivated by 2026-04-19 audit which found 35/64 `specifications:` citations were category errors (L-docs belong in `evidence:`; ADRs/governance/meta-docs belong in `constraints:`).
 

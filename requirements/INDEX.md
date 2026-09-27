@@ -10,12 +10,14 @@
 
 | Domain | File | Requirements | Status | Date |
 |--------|------|:----------:|--------|------|
-| **CORE** | [REQ-CORE_critical_foundations.md](REQ-CORE_critical_foundations.md) | 7F + 3Q | proposed | 2026-04-18 |
-| GOV | [REQ-GOV_agent_governance.md](REQ-GOV_agent_governance.md) | 4F + 2Q | proposed | 2026-04-18 |
-| REL | [REQ-REL_release_quality.md](REQ-REL_release_quality.md) | 6F + 3Q | proposed | 2026-03-28 |
+| **CORE** | [REQ-CORE_critical_foundations.md](REQ-CORE_critical_foundations.md) | 11F + 5Q | proposed | 2026-09-26 |
+| GOV | [REQ-GOV_agent_governance.md](REQ-GOV_agent_governance.md) | 7F + 4Q | proposed | 2026-09-26 |
+| REL | [REQ-REL_release_quality.md](REQ-REL_release_quality.md) | 10F + 4Q | proposed | 2026-09-26 |
+| INT | [REQ-INT_principal_agent_interaction.md](REQ-INT_principal_agent_interaction.md) | 4F + 2Q | proposed | 2026-09-26 |
+| IAC | [REQ-IAC_inter_agent_communication.md](REQ-IAC_inter_agent_communication.md) | 2F + 0Q | proposed | 2026-09-26 |
 | HOM | [REQ-HOM_homepage_quality.md](REQ-HOM_homepage_quality.md) | 6F + 3Q | proposed | 2026-04-04 |
 
-**CORE** is the cross-cutting foundational domain — the ten requirements every other domain inherits from. Read first.
+**CORE** is the cross-cutting foundational domain — the requirements every other domain inherits from. Read first.
 
 ---
 
