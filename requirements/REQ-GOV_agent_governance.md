@@ -1,8 +1,8 @@
 # REQ-GOV: Agent Governance Requirements
 
-**Version**: 0.2.0
-**Date**: 2026-04-18 (promoted from scratchpad draft v0.1 dated 2026-03-27)
-**Status**: proposed
+**Version**: 0.3.0
+**Date**: 2026-09-26 (refreshed from the principal's requirements ledger)
+**Status**: proposed (refreshed 2026-09-26)
 **Domain**: GOV (Governance)
 **Format**: REQUIREMENTS_FORMAT v1.0
 **Inherits from**: REQ-CORE_critical_foundations.md (cross-cutting foundations)
@@ -247,6 +247,125 @@ constraints:
   - "AGENTS.md Permission Governance section"
 status: proposed
 originator: operational-evidence
+```
+
+---
+
+## Added 2026-09-26 — from the principal's requirements ledger
+
+These requirements were ruled by the principal between July and September 2026 and held only in a private ledger until this refresh (framework openness rulings, 2026-09-26). Names of private agents, hosts and internal identifiers are stripped; each states the general principle. Three further ledger entries read as contract-level and are routed to specifications instead of this layer.
+
+```yaml
+id: REQ-GOV-F-005
+title: "Third-Party Agents Are Capability, Not Governance"
+type: functional
+description: >
+  Agents outside the framework's governance (third-party tools and
+  services) are treated as capabilities, not as participants. Their
+  output enters the knowledge base only with a provenance tag, and any
+  outward-facing act they can take requires a per-action principal
+  approval.
+rationale: >
+  A tool that can publish or send on its own is a live hazard; a
+  framework decision relayed to it is advisory to it, never binding.
+evidence:
+  - "Principal ruling, recorded in the framework's requirements ledger, 2026-07-18"
+fit_criterion: >
+  Every knowledge-base entry originating from a third-party agent
+  carries one of: attested fact, sourced claim, agent hypothesis,
+  unverifiable.
+priority: P1
+status: proposed
+originator: principal
+```
+
+```yaml
+id: REQ-GOV-F-006
+title: "Declarations of Ongoing Force Leave Firing Evidence"
+type: functional
+description: >
+  Every governed declaration that claims ongoing force — a goal's
+  review loop, an initiative's exit condition, a standing procedure
+  cadence — leaves dated evidence each time it fires. A run of missing
+  evidence marks the declaration as lapsed.
+rationale: >
+  A loop that has silently stopped looks the same as one that is
+  working; dated receipts are what tell them apart.
+evidence:
+  - "Principal ruling, recorded in the framework's requirements ledger, 2026-07-18 (two entries: accountability loops, then every declaration of ongoing force)"
+fit_criterion: >
+  For each declared loop, the record shows a dated receipt per review;
+  the configured number of consecutive misses flags it as lapsed.
+priority: P1
+status: proposed
+originator: principal
+```
+
+```yaml
+id: REQ-GOV-F-007
+title: "One Writer for a Shared Rate-Limited Resource"
+type: functional
+description: >
+  A shared external resource with a rate limit has exactly one agent
+  allowed to write to it. Other agents that need it route their writes
+  through that one.
+rationale: >
+  A second writer against a shared limit turns ordinary work into a
+  self-inflicted denial of service.
+evidence:
+  - "Principal ruling, recorded in the framework's requirements ledger, 2026-07-19 (instance names withheld)"
+fit_criterion: >
+  For each rate-limited shared resource, configuration names one
+  writing agent, and no other agent holds write credentials for it.
+priority: P2
+status: proposed
+originator: principal
+```
+
+```yaml
+id: REQ-GOV-Q-003
+title: "Authority Citations Verified at Entry and Reuse"
+type: quality
+category: Functional Suitability
+description: >
+  A citation of an external authority in governed vocabulary is checked
+  against its primary source when it is entered and again when it is
+  reused. Inherited citations are treated as claims to test, not facts
+  to extend.
+rationale: >
+  A mis-cited authority propagates silently once it is copied; checking
+  at reuse is where the copy chain is broken.
+evidence:
+  - "Principal ruling, recorded in the framework's requirements ledger, 2026-07-18"
+fit_criterion: >
+  Each authority citation in a governed vocabulary entry records when
+  and against which primary source it was last verified.
+priority: P1
+status: proposed
+originator: principal
+```
+
+```yaml
+id: REQ-GOV-Q-004
+title: "Governed External Effects Are Classified, Mediated and Receipted"
+type: quality
+category: Safety
+description: >
+  Every governed effect outside the agent — publishing, sending,
+  deleting, paying — is classified against a principal-owned action
+  policy, passes through a named mediation route, and ends in a
+  receipt.
+rationale: >
+  An external effect with no policy class, no route and no receipt
+  cannot be reviewed, reversed or trusted.
+evidence:
+  - "Principal ruling, recorded in the framework's requirements ledger, 2026-08-26"
+fit_criterion: >
+  Sampling external effects, each has a policy class, a mediation route
+  and a terminal receipt; none is missing any of the three.
+priority: P0
+status: proposed
+originator: principal
 ```
 
 ---

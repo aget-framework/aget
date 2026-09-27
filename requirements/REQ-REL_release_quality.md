@@ -1,8 +1,8 @@
 # REQ-REL: Release Quality Requirements
 
-**Version**: 1.3.0
-**Date**: 2026-03-28
-**Status**: proposed (wired to AGET_RELEASE_SPEC v1.11.0)
+**Version**: 1.4.0
+**Date**: 2026-09-26 (refreshed from the principal's requirements ledger)
+**Status**: proposed (refreshed 2026-09-26; wired to AGET_RELEASE_SPEC)
 **Domain**: REL (Release Management)
 **Format**: REQUIREMENTS_FORMAT v1.0 (requirements/REQUIREMENTS_FORMAT.md)
 **Specifications**: AGET_RELEASE_SPEC.md, SOP_release_process.md, RUBRIC_release_handoff_quality_v1.0.md
@@ -375,6 +375,79 @@ constraints:
   - "SOP Phase 7.3 (Remote Fleet Notification) — procedural enforcement"
 status: proposed
 originator: operational-evidence
+```
+
+---
+
+## Added 2026-09-26 — from the principal's requirements ledger
+
+These requirements were ruled by the principal between July and September 2026 and held only in a private ledger until this refresh (framework openness rulings, 2026-09-26). Names of private agents, hosts and internal identifiers are stripped; each states the general principle. Three further ledger entries read as contract-level and are routed to specifications instead of this layer.
+
+```yaml
+id: REQ-REL-F-009
+title: "Consumed Before Done"
+type: functional
+description: >
+  Every new claim surface a release introduces is used once from the
+  consumer's side before the act that produced it is marked done.
+  Release execution runs in a fresh context by default.
+rationale: >
+  A surface nobody has consumed can pass every producer-side check and
+  still fail its first reader.
+evidence:
+  - "Principal ruling, recorded in the framework's requirements ledger, 2026-07-18"
+fit_criterion: >
+  Each new claim surface in a release has one recorded consumer-side
+  use dated before its done mark; same-context release execution
+  carries a recorded override.
+priority: P1
+status: proposed
+originator: principal
+```
+
+```yaml
+id: REQ-REL-F-010
+title: "Pre-Release Research Blocks Until Run or Waived"
+type: functional
+description: >
+  The pre-release research phase, which the framework declares
+  mandatory for every minor release, is enforced by a check that blocks
+  the release cycle from advancing until the phase has run or has been
+  explicitly waived.
+rationale: >
+  A mandatory step with no blocking check is skipped under time
+  pressure, and its absence leaves no signal.
+evidence:
+  - "Principal ruling, recorded in the framework's requirements ledger, 2026-08-28"
+fit_criterion: >
+  Attempting to advance a release cycle with the research phase neither
+  run nor waived fails, naming the phase.
+priority: P1
+status: proposed
+originator: principal
+```
+
+```yaml
+id: REQ-REL-Q-004
+title: "Migration Cost Bounded From the Principal's Side"
+type: quality
+category: Interaction Capability
+description: >
+  Upgrading agents to a new release carries a service-level objective
+  stated from the principal's side: how many times the principal's
+  attention is needed, how long it takes, and how much rework falls to
+  them.
+rationale: >
+  A producer-side measure can report a migration as cheap while the
+  principal pays for it in interruptions.
+evidence:
+  - "Principal ruling, recorded in the framework's requirements ledger, 2026-08-29"
+fit_criterion: >
+  Each release's migration report states attention events, elapsed time
+  and principal rework against a declared objective.
+priority: P1
+status: proposed
+originator: principal
 ```
 
 ---
