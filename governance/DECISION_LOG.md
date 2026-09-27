@@ -14,7 +14,7 @@ decisions (scheduling, one batch, one go-ahead) are not logged.
 
 **Decision**: The framework publishes a plain log of what it decided and why, written fresh for a reader outside the project. The raw decision records stay private.
 
-**Why**: Outsiders could see what the framework does but not why. The principal's stated reason for keeping the raw records private: the local set of agents mixes framework agents with personal ones, and the separation between them needs to be clearer first.
+**Why**: Outsiders could see what the framework does but not why. The principal's stated reason for keeping the raw records private: they mix framework decisions with non-framework material, and the separation needs to be clearer first.
 
 ### 2026-09-26 · Public requirements kept current by a release check
 
@@ -44,7 +44,7 @@ decisions (scheduling, one batch, one go-ahead) are not logged.
 
 **Decision**: The openness goal is judged at the first release after 26 September 2026.
 
-**Why**: The principal chose the tighter of the offered windows over the recommended one. Amended the same day: the deadline is split (see below).
+**Why**: The earlier of the windows considered was chosen. Amended the same day: the deadline is split (see below).
 
 ### 2026-09-26 · One log page, starting today, with a back-fill
 
@@ -80,7 +80,7 @@ decisions (scheduling, one batch, one go-ahead) are not logged.
 
 **Decision**: Over the next four months the new engine is used as a third engine for cross-checking and research, on public or low-sensitivity work only, not for unattended work.
 
-**Why**: Whether its consumer tier may use prompts for training has not been ruled on, so its use stays on public or low-sensitivity work until it is.
+**Why**: Whether the tool's data terms permit training on prompts has not been reviewed, so its use stays on public or low-sensitivity work until they are.
 
 ### 2026-09-26 · Typed text counts as the principal only with a checkable mark
 
@@ -92,7 +92,7 @@ decisions (scheduling, one batch, one go-ahead) are not logged.
 
 **Decision**: An agent checks its own rendered replies by reading the terminal's screen as text with each character's colour, scrollback included, read-only.
 
-**Why**: Chosen over pixel capture and combined approaches. The same setting could let scripts type into any session, so it is used read-only.
+**Why**: Chosen over pixel capture and combined approaches; access is read-only.
 
 ### 2026-09-26 · An agent's check on the principal's behalf stays the agent's
 
@@ -230,7 +230,7 @@ decisions (scheduling, one batch, one go-ahead) are not logged.
 
 **Decision**: When a decision with lasting force is recorded, it also gets an entry in the principal's requirements list at that moment, so the release check sees every lasting decision.
 
-**Why**: The list held 25 requirements, while about 170 decisions sat in policy-type records (a lower-bound count by file name), so a check watching only the list could not see the lasting decisions among them.
+**Why**: The list held 25 requirements, while most lasting decisions were recorded outside it, so a check watching only the list could not see them.
 
 ### 2026-09-26 · The openness goal's deadline is split
 

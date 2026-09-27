@@ -13,7 +13,7 @@
 
 How agents exchange requests and findings with each other without corrupting what they measure or losing messages that have nowhere to go.
 
-These requirements were ruled by the principal between July and September 2026 and held only in a private ledger until this refresh (framework openness rulings, 2026-09-26). Names of private agents, hosts and internal identifiers are stripped; each states the general principle. Three further ledger entries read as contract-level and are routed to specifications instead of this layer.
+These requirements were ruled by the principal between July and September 2026 and held only in a private ledger until this refresh (framework openness rulings, 2026-09-26). Names of private agents, hosts and internal identifiers are stripped; each states the general principle. Across the whole ledger (not per file), three further entries read as contract-level and are routed to specifications instead of this layer.
 
 ---
 
