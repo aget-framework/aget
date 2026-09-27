@@ -1593,7 +1593,12 @@ def generate_report(topic: str, findings: dict, floor_info: dict = None,
     all_items = [x for v in findings.values() if isinstance(v, list) for x in v]
     relevant = [x for x in all_items if x.get('keyword_coverage', 1.0) >= 0.5]
     noise = len(all_items) - len(relevant)
-    if total == 0:
+    if total == 0 and suppressed:
+        # gh#2777: a floor-suppressed hit is a hit. Printing "novel topic" here turned a
+        # score-floor boundary into an absence claim (topic "agy": 0 shown, 1 suppressed).
+        lines.append(f"0 artifacts above the score floor{floor_note}. "
+                     "This is NOT a novel-topic verdict: suppressed hits exist.")
+    elif total == 0:
         lines.append("0 artifacts found on the searched surfaces. This appears to be a "
                      "**novel topic** — but check the NOT-searched list above before "
                      "concluding novelty.")

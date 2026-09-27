@@ -74,3 +74,18 @@ def test_coverage_propagated_through_finder():
     import inspect
     assert "keyword_coverage" in inspect.getsource(st.find_ldocs)
     assert "keyword_coverage" in inspect.getsource(st.find_governance)
+
+
+def test_zero_shown_with_floor_suppressed_hits_is_not_novel():
+    """gh#2777: 0 shown + N floor-suppressed must not read as a novel topic, and must say how to see them."""
+    f = {"ldocs": [], "patterns": [], "project_plans": [], "sops": [], "governance": []}
+    rec = _recommendation(st.generate_report("agy", f, floor_info={"floor": 2.0, "suppressed": 1}))
+    assert "novel topic" not in rec
+    assert "1 below score floor 2.0" in rec and "--no-floor" in rec
+
+
+def test_zero_shown_with_no_suppressed_hits_stays_novel():
+    """The other polarity: a floor that suppressed nothing leaves the existing novel-topic wording."""
+    f = {"ldocs": [], "patterns": [], "project_plans": [], "sops": [], "governance": []}
+    rec = _recommendation(st.generate_report("brand new", f, floor_info={"floor": 2.0, "suppressed": 0}))
+    assert "novel topic" in rec
