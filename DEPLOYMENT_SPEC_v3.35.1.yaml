@@ -1,0 +1,99 @@
+version: 3.35.1
+spec_version: 1.0.0
+created: '2026-10-03'
+status: released
+supersedes: DEPLOYMENT_SPEC_v3.35.0.yaml
+breaking_release: false
+source_ref: v3.35.1
+rollback_ref: v3.35.0
+release_notes: release-notes/v3.35.1.md
+release_handoff: handoffs/RELEASE_HANDOFF_v3.35.1.md
+remote_migration: handoffs/REMOTE_MIGRATION_MESSAGE_v3.35.1.md
+corrections: none at tag (a post-tag fix opens handoffs/CORRECTIONS_v3.35.1.md on main; SOP Phase 3.6 Rule 2)
+payload_manifest: none
+publication_boundary: '`status` is written as released for the copy of this file at the
+  annotated tag v3.35.1, as the release procedure requires of the tagged file. The same bytes
+  reach main through the release pull request shortly before the tag and its GitHub Release
+  exist; in that interval the field is ahead of the fact. This field is not publication
+  evidence: publication is shown by the annotated tag and the Release object, and neither
+  is installation or acceptance evidence. Record the annotated tag and peeled commit before
+  consuming.'
+mandatory_changes:
+- id: M-3.35.1-1
+  description: When the relevance floor suppresses every hit, study_topic's zero-result
+    branch reports the suppressed count and how to see the hits (--no-floor) instead of
+    calling the topic novel.
+  surfaces: [core, templates]
+  blocking: true
+  paths:
+  - scripts/study_topic.py
+  source_tests:
+  - tests/test_study_topic_relevance_floor.py
+  detection: |-
+    python3 -c "import sys; sys.path.insert(0, 'scripts'); import study_topic as st; r = st.generate_report('agy', {'ldocs': [], 'patterns': [], 'project_plans': [], 'sops': [], 'governance': []}, floor_info={'floor': 2.0, 'suppressed': 1}); sys.exit(0 if 'NOT a novel-topic verdict' in r and '--no-floor' in r else 1)"
+  detection_core: |-
+    python3 -m pytest -q tests/test_study_topic_relevance_floor.py
+  detection_scope: Runs the shipped report function on a fixture with one suppressed hit;
+    exits 1 on the 3.35.0 code. Not evidence about any receiver's own topics.
+- id: M-3.35.1-2
+  description: Six templates ship the Apache 2.0 LICENSE file their README declares
+    (CAP-LIC-005-01).
+  surfaces: [templates]
+  blocking: false
+  paths:
+  - LICENSE
+  detection: |-
+    test -f LICENSE && head -3 LICENSE | grep -q 'Apache License'
+  detection_scope: template-analyst-aget, template-architect-aget, template-executive-aget,
+    template-operator-aget, template-researcher-aget and template-reviewer-aget gained the
+    file; the other seven already carried it. A receiver's own licence choice is its own.
+- id: M-3.35.1-3
+  description: Grounded term display form (CAP-VOC-006, vocabulary specification v1.18.0);
+    a prose rule, no receiver action.
+  surfaces: [core]
+  blocking: false
+  paths:
+  - specs/AGET_VOCABULARY_SPEC.md
+  detection: |-
+    python3 -c "import sys; t=open('specs/AGET_VOCABULARY_SPEC.md').read(); sys.exit(0 if 'CAP-VOC-006' in t and all('V-VOCAB-0%d' % i in t for i in range(11, 17)) else 1)"
+  detection_scope: Presence of the capability and its six verification rows; not a check
+    that any document follows the rule.
+hygiene_changes:
+- commit: ac0964f
+  path: governance/DECISION_LOG.md
+  change: Public decision log published; seven requirements files refreshed.
+- commit: 0aa56eb
+  path: governance/DECISION_LOG.md
+  change: Five details removed after an independent review; a ledger-wide count clarified.
+- commit: 3287dcd
+  path: docs/AGET_CLI_SUPPORT_MATRIX.md
+  change: Antigravity terminal agent re-measured; the evidence checker declares its instruction
+    surface.
+- commit: 38f3f39
+  path: docs/REFERENT_REGISTRY.yaml
+  change: Ontology concept links marked partial (published concepts only), with a dated measurement.
+- commit: 19afebb
+  path: handoffs/CORRECTIONS_v3.35.0.md
+  change: The 3.35.0 corrections record opened (four rows).
+- commit: f0016a5
+  path: handoffs/V334_PAYLOAD_MANIFEST_corrected.json
+  change: In-record amendments for files edited after their release; released digests intact.
+- commit: f4da55a
+  path: tests/test_corrected_manifest_matches_tree.py
+  change: Corrected manifests accept an in-record amendment; an unamended edit still fails.
+removals: []
+receiver_acceptance:
+  ownership: Receiver-authored and receiver-revision verified; commissioning owned
+    by receiving manager
+  returned: Acknowledged transmission plus verification at receiver source revision
+  behaviour_verified: Credited capability and exercised rejection path pass; no blocking
+    delivery defect
+  producer_written: Never counts as receiver acceptance
+  terminals:
+  - ACCEPTED
+  - BEHAVIOUR_VERIFIED
+  - REJECTED
+  - CANNOT-RUN
+rollback: Preserve unrelated state; revert only committed migration changes or restore
+  only the recorded migration path set from the saved baseline. Never move published
+  tags.

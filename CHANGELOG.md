@@ -11,11 +11,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Items confirmed in-flight for a future release (latest released: **3.35.0**). Per Keep a Changelog 1.1.0 forward-work convention.
+Items confirmed in-flight for a future release (latest: **3.35.1**; publication is shown by its tag and GitHub Release). Per Keep a Changelog 1.1.0 forward-work convention.
 
 - Issue-governance spec delta for the `/aget-file-issue` pre-filing probes (skill layer shipped in 3.26.0; formal requirement rides the next spec pass).
 - Template `/aget-file-issue` structural refresh (routing + probe steps to all templates; fleet routing propagation staged per the 3.26.0 rollout decision).
 - **Traceability ratchet**: the test-requirement floor rises +5pp per minor release from the v3.29 measured floor.
+
+## [3.35.1] - 2026-10-04 — Weekly train: what landed on main since 3.35.0
+
+The first release of the weekly weekend train: it ships what reached `main` after 3.35.0: six content pull requests (#108 to #113; the sixteen commits after the 3.35.0 tag also include the 3.35.0 release merge, #107), each with all of its checks successful at merge (8 of 8, including the seven checks `main` requires today; the required-check configuration at each merge time is not recoverable), plus this release's own files. It adds no other code.
+
+### Added
+- **A public decision log.** `governance/DECISION_LOG.md` records, in plain language, why the framework's rulings were made, so anyone can check why AGET is as it is. The deliberation itself stays private; the reasons are published (`ac0964f`, `0aa56eb`).
+- **Grounded term display form (CAP-VOC-006).** `specs/AGET_VOCABULARY_SPEC.md` v1.18.0 states how a term grounded in a named register is highlighted in prose: a term-shaped code span holding the entry's preferred label, or an alias that points to exactly one entry; a term with no entry is never highlighted (paths, commands, file names and identifiers in code spans are outside the rule). Adds the verification rows V-VOCAB-011 to V-VOCAB-016, whose automated checks are still owed, and scopes the older prose rules to the spec's own register. It also corrects an identity definition: `Aget_Instance` is now a kind of `Aget_Agent` (the concrete agent created from a template), not of `Aget_AI_System`, and a checkout on a host is a working copy, not a second instance; the spec had defined it twice, inconsistently (`e366289`).
+- **The 3.35.0 corrections record.** `handoffs/CORRECTIONS_v3.35.0.md` opens with four rows, including the waiver under which the 3.35.0 deployment specification records `prepared` (`19afebb`).
+
+### Changed
+- **Public requirements refreshed.** Seven files under `requirements/` were refreshed from the principal's requirements ledger, including one requirement stating the openness position: the code is Apache-licensed, deliberation is private-first, and the reasons are published in the decision log (`ac0964f`, `0aa56eb`).
+- **CLI support matrix.** The Antigravity terminal agent was re-measured: levels L1 and L2 hold (`agy --print` is non-interactive); L3 is unproven. The Gemini CLI retirement is dated from the vendor notice, and `scripts/check_runtime_support_evidence.py` declares Antigravity's instruction surface (`3287dcd`).
+- **Referent registry.** `docs/REFERENT_REGISTRY.yaml` now records that ontology concept links resolve only for published concepts (`partial`, with a dated measurement), defines what `partial` means, and declares the scope of its label source (`38f3f39`).
+- **Templates.** All 13 templates carry the corrected `scripts/study_topic.py`.
+
+### Fixed
+- **`study_topic` no longer reports a suppressed result as a novel topic.** When the relevance floor hides every hit, the zero-result branch reports how many were suppressed and how to see them (`--no-floor`) instead of "novel topic" (`428ec9e`).
+- **Six templates now ship the licence their README declares.** `template-analyst-aget`, `template-architect-aget`, `template-executive-aget`, `template-operator-aget`, `template-researcher-aget` and `template-reviewer-aget` gain the Apache 2.0 `LICENSE` file (CAP-LIC-005-01).
+- Two handoff records carry in-record amendments for files edited after their release; the released digests are kept intact (`f0016a5`), and the corrected-manifest test accepts such an amendment while an unamended edit still fails (`f4da55a`).
+
+### Limitations
+- This is a patch release that carries one specification addition (CAP-VOC-006, a prose display rule). It adds no behaviour a receiving Aget runs.
+- The migration kit is not in this release; it is planned for 3.36.0.
+- The 13 templates still ship the close-authorization guard at its unrepaired 3.34.0 version (`handoffs/CORRECTIONS_v3.35.0.md`, row 4); the repair is in core only. Apply that row's workaround; propagation to the templates is not in this release.
 
 ## [3.35.0] - 2026-09-26 — Receiver correctness
 

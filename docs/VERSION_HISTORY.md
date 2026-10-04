@@ -12,9 +12,13 @@ This document records selected AGET Framework releases and historical repository
 
 ## Current Version
 
-**v3.35.0** (2026-09-26 candidate) — Release candidate; publication unverified
+**v3.35.1** (2026-10-04 candidate) — Release candidate; publication unverified
 
-Receiver correctness: proposed actions say what they move and the deferral scan reads what is on disk; the strict close gate runs in Agets created from templates; CI host independence is specified (advisory).
+Weekly-train patch: the public decision log and refreshed requirements, the grounded term display form (vocabulary specification v1.18.0, CAP-VOC-006), the `study_topic` zero-result fix, the Antigravity CLI re-measure, a partial referent-registry fix, the 3.35.0 corrections record, and the Apache 2.0 licence file in six templates. See `release-notes/v3.35.1.md`. This entry records the candidate; it does not assert a public tag, Release object or receiver confirmation.
+
+**v3.35.0** (2026-09-26 candidate; published 2026-09-25) — Published
+
+Receiver correctness: proposed actions say what they move and the deferral scan reads what is on disk; the strict close gate runs in Agets created from templates; CI host independence is specified (advisory). The [v3.35.0 GitHub Release](https://github.com/aget-framework/aget/releases/tag/v3.35.0) was published on 2026-09-25. Publication does not establish downstream deployment or receiver acceptance.
 
 **v3.34.0** (2026-09-13 candidate; published 2026-09-14) — Published
 
@@ -650,5 +654,5 @@ We acknowledge historical gaps transparently and focus on complete releases goin
 ---
 
 *VERSION_HISTORY.md - Selected release history for AGET Framework*
-*Last Updated: 2026-09-26 (v3.35.0 candidate)*
+*Last Updated: 2026-10-04 (v3.35.1 candidate)*
 *Maintained by: aget-framework*

@@ -1,7 +1,7 @@
 {
-  "aget_version": "3.35.0",
+  "aget_version": "3.35.1",
   "created": "2025-09-21",
-  "updated": "2026-09-26",
+  "updated": "2026-10-04",
   "component": "core",
   "description": "AGET Framework Core - Specifications, templates, and validation",
   "repository": "aget-framework/aget",
@@ -55,7 +55,8 @@
     "v3.32.0 -> v3.33.0: 2026-08-30 (staged on the release candidate; declared before tag so the template tier can converge against a real target rather than a promised one)",
     "v3.33.0 -> v3.33.1: 2026-08-30",
     "v3.33.1 -> v3.34.0: 2026-09-13 (release candidate assembly; publication verified separately)",
-    "v3.34.0 -> v3.35.0: 2026-09-26 (receiver correctness)"
+    "v3.34.0 -> v3.35.0: 2026-09-26 (receiver correctness)",
+    "v3.35.0 -> v3.35.1: 2026-10-04 (weekly-train patch: public commits since v3.35.0)"
   ],
   "contents": {
     "specs/": "Canonical specifications (AGET_VERSIONING_CONVENTIONS, etc.)",
