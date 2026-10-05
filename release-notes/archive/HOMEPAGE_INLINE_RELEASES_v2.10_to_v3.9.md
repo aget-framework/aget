@@ -161,8 +161,8 @@
 - **Current homepage**: [.github/profile/README.md](https://github.com/aget-framework/.github/blob/main/profile/README.md) — v3.10+ inline entries only (Fork C boundary)
 - **Full release pages**: [GitHub Releases](https://github.com/aget-framework/aget/releases) — canonical bodies per version
 - **CHANGELOG**: [CHANGELOG.md](https://github.com/aget-framework/aget/blob/main/CHANGELOG.md) — Keep-a-Changelog style consolidated history
-- **Fork C decision memo**: [MEMO_homepage_surface_architecture_fork_2026-05-10.md](https://github.com/gmelli/private-aget-framework-AGET/blob/main/docs/MEMO_homepage_surface_architecture_fork_2026-05-10.md) (private; principal-accessible context)
+- **Homepage architecture**: Maintainer review supporting the Fork C homepage layout described above.
 
 ---
 
-*Archive created under T1.12 Gate 1 of `PROJECT_PLAN_v3.18_T1.12_homepage_fork_bundle_v1.0.md` (Fork C Hybrid implementation). Closes L941-L944 cluster homepage-substrate findings.*
+*Archive created during the v3.18 homepage restructuring (Fork C Hybrid implementation). Closes L941-L944 cluster homepage-substrate findings.*

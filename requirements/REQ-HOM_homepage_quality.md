@@ -222,7 +222,7 @@ retirement:
     - "T1.12 Gate 1 execution evidence: 3 cross-repo commits 2026-05-16T~22:00Z (aget-framework/aget b35517d, aget-framework/.github f7f8cf3)"
     - "Audit baseline: docs/AUDIT_homepage_fork_c_baseline_2026-05-16.md §6 (forward targets table)"
   registry: "governance/POLICY_deprecation.md — added under Retired REQs section at v3.18"
-  retired_at: "2026-05-16 (private-aget-framework-AGET T1.12 Gate 2)"
+  retired_at: "2026-05-16 (homepage retirement verification)"
 ```
 
 ---
@@ -401,7 +401,7 @@ This document grounds in:
 **Cross-repo evidence**:
 - This amendment: `aget-framework/aget` (commit added in same window as `b35517d` archive)
 - Org-profile execution: `aget-framework/.github` commit `f7f8cf3` (org-profile retirement)
-- Private audit trail: `gmelli/private-aget-framework-AGET` PROJECT_PLAN_v3.18_T1.12_homepage_fork_bundle_v1.0.md Gates 0, 1, 2
+- Maintainer audit trail: Homepage retirement review, Gates 0, 1 and 2 (summarized in this ledger).
 
 **Verification**: T1.12 Gate 2 V-G2.1..V-G2.3 PASS (see private plan).
 
