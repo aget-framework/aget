@@ -22,6 +22,11 @@ Clear, consistent communication builds trust and enables collaboration. This doc
 
 ## Version Announcements
 
+For every release type, the GitHub Release body follows AGET_RELEASE_SPEC CAP-REL-006-02, including
+CAP-REL-006-02-10, and is written and inspected in SOP_release_process Phase 5.5 (or reworded and inspected in
+Phase 6.4.5.3). Where a template below is used
+for a GitHub Release body, that rule and procedure take precedence.
+
 ### When to Announce
 
 | Release Type | Announcement Required | Channel |

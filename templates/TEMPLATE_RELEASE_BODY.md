@@ -9,6 +9,8 @@ TEMPLATE INSTRUCTIONS:
    before `gh release create` or `gh release edit`
 5. For retroactive scope decisions (does this template apply to pre-existing
    releases?), consult RUBRIC_retroactive_scope_content_quality_caps_v0.1
+6. Word the release body per CAP-REL-006-02-10, then run the V-CAP-REL-006-02-10
+   inspection before publishing (no validator checks CAP-REL-006-02-10)
 -->
 
 **Theme**: {Theme name — Concise capability or discipline shipped this release}
@@ -30,6 +32,7 @@ Each item:
   3. Optional trailing `*Traceability: T-IDs, gh#NNN*` line for internal references
 Avoid em-dash compound constructions in lead sentences (REQ-HOM-Q-001).
 Preserve internal-ID precision (T-IDs, CAP-NNN, gh#NNN) — principal register, not for sanitization.
+Word each item per CAP-REL-006-02-10.
 -->
 
 - **{Plain-language outcome 1}.** {Context, mechanism, theoretical basis or
@@ -58,17 +61,21 @@ none.}
 ## Compatibility
 
 **{No breaking changes | Breaking changes — see Migration below}** in vX.Y.Z.
-{One sentence on upgrade path: typically "Existing instances upgrade by
-version-bump only." Note any spec-fault carries — gh#NNN OPEN per L708
-annotation precedent — when applicable.}
+{One sentence on upgrade path: typically "Existing agents upgrade by
+version-bump only." Name any open spec fault (gh#NNN) this release carries,
+when applicable (L708 precedent).}
 
 See [CHANGELOG.md](https://github.com/aget-framework/aget/blob/main/CHANGELOG.md)
 for full Added/Changed sections + [AGET_DELTA_vX.Y.md](https://github.com/aget-framework/aget/blob/main/specs/deltas/AGET_DELTA_vX.Y.md).
 
 ## Migration [OPTIONAL — required if breaking changes declared above]
 
-{Migration steps. Include executable commands when possible. Estimated time
-per agent. Link to BREAKING_CHANGES_vX.Y.md for full guide.}
+<!--
+Word this section per CAP-REL-006-02-10.
+-->
+
+{Migration steps. Include executable commands when possible. Estimated time, and what it
+is per (worded per CAP-REL-006-02-10). Link to BREAKING_CHANGES_vX.Y.md for full guide.}
 
 ## What This Release Doesn't Change [OPTIONAL]
 
@@ -118,6 +125,8 @@ Before publishing a release body authored from this template:
 - [ ] Release **title** is `vX.Y.Z - {theme}` or `vX.Y.Z — {theme}`, with the version appearing
       exactly once (CAP-REL-006-02-09)
 - [ ] Voice check: <20% sentences exceed 15 words; no em-dash compound clauses leading bullets
+- [ ] Register check: run the V-CAP-REL-006-02-10 inspection (no validator checks CAP-REL-006-02-10) and
+      record its result next to the V-CAP-REL-006-02 result
 - [ ] Evidence check: each capability claim has artifact link OR `(experimental)`/`(planned)` qualifier
 - [ ] Internal-link integrity: all hyperlinks resolve (run `post_release_validation.py` post-publish)
 - [ ] Validator run: `python3 .aget/patterns/release/validate_release_body_conformance.py --tag vX.Y.Z` returns 0

@@ -69,7 +69,7 @@ Aligned with framework v3.X.0 ({theme summary in 1 line}).
 
 ## Compatibility
 
-**Non-breaking.** Instances upgrade by version-bump only. See [aget framework CHANGELOG](https://github.com/aget-framework/aget/blob/main/CHANGELOG.md) for full release detail.
+**Non-breaking.** Agents upgrade by version-bump only. See [aget framework CHANGELOG](https://github.com/aget-framework/aget/blob/main/CHANGELOG.md) for full release detail.
 ```
 
 Target: ~250-400 bytes.
@@ -174,7 +174,7 @@ echo "✅ L909 PASS"
 
 *RELEASE_BODY_TEMPLATE_template.md — authored 2026-05-02 to close the core-vs-template release-body distinction gap. v3.16.0 archetype-templates calibration history: 138 (under-floor; original L671 anti-pattern) → 1155 (over-cap; verbatim CHANGELOG paste anti-pattern) → 766 (correct; skeleton 2 norm).*
 
-## Contract bounds (CAP-REL-006-02, spec v1.18.0)
+## Contract bounds (CAP-REL-006-02, spec v1.19.0)
 
 Template bodies obey the same contract as core, at template density:
 
@@ -185,3 +185,4 @@ Template bodies obey the same contract as core, at template density:
 - Every H2 must be a registered name (CAP-REL-006-02-04). `(or equivalent)` is withdrawn.
 - Release title: `vX.Y.Z - {theme}`, version appearing exactly once (CAP-REL-006-02-09).
 - The inverse-of-core principle is unchanged: a verbose core body MUST NOT inflate templates.
+- Wording: follow CAP-REL-006-02-10, and run the V-CAP-REL-006-02-10 inspection before publication (SOP_release_process Phase 5.5.2, or Phase 6.4.5.3 if the body is reworded there).
