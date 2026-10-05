@@ -1,11 +1,11 @@
 # AGET Release Specification
 
-**Version**: 1.18.0
+**Version**: 1.19.0
 **Status**: Active
 **Category**: Process (Release Management)
 **Format Version**: 1.2
 **Created**: 2026-01-04
-**Updated**: 2026-08-17
+**Updated**: 2026-10-05
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_RELEASE_SPEC.md`
 **Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.2
@@ -351,8 +351,10 @@ python3 -c "import json; v=json.load(open('.aget/version.json')); print('PASS' i
 | CAP-REL-006-02-07 | Release body total length SHALL be **12-25 non-blank lines** (~1500-2500 bytes) for minor releases; **5-15 lines** for patch releases. Range derived from v3.15+v3.16 precedent measurement (v3.15=22 lines/1922 bytes; v3.16=13 lines/1678 bytes). Bodies outside range FAIL the V-test as either too-thin (presence-only) OR too-long (verbose ballooning). | Precedent-grounded bounds (NOT aspirational architecture; per L289 evidence-first design at spec-authoring layer); closes recursive Theme C3 V-test scope-of-validation gap at spec-authoring scope (6th in-cycle recurrence) |
 | CAP-REL-006-02-08 | A release body SHALL carry the **core pair** — `## What's New` AND `## Compatibility` — each independently required. It MAY carry `## Migration` and zero or more disclosure sections, every H2 being a registered name per CAP-REL-006-02-04. There is **no fixed total-section count**. References (links) MAY be inline with sections; a separate `## References` section SHALL NOT be used. | **Corpus-derived, re-measured 2026-08-17** over the v3.17.0-v3.31.0 template era (n=18, `gh release view --json body`): the core pair holds at **16/18 (89%)** while exactly-three-H2 holds at only **7/18 (39%)**. The prior "exactly 3" was never precedent-grounded — a clause the majority of its own governed corpus violates is measuring the wrong thing (L742: the specification is at fault). The variation it read as drift lives **entirely in the disclosure sections**, which -04 now governs by name; the prior rule conflated *core sections* with *total sections*. Both remaining failures (v3.24.0, v3.25.0) are genuine missing-core defects the old rule buried among false positives. |
 | CAP-REL-006-02-09 | Release title SHALL be `v{X.Y.Z} - {theme}` (or `v{X.Y.Z} — {theme}` em-dash; precedent allows both). Title SHALL NOT contain `v{X.Y.Z}` more than once. | Precedent (v3.14.1: "v3.14.1 — #979 installer"; v3.15: "v3.15.0 — Two-Level Model"; v3.16: "v3.16.0 - Framework-Discipline Closure"); closes v3.17 duplication anomaly ("v3.17.0 - v3.17.0 — Theme C3..." caught at release-day audit). Either `tag_release.py:create_release()` SHALL detect leading-version-in-description and strip it, OR caller SHALL NOT include version in --description. V-CAP-REL-006-02 enforces via `gh release view --json name` regex match. |
+| CAP-REL-006-02-10 | WHERE text is in `## What's New`, in `## Compatibility`, or before the first H2 (the `**Theme**:` and `**For**:` lines included), the release body SHALL be in plain language and SHALL NOT contain a highlighted term (AGET_VOCABULARY_SPEC CAP-VOC-006) or another framework coinage: it says "agent", not `Aget_Instance`, and "the migration kit for supervisors", not `Fleet_Migration_Kit`. The framework's own names (AGET, Aget), traceability identifiers (CAP-, R-, V- IDs, gh#NNN), file paths and command names are not coinages under this rule. WHERE text is in `## Migration` or in a CAP-REL-006-02-04 disclosure section (preferred or alternate label), IF a plain word in a sentence can name two or more entries in a CAP-VOC-006 named register and the rest of the sentence does not rule out all but one, THEN the release body SHALL use the registered term for the entry meant, or plain words that name only that entry; where the sentence rules out every entry but one, the plain word MAY be used. IF a highlighted label in those sections names entries that do not state the same meaning, THEN the writer SHALL follow AGET_VOCABULARY_SPEC CAP-VOC-006-05. Published terms can be looked up at https://w3id.org/aget/vocab; that copy is not the authority (CAP-VOC-005-02). This requirement governs release bodies published after v1.19.0; earlier bodies are dated artifacts. No automated check enforces it yet (sleeping; see V-CAP-REL-006-02-10). | A release body serves two audiences: precision serves operators who upgrade, plain language serves readers outside the framework. Precision has a readability cost; paying it where nothing is ambiguous is jargon without benefit, and a register rule that fires everywhere stops being read. Example: "10-15 minutes per agent" can mean per agent or per working copy of an agent, so a Migration sentence must say which; "each agent's owner approves" can mean only the agent, so the plain word is enough. |
 | CAP-REL-006-03 | Pre-releases SHALL be marked as such | Stability signaling |
-| **V-CAP-REL-006-02** | **paired V-test** | **`aget/verification/validate_release_body.py`** fetches each repo's `gh release view --json body` **and `--json name`** post-publication and validates conformance to the **eight live sub-requirements** — `-01`, `-02`, `-03`, `-04`, `-05`, `-07`, `-08`, `-09` (`-06` is WITHDRAWN and is not validated). The validator SHALL emit one keyed result per live sub-requirement; a sub-requirement that cannot be evaluated SHALL emit an explicit `UNAVAILABLE` result and SHALL NOT be silently omitted. FAIL on any non-conforming release. Closes 17-cycle chronic gap. |
+| **V-CAP-REL-006-02** | **paired V-test** | **`aget/verification/validate_release_body.py`** fetches each repo's `gh release view --json body` **and `--json name`** post-publication and validates conformance to these **eight sub-requirements** — `-01`, `-02`, `-03`, `-04`, `-05`, `-07`, `-08`, `-09`. `-06` is WITHDRAWN and is not validated; `-10` is live and is verified by inspection (V-CAP-REL-006-02-10), not by this validator. The validator SHALL emit one keyed result per sub-requirement in this list; a listed sub-requirement that cannot be evaluated SHALL emit an explicit `UNAVAILABLE` result and SHALL NOT be silently omitted. FAIL on any non-conforming release. Closes 17-cycle chronic gap. |
+| **V-CAP-REL-006-02-10** | **inspection** | Before publication (SOP_release_process Phase 5.5.2), the reviewer reads every sentence of the plain-register text (What's New, Compatibility, and the text before the first H2) and lists any highlighted term or framework coinage found there. For `## Migration` and each disclosure section, the reviewer lists each plain word that can name two or more registered entries and records either the registered term used or the words in the sentence that rule out the others. The result, including "none found", is recorded next to the V-CAP-REL-006-02 result (Phase 6.5.1). **No validator checks `-10`**: `validate_release_body.py` excludes it, and `scripts/check_release_body_register.py` scans the whole body for internal-register leak classes but is not section-aware and does not check vocabulary terms. A section-aware check is owed; until it exists, the release that first ships `-10` lists it under `## Sleeping-CAPs Disclosure` (CAP-REL-006-02-04). |
 
 **CAP-REL-006-02-04 registered section vocabulary** (normative; referenced by `-04` and `-08`).
 Every H2 in a release body SHALL be a registered name. Names carry a **preferred label** and optional
@@ -1722,6 +1724,24 @@ Per the two-level model (L742): requirements define principal intent (human leve
 ---
 
 ## Changelog
+
+### v1.19.0 (2026-10-05)
+
+Release-body register discipline (CAP-REL-006-02-10).
+
+- **CAP-REL-006-02-10 (new).** The register splits by section: `## What's New` and `## Compatibility` are written in plain
+  language for readers outside the framework; `## Migration` and the disclosure sections use registered vocabulary terms
+  where a plain word could be read two ways. A precise term is required only where the alternative reading is coherent,
+  so the rule does not mandate jargon where nothing is ambiguous.
+- **V-CAP-REL-006-02 states that it does not cover `-10`**, and **V-CAP-REL-006-02-10** records the inspection that does,
+  with the automated section-aware check named as owed. Adding a SHALL that no check covers, without saying so, would
+  make the validator's green result read as covering it.
+- The examples cite terms in the published vocabulary (`Fleet_Migration_Kit`, `Weekly_Release_Train`).
+- **Scope in time.** `-10` governs release bodies published after v1.19.0; earlier bodies, including v3.35.1, remain dated
+  artifacts (the same rule v1.18.0 applied).
+- **`-10` is a sleeping requirement.** No automated check covers it; a section-aware check is owed, ideally as an extension of
+  `scripts/check_release_body_register.py` rather than a second register checker. The release-body authoring templates and the SOP's
+  Phase 5.5 still describe the earlier contract and are updated separately.
 
 ### v1.18.0 (2026-08-17)
 
