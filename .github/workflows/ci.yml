@@ -93,6 +93,11 @@ jobs:
       - name: Run tests
         run: python -m pytest tests -q
 
+      - name: Spec-to-ontology binding gate (strict)
+        # Exit 1 rejects unknown concepts; exit 2 means no ontology could be read.
+        # Both fail this job. Missing input is not a successful binding check.
+        run: python scripts/validate_spec_binding.py --strict
+
       - name: C6 focused contract evidence suite
         run: |
           python -m pytest -vv \
