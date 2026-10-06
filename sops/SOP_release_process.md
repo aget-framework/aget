@@ -1,11 +1,11 @@
 # SOP: Release Process
 
-**Version**: 1.34
+**Version**: 1.35
 **Created**: 2025-11-30
-**Updated**: 2026-05-09
+**Updated**: 2026-10-05
 **Owner**: private-aget-framework-AGET
 
-**Changelog**: **v1.33** V-G7.x slice canonical sync from private SOP — V-G7.5 added (Org Homepage Badge, was private-only since v1.41) + V-G7.1..V-G7.4 broadened (multi-condition correctness per AUDIT_validator_synecdoche_2026-05-08; closes Synecdoche-HIGH on V-G7.1/V-G7.2 and Synecdoche-MEDIUM on V-G7.3/V-G7.4) + repo enumeration drift fix (explicit RELEASE_REPOS array — case-sensitive bash glob `template-*-aget` silently skipped `template-document-processor-AGET`). v3.17 G1.T1.6 (homepage sub-plan G4 V-test slice; closes L910 V-test sub-slice; full L910 canonical sync remains OUT OF SCOPE per homepage sub-plan G4.2 deferral). Both pin-sites updated atomically (table + script) per L935 multi-site discipline. Canonical now at parity with private V-G7.x section as of private SOP v1.45. 2026-05-09.
+**Changelog**: **v1.35** R-REL-035 and Phases 5.5, 5.5.1, 5.5.2, 5.5.3, 6.4.5.3, 6.5, 6.5.1 and 6.5.4 point to CAP-REL-006-02-10 (release-body register) and its inspection V-CAP-REL-006-02-10; 6.5.1 and 6.5.4 now block Phase 7 on a missing or non-conforming V-CAP-REL-006-02-10 result. 2026-10-05. **v1.33** V-G7.x slice canonical sync from private SOP — V-G7.5 added (Org Homepage Badge, was private-only since v1.41) + V-G7.1..V-G7.4 broadened (multi-condition correctness per AUDIT_validator_synecdoche_2026-05-08; closes Synecdoche-HIGH on V-G7.1/V-G7.2 and Synecdoche-MEDIUM on V-G7.3/V-G7.4) + repo enumeration drift fix (explicit RELEASE_REPOS array — case-sensitive bash glob `template-*-aget` silently skipped `template-document-processor-AGET`). v3.17 G1.T1.6 (homepage sub-plan G4 V-test slice; closes L910 V-test sub-slice; full L910 canonical sync remains OUT OF SCOPE per homepage sub-plan G4.2 deferral). Both pin-sites updated atomically (table + script) per L935 multi-site discipline. Canonical now at parity with private V-G7.x section as of private SOP v1.45. 2026-05-09.
 
 **Implements**: R-REL-001-* (5 requirements), R-REL-006 through R-REL-020, R-REL-024, R-REL-025, R-REL-026, R-REL-027, R-REL-030 through R-REL-038, R-REL-042, R-REL-VER-001, R-LIC-001, R-SPEC-010, R-ISSUE-007, R-ISSUE-008, CAP-REL-021 (Persistent Validation Logging), CAP-REL-022 (Gate Execution Enforcement), CAP-REL-023 (Release State Snapshots), CAP-REL-024 (Propagation Audit), CAP-REL-025 (Healthcheck Persistence)
 - R-REL-001-01: Commit all repos locally before pushing
@@ -596,7 +596,7 @@ See: `docs/VERSION_BEARING_FILES.md` for the complete enumeration.
 ### Requirement: R-REL-035 (GitHub Release Required)
 
 **WHEN** tagging a release
-**THE** release manager SHALL create GitHub Releases for ALL tagged repos:
+**THE** release manager SHALL create GitHub Releases for ALL tagged repos. The body is passed with `--notes-file` and is worded per CAP-REL-006-02-10 and inspected per V-CAP-REL-006-02-10 before publication (Phase 5.5.2 or 6.4.5.3); the inline `--notes` below shows only the command shape:
 
 ```bash
 # Create releases for all repos (not just push tags)
@@ -2409,7 +2409,7 @@ See: `docs/COMMUNICATION_STANDARDS.md` for full template
 
 ### Phase 5.5: Compose Release Body (CAP-REL-006-02-NN per v3.18; NEW)
 
-**Purpose**: Author release-body markdown content conforming to the eight live CAP-REL-006-02 sub-requirements (`-01`,`-02`,`-03`,`-04`,`-05`,`-07`,`-08`,`-09`; `-06` is WITHDRAWN) BEFORE `tag_release.py --release-only` runs.
+**Purpose**: Author release-body markdown content conforming to the eight validator-checked CAP-REL-006-02 sub-requirements (`-01`,`-02`,`-03`,`-04`,`-05`,`-07`,`-08`,`-09`; `-06` is WITHDRAWN) and to CAP-REL-006-02-10, checked by inspection (V-CAP-REL-006-02-10), BEFORE `tag_release.py --release-only` runs.
 
 **When**: AFTER tag cut (Phase 5) AND BEFORE GitHub Release creation.
 
@@ -2417,9 +2417,9 @@ See: `docs/COMMUNICATION_STANDARDS.md` for full template
 
 #### 5.5.1. Author release-body content
 
-**Starting point**: copy [`templates/TEMPLATE_RELEASE_BODY.md`](../templates/TEMPLATE_RELEASE_BODY.md) (effective v3.18+; first worked example v3.17.0 refresh 2026-05-10). The template encodes the enhanced structure derived from L941-L944 lessons: lead-with-outcome bullet pattern, trailing `*Traceability:*` IDs, mandatory "What This Release Doesn't Change" section for honest gap recording. Voice requirement: REQ-HOM-Q-001 (no em-dash compounds; majority ≤15-word sentences).
+**Starting point**: copy [`templates/TEMPLATE_RELEASE_BODY.md`](../templates/TEMPLATE_RELEASE_BODY.md) (effective v3.18+; first worked example v3.17.0 refresh 2026-05-10). The template encodes the enhanced structure derived from L941-L944 lessons: lead-with-outcome bullet pattern, trailing `*Traceability:*` IDs, mandatory "What This Release Doesn't Change" section for honest gap recording. Voice requirement: REQ-HOM-Q-001 (no em-dash compounds; majority ≤15-word sentences). Register: word the body as CAP-REL-006-02-10 requires. V-CAP-REL-006-02-10 says when to list it under `## Sleeping-CAPs Disclosure`.
 
-For aget/ canonical: rich body matching the eight live sub-requirements — Theme line + What's New with **5-10 scannable items** (list items OR bold-lead paragraphs, each ≤2 rendered lines) summarizing CHANGELOG Added/Changed + Compatibility section + any applicable **registered** disclosure section + resolvable CHANGELOG/AGET_DELTA link + conformant release title.
+For aget/ canonical: rich body matching the eight validator-checked sub-requirements — Theme line + What's New with **5-10 scannable items** (list items OR bold-lead paragraphs, each ≤2 rendered lines) summarizing CHANGELOG Added/Changed + Compatibility section + any applicable **registered** disclosure section + resolvable CHANGELOG/AGET_DELTA link + conformant release title.
 
 For 13 templates: slim body matching same schema with 5-10 scannable items framework-aligned (each template's CHANGELOG entry is shorter than aget/'s; bullets summarize the template-specific changes per template-CHANGELOG.md `## [X.Y.Z]` section).
 
@@ -2443,7 +2443,9 @@ print('Drafts PASS V-CAP-REL-006-02')
 "
 ```
 
-If V-test fails: revise drafts before proceeding to Phase 5.6 release creation.
+Then run the V-CAP-REL-006-02-10 inspection on each draft. It is done by inspection: no validator checks CAP-REL-006-02-10. Keep the result for Phase 6.5.1.
+
+If V-CAP-REL-006-02 fails, or the V-CAP-REL-006-02-10 inspection lists text that does not conform to CAP-REL-006-02-10: revise drafts, re-run the V-CAP-REL-006-02 check above and the V-CAP-REL-006-02-10 inspection on each revised draft, and keep those results in place of the earlier ones, before proceeding to Phase 5.6 release creation.
 
 #### 5.5.3. Invoke release creation with --notes-file
 
@@ -2459,7 +2461,7 @@ python3 scripts/tag_release.py --version X.Y.Z --description "..." \
   --release-only --repos template-advisor-aget template-... (13 explicit)
 ```
 
-If `--notes-file` not supplied, `tag_release.py:create_release()` auto-extracts the `## [X.Y.Z]` section from each repo's CHANGELOG.md as fallback (per v3.18 amendment). Auto-extraction works for compliant repos; failure mode is V-CAP-REL-006-02 detection at Phase 7.5 post-publication audit.
+If `--notes-file` not supplied, `tag_release.py:create_release()` auto-extracts the `## [X.Y.Z]` section from each repo's CHANGELOG.md as fallback (per v3.18 amendment). Auto-extraction can pass V-CAP-REL-006-02 (checked after publication), but the fallback publishes CHANGELOG text that was not worded per CAP-REL-006-02-10 or inspected (V-CAP-REL-006-02-10) before publication, so Phase 6.5.1 fails it; supply `--notes-file` with the Phase 5.5 draft instead.
 
 ---
 
@@ -2705,7 +2707,7 @@ done
 
 **Anti-pattern (v1.32 NEW)**: pasting full aget core CHANGELOG entry verbatim into a template release body. Inflates template body to core-norm bytes; v3.16.0 archetype-templates shipped 1155 bytes via this pattern when ~600-800 was appropriate. Templates should reference (link to aget core CHANGELOG), not duplicate.
 
-**Construction**: For each repo, construct body per appropriate template, then commit body file path to `--notes-file`. The CHANGELOG entry is already L909-sanitized at G3.4 — when reused (core perspective), preserve both content density AND sanitization discipline. Template perspective: use the template's CHANGELOG entry as input but trim per `RELEASE_BODY_TEMPLATE_template.md` skeleton 1/2/3/4 selection.
+**Construction**: For each repo, construct body per appropriate template, then commit body file path to `--notes-file`. The CHANGELOG entry is already L909-sanitized at G3.4 — when reused (core perspective), preserve both content density AND sanitization discipline. Template perspective: use the template's CHANGELOG entry as input but trim per `RELEASE_BODY_TEMPLATE_template.md` skeleton 1/2/3/4 selection. Whatever body file this step passes to `--notes-file`, word it per CAP-REL-006-02-10 and run the V-CAP-REL-006-02-10 inspection on it (as in Phase 5.5.2) before the L909 re-verify, so that check runs on the final text. If the inspection lists text that does not conform to CAP-REL-006-02-10, revise the body. Whenever the body changes after its inspection, including a change the L909 re-verify forces, inspect it again before `gh release create`. Keep the latest result for Phase 6.5.1. The extraction loop below writes raw CHANGELOG text and does not stop for this: run its extraction step for every repo first, reword and inspect each body, then run the rest of the loop.
 
 **Per-repo CHANGELOG extraction** (one-shot per repo):
 
@@ -2715,6 +2717,7 @@ for repo in $RELEASED_REPOS; do
   cd "$repo"
   # Extract the [VERSION] block from CHANGELOG.md (between this version's heading and the next)
   awk "/^## \\[$VERSION\\]/,/^## \\[/" CHANGELOG.md | sed '$d' > /tmp/${repo}_v${VERSION}_body.md
+  # CAP-REL-006-02-10: this loop does not stop to reword and inspect (V-CAP-REL-006-02-10); see Construction above for the order
   # L909 re-verify (defense in depth; CHANGELOG was sanitized at G3.4 but verify before public push)
   for pat in 'private-[a-z]+-(aget|AGET)' 'gmelli/' '[0-9]+ agents( in| across)?' 'FLEET-[A-Z]+-[0-9]+' 'SESSION_2026-[0-9]' 'a downstream fleet'; do
     grep -qiE "$pat" /tmp/${repo}_v${VERSION}_body.md && { echo "❌ L909 FAIL ($repo): $pat"; exit 1; }
@@ -2816,7 +2819,7 @@ grep -q "Pilot.*Status\|private-supervisor-AGET" \
 
 ### Phase 6.5: Post-Publication V-test Verification (NEW v3.18)
 
-**Purpose**: Verify public-visible release artifacts conform to spec via automated V-tests AFTER public push completes.
+**Purpose**: Verify public-visible release artifacts conform to spec via automated V-tests, plus the V-CAP-REL-006-02-10 inspection results recorded in 6.5.1, AFTER public push completes.
 
 **When**: AFTER Phase 6 (handoff delivered) AND BEFORE Phase 7 (knowledge transfer).
 
@@ -2828,9 +2831,9 @@ grep -q "Pilot.*Status\|private-supervisor-AGET" \
 python3 aget/verification/validate_release_body.py --version X.Y.Z --all-repos
 ```
 
-Validates all eight live sub-requirements across 14 repos: Theme line + What's New with 5-10 scannable items + Compatibility + registered-name section vocabulary + resolvable CHANGELOG link + body length + core-pair presence + release title. Each live sub-requirement emits a keyed result; an unevaluable check emits UNAVAILABLE rather than being omitted.
+Validates the eight validator-checked sub-requirements across 14 repos: Theme line + What's New with 5-10 scannable items + Compatibility + registered-name section vocabulary + resolvable CHANGELOG link + body length + core-pair presence + release title. Each listed sub-requirement emits a keyed result; an unevaluable check emits UNAVAILABLE rather than being omitted. This validator does not check CAP-REL-006-02-10: next to this result, record the V-CAP-REL-006-02-10 inspection result for each published body (from Phase 5.5.2, or from Phase 6.4.5.3 if the body was reworded there).
 
-**Failure**: BLOCKING — Phase 7 SHALL NOT proceed if any repo fails. Remediation: revise release-body content via `gh release edit --notes-file <revised>` until V-test PASSes.
+**Failure**: BLOCKING — Phase 7 SHALL NOT proceed if any repo fails V-CAP-REL-006-02, has no V-CAP-REL-006-02-10 inspection result for its published body, or has one that lists text not conforming to CAP-REL-006-02-10. Remediation: revise release-body content via `gh release edit --notes-file <revised>` until V-CAP-REL-006-02 passes and each published body's V-CAP-REL-006-02-10 result lists no text failing CAP-REL-006-02-10. Run the inspection on each revised body before `gh release edit`, and on any published body that has no result, and record each result in place of the earlier one.
 
 #### 6.5.2. Run V-CAP-REL-008 — homepage currency
 
@@ -2854,9 +2857,9 @@ Validates R-REL-010b-01..02: each of 13 templates' `README.md` has `**Version**:
 
 #### 6.5.4. Aggregate post-publication audit report
 
-If all 3 V-tests PASS: emit Release_Bridge entry "Public-visibility V-test audit: 14/14 repos + homepage + 13 template READMEs PASS at vX.Y.Z release-day."
+If all 3 V-tests PASS and every published body has a V-CAP-REL-006-02-10 result that lists no text failing CAP-REL-006-02-10 (6.5.1): emit Release_Bridge entry "Public-visibility V-test audit: 14/14 repos + homepage + 13 template READMEs PASS at vX.Y.Z release-day."
 
-If any V-test FAILS: do not advance to Phase 7. Document failure in Release_Bridge as recurrence (with cycle-depth annotation) and remediate.
+If any V-test FAILS, or a V-CAP-REL-006-02-10 result is missing or lists text failing CAP-REL-006-02-10: do not advance to Phase 7. Document failure in Release_Bridge as recurrence (with cycle-depth annotation) and remediate.
 
 ---
 

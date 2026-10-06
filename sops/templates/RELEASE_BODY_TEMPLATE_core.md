@@ -33,6 +33,8 @@ NOT for template-{archetype}-aget release bodies — those use `RELEASE_BODY_TEM
 
 ## Required structure
 
+Word choice follows CAP-REL-006-02-10 (AGET_RELEASE_SPEC); before publication the reviewer runs the V-CAP-REL-006-02-10 inspection on it, at SOP_release_process Phase 5.5.2 (or Phase 6.4.5.3 if the body is reworded there).
+
 ```markdown
 ## What's New
 
@@ -80,7 +82,7 @@ NOT for template-{archetype}-aget release bodies — those use `RELEASE_BODY_TEM
 
 ## Compatibility
 
-**Non-breaking.** Instances upgrade by version-bump only. See [CHANGELOG.md](CHANGELOG.md) for full detail.
+**Non-breaking.** Agents upgrade by version-bump only. See [CHANGELOG.md](CHANGELOG.md) for full detail.
 ```
 
 Target: ~1000-1500 bytes.
@@ -146,6 +148,7 @@ Reuse the same patterns CAP-SEC-006 enforces at CHANGELOG-write time — release
 |------|-----------|
 | Used by | SOP_release_process v1.32 Phase 6.4.5.3 |
 | Required by | CAP-REL-032 R-REL-032-07a (aget core release body content requirement) |
+| Word choice | CAP-REL-006-02-10; checked by inspection V-CAP-REL-006-02-10 (SOP_release_process Phase 5.5.2 or 6.4.5.3) |
 | Companion | `RELEASE_BODY_TEMPLATE_template.md` (template release body — different audience) |
 | L-docs | L671 (decorative-classification anti-pattern at release-body surface), L909 (sanitization gate) |
 | Origin | v3.16.0 cycle defect surfaced by principal recalibration 2026-05-02 ("v3.16.0 is too verbose ... do we have requirements and templates for these two perspectives?") |
