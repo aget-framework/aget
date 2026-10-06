@@ -3,9 +3,9 @@
 # the concepts this repository cites (inline aget:concept/X, outside tests/) plus the
 # broader concepts their definitions require. Links to concepts outside this subset
 # are removed (142 dropped), so every link here resolves inside this file.
-# Internal references in prose are replaced by visible markers (6 replaced).
-# Concepts: 34 (30 cited + 4 parents).
-# Generated from the canonical vocabulary @ 5dc6140d4db7381fc1bcdb5f68b5d18731bd3a4e by
+# Internal references in prose are replaced by visible markers (5 replaced).
+# Concepts: 36 (36 cited + 0 parents).
+# Generated from the canonical vocabulary @ staged candidate; private input SHA256 f259a7f2f99d7e73a5f1e120cdf45c6d31515f12ad929856be691a662a5de924 by
 # export_public_concept_tranche_ext.py. Do not edit by hand: regenerate.
 # These are NOT the published w3id.org/aget/vocab concepts: a different set, and a
 # different identifier scheme (aget:concept/X here).
@@ -25,20 +25,18 @@ concepts:
       - User
       - Data Subject
       - Garden Owner
-    definition: >
-      The cognitive entity whom AI agents serve and who retains ultimate
-      authority over the system. In economics, the party who delegates
-      authority to an agent.
-    scopeNote: >
-      Lefos: User who owns the Garden.
-      AGET: Cognitive entity whom agents serve (L176 Worker Anchor).
+    definition: |
+      A Principal_(Agency) is a Cognitive_Entity that AI_Agents serve and that retains ultimate authority over their system.
+    scopeNote: |
+      The serving system remains under the Principal’s ultimate authority. In economics, a principal delegates authority to an agent; that is supporting cross-domain context, not a replacement for this AGET sense.
     theoreticalBasis:
       primary: Principal-Agent Theory
       source: Jensen & Meckling 1976
       modernApplication: https://cmr.berkeley.edu/2025/07/rethinking-ai-agents-a-principal-agent-perspective/
-    broader: null
+    broader: aget:concept/CognitiveEntity
     narrower: null
-    related: null
+    related:
+      - aget:concept/Agent
     inScheme: aget:ontology/personal-ai-systems
     cluster: Identity & Ownership
 
@@ -48,12 +46,10 @@ concepts:
     altLabel:
       - Environment-Mediated Coordination
       - Indirect Communication
-    definition: >
-      Coordination mechanism where agents communicate indirectly by
-      modifying a shared environment, enabling decentralized cooperation.
-    scopeNote: >
-      Lefos: Garden modifications signal to Entity.
-      AGET: KB modifications enable stigmergic coordination (L335).
+    definition: |
+      Stigmergy is a coordination mechanism in which agents communicate indirectly by modifying a shared environment, enabling decentralized cooperation.
+    scopeNote: |
+      Communication is indirect: agents modify a shared environment and other agents respond to those modifications. This enables decentralized cooperation.
     theoreticalBasis:
       primary: Stigmergy
       source: Grassé 1959
@@ -71,16 +67,9 @@ concepts:
   - id: C292
     uri: aget:concept/Thing
     prefLabel: Thing
-    altLabel:
-      - Top Concept
-      - Universal
-      - Conceptual Root
-    definition: >
-      The most general category in a SKOS conceptual hierarchy — anything
-      that can be referred to, named, or made the subject of discourse,
-      whether concrete or abstract. The conceptual root from which all
-      narrower concepts in this ontology descend. Exists as the implicit
-      topConcept anchoring cross-vocabulary alignment.
+    altLabel: []
+    definition: |
+      A Thing is anything that can be referred to, named, or made the subject of discourse, whether concrete or abstract.
     theoreticalBasis:
       primary: SKOS Knowledge Organization
       source: Miles & Bechhofer 2009 (W3C Recommendation, SKOS Reference, 18 Aug 2009 §4-5)
@@ -90,31 +79,24 @@ concepts:
     narrower:
       - aget:concept/Entity
     related: null
-    example: >
-      Every concept in AGET's Personal AI Systems Ontology — Principal,
-      Agent, Requirement, Specification, Verification Test — ultimately
-      descends from this root. The chain Thing → Entity → Artifact →
-      Software → Software System → Software System Requirement is what
-      lets aget:REQ-* declare a typed broader: parent rather than floating
-      ungrounded.
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): The intended hierarchy places every concept in AGET's Personal AI Systems Ontology — Principal, Agent, Requirement, Specification, Verification Test — beneath this root; this illustration does not assert that the existing hierarchy is complete. The chain Thing → Entity → Artifact → Software → Software System → Software System Requirement is what lets aget:REQ-* declare a typed broader: parent rather than floating ungrounded.
     sources:
       - "Miles, A. & Bechhofer, S. (2009). SKOS Simple Knowledge Organization System Reference. W3C Recommendation 18 August 2009."
       - "W3C OWL Working Group (2012). OWL 2 Web Ontology Language Document Overview (Second Edition). W3C Recommendation 11 December 2012."
     inScheme: aget:ontology/personal-ai-systems
     cluster: Foundational CS/SE Hierarchy
 
+    scopeNote: |
+      Thing is intended to serve as the conceptual root of this vocabulary. Top Concept and Conceptual Root describe that role of the SKOS concept; they are not synonyms for every thing it describes. The intended role does not assert that the entire existing vocabulary has a completed hierarchy beneath it.
   - id: C293
     uri: aget:concept/Entity
     prefLabel: Entity
     altLabel:
       - Existent
       - Bearer of Properties
-    definition: >
-      Any item assumed to exist — concrete or abstract, individual or
-      collective — that can be the bearer of properties and stand in
-      relations to other entities. Entities populate the world an
-      ontology purports to describe and are the subject matter of
-      ontological commitment.
+    definition: |
+      An Entity is a Thing whose existence the describing ontology assumes, whether concrete or abstract and individual or collective, and that can bear properties and stand in relations to other entities.
     theoreticalBasis:
       primary: Scientific Ontology
       source: Bunge 1977 (Treatise on Basic Philosophy Vol 3 — Ontology I, D. Reidel, Ch.1 §1.1)
@@ -123,53 +105,35 @@ concepts:
     broader: aget:concept/Thing
     narrower:
       - aget:concept/EntityCharacterizationDimension
-    related:
-      - aget:concept/Principal
-      - aget:concept/EntityDefinitionDimension
-      - aget:concept/EntityInterrelationshipDimension
-      - aget:concept/EntityActionDimension
-      - aget:concept/EntityLifecycleDimension
-      - aget:concept/EntityPersistenceDimension
-      - aget:concept/EntityGovernanceDimension
-      - aget:concept/EntityProvenanceDimension
-    example: >
-      In AGET, the Principal is an Entity (natural agent), the Agent is
-      an Entity (artificial agent), and a Requirement is an Entity
-      (informational artifact). Distinguishing 'what exists' from 'what
-      is named' grounds why specifications must trace to concrete
-      enforcement rather than floating as language. Per [internal ref],
-      every Entity is characterizable along the 7 EntityCharacterization
-      Dimensions (C535-C542).
+      - aget:concept/Agent
+      - aget:concept/VocabularyGovernanceBody
+      - aget:concept/CognitiveEntity
+    related: null
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): In AGET, the Principal is an Entity, the Agent is an Entity, and a Requirement is an Entity (informational artifact). Distinguishing 'what exists' from 'what is named' grounds why specifications must trace to concrete enforcement rather than floating as language. Per [internal ref], every Entity is characterizable along the 7 EntityCharacterization Dimensions (C535-C542).
     sources:
       - "Bunge, M. (1977). Treatise on Basic Philosophy, Vol 3: Ontology I — The Furniture of the World. D. Reidel, Dordrecht."
       - "Quine, W.V.O. (1948). On What There Is. Review of Metaphysics 2(5):21-38."
     inScheme: aget:ontology/personal-ai-systems
     cluster: Foundational CS/SE Hierarchy
 
+    scopeNote: |
+      Assumed existence is the describing ontology’s ontological commitment: entities populate the world that ontology purports to describe. It is not a proof of existence. Concrete and abstract, individual and collective entities are included.
   - id: C535
     uri: aget:concept/EntityCharacterizationDimension
     prefLabel: Entity Characterization Dimension
     altLabel:
       - Entity Description Facet
       - Entity Specification Axis
-    definition: >
-      A formally distinguishable axis along which any entity (artifact,
-      agent, capability, requirement) MAY be characterized. A dimension is
-      orthogonal to other dimensions when each adds independent expressive
-      power to the entity's specification. Multi-dimensional schemes are
-      content ontology design patterns whose dimensions can be added,
-      removed, or evolved independently.
+    definition: |
+      An Entity_Characterization_Dimension is a formally distinguishable axis along which any entity may be characterized.
     theoreticalBasis:
       primary: Content Ontology Design Patterns
       source: Gangemi, A. (2005). Ontology Design Patterns for Semantic Web Content. ISWC 2005, LNCS 3729:262-276
       secondary: Faceted Classification (PMEST)
       secondarySource: Ranganathan, S.R. (1933). Colon Classification. Madras Library Association
-    scopeNote: >
-      Parent class for AGET's seven entity-characterization dimensions
-      (Definition, Interrelationship, Action, Lifecycle, Persistence,
-      Governance, Provenance). Sibling to existing single-purpose Dimension
-      concepts (C380 Compliance Posture, C382 Cost-Awareness, C496
-      Generative-Executive Verb).
+    scopeNote: |
+      The axis may characterize any entity, including an artifact, agent, capability or requirement. A dimension is orthogonal to another when each adds independent expressive power to the entity’s specification. In a multi-dimensional scheme, dimensions can be added, removed or evolved independently. This differs from a dimension restricted to a single purpose.
     broader: aget:concept/Entity
     narrower:
       - aget:concept/EntityDefinitionDimension
@@ -183,13 +147,8 @@ concepts:
       - aget:concept/DimensionalFormalizationMaturity
       - aget:concept/MetaSpecificationGap
       - aget:concept/VocabularyFirstNamingDiscipline
-    example: >
-      An AGET Skill entity is fully specified when described along all 7
-      dimensions: its Definition (SKOS prefLabel + spec), Interrelationships
-      (related skills), Actions (the verb-noun grammar it implements),
-      Lifecycle (proposed -> active -> deprecated), Persistence (skill file
-      location), Governance (enforcement tier per ADR-008), and Provenance
-      (which agent emitted it and when).
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): An AGET Skill entity is fully specified when described along all 7 dimensions: its Definition (SKOS prefLabel + spec), Interrelationships (related skills), Actions (the verb-noun grammar it implements), Lifecycle (proposed -> active -> deprecated), Persistence (skill file location), Governance (enforcement tier per ADR-008), and Provenance (which agent emitted it and when).
     sources:
       - "Gangemi, A. (2005). Ontology Design Patterns for Semantic Web Content. ISWC 2005, LNCS 3729, pp. 262-276. Springer. https://link.springer.com/chapter/10.1007/11574620_21"
       - "Ranganathan, S.R. (1933, expanded editions to 1987). Colon Classification. Madras Library Association."
@@ -203,12 +162,8 @@ concepts:
     altLabel:
       - Entity Identity Facet
       - Entity Schema Axis
-    definition: >
-      The dimension along which an entity is given canonical name, formal
-      definition, and typed structural schema (attributes, value domains).
-      In AGET, instantiated as SKOS prefLabel + definition + JSON/YAML
-      schema. Distinct from Persistence (where the entity is materialized)
-      and from Lifecycle (which states it transitions through).
+    definition: |
+      An Entity_Definition_Dimension is an Entity_Characterization_Dimension along which an entity is given a canonical name, a formal definition, and a typed structural schema.
     theoreticalBasis:
       primary: ISO/IEC 11179 Data Element Concept / Value Domain split
       source: ISO/IEC 11179-4 (Formulation of data definitions); ISO/IEC 11179-5:2005 (Naming and identification principles)
@@ -216,13 +171,9 @@ concepts:
       secondarySource: Guarino, N. & Welty, C. (2009). An Overview of OntoClean. In Handbook on Ontologies (2nd ed.), Springer, pp. 201-220
     broader: aget:concept/EntityCharacterizationDimension
     related:
-      - aget:concept/Entity
-    example: >
-      L459 specifies 8 mid-level core entities (Person, Organization,
-      Document, Decision, Event, Task, Project, Requirement) along this
-      dimension via typed YAML schemas with required/optional attributes
-      and enum value domains. An entity that lacks Definition-dimension
-      coverage cannot be addressed in spec or skill.
+      - aget:concept/VocabularyFirstNamingDiscipline
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): L459 specifies 8 mid-level core entities (Person, Organization, Document, Decision, Event, Task, Project, Requirement) along this dimension via typed YAML schemas with required/optional attributes and enum value domains. An entity that lacks Definition-dimension coverage cannot be addressed in spec or skill.
     sources:
       - "ISO/IEC 11179-4 — Information technology — Metadata registries (MDR) — Part 4: Formulation of data definitions. https://www.iso.org/standard/35346.html"
       - "ISO/IEC 11179-5:2005 — Information technology — Metadata registries (MDR) — Part 5: Naming and identification principles. https://www.iso.org/standard/35347.html"
@@ -230,18 +181,16 @@ concepts:
     inScheme: aget:ontology/personal-ai-systems
     cluster: Meta-Ontological Concepts
 
+    scopeNote: |
+      The structural schema includes attributes and their value domains. Canonical name, formal definition and typed structural schema are all part of this dimension. It concerns intrinsic description, whereas Persistence concerns materialization location and Lifecycle concerns the states through which an entity transitions.
   - id: C537
     uri: aget:concept/EntityInterrelationshipDimension
     prefLabel: Entity Interrelationship Dimension
     altLabel:
       - Entity Relation Graph Axis
       - Entity Linkage Facet
-    definition: >
-      The dimension that captures how an entity stands in relation to other
-      entities through typed edges with cardinality and inverse — both
-      hierarchical (broader/narrower) and associative (related). Distinct
-      from Definition (which captures intrinsic attributes) by capturing
-      extrinsic position in a graph.
+    definition: |
+      An Entity_Interrelationship_Dimension is an Entity_Characterization_Dimension that captures how an entity relates to other entities through hierarchical and associative typed edges, each with a cardinality and an inverse.
     theoreticalBasis:
       primary: SKOS Simple Knowledge Organization System
       source: Miles, A. & Bechhofer, S. (eds., 2009). SKOS Reference. W3C Recommendation 18 August 2009. https://www.w3.org/TR/skos-reference/
@@ -249,32 +198,25 @@ concepts:
       secondarySource: Guarino & Welty (2009), op. cit.
     broader: aget:concept/EntityCharacterizationDimension
     related:
-      - aget:concept/Entity
       - aget:concept/EntityProvenanceDimension
-    example: >
-      L459's relationship blocks (e.g., Document.authored_by Person with
-      cardinality 1:many and inverse 'authors') exemplify this dimension.
-      AGET's vocabulary uses skos:broader/skos:narrower for hierarchy and
-      skos:related for associative links; the L448 Bidirectional Linking
-      Vision is the aspirational form.
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): L459's relationship blocks (e.g., Document.authored_by Person with cardinality 1:many and inverse 'authors') exemplify this dimension. AGET's vocabulary uses skos:broader/skos:narrower for hierarchy and skos:related for associative links; the L448 Bidirectional Linking Vision is the aspirational form.
     sources:
       - "Miles, A. & Bechhofer, S. (eds., 2009). SKOS Simple Knowledge Organization System Reference. W3C Recommendation. https://www.w3.org/TR/skos-reference/"
       - "Guarino, N. & Welty, C. (2009). An Overview of OntoClean. Handbook on Ontologies (2nd ed.), Springer."
     inScheme: aget:ontology/personal-ai-systems
     cluster: Meta-Ontological Concepts
 
+    scopeNote: |
+      Both hierarchical and associative relationships are included. Each typed edge has a cardinality and an inverse; a list of untyped links alone does not supply this characterization. It concerns extrinsic position in a graph, whereas Definition concerns intrinsic attributes.
   - id: C538
     uri: aget:concept/EntityActionDimension
     prefLabel: Entity Action Dimension
     altLabel:
       - Entity Verb-Skill Axis
       - Entity Operation Facet
-    definition: >
-      The dimension capturing the operations, verbs, and skills that may
-      legitimately be applied TO or emitted BY an entity. In AGET,
-      formalized via SVO skill grammar (aget-{verb}-{object}), the approved
-      verb registry, and the 7-verb artifact lifecycle (propose, create,
-      enhance, check, fix, deprecate, retire).
+    definition: |
+      An Entity_Action_Dimension is an Entity_Characterization_Dimension that captures the operations, verbs, and skills that may legitimately be applied to or emitted by an entity.
     theoreticalBasis:
       primary: BFO Occurrent / DOLCE Perdurant
       source: ISO/IEC 21838-2:2021 (BFO); Masolo et al. (2003) WonderWeb D17 — DOLCE
@@ -282,14 +224,10 @@ concepts:
       secondarySource: Lebo, T. et al. (eds., 2013). PROV-O. W3C Recommendation
     broader: aget:concept/EntityCharacterizationDimension
     related:
-      - aget:concept/Entity
       - aget:concept/EntityProvenanceDimension
-    example: >
-      An AGET PROJECT_PLAN entity admits actions {/aget-create-project,
-      /aget-enhance-project, /aget-check-initiative}. The action set is
-      governed by SKILL_NAMING_CONVENTION_SPEC v1.4.0 + the verb registry
-      (DESIGN_DIRECTION_skill_verb_vocabulary v3.16). Container-verb anti-
-      pattern (L912) is a failure to specify this dimension cleanly.
+      - aget:concept/EntityLifecycleDimension
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): An AGET PROJECT_PLAN entity admits actions {/aget-create-project, /aget-enhance-project, /aget-check-initiative}. The action set is governed by SKILL_NAMING_CONVENTION_SPEC v1.4.0 + the verb registry (DESIGN_DIRECTION_skill_verb_vocabulary v3.16). Container-verb anti- pattern (L912) is a failure to specify this dimension cleanly.
     sources:
       - "ISO/IEC 21838-2:2021 — Information technology — Top-level ontologies (TLO) — Part 2: Basic Formal Ontology (BFO). https://www.iso.org/standard/74572.html"
       - "Masolo, C., Borgo, S., Gangemi, A., Guarino, N., Oltramari, A. (2003). WonderWeb Deliverable D17: The DOLCE ontology. LOA-ISTC, CNR."
@@ -297,17 +235,16 @@ concepts:
     inScheme: aget:ontology/personal-ai-systems
     cluster: Meta-Ontological Concepts
 
+    scopeNote: |
+      Operations, verbs and skills may be applied to or emitted by the entity when legitimate. The definition describes permissible actions, not an obligation to perform every action.
   - id: C539
     uri: aget:concept/EntityLifecycleDimension
     prefLabel: Entity Lifecycle Dimension
     altLabel:
       - Entity State Machine Axis
       - Entity Maturation Facet
-    definition: >
-      The dimension capturing the temporal-state machine through which an
-      entity transitions: proposed -> active -> deprecated -> retired, and
-      analogous registration progressions. Each transition is an Action;
-      the dimension itself is the structured set of legitimate states.
+    definition: |
+      An Entity_Lifecycle_Dimension is an Entity_Characterization_Dimension that captures an entity’s temporal state machine and the structured set of legitimate states through which it transitions.
     theoreticalBasis:
       primary: ISO/IEC 11179-6 Administered Item registration progression
       source: "ISO/IEC 11179-6:2023 — Information technology — Metadata registries (MDR) — Part 6: Registration"
@@ -315,14 +252,10 @@ concepts:
       secondarySource: Upward, F. (2000). Modelling the continuum as paradigm shift. Records Management Journal 10(3); McKemmish, S. (2001). Placing Records Continuum Theory and Practice. Archival Science 1(4)
     broader: aget:concept/EntityCharacterizationDimension
     related:
-      - aget:concept/Entity
       - aget:concept/EntityActionDimension
-    example: >
-      An AGET Specification entity transitions through the 7-phase
-      enhancement lifecycle (L622): Phase 0 propose -> Phase 6 ratify.
-      Each gate is a Lifecycle-dimension state; each /aget-enhance-spec
-      invocation is an Action causing transition. POL-DEP-001 deprecation
-      governance enforces grace-period invariants on retire transitions.
+      - aget:concept/EntityPersistenceDimension
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): An AGET Specification entity transitions through the 7-phase enhancement lifecycle (L622): Phase 0 propose -> Phase 6 ratify. Each gate is a Lifecycle-dimension state; each /aget-enhance-spec invocation is an Action causing transition. POL-DEP-001 deprecation governance enforces grace-period invariants on retire transitions.
     sources:
       - "ISO/IEC 11179-6:2023 — Information technology — Metadata registries (MDR) — Part 6: Registration. https://cdn.standards.iteh.ai/samples/78916/7f79bc09f6f74ec490759c09f0d9f7ec/ISO-IEC-11179-6-2023.pdf"
       - "Upward, F. (2000). Modelling the continuum as paradigm shift in recordkeeping and archiving processes. Records Management Journal 10(3)."
@@ -330,38 +263,28 @@ concepts:
     inScheme: aget:ontology/personal-ai-systems
     cluster: Meta-Ontological Concepts
 
+    scopeNote: |
+      Each transition is an Action. The dimension is the structured set of legitimate states, not a particular transition. Proposed, active, deprecated and retired illustrate one progression; analogous registration progressions are included. Entity Lifecycle State explains how a shared core permits entity-specific specialization.
   - id: C540
     uri: aget:concept/EntityPersistenceDimension
     prefLabel: Entity Persistence Dimension
     altLabel:
       - Entity Materialization Axis
       - Entity Storage Facet
-    definition: >
-      The dimension capturing where and in what form an entity is
-      materialized: file system path, naming convention, version-control
-      regime, canonical-vs-private location. Distinct from Lifecycle (which
-      asks about state) by asking about location.
+    definition: |
+      An Entity_Persistence_Dimension is an Entity_Characterization_Dimension that captures where and in what form an entity is materialized.
     theoreticalBasis:
       primary: FAIR Data Principles (Findable / Accessible)
       source: Wilkinson, M.D. et al. (2016). The FAIR Guiding Principles. Scientific Data 3:160018. DOI 10.1038/sdata.2016.18
       secondary: OAIS Information Package (SIP/AIP/DIP)
       secondarySource: ISO 14721:2012 — Open Archival Information System Reference Model
-    scopeNote: >
-      Persistence-vs-Lifecycle independence is contested. Gruber's (1995)
-      Minimal Ontological Commitment principle warns that dimensions
-      claimed orthogonal must justify the commitment cost; some authors
-      treat Persistence as a Lifecycle facet. AGET treats them as separate
-      because canonical-vs-private location (L910) is a Persistence concern
-      that does not reduce to a Lifecycle state.
+    scopeNote: |
+      Location and materialization form are both included, for example a path, naming convention, version-control regime and canonical or private storage location. Independence from Lifecycle is contested in the source interpretation; AGET separates location from lifecycle state because canonical or private storage location is a persistence concern.
     broader: aget:concept/EntityCharacterizationDimension
     related:
-      - aget:concept/Entity
       - aget:concept/EntityLifecycleDimension
-    example: >
-      An AGET PROJECT_PLAN persists at planning/PROJECT_PLAN_*.md (private)
-      while a Spec persists at aget/specs/ (canonical). L910 surfaced that
-      AGET had no formal contract for this canonical-vs-private split — a
-      Persistence-dimension specification gap.
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): An AGET PROJECT_PLAN persists at planning/PROJECT_PLAN_*.md (private) while a Spec persists at aget/specs/ (canonical). L910 surfaced that AGET had no formal contract for this canonical-vs-private split — a Persistence-dimension specification gap.
     sources:
       - "Wilkinson, M.D., Dumontier, M., Aalbersberg, I.J. et al. (2016). The FAIR Guiding Principles for scientific data management and stewardship. Scientific Data 3, 160018. https://www.nature.com/articles/sdata201618"
       - "ISO 14721:2012 — Space data and information transfer systems — Open Archival Information System (OAIS) — Reference model. https://www.iso.org/standard/57284.html"
@@ -375,12 +298,8 @@ concepts:
     altLabel:
       - Entity Authority Axis
       - Entity Trust-Tier Facet
-    definition: >
-      The dimension capturing who has authority to create, modify, approve,
-      or retire an entity, and at what enforcement level. In AGET,
-      formalized via the Decision Authority Matrix, ADR-008 enforcement
-      progression (Advisory -> Strict -> Generator), and trust-tier
-      classification (T0 confidential .. T3 external).
+    definition: |
+      An Entity_Governance_Dimension is an Entity_Characterization_Dimension that captures who has authority to create, modify, approve, or retire an entity and at what enforcement level.
     theoreticalBasis:
       primary: UFO-C social-intentional layer (deontic / normative entities)
       source: "Guizzardi, G., Wagner, G., Almeida, J.P.A., Guizzardi, R.S.S. (2015). Towards ontological foundations for conceptual modeling: UFO. Applied Ontology 10(3-4):259-271. DOI 10.3233/AO-150157"
@@ -388,14 +307,9 @@ concepts:
       secondarySource: "AXELOS (2019/2024). ITIL 4: Service Configuration Management; ISO/IEC 20000-1:2018"
     broader: aget:concept/EntityCharacterizationDimension
     related:
-      - aget:concept/Entity
       - aget:concept/EntityProvenanceDimension
-    example: >
-      An AGET SPEC entity is governed by the Decision Authority Matrix
-      ('Spec creation: Autonomous'), ADR-008 (enforcement tier per spec),
-      and AGET_SECURITY_SPEC v0.2 trust-tier classification (most specs are
-      T2 shared / T3 external). Governance gaps surface as L910-class
-      findings — entities shipped without governance-dimension coverage.
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): An AGET SPEC entity is governed by the Decision Authority Matrix ('Spec creation: Autonomous'), ADR-008 (enforcement tier per spec), and AGET_SECURITY_SPEC v0.2 trust-tier classification (most specs are T2 shared / T3 external). Governance gaps surface as L910-class findings — entities shipped without governance-dimension coverage.
     sources:
       - "Guizzardi, G., Wagner, G., Almeida, J.P.A., Guizzardi, R.S.S. (2015). Towards ontological foundations for conceptual modeling: The unified foundational ontology (UFO) story. Applied Ontology 10(3-4):259-271. https://journals.sagepub.com/doi/10.3233/AO-150157"
       - "AXELOS (2019/2024). ITIL 4: Service Configuration Management."
@@ -403,18 +317,16 @@ concepts:
     inScheme: aget:ontology/personal-ai-systems
     cluster: Meta-Ontological Concepts
 
+    scopeNote: |
+      The dimension covers who may create, modify, approve or retire the entity and the enforcement level attached to that authority.
   - id: C542
     uri: aget:concept/EntityProvenanceDimension
     prefLabel: Entity Provenance Dimension
     altLabel:
       - Entity Lineage Axis
       - Entity Audit-Trail Facet
-    definition: >
-      The dimension capturing the origin, derivation history, and
-      attribution of an entity: who created it, what activity generated it,
-      from what prior entity it was derived, and what evidence supports it.
-      In AGET, formalized via decision logs, Authorization records (CAP-PP-
-      019-04), and PIR/retrospective scoring.
+    definition: |
+      An Entity_Provenance_Dimension is an Entity_Characterization_Dimension that captures an entity’s origin, derivation history, and attribution, including who created it, what activity generated it, what prior entity it was derived from, and what evidence supports it.
     theoreticalBasis:
       primary: W3C PROV Ontology (Entity / Activity / Agent triad)
       source: "Lebo, T., Sahoo, S., McGuinness, D. (eds., 2013). PROV-O: The PROV Ontology. W3C Recommendation 30 April 2013. https://www.w3.org/TR/prov-o/"
@@ -422,50 +334,38 @@ concepts:
       secondarySource: "Moreau, L., Missier, P. (eds., 2013). PROV-DM: The PROV Data Model. W3C Recommendation. https://www.w3.org/TR/prov-dm/"
     broader: aget:concept/EntityCharacterizationDimension
     related:
-      - aget:concept/Entity
       - aget:concept/EntityActionDimension
-    example: >
-      An AGET L-doc entity (e.g., L918) carries provenance via its decision
-      log (created date, author, triggering observation), back-references
-      to prior L-docs (wasDerivedFrom equivalent), and citation of evidence
-      sources (wasInformedBy). Authorization records (new at v3.16) extend
-      provenance to gate-go events: every /aget-go invocation writes a
-      record naming the principal, the principle triad invoked, and the
-      authorized scope.
+      - aget:concept/EntityGovernanceDimension
+      - aget:concept/EntityInterrelationshipDimension
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): An AGET L-doc entity (e.g., L918) carries provenance via its decision log (created date, author, triggering observation), back-references to prior L-docs (wasDerivedFrom equivalent), and citation of evidence sources (wasInformedBy). Authorization records (new at v3.16) extend provenance to gate-go events: every /aget-go invocation writes a record naming the principal, the principle triad invoked, and the authorized scope.
     sources:
       - "Lebo, T., Sahoo, S., McGuinness, D. (eds., 2013). PROV-O: The PROV Ontology. W3C Recommendation. https://www.w3.org/TR/prov-o/"
       - "Moreau, L., Missier, P. (eds., 2013). PROV-DM: The PROV Data Model. W3C Recommendation. https://www.w3.org/TR/prov-dm/"
     inScheme: aget:ontology/personal-ai-systems
     cluster: Meta-Ontological Concepts
 
+    scopeNote: |
+      The characterization includes the creator, generating activity, prior entity from which it was derived and supporting evidence, as well as attribution and derivation history.
   - id: C543
     uri: aget:concept/DimensionalFormalizationMaturity
     prefLabel: Dimensional Formalization Maturity
     altLabel:
       - Per-Dimension Maturity Grading
       - Dimensional Coverage Score
-    definition: >
-      An ordinal grading of how formally an entity's characterization on a
-      given dimension is specified, ranging from convention-only (level 1)
-      through documented (2), specified with R-/CAP- (3), validated by
-      tests (4), to fully formalized stack — spec + schema + validator +
-      tests + tooling (5). Per-dimension grading reveals lopsided coverage
-      patterns that whole-entity averages obscure.
+    definition: |
+      Dimensional_Formalization_Maturity is an ordinal grading of how formally an entity’s characterization on a given dimension is specified.
     theoreticalBasis:
       primary: CMMI Maturity Levels (5-level staged model)
       source: CMMI Institute / ISACA (2023). CMMI Model V3.0; Paulk, M. et al. (1993) — SEI/CMU origin
       secondary: ISO/IEC 25010 quality characteristics
       secondarySource: ISO/IEC 25010:2011 (and 2023 rev.) — System and software quality models
-    broader: aget:concept/EntityCharacterizationDimension
+    broader: null
     related:
       - aget:concept/MetaSpecificationGap
-    example: >
-      AGET v3.16 entities show lopsided maturity: Definition dimension
-      ~level 4 (AGET_VOCABULARY_SPEC + ontology + schemas), Action
-      dimension ~level 4 (SKILL_NAMING_CONVENTION_SPEC + V-validators +
-      contract tests), but Provenance dimension ~level 2 (decision logs +
-      Authorization records as new primitive, no formal contract). Mean
-      maturity ~3.1/5 reveals the meta-spec gap.
+      - aget:concept/EntityCharacterizationDimension
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): AGET v3.16 entities show lopsided maturity: Definition dimension ~level 4 (AGET_VOCABULARY_SPEC + ontology + schemas), Action dimension ~level 4 (SKILL_NAMING_CONVENTION_SPEC + V-validators + contract tests), but Provenance dimension ~level 2 (decision logs + Authorization records as new primitive, no formal contract). Mean maturity ~3.1/5 reveals the meta-spec gap.
     sources:
       - "CMMI Institute / ISACA (2023). CMMI Model V3.0. https://cmmiinstitute.com/learning/appraisals/levels"
       - "Paulk, M.C., Curtis, B., Chrissis, M.B., Weber, C.V. (1993). Capability Maturity Model for Software, Version 1.1. SEI/CMU Technical Report CMU/SEI-93-TR-024."
@@ -473,19 +373,16 @@ concepts:
     inScheme: aget:ontology/personal-ai-systems
     cluster: Meta-Ontological Concepts
 
+    scopeNote: |
+      The required ordered scale is: convention-only (level 1); documented (2); specified with requirement or capability identifiers, R-/CAP- (3); validated by tests (4); and a fully formalized stack comprising specification, schema, validator, tests and tooling (5). The intervals need not be equal. Grading each dimension exposes lopsided coverage that a whole-entity average can obscure.
   - id: C544
     uri: aget:concept/MetaSpecificationGap
     prefLabel: Meta-Specification Gap
     altLabel:
       - Dimension-Coverage Gap
       - Per-Dimension Specification Slack
-    definition: >
-      COUNTER-PERSPECTIVE. Anti-pattern in which an entity is shipped with
-      strong specification on some characterization dimensions but absent
-      or weak on others, with no META-SPEC requiring multi-dimensional
-      coverage. Per L671 (Classification Without Consequence), per-
-      dimension specification without meta-coverage requirement is
-      decorative metadata at the architectural level.
+    definition: |
+      A Meta-Specification_Gap is an anti-pattern in which an entity is shipped with strong specification on some characterization dimensions but absent or weak specification on others, with no meta-specification requiring multi-dimensional coverage.
     theoreticalBasis:
       primary: Minimal Ontological Commitment Principle
       source: Gruber, T.R. (1995). Toward Principles for the Design of Ontologies Used for Knowledge Sharing. International Journal of Human-Computer Studies 43:907-928
@@ -497,31 +394,24 @@ concepts:
       - aget:concept/NormativeConceptBinding
       - aget:concept/SpecificationToOntologyBinding
       - aget:concept/VocabularyDecorationFailure
-    example: >
-      v3.16 shipped 5 new entity types (Authorization Record, Trust Tier,
-      .agetignore, Healthy Friction Primitive, Sleeping Requirement) with
-      strong Action and Governance coverage but zero Provenance and
-      partial Definition (none promoted to AGET_VOCABULARY_SPEC Part 6).
-      Without a meta-spec requiring all-7-dimension coverage, this gap is
-      undetectable at release time.
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): v3.16 shipped 5 new entity types (Authorization Record, Trust Tier, .agetignore, Healthy Friction Primitive, Sleeping Requirement) with strong Action and Governance coverage but zero Provenance and partial Definition (none promoted to AGET_VOCABULARY_SPEC Part 6). Without a meta-spec requiring all-7-dimension coverage, this gap is undetectable at release time.
     sources:
       - "Gruber, T.R. (1995). Toward Principles for the Design of Ontologies Used for Knowledge Sharing. IJHCS 43:907-928. https://tomgruber.org/writing/onto-design/"
       - "AGET internal: .aget/evolution/L671_classification_without_consequence.md (Classification Without Consequence pattern)."
     inScheme: aget:ontology/personal-ai-systems
     cluster: Meta-Ontological Concepts
 
+    scopeNote: |
+      The entity has been shipped or released. Strong specification on some dimensions, absent or weak specification on others, and the absence of a meta-specification requiring multi-dimensional coverage are all conditions of this anti-pattern.
   - id: C547
     uri: aget:concept/VocabularyFirstNamingDiscipline
     prefLabel: Vocabulary-First Naming Discipline
     altLabel:
       - Pre-Coinage Ontology Check
       - Governed-Discourse Grounding
-    definition: >
-      Discipline mandating that before proposing new terminology, concept
-      names, or entity types, agents check existing controlled vocabulary
-      for established prefLabels and reuse them — or document why
-      divergence is needed. Prevents vocabulary fragmentation and fulfills
-      the L795 Governed Discourse Grounding contract.
+    definition: |
+      A Vocabulary-First_Naming_Discipline is a discipline that requires agents to check existing controlled vocabulary before proposing new terminology, concept names, or entity types and to reuse established preferred labels or document why divergence is needed.
     theoreticalBasis:
       primary: SKOS prefLabel discipline (W3C 2009)
       source: Miles, A. & Bechhofer, S. (eds., 2009). SKOS Reference. W3C Recommendation
@@ -530,13 +420,8 @@ concepts:
     related:
       - aget:concept/EntityCharacterizationDimension
       - aget:concept/EntityDefinitionDimension
-    example: >
-      The [internal ref] expansion that introduced C535-C547 is itself an
-      instance of this discipline: before authoring AGET_ENTITY_DIMENSION_
-      SPEC, the agent grounded the 7-dimension model in SKOS so the spec
-      can reference established prefLabels rather than coining new terms.
-      Reverse application: container-verb anti-pattern (L912) is a failure
-      of this discipline at the verb-naming level.
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): The [internal ref] expansion that introduced C535-C547 is itself an instance of this discipline: before authoring AGET_ENTITY_DIMENSION_ SPEC, the agent grounded the 7-dimension model in SKOS so the spec can reference established prefLabels rather than coining new terms. Reverse application: container-verb anti-pattern (L912) is a failure of this discipline at the verb-naming level.
     sources:
       - "Miles, A. & Bechhofer, S. (eds., 2009). SKOS Reference. W3C Recommendation. https://www.w3.org/TR/skos-reference/"
       - "AGET internal: .aget/evolution/L795_governed_discourse_grounding.md (Governed Discourse Grounding)."
@@ -544,28 +429,29 @@ concepts:
     cluster: Meta-Ontological Concepts
 
 
+    scopeNote: |
+      The vocabulary check precedes proposing terminology, concept names or entity types. Agents must either reuse an established preferred label or document why divergence is needed.
   - id: C641
     uri: aget:concept/NormativeConceptBinding
     prefLabel: Normative Concept Binding
     altLabel:
-      - "Inline Normative Reference"
-      - "SHALL-Binding Discipline"
-    definition: >
-      An inline reference from a specification, requirement, or governance rule to an ontology concept URI such that the rule's interpretation is constrained by the bound concept (e.g., "SHALL be interpreted in terms of aget:concept/X"). Distinguishes operational binding from citation-only mention.
+      - Inline Normative Reference
+    definition: |
+      A Normative_Concept_Binding is an Inline_URI_Reference from a specification, requirement, or governance rule to an ontology concept whose meaning constrains interpretation of the citing rule.
     theoreticalBasis:
       primary: DPCL Language Template for Normative Specifications
       source: Padget et al. (2022), arxiv 2201.04477
       secondary: ISO 15531 Mandate Standard ontology extraction
       secondarySource: Cutting-Decelle et al. (2018), arxiv 1806.02242
-    broader: null
-    narrower:
-      - aget:concept/InlineUriReference
-      - aget:concept/SpecificationToOntologyBinding
+    broader: aget:concept/InlineUriReference
+    narrower: null
     related:
       - aget:concept/MetaSpecificationGap
       - aget:concept/VocabularyDecorationFailure
-    example: >
-      L924 (2026-05-04) empirically established that AGET's 66 specs + 6 requirements contained 0 inline normative bindings to its 495-concept ontology. Mention by range is not binding; only inline "SHALL be interpreted in terms of aget:concept/X" creates operational consequence.
+      - aget:concept/ConceptPinningByVersion
+      - aget:concept/SpecificationToOntologyBinding
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): L924 (2026-05-04) empirically established that AGET's 66 specs + 6 requirements contained 0 inline normative bindings to its 495-concept ontology. Mention by range is not binding; only inline "SHALL be interpreted in terms of aget:concept/X" creates operational consequence.
     sources:
       - "DPCL: A Language Template for Normative Specifications, arxiv 2201.04477 (2022)"
       - "L924: Ontology-Spec Binding Gap Systemic (2026-05-04)"
@@ -574,24 +460,27 @@ concepts:
     cluster: Ontology Grounding, Lifecycle & Validation
     status: active
 
+    scopeNote: |
+      The bound concept’s meaning constrains interpretation of the citing rule. An inline citation that merely mentions a concept does not qualify.
   - id: C642
     uri: aget:concept/InlineUriReference
     prefLabel: Inline URI Reference
     altLabel:
       - "In-Body URI Citation"
       - "Inline Concept Hyperlink"
-    definition: >
-      A URI reference (typically curie-prefixed, e.g., aget:concept/X) embedded directly in the prose body of a specification or document, rather than relegated to metadata or annotation blocks. Visible, navigable entity references outperform JSON-LD-only markup for both human review and machine-readable RAG retrieval.
+    definition: |
+      An Inline_URI_Reference is a URI reference embedded directly in the prose body of a specification or document, rather than relegated to metadata or annotation blocks.
     theoreticalBasis:
       primary: Grounding Page Standard v1.6
       source: groundingpage.com/spec/ (2026)
       secondary: Entity-centric RAG retrieval accuracy
       secondarySource: Volpini et al. (2026) cited in testerstories.com 2026-03
-    broader: aget:concept/NormativeConceptBinding
-    narrower: null
+    broader: null
+    narrower:
+      - aget:concept/NormativeConceptBinding
     related: null
-    example: >
-      Volpini et al. (2026) measured ~30% accuracy improvement in RAG pipelines when entity content is navigable in body prose vs. JSON-LD-only markup. AGENTS.md uses inline `aget:concept/X` curies; AGET specs currently do not.
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): Volpini et al. (2026) measured ~30% accuracy improvement in RAG pipelines when entity content is navigable in body prose vs. JSON-LD-only markup. AGENTS.md uses inline `aget:concept/X` curies; AGET specs currently do not.
     sources:
       - "Grounding Page Standard v1.6, https://groundingpage.com/spec/"
       - "AI and Testing: From Specification to Ontology, testerstories.com (2026-03)"
@@ -599,23 +488,26 @@ concepts:
     cluster: Ontology Grounding, Lifecycle & Validation
     status: active
 
+    scopeNote: |
+      The reference is embedded in document prose rather than only metadata or annotations. A compact prefix form is typical, not mandatory, and requires a declared prefix expansion to identify the intended URI. URI-reference syntax alone does not prove an AGET concept binding or its intended target.
   - id: C643
     uri: aget:concept/ConceptPinningByVersion
     prefLabel: Concept Pinning by Version
     altLabel:
       - "Vocabulary Version Pinning"
       - "Bound-Version Reference"
-    definition: >
-      The discipline of declaring the ontology version a specification binds to, so that downstream consumers pin to a specific vocabulary release and upgrade deliberately. Without pinning, vocabulary evolution silently breaks specification semantics.
+    definition: |
+      Concept_Pinning_by_Version is a discipline of declaring the ontology version to which a specification binds so downstream consumers pin to a specific vocabulary release and upgrade deliberately.
     theoreticalBasis:
       primary: Ontology Management Operating Model — Versioning & Change Control
       source: getgalaxy.io articles ontology-management (accessed 2026-05-20)
-    broader: aget:concept/NormativeConceptBinding
+    broader: null
     narrower: null
     related:
       - aget:concept/BindOnceDecayOften
-    example: >
-      AGET ontology is at v8.10.0; no spec currently declares which ontology version its aget:concept/X references resolve against. Galaxy ontology management best practice: "Version the artifacts that downstream systems bind to; consumers pin to a specific version and upgrade deliberately."
+      - aget:concept/NormativeConceptBinding
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): AGET ontology is at v8.10.0; no spec currently declares which ontology version its aget:concept/X references resolve against. Galaxy ontology management best practice: "Version the artifacts that downstream systems bind to; consumers pin to a specific version and upgrade deliberately."
     sources:
       - "Galaxy: Ontology Management Operating Model"
       - "CSIRO Information Engineering — Best practice in formalizing a SKOS vocabulary"
@@ -623,24 +515,27 @@ concepts:
     cluster: Ontology Grounding, Lifecycle & Validation
     status: active
 
+    scopeNote: |
+      The specification declares the ontology version it binds to. Downstream consumers pin to that release and upgrade deliberately. A version declaration alone does not establish compatibility or semantic correctness.
   - id: C644
     uri: aget:concept/SpecificationToOntologyBinding
     prefLabel: Specification-to-Ontology Binding
     altLabel:
       - "Spec-Ontology Bridge"
       - "Contract-Layer Binding"
-    definition: >
-      A bidirectional formal linkage between an AGET specification (or requirement, governance rule, SOP) and one or more ontology concepts, such that vocabulary classification has operational consequence at the contract layer.
+    definition: |
+      A Specification-to-Ontology_Binding is a bidirectional formal linkage between an AGET specification, requirement, governance rule, or SOP and one or more ontology concepts, such that vocabulary classification has operational consequence at the contract layer.
     theoreticalBasis:
       primary: Ontology-Specification-Memory Stack
       source: L648 (AGET internal, 2026)
-    broader: aget:concept/NormativeConceptBinding
+    broader: null
     narrower: null
     related:
       - aget:concept/BackwardLinking
       - aget:concept/MetaSpecificationGap
-    example: >
-      INIT-ONTOLOGY-SPEC-BINDING (2026-05-04) is the AGET initiative tasked with creating these bindings across 66 specs + 6 requirements + governance + SOPs. Stream 1 pilot: AGET_ENTITY_DIMENSION_SPEC first-instance binding.
+      - aget:concept/NormativeConceptBinding
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): INIT-ONTOLOGY-SPEC-BINDING (2026-05-04) is the AGET initiative tasked with creating these bindings across 66 specs + 6 requirements + governance + SOPs. Stream 1 pilot: AGET_ENTITY_DIMENSION_SPEC first-instance binding.
     sources:
       - "L648: Ontology-Specification-Memory Stack"
       - "INIT-ONTOLOGY-SPEC-BINDING initiative manifest (2026-05-04)"
@@ -649,25 +544,28 @@ concepts:
     cluster: Ontology Grounding, Lifecycle & Validation
     status: active
 
+    scopeNote: |
+      The formal linkage runs in both directions, connects a specification, requirement, governance rule or SOP to one or more concepts, and gives vocabulary classification operational consequence at the contract layer.
   - id: C646
     uri: aget:concept/VocabularyDecorationFailure
     prefLabel: Vocabulary Decoration Failure
     altLabel:
       - "Decorative Metadata Pattern"
       - "Unconsumed Vocabulary"
-    scopeNote: >
-      Counter-perspective concept (failure mode). When a formal vocabulary exists but no specification normatively binds to it, the vocabulary becomes decorative metadata at the framework level — a named subtype of MetaSpecificationGap.
-    definition: >
-      A failure mode where a formal ontology is published and maintained but no downstream specification, requirement, or governance rule normatively binds to it. The vocabulary classification has no operational consequence; the ontology becomes documentation rather than contract.
+    scopeNote: |
+      Both publication and maintenance of the ontology are present, but downstream normative binding is absent. The failure is the lack of operational consequence, not an absence of vocabulary. This failure mode is associated with a Meta-Specification Gap; the association does not declare it a subtype of that gap.
+    definition: |
+      A Vocabulary_Decoration_Failure is a failure mode in which a formal ontology is published and maintained but no downstream specification, requirement, or governance rule normatively binds to it.
     theoreticalBasis:
       primary: L671 Decorative Metadata Pattern
       source: L671 (AGET internal)
-    broader: aget:concept/MetaSpecificationGap
+    broader: null
     narrower: null
     related:
       - aget:concept/NormativeConceptBinding
-    example: >
-      AGET 2026-05-04 baseline: 495-concept ontology, 66 specs, 0 inline normative bindings. Per L671, decoration without consequence is the failure mode INIT-ONTOLOGY-SPEC-BINDING remediates.
+      - aget:concept/MetaSpecificationGap
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): AGET 2026-05-04 baseline: 495-concept ontology, 66 specs, 0 inline normative bindings. Per L671, decoration without consequence is the failure mode INIT-ONTOLOGY-SPEC-BINDING remediates.
     sources:
       - "L671: Decorative Metadata Pattern"
       - "L924: Ontology-Spec Binding Gap Systemic"
@@ -683,17 +581,17 @@ concepts:
       - "aget:referencedBy"
       - "Reverse Citation Index"
       - "Populate-on-Touch Backward Link"
-    definition: >
-      A relationship field on an ontology concept enumerating the specs, requirements, SOPs, or docs that normatively bind to it. Provides bidirectional traceability: forward (spec→concept) plus reverse (concept→specs-that-bind). Populated structurally at binding time, not curated separately.
+    definition: |
+      Backward_Linking_(referencedBy) is a relationship field on an ontology concept that enumerates specifications, requirements, SOPs, or documents normatively bound to that concept.
     theoreticalBasis:
       primary: Bidirectional Linking Vision
       source: L448 (AGET internal); gh#799
-    broader: aget:concept/SpecificationToOntologyBinding
+    broader: null
     narrower: null
     related:
       - aget:concept/SpecificationToOntologyBinding
-    example: >
-      gh#799 (AGET): "aget:referencedBy field + populate-on-touch backward linking" — proposed framework capability for closing the spec→ontology→spec loop, surfacing which contracts depend on each concept at the moment vocabulary changes are considered.
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): gh#799 (AGET): "aget:referencedBy field + populate-on-touch backward linking" — proposed framework capability for closing the spec→ontology→spec loop, surfacing which contracts depend on each concept at the moment vocabulary changes are considered.
     sources:
       - "gh#799: aget:referencedBy field + populate-on-touch backward linking"
       - "L448: Bidirectional Linking Vision"
@@ -702,16 +600,18 @@ concepts:
     cluster: Ontology Grounding, Lifecycle & Validation
     status: active
 
+    scopeNote: |
+      The field lists normative binding consumers, not arbitrary mentions. It is required to be populated structurally at binding time, rather than curated separately.
   - id: C650
     uri: aget:concept/BindOnceDecayOften
     prefLabel: Bind-Once-Decay-Often
     altLabel:
       - "Binding Rot"
       - "Stale Binding Failure"
-    scopeNote: >
-      Counter-perspective concept. A binding made at time T to concept-version V silently rots as the ontology evolves past V without spec updates.
-    definition: >
-      A failure mode where a specification binds to an ontology concept at one point in time, the ontology subsequently evolves (concept renamed, deprecated, split, merged), and the binding is not maintained — leading to phantom references, semantic drift, or broken validators.
+    scopeNote: |
+      An earlier specification binding remains unmaintained as the ontology evolves. Phantom references, semantic drift or broken validators are the resulting failures.
+    definition: |
+      Bind-Once-Decay-Often is a failure mode in which a specification’s concept binding is left unmaintained after the ontology changes, leading to phantom references, semantic drift, or broken validators.
     theoreticalBasis:
       primary: Vocabulary versioning failure modes
       source: Galaxy Ontology Management Operating Model (2026)
@@ -719,8 +619,8 @@ concepts:
     narrower: null
     related:
       - aget:concept/ConceptPinningByVersion
-    example: >
-      Anticipated failure mode for INIT-ONTOLOGY-SPEC-BINDING. Mitigation: Concept Pinning by Version (C643) + Binding Validator (C666) in CI, so binding rot is detected at vocabulary release rather than at downstream consumer break.
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): Anticipated failure mode for INIT-ONTOLOGY-SPEC-BINDING. Mitigation: Concept Pinning by Version (C643) + Binding Validator (C666) in CI, so binding rot is detected at vocabulary release rather than at downstream consumer break.
     sources:
       - "Galaxy: Ontology Management Operating Model"
       - "AGET POL-DEP-001 deprecation policy (analogous discipline)"
@@ -734,8 +634,8 @@ concepts:
     altLabel:
       - "Vocabulary Entry State"
       - "SKOS Concept Status"
-    definition: >
-      The governed state of an ontology concept within an editorial workflow, typically one of: Candidate (proposed, under review), Active (committed, bindable), Deprecated (replaced, grace period), Retired (removed from bindable surface). Distinct from concept ID assignment, which is permanent.
+    definition: |
+      A Concept_Lifecycle_State is an Entity_Lifecycle_State of an ontology concept within an editorial workflow.
     theoreticalBasis:
       primary: Ontology editorial workflow lifecycle
       source: metaphactory governance guide (2026)
@@ -743,8 +643,9 @@ concepts:
     narrower: null
     related:
       - aget:concept/EditorialWorkflowStateLabel
-    example: >
-      metaphactory governance guide: "Editorial workflows facilitate the smooth movement of the ontology through its lifecycle by offering clear labels that display the state in which the ontology is in." AGET ontology currently has no per-concept state machine — gap identified by [internal ref].
+      - aget:concept/VocabularyGovernanceBody
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): metaphactory governance guide: "Editorial workflows facilitate the smooth movement of the ontology through its lifecycle by offering clear labels that display the state in which the ontology is in." AGET ontology currently has no per-concept state machine — gap identified by [internal ref].
     sources:
       - "A guide to ontology governance in metaphactory"
       - "Galaxy: Ontology Management Operating Model"
@@ -752,24 +653,26 @@ concepts:
     cluster: Ontology Grounding, Lifecycle & Validation
     status: active
 
+    scopeNote: |
+      Typical workflow states are Candidate (proposed and under review), Active (committed and bindable), Deprecated (replaced with a grace period) and Retired (removed from the bindable surface). These names are not a mandatory global enum. The state differs from concept-ID assignment, which is permanent.
   - id: C656
     uri: aget:concept/VocabularyGovernanceBody
     prefLabel: Vocabulary Governance Body
     altLabel:
       - "Vocabulary Steward"
       - "Ontology Owner"
-    definition: >
-      The named entity (organization, role, or agent) accountable for an ontology's content, lifecycle decisions, and URI persistence. CSIRO SKOS best practice: vocabulary URIs SHOULD be owned by, or acknowledge, the governance body.
+    definition: |
+      A Vocabulary_Governance_Body is a named entity, such as an organization, role, or agent, that is accountable for an ontology’s content, lifecycle decisions, and URI persistence.
     theoreticalBasis:
       primary: SKOS vocabulary governance best practice
       source: CSIRO Information Engineering — Best practice in formalizing a SKOS vocabulary
-    broader: null
-    narrower:
-      - aget:concept/ConceptEditorRole
+    broader: aget:concept/Entity
+    narrower: null
     related:
       - aget:concept/ConceptLifecycleState
-    example: >
-      AGET ontology vocabulary file currently declares "Author: [internal agent]" but does not formally name a governance body or steward role. INIT-ONTOLOGY-MATURATION Stream 1 (Vocab Lifecycle) target: add explicit governance-body attribution to header.
+      - aget:concept/ConceptEditorRole
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): AGET ontology vocabulary file currently declares "Author: [internal agent]" but does not formally name a governance body or steward role. INIT-ONTOLOGY-MATURATION Stream 1 (Vocab Lifecycle) target: add explicit governance-body attribution to header.
     sources:
       - "CSIRO: Best practice in formalizing a SKOS vocabulary"
       - "Galaxy: Ontology Management Operating Model — roles"
@@ -777,21 +680,23 @@ concepts:
     cluster: Ontology Grounding, Lifecycle & Validation
     status: active
 
+    scopeNote: |
+      The named entity is accountable for all three: ontology content, lifecycle decisions and URI persistence. An organization, role or agent can bear that accountability.
   - id: C657
     uri: aget:concept/ConceptEditorRole
     prefLabel: Concept Editor Role
     altLabel:
       - "Vocabulary Editor"
       - "SKOS Curator"
-    definition: >
-      A specific authoring/curatorial role within a Vocabulary Governance Body responsible for proposing, reviewing, and committing concept changes. Distinct from concept author (one-shot contribution) and binding consumer (downstream spec author).
-    broader: aget:concept/VocabularyGovernanceBody
+    definition: |
+      A Concept_Editor_Role is an authoring or curatorial role that belongs to a Vocabulary_Governance_Body and is responsible for proposing, reviewing, and committing concept changes.
+    broader: null
     narrower: null
     related:
       - aget:concept/EditorialWorkflowStateLabel
       - aget:concept/VocabularyGovernanceBody
-    example: >
-      For AGET, the framework-manager archetype (this agent) currently holds the implicit Concept Editor Role. INIT-ONTOLOGY-MATURATION proposes making this explicit alongside expansion-campaign cadence governance.
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): For AGET, the framework-manager archetype (this agent) currently holds the implicit Concept Editor Role. INIT-ONTOLOGY-MATURATION proposes making this explicit alongside expansion-campaign cadence governance.
     sources:
       - "metaphactory: editorial workflow roles"
       - "AGET .aget/identity.json (framework-manager archetype)"
@@ -799,21 +704,23 @@ concepts:
     cluster: Ontology Grounding, Lifecycle & Validation
     status: active
 
+    scopeNote: |
+      The role belongs to the governance body and is responsible for proposing, reviewing and committing changes. It differs from a one-time author or downstream binding consumer.
   - id: C658
     uri: aget:concept/EditorialWorkflowStateLabel
     prefLabel: Editorial Workflow State Label
     altLabel:
       - "Lifecycle State Annotation"
       - "Workflow Status Tag"
-    definition: >
-      A machine-readable label attached to a concept (or other vocabulary artifact) that displays its lifecycle state. Enables transparent workflow management — domain experts and reviewers can see at a glance which concepts are Candidate, Active, Deprecated, or Retired.
+    definition: |
+      An Editorial_Workflow_State_Label is a machine-readable label attached to a concept or other vocabulary artifact that displays that artifact’s lifecycle state.
     broader: null
     narrower: null
     related:
       - aget:concept/ConceptLifecycleState
       - aget:concept/ConceptEditorRole
-    example: >
-      Implementation candidate: `status:` field on each concept entry, with enum values {candidate, active, deprecated, retired}. Existing AGET concepts have `status: active` (implicit default); [internal ref] surfaces this as a vocabulary-wide field.
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): Implementation candidate: `status:` field on each concept entry, with enum values {candidate, active, deprecated, retired}. Existing AGET concepts have `status: active` (implicit default); [internal ref] surfaces this as a vocabulary-wide field.
     sources:
       - "metaphactory ontology governance — editorial workflow"
       - "W3C SKOS-XL — Extension for Labels"
@@ -821,16 +728,18 @@ concepts:
     cluster: Ontology Grounding, Lifecycle & Validation
     status: active
 
+    scopeNote: |
+      The label displays the lifecycle state of the concept or other vocabulary artifact to which it is attached. A displayed label is not the state itself.
   - id: C671
     uri: aget:concept/AuthorAssertedCleanlinessAntiPattern
     prefLabel: Author-Asserted Cleanliness Anti-Pattern
     altLabel:
       - "Skill-Assert-Before-Verify"
       - "Vocabulary Confidence-As-Measurement"
-    scopeNote: >
-      Counter-perspective concept (anti-pattern). Replacing empirical validator output ("0 orphans / 0 dangling / all reciprocal") with author confidence. Family member of L908 self-application failure and L803 stratified-fact-check bypass.
-    definition: >
-      A failure mode where an ontology author or skill declares "0 defects" or "all clean" based on confidence rather than validator output. Skosify EKAW 2012 baseline (n=24, 100% defective) establishes that defects exist until measurement confirms otherwise.
+    scopeNote: |
+      The author or skill asserts zero defects or complete cleanliness from confidence rather than validator output. The corrective is validator output reporting measured defects with a declared scope; historical counts do not certify current cleanliness.
+    definition: |
+      An Author-Asserted_Cleanliness_Anti-Pattern is a failure mode in which an ontology author or skill declares zero defects or complete cleanliness from confidence rather than validator output.
     theoreticalBasis:
       primary: L736 Skill Assert-Before-Verify
       source: L736 (AGET internal)
@@ -841,8 +750,8 @@ concepts:
     broader: null
     narrower: null
     related: null
-    example: >
-      L736 (Skill Assert-Before-Verify) is the AGET-internal naming; /aget-expand-ontology Step 7a empirical confirmation requirement is the structural remediation: "Author-asserted '0 orphans / 0 dangling / all reciprocal' claims MUST be replaced with validator output."
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): L736 (Skill Assert-Before-Verify) is the AGET-internal naming; /aget-expand-ontology Step 7a empirical confirmation requirement is the structural remediation: "Author-asserted '0 orphans / 0 dangling / all reciprocal' claims MUST be replaced with validator output."
     sources:
       - "L736: Skill Assert-Before-Verify"
       - "L803: Stratified Fact-Check"
@@ -858,16 +767,16 @@ concepts:
     altLabel:
       - "Designing for Appropriate Reliance"
       - "Reliance Calibration"
-    definition: >
-      Reliance is appropriate when the human's degree of dependence on automation matches the automation's actual capability — relying on it when it is correct and overriding it when it is wrong. Trust is the attitudinal mediator that guides reliance, especially where full understanding of the automation is impractical.
+    definition: |
+      Appropriate_Reliance is reliance on automation in which a human’s degree of dependence matches the automation’s actual capability, with reliance when it is correct and override when it is wrong.
     theoreticalBasis:
       primary: Human factors / trust in automation (peer-reviewed)
       source: Lee & See, Human Factors 2004; Parasuraman & Riley 1997
     broader: null
     narrower: null
     related: null
-    example: >
-      Lee & See define appropriate reliance as the design target: trust calibrated to capability, avoiding both over-reliance (misuse) and under-reliance (disuse, per Parasuraman & Riley's use/misuse/disuse/abuse taxonomy). AGET's memory-layer claim-verification rule (L908/L939/L960 — "verify before recommending from a memory premise") is appropriate-reliance discipline applied to the agent's reliance on its OWN prior outputs.
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): Lee & See define appropriate reliance as the design target: trust calibrated to capability, avoiding both over-reliance (misuse) and under-reliance (disuse, per Parasuraman & Riley's use/misuse/disuse/abuse taxonomy). AGET's memory-layer claim-verification rule (L908/L939/L960 — "verify before recommending from a memory premise") is appropriate-reliance discipline applied to the agent's reliance on its OWN prior outputs.
     sources:
       - "Lee, J. D., & See, K. A. (2004). Trust in Automation: Designing for Appropriate Reliance. Human Factors, 46(1), 50-80. DOI: 10.1518/hfes.46.1.50_30392"
       - "Parasuraman, R., & Riley, V. (1997). Humans and Automation: Use, Misuse, Disuse, Abuse. Human Factors, 39(2), 230-253. DOI: 10.1518/001872097778543886"
@@ -875,50 +784,54 @@ concepts:
     cluster: Human-AI Teaming & Calibrated Reliance
     status: active
 
+    scopeNote: |
+      Human dependence matches actual automation capability: rely on correct automation and override it when wrong. Trust is an attitudinal mediator; reliance is not identical to trust.
   - id: C1240
     uri: aget:concept/EntityLifecycleState
     prefLabel: Entity Lifecycle State
     altLabel:
       - "Shared lifecycle state"
       - "Artifact state genus"
-    definition: >
-      The genus for the governed state of any AGET entity within its lifecycle, generalizing ConceptLifecycleState (C651) from ontology-concepts to ALL entities. A shared vocabulary (proposed -> active -> deprecated -> retired + terminal variants) that each entity SPECIALIZES rather than re-inventing a bespoke enum (R-OGE-12). Shared != uniform: a Goal `achieves`, an Initiative `graduates/folds`, a concept `retires` — each specializes the core.
+    definition: |
+      An Entity_Lifecycle_State is a governed state of an AGET entity within its lifecycle.
     broader: null
     narrower:
       - aget:concept/ConceptLifecycleState
     related: null
-    example: >
-      Initiative uses ACTIVE/DORMANT/NASCENT/PROPOSED/COMPLETE/FOLDED; Plan uses Draft/In-Progress/Complete/Abandoned; Goal uses active/achieved — today all divergent, none drawing from a shared model. This genus is the model they map to.
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): Initiative uses ACTIVE/DORMANT/NASCENT/PROPOSED/COMPLETE/FOLDED; Plan uses Draft/In-Progress/Complete/Abandoned; Goal uses active/achieved — today all divergent, none drawing from a shared model. This genus is the model they are required to map to.
     sources:
       - "R-OGE-12 (principal 'all', 2026-07-15); generalizes C651 ConceptLifecycleState."
       - "Entity Lifecycle Dimension (live): proposed->active->deprecated->retired."
     inScheme: aget:ontology/personal-ai-systems
     cluster: Genus Expansion
-    status: provisional
+    status: active
 
+    scopeNote: |
+      Entity lifecycle vocabularies are required to specialize the shared proposed, active, deprecated and retired core, including appropriate terminal variants. Shared does not mean uniform: a goal may achieve, an initiative may graduate or fold, and a concept may retire. Existing divergent enums are lifecycle states that require mapping, not exclusion. Activating this concept does not certify current Plan, Goal or Initiative enums as conforming. For this record’s ratification only, its former provisional status corresponds to proposed-for-ratification; no global state migration follows.
   - id: C1064
     uri: aget:concept/FrictionReductionStrategy
     prefLabel: Friction Reduction Strategy
     altLabel:
       - "Friction Posture Strategy"
       - "Three-Posture Friction Model"
-    definition: >
-      A governance strategy that treats friction not as uniform waste to be eliminated but as a signal to be triaged across three postures: REDUCE avoidable/extraneous friction, PRESERVE-and-calibrate healthy (designed-in) friction, and CONVERGE captured friction to structure so it never recurs uncaptured. The strategically distinctive claim is that friction reduction is a classification problem, not an elimination problem.
+    definition: |
+      A Friction_Reduction_Strategy is a governance strategy that treats friction as a signal to triage across reducing avoidable friction, preserving and calibrating healthy friction, and converging captured friction into structure so it never recurs uncaptured.
     theoreticalBasis:
       primary: Compensating-control framing of governance ritual
       source: GOVERNANCE_PRINCIPLES.md (Healthy Friction); L918
     broader: null
-    narrower:
-      - aget:concept/HealthyFriction
+    narrower: null
     related:
       - aget:concept/FrictionTriage
-    example: >
-      A reported permission prompt is not auto-suppressed; it is triaged - if it gates authority expansion (public-repo write, instruction-surface edit) it is PRESERVED as healthy friction; if it is pure diagnostic overhead it is REDUCED via a settings rule; either way the event is CONVERGED to structure so it does not recur uncaptured (AGET 2026-06).
+      - aget:concept/HealthyFriction
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): A reported permission prompt is not auto-suppressed; it is triaged - if it gates authority expansion (public-repo write, instruction-surface edit) it is PRESERVED as healthy friction; if it is pure diagnostic overhead it is REDUCED via a settings rule; either way the event is CONVERGED to structure so it does not recur uncaptured (AGET 2026-06).
     sources:
       - "AGET GOVERNANCE_PRINCIPLES.md (Healthy Friction, :261)."
       - "L918: AGET as a High-Friction Implementation of an Individual-Sovereignty Future (2026-05-02)."
-    scopeNote: >
-      LANDED 2026-08-13 ([internal ref]) at its reserved draft-056 id. Draft `_DRAFT_FWRK-2026-056_concepts.yaml` also declared `aget:concept/FrictionConvergence` as a third narrower; that concept has never landed (0 definition sites), so the edge is omitted here rather than authored dangling. Restore it if and when FrictionConvergence lands.
+    scopeNote: |
+      Friction is a signal, not uniformly wasted effort. The strategy reduces avoidable friction, preserves and calibrates healthy friction, and converges captured friction into structure so that recurrence is not uncaptured.
     inScheme: aget:ontology/personal-ai-systems
     cluster: Trust & Governance
     status: active
@@ -929,18 +842,19 @@ concepts:
     altLabel:
       - "Calibrated Friction"
       - "Mandatory-Friction Principal-Elected-Block"
-    definition: >
-      A deliberately-imposed, calibrated enforcement posture sitting between Advisory (no friction) and Strict (hard block): friction is mandatory at an error-prone or authority-expanding step, but the principal may elect to proceed. It is a compensating control for a missing substrate primitive, not an artifact of immaturity. This is the PRESERVE pole — the friction that "is the way," not "in the way."
+    definition: |
+      Healthy_Friction is a deliberately imposed, calibrated enforcement posture between Advisory and Strict, compensating for a missing substrate primitive, in which friction is mandatory at error-prone or authority-expanding steps but the principal may elect to proceed.
     theoreticalBasis:
       primary: Poka-yoke (mandatory friction at error-prone steps)
       source: Shingo 1986 (Toyota Production System); GOVERNANCE_PRINCIPLES.md:261
-    broader: aget:concept/FrictionReductionStrategy
+    broader: null
     narrower: null
     related:
       - aget:concept/FrictionTriage
       - aget:concept/FrictionReportingFrontDoorAntiPattern
-    example: >
-      Authority-expanding edit prompts on public-repo writes, self-edits to settings.local.json, and instruction-injection surfaces are NOT suppressed — they are "the ONLY hard gates on authority expansion" (AGET memory feedback-public-repo-edit-prompts-are-healthy-friction, 2026-06-14). /aget-go, D71 STRUCTURAL routing, and the Saturday push window (L735) are further operationalizations.
+      - aget:concept/FrictionReductionStrategy
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): Authority-expanding edit prompts on public-repo writes, self-edits to settings.local.json, and instruction-injection surfaces are NOT suppressed — they are "the ONLY hard gates on authority expansion" (AGET memory feedback-public-repo-edit-prompts-are-healthy-friction, 2026-06-14). /aget-go, D71 STRUCTURAL routing, and the Saturday push window (L735) are further operationalizations.
     sources:
       - "Shingo, S. (1986). Zero Quality Control: Source Inspection and the Poka-Yoke System. Productivity Press."
       - "AGET GOVERNANCE_PRINCIPLES.md (Healthy Friction, :261); L918."
@@ -948,14 +862,16 @@ concepts:
     cluster: Trust & Governance
     status: active
 
+    scopeNote: |
+      The posture is deliberate and calibrated, between Advisory (no friction) and Strict (a hard block). A substrate primitive is an underlying mechanism that would otherwise enforce the relevant control. Friction is mandatory at error-prone or authority-expanding steps, while the principal may elect to proceed. It compensates for a missing substrate primitive; it is not an artifact of immaturity.
   - id: C1069
     uri: aget:concept/FrictionTriage
     prefLabel: Friction Triage
     altLabel:
       - "Classify-Before-Reduce"
       - "Friction Classification Gate"
-    definition: >
-      The operation of classifying each reported friction event — before any remediation — as avoidable (reduce), structural/healthy (preserve), or owed (ledger). It is the hinge of the friction strategy: it routes events to the correct posture and prevents the default assumption that "reported friction" equals "friction to eliminate."
+    definition: |
+      Friction_Triage is an operation that classifies each reported friction event as avoidable, structural/healthy, or owed before any remediation.
     theoreticalBasis:
       primary: Three-way friction classification
       source: CAP-SESSION-013-D (R-CLOSE-018)
@@ -965,21 +881,23 @@ concepts:
       - aget:concept/HealthyFriction
       - aget:concept/FrictionReductionStrategy
       - aget:concept/FrictionReportingFrontDoorAntiPattern
-    example: >
-      R-CLOSE-018 requires close-session to classify friction events as "avoidable, structural, or operational" before recording — the structural class is precisely the healthy friction that must NOT be routed to elimination.
+    example: |
+      Illustration: an unnecessary repeat prompt is avoidable; an authority boundary that requires affirmation is structural/healthy; a missing promised delivery is owed. Triage classifies each before choosing remediation.
     sources:
       - "AGET CAP-SESSION-013-D (R-CLOSE-017..020)."
     inScheme: aget:ontology/personal-ai-systems
     cluster: Trust & Governance
     status: active
 
+    scopeNote: |
+      Every reported event is classified before any remediation. The three classes are avoidable, structural/healthy and owed; reporting an event does not by itself authorize eliminating its control.
   - id: C1072
     uri: aget:concept/FrictionReportingFrontDoorAntiPattern
     prefLabel: Friction-Reporting Front-Door Anti-Pattern
     altLabel:
       - "Untriaged Friction Capture Surface"
-    definition: >
-      A user-facing friction-reporting or friction-proposing skill that routes reported events straight to remediation/elimination WITHOUT a triage step becomes a lever for dissolving healthy friction. A capture front-door must classify first (avoidable / structural / owed); a front-door that only reduces is an attack surface on the compensating controls.
+    definition: |
+      A Friction-Reporting_Front-Door_Anti-Pattern is an anti-pattern in which a user-facing friction-reporting or friction-proposing skill routes reported events directly to remediation or elimination without a prior triage step classifying them as avoidable, structural, or owed.
     theoreticalBasis:
       primary: Triage-before-remediate requirement on capture surfaces
       source: this study (2026-06-23); CAP-SESSION-013-D
@@ -988,8 +906,8 @@ concepts:
     related:
       - aget:concept/FrictionTriage
       - aget:concept/HealthyFriction
-    example: >
-      A hypothesized /aget-propose-friction or /aget-report-friction skill (named by the principal, built nowhere as of 2026-06-23) is valuable ONLY if it wraps the three-way triage; if it auto-routes "I hit friction" to "remove it," it can quietly disable poka-yoke gates such as the public-push window or STRUCTURAL skill routing.
+    example: |
+      Source-era illustration (not a claim of current implementation or conformity): A hypothesized /aget-propose-friction or /aget-report-friction skill (named by the principal, built nowhere as of 2026-06-23) is valuable ONLY if it wraps the three-way triage; if it auto-routes "I hit friction" to "remove it," it can quietly disable poka-yoke gates such as the public-push window or STRUCTURAL skill routing.
     sources:
       - "AGET deep-study pipeline 2026-06-23 (friction reduction strategy)."
       - "AGET CAP-SESSION-013-D (R-CLOSE-018 three-way friction classification)."
@@ -997,16 +915,18 @@ concepts:
     cluster: Trust & Governance
     status: active
 
+    scopeNote: |
+      A user-facing reporting or proposing skill routes events straight to remediation or elimination, without first classifying them as avoidable, structural or owed. This can erode healthy controls; classification must precede remediation.
   - id: C1075
     uri: aget:concept/ReleaseSkillRelianceContract
     prefLabel: Release Skill Reliance Contract
     altLabel:
       - "Release Capability Contract"
       - "Skill-at-Release-R Contract"
-    scopeNote: >
-      Per semver.org: "SemVer is a social contract between maintainers and consumers, not a technical enforcement mechanism... the version number is just a number" without a defined public API. AGET parallel: the reliance tiers are meaningful only against a defined core-skill set bound to R; the obligor that keeps the promise is the FrameworkManagerArchetype (C610) via release governance (curation -> 13-template distribution -> handoff). The contract is NOT runtime-enforced (L474-476 SAFE-not-GOVERNED) except at the 4 D71-Strict must-invoke routes. GAP: no canonical spec currently states this contract (see C1079; ARCHETYPE_SKILLS_INDEX gives a deployment split, not a reliance contract).
-    definition: >
-      The commitment, bound to a specific Aget release R, about which skills a Principal may rely on being present and behaving as specified ({S}), which are optional/adoptable ({O}), and that the {D} authoring path exists. The skills are, in effect, the version-bound public API of an Aget. Like a SemVer public API, the contract is a SOCIAL contract — a promise the release process keeps — not a runtime-enforced guarantee.
+    scopeNote: |
+      The framework manager is the obligor, the Principal the beneficiary, and the release process keeps the promise through release governance and delivery. For a particular release, the contract distinguishes specified skills that are present and behave as specified from optional or adoptable skills, and requires an authoring path. It is not a runtime-enforced guarantee of the whole contract. The source separately identifies four strict must-invoke routing exceptions. Its earlier observation that no canonical specification stated the contract is historical, not a current absence claim.
+    definition: |
+      A Release_Skill_Reliance_Contract is a promise kept by the release process and bound to a specific Aget release, about which skills a Principal may rely on being present and behaving as specified, which skills are optional or adoptable, and that an authoring path exists.
     theoreticalBasis:
       primary: Semantic Versioning 2.0.0 (public-API social contract)
       source: semver.org (Preston-Werner)
@@ -1018,3 +938,50 @@ concepts:
     related: null
     inScheme: aget:ontology/personal-ai-systems
     cluster: Skill Reliance Contract
+
+  - id: C2032
+    uri: aget:concept/Agent
+    prefLabel: Agent
+    altLabel:
+      - "Agent Entity"
+      - "Acting Entity"
+    scopeNote: |
+      Distinguish the agent (the actor) from the mechanism it operates or is realized in (an agent system — software, an organization's procedures): the distinction L538 took from GM-RKB's Agent Entity vs Agent System, which exposed a conflation in an earlier AGET term. An Aget_Instance is an artificial agent; an Aget_Clone is not an agent at all but an artifact that realizes one. When an agent acts for another party, that party is its principal in the general agency sense; it is an AGET Principal only when it also meets that record’s conditions.
+    definition: >
+      An entity that perceives some part of its environment and acts on it in pursuit of goals — its own, or those of another party on whose behalf it acts. The genus is neutral about substrate: people, organizations, software and collectives can all be agents. What sets an agent apart from other entities is directed action, not what it is made of.
+    broader: aget:concept/Entity
+    narrower: null
+    related:
+      - aget:concept/Principal
+      - aget:concept/CognitiveEntity
+    example: >
+      A person booking travel, a company negotiating a contract, and a coding assistant editing a repository on its user's instruction are all agents: each perceives a situation and acts in it toward a goal. The laptop the assistant runs on is not — it is part of the system through which that agent acts.
+    sources:
+      - "Russell, S. & Norvig, P. Artificial Intelligence: A Modern Approach (4th ed., 2020), ch. 2 — agent as that which perceives through sensors and acts through actuators"
+      - "Jensen, M. C. & Meckling, W. H. (1976), Theory of the Firm — the agency relationship (acting on another's behalf)"
+      - "Consulted: GM-RKB Agent Entity (mapping row in ontology/MAPPINGS_aget_to_gmrkb.sssom.tsv; L538)"
+    inScheme: aget:ontology/personal-ai-systems
+    cluster: Framework Metamodel
+    status: active
+
+  - id: C2150
+    uri: aget:concept/CognitiveEntity
+    prefLabel: Cognitive Entity
+    definition: |
+      A Cognitive_Entity is an Entity capable of performing cognitive processes, such as perception, memory, reasoning, learning, or decision-making.
+    scopeNote: |
+      Capacity for cognitive processing is required; consciousness is not asserted. An individual or collective qualifies only when it has that capacity; legal or organizational status alone is insufficient. Cognition here means interpreting and using information to support the entity’s own understanding or behaviour. Mere storage or fixed-rule switching by itself does not establish the capacity, and a single memory operation is not a membership test. Cognitive capacity alone does not grant a principal role or authorization. Agent denotes the existing perceiving-and-goal-directed-acting genus. Directed action and cognitive capacity are distinct criteria; neither alone establishes the other in this model. Cognitive Entity and Agent have a reciprocal related association. Principal has Cognitive Entity as its one direct parent and retains its Agent association. This is an explicitly stipulative AGET genus, not a claim of scientific consensus.
+    broader: aget:concept/Entity
+    narrower:
+      - aget:concept/Principal
+    related:
+      - aget:concept/Agent
+    sources:
+      - 'Principal adoption, 2026-10-06: the concrete public-definition meaning package; existing AGET Principal and Agent definitions.'
+    theoreticalBasis:
+      primary: AGET stipulative cognitive-capacity distinction
+      source: Existing Principal and Agent definitions; explicit principal adoption of the distinction.
+      limit: No scientific consensus or unverified literature quotation is asserted.
+    inScheme: aget:ontology/personal-ai-systems
+    cluster: Public Definition Grounding
+    status: active
