@@ -5,7 +5,7 @@
 # Governance: R-DEP-002, R-REL-038
 #
 # Created: 2026-06-27 (RETROSPECTIVE BACK-FILL per principal /aget-ask Q2:B;
-#   PROJECT_PLAN_v3.24_fleet_completion_consumer_gate_v1.0 Gate 1.)
+#   prior internal authoring plan Gate 1.)
 # Origin: DEPLOYMENT_SPEC_v3.23.0.yaml
 # Release: Goal Tier (canonical) + Close-Authorization Guard
 
@@ -75,4 +75,4 @@ completion_response:
 
 references:
   changelog: "aget/CHANGELOG.md (v3.23.1 entry, 2026-06-20)"
-  backfill_authority: "principal /aget-ask Q2:B 2026-06-27; PROJECT_PLAN_v3.24_fleet_completion_consumer_gate_v1.0 Gate 1"
+  backfill_authority: "principal /aget-ask Q2:B 2026-06-27; prior internal authoring plan Gate 1"

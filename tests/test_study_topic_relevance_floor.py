@@ -1,6 +1,6 @@
 """Tests for the #1560 relevance-floor in study_topic.generate_report.
 
-Gate 2 (re-opened), PROJECT_PLAN_research_capability_first_rung_v1.0. Build V-tests (L625).
+Gate 2 (re-opened), prior internal authoring plan. Build V-tests (L625).
 The floor buckets the Recommendation on the RELEVANT count (keyword_coverage >=
 0.5), not raw total, so token-noise over-matches don't read as "good coverage".
 keyword_coverage is now propagated through every finder (the F-G2-A fix).

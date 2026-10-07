@@ -101,7 +101,7 @@ The v3.16 self-test surfaced that `validate_archetype_skills.py` was modified be
 - **G4 backfill audit** — v3.10..v3.16 handoffs scored against the new V-tests, surfacing per-handoff gap inventory.
 - **G5 L901 closure** — re-grade L901 ("REMOTE_MIGRATION_MESSAGE recurring orphan gap") once G3 + G4 land.
 
-These are tracked under H-RHSC-001 (`PROJECT_PLAN_release_handoff_self_containment_spec_v1.0.md` in the framework manager's planning surface).
+These are tracked under H-RHSC-001 (`prior internal authoring plan` in the framework manager's planning surface).
 
 ---
 
@@ -135,7 +135,7 @@ If you fork or integrate `aget-framework/aget`:
 | Spec | `specs/AGET_RELEASE_HANDOFF_SELF_CONTAINMENT_SPEC.md` v0.1.0 (REVIEWED) |
 | Validator | `verification/validate_handoff_self_containment.py` v0.1.0 |
 | Parent spec | `AGET_RELEASE_SPEC v1.17.0` CAP-REL-020 (R-REL-019) |
-| Hypothesis | H-RHSC-001 (`PROJECT_PLAN_release_handoff_self_containment_spec_v1.0.md` in framework manager's planning surface) |
+| Hypothesis | H-RHSC-001 (`prior internal authoring plan` in framework manager's planning surface) |
 | Initiative | INIT-FRAMEWORK-TRANSPARENCY (Stream 1 extension — handoff layer) |
 | L-docs (public-relevant) | L901 (revised by this spec); L910 (CAP-RHSC-003 closure); L916 (CAP-RHSC-006 closure); L917 (CAP-RHSC-007 motivation); L656 (Loading Dock anti-pattern — disclosed in this drop) |
 | CHANGELOG | `CHANGELOG.md` `[3.17.0-unreleased]` section |

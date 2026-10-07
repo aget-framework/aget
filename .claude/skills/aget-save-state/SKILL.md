@@ -112,4 +112,4 @@ This skill implements the "save state, resume later" pattern for AGET session ma
 | Skill Spec | SKILL-005 |
 | L-docs | L570, L574, L575 |
 | RQ | RQ-054 |
-| Project | PROJECT_PLAN_AGET_CHECKPOINT_SKILL.md |
+| Project | prior internal authoring plan |

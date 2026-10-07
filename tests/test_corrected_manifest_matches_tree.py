@@ -1,6 +1,6 @@
 """A corrected payload manifest must match the tree it is published in.
 
-Found by node-1 (private-aof1-aof-supervisor-AGET) 2026-09-20: PR #103 published
+Found by an independent AGET contributor 2026-09-20: PR #103 published
 V334_PAYLOAD_MANIFEST_corrected.json bound to 5cfc055 and, in the same PR, edited one of
 the 50 manifested paths (row 6) -- so the manifest was stale by one digest the moment it
 landed. This test recomputes every entry of every handoffs/*_corrected.json against the

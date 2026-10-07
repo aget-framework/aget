@@ -5,7 +5,7 @@
 # Governance: R-DEP-002, R-REL-038
 #
 # Created: 2026-06-27 (RETROSPECTIVE BACK-FILL per principal /aget-ask Q2:B;
-#   PROJECT_PLAN_v3.24_fleet_completion_consumer_gate_v1.0 Gate 1.)
+#   prior internal authoring plan Gate 1.)
 # Origin: DEPLOYMENT_SPEC_v3.23.1.yaml
 # Release: Reliance & Boundaries (advanced, not completed)
 
@@ -86,7 +86,7 @@ propagation_gap:
     delivery:
       RELEASE_HANDOFF_v3.24.0_canonical: present   # promoted 2026-06-27 (215e98b)
       REMOTE_MIGRATION_MESSAGE_v3.24.0: "N/A — local-mode migration (not required)"
-  remediation_owner: "PROJECT_PLAN_v3.24_fleet_completion_consumer_gate_v1.0 — Gate 3 (fan-out, PUBLIC L735) + Gate 2 (canonical delivery, PUBLIC L735)"
+  remediation_owner: "prior internal authoring plan — Gate 3 (fan-out, PUBLIC L735) + Gate 2 (canonical delivery, PUBLIC L735)"
   tracking: "D-REL-3 (handoff §Owed follow-ups); principal Q1:A 2026-06-27 (ship fleet-reach this cycle)"
 
 breaking_changes:
@@ -104,4 +104,4 @@ references:
   release_handoff: "handoffs/RELEASE_HANDOFF_v3.24.0.md (canonical promotion owed — Gate 2)"
   supervisor_notification: "handoffs/SUPERVISOR_NOTIFICATION_v3.24.0.md"
   backfill_authority: "principal /aget-ask Q2:B 2026-06-27"
-  remediation: "PROJECT_PLAN_v3.24_fleet_completion_consumer_gate_v1.0 (Gates 2/3)"
+  remediation: "prior internal authoring plan (Gates 2/3)"

@@ -1,0 +1,380 @@
+version: 3.36.0
+spec_version: 1.0.0
+# Previous release: v3.35.1, published 2026-10-04 UTC. Planned tag: 2026-10-10.
+# Migration paths: 3.35.0 to 3.36.0, or 3.35.1 to 3.36.0.
+# From 3.35.0, include retained v3.35.1 content: study_topic.py fix 428ec9e
+# and LICENSE for analyst, architect, executive, operator, researcher and reviewer.
+# From 3.35.1, those files are already shipped; install the new kit at supervisors
+# and apply version updates and template data corrections, preserving local extensions.
+# Roll back a receiver to its recorded pre-upgrade baseline; rollback_ref names the previous release.
+created: '2026-10-01'
+status: released
+supersedes: DEPLOYMENT_SPEC_v3.35.1.yaml
+breaking_release: false
+source_ref: v3.36.0
+rollback_ref: v3.35.1
+release_notes: release-notes/v3.36.0.md
+release_handoff: handoffs/RELEASE_HANDOFF_v3.36.0.md
+remote_migration: handoffs/REMOTE_MIGRATION_MESSAGE_v3.36.0.md
+corrections: handoffs/CORRECTIONS_v3.36.0.md
+payload_manifest: none
+publication_boundary: Prepared content is not publication, installation or acceptance
+  evidence. Record the annotated tag and peeled commit before consuming.
+publication_state_note: 'Publication is evidenced by the annotated tag v3.36.0 and the GitHub Release object, and this field agrees with them. Planned publication date 2026-10-10. Read the peeled commit of the tag with: git rev-parse v3.36.0^{commit} (a file inside the tagged commit cannot name it). The corrections record named in the corrections field is not in this tagged commit; it is opened on main only if a correction is needed, so read it from main if it exists.'
+mandatory_changes:
+- id: M-3.36-1
+  description: >-
+    A fleet migration kit for supervisors ships in the core repository.
+    A supervisor copies it from a core clone into its own repository; it is not part
+    of any template. The kit reads its source and target releases from environment
+    variables or .aget/migration_target.json and carries no default release. Release-specific
+    names from the 3.35.0 migration remain in several tools (schema names, a fixed list
+    of 3.35.0 payload paths and two more paths the code lists for 3.35.0 corrections row 4
+    (the close-authorization guard and a test file for it), which fleet_ledger.py,
+    prepare_batch.py and prepare_launch.py add to a member's expected payload whatever the
+    target release, a receipt
+    filename, three fixed validation commands a migrating or repair receiver is asked to run,
+    and a fixed route text that a migrating member is told to record in its version history
+    and receipt, and a repair member in its receipt only, unless the route option is
+    passed). The typed-line check is per act and has limits. A push,
+    and a launch without the copy-root option, are refused (exit 6) unless a recorded
+    line is found in a prompt recorded as typed, or in a human-origin entry queued mid-turn whose
+    prompt source the tool does not read (accepted, and reported by the tool as typed mid-turn). A launch with the copy-root option makes
+    no authority check. It is refused (exit 2) unless the folder is apart from the member's
+    own folder (not the same, not inside it, not containing it, not sharing its .git through
+    a link), git run in it names the folder as its working tree and the folder's own .git
+    as its git folder and common folder (so a copy whose core.worktree setting names the
+    member, a linked worktree, and an environment holding GIT_DIR or a like variable are
+    refused), holds in its .git a marker file that rehearse_v37.py writes, naming the packet
+    file's digest and the member, has no git remote, and is at the packet's HEAD. The
+    session rehearsal refuses, before it removes or copies anything, a copy folder that is
+    the member's own folder, holds it or lies inside it, and makes the same git test on the
+    copy before it applies or launches. That does
+    not prove a throwaway copy, because the marker is a plain file and anyone able to write
+    it can forge it. The session rule covers the launch command with
+    any arguments. A launch line need not name the launch. The launch check binds the batch name; the push check binds the packet digest. Another packet with the same batch value passes the launch check on the same recorded line, whatever receivers it lists; a push from that other packet is refused. Launching the packet rehearsed and approved for the batch remains an operator rule. A push reads only a line recorded
+    for the push (key <batch>:push, written by record_authority.py with --act push); the
+    batch's launch line is never push authority. The push line must have one fixed form
+    (the prefix, then "push the commits of batch N", optionally more batches and
+    " with commit SHA", each SHA 7 to 40 hexadecimal characters, and nothing else) and must
+    equal the whole typed prompt it is found in (runs of whitespace collapsed; a pasted
+    block among other words is left out of the comparison). The baseline-equal ruling line
+    gets the same whole-prompt test and has its own fixed form (the prefix, then
+    "the failures at SHA are baseline-equal", SHA being 7 to 40 characters the commit's id
+    starts with). This is a test of form, not a reading of meaning. A line worded any other
+    way is refused, an affirmative one too, and the principal types the form; a condition
+    that exists only inside a pasted block, and a later prompt that withdraws the push
+    without repeating the line, are not read. A launch line is unchanged. It is matched as part of a typed
+    prompt, the words typed around it are not read by the shape and exclusion tests, and it is
+    refused as excluding the launch only when a recognized exclusion phrase comes shortly
+    before the word launch in the same clause. For either act the batch must be named in the
+    first batch list of the newest prompt that contains the line. A member dropped
+    from the write list is not dropped from the launch by that; the launcher does not read
+    the write list and takes its members from the packet, less those a non-empty --only list
+    leaves out. Two push options (extra-paths, allow-dirty) are compared with no typed line. The extra-commit option must match a commit named in the recorded push line; when HEAD moved since the launch check, HEAD is compared with the longer matching id. With HEAD unchanged, a supplied extra commit does not change the checked commit the gate permits. A live
+    launch of the members' migration sessions exits 0 whatever its after-run checks
+    said, and a receiver that the push tool's per-receiver gate refuses does not make its exit
+    code non-zero
+    (it prints NOT PUSHED). The suite check at the commit (step B8a), run from the command
+    line, reads the clone's HEAD after the suite and after the pre-push hook, and git status
+    before the suite and after each when the suite left HEAD in place, with the content of
+    the paths each status line names.
+    A moved HEAD, or outside the paths named with the repeatable option --allow-path a new
+    status line, a status line that is gone, or any other change to a file, link or folder
+    of the working tree that git does not ignore, tracked or not (bytes, permission bits,
+    a link's target), reads
+    INCONCLUSIVE, which the push tool does not push, and the record keeps
+    what was allowed and, unless the suite moved HEAD, the status lines (the first 40 of each
+    reading). Untracked files
+    under __pycache__ or .pytest_cache folders are left out, and a file git ignores and a
+    change made and undone between two readings are not seen. The after-run check gives its confirmation clone, and each copied sibling folder
+    that is a git repository, a push URL that cannot resolve before any test runs; if that
+    cannot be done, or a declared sibling's .git is a file or a link, the candidates are not
+    re-run and stay failures. A push to an explicit URL or path, and the environment that run
+    inherits, are unchanged. The ledger (step B12) reads a member INCONCLUSIVE when it has a
+    root workflow, has met the conditions the ledger tests before the workflow checks, and its
+    workflow checks could not be compared with its pre-migration revision (revision not found,
+    or a workflow tree unreadable), unless a check-change ruling is recorded for that member
+    in the shape record_authority.py writes (a named check with its change and the principal's
+    line); the row carries whether the comparison was made. Every copy and clone the kit makes
+    (the packet rehearsal, the repair rehearsal, the session rehearsal, the suite check and the
+    after-run confirmation run, each with its copied sibling folders) goes through one isolation
+    routine, copy_isolation.py - the environment holds no variable that tells git where a
+    repository is; the folder cleared and filled is not the member's own or one holding it;
+    git run in the copy acts on the copy and nothing under its .git links outside it, or
+    nothing is run in it; the push URL git would use is read back after it is set; remote definitions under .git/remotes and .git/branches are
+    deleted; a copy of the member loses its other remotes, a clone of it and each copied sibling
+    repository get a push URL that cannot resolve; a member copy with no .git of its own is refused.
+    Not closed - a sibling folder with no .git (git run in its copy acts on any repository
+    that encloses it), a symbolic link inside a copied sibling, a repository nested deeper in a
+    copied sibling, a submodule, a branch whose remote is a path with no remote section, a
+    remote added during the run, a push to an explicit URL or path, the alternates file, hooks,
+    and what code does after it starts; no tool refuses an output or evidence folder placed
+    inside a member's repository (operator rule). The suite check also compares .git/info/exclude
+    and the value of core.excludesFile, not the file it names nor git's default ignore file, and
+    runs only the pre-push hook at the default place (not one core.hooksPath names). A
+    protected file is replaced only when it is byte for byte an upstream version; no write goes
+    through a symbolic link (a protected path is unsafe in the protected-write list, and the
+    apply refuses it at plan and write if a list names it as a write; an unprotected one is
+    left unmigrated in the launch packet with an INCONCLUSIVE after-run reading);
+    the apply step compares each listed file's bytes and requires the member's HEAD to equal the list entry's named HEAD (a missing HEAD refuses). The session rehearsal reports a verdict only
+    from its own run - an earlier after-run record is removed first, and a session launch that
+    does not exit 0 gives no verdict. By default the launch preparation
+    takes the close-authorization guard and its test from core, not from the template. A
+    migrating member whose copy differs from core's file is given that file when the copy
+    holds no lines of its own, and is told to merge core's file with its own lines when it
+    holds some. A resolved-file entry for the path makes the packet name the bytes that
+    entry names as the path's source instead, and an exclude entry takes the path out of
+    that member's items and records the reason. The templates ship the unrepaired guard. The operator rules
+    that go with these limits are in the release notes (Authority checks - what the
+    tools do and do not enforce) and are not enforced by the tools. A line passed
+    as a session's launch argument is refused. The readiness run of
+    wave_readiness.py needs four scripts this release does not ship; it names them
+    and stops before writing anything. The batch procedure does not run that readiness
+    run; other kit tools load that module for functions and constants. The module's
+    privacy mode defaults to private unless the register portfolio explicitly declares privacy: public. Built, tested
+    and rehearsed with Claude Code only. The second outcome run exercised two worker fixtures from 3.35.1 to 3.36.0, returning FAIL accepted as R59 named limits; real-fleet deployment is unverified. No action for an Aget that is not a supervisor.
+    F-5 is fixed; the other named limits retain their workarounds.
+    F-3 - Supervisor-template members have a runtime-skip limit - test_template_size_buffer calls pytest.skip() when AGENTS.md is at least 25,000 characters, and B2 reads that runtime skip as INCONCLUSIVE. Drop such a member from the batch and record the reason; it is not a kit migration pass.
+    F-5 - Fixed. The default member suite command is python3 -m pytest -q -p no:cacheprovider, so pytest does not create .pytest_cache/.gitignore in a fresh checkout and the after-run ignore check does not read that cache file as a change. The baseline, step-5 prompt and rehearsals disable the cache provider; an explicit --suite-cmd still overrides the default. K-1 remains a named cost - templates declare no write scope, so their scope needs the principal's recorded override.
+    F-6 - A member session that runs a targeted test command for one file instead of the declared step-5 suite reads INCONCLUSIVE; that narrower run is not the declared suite. At B1, pass prepare_launch.py --extra-step "AGET=For pytest, run only the declared step-5 suite command; do not run targeted test commands." (replace AGET with its register name); this adds an instruction, not enforcement or a change to the other required validation commands.
+    F-8 - The kit updates @aget-version in AGENTS.md but leaves the @aget-canonical-specs reference to .../v<from>/specs unchanged, and no kit check reports it. After the batch, update that reference by hand to the target version in the member's own session, or record it as a stale reference in B13.
+    hooks - A member whose core.hooksPath is /dev/null is refused for the session rehearsal - /dev/null is not a hooks folder inside the run that the kit can judge. If no hooks are wanted, run git config --local --unset-all core.hooksPath in the member before the batch and check its result, then confirm that git config --get-all core.hooksPath prints nothing and exits 1. The first command clears all local values; if the effective setting still appears, stop and record it rather than treating the workaround as complete. With no effective setting, Git uses its default hooks location, so check that no hooks are installed there.
+  surfaces: [core]
+  blocking: false
+  paths:
+  - scripts/migration_kit/BATCH_SESSION.md
+  - scripts/migration_kit/after_run_check.py
+  - scripts/migration_kit/apply_protected.py
+  - scripts/migration_kit/batch_authority.py
+  - scripts/migration_kit/batch_rules.json
+  - scripts/migration_kit/census_fleet_ci.py
+  - scripts/migration_kit/check_batch_scope.py
+  - scripts/migration_kit/check_list_approvable.py
+  - scripts/migration_kit/check_principal_line.py
+  - scripts/migration_kit/check_receiver_write_scope.py
+  - scripts/migration_kit/copy_isolation.py
+  - scripts/migration_kit/fleet_ledger.py
+  - scripts/migration_kit/launch_batch.py
+  - scripts/migration_kit/open_receiver.py
+  - scripts/migration_kit/plan_protected.py
+  - scripts/migration_kit/prepare_batch.py
+  - scripts/migration_kit/prepare_launch.py
+  - scripts/migration_kit/prepare_write_list.py
+  - scripts/migration_kit/push_batch.py
+  - scripts/migration_kit/record_authority.py
+  - scripts/migration_kit/rehearse_batch2.py
+  - scripts/migration_kit/rehearse_repair.py
+  - scripts/migration_kit/rehearse_v37.py
+  - scripts/migration_kit/release_target.py
+  - scripts/migration_kit/requirements.txt
+  - scripts/migration_kit/run_suite_parallel.py
+  - scripts/migration_kit/suite_at_commit.py
+  - scripts/migration_kit/verify_extension_survival.py
+  - scripts/migration_kit/watch_receiver.py
+  - scripts/migration_kit/watch_settings_rules.py
+  - scripts/migration_kit/wave_readiness.py
+  - scripts/migration_kit/write_scope_rules.py
+  source_tests:
+  - tests/migration_kit/conftest.py
+  - tests/migration_kit/test_migration_kit_act_authority.py
+  - tests/migration_kit/test_migration_kit_after_run_check.py
+  - tests/migration_kit/test_migration_kit_batch_authority.py
+  - tests/migration_kit/test_migration_kit_batch_protected.py
+  - tests/migration_kit/test_migration_kit_batch_rules.py
+  - tests/migration_kit/test_migration_kit_batch_scope_layout.py
+  - tests/migration_kit/test_migration_kit_check_principal_line.py
+  - tests/migration_kit/test_migration_kit_fleet_ledger.py
+  - tests/migration_kit/test_migration_kit_framework_root.py
+  - tests/migration_kit/test_migration_kit_launch_argument.py
+  - tests/migration_kit/test_migration_kit_launch_no_push.py
+  - tests/migration_kit/test_migration_kit_launch_packet.py
+  - tests/migration_kit/test_migration_kit_open_receiver.py
+  - tests/migration_kit/test_migration_kit_plan_protected.py
+  - tests/migration_kit/test_migration_kit_public_surface.py
+  - tests/migration_kit/test_migration_kit_push_baseline_equal.py
+  - tests/migration_kit/test_migration_kit_release_target.py
+  - tests/migration_kit/test_migration_kit_suite_at_commit.py
+  - tests/migration_kit/test_migration_kit_watch_receiver.py
+  detection: |-
+    python3 -c "import yaml" && python3 -m pytest -q -p no:cacheprovider tests/migration_kit
+  detection_scope: "Round 2 and Round 2b name the two pre-publication correction passes: documentation and behaviour fixes, followed by protected-mode, after-run consumer and provenance fixes. Historical Round 2 local source verification gave 1523 passed on Python 3.14.8 and Python 3.12.13 before the protected-mode changes. The later protected-mode and after-run consumer corrections also passed the full local kit suite on both interpreters before this text-only amendment. Re-run the kit suite on the tagged checkout and record its measured count; the prior candidate result does not establish verification of the amended commit. Not a GitHub CI or further outcome result. Shipped source tests only, run in the core repository with the kit's
+    one declared dependency (PyYAML) installed. The tests set a 3.34.0 to 3.35.0 target,
+    so this command exercises 3.34.0 to 3.35.0 content. On the release candidate before the release
+    files were added (an earlier internal candidate), on Python 3.14, this command gave 393 passed; on an earlier re-based internal candidate, the kit suite gave 1476 passed on Python 3.14.8 and on Python 3.12.13 outside the builder sandbox. The eight behaviour fixes made after review have unit-test coverage; the later second outcome run exercised the worker path and returned FAIL, accepted as named limits under weekly-train:R59. Not evidence that the
+    kit migrates a fleet. Shown in rehearsal - one ordinary member, in a throwaway
+    copy, migrated and pushed by a supervisor session told to work from the procedure's
+    kit section (the section did not suffice by itself); a harder member migrated
+    and verified but not pushed; a supervisor built from the public template preparing
+    and applying a batch after ordinary setup, mechanically in a scratch folder and
+    not by a
+    live session; a live run by a supervisor built fresh from the public template, three members in one batch on two typed lines, with local remotes, on the kit at an earlier internal candidate (v3.36.0 is published as a single commit; the earlier internal candidates cited in review are not in the public history. The released kit differs from that candidate in two ways - by text-only changes that reworded function descriptions, comments, the guide and the procedure; and by eight behaviour fixes made after independent reviews, to the push authority check, the isolation of every copy and clone the kit makes (the folder tests of a launch with the copy-root option among them), the session rehearsal's verdict, the after-run confirmation run, the suite check at the commit, the ledger's workflow comparison, the protected-write classification and the refusal to write through a symbolic link. the fixes have unit-test coverage, and the later second outcome run exercised the worker path through apply, launch, push and the ledger, returning FAIL accepted as named limits under weekly-train:R59); it ran in the tool's automatic permission mode, read documents beyond the procedure's kit section, and stopped at the ledger step. Not shown - a push for the harder member (the suite check
+    before the push failed fewer tests than the member's baseline, the kit's waiver
+    accepts only an exactly equal set, and the kit has no route from there yet);
+    the close-out gate passing (members in separate repositories that carry a root
+    workflow need a readable, successful GitHub continuous-integration result on
+    their exact published commit, and the kit has no success route for continuous
+    integration that is not on GitHub; a root shared by several members has a
+    separate route, described in the release notes);
+    the close-gate rejection check in a member's session; a held commit, a scope
+    override, or a receiver's own window with the watcher; a remote on GitHub or
+    an external continuous-integration result in a run by a template-built supervisor; any command-line tool other than Claude Code; a real fleet
+    deployed to 3.36.0. The typed waiver for a failing suite is shown by tests only.
+    Three further fixes made after the first outcome test are covered by failing-first tests: the launcher accepts the null apply receipt that B1 writes before apply, for packet reading and baseline launches, while a migration launch still needs a receipt; parallel members can create their shared contained environment without a directory-creation collision, and links or non-directories still refuse; and default packet and confirmation folders now sit beside the batch packet, under <packet folder>/<release>/packets/ and <packet folder>/<release>/runs/, with the explicit environment overrides retained. The packet folder must lie outside every git repository, every member and the framework clones. The second outcome test ran on 2026-10-06: a fresh template-built supervisor took two worker members from 3.35.1 to v3.36.0 through apply, launch, push to local remotes and the ledger. Its result was FAIL: P3 exceeded the principal-line count and P6 exceeded the principal-wait time. The principal accepted that FAIL as named limits under weekly-train:R59, including F-3/F-5/F-6/F-8 and the hooks refusal; F-5 was subsequently fixed by the cache-free default. Supervisor-template members stay INCONCLUSIVE. This fixture run is not evidence of real-fleet deployment or GitHub continuous integration.
+    The release notes carry the full statement and the known gaps. "
+- id: M-3.36-2
+  description: The fleet migration procedure moves from 1.9.0 to 1.10.8. It adds the
+    kit batch procedure (fifteen steps, B0 to B13 with B8a), the setup a supervisor
+    needs before the first command (copying the kit, installing its dependency, a
+    committed fleet register, the release target file, the framework clones), a blocking
+    release-outcome close-out gate, and a statement that the kit is built, tested
+    and rehearsed with Claude Code only.
+  surfaces: [core]
+  blocking: false
+  paths:
+  - sops/SOP_fleet_migration.md
+  detection: |-
+    python3 -c "import sys; t=open('sops/SOP_fleet_migration.md').read(); sys.exit(0 if '**Version**: 1.10.8' in t and '## Kit Batch Procedure' in t else 1)"
+  detection_scope: Presence of the version line and the section heading only; not evidence
+    that a supervisor can run a batch from the section alone. In rehearsal the section
+    did not suffice by itself - the session also read the kit's session guide, the
+    plan skill with its template and specification, and the source of four kit tools.
+    In the later live run the supervisor also read one tool's documentation for the
+    rules a typed line must meet.
+- id: M-3.36-3
+  description: Retained from v3.35.1, not new in v3.36.0. AGET_VOCABULARY_SPEC moves from 1.17.0 to 1.18.0. It adds CAP-VOC-006
+    Grounded Term Display Form (seven requirement rows, six verification rows) - how
+    a registered term is written when highlighted in prose. It also changes existing
+    text - R-VOC-PROSE-001, R-VOC-PROSE-003, CAP-VOC-002-03, CAP-VOC-004-02, V-VOCAB-009,
+    the marking convention table and the compound-form pattern now state that they
+    govern the specification's own register, and highlights follow CAP-VOC-006. The
+    same change redefines Aget_Instance - it is now a narrower term of Aget_Agent,
+    no longer of Aget_AI_System, and its definition says it is the concrete agent
+    created from a template. The specification's own 1.18.0 changelog does not list
+    this redefinition. No file to place; no receiver action at migration.
+  surfaces: [core]
+  blocking: false
+  paths:
+  - specs/AGET_VOCABULARY_SPEC.md
+  detection: |-
+    python3 -c "import sys; t=open('specs/AGET_VOCABULARY_SPEC.md').read(); sys.exit(0 if all('CAP-VOC-006-0%d' % i in t for i in range(1, 8)) else 1)"
+  detection_scope: Presence of the seven requirement rows only. Four of the six verification
+    rows are marked automated with the canonical check owed; no shipped test or checker
+    for these rows is named by this release.
+- id: M-3.36-4
+  description: Retained from v3.35.1, not new in v3.36.0. Study-topic no longer prints a novel-topic verdict when the score floor
+    suppressed hits; it reports the suppressed count and the option that lifts the
+    floor.
+  surfaces: [core, templates]
+  blocking: false
+  paths:
+  - scripts/study_topic.py
+  source_tests:
+  - tests/test_study_topic_relevance_floor.py
+  detection: |-
+    python3 -m pytest -q tests/test_study_topic_relevance_floor.py
+  detection_scope: Shipped source test only, in the core repository; receiver-owned
+    behaviour and acceptance require separate evidence.
+- id: M-3.36-5
+  description: Retained from v3.35.1, not new in v3.36.0. The runtime-support evidence checker declares the instruction surface
+    of one additional terminal agent, so that its instructability reads from the
+    tool's own help text and no longer reads unknown; a desktop launcher answering
+    to the same name does not borrow the entry. The command-line support matrix
+    (1.1.0 to 1.2.0) records the re-measurement and keeps that tool Experimental,
+    with governed use unproven and the compatibility suite not run. The same edit
+    dates, from the vendor's notice, when another listed tool stopped serving individual
+    accounts and two named subscription plans. This is a measurement record, not
+    a support claim; no receiver action.
+  surfaces: [core]
+  blocking: false
+  paths:
+  - scripts/check_runtime_support_evidence.py
+  - docs/AGET_CLI_SUPPORT_MATRIX.md
+  source_tests:
+  - tests/test_runtime_support_evidence.py
+  detection: |-
+    python3 -m pytest -q tests/test_runtime_support_evidence.py
+  detection_scope: Shipped source test only; it tests the checker's reading of declared
+    help text, not any tool's behaviour under AGET governance.
+# The following hygiene entries shipped in v3.35.1; only corrections row 5 is new in v3.36.0.
+hygiene_changes:
+- commit: 19afebb
+  path: handoffs/CORRECTIONS_v3.35.0.md
+  change: "The corrections record for v3.35.0 was published in v3.35.1 with four rows. Row 4 of that record says propagation of a guard repair
+    to the templates is recorded for the next release. The templates do not carry that repair at
+    their v3.36.0 tags; its propagation is deferred to the next release, as the release notes state. This release
+    appends row 5 to that record to say so."
+- commit: 38f3f39
+  path: docs/REFERENT_REGISTRY.yaml
+  change: Ontology concept links resolve for published concepts (partial); the source's
+    scope is declared.
+- commit: f0016a5
+  path: handoffs/FLEET_MIGRATION_CONTRACT_v3.30.0.json
+  change: In-record amendment fields added for a file edited after its release; released
+    digests intact.
+- commit: f0016a5
+  path: handoffs/V334_PAYLOAD_MANIFEST_corrected.json
+  change: In-record amendment fields added for the four files edited after the 3.34.0
+    tag; released digests intact.
+- commit: f4da55a
+  path: tests/test_corrected_manifest_matches_tree.py
+  change: The corrected-manifest test accepts an in-record amendment and still fails
+    an unamended edit.
+- commit: ac0964f
+  path: governance/DECISION_LOG.md
+  change: The decision log is published.
+- commit: 0aa56eb
+  path: governance/DECISION_LOG.md
+  change: Five details removed after an independent review; a ledger-wide count clarified.
+- commit: ac0964f
+  path: requirements/INDEX.md
+  change: Public requirements refresh - index updated.
+- commit: ac0964f
+  path: requirements/REQUIREMENTS_FORMAT.md
+  change: Public requirements refresh - format document updated.
+- commit: ac0964f
+  path: requirements/REQ-CORE_critical_foundations.md
+  change: Public requirements refresh - updated.
+- commit: ac0964f
+  path: requirements/REQ-GOV_agent_governance.md
+  change: Public requirements refresh - updated.
+- commit: ac0964f
+  path: requirements/REQ-REL_release_quality.md
+  change: Public requirements refresh - updated.
+- commit: ac0964f
+  path: requirements/REQ-IAC_inter_agent_communication.md
+  change: Public requirements refresh - new file.
+- commit: ac0964f
+  path: requirements/REQ-INT_principal_agent_interaction.md
+  change: Public requirements refresh - new file.
+- commit: 0aa56eb
+  path: requirements/REQ-CORE_critical_foundations.md
+  change: One line changed in the commit that followed the independent review.
+- commit: 0aa56eb
+  path: requirements/REQ-GOV_agent_governance.md
+  change: One line changed in the commit that followed the independent review.
+- commit: 0aa56eb
+  path: requirements/REQ-REL_release_quality.md
+  change: One line changed in the commit that followed the independent review.
+- commit: 0aa56eb
+  path: requirements/REQ-IAC_inter_agent_communication.md
+  change: One line changed in the commit that followed the independent review.
+- commit: 0aa56eb
+  path: requirements/REQ-INT_principal_agent_interaction.md
+  change: One line changed in the commit that followed the independent review.
+removals: []
+receiver_acceptance:
+  ownership: Receiver-authored and receiver-revision verified; commissioning owned
+    by receiving manager
+  returned: Acknowledged transmission plus verification at receiver source revision
+  behaviour_verified: Credited capability and exercised rejection path pass; no blocking
+    delivery defect
+  producer_written: Never counts as receiver acceptance
+  terminals:
+  - ACCEPTED
+  - BEHAVIOUR_VERIFIED
+  - REJECTED
+  - CANNOT-RUN
+rollback: Preserve unrelated state; revert only committed migration changes or restore
+  only the recorded migration path set from the saved baseline. Never move published
+  tags.

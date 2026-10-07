@@ -301,7 +301,7 @@ Before the first migration mutation:
 > Fill this roster with the agent names your own fleet uses. The rows above are **shape, not a
 > roster** — a published template must not carry any operator's actual agent inventory.
 
-**Migration PR column semantics** (added PP-035 / closes gh#1392 / L952):
+**Migration PR column semantics** (added prior authoring project / closes gh#1392 / L952):
 - **Purpose**: Records the PR# that shipped the migration to this agent. Closes L952 deployment-evidence-channel traceability axis (PR# was previously unrecorded at migration moment).
 - **Format (private/internal handoff)**: `{private-org}/{repo}#NNN` for internal agent migrations.
 - **Format (promoted/public handoff per R-REL-019-07)**: `aget-framework/{repo}#NNN` only — private-org refs are sanitized per R-RHSC-002-02 / L631.

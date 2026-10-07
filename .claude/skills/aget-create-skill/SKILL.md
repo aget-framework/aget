@@ -145,4 +145,4 @@ This skill implements the "template-driven skill creation" pattern per SOP_SKILL
 | SOP | SOP_SKILL_DEVELOPMENT.md |
 | Template | templates/skill/SKILL.template.md |
 | L-docs | L474, L557, L561, L582, L583 |
-| Project | PROJECT_PLAN_AGET_CREATE_SKILL.md |
+| Project | prior internal authoring plan |

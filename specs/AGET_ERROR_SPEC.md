@@ -8,7 +8,7 @@
 **Updated**: 2026-01-04
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_ERROR_SPEC.md`
-**Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.5
+**Change Origin**: prior internal authoring plan Gate 2.5
 **Related Specs**: AGET_VALIDATION_SPEC, AGET_PYTHON_SCRIPT_SPEC
 
 ---

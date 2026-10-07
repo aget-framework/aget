@@ -62,7 +62,7 @@ git log -5 --pretty=format:"%s" | grep -Eiq "SCOPE_LOCK|RELEASED|cycle.close|win
 
 On either signal, propose goal candidates (this skill) before `/aget-propose-actions`.
 
-**Ceiling (L474–476)**: a skill is model-followed instruction, not harness-enforced — so true *automatic* firing needs a hook. That hook is **deferred to the canonical wake-up / PreToolUse infrastructure** built by `PROJECT_PLAN_self_oversight_structural_enforcement` (#618 channel-4) and is **not duplicated here** — same hook mechanism, distinct trigger. Until then E2 is advisory: documented trigger + agent discipline.
+**Ceiling (L474–476)**: a skill is model-followed instruction, not harness-enforced — so true *automatic* firing needs a hook. That hook is **deferred to the canonical wake-up / PreToolUse infrastructure** built by `prior internal authoring plan` (#618 channel-4) and is **not duplicated here** — same hook mechanism, distinct trigger. Until then E2 is advisory: documented trigger + agent discipline.
 
 ### Step 1: Parse Parameters
 
@@ -200,7 +200,7 @@ The two compose: `propose-goals` picks direction; `propose-actions` executes wit
 | Proposal | SP-017 (`planning/skill-proposals/PROPOSAL_aget-propose-goals.md`) |
 | Rubric | `rubrics/RUBRIC_goal_selection_v1.0.md` |
 | L-docs | L845 (parent — session-pivot rubric gap), L846 (companion action-rubric gap), L1067 (two-propose semantics / plurality), L677 (divergent proposal), L693 (count default), L671 (classification without consequence), L839 (reflexive validation) |
-| Owning initiative | INIT-CORE-ARTIFACT-MATURATION Stream 9 (PP-051) |
+| Owning initiative | INIT-CORE-ARTIFACT-MATURATION Stream 9 (prior authoring project) |
 | Verb family | propose-skill (SP-009) / propose-project (SP-006) / propose-actions (SP-011) / propose-initiative (SP-NNN) / **propose-goals (SP-017)** |
 | Tests | `tests/test_propose_goals.py` |
 

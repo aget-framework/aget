@@ -6,7 +6,7 @@
 **Location**: `aget/specs/AGET_RELEASE_HANDOFF_SELF_CONTAINMENT_SPEC.md`
 **Extends**: `AGET_RELEASE_SPEC.md` v1.17.0 (CAP-REL-020 Release Handoff Requirements)
 **Format**: AGET_SPEC_FORMAT v1.3
-**Hypothesis**: H-RHSC-001 (`PROJECT_PLAN_release_handoff_self_containment_spec_v1.0.md`)
+**Hypothesis**: H-RHSC-001 (`prior internal authoring plan`)
 
 ---
 
@@ -41,7 +41,7 @@ Empirical evidence that self-containment is achievable: v3.16 fleet upgrade reac
 ### Out of Scope
 
 - Handoff existence (covered by R-REL-019-01)
-- Handoff publication to public repo (covered by R-REL-019-07; PP-022 G3 is a coordination point)
+- Handoff publication to public repo (covered by R-REL-019-07; prior authoring project G3 is a coordination point)
 - Skill-text canonical authority resolution (L919; INIT-SKILL-MATURATION territory)
 - Generalized private/canonical SOP sync mechanism (this spec mandates parity for handoff-cited SOP versions only)
 - Qualitative SHALLs from parent (R-REL-019-03, R-REL-019-04, R-REL-019-06) — deferred to v0.2 if backfill audit demonstrates need
@@ -251,8 +251,8 @@ This spec is owned by the aget-framework manager. Amendments to invariants follo
 
 | Link | Reference |
 |------|-----------|
-| Hypothesis | H-RHSC-001 (`PROJECT_PLAN_release_handoff_self_containment_spec_v1.0.md`) |
-| Proposal | PP-022 (`planning/project-proposals/PROPOSAL_release_handoff_self_containment_spec.md`, Promoted 2026-05-03) |
+| Hypothesis | H-RHSC-001 (`prior internal authoring plan`) |
+| Proposal | prior authoring project (`planning/project-proposals/PROPOSAL_release_handoff_self_containment_spec.md`, Promoted 2026-05-03) |
 | Initiative | INIT-FRAMEWORK-TRANSPARENCY (Stream 1 extension — handoff layer) |
 | Parent spec | `AGET_RELEASE_SPEC v1.17.0` CAP-REL-020 (R-REL-019) |
 | Format | `AGET_SPEC_FORMAT v1.3` |
@@ -260,8 +260,8 @@ This spec is owned by the aget-framework manager. Amendments to invariants follo
 | L-docs | L901 (revised by this spec); L910 (CAP-RHSC-003 closure); L916 (CAP-RHSC-006 closure); L917 (CAP-RHSC-007 motivation); L919 (CAP-RHSC-003 secondary); L723, L755 (parent CAP-REL-020 prior art); L671 (parent anti-pattern); supervisor-L644 (CAP-RHSC-001 motivation, qualified per CAP-LDOC-010) |
 | Predecessor work | H-RHSE-001 (COMPLETE 2026-02-15 — content sections); H-PRHR-001 (G4 COMPLETE / G5 reframed-as-coordination 2026-02-22 — publication discipline) |
 | Issues | Internal issue #1221 (template-spec drift surfaced during this spec's drafting) |
-| Wiring SOP | `aget/sops/SOP_release_process.md` (v1.32 → planned v1.33 amendment, PP-022 G3) |
-| Validator | `aget/verification/validate_handoff_self_containment.py` (PP-022 G2 deliverable) |
+| Wiring SOP | `aget/sops/SOP_release_process.md` (v1.32 → planned v1.33 amendment, prior authoring project G3) |
+| Validator | `aget/verification/validate_handoff_self_containment.py` (prior authoring project G2 deliverable) |
 
 ---
 

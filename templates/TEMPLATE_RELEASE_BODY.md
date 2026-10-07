@@ -101,10 +101,10 @@ Victory) at the release-narrative layer.
 | Effective version | v3.18+ (forward; v3.17.0 refreshed retroactively under principal override per L178) |
 | Governing requirement | CAP-REL-006-02-NN (release-body structured-template) |
 | Voice requirement | REQ-HOM-Q-001 (Principal's Voice — ≤15-word sentences majority; no em-dash compounds) |
-| Validator | `validate_release_body_conformance.py` (private-aget-framework-AGET); promotion to canonical `aget/scripts/` is a v3.18 grooming candidate |
+| Validator | `validate_release_body_conformance.py` (aget-framework); promotion to canonical `aget/scripts/` is a v3.18 grooming candidate |
 | Lessons that shaped this template | L941 (no observed peer for inline release history); L942 (triple-surface drift); L944 (retroactive scope question) |
-| Retroactive-scope decision-support | `RUBRIC_retroactive_scope_content_quality_caps_v0.1.md` (private-aget-framework-AGET docs/) |
-| First worked example | v3.17.0 refresh on 2026-05-10 (commit `473fbc7` in private-aget-framework-AGET) |
+| Retroactive-scope decision-support | `RUBRIC_retroactive_scope_content_quality_caps_v0.1.md` (internal framework documentation) |
+| First worked example | v3.17.0 refresh on 2026-05-10 (commit `473fbc7` in the internal framework authoring repository) |
 
 ## Validation checklist
 

@@ -171,7 +171,7 @@ v3.11.0 is available. Key items for your fleet:
 - DEPLOYMENT_SPEC_v3.11.0.yaml (state specification)
 - release-notes/v3.11.0.md (deep release notes)
 - CHANGELOG.md (concise changes)
-- PROJECT_PLAN_v3.11.0_release_v1.0.md (REL-041)
+- prior internal authoring plan (REL-041)
 - VERSION_SCOPE_v3.11.0.md v1.8.0 (SCOPE LOCKED)
 
 ---

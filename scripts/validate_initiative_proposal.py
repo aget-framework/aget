@@ -18,7 +18,7 @@ Exit codes:
 
 Governing spec: ../aget/specs/AGET_INITIATIVE_SPEC.md v1.2.0
 Implementing skill: .claude/skills/aget-propose-initiative/SKILL.md v1.0.0
-PROJECT_PLAN: planning/PROJECT_PLAN_aget_propose_initiative_v1.0.md Gate 2
+PROJECT_PLAN: prior internal authoring plan Gate 2
 """
 from __future__ import annotations
 

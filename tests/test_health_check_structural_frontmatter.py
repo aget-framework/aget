@@ -6,7 +6,7 @@ create-initiative, file-issue) may carry `disable-model-invocation: true`,
 which would block the agent model-invocation that D71 mandates.
 
 References: gmelli/aget-aget#1489 (SGR remediation F2);
-PROJECT_PLAN_structural_skill_governance_remediation_v1.0 Gate 1.
+prior internal authoring plan Gate 1.
 """
 
 import importlib.util

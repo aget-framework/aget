@@ -188,10 +188,14 @@ ELSE:
 
 ## Invocation Recording
 
-After completing this skill's primary actions, record the invocation:
+After completing this skill's primary actions, check with Glob whether the optional
+`scripts/record_invocation.py` helper exists. [instance-only per L600]
+If it exists, record the invocation:
 ```bash
-python3 scripts/record_invocation.py aget-analyze-ontology
+python3 scripts/record_invocation.py aget-analyze-ontology # [instance-only per L600]
 ```
+If it is absent, skip invocation telemetry; the primary read-only analysis is complete.
+
 ## Related Skills
 
 - `/aget-check-kb` - Quick KB threshold check *(`/aget-healthcheck-kb` was renamed to this)*

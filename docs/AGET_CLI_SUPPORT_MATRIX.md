@@ -3,7 +3,7 @@
 **Version**: 1.2.0
 **Date**: 2026-09-26 (v1.1.0 2026-09-09; v1.0.0 2026-01-16)
 **Status**: ACTIVE
-**Implements**: PROJECT_PLAN_cli_independence_validation_v1.0
+**Implements**: prior internal authoring plan
 
 ---
 
@@ -350,7 +350,7 @@ To validate a new CLI:
 
 ## References
 
-- PROJECT_PLAN_cli_independence_validation_v1.0
+- prior internal authoring plan
 - L452: Shell Orchestration Pattern
 - CLI_SETTINGS_STANDARD.md
 - AGET_FRAMEWORK_SPEC.md

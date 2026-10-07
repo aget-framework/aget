@@ -11,7 +11,7 @@
 **Status**: Active
 **Created**: 2026-01-16
 **Updated**: 2026-07-16
-**Owner**: private-aget-framework-AGET
+**Owner**: aget-framework
 **Category**: Governance
 **Related**: AGET_SOP_SPEC.md, L436, L524, L376
 
@@ -475,7 +475,7 @@ Want to create SOP?
 
 ```yaml
 graduation:
-  source: "PROJECT_PLAN_sop_creation_sop_v1.0.md"
+  source: "prior internal authoring plan"
   trigger: "Meta-SOP needed to govern SOP creation"
   research:
     enhancement_requests: 0
@@ -496,4 +496,4 @@ graduation:
 
 *SOP_sop_creation.md v1.1.0 — "The SOP for creating SOPs"*
 *Created: 2026-01-16 | Updated: 2026-07-16*
-*Owner: private-aget-framework-AGET*
+*Owner: aget-framework*

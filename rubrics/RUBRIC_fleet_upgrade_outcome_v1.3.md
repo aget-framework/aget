@@ -3,15 +3,15 @@
 **Version**: 1.3.0
 **Created**: 2026-04-26
 **Updated**: 2026-08-19 (v1.3.0 — lifecycle-correct C-C terminal acceptance)
-**Author**: private-aget-framework-AGET v3.15.0
-**Cross-Agent Source**: private-supervisor-AGET (v1.0.0 original, FLEET-UPG-013), a downstream fleet's supervisor (FLEET-UPG-014 calibration feedback, #1165)
+**Author**: aget-framework v3.15.0
+**Cross-Agent Source**: aget-framework (v1.0.0 original, prior fleet upgrade case), a downstream fleet's supervisor (prior fleet upgrade case calibration feedback, #1165)
 **Domain**: Conformance — fleet upgrade release outcome (FLEET-UPG-NNN close-out)
 **Status**: Active (two scored instances: 13/15 Exemplary, 10/15 Compliant)
 **Governing Spec**: `aget/specs/AGET_RELEASE_SPEC.md` CAP-REL-016 R-REL-024-03
 
 ## Purpose
 
-Evaluate the quality and completeness of a fleet upgrade release outcome. Closes the gap identified during FLEET-UPG-013 close-out (2026-04-26): the `RELEASE_HANDOFF.md` Completion Response section listed fields but none required a rubric-scored report, leaving "successful release" as a vibe, not a measurement. See #1149.
+Evaluate the quality and completeness of a fleet upgrade release outcome. Closes the gap identified during prior fleet upgrade case close-out (2026-04-26): the `RELEASE_HANDOFF.md` Completion Response section listed fields but none required a rubric-scored report, leaving "successful release" as a vibe, not a measurement. See #1149.
 
 **Decisions this rubric supports**:
 1. **Self-check** (primary): Is this release outcome rigorous enough to report as complete? — supervisor grades own output before final close-out commit.
@@ -34,13 +34,13 @@ Evaluate the quality and completeness of a fleet upgrade release outcome. Closes
 
 | Instance | Score | Band | Scored By | Notes |
 |----------|:-----:|------|-----------|-------|
-| FLEET-UPG-013, v3.15.0 (main fleet, 34/34) | 13/15 | Exemplary | private-supervisor-AGET | D4=1/3: G3/G4 gate Status retroactive; motivates v3.16 structural enforcement candidates |
-| FLEET-UPG-014, v3.15.0 (downstream fleet, 7/7) | 10/15 | Compliant | a downstream fleet's supervisor | D5=low: no fleet upgrade scripts/L-docs; drove format-agnostic calibration in v1.1 |
+| prior fleet upgrade case, v3.15.0 (main fleet, 34/34) | 13/15 | Exemplary | aget-framework | D4=1/3: G3/G4 gate Status retroactive; motivates v3.16 structural enforcement candidates |
+| prior fleet upgrade case, v3.15.0 (downstream fleet, 7/7) | 10/15 | Compliant | a downstream fleet's supervisor | D5=low: no fleet upgrade scripts/L-docs; drove format-agnostic calibration in v1.1 |
 
 **Version history**:
-- v1.0.0 (2026-04-26): Initial draft; first scored instance FLEET-UPG-013. Draft status pending calibration.
+- v1.0.0 (2026-04-26): Initial draft; first scored instance prior fleet upgrade case. Draft status pending calibration.
 - v1.1.0 (2026-04-26): Active status after second scored instance. Five calibration fixes applied (C-A timing, C-D format-agnostic, D3.3 L100 vocabulary, D4.1 format-agnostic, D4.3 clarification). FLEET-UPG-NNN namespacing note added.
-- v1.2.0 (2026-05-30): C-A made conditional on `breaking_release` (#1517 D3 ruling R1, requested via private-supervisor-AGET reconciliation memo). Non-breaking releases satisfy C-A via an explicitly-inherited, origin/main-published spec (3-part proviso); breaking releases still require a version-specific spec; documenting absence still fails. Closes the text-vs-intent gap where Option-B-inherit (v3.20 → v3.16.0) failed C-A literally despite meeting its intent. Note: the prior #1517 ruling comment misattributed "13/15 Exemplary" to v3.16 — 13/15 is FLEET-UPG-013/v3.15.0 (main fleet) per the calibration table above; v3.16 (FLEET-UPG-014) is a distinct per-fleet id (§FLEET-UPG-NNN namespace note); immaterial to C-A (v3.16 passes either way).
+- v1.2.0 (2026-05-30): C-A made conditional on `breaking_release` (#1517 D3 ruling R1, requested via aget-framework reconciliation memo). Non-breaking releases satisfy C-A via an explicitly-inherited, origin/main-published spec (3-part proviso); breaking releases still require a version-specific spec; documenting absence still fails. Closes the text-vs-intent gap where Option-B-inherit (v3.20 → v3.16.0) failed C-A literally despite meeting its intent. Note: the prior #1517 ruling comment misattributed "13/15 Exemplary" to v3.16 — 13/15 is prior fleet upgrade case/v3.15.0 (main fleet) per the calibration table above; v3.16 (prior fleet upgrade case) is a distinct per-fleet id (§FLEET-UPG-NNN namespace note); immaterial to C-A (v3.16 passes either way).
 - v1.2.1 (2026-05-30): C-A **read-site clarification** — the v1.2.0 clause keyed to `breaking_release` but did not specify *where* the grader reads it for a release with no own spec (the v3.20 case: its non-breaking signal is prose in release-notes/CHANGELOG, not a structured field). v1.2.1 specifies: read `breaking_release` from the **inherited governing spec**, corroborated by proviso (3) + the handoff/CHANGELOG non-breaking declaration. Closes the mechanization gap in v1.2.0's own amendment (self-caught by framework-owner pre-Gate-3). No semantic change to the breaking/non-breaking branches.
 - v1.3.0 (2026-08-19): C-C changed from a pre-close `Plan_Status: COMPLETE` prerequisite to a commit-bound post-close confirmation. Pre-close eligibility now produces a provisional score and evidence receipt; the governed close changes the plan and generated index; deterministic received-state verification must pass before the score is final or downstream work is authorized. Pre-set and same-transaction terminal states cannot pass. `Closed (Partial)` requires a separate authorized transaction and exact unfinished-work accounting. D1–D5 scoring is unchanged.
 
@@ -54,7 +54,7 @@ Evaluate the quality and completeness of a fleet upgrade release outcome. Closes
 | Residual filing and meta-pattern analysis | Issue content quality |
 | Upstream value (L-docs, SOPs, templates) | Framework-AGET implementation work |
 
-**FLEET-UPG-NNN namespace note**: The FLEET-UPG-NNN identifier is maintained per-fleet. Two fleets may each have a FLEET-UPG-013 that refers to different migration events. When citing scores across fleets, always qualify with fleet name (e.g., "main fleet FLEET-UPG-013" vs "downstream fleet FLEET-UPG-013"). This rubric scores a single fleet's upgrade; cross-fleet comparison requires fleet-qualified identifiers.
+**FLEET-UPG-NNN namespace note**: The FLEET-UPG-NNN identifier is maintained per-fleet. Two fleets may each have a prior fleet upgrade case that refers to different migration events. When citing scores across fleets, always qualify with fleet name (e.g., "main fleet prior fleet upgrade case" vs "downstream fleet prior fleet upgrade case"). This rubric scores a single fleet's upgrade; cross-fleet comparison requires fleet-qualified identifiers.
 
 ## Theoretical Basis
 
@@ -278,11 +278,11 @@ Failure consequences are deterministic:
 
 - **Self-check** (every FLEET-UPG close-out): Produce the provisional assessment before the close commit, then finalize it only after C-C confirms the received committed state. Target: ≥10 (Compliant). Below 10 → flag explicitly or rework before entering closure.
 - **Principal meta-assessment** (per release): Apply retrospectively. Use to calibrate release quality standards across FLEET-UPG-NNN history.
-- **Trajectory tracking** (FLEET-UPG-011 and later): Plot scores over time. Drift downward → process degradation; drift upward → process maturation.
+- **Trajectory tracking** (prior fleet upgrade case and later): Plot scores over time. Drift downward → process degradation; drift upward → process maturation.
 
 ## Open Questions for Principal Calibration
 
-1. Should "upstream retro issue filed" be a constraint (C-E) rather than a D5 criterion? Filing the retro issue is more of a binary gate than a quality gradient. (Calibration feedback from FLEET-UPG-014 #1165.)
+1. Should "upstream retro issue filed" be a constraint (C-E) rather than a D5 criterion? Filing the retro issue is more of a binary gate than a quality gradient. (Calibration feedback from prior fleet upgrade case #1165.)
 
 ---
 
@@ -292,12 +292,12 @@ Failure consequences are deterministic:
 |------|--------|
 | Governing spec | `aget/specs/AGET_RELEASE_SPEC.md` CAP-REL-016 R-REL-024-03 |
 | Template | `aget/templates/PROJECT_PLAN_TEMPLATE.md` (Closure Checklist) |
-| Scored instances | FLEET-UPG-013 (13/15), FLEET-UPG-014 (10/15) |
+| Scored instances | prior fleet upgrade case (13/15), prior fleet upgrade case (10/15) |
 | Promotion issue | gmelli/aget-aget#1165 |
 | Calibration feedback | gmelli/aget-aget#1165 (five calibration points; four applied in v1.1) |
 
 ---
 
 *Created via /aget-create-rubric (Generator level per ADR-008).*
-*First scored instance: FLEET-UPG-013 (v3.15.0, 2026-04-26).*
-*Second scored instance: FLEET-UPG-014 (v3.15.0, 2026-04-26) — drove v1.1 calibration.*
+*First scored instance: prior fleet upgrade case (v3.15.0, 2026-04-26).*
+*Second scored instance: prior fleet upgrade case (v3.15.0, 2026-04-26) — drove v1.1 calibration.*

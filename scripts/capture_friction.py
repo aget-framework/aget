@@ -19,8 +19,8 @@ propagates via template to every scaffolded agent. Wire it in `.claude/settings.
 Contract: never blocks the prompt. Exit 0 always. Silent unless a note was captured.
 Self-test (V-FRIC-001): `python3 scripts/capture_friction.py --self-test` (exit 0 = PASS).
 
-Generalized from the dogfooded supervisor instrument (private-supervisor-AGET,
-.claude/hooks/capture_friction.py, L656/L669) per PP-052; lane: framework propagation surface.
+Generalized from the dogfooded supervisor instrument (aget-framework,
+.claude/hooks/capture_friction.py, L656/L669) per prior authoring project; lane: framework propagation surface.
 """
 import json
 import os

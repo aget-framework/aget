@@ -5,7 +5,7 @@ Verifies the Gate 3 release observability scripts exist, have correct structure,
 and pass self-tests. These scripts implement the L605 remediation.
 
 Specification: AGET_RELEASE_SPEC.md (CAP-REL-021 through CAP-REL-025)
-Source: PROJECT_PLAN_v3.6.0_release_v1.0.md, Gate 3.5 R4
+Source: prior internal authoring plan, Gate 3.5 R4
 """
 
 import json

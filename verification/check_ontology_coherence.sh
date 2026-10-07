@@ -4,7 +4,7 @@
 # Version: 1.0.0
 # Created: 2026-01-12
 # Owner: aget-framework
-# Related: AGET_VOCABULARY_SPEC Part 7, PROJECT_PLAN_standards_ontology_elevation_v1.0
+# Related: AGET_VOCABULARY_SPEC Part 7, prior internal authoring plan
 #
 # Checks:
 # 1. Vocabulary spec size (warn at 1500, critical at 2000)

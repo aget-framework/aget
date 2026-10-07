@@ -4,8 +4,8 @@
 **Status**: Active (canonical promotion 2026-07-04, v3.25 C-25-22; graduated from private draft v0.2.0)
 **Created**: 2026-06-21
 **Updated**: 2026-06-24 (v0.2.0 — added CAP-FRIC-006 Triage-by-value; closes gmelli/aget-aget#1747)
-**Author**: private-aget-framework-AGET
-**Governing Project**: PROJECT_PLAN_friction_pattern_canonicalization_v1.0 (PP-052)
+**Author**: aget-framework
+**Governing Project**: prior internal authoring plan (prior authoring project)
 **Serves Goal**: GOAL-FRICTION-CONVERGENCE
 **Evidence basis**: L147 (it-consultant), L656 + L669 (supervisor, source-verified), L1111, L467, L1127 (triage-not-elimination; preserve-pole)
 
@@ -131,7 +131,7 @@ Define the framework contract for **friction handling** — capturing, harvestin
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 0.1.0 | 2026-06-21 | Initial DRAFT — CAP-FRIC-001..005 (capture / persist / harvest / remediate / propagate). PP-052 Gate 1. |
+| 0.1.0 | 2026-06-21 | Initial DRAFT — CAP-FRIC-001..005 (capture / persist / harvest / remediate / propagate). prior authoring project Gate 1. |
 | 0.2.0 | 2026-06-24 | Added **CAP-FRIC-006 Triage-by-value** (+ value-class / triage-by-value definitions, V-FRIC-006, traceability row, desirable-difficulties theoretical basis); amended CAP-FRIC-004-01 to gate on `avoidable` class. Closes gmelli/aget-aget#1747. Still DRAFT per L1113 forward-validation gate (no version advance to 1.0.0 until hook ships + ≥1 agent inherits capture). |
 
 *AGET_FRICTION_SPEC v0.2.0 DRAFT — "Friction becomes structure, or an owed debt, or — if it is the way — it is kept. Never a silent drop, never a blind removal."*

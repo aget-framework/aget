@@ -4,7 +4,7 @@
 **Date**: 2026-04-19
 **Status**: Active
 **Authority**: Active (normative, minor/patch allowed)
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Parallel to**: AGET_SPEC_FORMAT.md v1.3.0 (specification-level meta-doc)
 **Evidence**: L748, L749, ISO/IEC/IEEE 29148:2018, Volere, ISO/IEC 25010:2023
 **Tracking**: #725

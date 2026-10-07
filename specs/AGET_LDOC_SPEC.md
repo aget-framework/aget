@@ -16,7 +16,7 @@ Learning Documents (L-docs) capture experiential knowledge gained during agent o
 
 ## Conformance Status (2026-04-26 audit)
 
-Empirical baseline from private-aget-framework-AGET fleet (568 L-docs):
+Empirical baseline from aget-framework fleet (568 L-docs):
 
 | Requirement | Conformant | Non-Conformant | Rate |
 |-------------|:----------:|:--------------:|:----:|
@@ -412,7 +412,7 @@ python3 scripts/migrate_ldoc_to_v2.py --dry-run .aget/evolution/
 
 **Evidence basis for CAP-LDOC-008/009**: 2026-04-26 conformance audit — 2/568 (0.35%) v2 conformance, 6 legacy schemas (S1–S6, see § Conformance Status). CAP-LDOC-008 surfaces the gap via health_check; CAP-LDOC-009 prevents further drift without requiring immediate bulk migration of 566 legacy L-docs.
 
-**Evidence basis for CAP-LDOC-010**: L801 (cross-fleet false-positive verification: 3 instances in single session despite awareness) + L807 (incident-density threshold: 3+ recurrences = structural fix required). FLEET-UPG-013 vs FLEET-UPG-014 collision class confirmed at project ID layer; same root cause class as L-doc IDs. Backward-compatible: unqualified IDs valid within agent scope; qualification mandatory only for cross-agent reference points.
+**Evidence basis for CAP-LDOC-010**: L801 (cross-fleet false-positive verification: 3 instances in single session despite awareness) + L807 (incident-density threshold: 3+ recurrences = structural fix required). prior fleet upgrade case vs prior fleet upgrade case collision class confirmed at project ID layer; same root cause class as L-doc IDs. Backward-compatible: unqualified IDs valid within agent scope; qualification mandatory only for cross-agent reference points.
 
 **Vocabulary**: Learning_Document, Evolution_Index, Enforcement_Status, Applicability_Scope
 
@@ -549,7 +549,7 @@ print(f'Non-conformant: {total-v2}/{total}')
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 2.2.0 | 2026-04-26 | Added § Conformance Status (empirical audit: 2/568 v2 conformant, 6 legacy schemas). Added CAP-LDOC-008 (health_check v2 reporting) + CAP-LDOC-009 (new-doc enforcement gate post v3.16.0). Fixed index.json schema to match actual flat `L###` key implementation. Updated V-LDOC-002 from automated→inspection (pending health_check extension). Added V-LDOC-008/009. Evidence: 2026-04-26 conformance audit (private-aget-framework-AGET fleet). |
+| 2.2.0 | 2026-04-26 | Added § Conformance Status (empirical audit: 2/568 v2 conformant, 6 legacy schemas). Added CAP-LDOC-008 (health_check v2 reporting) + CAP-LDOC-009 (new-doc enforcement gate post v3.16.0). Fixed index.json schema to match actual flat `L###` key implementation. Updated V-LDOC-002 from automated→inspection (pending health_check extension). Added V-LDOC-008/009. Evidence: 2026-04-26 conformance audit (aget-framework fleet). |
 | 2.1.0 | 2026-03-16 | Added EARS-patterned requirements (CAP-LDOC-001 through 007). Migrated R-LDOC-* IDs to CAP-LDOC-*. Per L682 maturity uplift L0→L1. |
 | 2.0.0 | — | Initial v2 format with YAML frontmatter and cross-agent discovery. |
 

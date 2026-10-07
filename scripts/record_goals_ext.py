@@ -21,7 +21,7 @@ record_invocation.py: a recording failure exits 1 with a warning and MUST NOT ab
 the calling skill (the skill still presented the scored set to the principal).
 
 Coordination: shares the "recording≠enforcing" family with
-PROJECT_PLAN_self_oversight_structural_enforcement (D71-routing guard). Distinct
+prior internal authoring plan (D71-routing guard). Distinct
 trigger (goal-set recording, not governed-route bypass) — no duplication.
 
 See: SKILL-055 (aget-propose-goals) C2/C-PG-002; L1090 (SOP↔skill fold); L605/L671.

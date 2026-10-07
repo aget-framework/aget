@@ -139,7 +139,7 @@ ELSE:
 | Link | Reference |
 |------|-----------|
 | POC | POC-017 |
-| Project | PROJECT_PLAN_AGET_UNIVERSAL_SKILLS.md |
+| Project | prior internal authoring plan |
 | Proposal | PROPOSAL_aget-review-project.md |
 | Source | Fleet Skill Deployment Report (supervisor) |
 

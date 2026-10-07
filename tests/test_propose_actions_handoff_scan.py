@@ -1,6 +1,6 @@
 """Red fixtures for the /aget-propose-actions deferral scan (REQ-PA-012; gh#2676, gh#2426).
 
-Written at Gate 0 of planning/PROJECT_PLAN_v3.35.0_value_row_propose_actions_repairs_v1.0.md,
+Written at Gate 0 of prior internal authoring plan,
 BEFORE the implementation existed: each behavioural test ran red (strict xfail) on 2026-09-24
 at 09:40, and went green at Gate 1 when scripts/propose_actions_handoff_scan.py landed and the
 markers were removed. The two

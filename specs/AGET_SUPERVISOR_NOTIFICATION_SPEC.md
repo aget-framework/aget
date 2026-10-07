@@ -7,7 +7,7 @@
 **Created**: 2026-03-05
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_SUPERVISOR_NOTIFICATION_SPEC.md`
-**Change Origin**: PROJECT_PLAN_supervisor_notification_spec_v1.0 (G1)
+**Change Origin**: prior internal authoring plan (G1)
 **Related Specs**: AGET_RELEASE_SPEC (R-REL-019), AGET_ISSUE_GOVERNANCE_SPEC (sanitization model)
 
 ---

@@ -2,7 +2,7 @@
 
 **Version**: 1.0
 **Created**: 2026-04-19
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Domain**: Quality of individual V-test artifacts (contract tests, gate V-tests, validators) against the AGET verification practice
 **Archetype**: Compliance (gate-before-pass — does this V-test verify what it claims?)
 **Assessor**: Hybrid (agent scores executability/specificity/discrimination mechanically; human verifies adequacy honesty)
@@ -373,7 +373,7 @@ Per-test scores aggregate to suite-level metrics:
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
-| 1.0 | 2026-04-19 | private-aget-framework-AGET | Initial rubric — closes L749 third corner; grounded in C300/C301/C304 ontology concepts added FWRK-2026-004 |
+| 1.0 | 2026-04-19 | aget-framework | Initial rubric — closes L749 third corner; grounded in C300/C301/C304 ontology concepts added FWRK-2026-004 |
 
 ## Related Artifacts
 

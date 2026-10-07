@@ -281,7 +281,7 @@ C023_Project_Plan:
     - C024_V_Test
     - C026_Research_Phase
   skos:example:
-    - "PROJECT_PLAN_archetype_customization_v3.5_v1.0.md"
+    - "prior internal authoring plan"
 
 C024_Project_Review:
   skos:prefLabel: "Project_Review"
@@ -395,5 +395,5 @@ traceability:
   templates:
     - SKILL_SPEC_TEMPLATE.yaml
   projects:
-    - PROJECT_PLAN_skill_specification_remediation_v1.0.md
-    - PROJECT_PLAN_archetype_customization_v3.5_v1.0.md
+    - prior internal authoring plan
+    - prior internal authoring plan

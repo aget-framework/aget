@@ -69,7 +69,7 @@ Patterns to detect/redact WHEN promoting to public (not at filing time):
 | `gmelli/*` | `[INTERNAL-REPO]` | `{private-tracker}` |
 | Fleet size numbers | `[N agents]` | `28 agents in fleet` |
 | Session references | `[SESSION]` | `SESSION_2026-01-11` |
-| Internal project IDs | `[PROJECT-ID]` | `FLEET-UPG-004` |
+| Internal project IDs | `[PROJECT-ID]` | `prior fleet upgrade case` |
 
 ## Constraints
 

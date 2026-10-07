@@ -19,7 +19,7 @@ spec:
     engine: "scripts/create_goal.py"
     tests: "tests/test_create_goal.py (11 falsifiers)"
     rubric: "RUBRIC_goal_value (paired, build-pending — L1093)"
-    owning_initiative: "INIT-CORE-ARTIFACT-MATURATION Stream 9 (PP-051); v3.23 release C-23-01"
+    owning_initiative: "INIT-CORE-ARTIFACT-MATURATION Stream 9 (prior authoring project); v3.23 release C-23-01"
     verb_pair: "/aget-propose-goals (SKILL-055 plural producer) -> /aget-create-goal (SKILL-057 singular committer)"
     l_docs:
       - "L1067: Two-propose semantics (plurality encodes pipeline)"

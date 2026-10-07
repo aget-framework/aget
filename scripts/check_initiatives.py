@@ -265,9 +265,9 @@ def detect_status_mismatches():
 
     Two cheap, high-precision signals (each reproduced live on 2026-06-12):
       - header leads PROPOSED while the mapped INIT-*.md manifest exists
-        (PP-014/PP-033 class — approval+scaffold happened, header never updated)
+        (prior authoring project/prior authoring project class — approval+scaffold happened, header never updated)
       - header leads PROPOSED while the body carries a fold disposition
-        (PP-051 class — Decision section ruled FOLDED, header never updated)
+        (prior authoring project class — Decision section ruled FOLDED, header never updated)
     Name-mapping is heuristic (proposal slug -> INIT id), so a renamed initiative
     can evade the first signal — false negatives accepted, zero-noise preferred.
     """

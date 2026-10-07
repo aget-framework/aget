@@ -29,7 +29,7 @@
       "name": "aget-save-state",
       "path": ".agents/skills/aget-save-state",
       "source": ".claude/skills/aget-save-state",
-      "sha256": "b7145bce8eac6e7ad36dc06d703f0f6122f1011737ed4ac93fcd7c224cce60e1"
+      "sha256": "24490283b6d4dd2e46074faf2569769ed8b06665ad122865232a4d2692b2c9da"
     }
   ],
   "runtime": {

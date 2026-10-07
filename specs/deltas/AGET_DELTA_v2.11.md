@@ -10,7 +10,7 @@
 - R-SPEC-002-07: Includes traceability matrix (Traceability Matrix section)
 - R-SPEC-002-08: Saved to specs/deltas/AGET_DELTA_v2.11.md
 
-**Pain Point**: PROJECT_PLAN_v2.11_consistency_verification (missing traceability)
+**Pain Point**: prior internal authoring plan (missing traceability)
 **See**: aget/specs/AGET_FRAMEWORK_SPEC_v2.11.md Section R-SPEC-002
 **Tests**: tests/test_delta_specification.py::TestDeltaSpecification
 **Pattern**: L352 (Requirement-to-Test Traceability)
@@ -59,7 +59,7 @@ v2.11 introduces Memory Architecture, Vocabulary Standard, CLI Settings Hygiene,
 | R-PROC-003 | The SYSTEM shall track Learnings_Applied in process specifications | L344 | learnings_applied section |
 | R-SPEC-001 | The SYSTEM shall maintain AGET_FRAMEWORK_SPEC for each release | v2.11 | specs/AGET_FRAMEWORK_SPEC_v2.11.md |
 | R-SPEC-002 | The SYSTEM shall produce AGET_DELTA for changes between releases | v2.11 | specs/deltas/AGET_DELTA_v2.11.md |
-| R-SPEC-003 | WHEN Release_Preparation is initiated, the SYSTEM shall create Framework_Spec as prerequisite | v2.11 | PROJECT_PLAN_framework_specification |
+| R-SPEC-003 | WHEN Release_Preparation is initiated, the SYSTEM shall create Framework_Spec as prerequisite | v2.11 | prior internal authoring plan |
 | R-SPEC-004 | The SYSTEM shall use EARS patterns for all formal requirements | AGET_SPEC_FORMAT_v1.1 | All specs |
 | R-SPEC-005 | WHERE Gate exists in process, the SYSTEM shall trace to Requirement | L348 | Process specs |
 | R-VER-001-08 | WHEN --include-manager flag provided, version consistency check SHALL include managing agent | GAP_ANALYSIS | .aget/patterns/sync/version_consistency.py |
@@ -106,7 +106,7 @@ v2.11 introduces Memory Architecture, Vocabulary Standard, CLI Settings Hygiene,
 | GEMINI.md symlink | templates/ | Gemini entry point | R-CLI-005 |
 | .gitignore | Root | Ignore user-specific config | R-SESSION-001 |
 | planning/GAP_ANALYSIS_version_migration_v1.0.md | Docs | Gap analysis and fix documentation | R-REL-006 |
-| planning/PROJECT_PLAN_L352_phase2_plus_enhancements_v1.0.md | Docs | Phase 2 + enhancements complete | L352 |
+| prior internal authoring plan | Docs | Phase 2 + enhancements complete | L352 |
 | .aget/evolution/L353_pattern_efficiency_scaling.md | Learnings | Pattern efficiency learning | L353 |
 | .aget/evolution/L354_meta_testing_viability.md | Learnings | Meta-testing learning | L354 |
 | .aget/evolution/L355_pilot_phase_flexibility.md | Learnings | Pilot threshold learning | L355 |
@@ -257,7 +257,7 @@ v2.11 introduces Memory Architecture, Vocabulary Standard, CLI Settings Hygiene,
 |-------------|-------|-------|----------|
 | R-SPEC-001 | — | — | specs/AGET_FRAMEWORK_SPEC_v2.11.md |
 | R-SPEC-002 | — | — | specs/deltas/AGET_DELTA_v2.11.md |
-| R-SPEC-003 | — | — | PROJECT_PLAN_framework_specification |
+| R-SPEC-003 | — | — | prior internal authoring plan |
 | R-SPEC-004 | — | — | AGET_SPEC_FORMAT_v1.1 |
 | R-SPEC-005 | L348 | — | Process spec traceability |
 

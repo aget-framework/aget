@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-fleet_remediation_v318.py — FLEET-UPG-016R Generator for v3.18 adoption-stream remediation.
+fleet_remediation_v318.py — prior fleet upgrade case Generator for v3.18 adoption-stream remediation.
 
-Plan: PROJECT_PLAN_fleet_v318_adoption_remediation_v1.0.md
+Plan: prior internal authoring plan
 Authorization: principal R-CLI-004 carve-out 2026-05-17 (structural artifacts only;
-no substance modification; applies to FLEET-UPG-016R and v3.19 successors).
+no substance modification; applies to prior fleet upgrade case and v3.19 successors).
 
 Architecture (per workspace/FU016R_ADOPTION_STREAM_TAXONOMY_v1.0.md §2):
 - Table-driven stream registry (D-FU016R-2)
@@ -51,7 +51,7 @@ CARVE_OUT_REF = (
     "adoption-stream restoration of supervisor-direct-migrated agents. "
     "Scope: structural artifacts only (AGENTS.md sections + skill files + "
     "governance refs); no substance modification. Carve-out applies to "
-    "FLEET-UPG-016R and any v3.19 successor remediation cycles."
+    "prior fleet upgrade case and any v3.19 successor remediation cycles."
 )
 
 # Path allowlist per D-FU016R-3 (structural artifacts only)
@@ -90,11 +90,11 @@ COHORT_DEFINITIONS: dict[str, list[tuple[str, str]]] = {
 
 
 def run_finalize_against_agent(agent_name: str, agent_rel: str, dry_run: bool) -> dict:
-    """FU016F mode: push stale (carve-out) → migrate (fleet_upgrade) → adopt (existing Generator).
+    """prior finalization project mode: push stale (carve-out) → migrate (fleet_upgrade) → adopt (existing Generator).
 
     Per-agent flow:
     1. L646 pre-flight (capture state)
-    2. Push stale commits (REQUIRES Path B-2 carve-out extension; routine-classified per FU016F manifest)
+    2. Push stale commits (REQUIRES Path B-2 carve-out extension; routine-classified per prior finalization project manifest)
     3. Subprocess: fleet_upgrade_v3180.py --agent <name> (migration; auto-pushes)
     4. Run adoption-stream emissions (existing emit_* functions) + commit + push
     """
@@ -305,7 +305,7 @@ def ensure_adoption_section_present(agents_md: Path, dry_run: bool) -> tuple[str
         return content, False  # already present
     # Append section after Project Context if found, else at end of file
     section = (
-        "\n\n## v3.18.0 Adoption (FLEET-UPG-016R remediated 2026-05-17)\n\n"
+        "\n\n## v3.18.0 Adoption (prior fleet upgrade case remediated 2026-05-17)\n\n"
         "Per `RELEASE_HANDOFF_v3.18.0.md` §Upgrade Guide adoption streams:\n\n"
         "| Stream | Status | Note |\n"
         "|--------|--------|------|\n"
@@ -420,7 +420,7 @@ def run_against_agent(agent_name: str, agent_rel: str, dry_run: bool) -> dict:
     }
 
 def index_csv_append(agent_name: str, applied_ids: list, skipped_ids: list, head_before: str, head_after: str, push_success: bool):
-    """D-FU016R-8: append per-agent row to FU016R INDEX CSV for L656 audit."""
+    """D-FU016R-8: append per-agent row to prior adoption-remediation project INDEX CSV for L656 audit."""
     header_needed = not INDEX_CSV.exists()
     with INDEX_CSV.open("a", newline="") as f:
         w = csv.writer(f)
@@ -439,11 +439,11 @@ def index_csv_append(agent_name: str, applied_ids: list, skipped_ids: list, head
 def commit_and_push(agent_name: str, agent_rel: str, applied_ids: list, skipped_ids: list) -> str:
     agent_root = Path.home() / "github" / agent_rel
     msg = (
-        f"chore: v3.18 adoption-stream remediation (FLEET-UPG-016R per principal "
+        f"chore: v3.18 adoption-stream remediation (prior fleet upgrade case per principal "
         f"R-CLI-004 carve-out; structural artifacts only)\n\n"
         f"Streams applied: {','.join(applied_ids) if applied_ids else '(none)'}\n"
         f"Streams skipped (already-present): {','.join(skipped_ids) if skipped_ids else '(none)'}\n\n"
-        f"Authorization: per PROJECT_PLAN_fleet_v318_adoption_remediation_v1.0.md "
+        f"Authorization: per prior internal authoring plan "
         f"§Authorization Record.\n\n"
         f"Generator: workspace/fleet_remediation_v318.py v1.0.0.\n"
     )
@@ -537,7 +537,7 @@ def main():
     if args.cohort:
         targets.extend(COHORT_DEFINITIONS.get(args.cohort, []))
 
-    # FU016F mode: cohort "fg21-routine" uses finalize flow (push + migrate + adopt)
+    # prior finalization project mode: cohort "fg21-routine" uses finalize flow (push + migrate + adopt)
     finalize_mode = args.cohort == "fg21-routine"
 
     for name, rel in targets:

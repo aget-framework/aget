@@ -392,7 +392,7 @@ For formal SKOS-compliant definitions, see `ONTOLOGY_skills.yaml`.
 | L-docs | L532, L589 |
 | Template | SKILL_SPEC_TEMPLATE.yaml |
 | Specs | SKILL-001 through SKILL-013 |
-| Project | PROJECT_PLAN_skill_specification_remediation_v1.0.md |
+| Project | prior internal authoring plan |
 
 ---
 

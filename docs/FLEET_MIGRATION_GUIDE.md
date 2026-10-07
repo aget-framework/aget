@@ -592,7 +592,7 @@ Agent version 2.9.0 < minimum required 2.11.0
 
 ## Example: Complete Migration
 
-### Agent: private-data-analyst-aget
+### Agent: aget-framework
 
 **Before**:
 ```

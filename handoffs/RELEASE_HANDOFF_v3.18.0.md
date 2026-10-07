@@ -32,7 +32,7 @@ The L908 family closed at memory layer (L960 + L963 + L964 graduated). The frame
 ### Key Deliverables
 
 - **AGET_MEMORY_SURFACE_SPEC v0.2.0 canonical promotion** (T1.16 + T2.37): drafts/ → `aget/specs/AGET_MEMORY_SURFACE_SPEC.md` (canonical commit `596dea1`). Codifies harness-vs-KB taxonomy per L335. R-MS-001..007 + V-MS-001..008 + CAP-MS-001..003 at LANDED rigor. Cross-references wired at T2.37 (canonical `0579a3a`).  [instance-only per L600]
-- **Verb Registry Currency** (T1.9 = PP-021, gh#1204; 8-gate sub-plan in ~2hr): 37 Active + 4 Reserved verbs + 11 §Hierarchy Decisions pairs (incl. `analyze ⊂ check`, `scan ⊂ study`, `update ⊂ enhance`, `verify ⊂ validate`, `research ⊂ study`). `SOP_verb_registry_maintenance.md` v1.0.0 + `audit_verb_registry.py` drift-detector. Closes INIT-FRAMEWORK-COHERENCE Stream 2 verify/validate boundary.
+- **Verb Registry Currency** (T1.9 = prior authoring project, gh#1204; 8-gate sub-plan in ~2hr): 37 Active + 4 Reserved verbs + 11 §Hierarchy Decisions pairs (incl. `analyze ⊂ check`, `scan ⊂ study`, `update ⊂ enhance`, `verify ⊂ validate`, `research ⊂ study`). `SOP_verb_registry_maintenance.md` v1.0.0 + `audit_verb_registry.py` drift-detector. Closes INIT-FRAMEWORK-COHERENCE Stream 2 verify/validate boundary.
 - **Homepage Fork C Hybrid** (T1.12; 8-gate sub-plan): org-profile inline releases bounded v3.10+; 14 pre-v3.10 entries archived; `## Roadmap` → `## Release History` (L943); REQ-HOM v1.1.0 → v1.2.0 (Q-003 N=2 bounding + F-006 retirement + v3.20 grace); `release_homepage_update.py` ADR-008 Generator (`--check` 8-surface). **L941-L944 cluster closed structurally**.  [instance-only per L600]
 - **`/aget-create-initiative` Strict promotion** (T2.46): D71 verb-pair gap closed. Direct authoring of `planning/initiatives/INIT-*.md` now PROHIBITED unless skill invoked. Three Strict skills now: `/aget-create-project`, `/aget-create-initiative`, `/aget-file-issue`.
 - **L961 multi-channel structural defenses** (Gate 4.A): Channel 1 AGENTS.md §HANDOFF-Deferral Discipline + Channel 2 SKILL-024 v1.4.0 REQ-PA-012 + V-PA-012 + Step 2.6 HANDOFF-Deferral Scan + Channel 4 wake_up.py `get_active_handoffs()`. **4/5 channels LANDED** (Channel 5 Automated deferred v3.19). Exceeds L467 ≥2 multi-channel requirement.  [instance-only per L600]
@@ -128,7 +128,7 @@ This release applies uniformly across all 13 archetype templates: **no per-arche
 | a downstream portfolio | ⏳ Pending | — | — | Cross-portfolio pilot awaiting supervisor disposition |
 | (additional pilot agents) | ⏳ Pending | — | — | Per supervisor disposition |
 
-**Migration PR backfill note** (PP-035 `Migration PR` column per gh#1392 closure 2026-05-16): v3.18.0 backfill row 1 = `N/A (direct-commit)` (framework-manager self-deploy). Column populates non-`N/A` once a branched-PR "heavyweight" route per gh#1392 is adopted at a future cycle.
+**Migration PR backfill note** (prior authoring project `Migration PR` column per gh#1392 closure 2026-05-16): v3.18.0 backfill row 1 = `N/A (direct-commit)` (framework-manager self-deploy). Column populates non-`N/A` once a branched-PR "heavyweight" route per gh#1392 is adopted at a future cycle.
 
 **L656 Loading Dock guard**: This handoff documents what landed; deployment verification confirms it is running. Self-deployment confirmed at framework-manager (this agent) post-Gate-7 push. **Cross-fleet verification deferred to supervisor-coordinated pilot pass.** Supervisor is the natural next pilot (own portfolio).  [instance-only per L600]
 
@@ -164,10 +164,10 @@ Sibling L-docs graduated this cycle: **L960** (memory-entry-as-claim-not-premise
 | 12 | CHANGELOG-historical sanitization sweep ("28 agents" + similar pre-existing L909 patterns) | Documentation sync | F-G4A-5 + analogues |  [instance-only per L600]
 | 13 | RELEASE_HANDOFF v3.17.0 internal-ID leak at line 149 sanitization | Documentation sync | F-G4B-1 |
 | 14 | validate_pre_release_coherence.py scoping fix: tag check should target public repos not private workspace | Validator amendment | F-G7-1 |
-| 15 | Sub-plan finding pools (T1.12 37 + PP-021 17 + V3_18_IMPROVEMENTS 15) — disposition review for v3.19 carry-forward selection | Process | DECIDE_PACKET §Forward-Routables scope-disclosure |
+| 15 | Sub-plan finding pools (T1.12 37 + prior authoring project 17 + V3_18_IMPROVEMENTS 15) — disposition review for v3.19 carry-forward selection | Process | DECIDE_PACKET §Forward-Routables scope-disclosure |
 | 16 | CAP-REL-032 + CAP-REL-033 IMPLEMENT commitment | Spec implementation | R-DEP-4 v3.19 explicit commitment |
 
-**Cycle finding population total**: ~85 forward-routables across 4 pools (release plan 16 + T1.12 sub-plan 37 + PP-021 sub-plan 17 + V3_18_IMPROVEMENTS 15). Selection for v3.19 IN scope occurs at v3.19 grooming.
+**Cycle finding population total**: ~85 forward-routables across 4 pools (release plan 16 + T1.12 sub-plan 37 + prior authoring project sub-plan 17 + V3_18_IMPROVEMENTS 15). Selection for v3.19 IN scope occurs at v3.19 grooming.
 
 ---
 

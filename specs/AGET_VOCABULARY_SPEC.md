@@ -8,7 +8,7 @@
 **Updated**: 2026-09-26
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_VOCABULARY_SPEC.md`
-**Change Origin**: PROJECT_PLAN_standards_ontology_elevation_v1.0
+**Change Origin**: prior internal authoring plan
 **Related Specs**: AGET_FRAMEWORK_SPEC
 **Consolidates**: AGET_GLOSSARY_STANDARD_SPEC.md, AGET_CONTROLLED_VOCABULARY.md
 
@@ -2087,7 +2087,7 @@ entities:
 
 # Part 7: Standards Document Ontology
 
-This part elevates AGET standards documents (specifications, SOPs, templates, learnings) as first-class ontology entities. Per **PROJECT_PLAN_standards_ontology_elevation_v1.0**, this enables queryable relationships between documents and the concepts they define.
+This part elevates AGET standards documents (specifications, SOPs, templates, learnings) as first-class ontology entities. Per **prior internal authoring plan**, this enables queryable relationships between documents and the concepts they define.
 
 ## Document Type Hierarchy
 
@@ -2875,7 +2875,7 @@ grep -E "^    [a-z]" aget/specs/AGET_VOCABULARY_SPEC.md | grep -v "skos:\|aget:\
 
 - **NEW**: `aget:published_at` publication-provenance extension (0:many, non-breaking) + Publication Provenance subsection (Part 1)
 - **NEW**: CAP-VOC-005 Publication Provenance (3 EARS requirements: record-on-publish, no-inbound-authority, PID-form-only)
-- Origin: PROJECT_PLAN_ontology_publication_v1.0 G3.1(c); L882 (forum) + L1126 (standard); D-PUB rulings 2026-07-11; delta artifact SPEC_DELTA_vocabulary_published_at_2026-07-11
+- Origin: prior internal authoring plan G3.1(c); L882 (forum) + L1126 (standard); D-PUB rulings 2026-07-11; delta artifact SPEC_DELTA_vocabulary_published_at_2026-07-11
 
 ### v1.16.1 (2026-03-17)
 
@@ -2940,7 +2940,7 @@ grep -E "^    [a-z]" aget/specs/AGET_VOCABULARY_SPEC.md | grep -v "skos:\|aget:\
   - Archetype_Constraint, Portfolio_Boundary, Audit_Required
   - Ontology_Maturity_Tier (Production/Embedded/Planning/None)
 - Updated Agent_Capability with governance attribute slots
-- See: L573, PROJECT_PLAN_fleet_capability_ontology_v3.5_v1.0
+- See: L573, prior internal authoring plan
 
 ### v1.11.0 (2026-02-11)
 
@@ -2956,7 +2956,7 @@ grep -E "^    [a-z]" aget/specs/AGET_VOCABULARY_SPEC.md | grep -v "skos:\|aget:\
 - Documented L536 ontological correction: peers not hierarchy
 - Added test coverage mapping for all protocol terms
 - Cross-referenced to ontology/ONTOLOGY_personal_ai_systems_v1.0.yaml (Cluster 10, C041-C047)
-- See: PROJECT_PLAN_skills_ontology_integration_v1.0, L533, L536, L557, L570
+- See: prior internal authoring plan, L533, L536, L557, L570
 
 ### v1.10.0 (2026-01-17)
 
@@ -2968,7 +2968,7 @@ grep -E "^    [a-z]" aget/specs/AGET_VOCABULARY_SPEC.md | grep -v "skos:\|aget:\
   - MVP_Scope: Must-Ship items that block release
   - Rollback_Plan: Contingency procedure for release reversion
   - Release_Retrospective: Post-release lesson capture
-- See: PROJECT_PLAN_version_scope_standardization_v1.0
+- See: prior internal authoring plan
 
 ### v1.9.0 (2026-01-16)
 
@@ -2992,14 +2992,14 @@ grep -E "^    [a-z]" aget/specs/AGET_VOCABULARY_SPEC.md | grep -v "skos:\|aget:\
 - Added DAG relationship support (multi-parent inheritance)
 - Added new AGET extensions: aget:theoretical_basis, aget:dag_parents, aget:user_facing, aget:display_alias, aget:deontic_operator, aget:hohfeldian_correlative, aget:impact_dimensions
 - Maintained backward compatibility with Person_Entity, Organization_Entity, etc.
-- See: L530 (AGET Ontology Foundation Research), PROJECT_PLAN_aget_ontology_foundation_v1.0
+- See: L530 (AGET Ontology Foundation Research), prior internal authoring plan
 
 ### v1.8.0 (2026-01-12)
 
 - Added Part 7: Standards Document Ontology (L502)
 - Added document type hierarchy (Normative, Informative, Process)
 - Added specification instances as first-class entities
-- See: PROJECT_PLAN_standards_ontology_elevation_v1.0
+- See: prior internal authoring plan
 
 ### v1.7.0 (2026-01-12)
 
@@ -3008,7 +3008,7 @@ grep -E "^    [a-z]" aget/specs/AGET_VOCABULARY_SPEC.md | grep -v "skos:\|aget:\
 - Added Version_Drift_File anti-pattern term
 - Added terms to Release Terms table
 - Supports R-REL-VER-001 (Version-Bearing File Coherence)
-- See: L521 (Version-Bearing File Specification-to-Tool Gap), PROJECT_PLAN_version_bearing_file_remediation_v1.0
+- See: L521 (Version-Bearing File Specification-to-Tool Gap), prior internal authoring plan
 
 ### v1.6.0 (2026-01-11)
 
@@ -3016,7 +3016,7 @@ grep -E "^    [a-z]" aget/specs/AGET_VOCABULARY_SPEC.md | grep -v "skos:\|aget:\
 - Added 9 issue governance vocabulary terms: Issue_Destination, Private_Issue_Destination, Public_Issue_Destination, Private_Fleet_Agent, Public_Remote_Agent, Issue_Sanitization, Private_Pattern, Cross_Boundary_Filing, Issue_Fragmentation
 - Added SKOS relationships linking terms to AGET_ISSUE_GOVERNANCE_SPEC requirements
 - Supports CAP-ISSUE-001 through CAP-ISSUE-004
-- See: L520 (Issue Governance Gap), PROJECT_PLAN_issue_governance_v1.0
+- See: L520 (Issue Governance Gap), prior internal authoring plan
 
 ### v1.5.0 (2026-01-11)
 

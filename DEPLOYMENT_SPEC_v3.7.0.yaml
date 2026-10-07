@@ -489,7 +489,7 @@ traceability:
     - "L626: Release Planning Lifecycle Gap"
     - "L627: Release Plan SOP Coverage Gap"
     - "L628: Version-Coupled Artifact Inventory Gap"
-  project: "PROJECT_PLAN_v3.7.0_release_v1.0.md"
+  project: "prior internal authoring plan"
   supersedes: "DEPLOYMENT_SPEC_v3.6.0.yaml"
   requirements:
     - "R-DEP-001: Canonical Source Requirement"

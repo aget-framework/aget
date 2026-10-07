@@ -17,7 +17,7 @@ spec:
     skill_md: ".claude/skills/aget-propose-goals/SKILL.md"
     proposal: "planning/skill-proposals/PROPOSAL_aget-propose-goals.md (SP-017)"
     rubric: "rubrics/RUBRIC_goal_selection_v1.0.md"
-    owning_initiative: "INIT-CORE-ARTIFACT-MATURATION Stream 9 (PP-051)"
+    owning_initiative: "INIT-CORE-ARTIFACT-MATURATION Stream 9 (prior authoring project)"
     l_docs:
       - "L845: Session-Pivot Goal-Selection Rubric Gap (parent)"
       - "L846: Action-Within-Session Rubric Gap (companion)"

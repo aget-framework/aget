@@ -750,7 +750,7 @@ def scan_value_resolution(text: str):
     contained ZERO references to benefit / hypothesis / value-resolution, so the
     requirement was discharged entirely by model-following. Compliance was in fact
     high (6 of 7 post-rule terminal closures carried a verdict) — but the one that
-    did not, `PROJECT_PLAN_public_artifact_sanitization_actuation_v1.0.md`, closed
+    did not, `prior internal authoring plan`, closed
     2026-08-15 with neither a hypothesis nor a verdict and nothing observed it.
 
     SCOPE. Fires ONLY on a terminal plan. A mid-flight plan has nothing to resolve

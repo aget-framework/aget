@@ -360,7 +360,7 @@ traceability:
     - "D62: /aget-create-project Principles Enforcement"
     - "D64: Version-Bearing File Expansion (5/5 types)"
     - "D39: Gate 0 Due Diligence Template"
-  project: "PROJECT_PLAN_v3.9.0_release_v1.0.md"
+  project: "prior internal authoring plan"
   supersedes: "DEPLOYMENT_SPEC_v3.8.0.yaml"
   requirements:
     - "R-DEP-001: Canonical Source Requirement"

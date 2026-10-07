@@ -18,8 +18,8 @@
       "path": "docs/AGET_CLI_SUPPORT_MATRIX.md",
       "sha256": "c72870583dad2c06fdd630cc3e3024c6b58b38c6be605de02f869b03a9419e22",
       "mode": "0o644",
-      "sha256_current": "e88e1720b1952acda4657463bb9cdab211ffaa6a6a763cd2794562c2fe793527",
-      "amended_post_tag": "2026-09-26: Antigravity terminal-agent re-measurement (matrix v1.2.0: L1/L2 YES for agy 1.2.11; Gemini CLI retirement dated from the vendor notice). Post-v3.34 edit; sha256 stays the record of what v3.34 shipped."
+      "sha256_current": "2960ecdc069fc8e5703ee99883472adafa3d10a07b118a5b8a52277f9176e5ce",
+      "amended_post_tag": "2026-09-26: Antigravity terminal-agent re-measurement (matrix v1.2.0: L1/L2 YES for agy 1.2.11; Gemini CLI retirement dated from the vendor notice). Post-v3.34 edit; sha256 stays the record of what v3.34 shipped.; v3.36.0 Round 2b producing-plan provenance generalized; released sha256 retained"
     },
     {
       "path": "handoffs/FLEET_MIGRATION_CONTRACT_v3.30.0.json",
@@ -210,7 +210,9 @@
     {
       "path": "tests/test_release_observability.py",
       "sha256": "7f486ce875213ff079dba5c3f71923c49b8be53f5bc1f199ce3ea7f8e8939b9e",
-      "mode": "0o644"
+      "mode": "0o644",
+      "sha256_current": "08bff62b392c3ee018cfc9f15c33d2dc857242dde6466ceb1f4184c83cfc1c2c",
+      "amended_post_tag": "; v3.36.0 Round 2b producing-plan provenance generalized; released sha256 retained"
     },
     {
       "path": "tests/test_runtime_support_evidence.py",
@@ -242,7 +244,9 @@
     {
       "path": "tests/test_validate_initiative_proposal.py",
       "sha256": "963a493a6ee4b26881c209ca343343e8d06d518bb6e9714c90f0e0486fac2ac3",
-      "mode": "0o644"
+      "mode": "0o644",
+      "sha256_current": "1ef5c36ad328e0d30123c07136e929bec0ebc6273f590b3c735823c181db91ce",
+      "amended_post_tag": "2026-10-06 weekly-train:R79 Round 2: producing-Aget authorship de-identification; test behaviour unchanged; v3.36.0 Round 2b producing-plan provenance generalized; released sha256 retained"
     },
     {
       "path": "tests/test_verdict_subject_binding.py",
@@ -303,8 +307,8 @@
     ],
     "rationale": "CORRECTIONS_v3.34.0.md rows 1 (W1), 2 (W3) and 6 (W3c: check_capability_retention.py); W3b files are outside the manifest",
     "prepared": "2026-09-20",
-    "prepared_by": "private-aget-framework-AGET",
+    "prepared_by": "aget-framework",
     "receiver_use": "python3 scripts/check_receiver_conformance.py --manifest handoffs/V334_PAYLOAD_MANIFEST_corrected.json --repo <receiver> --acceptance <dir> --json ; qualification instruments SHOULD prefer this file when present in the candidate tree and name it in the receipt",
-    "independent_composition": "node-1 (private-aof1-aof-supervisor-AGET) composed the same four substitutions independently on 2026-09-20 from the branch tip 0304bed9; digests agree"
+    "independent_composition": "an independent AGET contributor composed the same four substitutions independently on 2026-09-20 from the branch tip 0304bed9; digests agree"
   }
 }

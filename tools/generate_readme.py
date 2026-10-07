@@ -12,7 +12,7 @@ Usage:
     python3 generate_readme.py --verify           # Verify specs exist
     python3 generate_readme.py --dry-run          # Show what would be generated
 
-Implements: PROJECT_PLAN_spec_first_documentation_v1.0.md Gate 4
+Implements: prior internal authoring plan Gate 4
 Related: L545 (Strategic Positioning Evolution)
 """
 

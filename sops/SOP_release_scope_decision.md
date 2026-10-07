@@ -3,7 +3,7 @@
 **Version**: 1.0.0
 **Status**: Active
 **Created**: 2026-02-28
-**Owner**: private-aget-framework-AGET
+**Owner**: aget-framework
 **Related**: L465, L553, L591, L605, L621, AGET_SOP_SPEC v1.1.0
 **Implements**: R-REL-013 (scope consolidation), R-RES-001-17 (triage handoff)
 **Pain Point**: L465 (scope consolidation gap), L621 (distributed scope decisions), L605 (post-release remediation)
@@ -392,7 +392,7 @@ done
 | ER absorbed | ER-release-value-cost-rubric (ENH-2026-01-18-002) |
 | Design | findings/D_release_scope_decision_sop_design.md |
 | Research | findings/R_release_scope_decision_patterns_2026.md |
-| PROJECT_PLAN | PROJECT_PLAN_release_scope_decision_sop_v1.0.md |
+| PROJECT_PLAN | prior internal authoring plan |
 
 ---
 

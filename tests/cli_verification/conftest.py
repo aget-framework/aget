@@ -5,7 +5,7 @@ Provides common fixtures for validating AGET operations across
 multiple CLI agents (Claude Code, Codex CLI, Gemini CLI).
 
 Version: 1.0.0
-Implements: PROJECT_PLAN_cli_independence_validation_v1.0
+Implements: prior internal authoring plan
 """
 
 import json

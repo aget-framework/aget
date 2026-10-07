@@ -8,7 +8,7 @@ Verifies the 14 V-INIT-PROP-### implementations against:
 - Targeted non-conformant fixtures (each fails specific V-tests)
 
 Spec: AGET_INITIATIVE_SPEC v1.0.1 §7
-Plan: PROJECT_PLAN_aget_propose_initiative_v1.0.md Gate 2 (G2.4 self-test)
+Plan: prior internal authoring plan Gate 2 (G2.4 self-test)
 """
 from __future__ import annotations
 
@@ -49,7 +49,7 @@ CONFORMANT_BODY = dedent("""\
     # Initiative Proposal: Synthetic Test
 
     **Date**: 2026-05-14
-    **Author**: private-aget-framework-AGET
+    **Author**: aget-framework
     **Status**: PROPOSED
     **Proposal ID**: PP-9999
     **Proposed Initiative ID**: INIT-SYNTHETIC-TEST-FIXTURE

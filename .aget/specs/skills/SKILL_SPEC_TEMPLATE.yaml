@@ -3,7 +3,7 @@
 # Version: 1.0.0
 # Created: 2026-03-21
 # Resolves: #439 (247 broken references across fleet)
-# See: SKILL_VOCABULARY.md, ONTOLOGY_skills.yaml, private-cli-aget SKILL_SPEC_TEMPLATE.md
+# See: SKILL_VOCABULARY.md, ONTOLOGY_skills.yaml, internal CLI-authoring template (not shipped)
 
 # ============================================================
 # Usage: Copy this template when creating a new SKILL-xxx spec.

@@ -14,7 +14,7 @@ Prevent direct authoring of `INIT-*.md` manifests without a proposal gate. Per *
 
 **Evidence**:
 - 2026-04-19 INIT-REQ-SPEC-TEST-DEFINED authored via direct Write — no proposal gate, no cross-initiative overlap check (`planning/skill-proposals/PROPOSAL_aget-create-initiative.md`)
-- 7 existing `PROPOSAL_init_*.md` files (PP-014, 016, 017, 018, 019, 020, 027) authored via `/aget-propose-project` *(not yet in this package — manager-seat skill)* — 0/7 contain Channels, Contributors, or Cross-Initiative Overlap sections (empirical grep 2026-05-14)
+- 7 existing `PROPOSAL_init_*.md` files (seven prior initiative proposals) authored via `/aget-propose-project` *(not yet in this package — manager-seat skill)* — 0/7 contain Channels, Contributors, or Cross-Initiative Overlap sections (empirical grep 2026-05-14)
 - gh#1193 INIT-PRINCIPLED-EXECUTION referenced in scope tables without file — decorative-reference anti-pattern
 
 **Governing Spec**: `../aget/specs/AGET_INITIATIVE_SPEC.md` v1.0.1 (canonical commit `7bb93f0`)
@@ -367,7 +367,7 @@ Run mechanically via `python3 scripts/validate_initiative_proposal.py --file <pa
 | Contributor profile pattern | gh#910 + L572 |
 | Initiative relevance rubric | gh#886 (Decision section input) |
 | Verb registry | `ontology/DESIGN_DIRECTION_skill_verb_vocabulary.md` v3.16 — `propose` is verb #18 (Governance, approved) |
-| Implementation plan | `planning/PROJECT_PLAN_aget_propose_initiative_v1.0.md` |
+| Implementation plan | `prior internal authoring plan` |
 | ADR | ADR-008 (Advisory → Strict → Generator progression) |
 
 ---

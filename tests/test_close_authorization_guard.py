@@ -22,7 +22,7 @@ V323_VOIDED_CLOSE = (
     "**Plan_Status**: **CLOSED — PRIVATE MILESTONE (2026-06-20T07:36:36Z)** via "
     "`/aget-close-project` (D71). Terminated-with-deferral. **Reason** (principal-ruled): "
     "G-a (REQ-9 cut) + G-d Path-2 (public version-bump folded to v3.24); v3.23 finalized "
-    "as a private milestone. **Closing agent**: private-aget-framework-AGET."
+    "as a private milestone. **Closing agent**: aget-framework."
 )
 
 # --- the corrected/authorized form: attribution WITH a real event pointer ------

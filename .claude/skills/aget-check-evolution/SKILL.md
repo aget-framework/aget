@@ -149,7 +149,7 @@ def health_status(total_files, non_standard, disk_mib, index_status):
 | Link | Reference |
 |------|-----------|
 | POC | POC-017 |
-| Project | PROJECT_PLAN_AGET_UNIVERSAL_SKILLS.md |
+| Project | prior internal authoring plan |
 | Source | Fleet Skill Deployment Report (supervisor) |
 | Baseline | 94 files, 800K (2026-02-08) |
 
