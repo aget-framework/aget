@@ -1,11 +1,11 @@
 # AGET Vocabulary Specification
 
-**Version**: 1.18.0
+**Version**: 1.18.1
 **Status**: Active
 **Category**: Core (Standards)
 **Format Version**: 1.2
 **Created**: 2026-01-04
-**Updated**: 2026-09-26
+**Updated**: 2026-10-07
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_VOCABULARY_SPEC.md`
 **Change Origin**: PROJECT_PLAN_standards_ontology_elevation_v1.0
@@ -706,7 +706,7 @@ Public_Issue_Destination:
 
 Private_Fleet_Agent:
   skos:prefLabel: "Private_Fleet_Agent"
-  skos:definition: "Agent in gmelli's private fleet, may reference private details in issues."
+  skos:definition: "Agent in a private fleet, may reference private details in issues."
   skos:related: ["R-ISSUE-001", "Issue_Sanitization"]
 
 Public_Remote_Agent:
@@ -723,7 +723,7 @@ Issue_Sanitization:
 Private_Pattern:
   skos:prefLabel: "Private_Pattern"
   skos:definition: "Content pattern indicating private/internal information that should not appear in public issues."
-  skos:example: ["private-*-aget", "gmelli/*", "fleet size disclosure"]
+  skos:example: ["private agent identifiers", "private repository references", "fleet size disclosure"]
   aget:detection_script: "sanitize_issue_content.py"
 
 Cross_Boundary_Filing:
@@ -2863,6 +2863,10 @@ grep -E "^    [a-z]" aget/specs/AGET_VOCABULARY_SPEC.md | grep -v "skos:\|aget:\
 ---
 
 ## Changelog
+
+### v1.18.1 (2026-10-07)
+
+- Generalized the examples in the [issue-governance terms](#issue-governance-terms-cap-issue-) for public readers.
 
 ### v1.18.0 (2026-09-26)
 
