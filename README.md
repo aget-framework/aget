@@ -63,7 +63,7 @@ See [CLI Support Matrix](docs/AGET_CLI_SUPPORT_MATRIX.md) for details.
 
 ## What AGET is NOT
 
-- **Not an AI model or runtime.** AGET is a governance layer that works with any LLM backend.
+- **Not an AI model or runtime.** AGET provides repository-based governance for CLI agents. Claude Code is the baseline; Codex CLI is compatible. Other tools have the support levels and dated validation evidence in the [CLI Support Matrix](docs/AGET_CLI_SUPPORT_MATRIX.md).
 - **Not a replacement for Claude Code or Codex CLI.** AGET sits above these platforms.
 - **Not an autonomous system.** AGET requires human supervision and gate discipline.
 - **Not coding-only.** AGET supports advisory, consulting, research, and general knowledge work.
