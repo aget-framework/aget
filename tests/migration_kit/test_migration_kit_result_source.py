@@ -85,6 +85,9 @@ def test_b185_1_baseline_and_f_read_the_full_native_id_when_pytest_omits_the_mes
     holds one ` - ` inside the id. The baseline producer (a real run_baseline, the session's pytest run natively under
     the environment the kit gives it) records the full id, and F reads the full ` - beta` id as new. On C2a6 the
     producer recorded the prefix and F returned ([], None)."""
+    # This fixture needs width-based message omission; pytest disables it in CI.
+    monkeypatch.delenv("CI", raising=False)
+    monkeypatch.delenv("BUILD_NUMBER", raising=False)
     root = member(tmp_path, {"test_synthetic.py": wide("alpha")})
     prefix = "tests/test_synthetic.py::test_synthetic" + "x" * 110
 
