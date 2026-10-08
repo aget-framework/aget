@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 1010" role="img" aria-labelledby="title description">
+<title id="title">AGET technology architecture — draft</title><desc id="description">Permission applies to operations; evidence must match its occurrence. Host deployment is not established.</desc>
+<defs><marker id="arrow" markerWidth="9" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L9,4 L0,8" fill="#9db1c8"/></marker></defs>
+<rect width="1440" height="1010" fill="#0b1522"/>
+<text x="56" y="57" font-family="Arial,sans-serif" font-size="31" font-weight="bold" text-anchor="start" fill="#f3f6fa">AGET technology architecture</text>
+<text x="56" y="88" font-family="Arial,sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#98dfcb">DRAFT · adopted meanings · conditional relationships · no deployed conformance claim</text>
+<a href="companion.html#relationship-requires-permission"><title>The applicable runtime or environment policy evaluates or constrains that operation; a prompt may be unnecessary when a valid policy already permits it. The operation qualifier is required when this is instantiated; runtime-to-control alone does not mean every operation requires a fresh prompt.</title><path data-relation="requires-permission" d="M540,506.0 L376,506.0" stroke="#9db1c8" stroke-width="2" stroke-dasharray="7 5" fill="none" marker-end="url(#arrow)"/>
+<text x="458.0" y="467.0" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="middle" fill="#c3d2e0">is subject to</text>
+<text x="458.0" y="488.0" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="middle" fill="#c3d2e0">(per operation)</text>
+</a>
+<a href="companion.html#relationship-runs"><title>The session uses that runtime; this connection is not established for a specific event here.</title><path data-relation="runs" d="M860,506.0 L1024,506.0" stroke="#9db1c8" stroke-width="2" stroke-dasharray="7 5" fill="none" marker-end="url(#arrow)"/>
+<text x="942.0" y="488.0" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="middle" fill="#c3d2e0">supports</text>
+</a>
+<a href="companion.html#relationship-records-evidence"><title>Evidence refers to the relevant occurrence. The cited audit obligation applies WHEN an unattended run completes, not to every session unconditionally.</title><path data-relation="records-evidence" d="M1184.0,715 L1184.0,577" stroke="#9db1c8" stroke-width="2" stroke-dasharray="7 5" fill="none" marker-end="url(#arrow)"/>
+<text x="1198.0" y="646.0" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#c3d2e0">supports claims</text>
+<text x="1198.0" y="667.0" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#c3d2e0">about</text>
+</a>
+<a href="companion.html#concept-host"><g data-entity="host"><title>An Execution Host is a System that provides infrastructure resources in which an execution mechanism can operate.</title><rect x="56" y="155" width="320" height="142" rx="14" fill="#152638" stroke="#57718d"/>
+<text x="76" y="189" font-family="Arial,sans-serif" font-size="22" font-weight="bold" text-anchor="start" fill="#f3f6fa">Execution host</text>
+<text x="76" y="219" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#c3d2e0">Infrastructure resources. No deployment</text>
+<text x="76" y="241" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#c3d2e0">connection is established here.</text>
+</g></a>
+<a href="companion.html#concept-runtime"><g data-entity="runtime"><title>An Agent Runtime is a Software System that supplies an execution mechanism for agent-assisted work through configured tool interfaces.</title><rect x="540" y="435" width="320" height="142" rx="14" fill="#152638" stroke="#57718d"/>
+<text x="560" y="469" font-family="Arial,sans-serif" font-size="22" font-weight="bold" text-anchor="start" fill="#f3f6fa">Agent runtime</text>
+<text x="560" y="499" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#c3d2e0">Software system supplying execution</text>
+<text x="560" y="521" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#c3d2e0">through configured tool interfaces.</text>
+</g></a>
+<a href="companion.html#concept-permission"><g data-entity="permission"><title>An Execution Permission Control is an Entity that implements a mechanism for evaluating or enforcing whether a specified runtime operation is permitted under an applicable access rule.</title><rect x="56" y="435" width="320" height="142" rx="14" fill="#152638" stroke="#57718d"/>
+<text x="76" y="469" font-family="Arial,sans-serif" font-size="22" font-weight="bold" text-anchor="start" fill="#f3f6fa">Permission control</text>
+<text x="76" y="499" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#c3d2e0">Evaluates or enforces access for a</text>
+<text x="76" y="521" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#c3d2e0">specified runtime operation.</text>
+</g></a>
+<a href="companion.html#concept-receipt"><g data-entity="receipt"><title>An Execution Evidence Record is an Artifact that records claims or observations about an identified execution occurrence together with provenance and the scope of the supported claim.</title><rect x="1024" y="715" width="320" height="142" rx="14" fill="#152638" stroke="#57718d"/>
+<text x="1044" y="749" font-family="Arial,sans-serif" font-size="22" font-weight="bold" text-anchor="start" fill="#f3f6fa">Execution evidence</text>
+<text x="1044" y="779" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#c3d2e0">A record supports specified claims when</text>
+<text x="1044" y="801" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#c3d2e0">subject and occurrence match.</text>
+</g></a>
+<a href="companion.html#concept-session"><g data-entity="session"><title>A Collaboration Session is a Channel Interaction that forms a bounded principal-agent or pairing work episode.</title><rect x="1024" y="435" width="320" height="142" rx="14" fill="#152638" stroke="#57718d"/>
+<text x="1044" y="469" font-family="Arial,sans-serif" font-size="22" font-weight="bold" text-anchor="start" fill="#f3f6fa">Collaboration session</text>
+<text x="1044" y="499" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#c3d2e0">Bounded work episode, distinct from</text>
+<text x="1044" y="521" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#c3d2e0">identity and process lifetime.</text>
+</g></a>
+<text x="56" y="926" font-family="Arial,sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#c3d2e0">Dashed arrows: conditional architectural relationships; adopted meaning does not prove an occurrence.</text>
+<text x="56" y="956" font-family="Arial,sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#98dfcb">Definitions, arrow conditions, evidence and tested limits: companion.html</text>
+<text x="56" y="986" font-family="Arial,sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#c3d2e0">Host is intentionally unconnected: this model supplies no deployment mapping.</text>
+</svg>

@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 730" role="img" aria-labelledby="title description">
+<title id="title">AGET architecture overview — draft</title><desc id="description">Identity, working copy, runtime and episode are separate. Arrows are conditional meanings, not deployment evidence.</desc>
+<defs><marker id="arrow" markerWidth="9" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L9,4 L0,8" fill="#9db1c8"/></marker></defs>
+<rect width="1440" height="730" fill="#0b1522"/>
+<text x="56" y="57" font-family="Arial,sans-serif" font-size="31" font-weight="bold" text-anchor="start" fill="#f3f6fa">AGET architecture overview</text>
+<text x="56" y="88" font-family="Arial,sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#98dfcb">DRAFT · adopted meanings · conditional relationships · no deployed conformance claim</text>
+<a href="companion.html#relationship-directs"><title>The entity is acting as the Principal for the relevant work; additional approval conditions come from its governing plan and mandate.</title><path data-relation="directs" d="M376,226.0 L540,226.0" stroke="#9db1c8" stroke-width="2" stroke-dasharray="7 5" fill="none" marker-end="url(#arrow)"/>
+<text x="458.0" y="208.0" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="middle" fill="#c3d2e0">directs</text>
+</a>
+<a href="companion.html#relationship-realizes"><title>The checkout maps to the declared identity; its actual configuration must establish that mapping in a worked case.</title><path data-relation="realizes" d="M700.0,435 L700.0,297" stroke="#9db1c8" stroke-width="2" stroke-dasharray="7 5" fill="none" marker-end="url(#arrow)"/>
+<text x="714.0" y="366.0" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#c3d2e0">materializes</text>
+</a>
+<a href="companion.html#relationship-holds"><title>Applicable artifacts are stored within this repository/copy; an external store is not silently assumed to be inside it.</title><path data-relation="holds" d="M540,506.0 L376,506.0" stroke="#9db1c8" stroke-width="2" stroke-dasharray="7 5" fill="none" marker-end="url(#arrow)"/>
+<text x="458.0" y="488.0" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="middle" fill="#c3d2e0">stores</text>
+</a>
+<a href="companion.html#relationship-uses"><title>The selected runtime is connected to this copy by a documented integration route.</title><path data-relation="uses" d="M1024,506.0 L860,506.0" stroke="#9db1c8" stroke-width="2" stroke-dasharray="7 5" fill="none" marker-end="url(#arrow)"/>
+<text x="942.0" y="488.0" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="middle" fill="#c3d2e0">uses</text>
+</a>
+<a href="companion.html#relationship-runs"><title>The session uses that runtime; this connection is not established for a specific event here.</title><path data-relation="runs" d="M1184.0,435 L1184.0,297" stroke="#9db1c8" stroke-width="2" stroke-dasharray="7 5" fill="none" marker-end="url(#arrow)"/>
+<text x="1198.0" y="366.0" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#c3d2e0">supports</text>
+</a>
+<a href="companion.html#relationship-participates"><title>That identity is involved in the relevant collaboration episode.</title><path data-relation="participates" d="M860,226.0 L1024,226.0" stroke="#9db1c8" stroke-width="2" stroke-dasharray="7 5" fill="none" marker-end="url(#arrow)"/>
+<text x="942.0" y="208.0" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="middle" fill="#c3d2e0">participates in</text>
+</a>
+<a href="companion.html#concept-principal"><g data-entity="principal"><title>A Principal is a Cognitive Entity that AI agents serve and that retains ultimate authority over their system.</title><rect x="56" y="155" width="320" height="142" rx="14" fill="#152638" stroke="#57718d"/>
+<text x="76" y="189" font-family="Arial,sans-serif" font-size="22" font-weight="bold" text-anchor="start" fill="#f3f6fa">Principal</text>
+<text x="76" y="219" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#c3d2e0">Directs work within the relevant</text>
+<text x="76" y="241" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#c3d2e0">authority relationship.</text>
+</g></a>
+<a href="companion.html#concept-aget"><g data-entity="aget"><title>An Aget Instance is an Agent created from a reusable template and configured as a persistent identity distinct from its working copies and the AI system it uses.</title><rect x="540" y="155" width="320" height="142" rx="14" fill="#152638" stroke="#57718d"/>
+<text x="560" y="189" font-family="Arial,sans-serif" font-size="22" font-weight="bold" text-anchor="start" fill="#f3f6fa">Aget identity</text>
+<text x="560" y="219" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#c3d2e0">Persistent identity, distinct from its</text>
+<text x="560" y="241" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#c3d2e0">working copies and runtime.</text>
+</g></a>
+<a href="companion.html#concept-copy"><g data-entity="copy"><title>An Aget Clone is an Artifact that materializes one Aget Instance as an on-disk working copy with its own working tree, records and hooks.</title><rect x="540" y="435" width="320" height="142" rx="14" fill="#152638" stroke="#57718d"/>
+<text x="560" y="469" font-family="Arial,sans-serif" font-size="22" font-weight="bold" text-anchor="start" fill="#f3f6fa">Working copy</text>
+<text x="560" y="499" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#c3d2e0">On-disk materialization of one Aget</text>
+<text x="560" y="521" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#c3d2e0">identity, with its own records and</text>
+<text x="560" y="543" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#c3d2e0">hooks.</text>
+</g></a>
+<a href="companion.html#concept-records"><g data-entity="records"><title>A Governed Record Set is an Artifact that groups selected repository records carrying identity, memory, instructions or governance responsibilities.</title><rect x="56" y="435" width="320" height="142" rx="14" fill="#152638" stroke="#57718d"/>
+<text x="76" y="469" font-family="Arial,sans-serif" font-size="22" font-weight="bold" text-anchor="start" fill="#f3f6fa">Governed records</text>
+<text x="76" y="499" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#c3d2e0">Selected identity, memory, instruction</text>
+<text x="76" y="521" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#c3d2e0">and governance records.</text>
+</g></a>
+<a href="companion.html#concept-runtime"><g data-entity="runtime"><title>An Agent Runtime is a Software System that supplies an execution mechanism for agent-assisted work through configured tool interfaces.</title><rect x="1024" y="435" width="320" height="142" rx="14" fill="#152638" stroke="#57718d"/>
+<text x="1044" y="469" font-family="Arial,sans-serif" font-size="22" font-weight="bold" text-anchor="start" fill="#f3f6fa">Agent runtime</text>
+<text x="1044" y="499" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#c3d2e0">Software system supplying execution</text>
+<text x="1044" y="521" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#c3d2e0">through configured tool interfaces.</text>
+</g></a>
+<a href="companion.html#concept-session"><g data-entity="session"><title>A Collaboration Session is a Channel Interaction that forms a bounded principal-agent or pairing work episode.</title><rect x="1024" y="155" width="320" height="142" rx="14" fill="#152638" stroke="#57718d"/>
+<text x="1044" y="189" font-family="Arial,sans-serif" font-size="22" font-weight="bold" text-anchor="start" fill="#f3f6fa">Collaboration session</text>
+<text x="1044" y="219" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#c3d2e0">Bounded work episode, distinct from</text>
+<text x="1044" y="241" font-family="Arial,sans-serif" font-size="16" font-weight="normal" text-anchor="start" fill="#c3d2e0">identity and process lifetime.</text>
+</g></a>
+<text x="56" y="646" font-family="Arial,sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#c3d2e0">Dashed arrows: conditional architectural relationships; adopted meaning does not prove an occurrence.</text>
+<text x="56" y="676" font-family="Arial,sans-serif" font-size="17" font-weight="normal" text-anchor="start" fill="#98dfcb">Definitions, arrow conditions, evidence and tested limits: companion.html</text>
+</svg>
