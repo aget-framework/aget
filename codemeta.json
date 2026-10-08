@@ -52,6 +52,7 @@
   "readme": "https://github.com/aget-framework/aget/blob/main/README.md",
   "softwareRequirements": [
     "Python 3.10+",
+    "Migration kit test-body witness: Python 3.12+ (sys.monitoring); below 3.12 a run needing the witness is INCONCLUSIVE by design (weekly-train:R15)",
     "PyYAML"
   ],
   "applicationCategory": "Developer Tools",

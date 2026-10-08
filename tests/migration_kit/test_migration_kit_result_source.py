@@ -1,5 +1,7 @@
 """C2a7, B185 finding 1 (REVW9's structural ruling): the failing ids every consumer compares come from a kit-owned
 result source (the kit's pytest report plugin), never from pytest's display text. Native pytest throughout."""
+from _kit_report import requires_monitoring
+
 import ast
 import importlib.util
 import json
@@ -76,6 +78,7 @@ def wide(tail):
             f"globals()[{('test_synthetic' + 'x' * 110 + ' - ' + tail)!r}] = scenario\n")
 
 
+@requires_monitoring
 def test_b185_1_baseline_and_f_read_the_full_native_id_when_pytest_omits_the_message(tmp_path, monkeypatch):
     """B185 finding 1 (REVW9 `reviewer_c2a5_probes.py::test_baseline_and_f_refuse_a_full_native_id_when_pytest_omits_
     the_message[True]`): pytest at width 80 prints the whole id ending ` - alpha` and omits the message, so the text
@@ -123,6 +126,7 @@ SIDE = ("import pytest\n"
         "        fh.write(repr([i.nodeid for i in items]))\n")
 
 
+@requires_monitoring
 def test_c2a7_the_report_ids_are_pytests_own_node_ids_byte_for_byte(tmp_path):
     """REVW9's ruling: faithful id encoding SHOWN. A conftest writes each collected item's `nodeid` (repr) before any
     test runs; the report's failing ids equal that population exactly, for ids holding ` - `, `]`, a tab, a non-ASCII
@@ -170,6 +174,7 @@ def test_c2a7_an_incomplete_or_unreadable_record_gives_no_ids(tmp_path, case):
     assert ids == [] and why, (case, text[-400:])
 
 
+@requires_monitoring
 def test_c2a7_a_complete_clean_run_is_complete_with_no_ids(tmp_path):
     root = member(tmp_path, {"test_a.py": "def test_a():\n    pass\n"})
     report, token, env = under_report(tmp_path)
@@ -189,6 +194,7 @@ NESTED = ("import os, subprocess, sys\n"
           "    assert p.returncode == 1 and 'aget-kit-report' not in p.stdout\n")
 
 
+@requires_monitoring
 def test_c2a7_member_code_sees_its_own_environment_and_a_nested_pytest_writes_nothing(tmp_path):
     """The plugin puts the member's PYTEST_ADDOPTS and PYTHONPATH back and removes the kit's variables before any
     member code runs, so a pytest a test starts neither loads the plugin nor adds an invocation or a failure."""
@@ -216,7 +222,7 @@ def _wit(report):
 RUNNER = BATCH / "run_suite_parallel.py"
 
 
-@pytest.mark.parametrize("crash", [False, True])
+@pytest.mark.parametrize("crash", [pytest.param(False, marks=requires_monitoring), True])
 def test_c2a7_the_parallel_runner_names_one_finished_invocation_per_file(tmp_path, crash):
     """run_suite_parallel's record lists one invocation per test file it started; the full wide id is read from the
     report; a file whose pytest dies before its summary (os._exit) leaves the whole run not complete."""
@@ -239,6 +245,7 @@ def test_c2a7_ids_unknown_is_read_when_no_failure_is_counted():
     assert RB.summary_section(text)[3] and RB.failing_ids(text)[1]
 
 
+@requires_monitoring
 def test_c2a7_b8a_pass_needs_a_complete_result(tmp_path):
     """FWK-OVSR5's C2a5 advisory (2): B8a's PASS read only the exit status and the (empty) failure list. A suite that
     exits 0 with no kit result (here the member's command blocks the plugin) is INCONCLUSIVE, not PASS."""
@@ -250,6 +257,7 @@ def test_c2a7_b8a_pass_needs_a_complete_result(tmp_path):
     assert rec["verdict"] == "INCONCLUSIVE" and rec["failures_complete"] is False, rec
 
 
+@requires_monitoring
 def test_c2a7_a_confirmation_candidate_that_did_not_run_is_not_called_passed(tmp_path):
     """The confirmation run calls a candidate passed at HEAD only when the report shows its test phase passed."""
     root = member(tmp_path, {"test_x.py": "def test_real():\n    assert False\ndef test_ok():\n    pass\n"})
@@ -297,7 +305,8 @@ KINDS = {
 }
 
 
-@pytest.mark.parametrize("kind", sorted(KINDS))
+@pytest.mark.parametrize("kind", [pytest.param(v, marks=requires_monitoring) if v in ['collection-continued', 'setup-teardown', 'strict-xpass'] else v
+                                  for v in sorted(KINDS)])
 def test_c2a7_native_failure_kinds_tally_with_the_count_line(tmp_path, kind):
     """The count cross-check on native pytest: setup and teardown errors (two events for one failing test, one id),
     strict XPASS (failed), plain xfail and skip (not failures), a collection error with
@@ -347,6 +356,7 @@ GRAMMAR = {
 }
 
 
+@requires_monitoring
 @pytest.mark.parametrize("case", sorted(GRAMMAR))
 def test_b188_1_a_malformed_report_gives_no_ids(tmp_path, case):
     """B188 finding 1 (REVW9 `reviewer_c2a7_probes.py` grammar rows): invalid UTF-8 (decoded with replacement it
@@ -366,6 +376,7 @@ def test_b188_1_a_malformed_report_gives_no_ids(tmp_path, case):
     assert ids == [] and why, (case, why)
 
 
+@requires_monitoring
 @pytest.mark.parametrize("children", [[["a" * 32]], ["A" * 32], [7], "abc"])
 def test_b188_1_a_malformed_runner_record_gives_no_ids_and_raises_nothing(tmp_path, children):
     """B188 finding 1: a runner record whose children are not a list of invocation ids gives a reason (on C2a7 a nested
@@ -381,6 +392,7 @@ def test_b188_1_a_malformed_runner_record_gives_no_ids_and_raises_nothing(tmp_pa
     assert ids == [] and why
 
 
+@requires_monitoring
 def test_b188_1_f_refuses_a_malformed_report_instead_of_exempting_an_invented_id(tmp_path):
     """B188 finding 1, consumer half (REVW9 `::test_f_refuses_a_malformed_report_instead_of_exempting_an_invented_id`):
     a malformed byte in the baseline's and the session's ids, replaced by the same character, made two different
@@ -424,6 +436,7 @@ def test_b188_2_a_fifo_report_is_refused_without_waiting(tmp_path, who):
         assert p.returncode == 0 and RB.REPORT_MARK not in p.stdout   # silent: the run is not known, nothing blocked
 
 
+@requires_monitoring
 def test_c2a8_f_needs_the_last_suite_calls_own_result(tmp_path):
     """FWK-OVSR5's C2a7 advisory (1) (Codex, two real pytest runs): when the session's LAST suite call has no tool
     result in the transcript, F and the baseline parser took the earlier run's output and report as the result."""
@@ -439,6 +452,7 @@ def test_c2a8_f_needs_the_last_suite_calls_own_result(tmp_path):
     assert LB.parse_baseline("\n".join(rows), PYTEST, report, token)["complete"] is False  # changed at C2a10 (labelled, B192 finding 2): a refusal is a record that is not complete
 
 
+@requires_monitoring
 def test_c2a8_a_run_that_stops_early_is_not_complete(tmp_path):
     """FWK-OVSR5's C2a7 advisory (2): `-x` (or `--maxfail`, from the command or a member's addopts) stops the run, so
     a new failure among the tests not run would be unseen; collected must equal reported."""
@@ -472,7 +486,7 @@ def _calls(*events):
     return "\n".join(rows) + "\n"
 
 
-@pytest.mark.parametrize("order", ["chronological", "last-result-first", "duplicate-result"])
+@pytest.mark.parametrize("order", [pytest.param("chronological", marks=requires_monitoring), pytest.param("last-result-first", marks=requires_monitoring), "duplicate-result"])
 def test_b190_1_f_reads_the_last_calls_own_result_whatever_order_results_arrive(tmp_path, order):
     """B190 finding 1 (REVW9 `reviewer_c2a8_probes.py::test_f_refuses_an_older_calls_result_in_place_of_the_last_
     calls_own_result[True]`): F took the suite result that arrived last; when the newer call's own result came first
@@ -497,7 +511,7 @@ def test_b190_1_f_reads_the_last_calls_own_result_whatever_order_results_arrive(
         assert parsed["failures"] == ["tests/test_s.py::test_new"] and parsed["complete"]
 
 
-@pytest.mark.parametrize("mode", ["k", "m", "ini-deselect", "lf", "declared-deselect"])
+@pytest.mark.parametrize("mode", [pytest.param("k", marks=requires_monitoring), pytest.param("m", marks=requires_monitoring), pytest.param("ini-deselect", marks=requires_monitoring), "lf", pytest.param("declared-deselect", marks=requires_monitoring)])
 def test_b190_2_undeclared_deselection_is_not_a_complete_suite(tmp_path, mode):
     """B190 finding 2 (REVW9 `::test_f_refuses_undeclared_member_deselection_as_full_suite_completeness[…]`): a member's
     pytest.ini adding `-k`, `-m` or `--deselect`, or a `--lf` run, reduced the collection and read complete. Now only
@@ -528,6 +542,7 @@ def test_b190_3_ids_are_exactly_32_hex_digits():
     assert not RB._MARK_LINE.fullmatch(f"aget-kit-report: pytest {'a' * 32}\n")
 
 
+@requires_monitoring
 def test_c2a9_both_readers_take_the_same_declared_call(tmp_path):
     """FWK-OVSR5's C2a8 advisory (1) (Codex and agy): after a completed run, a later `… -q` call with no result was
     skipped by the baseline parser (exact command match) while F took it as the declared suite; producer and F
@@ -577,7 +592,7 @@ def _rows(*events):
     return "\n".join(rows) + "\n"
 
 
-@pytest.mark.parametrize("case", ["reused-id", "early-result", "wrapped-later", "commented-later"])
+@pytest.mark.parametrize("case", ["reused-id", "early-result", "wrapped-later", pytest.param("commented-later", marks=requires_monitoring)])
 def test_c2a10_the_last_suite_call_is_read_by_its_own_id_and_form(tmp_path, case):
     """FWK-OVSR5's C2a9 advisory 2, 3 and 5 (Codex and agy, both products). On C2a9: (a) an id first used by a
     non-matching call was not counted, so that call's result became the suite call's; (b) a result that arrived
@@ -641,6 +656,7 @@ def test_b192_1_an_exit_changed_by_a_member_sessionfinish_wrapper_is_not_a_clean
     assert LB.parse_baseline(stream(text, PYTEST), PYTEST, report, token)["complete"] is False
 
 
+@requires_monitoring
 def test_b192_1_a_status_changed_after_unconfigure_is_caught_by_the_process_exit(tmp_path):
     """B192 finding 1, closing route "compare with the invoker's exit wherever it is available": a member that
     changes the status even later (its own unconfigure wrapper, outside the plugin's) is not seen by the report, but
@@ -691,6 +707,7 @@ _NARROW = {
 }
 
 
+@requires_monitoring
 @pytest.mark.parametrize("case", sorted(_NARROW))
 def test_b192_3_an_undeclared_collection_omission_is_not_a_complete_suite(tmp_path, case):
     """B192 finding 3 (REVW9 `reviewer_c2a9_probes.py::test_f_refuses_undeclared_collection_path_omissions[…]`): a new
@@ -727,6 +744,7 @@ def test_b192_3_an_undeclared_collection_omission_is_not_a_complete_suite(tmp_pa
                                  approved={RB.selection_digest(parsed["selection"])})["complete"]
 
 
+@requires_monitoring
 @pytest.mark.parametrize("declared,complete", [("tests/test_s.py::test_t", False), ("tests/test_s.py", True)])
 def test_b192_3_a_declared_exclusion_is_an_identity_not_a_prefix(tmp_path, declared, complete):
     """B192 finding 3 (REVW9 `::test_b8a_refuses_prefix_deselection_of_an_unlisted_new_node`): pytest's `--deselect
@@ -744,6 +762,7 @@ def test_b192_3_a_declared_exclusion_is_an_identity_not_a_prefix(tmp_path, decla
         assert ids == [] and why and "did not declare" in why and "test_t2" in why, why
 
 
+@requires_monitoring
 def test_b192_3_positive_control_an_unnarrowed_run_is_complete(tmp_path):
     """C2a10 positive control: the same member with no narrowing input reads complete with its failing test."""
     root = _tree_member(tmp_path, {"a/test_a.py": "def test_a():\n    pass\n", "test_new.py": _NEW})
@@ -762,6 +781,7 @@ _HIDDEN = {
 }
 
 
+@requires_monitoring
 @pytest.mark.parametrize("case", sorted(_HIDDEN))
 def test_c2a10_preread_1_a_population_left_out_before_collection_is_not_complete(tmp_path, case):
     """FWK-OVSR6's C2a10 pre-read 1 (HIGH, reproduced): a conftest `pytest_ignore_collect`, changed `python_files`, or
@@ -780,6 +800,7 @@ def test_c2a10_preread_1_a_population_left_out_before_collection_is_not_complete
     assert ids == [] and why and "narrowed" in why, why
 
 
+@requires_monitoring
 def test_c2a10_preread_9_an_options_value_in_addopts_is_not_a_path(tmp_path):
     """FWK-OVSR6's C2a10 pre-read 9: `--junit-prefix tests` in addopts read as a path written into addopts."""
     root = _tree_member(tmp_path, {"a/test_a.py": "def test_a():\n    pass\n"})
@@ -875,6 +896,7 @@ def test_b194_6_a_collection_hook_that_creates_no_item_is_refused(tmp_path):
         assert ids == [] and why and "uncreated" in why, why
 
 
+@requires_monitoring
 def test_b194_6_a_plugin_blocked_through_pytest_addopts_is_a_narrowing(tmp_path):
     """B194 finding 6 (REVW9's blocked-producer row): `PYTEST_ADDOPTS=-p no:X` read complete, its value skipped."""
     _, report, token, text = _run_member(tmp_path, {"test_s.py": "def test_a():\n    pass\n"},
@@ -884,6 +906,7 @@ def test_b194_6_a_plugin_blocked_through_pytest_addopts_is_a_narrowing(tmp_path)
     assert "doctest" in RB.invocation_selection(report, token, text)["blocked"]
 
 
+@requires_monitoring
 def test_b194_6_a_standing_policy_equal_to_its_baseline_counts_and_a_changed_one_refuses(tmp_path):
     """REVW9's B194 answer 3 (accepted as a design route, conditional on a complete witness): a standing
     `collect_ignore_glob = ["templates/*"]` made every run incomplete on C2a10 (an availability defect). The baseline
@@ -940,6 +963,7 @@ def test_c2a12_preread_5_a_call_without_a_session_id_is_not_part_of_one_session(
     assert RB.last_call_output(clean, lambda c: RB.is_suite_run(c, PYTEST), bash_only=True) == ("x", None)
 
 
+@requires_monitoring
 def test_c2a12_preread_3_the_witness_is_compared_with_the_baseline_even_when_nothing_reads_narrowed(tmp_path):
     """FWK-OVSR6's C2a11 pre-read 3 (MEDIUM, reproduced): the selection witness was compared with the baseline's only
     when the run read as narrowed, so a judged run with plugin autoload switched off by the environment was accepted
@@ -1035,6 +1059,7 @@ def test_b195_1_a_make_collect_report_wrapper_that_drops_tests_is_refused_by_the
         assert ids == [] and why and "implements pytest_make_collect_report" in why, why
 
 
+@requires_monitoring
 def test_b195_1_census_control_parameters_classes_and_non_tests_do_not_trip_it(tmp_path):
     """Control: parametrized tests, test-class methods, a class with `__init__` (pytest does not collect it), a
     `__test__ = False` class and a fixture named like a test are all accounted for; the run is complete."""
@@ -1048,6 +1073,7 @@ def test_b195_1_census_control_parameters_classes_and_non_tests_do_not_trip_it(t
     assert (ids, why) == ([], None), (why, text[-400:])
 
 
+@requires_monitoring
 def test_b195_1_a_local_producer_no_longer_activated_changes_the_witness(tmp_path):
     """B195 finding 1 (REVW9's second falsifier): a local plugin activated through PYTEST_ADDOPTS at baseline and not
     at the judged run left the witness equal (`list_plugin_distinfo` names distributions only). Every active
@@ -1098,6 +1124,7 @@ def test_b196_1_a_conftest_that_hides_tests_without_any_hook_is_refused_by_the_i
     assert ids == [] and why and "never became a collected item" in why, (why, text[-300:])
 
 
+@requires_monitoring
 def test_b196_1_control_the_same_shapes_without_the_hiding_conftest_are_complete(tmp_path):
     """Control: parameters, unittest, nested classes, an imported test and a module-level dynamic skip elsewhere are
     all pytest's own in both collections; the run is complete."""
@@ -1199,6 +1226,7 @@ def test_c2a13_preread_h3_parameters_added_outside_the_census_are_unsupported_sc
         assert ids == [] and why and "parameters added outside the census" in why, why
 
 
+@requires_monitoring
 def test_c2a13_preread_m1_m2_import_mode_and_a_literal_bracket_are_pytests_own(tmp_path):
     """M1: the census dropped `--import-mode`, so two folders each holding `test_same.py` under importlib were refused.
     M2: a test named with a literal `[` was read as parameters. Both are complete now."""
@@ -1234,15 +1262,15 @@ _COND = "import os\ndef test_a():\n    pass\nif not os.environ.get('SYNTHETIC_SK
 @pytest.mark.parametrize("name, files, needle", [
     ("b197_1_env", {"test_s.py": _COND, "conftest.py": "import os\nos.environ['SYNTHETIC_SKIP_NEW'] = '1'\n"},
      "never became a collected item"),
-    ("skip_marker", {"test_s.py": "def test_a():\n    pass\n" + _NEW,
+    pytest.param("skip_marker", {"test_s.py": "def test_a():\n    pass\n" + _NEW,
                      "conftest.py": "import pytest\ndef pytest_collection_modifyitems(items):\n"
                                     "    for i in items:\n        if 'new' in i.name:\n"
                                     "            i.add_marker(pytest.mark.skip(reason='x'))\n"},
-     "not produced by the census"),   # changed at C2a14r (labelled): one skip rule
-    ("fixture_skip", {"test_s.py": "def test_a():\n    pass\n" + _NEW,
+     "not produced by the census", marks=requires_monitoring),   # changed at C2a14r (labelled): one skip rule
+    pytest.param("fixture_skip", {"test_s.py": "def test_a():\n    pass\n" + _NEW,
                       "conftest.py": "import pytest\n@pytest.fixture(autouse=True)\ndef _s(request):\n"
                                      "    if 'new' in request.node.name:\n        pytest.skip('x')\n"},
-     "not produced by the census"),   # changed at C2a14r (labelled): one skip rule
+     "not produced by the census", marks=requires_monitoring),   # changed at C2a14r (labelled): one skip rule
     ("swap", {"test_s.py": "def test_a():\n    pass\n" + _NEW,
               "conftest.py": "import pytest\ndef pytest_collection_modifyitems(items):\n    for n, i in enumerate(items):\n"
                              "        if 'new' in i.name:\n"
@@ -1330,6 +1358,7 @@ def test_b197_3_the_census_output_is_never_written_through_shared_storage(tmp_pa
 _HELPER = "import pytest\ndef skip_it():\n    pytest.skip('x')\ndef imp():\n    pytest.importorskip('not_installed_anywhere')\n"
 
 
+@requires_monitoring
 @pytest.mark.parametrize("name, files, needle", [
     ("replace_fn", {"test_s.py": "def test_a():\n    pass\n" + _NEW,
                     "conftest.py": "def pytest_collection_modifyitems(items):\n    for i in items:\n"
@@ -1365,6 +1394,7 @@ def test_c2a14r_skips_and_replacements_the_census_does_not_reproduce_are_not_pro
         (why, text[-300:])
 
 
+@requires_monitoring
 def test_c2a14r_declared_skips_and_xfails_are_proven(tmp_path):
     """Control: a skip, a true skipif and an xfail declared in the test module are produced by the census too."""
     body = ("import pytest\ndef test_a():\n    pass\n@pytest.mark.skip(reason='s')\ndef test_s():\n    pass\n"
@@ -1374,6 +1404,7 @@ def test_c2a14r_declared_skips_and_xfails_are_proven(tmp_path):
     assert RB.report_failures(report, token, text)[:2] == ([], None), text[-300:]
 
 
+@requires_monitoring
 def test_c2a14r_preread_7_a_collect_ignore_that_matched_nothing_is_no_narrowing(tmp_path):
     """FWK-OVSR7's C2a14 pre-read 7 (MEDIUM): `collect_ignore_glob = ["elsewhere/*"]` matching nothing narrowed the
     run. Only paths pytest's ignore hook actually skipped narrow it. Control: a pattern that matches does."""
@@ -1397,6 +1428,7 @@ def test_c2a14r_preread_6_wrapped_unresolved_programs_are_mentions(later):
         assert not RB.mentions_suite(other, "python3 -m pytest"), other
 
 
+@requires_monitoring
 def test_c2c_a_pycache_folder_under_the_tests_is_not_a_narrowing(tmp_path):
     """Found by BILD14 re-running the suite on C2a12 (intermittent in the parallel-runner test): pytest's own ignore
     hook skips `__pycache__`, and a run that met one read as "narrowed" (an availability defect). Control: an
@@ -1412,6 +1444,7 @@ def test_c2c_a_pycache_folder_under_the_tests_is_not_a_narrowing(tmp_path):
     assert RB.report_failures(report, token, text)[1], text[-300:]
 
 
+@requires_monitoring
 def test_c2c_a_baseline_with_no_selection_witness_gives_no_policy(tmp_path):
     """Owed since B195/B196, FWK-OVSR6's C2a12 pre-read MEDIUM: F judged against a baseline holding no witness (`{}`)
     accepted a run with plugin autoload switched off. No witness, no policy: refused. Control: the same run against its
@@ -1470,6 +1503,7 @@ def test_c2c_preread_m2_a_reused_run_id_that_started_again_and_never_finished_is
     assert doc is None and "did not finish" in why, why
 
 
+@requires_monitoring
 def test_c2c_preread_m1_a_partial_selection_witness_proves_no_selection(tmp_path):
     """FWK-OVSR7's C2c pre-read M1 (MEDIUM, reproduced): a test-module fixture replaced the plugin's witness with
     `{'unexpected': []}`; recorded as the baseline, the same partial witness approved a narrowed run. A witness (the
@@ -1491,6 +1525,7 @@ def test_c2c_preread_m1_a_partial_selection_witness_proves_no_selection(tmp_path
     assert len(own) == 10 and RB.report_failures(report, token, text, policy=own)[:2] == ([], None)
 
 
+@requires_monitoring
 def test_c2c_preread_h3_a_parallel_run_is_judged_against_its_baselines_per_file_witness(tmp_path):
     """FWK-OVSR7's C2c pre-read H3 (HIGH, reproduced): the parallel runner's children were judged with no policy, so a
     baseline holding no witness, a malformed one or a foreign one read ([], None), where plain pytest refuses. A
@@ -1531,6 +1566,7 @@ def test_c2c_preread_m3_baseline_equal_ruled_reads_the_current_baseline_by_defau
 _B198_TESTS = "def test_control():\n    pass\ndef bad():\n    assert False\ndef good():\n    pass\ndef test_new():\n    bad()\n"
 
 
+@requires_monitoring
 @pytest.mark.parametrize("case", ["co_names", "rebound_helper", "collect_patch"])
 def test_c2a15_b198_1_changed_execution_or_collection_machinery_is_not_proven(tmp_path, case):
     """B198 finding 1 (HIGH, continuing): (i) a conftest changed only `test_new`'s code-name table
@@ -1571,6 +1607,7 @@ def test_c2a15_b198_2_later_interpreter_code_is_a_mention(later):
         assert not RB.mentions_suite(other, "python3 -m pytest"), other
 
 
+@requires_monitoring
 def test_c2a15_b198_3_the_census_output_is_a_pipe_with_no_storage_to_share(tmp_path):
     """B198 finding 3 (HIGH, continuing): census-side test-module code hardlinked the inode of its inherited output
     descriptor before the census wrote, so the kit's later refusal came after a write through shared storage. The
@@ -1605,6 +1642,7 @@ def test_d2_preread_1_a_shell_keyword_before_later_interpreter_code_is_a_mention
     assert RB.mentions_suite(later, "python3 -m pytest"), later
 
 
+@requires_monitoring
 def test_d2_preread_3_a_callable_default_swapped_for_a_no_op_changes_the_identity(tmp_path):
     """FWK-OVSR8's C2a15+C2e pre-read 3 (reproduced): an unmarshallable default (a function) collapsed to its type
     name, so a conftest swapping a test's callable default for a no-op kept the identity. Control: plain run."""
@@ -1632,6 +1670,7 @@ def test_d2_preread_2_an_empty_option_value_is_a_value_for_the_first_act():
 
 # --- REVW9's B199 read (D2) --------------------------------------------------------------------------------------
 
+@requires_monitoring
 @pytest.mark.parametrize("case", ["item_runtest", "pyfunc_hook", "restored_collection"])
 def test_d2_b199_1_execution_machinery_the_kit_cannot_account_for_is_not_proven(tmp_path, case):
     """B199 finding 1 (HIGH, continuing; answer (a): execution-phase omissions are inside the class): an item whose
@@ -1680,6 +1719,7 @@ def test_d2_b199_2_a_later_call_whose_output_shows_a_pytest_run_is_not_ignored()
     assert why is None and "1 passed" in got
 
 
+@requires_monitoring
 def test_d2_preread_7_a_self_restoring_collection_patch_in_the_test_module_is_not_proven(tmp_path):
     """FWK-OVSR8's C2a15+C2e pre-read 7 (reproduced on the saved D2 first build): a test module patched
     `PyCollector.collect` to hide its own `test_hidden` and restored the patch inside that one collect call, so no
@@ -1697,6 +1737,7 @@ def test_d2_preread_7_a_self_restoring_collection_patch_in_the_test_module_is_no
     assert ids == [] and why and "defined in its module" in why, (why, text[-300:])
 
 
+@requires_monitoring
 def test_d2_overseer_preread_1_a_testcase_overriding_how_its_test_runs_is_not_proven(tmp_path):
     """FWK-OVSR9's D2 pre-read 1 (reproduced on the first D2 save): a unittest.TestCase overriding `run()` to return
     None read "1 passed", complete, with its failing test never run. A TestCase class that overrides how its test
@@ -1722,6 +1763,7 @@ def test_d2_overseer_preread_2_a_valueless_repeated_option_never_takes_the_next_
 _B200_HELPER = "def bad():\n    assert False\ndef good():\n    pass\ndef check(action=bad):\n    action()\n"
 
 
+@requires_monitoring
 @pytest.mark.parametrize("case", ["unregistered_execution_hook", "helper_callable_default", "nested_callable_default"])
 def test_d3_b200_1_execution_history_and_delegated_callables_are_proven_or_refused(tmp_path, case):
     """B200 finding 1 (HIGH, continuing; REVW10's three falsifiers): (a) a conftest's `pytest_pyfunc_call` that
@@ -1752,6 +1794,7 @@ def test_d3_b200_1_execution_history_and_delegated_callables_are_proven_or_refus
     assert ids == [] and ((why is None) if case.endswith("callable_default") else why), (case, text[-300:])
 
 
+@requires_monitoring
 def test_d3_b200_1_an_unchanged_helper_and_default_still_read_complete(tmp_path):
     """The other side of B200 finding 1's repair: hashing defaults and closures must not refuse an unchanged test.
     A test with a callable default whose helper has a default, a partial and a builtin reads complete."""
@@ -1764,6 +1807,7 @@ def test_d3_b200_1_an_unchanged_helper_and_default_still_read_complete(tmp_path)
 
 # --- weekly-train:R17 (F3): a narrowed population counts only with a recorded approval of its selection ----------
 
+@requires_monitoring
 def test_f3_r17_a_narrowed_population_needs_an_approval_of_its_exact_selection(tmp_path):
     """weekly-train:R17 (principal, 2026-10-05 ~00:2x): "The kit accepts a narrowed population only with a recorded
     approval of that narrowing; without one the suite reads INCONCLUSIVE naming the missing approval." On D3 F counted
@@ -1782,6 +1826,7 @@ def test_f3_r17_a_narrowed_population_needs_an_approval_of_its_exact_selection(t
     assert RB.report_failures(report, token, text, policy=plain)[1] is None          # nothing narrowed: no approval
 
 
+@requires_monitoring
 def test_f4_r17_an_unapproved_narrowed_baseline_is_not_complete_but_keeps_its_witness(tmp_path):
     """B201 finding 2 (REVW11's `revw11_r17_cost_probes.py::test_kit_refuses_to_call_an_unapproved_narrowed_baseline_complete`):
     the baseline producer read a narrowed suite with policy "record", which F3 exempted, so an unapproved narrowed
@@ -1810,6 +1855,7 @@ def test_f4_r17_the_baseline_reads_the_member_s_recorded_approvals():
     assert "parse_baseline(p.stdout, suite_cmd, report, token, approved=ARC.policy_approvals(r[\"aget\"]))" in src
 
 
+@requires_monitoring
 @pytest.mark.parametrize("variant", ["exact", "append_report", "insert_report"])
 def test_b216_reporting_only_placement_keeps_a_native_full_suite_complete(tmp_path, variant):
     """B216 falsifier: native two-test baseline/current reports reach F with complete bound identities."""
@@ -1881,3 +1927,18 @@ def test_b216_each_permitted_report_flag_can_be_interleaved_without_reordering_d
     quoted_pair = "python3 -m pytest -q '-p no:cacheprovider'"
     assert not RB.is_suite_run(quoted_pair, declared)
     assert not RB.is_suite_run(declared, quoted_pair)
+
+
+def test_without_sys_monitoring_a_native_pass_is_inconclusive(tmp_path):
+    """Below 3.12 the native path refuses; newer Pythons exercise the same missing-facility path in a child."""
+    root = member(tmp_path, {
+        "test_x.py": "def test_x():\n    assert True\n",
+        "conftest.py": "import sys\nif hasattr(sys, 'monitoring'):\n    del sys.monitoring\n",
+    })
+    report, token, env = under_report(tmp_path)
+    p, text = native(root, PYTEST, env)
+    ids, why, _ = RB.report_failures(report, token, text)
+    assert p.returncode == 0 and "1 passed" in text, text
+    assert ids == [] and why and "this Python has no sys.monitoring" in why, (ids, why)
+    parsed = LB.parse_baseline(stream(text, PYTEST), PYTEST, report, token)
+    assert parsed["complete"] is False and "this Python has no sys.monitoring" in parsed["failures_unknown"], parsed

@@ -1,4 +1,6 @@
 """Tests for batch 1's launch packet (prepare_launch.py) and launcher (launch_batch.py). No launch happens here."""
+from _kit_report import requires_monitoring
+
 import hashlib
 import importlib.util
 import json
@@ -810,6 +812,7 @@ def _git_repo(loc, files):
     return g
 
 
+@requires_monitoring
 def test_v36_blind_spots_are_copy_only_failures_against_a_clean_clone_reference(tmp_path):
     """Plan G3.6 row 13 (b), supervisor:L816: batch 8's copy had 153 failures where the real Aget had 0, and nothing
     compared them. A test failing on the copy but not in a clean clone of the Aget's commit is a blind spot."""
@@ -1718,6 +1721,7 @@ def test_c2e_d8_s351_the_blind_spot_gate_reads_the_mode_from_the_list(tmp_path, 
     assert CA.blind_spot_problems(lst, v36) == []
 
 
+@requires_monitoring
 def test_c2e_d8_s193_s325_one_success_of_an_unrelated_workflow_does_not_widen_blind_spots(tmp_path, monkeypatch):
     """D-8, S-193/S-325 (DESIGN's new R2-T3 case): any non-empty all-success run list on the commit counted as CI
     green, so one success of an unrelated workflow widened the blind spots to every copy failure. CI now corroborates

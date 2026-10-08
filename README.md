@@ -17,6 +17,8 @@ AGET fixes this. It gives your agents persistent knowledge, shared memory, fleet
 
 See the [release notes](release-notes/v3.36.0.md) and [migration handoff](handoffs/RELEASE_HANDOFF_v3.36.0.md). Availability and receiver acceptance require separate verification.
 
+The migration kit's test-body witness requires Python 3.12+ (`sys.monitoring`); on Python 3.10/3.11 a run needing that witness returns INCONCLUSIVE by design (weekly-train:R15).
+
 ## Quick Start
 
 Start with the [Supervisor template](https://github.com/aget-framework/template-supervisor-aget). It coordinates your fleet and can create new agents.

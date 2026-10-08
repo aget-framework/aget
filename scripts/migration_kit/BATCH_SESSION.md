@@ -2,6 +2,8 @@
 
 Start the session that runs a migration batch with the kit's session-only rules:
 
+The migration kit's test-body witness requires Python 3.12+ (`sys.monitoring`); on Python 3.10/3.11 a run needing that witness returns INCONCLUSIVE by design (weekly-train:R15).
+
 ```
 claude --settings scripts/migration_kit/batch_rules.json
 ```

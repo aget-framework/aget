@@ -1,8 +1,16 @@
 """Test helper (C2a7, B185 finding 1): a kit report written as the kit's pytest plugin writes it, for tests that
 hand-write a run's output text. Native runs of the plugin itself are in test_migration_kit_result_source.py."""
 import json
+import sys
 import uuid
 from pathlib import Path
+
+import pytest
+
+requires_monitoring = pytest.mark.skipif(
+    sys.version_info < (3, 12),
+    reason='requires sys.monitoring (Python 3.12+); below 3.12 the kit returns inconclusive by design (weekly-train:R15)',
+)
 
 MARK = "aget-kit-report: pytest "
 # C2c (labelled): the selection witness these hand-written runs carry, and their baselines record (a baseline

@@ -1,4 +1,6 @@
 """Tests for the route (ii) after-run detective check (batch1/after_run_check.py). Hermetic fixtures only."""
+from _kit_report import requires_monitoring
+
 import hashlib
 import importlib.util
 import json
@@ -477,6 +479,7 @@ def test_F_is_inconclusive_never_pass_when_the_run_cannot_be_read(tmp_path, outp
     assert new == [] and why
 
 
+@requires_monitoring
 def test_F_confirms_candidates_at_the_committed_revision_in_a_clean_clone(tmp_path):
     """The framework Aget's review (2026-09-29): sessions test before they commit, so a clean-tree test fails in the
     session's run and passes at the commit. F re-runs candidates at the named revision in a clone: a real regression
@@ -515,6 +518,7 @@ def _confirm_repo(tmp_path, tests):
     return root, g
 
 
+@requires_monitoring
 def test_a_confirmation_run_that_pushes_cannot_reach_the_receiver(tmp_path):
     """Review finding F-5 (2026-10-01): the confirmation clone's origin is the receiver's live folder, so a test that
     commits and pushes an explicit refspec created a ref there. The clone's push URL is disabled before any test
@@ -535,6 +539,7 @@ def test_a_confirmation_run_that_pushes_cannot_reach_the_receiver(tmp_path):
                           capture_output=True, text=True).stdout.strip() == C.NO_PUSH_URL
 
 
+@requires_monitoring
 def test_a_copied_sibling_repository_has_its_push_route_closed_and_the_live_sibling_is_unchanged(tmp_path):
     root, g = _confirm_repo(tmp_path, "def test_a():\n    assert True\n")
     sib = tmp_path / "home" / "sib"

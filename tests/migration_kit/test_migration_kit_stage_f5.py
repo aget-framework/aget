@@ -1,6 +1,8 @@
 """Stage F5 (weekly-train:R29, the principal's narrow stage after REVW11's B203 read of F4): the failing-first rows for
 B203 findings 1 and 2, from REVW11's `revw11_f4_witness_refusal_probes.py`, each with its control asserted first. The
 control tree is stage F4."""
+from _kit_report import requires_monitoring
+
 import struct
 
 from test_migration_kit_stage_f3 import BATCH, CENSUS, complete, kit, load, refused, seen
@@ -30,6 +32,7 @@ def test_x(ok=False):
 """
 
 
+@requires_monitoring
 def test_f5_b203_1_an_earlier_raise_is_not_hidden_by_a_later_return(tmp_path):
     """B203 finding 1 (REVW11's `test_kit_refuses_an_earlier_raised_body_hidden_by_a_second_return`): F4 kept only the
     last end of the test's own code, so a wrapper that caught its failure and called it again (returning) read
@@ -39,6 +42,7 @@ def test_f5_b203_1_an_earlier_raise_is_not_hidden_by_a_later_return(tmp_path):
     assert refused(r, RAISED), r
 
 
+@requires_monitoring
 def test_f5_b203_1_a_single_clean_run_still_reads_complete(tmp_path):
     """The other side: a wrapper that calls the test's own code once and it returns reads complete."""
     r = kit(tmp_path / "case", {"test_x.py": SECOND_CALL.format(mode="none").replace("assert ok,", "assert not ok,")})
@@ -60,6 +64,7 @@ test_x.__code__ = test_x.__code__.replace(
 """
 
 
+@requires_monitoring
 def test_f5_b203_2_own_code_constants_differing_only_in_nan_sign_are_different_code(tmp_path):
     """B203 finding 2 (REVW11's `test_kit_refuses_distinct_signed_nan_own_code_constants`): `float.hex()` wrote +nan
     and -nan alike, so the census's and the run's different own-code constants shared an identity. Floats are now

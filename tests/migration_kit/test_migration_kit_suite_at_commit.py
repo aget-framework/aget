@@ -1,4 +1,6 @@
 """Tests for batch1/suite_at_commit.py (SOP B8a v1.31.0; plan G3.6 row 13 (a)). Hermetic git fixtures only."""
+from _kit_report import requires_monitoring
+
 import importlib.util
 import json
 import subprocess
@@ -34,6 +36,7 @@ def repo(tmp_path, tests, workflow=None, known=None):
     return loc, g
 
 
+@requires_monitoring
 def test_pass_and_fail_are_read_from_the_exact_commit_in_a_clean_clone(tmp_path):
     loc, g = repo(tmp_path, "def test_a():\n    assert True\n")
     good = g("rev-parse", "HEAD")
@@ -65,6 +68,7 @@ def test_a_suite_that_pushes_cannot_reach_the_real_repository(tmp_path):
                           capture_output=True, text=True).stdout.strip() == S.NO_PUSH_URL
 
 
+@requires_monitoring
 def test_processes_a_suite_leaves_running_are_killed_with_its_group(tmp_path):
     """2026-09-29 17:51: orphaned `pytest -q` processes survived the suite that started them. The run now owns a
     process group and kills it afterwards, so a background child is gone when the record is written."""
@@ -94,6 +98,7 @@ def test_a_timeout_kills_the_whole_group(tmp_path):
     assert r["verdict"] == "INCONCLUSIVE" and "process group killed" in r["why"]
 
 
+@requires_monitoring
 def test_ci_exclusions_are_applied_and_disclosed(tmp_path):
     """The framework Aget's CI deselects a named file of known failures; the stand-in must do the same, or it fails
     where CI passes."""
@@ -106,6 +111,7 @@ def test_ci_exclusions_are_applied_and_disclosed(tmp_path):
         "exclusion_sources"]
 
 
+@requires_monitoring
 def test_the_agets_own_pre_push_hook_runs_too_and_its_failure_fails(tmp_path):
     loc, g = repo(tmp_path, "def test_a():\n    assert True\n")
     hook = loc / ".git" / "hooks" / "pre-push"
@@ -129,6 +135,7 @@ def test_f3_a_pre_push_hook_past_the_timeout_reads_inconclusive_not_a_traceback(
     assert r["hook"]["present"] and r["hook"]["run"] is True and r["hook"]["exit"] is None
 
 
+@requires_monitoring
 def test_declared_siblings_are_copied_beside_the_clone(tmp_path):
     loc, g = repo(tmp_path, "from pathlib import Path\n\ndef test_sib():\n"
                             "    assert (Path(__file__).parents[2] / 'sib' / 'x.txt').exists()\n")
@@ -139,6 +146,7 @@ def test_declared_siblings_are_copied_beside_the_clone(tmp_path):
     assert S.run(loc, "seat", sha, PYTEST, ["../sib"], work=tmp_path / "w")["verdict"] == "PASS"
 
 
+@requires_monitoring
 def test_review_fixes_env_sibling_ref_and_exclusions_come_from_the_commit(tmp_path, monkeypatch):
     """The framework Aget's review of e046a182: (1) a sibling is checked out at its remote default branch, not the
     live checkout's branch or dirt; (2) CLAUDE_PROJECT_DIR is the clone, AGET_TWG_* dropped; (3) the deselect file is
@@ -183,6 +191,7 @@ def repo_with_log(tmp_path, tests=LOGS):
     return loc, g
 
 
+@requires_monitoring
 def test_a_suite_that_changes_a_tracked_file_without_committing_is_never_pass(tmp_path):
     """Review finding F-6: only HEAD was compared after the suite, so an uncommitted write left PASS and no trace."""
     loc, g = repo_with_log(tmp_path)
@@ -197,6 +206,7 @@ def test_a_suite_that_changes_a_tracked_file_without_committing_is_never_pass(tm
     assert r["verdict"] == "PASS" and r["tree_check"] == "recorded only" and r["tree_after_suite"]["count"] == 1
 
 
+@requires_monitoring
 def test_a_suite_that_creates_an_untracked_file_is_never_pass_unless_git_ignores_it(tmp_path):
     made = ("from pathlib import Path\n\ndef test_makes_a_file():\n"
             "    (Path(__file__).resolve().parents[1] / 'made_by_suite.txt').write_text('x\\n')\n")
@@ -234,6 +244,7 @@ def test_a_hook_that_commits_is_never_pass_whatever_is_allowed(tmp_path):
     assert g("rev-parse", "HEAD") == sha
 
 
+@requires_monitoring
 def test_allow_path_lets_a_known_write_pass_and_the_record_shows_it(tmp_path, monkeypatch):
     loc, g = repo_with_log(tmp_path)
     sha = g("rev-parse", "HEAD")
@@ -281,6 +292,7 @@ REWRITES = ("from pathlib import Path\n\ndef test_changes_copied_input():\n"
             "    Path('support/input.txt').write_text('changed by suite\\n')\n")
 
 
+@requires_monitoring
 def test_a_suite_that_rewrites_a_path_already_listed_before_it_is_never_pass(tmp_path):
     """F-6, second review (2026-10-02): the status line `?? support/input.txt` is the same before and after the
     suite that rewrote the file, and only new lines were compared, so the run read PASS. Now the content is compared
@@ -305,6 +317,7 @@ def test_a_suite_that_rewrites_a_path_already_listed_before_it_is_never_pass(tmp
     assert r["verdict"] == "PASS" and r["tree_after_suite"]["count"] == 1 and "tree_unallowed" not in r
 
 
+@requires_monitoring
 def test_a_suite_that_deletes_or_only_changes_the_mode_of_a_listed_path_is_never_pass(tmp_path):
     """F-6, second review's further control: the suite deletes the listed copied file, so its status line is gone
     and no line is new; and a suite that only makes the file executable leaves line and bytes as they were."""
@@ -335,6 +348,7 @@ def test_a_hook_that_deletes_a_listed_path_is_never_pass(tmp_path):
     assert r["tree_unallowed"] == ["?? support/input.txt (no longer listed)"]
 
 
+@requires_monitoring
 def test_a_permission_change_git_does_not_list_is_never_pass(tmp_path):
     """F-6, second review's last two controls: the suite changes the read and write bits of its own tracked, clean
     test file (git tracks only the executable bit, so no status line appears), or the permission bits of a copied
@@ -471,6 +485,7 @@ PUSHES_FROM_SIBLING = ("import subprocess\n\ndef test_pushes_from_the_sibling():
                        "    subprocess.run(['git', '-C', '../sib', 'push', 'origin', 'HEAD:refs/heads/from-suite'])\n")
 
 
+@requires_monitoring
 def test_a_suite_cannot_push_from_a_copied_sibling_to_its_real_remote(tmp_path):
     """Both review legs, 2026-10-02: pushing was closed for the clone's remotes and left open in each copied sibling,
     so a suite running `git -C ../sib push origin ...` put a ref in the sibling's real remote and the run read PASS.
@@ -498,6 +513,7 @@ def test_a_copied_sibling_whose_git_acts_on_the_live_sibling_is_refused_before_a
     assert (sib / "uncommitted.txt").read_text() == "live work\n" and "summary" not in r     # no suite ran
 
 
+@requires_monitoring
 def test_the_clone_folder_may_not_be_or_hold_the_member(tmp_path):
     """A work root that holds the member is refused. Since E2g (R1-T1, R1 clause 5) so is one inside the member's
     repository: until E2f a work folder inside the member was accepted ("inside is accepted"), and the clone was made
@@ -513,6 +529,7 @@ def test_the_clone_folder_may_not_be_or_hold_the_member(tmp_path):
     assert S.run(loc, "seat", sha, PYTEST, work=tmp_path / "apart", hook=False)["verdict"] == "PASS"   # control
 
 
+@requires_monitoring
 def test_main_writes_the_record_the_push_gate_reads(tmp_path):
     loc, g = repo(tmp_path, "def test_a():\n    assert True\n")
     pk = tmp_path / "packet.json"
@@ -642,6 +659,7 @@ def test_e2i_r1_t9_a_hook_that_changes_the_ignore_state_is_inconclusive_naming_t
         assert ".gitignore sub/.gitignore" in rec["why"]
 
 
+@requires_monitoring
 def test_e2i_r1_t9_positive_control_a_write_into_a_cache_folder_still_passes(tmp_path):
     """R1-T9's positive control: a suite that writes only into a `__pycache__` folder (git's ignore state unchanged)
     reads PASS, judged and as the reference run."""

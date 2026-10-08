@@ -4,6 +4,8 @@ R1 at the act for the writes the rehearsals make in their copies.
 Each test fails on 34353311 for the defect it names and passes after the change. Suites are stubbed (a command that
 prints a pytest summary), the reference run is monkeypatched, and nothing outside tmp_path is touched.
 """
+from _kit_report import requires_monitoring
+
 import hashlib
 import importlib.util
 import json
@@ -901,6 +903,7 @@ def test_e2i_a_rehearsal_suite_that_changes_the_ignore_state_does_not_count(tmp_
     assert "IGNORE STATE: the suite changed git's ignore state" in (ev / "S0_baseline.txt").read_text()
 
 
+@requires_monitoring
 def test_e2i_a_rehearsal_suite_that_leaves_the_ignore_state_alone_still_counts(tmp_path):
     """The positive control for the test above: the same suite without the ignore change reads as ran."""
     RR = load("rehearse_repair")

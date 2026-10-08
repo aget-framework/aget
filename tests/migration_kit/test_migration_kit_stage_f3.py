@@ -3,6 +3,8 @@ each rewritten here with its own controls, which are asserted first so a row fai
 member measurement on the F3 WIP (0 of 4 members complete: Python 3.14 keeps constant slices in `co_consts`, which
 marshal formats below 5 cannot write, so every test that slices with constants read "identity could not be read").
 The control tree is stage D3 (the defects are in D3's new identity and execution-hook code)."""
+from _kit_report import requires_monitoring
+
 import importlib.util
 import os
 import subprocess
@@ -66,6 +68,7 @@ def refused(r, *why):
 SLICES = ("def test_x():\n    s = 'abcdef'\n    assert s[1:3] == 'bc' and s[::-1][:2] == 'fe' and s[2:] == 'cdef'\n")
 
 
+@requires_monitoring
 def test_f3_member_a_test_that_slices_with_constants_has_a_readable_identity(tmp_path):
     """FWK-OVSR9's member measurement on the F3 WIP (`overseer_prereads/D3/FLEET_KIT_COST_4members_F3WIP_125bdd3.json`):
     0 of 4 members complete, 15-16 tests each refused as "identity could not be read". On Python 3.14 `s[1:3]`
@@ -79,6 +82,7 @@ def test_f3_member_a_test_that_slices_with_constants_has_a_readable_identity(tmp
     assert seen(r), r
 
 
+@requires_monitoring
 def test_f3_member_identity_is_the_same_from_a_cold_and_a_warm_pycache(tmp_path):
     """The identity is read from the code's values, so a process that compiled the test (cold `__pycache__`) and one
     that loaded it from `__pycache__` (warm) read the same identity: the kit, with bytecode written, reads complete on
@@ -117,6 +121,7 @@ def test_f3_member_an_unknown_code_constant_refuses_with_its_reason():
 
 # --- D3 pre-read items 1-5 and 7: the test's identity ------------------------------------------------------------------
 
+@requires_monitoring
 def test_f3_i1_a_cyclic_default_swapped_by_an_earlier_test_is_setup_under_r27(tmp_path):
     """Reinterpreted at F4 under weekly-train:R27 (R15 (a)): the swap is the test's setup and the
     declared test's own code ran, so it reads complete; the history below is what F3 refused. Item 1 (`d3_item01.sh`): a self-referencing list default made the identity recurse; census and run both read
@@ -132,6 +137,7 @@ def test_f3_i1_a_cyclic_default_swapped_by_an_earlier_test_is_setup_under_r27(tm
     assert complete(r), (R27, r)
 
 
+@requires_monitoring
 def test_f3_i2_a_wrapped_test_s_closure_swap_is_refused(tmp_path):
     """Item 2 (`d3_item02.sh`): a `functools.wraps` test whose wrapper's closure cell (the declared body) a run-only
     conftest fixture swaps for a no-op."""
@@ -147,6 +153,7 @@ def test_f3_i2_a_wrapped_test_s_closure_swap_is_refused(tmp_path):
     assert refused(r, CENSUS, NOT_RUN), r          # F4: the wrapped declared body never ran (the witness)
 
 
+@requires_monitoring
 def test_f3_i3_a_partial_test_swapped_for_another_partial_is_refused(tmp_path):
     """Item 3 (`d3_item03.sh`): a test collected from a module-level `functools.partial` had identity [item class]
     only, so swapping the item's partial for `partial(no-op)` at run time was not seen."""
@@ -160,6 +167,7 @@ def test_f3_i3_a_partial_test_swapped_for_another_partial_is_refused(tmp_path):
     assert refused(r, CENSUS, NOT_RUN), r          # F4: the partial's declared function never ran (the witness)
 
 
+@requires_monitoring
 def test_f3_i4_a_helper_s_own_global_rebound_is_setup_under_r27(tmp_path):
     """Reinterpreted at F4 under weekly-train:R27 (R15 (a)): the swap is the test's setup and the
     declared test's own code ran, so it reads complete; the history below is what F3 refused. Item 4 (`d3_item04.sh`): the test calls `helper()`, which calls `body()`; a conftest fixture rebinds the
@@ -178,6 +186,7 @@ KLASS5 = "class Body:\n    def __init__(self):\n{body}\n\n\ndef test_x(fn=Body):
 FAIL5 = "        assert False, 'declared failure'"
 
 
+@requires_monitoring
 @pytest.mark.parametrize("test, swap", [
     (INST5, "request.module.Body.__call__ = lambda self: None"),     # a global callable instance's method
     (KLASS5, "request.module.Body.__init__ = lambda self: None"),    # a class default's constructor
@@ -197,6 +206,7 @@ def test_f3_i5_a_rebound_method_of_the_member_s_class_is_setup_under_r27(tmp_pat
     assert complete(r), (R27, r)
 
 
+@requires_monitoring
 @pytest.mark.parametrize("src", [
     "class A:\n    def __call__(self):\n        return True\n\n\ndef test_x(fn=A()):\n    assert fn()\n",
     "import functools\n\n\n@functools.lru_cache()\ndef helper():\n    return True\n\n\ndef test_x(fn=helper):\n"
@@ -212,6 +222,7 @@ def test_f3_i7_a_correct_run_with_a_callable_default_reads_complete(tmp_path, sr
     assert complete(r), r
 
 
+@requires_monitoring
 def test_f3_i8_data_appended_to_a_helper_s_default_by_an_earlier_test_is_not_a_refusal(tmp_path):
     """Item 8 (`d3_item08.sh`): an earlier passing test appends to a list that a helper's default holds; every body
     runs and only ordinary data changes (B199's calibration), but D3's identity walked the list's elements, so the
@@ -223,6 +234,7 @@ def test_f3_i8_data_appended_to_a_helper_s_default_by_an_earlier_test_is_not_a_r
     assert complete(r), r
 
 
+@requires_monitoring
 def test_f3_i8_a_callable_put_into_a_helper_s_default_list_is_setup_under_r27(tmp_path):
     """Reinterpreted at F4 under weekly-train:R27 (R15 (a)): the swap is the test's setup and the
     declared test's own code ran, so it reads complete; the history below is what F3 refused. The other side of item 8's repair: a container contributes the callables it holds, so a test whose helper's
@@ -244,6 +256,7 @@ REREG6 = "    pm.unregister(P)\n    P.pytest_pyfunc_call = {fn}\n    pm.register
 BAD = {"test_x.py": "def test_x():\n    assert False, 'declared failure'\n"}
 
 
+@requires_monitoring
 def test_f3_i6_pytest_s_own_run_hook_replaced_and_restored_is_refused(tmp_path):
     """Item 6 (`d3_item06.sh`): a session fixture re-registers pytest's own `_pytest.python` with its
     `pytest_pyfunc_call` replaced (after collection), and restores it before the session ends, so neither the
@@ -257,6 +270,7 @@ def test_f3_i6_pytest_s_own_run_hook_replaced_and_restored_is_refused(tmp_path):
     assert refused(r, "pytest's own collection or run code was changed"), r
 
 
+@requires_monitoring
 def test_f3_i6_an_execution_hook_registered_under_a_pytest_like_module_name_is_refused(tmp_path):
     """A variant of item 6 found while building it: a member registers a module object it names `_pytest.…`, whose
     `pytest_pyfunc_call` is the member's own function. D3 judged an execution hook by its plugin's module name only.
@@ -300,6 +314,7 @@ PATCHED_LIBRARY = (
     "def test_x(home):\n    assert Path.home() == home{fail}\n")
 
 
+@requires_monitoring
 def test_f3_member_a_fixture_patching_a_library_class_the_test_names_is_not_a_refusal(tmp_path):
     """FWK-OVSR11's member baseline on the F3 WIP (`overseer_prereads/F3WIP_member_baseline_ovsr11/`, `8233b6a41`):
     it-consultant's `tests/test_wind_down_script_cov.py` read 9 "the function that ran is not the one the census
@@ -323,6 +338,7 @@ BOUND = {
 }
 
 
+@requires_monitoring
 @pytest.mark.parametrize("name", sorted(BOUND))
 def test_f3_member_a_member_class_whose_methods_are_bound_outside_its_body_is_setup_under_r27(tmp_path, name):
     """Reinterpreted at F4 under weekly-train:R27 (R15 (a)): the swap is the test's setup and the

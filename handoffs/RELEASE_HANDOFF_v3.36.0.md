@@ -124,6 +124,8 @@ None. This release does not change `governance/DEPRECATIONS.md`: no deprecation 
 
 Python 3.10 or later, as for v3.35.0 (a local preview of an earlier internal candidate passed on Python 3.10 to 3.14; the kit on an earlier internal candidate passed on Python 3.14. These are measurements before release, not CI results for the final release commit), immutable tag-bound sources, a matching archetype template, a recorded receiver baseline and a rollback reference are required. Missing evidence is `HOLD`, never an inferred pass.
 
+The migration kit's test-body witness requires Python 3.12+ (`sys.monitoring`); on Python 3.10/3.11 a run needing that witness returns INCONCLUSIVE by design (weekly-train:R15).
+
 For the migration kit, additionally:
 - **PyYAML 6.0 or later**, the kit's one declared dependency (`scripts/migration_kit/requirements.txt`). Without it the ledger and seven other tools (`census_fleet_ci.py`, `wave_readiness.py`, `prepare_batch.py`, `prepare_launch.py`, `prepare_write_list.py`, `rehearse_repair.py`, `rehearse_batch2.py`) stop at import, even for `--help`.
 - **Claude Code**, for the supervisor's session and for every receiver's session. The typed-line check, the launcher and the receiver watcher read Claude Code's session transcripts and launch settings. A session run with another command-line tool is outside what this release has shown to work: record it as a deviation in step B13, and do not read a refusal there as a defect of that tool.

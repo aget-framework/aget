@@ -14,6 +14,8 @@
 
 Standard operating procedure for migrating fleet agents to new AGET framework versions. Ensures consistent deployment of version updates, session scripts, and validation across all active agents.
 
+The migration kit's test-body witness requires Python 3.12+ (`sys.monitoring`); on Python 3.10/3.11 a run needing that witness returns INCONCLUSIVE by design (weekly-train:R15).
+
 ---
 
 ## Execution Model (Centralized by Default)
