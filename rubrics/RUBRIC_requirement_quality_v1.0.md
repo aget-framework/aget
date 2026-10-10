@@ -2,7 +2,7 @@
 
 **Version**: 1.0
 **Created**: 2026-04-19
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Domain**: Quality of individual REQ-* artifacts in `aget/requirements/` against REQUIREMENTS_FORMAT.md v1.0
 **Archetype**: Compliance (gate-before-pass — does this REQ meet the format contract?)
 **Assessor**: Hybrid (agent scores schema/traceability mechanically; human verifies `fit_criterion:` truthfulness)
@@ -351,7 +351,7 @@ If any CR fails on a non-draft REQ, the REQ scores L0 regardless of other dimens
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
-| 1.0 | 2026-04-19 | private-aget-framework-AGET | Initial rubric — closes L749 duality gap; grounded in C298 (Software System Requirement) ontology concept added FWRK-2026-004 |
+| 1.0 | 2026-04-19 | aget-framework | Initial rubric — closes L749 duality gap; grounded in C298 (Software System Requirement) ontology concept added FWRK-2026-004 |
 
 ## Related Artifacts
 

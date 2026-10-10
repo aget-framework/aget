@@ -174,7 +174,7 @@ Examples:
 | SOP | SOP_specification_enhancement.md v1.0.0 (Advisory layer) |
 | L-docs | L622 (lifecycle), L623 (meta-governance gap), L560 (bootstrapping), L557 (traceability), L555 (certainty bias), L611 (stale assertions) |
 | Proposal | SP-002 (planning/skill-proposals/PROPOSAL_aget-enhance-spec.md) |
-| Parent Plan | PROJECT_PLAN_aget_enhance_spec_skill_v1.0.md |
+| Parent Plan | prior internal authoring plan |
 | Verb Registration | DESIGN_DIRECTION_skill_verb_vocabulary.md (verb #25, 4th domain innovation) |
 | ADR-008 Chain | L622/L623 (L-docs) → SOP_specification_enhancement (Advisory) → SKILL-041 (Strict) → /aget-enhance-spec (Generator) |
 | Requirements | R-ENHANCE-SPEC-001 through R-ENHANCE-SPEC-033 |

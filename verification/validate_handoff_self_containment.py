@@ -3,7 +3,7 @@
 Validate RELEASE_HANDOFF self-containment.
 
 Implements: AGET_RELEASE_HANDOFF_SELF_CONTAINMENT_SPEC v0.1 (REVIEWED 2026-05-03)
-Traces to: H-RHSC-001 G2 (PROJECT_PLAN_release_handoff_self_containment_spec_v1.0.md)
+Traces to: H-RHSC-001 G2 (prior internal authoring plan)
 
 Validates RELEASE_HANDOFF_v{X.Y.Z}.md against 8 CAPs (CAP-RHSC-001..008) and
 11 sub-requirements (V-RHSC-001..011), emitting per-V-test PASS/FAIL/UNKNOWN

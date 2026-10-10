@@ -352,8 +352,8 @@ If any FAIL: do NOT proceed to Step 8; surface for principal review.
 
 ### Step 9: Generated INDEX transaction (C-CLOSE-006)
 
-After Step 5 has written the new `Plan_Status`, when `planning/INDEX_PROJECT_PLANS.md` exists, run
-both commands in order:
+After Step 5 has written the new `Plan_Status`, when `planning/INDEX_PROJECT_PLANS.md` exists,
+check whether the index generator is present. If it is, run both commands in order:
 
 ```bash
 python3 scripts/generate_project_plan_index.py
@@ -361,10 +361,14 @@ python3 scripts/generate_project_plan_index.py --check
 ```
 
 The first command re-derives **every** row from the plan sources; the second is the blocking proof that
-the committed register candidate is current. A direct row edit is PROHIBITED because it creates a
-second status predicate beside `scripts/loading_dock_surfacer.py`. If either command fails, the close is
-incomplete: do not emit Step 10's completion signal. If the INDEX is absent, emit a one-line gap note in
-the closure summary instead of creating an ad-hoc register.
+the committed register candidate is current. If the generator is absent, compare the complete INDEX
+with all plan sources, including missing or surplus rows, and record an INDEX-currentness note: generator absent,
+sources checked, and PASS or the specific mismatches/unavailable sources. Continue to Step 10 only
+when that comparison establishes currentness. A direct row edit remains PROHIBITED because it
+creates a second status predicate beside `scripts/loading_dock_surfacer.py`. If either generator
+command fails, or currentness cannot be established without the generator, the close is incomplete:
+do not emit Step 10's completion signal. If the INDEX is absent, emit a one-line gap note in the
+closure summary instead of creating an ad-hoc register.
 
 ### Step 10: Skill completion signal
 
@@ -386,9 +390,11 @@ Emit terminal block:
 - **C-CLOSE-003 (Verifiable assertion)**: Status transition requires V-test SHA mapping + timestamp + agent identity. Text-edit alone is insufficient.
 - **C-CLOSE-004 (Deferred-surface scan mandatory)**: Step 6 MUST execute. Output is consumed by `/aget-propose-actions` (L913 closure).
 - **C-CLOSE-005 (Self-verification)**: Step 7.5 PASS for every checklist item before Step 8 fires.
-- **C-CLOSE-006 (generated INDEX transaction mandatory when present)**: After the plan status mutation,
-  when `INDEX_PROJECT_PLANS.md` exists, MUST run the generator and then `--check`; direct row edits are
-  PROHIBITED and either command failing blocks the completion signal. Guarded by
+- **C-CLOSE-006 (INDEX-currentness transaction mandatory when present)**: After the plan status mutation,
+  when `INDEX_PROJECT_PLANS.md` exists, MUST run the generator and then `--check` if the generator is present;
+  otherwise, MUST compare the complete INDEX with all plan sources, including missing or surplus rows,
+  and record the INDEX-currentness note specified in Step 9; direct row edits are PROHIBITED, and a failed
+  command or unestablished currentness blocks the completion signal. Guarded by
   `tests/test_close_project_index_regeneration.py` (source mutation → STALE; transaction → CURRENT).
 - **C-CLOSE-007 (Closer mutates scaffold — gh#1838)**: Closure facts land by MUTATING the scaffolded checklist/sections in place; appending a parallel prose sign-off beside unticked scaffold boxes is PROHIBITED (dual representation, structured copy born stale).
 - **C-CLOSE-009 (Value-resolution verdict — CAP-PP-021, 2026-07-19)**: A terminal close SHALL record the benefit-hypothesis verdict + Goal-frame evaluation + cost side in the Retrospective (Step 5.7). A verdict-free terminal close is flagged by close_gate_check — **V-PP-021 WIRED 2026-08-17** (`scan_value_resolution()`; three WARN keys `value_resolution_absent` / `_costless` / `_unobservable`, surfaced in the human output and under the `value_resolution` key in `--json`). **WARN, not BLOCK**: C-CLOSE-009 says a verdict-free close is *flagged*, and making it blocking would change the verdict of every existing terminal-plan test in five modules. Fires only on a terminal `Plan_Status`. Guarded by `tests/test_close_gate_value_resolution.py` (14 tests, both polarities). Corpus at wiring time: **7 of 7** post-rule terminal closures record a verdict; **1 of 7** records benefit with no cost side (`fleet_conceptual_alignment_assessment`, whose own text notes the structural step was not yet built).
@@ -418,13 +424,13 @@ Emit terminal block:
 |------|-----------|
 | Skill ID | SKILL-052 (`.aget/specs/skills/SKILL-052_aget-close-project.yaml`) |
 | Proposal | `planning/skill-proposals/PROPOSAL_aget-close-project.md` (APPROVED 2026-05-21) |
-| Owning Initiative | INIT-PROJECT-MATURATION (Stream 4 — Lifecycle Symmetry; highest-WSJF per PP-020 D4) |
+| Owning Initiative | INIT-PROJECT-MATURATION (Stream 4 — Lifecycle Symmetry; highest-WSJF per prior authoring project D4) |
 | Sibling verb-pair | `/aget-create-project` (Strict) |
 | Spec (governing) | AGET_PROJECT_PLAN_SPEC.md (DRAFT — #1180) |
 | L-docs | L001 (gate discipline), L617 (gate ordering), L649 (closure-time structural gap — originating), L675 (consequence gap), L908 (apply-to-others-not-self), L913 (plan-close→create handoff), L131 (stopping-point bypass), L178 (Human Override), L735 (push window) |
 | CAPs | CAP-PRJ-001 (verifiable assertion), CAP-PRJ-002 (closure handoff scan), CAP-PRJ-004 (symmetric close-side gate), CAP-PRJ-007 (Loading Dock detection — consumer) |
 | V-tests (pending spec landing) | V-PRJ-001, V-PRJ-002, V-PRJ-004 |
-| Cross-fleet evidence | FLEET-UPG-013 + FLEET-UPG-014 D4 root cause (status-field text-edit) |
+| Cross-fleet evidence | Prior fleet upgrade evidence, including the status-field text-edit root cause |
 | Verb registry | `close` (Active, row 29, Common, added v3.13.0; paired with `open`) |
 | Architecture | SKILL.md-driven (mirrors `/aget-create-project`); no companion script per 2026-05-21 proposal revision |
 

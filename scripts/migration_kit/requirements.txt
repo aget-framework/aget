@@ -1,0 +1,3 @@
+# What the migration kit needs beyond Python itself. Install once, in the environment that runs the kit:
+#   python3 -m pip install -r scripts/migration_kit/requirements.txt
+PyYAML>=6.0

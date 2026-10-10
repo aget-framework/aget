@@ -7,7 +7,7 @@ This is the BASELINE CLI - the reference implementation.
 Version: 1.0.0
 CLI: Claude Code
 Minimum Version: 2.0.0
-Implements: PROJECT_PLAN_cli_independence_validation_v1.0
+Implements: prior internal authoring plan
 """
 
 import json

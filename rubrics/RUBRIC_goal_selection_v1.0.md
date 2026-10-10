@@ -2,7 +2,7 @@
 
 **Version**: 1.0.0
 **Created**: 2026-04-17
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Domain**: Session-pivot ex-ante goal selection — scoring candidate goals mid-session
 **Archetype**: Decision (Score-before-act)
 **Assessor**: Hybrid (agent scores, principal reviews)

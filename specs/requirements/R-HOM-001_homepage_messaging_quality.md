@@ -228,7 +228,7 @@ for use_case in homepage_use_cases:
 
 | Artifact | Reference |
 |----------|-----------|
-| PROJECT_PLAN_homepage_use_cases_v1.0.md | Implementation plan |
+| prior internal authoring plan | Implementation plan |
 | L407_pain_point_framing_superiority.md | Decision rationale |
 | L408_5d_use_case_characterization.md | Evaluation framework |
 | .github/profile/README.md | Implementation target |

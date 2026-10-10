@@ -1,16 +1,16 @@
 # Template AGENTS.md Structure Specification
 
 **Version**: 1.0.0
-**Status**: Active (canonical — promoted from Draft via ACC-001 Gate 0 / PP-040 Q3 / SP-028 Q2 authorization 2026-05-16T~18:30Z)
+**Status**: Active (canonical — promoted from Draft via ACC-001 Gate 0 / prior authoring project Q3 / SP-028 Q2 authorization 2026-05-16T~18:30Z)
 **Category**: Standards (Template Governance)
 **Format Version**: 1.3
 **Created**: 2026-03-02
 **Updated**: 2026-05-16T~18:30Z (canonical promotion via ACC-001 Gate 0 — direct execution per Option B; `/aget-enhance-spec` skill-fit gap captured as observation candidate at ACC-001 Gate 9)
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/TEMPLATE_AGENTS_MD_SPEC.md` (canonical in `aget-framework/aget` public repo; promoted from private `./specs/` per ACC-001 Gate 0)
-**Change Origin**: PROJECT_PLAN_cli_feature_adoption_remediation_v1.0.md (Gate 1)
+**Change Origin**: prior internal authoring plan (Gate 1)
 **Related Specs**: AGET_TEMPLATE_SPEC (CAP-TPL-006-03, CAP-TPL-008-01), AGET_5D_COMPONENTS_SPEC (CAP-PERSONA-005-05)
-**Consumed by**: PROPOSAL_aget-enhance-config.md (SP-027) §Inheritable substrate ; PROPOSAL_aget-check-config.md (SP-028) §Dependencies + Tier 1 spec authority ; PROJECT_PLAN_aget_check_config_skill_v1.0.md (ACC-001) — Tier 1 spec authority
+**Consumed by**: PROPOSAL_aget-enhance-config.md (SP-027) §Inheritable substrate ; PROPOSAL_aget-check-config.md (SP-028) §Dependencies + Tier 1 spec authority ; prior internal authoring plan (ACC-001) — Tier 1 spec authority
 
 ---
 
@@ -167,7 +167,7 @@ The spec SHALL apply uniformly to both template generations (v2-era and v3-era) 
 | Evidence | L596 (governance pattern validation), L621 (external best practices) |
 | Gate -1 | `planning/analysis/governing_spec_inventory.md` — GAP confirmed |
 | Gate 0 | `planning/analysis/template_agents_md_audit.md` — 0/12 Skill Routing |
-| Project | `planning/PROJECT_PLAN_cli_feature_adoption_remediation_v1.0.md` |
+| Project | `prior internal authoring plan` |
 | Cross-agent | CLI-AGET fleet scan report (2026-03-02) |
 
 ---

@@ -55,7 +55,7 @@ Status transitions are governed edits. **Type-differentiated terminal**: an **Ac
 | Engine | `scripts/create_goal.py` · Tests `tests/test_create_goal.py` (11) |
 | Verb pair | `/aget-propose-goals` (SKILL-055, plural producer) → `/aget-create-goal` (SKILL-057, singular committer) |
 | SKILL ID | SKILL-057 |
-| Owning Initiative | INIT-CORE-ARTIFACT-MATURATION Stream 9 (PP-051); v3.23 release C-23-01 |
+| Owning Initiative | INIT-CORE-ARTIFACT-MATURATION Stream 9 (prior authoring project); v3.23 release C-23-01 |
 | L-docs | L1067, L1085 (verb-pair semantics); MP#12 (loop binding); L656 (lifecycle/Loading-Dock); L742 (REQ→CAP) |
 
 > **Canonical-promotion gate**: this skill + spec are DRAFT. Promotion to canonical (`aget/`) + the AGENTS.md D71 routing-table row + public push are gated on (a) the 3-concept grounding gap (Goal Identifier/Goal Value/Commitment Tag — INIT-ONTOLOGY-MATURATION) and (b) the L735 weekend window. Locally drivable now.

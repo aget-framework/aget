@@ -7,7 +7,7 @@ First non-Claude validation target.
 Version: 1.0.0
 CLI: Codex CLI
 Minimum Version: 0.70.0
-Implements: PROJECT_PLAN_cli_independence_validation_v1.0
+Implements: prior internal authoring plan
 """
 
 import json

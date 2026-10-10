@@ -8,7 +8,7 @@
 **Updated**: 2026-05-02
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_SECURITY_SPEC.md`
-**Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.6
+**Change Origin**: prior internal authoring plan Gate 2.6
 **Related Specs**: AGET_LICENSE_SPEC, AGET_TEMPLATE_SPEC
 
 ---

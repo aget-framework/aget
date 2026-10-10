@@ -2,7 +2,7 @@
 
 **Status**: Local pilot guidance; not yet public payload or fleet convention
 **Owner**: INIT-CROSS-CLI-PORTABILITY Streams 1–4
-**Evidence**: `PROJECT_PLAN_codex_portability_pilot_v1.0.md` Gates 1C–1D
+**Evidence**: `prior internal authoring plan` Gates 1C–1D
 
 ## Daily operating sequence
 

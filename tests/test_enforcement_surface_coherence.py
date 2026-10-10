@@ -1,4 +1,4 @@
-"""V-tests for Gate 1 of PROJECT_PLAN_spec_enforcement_truthfulness.
+"""V-tests for Gate 1 of prior internal authoring plan.
 
 V-SET-05  no canonical surface reports two different statuses for one instrument
 V-SET-06  every instrument recorded as reached has >=1 invocation caller

@@ -13,9 +13,11 @@ AGET fixes this. It gives your agents persistent knowledge, shared memory, fleet
 
 **New to AGET?** Listen to the [audio introduction](https://youtu.be/zLSFeT9TF8E) — a narrated walkthrough of session rhythm, key skills, and fleet creation.
 
-## v3.35.1 release candidate
+## v3.36.0 release candidate
 
-See the [release notes](release-notes/v3.35.1.md) and [migration handoff](handoffs/RELEASE_HANDOFF_v3.35.1.md). Availability and receiver acceptance require separate verification.
+See the [release notes](release-notes/v3.36.0.md) and [migration handoff](handoffs/RELEASE_HANDOFF_v3.36.0.md). Availability and receiver acceptance require separate verification.
+
+The migration kit's test-body witness requires Python 3.12+ (`sys.monitoring`); on Python 3.10/3.11 a run needing that witness returns INCONCLUSIVE by design (weekly-train:R15).
 
 ## Quick Start
 

@@ -6,12 +6,12 @@
 **Category**: Process (Planning / Governance)
 **Created**: 2026-05-14
 **Updated**: 2026-05-14
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Location**: `aget/specs/AGET_INITIATIVE_SPEC.md`
 **Change Origin**: 2026-05-14 session — `/aget-propose-initiative` design request; principal GO 2026-05-14
-**v1.0.1 Patch**: Fix §4 vocabulary anti-pattern stale count (6 → 7) per Gate -1 Auditor finding in PROJECT_PLAN_aget_propose_initiative_v1.0 / `planning/triad_findings.jsonl` line 35.
-**v1.1.1 Patch**: Split V-INIT-PROP-003 into creation-mode + revalidation-mode per Gate 2 Auditor finding in PROJECT_PLAN_aget_propose_initiative_v1.0 / `planning/triad_findings.jsonl` line 36. Resolves creation-time-only semantics gap.
-**v1.1.0 Minor (additive — no behavioral / R-INIT-PROP / V-INIT-PROP changes)**: SKOS uplift per PP-028 (PROPOSAL_spec_aget_initiative_v1.1_skos_uplift.md, principal Approve 2026-05-14 PM). §4 vocabulary table extends `Initiative` / `Initiative_Proposal` / `Initiative_Manifest` / `Stream` SKOS links to Meta-Ontological cluster (C404-C408); §4 anti-patterns add `Decorative_Initiative_Reference → skos:narrower: C408 PortfolioTheater`, `Direct_Initiative_Authoring → skos:related: C544`, `Project_Template_Reuse → skos:related: C547`; `Channel` and `Contributor_Role` add `skos:candidate` annotations naming ontology gaps (InitiativeChannelRegistry per L813, ContributorValueProfile); §10 traceability adds 5 rows. **First-instance dogfood** of INIT-ONTOLOGY-SPEC-BINDING discipline (gh#1241) applied to canonical spec landed 2026-05-14 — closes recursive C544 self-application gap assessed in same session at 5/10 grounding score. Pairs with `docs/FINDING_per_agent_ontology_grounding_gap_2026-05-14.md` Evidence 4 + `docs/MEMO_ontology_grounding_initiative_overlap_2026-05-14.md` Finding M-1.
+**v1.0.1 Patch**: Fix §4 vocabulary anti-pattern stale count (6 → 7) per Gate -1 Auditor finding in prior internal authoring plan / `planning/triad_findings.jsonl` line 35.
+**v1.1.1 Patch**: Split V-INIT-PROP-003 into creation-mode + revalidation-mode per Gate 2 Auditor finding in prior internal authoring plan / `planning/triad_findings.jsonl` line 36. Resolves creation-time-only semantics gap.
+**v1.1.0 Minor (additive — no behavioral / R-INIT-PROP / V-INIT-PROP changes)**: SKOS uplift per prior authoring project (PROPOSAL_spec_aget_initiative_v1.1_skos_uplift.md, principal Approve 2026-05-14 PM). §4 vocabulary table extends `Initiative` / `Initiative_Proposal` / `Initiative_Manifest` / `Stream` SKOS links to Meta-Ontological cluster (C404-C408); §4 anti-patterns add `Decorative_Initiative_Reference → skos:narrower: C408 PortfolioTheater`, `Direct_Initiative_Authoring → skos:related: C544`, `Project_Template_Reuse → skos:related: C547`; `Channel` and `Contributor_Role` add `skos:candidate` annotations naming ontology gaps (InitiativeChannelRegistry per L813, ContributorValueProfile); §10 traceability adds 5 rows. **First-instance dogfood** of INIT-ONTOLOGY-SPEC-BINDING discipline (gh#1241) applied to canonical spec landed 2026-05-14 — closes recursive C544 self-application gap assessed in same session at 5/10 grounding score. Pairs with `docs/FINDING_per_agent_ontology_grounding_gap_2026-05-14.md` Evidence 4 + `docs/MEMO_ontology_grounding_initiative_overlap_2026-05-14.md` Finding M-1.
 **Related Specs**: AGET_PROJECT_PLAN_SPEC (sibling structural pattern), AGET_SOP_SPEC, AGET_ISSUE_GOVERNANCE_SPEC (#916 channel registry source)
 **Related SOP**: `sops/SOP_initiative.md` v1.2.0 (procedural canon — this spec promotes its rules to contract level)
 
@@ -33,9 +33,9 @@ Concrete failures observed in 2026-04 / 2026-05 sessions:
 |---|---------|--------|------|
 | 1 | INIT-REQ-SPEC-TEST-DEFINED authored 2026-04-19 via direct Write — no proposal gate, no cross-initiative overlap check | 2026-04-19 session | Same-day proposal `PROPOSAL_aget-create-initiative.md` filed to close the gap. Open since. |
 | 2 | INIT-PRINCIPLED-EXECUTION referenced in scope tables (v3.15 P1 #3, v3.16 CF-1) but no initiative file exists | `planning/initiatives/INDEX.md` Finding #4 | gh#1193 OPEN since 2026-05-02. Decorative reference, untriaged. |
-| 3 | 6 PROPOSED initiatives (PP-014, PP-017..020, PP-027) shipped through their target version windows without disposition | INDEX.md "v3.18 Grooming Inputs" section, 2026-05-14 truth-up | Carry-forward debt; 5 of 6 now past-target. |
+| 3 | 6 PROPOSED initiatives (prior authoring project, prior authoring project..020, prior authoring project) shipped through their target version windows without disposition | INDEX.md "v3.18 Grooming Inputs" section, 2026-05-14 truth-up | Carry-forward debt; 5 of 6 now past-target. |
 | 4 | Status taxonomy drift: SOP enum (ACTIVE/COMPLETE/CLOSED/PAUSED) vs. INDEX enum (ACTIVE/PROPOSED/DORMANT/RETIRED) vs. wild usage (NASCENT) — 3 vocabularies | `docs/FINDING_initiative_status_taxonomy_2026-05-14.md` | Spec-vs-wild divergence; Decide gate G4 open. |
-| 5 | Initiative proposals reuse the `/aget-propose-project` template — Channels (#916), Contributors (#910), and cross-initiative-overlap sections are absent from all 7 existing initiative proposals (PP-014, 016, 017, 018, 019, 020, 027) | `planning/project-proposals/PROPOSAL_init_*.md` survey 2026-05-14: 0/7 have `## Channels`, 0/7 have `## Contributors`, 0/7 have `## Cross-Initiative Overlap` | Initiative-specific concerns invisible at proposal review time. |
+| 5 | Initiative proposals reuse the `/aget-propose-project` template — Channels (#916), Contributors (#910), and cross-initiative-overlap sections are absent from all 7 existing initiative proposals (seven prior initiative proposals) | `planning/project-proposals/PROPOSAL_init_*.md` survey 2026-05-14: 0/7 have `## Channels`, 0/7 have `## Contributors`, 0/7 have `## Cross-Initiative Overlap` | Initiative-specific concerns invisible at proposal review time. |
 
 L867 names the underlying class: **artifact-needs-skill** — when an artifact class lacks its own propose/create skill pair, it accumulates governance bypass debt at a measurable rate (5 of 6 PROPOSED initiatives = 83% bypass-debt accrual within 6 weeks).
 
@@ -86,7 +86,7 @@ vocabulary:
       aget:naming: "PROPOSAL_init_{snake_case}.md"
       aget:location: "planning/project-proposals/"
       aget:id_format: "PP-{NNN}"
-      skos:example: "PROPOSAL_init_public_surface_enhancement.md (PP-027)"
+      skos:example: "PROPOSAL_init_public_surface_enhancement.md (prior authoring project)"
       skos:related: ["CAP-INIT-PROP-001", "C405-DemandDrivenInitiativeGraduation"]
 
     Initiative_Manifest:
@@ -138,7 +138,7 @@ vocabulary:
     Project_Template_Reuse:
       skos:definition: "Filing an initiative proposal using the /aget-propose-project template — initiative-specific sections (Channels, Contributors, Overlap) missing"
       aget:anti_pattern: true
-      skos:related: ["C547-VocabularyFirstNamingDiscipline", "PP-014, PP-016, PP-017, PP-018, PP-019, PP-020, PP-027 — all 7 currently filed in this pattern"]
+      skos:related: ["C547-VocabularyFirstNamingDiscipline", "seven prior initiative proposals — all 7 currently filed in this pattern"]
 ```
 
 ---
@@ -150,7 +150,7 @@ These are the principal-readable intent statements. Each requirement R-INIT-PROP
 | ID | Requirement (principal intent) | Evidence | Maps to |
 |----|-------------------------------|----------|---------|
 | R-INIT-PROP-001 | Before any new INIT-*.md is authored, a proposal artifact MUST exist | L867 + 2026-04-19 INIT-REQ-SPEC-TEST-DEFINED incident | CAP-INIT-PROP-001, CAP-INIT-PROP-010 |
-| R-INIT-PROP-002 | Initiative proposals MUST be distinguishable from project proposals at a glance | PP-027 mis-classified as project-class proposal; survey of PP-014..020 | CAP-INIT-PROP-001, CAP-INIT-PROP-002 |
+| R-INIT-PROP-002 | Initiative proposals MUST be distinguishable from project proposals at a glance | prior authoring project mis-classified as project-class proposal; survey of prior authoring project..020 | CAP-INIT-PROP-001, CAP-INIT-PROP-002 |
 | R-INIT-PROP-003 | The proposal MUST check for overlap with all existing initiatives (active + proposed + carry-forward) | L760 — initiatives organize; overlap is the load-bearing failure mode | CAP-INIT-PROP-003, CAP-INIT-PROP-004 |
 | R-INIT-PROP-004 | The proposal MUST declare which channels (Slack, Linear, GitHub milestone, KB-only) the initiative will use | #916 Initiative-scoped channel registry pattern + REQ-CHKI-005 precedence | CAP-INIT-PROP-005 |
 | R-INIT-PROP-005 | The proposal MUST declare which contributor role archetypes will supply value, and what value dimensions each supplies | #910 Contributor Value Profile + L572 | CAP-INIT-PROP-006 |
@@ -305,7 +305,7 @@ test "$COUNT" -eq 1
 
 **Expected**: exit 0 in at least one mode. **Verifies**: CAP-INIT-PROP-002-01.
 
-**Discovery**: `planning/triad_findings.jsonl` line 36 (Gate 2 Auditor finding 2026-05-14) — original single-mode V-test failed PP-027 on re-validation because PP-028 was filed later in the shared sequence; creation-time-only semantics not stated in v1.0.0 / v1.0.1 / v1.1.0.
+**Discovery**: `planning/triad_findings.jsonl` line 36 (Gate 2 Auditor finding 2026-05-14) — original single-mode V-test failed prior authoring project on re-validation because prior authoring project was filed later in the shared sequence; creation-time-only semantics not stated in v1.0.0 / v1.0.1 / v1.1.0.
 
 ### V-INIT-PROP-004: Proposed INIT-ID uniqueness
 ```bash
@@ -400,7 +400,7 @@ python3 -c "import sys; sys.exit(0 if tuple(map(int, '$START'.split('.'))) > tup
 | **vs. `aget/specs/AGET_PROJECT_PLAN_SPEC.md` v1.2.3** | Coherent. Spec format mirrors PROJECT_PLAN_SPEC structure (Abstract / Motivation / Scope / Vocabulary / Requirements / V-tests). Verb-pair `/aget-propose-X` + `/aget-create-X` maintained. |
 | **vs. `aget/specs/AGET_ISSUE_GOVERNANCE_SPEC.md`** | Coherent. The "INDEX update" pattern (CAP-INIT-PROP-009) mirrors the issue-governance principle of authoritative registries. |
 | **vs. existing 11 INIT-*.md files** | Coherent — no field this spec defines for proposals conflicts with manifest fields. Manifest format is OUT OF SCOPE for v0.1. (Verified: `ls planning/initiatives/INIT-*.md \| wc -l` = 11 on 2026-05-14.) |
-| **vs. existing 7 PROPOSAL_init_*.md files (PP-014, 016, 017, 018, 019, 020, 027)** | **Non-coherent by design and empirically confirmed** — `grep -c` over all 7 files shows 0/7 contain `## Channels`, 0/7 contain `## Contributors`, 0/7 contain `## Cross-Initiative Overlap`. Per L867, this spec creates the obligation; pre-existing proposals are grandfathered (status-quo) and SHALL be enriched at next-Decide if revived. Recommend filing this as a known migration debt note in the v0.2 spec revision. |
+| **vs. existing 7 PROPOSAL_init_*.md files (seven prior initiative proposals)** | **Non-coherent by design and empirically confirmed** — `grep -c` over all 7 files shows 0/7 contain `## Channels`, 0/7 contain `## Contributors`, 0/7 contain `## Cross-Initiative Overlap`. Per L867, this spec creates the obligation; pre-existing proposals are grandfathered (status-quo) and SHALL be enriched at next-Decide if revived. Recommend filing this as a known migration debt note in the v0.2 spec revision. |
 | **vs. L760 (Initiative as Scope Modifier)** | Coherent. Vocabulary explicitly cites L760; Initiative defined as "scope modifier per L760, not first-class entity". |
 | **vs. INDEX.md status taxonomy drift (G4 Decide open)** | Sidestepped. v0.1 defines only **proposal** status (PROPOSED/APPROVED/DEFERRED/REJECTED) — disjoint from the manifest status drift. v0.2 SHALL address manifest status after G4 resolution. |
 | **vs. `/aget-propose-project` (sibling)** | Coherent. Same proposal-stage pattern; ID sequence shared (CAP-INIT-PROP-002-02); template differences are additive (3 new mandatory sections: Channels, Contributors, Cross-Initiative Overlap). |
@@ -415,7 +415,7 @@ python3 -c "import sys; sys.exit(0 if tuple(map(int, '$START'.split('.'))) > tup
 | Q1 | Scope at v1.0.0 release | **v0.1 → v1.0.0 ships standalone (proposal stage only)**. Manifest-stage capabilities CAP-INIT-MFST-* deferred to v2.0.0. |
 | Q2 | Filename prefix | **`PROPOSAL_init_*`** (lowercase `init_` infix). Matches 7 existing proposals; lowercase chosen for grep-ability and visual contrast with INIT-* manifest filename. |
 | Q3 | Enforcement level | **Advisory** (ADR-008 Layer 1). Matches sibling `/aget-propose-project`. Promotion to Strict (D71) is deferred until `/aget-create-initiative` exists as the only path to INIT-*.md. |
-| Q4 | Grandfather policy | **Grandfather** the 7 existing pre-spec proposals (PP-014, 016, 017, 018, 019, 020, 027). Pre-existing proposals SHALL be enriched at next-Decide if revived; no retroactive re-authoring. Documented as known migration debt in v2.0.0 scope. |
+| Q4 | Grandfather policy | **Grandfather** the 7 existing pre-spec proposals (seven prior initiative proposals). Pre-existing proposals SHALL be enriched at next-Decide if revived; no retroactive re-authoring. Documented as known migration debt in v2.0.0 scope. |
 | Q5 | PP-### sequence | **Shared** with `/aget-propose-project` (codified in CAP-INIT-PROP-002-02). |
 | Q6 | Canonical promotion path | **Promote on GO**. Commit local (any day per L735); push to public repo on Saturday (push window). |
 
@@ -447,7 +447,7 @@ python3 -c "import sys; sys.exit(0 if tuple(map(int, '$START'.split('.'))) > tup
 | **Self-application gap (named pattern)** (added v1.1.0) | C544 MetaSpecificationGap — formal vocabulary exists but contract layer doesn't bind; recursive instance: this spec was the first canonical spec landed after INIT-ONTOLOGY-SPEC-BINDING charter (gh#1241) and v1.0.1 itself failed to bind, requiring v1.1.0 patch |
 | **Vocabulary discipline** (added v1.1.0) | C547 VocabularyFirstNamingDiscipline — naming SHALL check ontology before coining; Project_Template_Reuse anti-pattern is its failure mode |
 | **Per-agent grounding context** (added v1.1.0) | `docs/FINDING_per_agent_ontology_grounding_gap_2026-05-14.md` — names the structural gap surfaced by 2026-05-14 PM principal probe; this v1.1.0 patch is Evidence 4 of that finding |
-| **Cross-initiative cluster** (added v1.1.0) | `docs/MEMO_ontology_grounding_initiative_overlap_2026-05-14.md` — 21-pair classification (CAP-INIT-PROP-004 self-applied to 7-artifact ontology-grounding cluster); this spec sits at Producer position relative to INIT-REQ-SPEC-TEST-DEFINED + PP-017 |
+| **Cross-initiative cluster** (added v1.1.0) | `docs/MEMO_ontology_grounding_initiative_overlap_2026-05-14.md` — 21-pair classification (CAP-INIT-PROP-004 self-applied to 7-artifact ontology-grounding cluster); this spec sits at Producer position relative to INIT-REQ-SPEC-TEST-DEFINED + prior authoring project |
 
 ---
 
@@ -462,7 +462,7 @@ python3 -c "import sys; sys.exit(0 if tuple(map(int, '$START'.split('.'))) > tup
 | 1 | Author `/aget-propose-initiative` SKILL.md against CAP-INIT-PROP-001..012 | Pending GO on PROJECT_PLAN | private-aget-framework-AGET |
 | 2 | File implementation PROJECT_PLAN via `/aget-create-project` (skill scaffold, V-test runner, dogfood, retro gates) | Pending | private-aget-framework-AGET |
 | 3 | Build V-test runner for V-INIT-PROP-001..014 (mechanical conformance) | Pending | private-aget-framework-AGET |
-| 4 | Dogfood: re-validate the spec by invoking `/aget-propose-initiative` on the issue-backlog stewardship topic that opened this session | Pending | private-aget-framework-AGET |
+| 4 | Dogfood: re-validate the spec by invoking `/aget-propose-initiative` on the issue-backlog stewardship topic that opened this session | Pending | aget-framework |
 
 ### v2.0.0 Scope (Manifest-Stage)
 
@@ -475,7 +475,7 @@ python3 -c "import sys; sys.exit(0 if tuple(map(int, '$START'.split('.'))) > tup
 
 *AGET_INITIATIVE_SPEC v1.1.1*
 *Authored under principle-triad: spec+verify-first, coherence-next, evidence-driven (2026-05-14)*
-*v1.1.0 SKOS uplift via PP-028 — first-instance dogfood of INIT-ONTOLOGY-SPEC-BINDING discipline (2026-05-14 PM)*
+*v1.1.0 SKOS uplift via prior authoring project — first-instance dogfood of INIT-ONTOLOGY-SPEC-BINDING discipline (2026-05-14 PM)*
 *v1.1.1 V-003 split — creation-mode vs revalidation-mode per Gate 2 Auditor finding (2026-05-14 PM)*
 
 ---
@@ -484,7 +484,7 @@ python3 -c "import sys; sys.exit(0 if tuple(map(int, '$START'.split('.'))) > tup
 
 ### R-INIT-GOAL-001 (Human Level)
 
-An initiative names the committed Goal(s) its work serves — or states legibly that none exists yet. (Principal rulings 2026-07-19: full-ladder coverage + structural linkage; evidence PP-057/fwk:L1219 — the un-modeled reverse direction let four ladder readings diverge fleet-wide.)
+An initiative names the committed Goal(s) its work serves — or states legibly that none exists yet. (Principal rulings 2026-07-19: full-ladder coverage + structural linkage; evidence prior authoring project/fwk:L1219 — the un-modeled reverse direction let four ladder readings diverge fleet-wide.)
 
 ### CAP-INIT-GOAL-001: Serves-Goal Field
 

@@ -2,7 +2,7 @@
 
 **Pattern type**: Cross-agent operations infrastructure
 **Status**: PRODUCTION-READY (v1.0.0 validated under load 2026-05-17)
-**Source cycle**: FLEET-UPG-016R adoption-stream remediation (private fleet, 2026-05-17)
+**Source cycle**: prior fleet upgrade case adoption-stream remediation (private fleet, 2026-05-17)
 **Reusable**: YES — designed for v3.19+ adoption-stream cycles + fleet-wide structural-artifact updates
 
 ---
@@ -62,7 +62,7 @@ def check_stream_idempotency(stream, agent_root):
 
 **Why regex on identifier, not byte-equality**: byte-equality would create duplicates on re-run if format drifts (extra whitespace, table reformatting, etc.). Regex on semantic identifier (e.g., the spec name) treats "present-anywhere-in-section" as semantically present.
 
-**Validated under load**: re-running Generator on already-completed cohort during FU016R Wave 1 = 7/7 skipped, zero double-write.
+**Validated under load**: re-running Generator on already-completed cohort during prior adoption-remediation project Wave 1 = 7/7 skipped, zero double-write.
 
 ### Path allowlist guard (R-CLI-004 boundary enforcement)
 
@@ -97,7 +97,7 @@ def self_test_substance_refuse():
 
 ### Dry-run flag with side-effect propagation
 
-**Trap from FU016R G2-1**: the cycle-1 bug was `dry_run=False` hardcoded inside `ensure_adoption_section_present()`. Dry-run wrote section headers despite `--dry-run` flag.
+**Trap from prior adoption-remediation project G2-1**: the cycle-1 bug was `dry_run=False` hardcoded inside `ensure_adoption_section_present()`. Dry-run wrote section headers despite `--dry-run` flag.
 
 **Fix**: propagate `dry_run` flag explicitly through every function that mutates state. Test by running dry-run + grepping target files for changes (should be zero).
 
@@ -117,7 +117,7 @@ For Wave-2c L100-worker mechanic (substance-staged agents), the Generator's `--c
 
 ## Performance benchmarks (cycle evidence)
 
-| Metric | FU016R Wave 1 | FU016F finalize |
+| Metric | prior adoption-remediation project Wave 1 | prior finalization project finalize |
 |---|---|---|
 | Agents processed | 13 | 5 |
 | Wall-clock | ~25 seconds | ~5 minutes (incl. headless dispatch latency) |
@@ -148,11 +148,11 @@ The Generator pattern is best for **structural artifacts** (deterministic, idemp
 ## References
 
 - **Reference implementation**: `scripts/fleet_remediation_v318.py` v1.0.0 at this repo (public canonical); URL: https://github.com/aget-framework/aget/blob/main/scripts/fleet_remediation_v318.py
-- **Cycle origin**: FU016R adoption-stream remediation + FU016F finalize-mode extension
+- **Cycle origin**: prior adoption-remediation project adoption-stream remediation + prior finalization project finalize-mode extension
 - **L-docs**: L968 (frame-anchoring; alternative mechanics), L967 (plan-body-as-spec; substrate discipline), L644 (verify-before-recommend)
 - **Specs**: AGET_RELEASE_SPEC R-REL-043 (KR1-substance requirement; this Generator is the mechanism)
 - **ADR**: DRAFT headless-mechanic-first (sibling default for non-structural cross-agent action)
 
 ---
 
-*v1.0.0 — authored 2026-05-17 by `private-aget-framework-AGET` at LEARN-001 G3 BUILD-B. Generalizes the FU016R cycle's Generator into a reusable pattern for v3.19+ adoption-stream remediation.*
+*v1.0.0 — authored 2026-05-17 by `aget-framework` at prior authoring project G3 BUILD-B. Generalizes the prior adoption-remediation project cycle's Generator into a reusable pattern for v3.19+ adoption-stream remediation.*

@@ -2,8 +2,8 @@
 
 **Version**: 0.2.0 (DRAFT)
 **Status**: DRAFT — **storage BLOCKER RESOLVED 2026-06-20 via REQ-3** (principal two-tier Decide). The v0.1.0 review's 4 BLOCKERs shared one root (flat 5-column `governance/GOALS.md` under-dimensioned); REQ-3 replaces it with a **two-tier store**: committed Goals = a structured, principal-facing **section-per-goal** registry (carries provenance + status/lifecycle + the loop 5-tuple at ≥1 multiplicity + parent linkage — all 4 review blockers); aspirational Goals = an agent-internal lightweight store off the governance surface. **Remaining promotion blocker**: the 3-concept grounding gap (Goal Identifier / Goal Value / Commitment Tag — owner INIT-ONTOLOGY-MATURATION, NOT minted here). Canonical promotion via `/aget-enhance-spec` + public push gated to v3.23 weekend (L735). Findings: `planning/triad_findings.jsonl` (gate GTA-G-1).
-**Author**: private-aget-framework-AGET
-**Owning Initiative**: INIT-CORE-ARTIFACT-MATURATION Stream 9 (PP-051)
+**Author**: aget-framework
+**Owning Initiative**: INIT-CORE-ARTIFACT-MATURATION Stream 9 (prior authoring project)
 **Governing Process**: `/aget-enhance-spec` (7-phase, L622)
 **theoretical_basis**: BDI declarative goals (Rao & Georgeff 1995; Sardina & Padgham 2011) — a Goal is a declarative desire-state the agent commits to. GORE/KAOS (van Lamsweerde 2001) — goals are *achieve/maintain/avoid* predicates over system state, refined down a ladder. OKR/SAFe — objectives are outcomes, distinct from the key-results/workstreams that pursue them (the C930 separation). Cybernetics (MP#12) — a goal without a regulating loop is an orphan that decays.
 

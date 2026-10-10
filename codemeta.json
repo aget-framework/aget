@@ -7,10 +7,10 @@
   "license": "https://spdx.org/licenses/Apache-2.0",
   "codeRepository": "https://github.com/aget-framework/aget",
   "issueTracker": "https://github.com/aget-framework/aget/issues",
-  "version": "3.35.1",
+  "version": "3.36.0",
   "dateCreated": "2025-11-21",
-  "dateModified": "2026-10-04",
-  "datePublished": "2026-10-04",
+  "dateModified": "2026-10-10",
+  "datePublished": "2026-10-10",
   "programmingLanguage": [
     "Python",
     "YAML",
@@ -51,7 +51,8 @@
   "developmentStatus": "active",
   "readme": "https://github.com/aget-framework/aget/blob/main/README.md",
   "softwareRequirements": [
-    "Python 3.9+",
+    "Python 3.10+",
+    "Migration kit test-body witness: Python 3.12+ (sys.monitoring); below 3.12 a run needing the witness is INCONCLUSIVE by design (weekly-train:R15)",
     "PyYAML"
   ],
   "applicationCategory": "Developer Tools",

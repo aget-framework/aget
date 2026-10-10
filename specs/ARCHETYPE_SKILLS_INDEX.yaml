@@ -15,7 +15,7 @@ meta:
   framework_version: "3.6.0"
   spec_reference: "AGET_TEMPLATE_SPEC.md"
   purpose: "Authoritative index for archetype-specific skills"
-  project: "PROJECT_PLAN_archetype_customization_v3.5_v1.0.md"
+  project: "prior internal authoring plan"
   related_learnings:
     - L463  # Entity-archetype alignment
     - L486  # Ontology-driven creation

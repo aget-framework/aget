@@ -271,7 +271,7 @@ The following specs have been superseded and moved to `specs/archive/`:
 
 ### v1.0.0 (2026-01-04)
 
-- Initial index created (PROJECT_PLAN_v3.2.0 Gate 4)
+- Initial index created (prior internal authoring plan Gate 4)
 - 30 specifications registered
 - 29 domain codes defined
 - 8 archived specs documented

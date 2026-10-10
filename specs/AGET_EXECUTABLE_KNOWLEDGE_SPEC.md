@@ -9,7 +9,7 @@
 **Updated**: 2026-01-04
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_EXECUTABLE_KNOWLEDGE_SPEC.md`
-**Change Origin**: PROJECT_PLAN_executable_knowledge_ontology_v1.0 Gate 4
+**Change Origin**: prior internal authoring plan Gate 4
 **Related Specs**: AGET_VOCABULARY_SPEC, AGET_FILE_NAMING_CONVENTIONS
 
 ---
@@ -335,7 +335,7 @@ done
 
 ### v1.0.0 (2026-01-04)
 
-- Initial specification created (PROJECT_PLAN_executable_knowledge_ontology Gate 4)
+- Initial specification created (prior internal authoring plan Gate 4)
 - Three-axis taxonomy defined (Abstraction, Determinism, Reusability)
 - CAP-EKO-001 through CAP-EKO-004 requirements
 - AGET artifact classification table

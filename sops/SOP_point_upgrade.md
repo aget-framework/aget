@@ -3,7 +3,7 @@
 **Version**: 1.0.0
 **Created**: 2026-01-10
 **Updated**: 2026-01-10
-**Owner**: private-aget-framework-AGET
+**Owner**: aget-framework
 **Implements**: L438 (Point Upgrade SOP Gap)
 **Related**: L148, L444, L457, L458, AGET_SOP_SPEC.md
 
@@ -147,7 +147,7 @@ git add .
 git commit -m "chore: Upgrade to v3.3.0"
 ```
 
-**V-test V-UPGRADE-004** (added PP-035 / closes L671 + L952 traceability axis):
+**V-test V-UPGRADE-004** (added prior authoring project / closes L671 + L952 traceability axis):
 - [ ] Migration PR# recorded in this agent's row of the canonical `RELEASE_HANDOFF_vX.Y.Z.md` pilot tracking table (Migration PR column), OR
 - [ ] Migration PR column marked `N/A (direct-commit)` (direct-commit path used; no PR opened — acceptable per current Phase 4 workflow above)
 
@@ -185,7 +185,7 @@ For version-specific changes, consult:
 
 | Version Pair | Key Changes | Notes |
 |--------------|-------------|-------|
-| v3.2.1→v3.3.0 | Specification maturity | See PROJECT_PLAN_v3.3.0_release.md |
+| v3.2.1→v3.3.0 | Specification maturity | See prior internal authoring plan |
 
 *Add entries as new versions are released.*
 
@@ -270,7 +270,7 @@ For upgrading multiple agents:
 
 ## Checklist Template
 
-See [Point Upgrade Checklist Template](#checklist-template) in PROJECT_PLAN_point_upgrade_sop_v1.0.md, or use:
+See [Point Upgrade Checklist Template](#checklist-template) in prior internal authoring plan, or use:
 
 ```markdown
 # v3.2.1 → v3.3.0 Point Upgrade Checklist

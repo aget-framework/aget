@@ -8,7 +8,7 @@
 **Updated**: 2026-05-23
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_ISSUE_GOVERNANCE_SPEC.md`
-**Change Origin**: PROJECT_PLAN_issue_governance_v1.0, PROJECT_PLAN_issue_content_sanitization_v1.0, PROJECT_PLAN_public_issue_migration_v1.0, PROJECT_PLAN_issue_management_remediation_v3.11_v1.0
+**Change Origin**: prior internal authoring plan, prior internal authoring plan, prior internal authoring plan, prior internal authoring plan
 **Related Specs**: AGET_RELEASE_SPEC, AGET_TEMPLATE_SPEC, AGET_ORGANIZATION_SPEC, AGET_VOCABULARY_SPEC
 
 ---
@@ -768,7 +768,7 @@ PRIVATE_PATTERNS = [
 
 **Pattern**: ubiquitous + conditional
 
-**Theoretical Basis**: PP-042 Q1=Option B (single-rev mode taxonomy). gh#1845 (fleet-universal supervisor relay — supervisors are the filing authority). L638 destination routing unchanged: everything still lands at `{private-tracker}`; the flip changes WHO performs the `gh` act, not WHERE issues live.
+**Theoretical Basis**: prior authoring project Q1=Option B (single-rev mode taxonomy). gh#1845 (fleet-universal supervisor relay — supervisors are the filing authority). L638 destination routing unchanged: everything still lands at `{private-tracker}`; the flip changes WHO performs the `gh` act, not WHERE issues live.
 
 | ID | Pattern | Statement |
 |----|---------|-----------|
@@ -1023,10 +1023,10 @@ graduation:
 - L498: Action Item Ontology Implications
 - L535: Vocabulary Completeness Gap
 - L595: Action Item Management Theoretical Grounding
-- PROJECT_PLAN_issue_governance_v1.0.md
-- PROJECT_PLAN_issue_content_sanitization_v1.0.md
-- PROJECT_PLAN_public_issue_migration_v1.0.md
-- PROJECT_PLAN_issue_management_remediation_v3.11_v1.0.md
+- prior internal authoring plan
+- prior internal authoring plan
+- prior internal authoring plan
+- prior internal authoring plan
 - AGET_RELEASE_SPEC (R-REL requirements pattern)
 - AGET_TEMPLATE_SPEC (template requirements)
 - AGET_VOCABULARY_SPEC (vocabulary alignment)
@@ -1044,7 +1044,7 @@ graduation:
 | 1.0.0 | 2026-01-11 | Initial specification: routing, sanitization, repo settings |
 | 1.1.0 | 2026-02-14 | Added WorkCo, VP-of-AI, WorkCo patterns per L583 |
 | 2.0.0 | 2026-03-02 | **Private-first routing**: R-ISSUE-001 rewritten (all agents -> {private-tracker}), R-ISSUE-002 rewritten (promotion-only), R-ISSUE-009 revised (promotion target), CAP-ISSUE-005 added (R-ISSUE-011 through R-ISSUE-014: promotion requirements), vocabulary updated, Exhaustive_Pattern_List anti-pattern added. Per L638. |
-| 2.2.0 | 2026-05-23 | **Lesson-first filing + supervisor relay (PP-042 leapfrog)**: CAP-ISSUE-009 (Supervisor Intake: R-ISSUE-024..025), CAP-ISSUE-010 (Supervisor Editorial: R-ISSUE-026..027, ADR-021 Option 5), CAP-ISSUE-011 (Lesson-First Precondition: R-ISSUE-028), CAP-ISSUE-012 (Lesson↔Issue Traceability: R-ISSUE-029), CAP-ISSUE-013 (Filing-Mode Declaration: R-ISSUE-030, default `direct` preserves CAP-ISSUE-001), CAP-ISSUE-014 (Lift-Rate Hook: R-ISSUE-031, instrumentation deferred to Stream 3). 6 new V-tests (V-ISSUE-015..020). No changes to CAP-ISSUE-001..008. Per L977 (lesson-as-substrate), L863 (lift-rate gap), L671 (anti-decorative), L638 (routing preserved). PP-042 Stream 1 / INIT-ISSUE-INBOX-STEWARDSHIP Stream 8; v3.19 release T1.3. |
+| 2.2.0 | 2026-05-23 | **Lesson-first filing + supervisor relay (prior authoring project leapfrog)**: CAP-ISSUE-009 (Supervisor Intake: R-ISSUE-024..025), CAP-ISSUE-010 (Supervisor Editorial: R-ISSUE-026..027, ADR-021 Option 5), CAP-ISSUE-011 (Lesson-First Precondition: R-ISSUE-028), CAP-ISSUE-012 (Lesson↔Issue Traceability: R-ISSUE-029), CAP-ISSUE-013 (Filing-Mode Declaration: R-ISSUE-030, default `direct` preserves CAP-ISSUE-001), CAP-ISSUE-014 (Lift-Rate Hook: R-ISSUE-031, instrumentation deferred to Stream 3). 6 new V-tests (V-ISSUE-015..020). No changes to CAP-ISSUE-001..008. Per L977 (lesson-as-substrate), L863 (lift-rate gap), L671 (anti-decorative), L638 (routing preserved). prior authoring project Stream 1 / INIT-ISSUE-INBOX-STEWARDSHIP Stream 8; v3.19 release T1.3. |
 | 2.3.0 | 2026-07-10 | **Fleet-universal supervisor relay (gh#1845 enactment, v3.26 C-26-02)**: R-ISSUE-030 absent-mode default flipped `direct` → seat-conditional (`supervisor_intake` for managed agents; `direct` for supervisor seats); R-ISSUE-032 supervisor filing authority + own-repo intake artifact (L480-clean); R-ISSUE-033 principal-supervised direct exception. Destination routing (CAP-ISSUE-001, L638) unchanged. Skill layer `eef2154`; fleet propagation next cycle (D-26-4). |
 | 2.1.0 | 2026-04-04 | **Triage, lifecycle, structured filing**: CAP-ISSUE-006 (Triage: R-ISSUE-015 through R-ISSUE-017), CAP-ISSUE-007 (Lifecycle: R-ISSUE-018 through R-ISSUE-020), CAP-ISSUE-008 (Issue Forms: R-ISSUE-021 through R-ISSUE-023). 54 new SKOS vocabulary terms across 4 concept groups (triage, lifecycle, labeling, promotion_workflow). 3 new anti-patterns. 6 new V-tests (V-ISSUE-009 through V-ISSUE-014). Per L750, L671, L498. |
 

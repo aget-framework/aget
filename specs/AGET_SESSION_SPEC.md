@@ -520,7 +520,7 @@ The SYSTEM shall provide a health remediation capability that consumes `/aget-ch
 **Composition Architecture**: CAP-SESSION-014 EXTENDS CAP-SESSION-008 (Sanity Check Protocol). Check-health detection remains in force; enhance-health consumes check output. The pair instantiates the canonical `check → enhance` pipeline codified in DESIGN_DIRECTION §Principle 9 (2026-04-19) for the health domain.
 
 **Enforcement**: `/aget-enhance-health` skill v1.0.0 (SKILL-049); consumes `scripts/health_check.py --json` (read-only).
-**Origin**: SP-023 (2026-04-20, self-scored 27/27); PP-006 (2026-04-20); AEH-001 PROJECT_PLAN Gate 0. Evidence: L867 (enhance-verb family), L656 (Loading Dock — replaces unimplemented `--fix` flag across 13 SKILL.md files), L671 (Classification Without Consequence).
+**Origin**: SP-023 (2026-04-20, self-scored 27/27); prior authoring project (2026-04-20); AEH-001 PROJECT_PLAN Gate 0. Evidence: L867 (enhance-verb family), L656 (Loading Dock — replaces unimplemented `--fix` flag across 13 SKILL.md files), L671 (Classification Without Consequence).
 **Inherits from REQ**: TBD — REQ-OPS-* candidate for agent operational health. Current session spec inherits via sibling CAP-SESSION-008 chain.
 
 ---

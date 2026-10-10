@@ -94,7 +94,7 @@ If the version does not show X.Y.Z, your framework repo is stale. Do NOT proceed
 
 ## Step 0.5: Pre-Migration Verification — SUBSTANCE, not just the label (do NOT skip)
 
-The version reading X.Y.Z confirms the *label* is set — NOT that the payload is present or the contract published. These checks convert failure modes from prior fleet migrations (FLEET-UPG-023) into self-contained pre-flight gates. A remote fleet has no producer-side relay to catch them.
+The version reading X.Y.Z confirms the *label* is set — NOT that the payload is present or the contract published. These checks convert failure modes from prior fleet migrations (prior fleet upgrade case) into self-contained pre-flight gates. A remote fleet has no producer-side relay to catch them.
 
 ```bash
 # (a) DEPLOYMENT_SPEC published — the authoritative deployment contract (existence != deviation):
@@ -196,7 +196,7 @@ Recommended wave strategy:
 | 1 | 2-3 pilot agents (one per portfolio) | Catch archetype-specific issues |
 | 2 | Remaining agents (batches of 3-5) | Full rollout |
 
-**After each wave** (FLEET-UPG-023 lessons): Run wake_up.py, confirm version, check for regressions — and:
+**After each wave** (prior fleet upgrade case lessons): Run wake_up.py, confirm version, check for regressions — and:
 - **Re-verify independently** — never trust the worker's self-report alone; the supervisor confirms version + SHA + tree state at source.
 - **Respect per-agent variance** — standing no-push policies, deliberate dirty-tree holds, and instance-version semvers are legitimate; a blanket directive must NOT silently override them (use per-file `git add`).
 - **Expect transient failures** at fleet scale — design the runner to record verified facts and make failures cleanly retryable (one retry usually clears it).
@@ -258,9 +258,9 @@ Before sending a message from this template:
 
 | Version | Date | Change |
 |---------|------|--------|
-| 1.0.0 | 2026-03-09 | Initial template. Incorporates L457, L458, L582, L612, L613, L631, L633. Completes deferred G4-G5 of PROJECT_PLAN_public_release_handoff_remediation. |
+| 1.0.0 | 2026-03-09 | Initial template. Incorporates L457, L458, L582, L612, L613, L631, L633. Completes deferred G4-G5 of prior internal authoring plan. |
 | 1.1.0 | 2026-03-09 | L658: Added filesystem verification to sanitization + authoring checklists. Made pre_sync_check.py conditional with diff fallback. |
-| 1.2.0 | 2026-06-07 | **Step 0.5 Pre-Migration Verification** (substance ≠ label): verify DEPLOYMENT_SPEC published + source actually contains the new artifacts (a version bump does NOT copy payload). Smoke test: version-pass ≠ health-pass + schema-aware L444 coherence. Coordination: independent re-verify + respect per-agent variance + expect transient retries. Source: FLEET-UPG-023 v3.21 migration lessons (#1600 symbol-vs-substance root; #1607 schema-aware tooling; supervisor 8-lesson distillation). Remote fleets lack the producer-side relay that caught these locally → bake them into the message. |
+| 1.2.0 | 2026-06-07 | **Step 0.5 Pre-Migration Verification** (substance ≠ label): verify DEPLOYMENT_SPEC published + source actually contains the new artifacts (a version bump does NOT copy payload). Smoke test: version-pass ≠ health-pass + schema-aware L444 coherence. Coordination: independent re-verify + respect per-agent variance + expect transient retries. Source: prior fleet upgrade case v3.21 migration lessons (#1600 symbol-vs-substance root; #1607 schema-aware tooling; supervisor 8-lesson distillation). Remote fleets lack the producer-side relay that caught these locally → bake them into the message. |
 | 1.3.0 | 2026-07-05 | **Target Version header (mandatory)** + read-from-main currency note + authoring-checklist release-list verification. Source: 2026-07-05 remote-fleet round-trip — a dispatch without an explicit target resolved to N-1 (fleet-internal inference) one day after the latest release shipped; and post-tag hardening notes were not reachable at the tag the reader was directed to. Tracking: framework tracker #1835 (dispatch declares target), #1834 (tag-payload coherence). |
 
 | 1.4.0 | 2026-07-05 | **Script Customization pre-flight** (def-level delta before any base-script overwrite; function-preserving merge when local-only defs exist; conformance-then-bump). Source: second-fleet Wave-0 GATE-0 halt — blind overwrite per the message's own instruction would have deleted 8 local health_check invariants. Tracking: framework tracker #1836 (ext-hooks for health_check/study_topic — makes "overwrite" honest once shipped). |

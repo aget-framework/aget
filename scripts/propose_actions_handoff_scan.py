@@ -33,7 +33,7 @@ Usage:
     python3 scripts/propose_actions_handoff_scan.py --self-test
 
 Traceability: REQ-PA-012; gh#2676, gh#2426; tests/test_propose_actions_handoff_scan.py;
-planning/PROJECT_PLAN_v3.35.0_value_row_propose_actions_repairs_v1.0.md (Gate 1, G1.1).
+prior internal authoring plan (Gate 1, G1.1).
 """
 
 from __future__ import annotations

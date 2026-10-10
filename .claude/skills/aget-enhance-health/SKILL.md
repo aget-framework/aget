@@ -255,8 +255,8 @@ If any phase is SKIP, the signal MUST state the reason. If any phase is FAIL, th
 | Sibling Spec | AGET_SESSION_SPEC CAP-SESSION-008 (Sanity Check Protocol — consumed by this skill) |
 | Skill Spec | SKILL-049 (`.aget/specs/skills/SKILL-049_aget-enhance-health.yaml`) v1.0.0 |
 | Parent Proposal (skill) | SP-023 (self-scored 27/27 on RUBRIC_skill_proposal_readiness_v1.0) |
-| Parent Proposal (project) | PP-006 (promoted) |
-| Implementation Plan | AEH-001 (`planning/PROJECT_PLAN_aget_enhance_health_skill_v1.0.md`) |
+| Parent Proposal (project) | prior authoring project (promoted) |
+| Implementation Plan | prior internal authoring plan (not shipped) |
 | Pattern Template | SKILL-041 `/aget-enhance-spec` v1.1.0 |
 | Verb | `enhance` (#9, Lifecycle, approved via DESIGN_DIRECTION row 46) |
 | Pipeline | check → enhance (DESIGN_DIRECTION §Principle 9, 2026-04-19) |

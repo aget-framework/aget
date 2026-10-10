@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 scripts/migration_kit/launch_batch.py:*)",
+      "Bash(python3 scripts/migration_kit/push_batch.py:*)",
+      "Bash(python3 scripts/migration_kit/record_authority.py:*)"
+    ]
+  }
+}

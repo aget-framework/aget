@@ -2,7 +2,7 @@
 
 **Version**: 1.0.0
 **Status**: ACTIVE
-**Implements**: PROJECT_PLAN_cli_independence_validation_v1.0
+**Implements**: prior internal authoring plan
 
 ---
 
@@ -163,7 +163,7 @@ Common fixtures in `conftest.py`:
 
 ## References
 
-- PROJECT_PLAN_cli_independence_validation_v1.0
+- prior internal authoring plan
 - L452: Shell Orchestration Pattern
 - CLI_SETTINGS_STANDARD.md
 - AGET_FRAMEWORK_SPEC.md

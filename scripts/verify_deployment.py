@@ -20,7 +20,7 @@ History:
     v1.0.0 (2026-03-28): Initial creation during DVF-001. 8 check categories.
     v1.1.0 (2026-03-28): Framework core auto-detection. Self-exclusion from
         terminology scan. Fixed manifest.yaml regex for YAML comments.
-    v1.2.0 (2026-03-28): Fixed false positives from supervisor FLEET-UPG-009 G1:
+    v1.2.0 (2026-03-28): Fixed false positives from supervisor prior fleet upgrade case G1:
         manifest.yaml comment format, migration_history object format.
         Skill count corrected 16 -> 18. History/motivation docstring added.
     v1.3.0 (2026-05-02): v3.16-aware enhancement (release-completeness fix).
@@ -43,7 +43,7 @@ History:
 Motivation:
     DEPLOYMENT_SPEC_v3.10.0 included verify_v3.10.0.sh (100+ lines, 7 check
     categories). DEPLOYMENT_SPEC_v3.11.0 was created without a verification
-    script. The supervisor's fleet migration (FLEET-UPG-009) needed verification
+    script. The supervisor's fleet migration (prior fleet upgrade case) needed verification
     tooling at Gate 2 and it didn't exist. L754 captures the root cause:
     "A state description without verification tooling is a wish, not a spec."
 

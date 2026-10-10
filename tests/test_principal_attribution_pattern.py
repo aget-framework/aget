@@ -1,6 +1,6 @@
 """CANONICAL COPY (2026-09-19): the two corpus tests that glob the instance seat's
 governance/RULING*_*.md register (author-naming floor of 50) are omitted here -- they
-measure one seat's corpus, not the pattern. They live at private-aget-framework-AGET.
+measure one seat's corpus, not the pattern. Those corpus-specific tests remain in the internal framework authoring repository.
 Everything below is pure pattern behaviour and runs at any seat.
 """
 

@@ -329,8 +329,8 @@ rationale: >
 evidence:
   - L754 (Deployment Verification Script Gap)
   - L671 (Classification Without Consequence — state without enforcement)
-  - DEPLOYMENT_SPEC_v3.10.0 (has script, used in FLEET-UPG-008)
-  - DEPLOYMENT_SPEC_v3.11.0 (missing script, caught during FLEET-UPG-009 prep)
+  - DEPLOYMENT_SPEC_v3.10.0 (has script, used in prior fleet upgrade case)
+  - DEPLOYMENT_SPEC_v3.11.0 (missing script, caught during prior fleet upgrade case prep)
 fit_criterion: >
   DEPLOYMENT_SPEC_vX.Y.Z includes a verification_script section
   referencing an executable script. The script accepts --version

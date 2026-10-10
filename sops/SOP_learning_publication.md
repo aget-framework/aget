@@ -296,7 +296,7 @@ python3 validation/validate_public_learnings.py docs/learnings/L455_migration_ag
 
 ```yaml
 graduation:
-  source: "PROJECT_PLAN_public_learning_governance_v1.0.md"
+  source: "prior internal authoring plan"
   trigger: "Gap analysis revealed docs/learnings/ lacked formal governance"
   rationale: "Formalize ad-hoc publication pattern observed with L455, L457"
 ```

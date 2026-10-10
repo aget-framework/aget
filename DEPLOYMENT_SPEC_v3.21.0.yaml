@@ -2,7 +2,7 @@
 # Complete target state specification for v3.21.0 deployment
 #
 # Purpose: Define what a correctly-deployed v3.21.0 agent looks like.
-# Usage: Supervisors use this to verify fleet deployments (FLEET-UPG-023).
+# Usage: Supervisors use this to verify fleet deployments (prior fleet upgrade case).
 # Governance: R-DEP-002 (State-Based Deployment Requirement), R-REL-038
 #
 # Created: 2026-06-06
@@ -97,7 +97,7 @@ optional_changes:
 # the true state so the migration does not assume the artifacts are reachable.
 propagation_gap:
   status: "CLOSED 2026-06-06 — payload pushed to origin/main across 14 repos (aget + 13 templates), reachability verified"
-  tracking: "gh#1600 (root cause); PP-048 Stream 5 (remediation)"
+  tracking: "gh#1600 (root cause); prior authoring project Stream 5 (remediation)"
   per_surface:
     canonical_aget:
       AGET_UNATTENDED_AUTONOMY_SPEC.md: present     # aget/specs/
@@ -147,7 +147,7 @@ references:
   release_handoff: "private handoffs/RELEASE_HANDOFF_v3.21.0.md"
   remote_migration_message: "private handoffs/REMOTE_MIGRATION_MESSAGE_v3.21.0.md"
   root_cause: "gh#1600 (release verification proves labels agree, not that they are true)"
-  remediation: "PP-048 (PROPOSAL_release_toolchain_continuous_validation_and_debt) Streams 5/6"
+  remediation: "prior authoring project (PROPOSAL_release_toolchain_continuous_validation_and_debt) Streams 5/6"
   lapse_history: "gh#1490 (DEPLOYMENT_SPEC practice lapsed v3.17-v3.19; extended to v3.20/v3.21)"
   process_changes:
     - "Resumes DEPLOYMENT_SPEC practice after 5-cycle lapse (first since v3.16.0)"

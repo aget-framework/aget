@@ -4,10 +4,10 @@
 **Status**: LANDED
 **Created**: 2026-05-09
 **Updated**: 2026-07-18 (v1.7.2 → v1.7.3 — AM1 sealed prompts carry the delegated-prompt date contract (gh#1812, CONVENTION_delegated_prompt_date). Prior v1.7.1 → v1.7.2 — G1.PORTFOLIO ingest half gains rule 3: **re-verify at ingest** (C-27-14, F-2026-07-16-D 19% obsolete-on-arrival base rate + 3 more caught at v3.27); built at v3.27 release plan G1.6. Prior v1.7.0 → v1.7.1 — **anti-pattern cluster currency fix**: the SOP carried "11 L-docs" at three sites while its own §table listed 12, and the v3.26 additions (L1155/L1158/L1160, recorded only in VERSION_SCOPE_v3.26.0 prereq #4) never propagated back — an L1188 instance (stored registry not read) inside the SOP that defines the cluster. True count 15, all members re-verified on disk 2026-07-17. Fix: §Anti-Pattern Cluster table becomes the single membership source of truth; prereq #4 and Gate 0 reference it instead of restating counts; L1155/L1158/L1160 rows added; v3.27 addition candidates L1168/L1187/L1188/L1190 staged pending Gate-0 stamp. See `planning/MEMO_v3.27_freshness_audit_2026-07-17.md`. Prior 2026-07-11 v1.6.0 → v1.7.0 — adds Gate 1 **G1.PORTFOLIO**: per-release initiative-portfolio grooming pass (agent-prepared close-candidate/re-authorize/suspend verdicts per ACTIVE, D-IG-3) + **prior-cycle VERSION_SCOPE §Deferred ingest** with PROCEED/RE-DEFER/DROP dispositions (gh#1536 deferral backpressure; L1002 cheapest non-recursive edge). Prior v1.5.0 → v1.6.0 — adds **G1.SELECT board design requirement 7**: predicted-value (V1) selection column, HYBRID threshold-gated per D-RP-13 / gmelli/aget-aget#1758 — value-contribution legible at the moment of selection, distinct-axis-never-summed; tooling column render OWED #1758/#1649. Prior v1.4.0 → v1.5.0 — adds Gate 1 **G1.VALUEGATE** blocking value-to-ship gate per POL-REL-001 v1.1.0 R-REL-CAD-008 / decision D-RP-4; the prework enforcement of substance-gated cadence — stops a v3.23.0-class dominated-thin lock at scope-lock, not post-ship). Prior: 2026-06-12 v1.3.0 → v1.4.0 — Gate 1 **G1.SELECT** principal scope-selection via cycle-current interactive control board; closes L824. v1.2.0 → v1.3.0 2026-05-23 — G1.AUDIT audit-after-synthesis pairing; L980 / gh#1476)
-**Owner**: private-aget-framework-AGET (canonical-promoted to `aget-framework/aget/sops/SOP_scope_lock_ceremony.md` at v1.0.0; v1.1.0/v1.2.0/v1.3.0 canonical sync deferred to next public push window per L735 — `origin = aget-framework/*` applies)
+**Owner**: aget-framework (canonical-promoted to `aget-framework/aget/sops/SOP_scope_lock_ceremony.md` at v1.0.0; v1.1.0/v1.2.0/v1.3.0 canonical sync deferred to next public push window per L735 — `origin = aget-framework/*` applies)
 **Implements**: R-REL-022-01 (Lock-Event Status Transition), CAP-REL-029 (Lock-Event Protocol)
 **Governing**: PROJECT_PLAN scope-lock plans (v3.16, v3.17 cycles); VERSION_SCOPE_vX.Y.Z lifecycle state machine (L708)
-**Source Evidence**: `planning/archive/PROJECT_PLAN_v3.16.0_scope_lock_v1.0.md` v1.1.2 (Complete); `planning/archive/PROJECT_PLAN_v3.17.0_scope_lock_v1.0.md` v1.1.2 (Complete); `MEMO_v3.17_release_patterns_research_2026_05_09.md`; `MEMO_v3.17_freshness_audit_2026_05_09.md`; v3.17.0 release plan v1.0.18 (lock event commit `e50a182` 2026-05-09T13:28:03-0700)
+**Source Evidence**: `prior internal authoring plan` v1.1.2 (Complete); `prior internal authoring plan` v1.1.2 (Complete); `MEMO_v3.17_release_patterns_research_2026_05_09.md`; `MEMO_v3.17_freshness_audit_2026_05_09.md`; v3.17.0 release plan v1.0.18 (lock event commit `e50a182` 2026-05-09T13:28:03-0700)
 **Empirical Grounding (LANDED rigor)**: SOP procedure empirically executed twice — at v3.16.0 scope-lock (commit `91c5871` 2026-05-02) and v3.17.0 scope-lock (commit `e50a182` 2026-05-09); both ceremonies generated the cycle outcomes the SOP predicts (PLANNING → READY FOR RELEASE state transition; principal-GO form contract recorded; cluster anti-pattern self-application audit clearance). Theme C3 self-conformance: this SOP codifies the very 4-gate ceremony that v3.17 has just executed.
 
 ---
@@ -326,7 +326,7 @@ G1.INBOUND covers inbound *GitHub issues* filed since the freshness-audit timest
 - `planning/initiatives/INIT-*.md` (initiative manifests)
 - `docs/CANDIDATE_LDOC_*.md` (L-doc candidates pre-promotion)
 
-These artifacts slip past G1.INBOUND as currently scoped. The v3.18 pre-plan cycle (2026-05-12 → 2026-05-14 burst) empirically surfaced 11 such artifacts: 5 new PROPOSALs (PP-027..PP-032), 2 new initiative manifests, 4 L-doc candidates (L945..L948) — all would be undispositioned at scope-lock Gate 1 under v1.1.0 scope.
+These artifacts slip past G1.INBOUND as currently scoped. The v3.18 pre-plan cycle (2026-05-12 → 2026-05-14 burst) empirically surfaced 11 such artifacts: 5 new PROPOSALs (prior authoring project..prior authoring project), 2 new initiative manifests, 4 L-doc candidates (L945..L948) — all would be undispositioned at scope-lock Gate 1 under v1.1.0 scope.
 
 **Sibling layer in handoff-discovery family**:
 
@@ -633,7 +633,7 @@ verify_scope_lock_ceremony() {
 | L-docs | L708 (Scope-Lock state machine), L656 (Loading Dock), L465 (Scope Consolidation), L131 (amendment cap), L850 (annotation-only), L908 (Apply-to-Others-Not-Self), L913 (Plan-Close → Plan-Create handoff), L935 (Wired Validator Synecdoche), L671 (Classification w/o Consequence) |
 | ADRs | ADR-005 (Gates as release points), ADR-008 (Advisory → Strict → Generator) |
 | Specs | AGET_RELEASE_SPEC R-REL-022-01, CAP-REL-029; AGET_PROJECT_PLAN_SPEC v1.2.3 |
-| Predecessors | `PROJECT_PLAN_v3.16.0_scope_lock_v1.0.md` v1.1.2; `PROJECT_PLAN_v3.17.0_scope_lock_v1.0.md` v1.1.1 |
+| Predecessors | `prior internal authoring plan` v1.1.2; `prior internal authoring plan` v1.1.1 |
 | VERSION_SCOPE entries | T2.18 (this SOP), T2.19 (`AGET_SKILL_LIFECYCLE_SPEC`), T2.20 (`AGET_FLEET_UPGRADE_SPEC`), T2.23 (`AGET_TASK_ROUTING_SPEC`) — sibling spec-authoring cluster at canonical-coherence-at-governance-layer |
 
 ---

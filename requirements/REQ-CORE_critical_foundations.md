@@ -5,7 +5,7 @@
 **Status**: proposed (refreshed 2026-09-26)
 **Domain**: CORE (cross-cutting, foundational)
 **Specifications**: AGET_SPEC_FORMAT, REQUIREMENTS_FORMAT, ADR-001, ADR-004, ADR-005, ADR-008, AGET_SESSION_SPEC, AGET_ISSUE_GOVERNANCE_SPEC, AGET_RELEASE_SPEC, governance/MISSION.md
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Tracking**: #725 (requirements publication), #539 (community documentation), #808 (discoverability)
 
 ---

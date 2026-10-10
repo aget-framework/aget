@@ -126,7 +126,7 @@ ELSE:
 | Link | Reference |
 |------|-----------|
 | POC | POC-017 |
-| Project | PROJECT_PLAN_AGET_UNIVERSAL_SKILLS.md |
+| Project | prior internal authoring plan |
 | Source | Fleet Skill Deployment Report (supervisor) |
 | Baseline | 14 files, 96K (2026-02-08) |
 

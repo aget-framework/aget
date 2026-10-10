@@ -3,7 +3,7 @@
 **Version**: 1.0.0
 **Created**: 2026-05-02
 **Updated**: 2026-05-02 (initial; v3.16.0 cycle as N=1 evidence)
-**Author**: private-aget-framework-AGET v3.16.0
+**Author**: aget-framework v3.16.0
 **Domain**: Pre-release scope sizing for MINOR cycles (vX.Y.0)
 **Status**: Active (single-cycle calibration; rolling 4-cycle baseline targeted by v3.20)
 **Governing Spec**: `aget/specs/AGET_RELEASE_SPEC.md` CAP-REL-012 (VERSION_SCOPE Requirement); `governance/POLICY_release_cadence.md` POL-REL-001 R-REL-CAD-006
@@ -96,7 +96,7 @@ Per **net deliverable capacity** above, recommended Tier sizing:
 - L894 (plan-driven discipline) — recurrence-check the estimate-anchoring pattern
 - F-CRITIC-REL-040 (velocity-as-evidence inversion) — v3.16.0 cycle calibration evidence
 - POL-REL-001 R-REL-CAD-006 (Major Cadence) — MAJOR rhythm complement to this rubric
-- v3.16.0 PROJECT_PLAN_release retrospective Velocity Analysis table (private)
+- v3.16.0 prior internal authoring plan retrospective Velocity Analysis table (private)
 - AGET_RELEASE_SPEC CAP-REL-012 (VERSION_SCOPE Requirement) — governing spec layer
 - L749 Requirements-Rubric Duality — every estimation requirement implies an estimation rubric (this artifact)
 

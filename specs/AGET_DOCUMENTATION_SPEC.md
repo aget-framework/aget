@@ -8,7 +8,7 @@
 **Updated**: 2026-08-16 (v1.1.0 — Enforcement surface separates instrument-exists from instrument-is-reached; see Changelog)
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_DOCUMENTATION_SPEC.md`
-**Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.3
+**Change Origin**: prior internal authoring plan Gate 2.3
 **Related Specs**: AGET_FILE_NAMING_CONVENTIONS, AGET_TEMPLATE_SPEC
 
 ---

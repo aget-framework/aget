@@ -5,7 +5,7 @@ description: Create research projects with context-aware scaffolding. Reads AGET
 
 # /aget-create-project
 
-Create a new AGET project with research-informed scaffolding per PROJECT_PLAN_AGET_CREATE_PROJECT_V2.md.
+Create a new AGET project with research-informed scaffolding per prior internal authoring plan.
 
 ## Input
 
@@ -408,7 +408,7 @@ Per AGET governance principles:
 - **MP-5 (Infrastructure Over Memory)**: Steps 0, 3.6-3.8, and 8 embed critical principles as structural gates, not passive CLAUDE.md warnings. This moves the skill from ADR-008 Advisory to Strict for principle enforcement.
 - **ADR-008 (Advisory → Strict → Generator)**: Step 3.7 verifies the prerequisite chain (L-doc → SOP → Spec → Skill) is satisfied before creating artifacts that assume infrastructure exists.
 
-This skill implements the "research-informed project creation" pattern per PROJECT_PLAN_AGET_CREATE_PROJECT_V2.md, enhanced with principle enforcement per PROJECT_PLAN_create_project_principles_enforcement_v1.0.md (D62).
+This skill implements the "research-informed project creation" pattern per prior internal authoring plan, enhanced with principle enforcement per prior internal authoring plan (D62).
 
 
 ### Step 9: Skill Completion Signal (D71 Layer 3)
@@ -440,6 +440,6 @@ If Step 7.5 or Step 8 were skipped or failed, the signal MUST report FAIL with t
 | L-docs | L474, L561, L567, L582, L584, L616 (spec-first gate failure), L617 (inductive planning bypass), L618 (citing lesson while repeating), L620 (template structural completeness), L644 (template-spec conformance) |
 | Issues | #295 (Step 0), #313 (Steps 3.6/3.7), #315 (Step 3.8), #391 (Step 4 scope estimation), #356 (template Gate -1 — addressed in template v1.5.0), #382 (validator — partial, see D24) |
 | Governance | MP-1 (Spec-First + Verification), MP-5 (Infrastructure Over Memory), ADR-008 (Advisory → Strict → Generator) |
-| Project | PROJECT_PLAN_AGET_CREATE_PROJECT_V2.md |
-| Remediation | PROJECT_PLAN_create_project_principles_enforcement_v1.0.md (D62) |
+| Project | prior internal authoring plan |
+| Remediation | prior internal authoring plan (D62) |
 | Hypotheses | H-ACP-000 through H-ACP-006, H-CPE-001 |

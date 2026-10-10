@@ -140,7 +140,7 @@ This skill creates a proposal artifact. If an agent bypasses it and creates skil
 | Link | Reference |
 |------|-----------|
 | POC | POC-017 |
-| Project | PROJECT_PLAN_AGET_UNIVERSAL_SKILLS.md |
+| Project | prior internal authoring plan |
 | Source | Fleet Skill Deployment Report (supervisor) |
 | Pattern | Propose → Review → Approve → Implement |
 

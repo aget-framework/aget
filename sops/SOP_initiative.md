@@ -3,7 +3,7 @@
 **Version**: 1.3.0
 **Created**: 2026-04-04
 **Updated**: 2026-05-14 (v1.3.0 — Label Management section added)
-**Owner**: private-aget-framework-AGET
+**Owner**: aget-framework
 **Category**: Governance
 **Related**: L760 (Initiative as Scope Modifier), C227 (InitiativeScope), SP-004 (aget-check-initiative), #916 (Initiative-scoped channel registry), #910 (Contributor value profiles), gh#1193 (INIT-PRINCIPLED-EXECUTION file gap), L524 (Pattern Consolidation)
 
@@ -265,7 +265,7 @@ Default policy: **Phase B1**. Phase B2/B3 require explicit principal Decide.
 | Conceptual model | L760 (Initiative as Scope Modifier) |
 | Ontology | C227 (InitiativeScope) |
 | Related skill proposal | SP-004 (aget-check-initiative) |
-| Related proposal | PP-001 (Initiative Construct v1) |
+| Related proposal | prior authoring project (Initiative Construct v1) |
 | Governing SOP | SOP_sop_creation.md |
 
 ---

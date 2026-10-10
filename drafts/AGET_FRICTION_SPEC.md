@@ -3,8 +3,8 @@
 **Version**: 0.1.0
 **Status**: DRAFT
 **Created**: 2026-06-21
-**Author**: private-aget-framework-AGET
-**Governing Project**: PROJECT_PLAN_friction_pattern_canonicalization_v1.0 (PP-052)
+**Author**: aget-framework
+**Governing Project**: prior internal authoring plan (prior authoring project)
 **Serves Goal**: GOAL-FRICTION-CONVERGENCE
 **Evidence basis**: L147 (it-consultant), L656 + L669 (supervisor, source-verified), L1111, L467
 

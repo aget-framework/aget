@@ -8,7 +8,7 @@
 **Updated**: 2026-08-17
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_PROJECT_PLAN_SPEC.md`
-**Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.7, Issue #30
+**Change Origin**: prior internal authoring plan Gate 2.7, Issue #30
 **Related Specs**: AGET_RELEASE_SPEC, AGET_5D_COMPONENTS_SPEC (holds CAP-REASON-008; supersedes the
 archived AGET_REASONING_SPEC), AGET_SOP_SPEC
 
@@ -16,7 +16,7 @@ archived AGET_REASONING_SPEC), AGET_SOP_SPEC
 
 ## Abstract
 
-This specification defines requirements for PROJECT_PLAN documents in the AGET framework. PROJECT_PLANs govern multi-gate work with structured deliverables, verification tests, and decision points. This spec formalizes patterns validated in PROJECT_PLAN_v3.0.0 through v3.2.0.
+This specification defines requirements for PROJECT_PLAN documents in the AGET framework. PROJECT_PLANs govern multi-gate work with structured deliverables, verification tests, and decision points. This spec formalizes patterns validated in prior internal authoring plan through v3.2.0.
 
 ## Motivation
 
@@ -64,7 +64,7 @@ vocabulary:
     PROJECT_PLAN:
       skos:definition: "Governance document for multi-gate work with verification"
       aget:naming: "PROJECT_PLAN_{scope}_v{M}.{m}.md"
-      skos:example: "PROJECT_PLAN_v3.2.0_specification_architecture.md"
+      skos:example: "prior internal authoring plan"
       skos:related: ["CAP-PP-001"]
 
     Gate:
@@ -483,7 +483,7 @@ python3 -c "import json; v=json.load(open('.aget/version.json')); print('PASS' i
 
 **Rationale (L502):**
 
-PROJECT_PLAN_v3.2.0 (25,088 tokens, 1,641 lines) exceeded the Read tool's 25,000 token limit. Root cause analysis revealed CAP-PP-011 (V-tests) optimized for verification without constraining comprehensibility—a single-axis optimization anti-pattern.
+prior internal authoring plan (25,088 tokens, 1,641 lines) exceeded the Read tool's 25,000 token limit. Root cause analysis revealed CAP-PP-011 (V-tests) optimized for verification without constraining comprehensibility—a single-axis optimization anti-pattern.
 
 **Tool Constraints:**
 
@@ -933,7 +933,7 @@ structure:
 
 ### CAP-PP-020: Benefit Hypothesis at Creation
 
-A PROJECT_PLAN SHALL carry, at creation, a **falsifiable benefit hypothesis**: an "if this lands, then ⟨measurable improvement⟩, falsified by ⟨observable⟩" statement naming the benefit (PRINCE2/ISO 21502 Output→Outcome→Benefit chain; SAFe benefit-hypothesis pattern) evaluated against the plan's `Parent Goal` frame. WHERE no Parent Goal exists, the hypothesis SHALL name its beneficiary directly and the coverage instrument reports the un-parented state (CAP-GOAL-013). First instance: `PROJECT_PLAN_goal_value_canon_arc_v1.0.md` header (2026-07-19).
+A PROJECT_PLAN SHALL carry, at creation, a **falsifiable benefit hypothesis**: an "if this lands, then ⟨measurable improvement⟩, falsified by ⟨observable⟩" statement naming the benefit (PRINCE2/ISO 21502 Output→Outcome→Benefit chain; SAFe benefit-hypothesis pattern) evaluated against the plan's `Parent Goal` frame. WHERE no Parent Goal exists, the hypothesis SHALL name its beneficiary directly and the coverage instrument reports the un-parented state (CAP-GOAL-013). First instance: `prior internal authoring plan` header (2026-07-19).
 
 ### CAP-PP-021: Close-Time Value Resolution (with Cost Side)
 

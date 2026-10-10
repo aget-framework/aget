@@ -8,7 +8,7 @@
 **Updated**: 2026-03-08
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_ORGANIZATION_SPEC.md`
-**Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.4
+**Change Origin**: prior internal authoring plan Gate 2.4
 **Related Specs**: AGET_FRAMEWORK_SPEC, AGET_TEMPLATE_SPEC
 
 ---

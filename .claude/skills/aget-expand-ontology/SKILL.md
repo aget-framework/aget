@@ -443,7 +443,7 @@ This step is **non-blocking** — the expansion is already complete and committe
 | Link | Reference |
 |------|-----------|
 | Spec | `.aget/specs/skills/SKILL-019_aget-expand-ontology.yaml` |
-| Promotion Plan | `planning/PROJECT_PLAN_expand_ontology_skill_promotion_v1.0.md` |
+| Promotion Plan | `prior internal authoring plan` |
 | Lineage (pro-core) | professional-core-aget v1.5.0 (Steps 5a, 5b, 7a, PrefLabel spec, registry) |
 | Lineage (framework) | framework-AGET v1.0.0 (generalized structure, multi-vocabulary) |
 | Lineage (supervisor) | Config block, --from-kb, staging, PROCO auto-increment, lifecycle frontmatter |

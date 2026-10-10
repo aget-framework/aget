@@ -5,7 +5,7 @@ check_skill_coherence.py — Release-time skill self-description ↔ shipped-tre
 Closes #1614 (C-22-29, v3.22): a shipped SKILL.md can assert artifacts that are
 ABSENT or MISLABELED in the shipped tree — a release-integrity gap distinct from
 missing-field hygiene (#1335) and instance→template drift (#1489). Stale
-self-descriptions are confabulation seeds (FLEET-UPG-021: a reviewer trusted a
+self-descriptions are confabulation seeds (prior fleet upgrade case: a reviewer trusted a
 "future" label and reported a shipped spec as absent).
 
 Per skill, validates two failure modes (deliberately high-precision — only

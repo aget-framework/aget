@@ -8,7 +8,7 @@
 **Updated**: 2026-10-05
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_RELEASE_SPEC.md`
-**Change Origin**: PROJECT_PLAN_v3.2.0 Gate 2.2
+**Change Origin**: prior internal authoring plan Gate 2.2
 **Related Specs**: AGET_FRAMEWORK_SPEC, AGET_VERSIONING_CONVENTIONS
 
 ---
@@ -482,7 +482,7 @@ python3 aget/validation/validate_version_inventory.py --all-files
 | R-REL-010c-04 | Surface coverage gap (any surface with `update_mechanism: unspecified`) SHALL be flagged at release-readiness check | Pre-release gate |
 | **V-CAP-REL-008c** | **paired V-test** | **`aget/verification/validate_release_surfaces_manifest.py`** verifies manifest covers known surfaces (filesystem walk for *.md files matching version-bearing patterns) and flags `unspecified` rows. |
 
-**Reference**: `private-aget-framework-AGET/docs/RELEASE_SURFACES_AUDIT_v3.17.md` (initial audit; promote to canonical `aget/RELEASE_SURFACES_MANIFEST.md` at v3.18).
+**Reference**: Internal initial release-surfaces audit, v3.17 (not shipped); canonical consumer register: `aget/RELEASE_SURFACES_MANIFEST.md`.
 
 ### CAP-REL-009: Release Verification (L517)
 
@@ -628,7 +628,7 @@ CANCELLED (with rationale)
 |----|---------|-----------|-----------|
 | R-REL-024-01 | conditional | AFTER release completion, release manager SHOULD complete Retrospective section | Learning capture |
 | R-REL-024-02 | conditional | IF retrospective completed THEN it SHOULD be within 7 days of release | Context freshness |
-| R-REL-024-03 | conditional | FOR fleet upgrade close-outs (FLEET-UPG-NNN), the fleet supervisor SHALL author a rubric-scored Release_Outcome_Report using `aget/rubrics/RUBRIC_fleet_upgrade_outcome_v1.3.md` before setting `Plan_Status: COMPLETE`. The report SHALL record per-dimension scores (D1–D5) and reasoning (2–3 sentences each). A score of ≥10 (Compliant band) is required; scores below 10 SHALL be explicitly documented as gaps requiring remediation in the next cycle. | Closes the vibe-not-measurement gap (FLEET-UPG-013 retrospective finding, #1149); two-supervisor convergence (FLEET-UPG-013 = 13/15, FLEET-UPG-014 = 10/15) validates rubric applicability |
+| R-REL-024-03 | conditional | FOR fleet upgrade close-outs (FLEET-UPG-NNN), the fleet supervisor SHALL author a rubric-scored Release_Outcome_Report using `aget/rubrics/RUBRIC_fleet_upgrade_outcome_v1.3.md` before setting `Plan_Status: COMPLETE`. The report SHALL record per-dimension scores (D1–D5) and reasoning (2–3 sentences each). A score of ≥10 (Compliant band) is required; scores below 10 SHALL be explicitly documented as gaps requiring remediation in the next cycle. | Closes the vibe-not-measurement gap (prior fleet upgrade case retrospective finding, #1149); two-supervisor convergence (prior fleet upgrade case = 13/15, prior fleet upgrade case = 10/15) validates rubric applicability |
 
 ### CAP-REL-017: VERSION_SCOPE Template Compliance
 
@@ -1036,7 +1036,7 @@ After completing a fleet upgrade, fleet supervisors SHOULD file an upstream enha
 
 | ID | Pattern | Statement | Rationale |
 |----|---------|-----------|-----------|
-| R-REL-028-01 | event-driven | WHEN a fleet supervisor completes a fleet upgrade using the MIGRATION_COMPLETION_REPORT, the supervisor SHOULD file an enhancement issue to `gmelli/aget-aget` containing friction events, tool effectiveness, and improvement recommendations | Deployment learnings embedded in local plans are invisible to the framework agent (L825, FLEET-UPG-011 evidence) |
+| R-REL-028-01 | event-driven | WHEN a fleet supervisor completes a fleet upgrade using the MIGRATION_COMPLETION_REPORT, the supervisor SHOULD file an enhancement issue to `gmelli/aget-aget` containing friction events, tool effectiveness, and improvement recommendations | Deployment learnings embedded in local plans are invisible to the framework agent (L825, prior fleet upgrade case evidence) |
 | R-REL-028-02 | ubiquitous | The MIGRATION_COMPLETION_REPORT template SHALL include an "Upstream Enhancement Issue" section with guidance on what to include in the feedback issue | Template-driven prompting ensures consistent feedback content |
 | R-REL-028-03 | conditional | IF the framework agent receives an upstream feedback issue THEN the framework agent SHOULD reference it in the next VERSION_SCOPE grooming | Closes the feedback loop — deployment learnings inform next release planning |
 
@@ -1389,7 +1389,7 @@ python3 scripts/post_release_contract_validator.py --version 3.16.0 && \
 - **#1148 (BC-002 detection scope)**: Root cause spec-bound here via R-REL-033-02
 - **CAP-REL-030 (CHANGELOG)**: BC-NNN must appear in CHANGELOG (R-REL-030-03); this CAP verifies BC-NNN has test coverage; together they bind BC declarations end-to-end
 
-### CAP-REL-034: KR1-Substance Separation (R-REL-043) (L968 substrate via LEARN-001)
+### CAP-REL-034: KR1-Substance Separation (R-REL-043) (L968 substrate via prior authoring project)
 
 **SHALL** requirements distinguishing version-stamp coverage from substantive adoption-stream coverage in fleet-migration cycles:
 
@@ -1400,9 +1400,9 @@ python3 scripts/post_release_contract_validator.py --version 3.16.0 && \
 | R-REL-043-03 | ubiquitous | Fleet-migration plans SHALL track **KR1-version-stamp** and **KR1-substance** as separate metrics; both reported at gate close | Honest accounting prevents L644 conflation |
 | R-REL-043-04 | conditional | IF KR1-substance < KR1-version-stamp at G4 close THEN plan SHALL transition to COMPLETE-WITH-CARRIES (not COMPLETE) until remediation cycle planned | Status-honesty discipline (L969 sibling) |
 
-**Substrate evidence** (FLEET-UPG-016, 2026-05-17):
+**Substrate evidence** (prior fleet upgrade case, 2026-05-17):
 
-KR1 reported 55% version-stamp coverage while effective adoption was 11% — the conflation surfaced at Gate 4 close after the cycle had stamped Plan_Status=Complete, triggering ~3h retroactive remediation cycle (FU016R). 4 of 5 adoption streams (MEMORY_SURFACE_SPEC ref / verb-registry awareness / L961 channel wiring / `/aget-create-initiative` STRICT deploy / R-DEP-3 RECLASSIFY) had no Generator coverage; only `@aget-version` line was migrated.
+KR1 reported 55% version-stamp coverage while effective adoption was 11% — the conflation surfaced at Gate 4 close after the cycle had stamped Plan_Status=Complete, triggering ~3h retroactive remediation cycle (prior adoption-remediation project). 4 of 5 adoption streams (MEMORY_SURFACE_SPEC ref / verb-registry awareness / L961 channel wiring / `/aget-create-initiative` STRICT deploy / R-DEP-3 RECLASSIFY) had no Generator coverage; only `@aget-version` line was migrated.
 
 **V-Test for KR1-substance separation**:
 
@@ -1453,7 +1453,7 @@ Wired into `scripts/validate_release_gate.py --phase pre-release` as blocking va
 
 **Composition with R-DEP-010 deprecation-discipline**: Citations to retired artifacts SHALL be removed from release artifacts at deprecation removal-date; they SHALL NOT be annotated as `[instance-only]` to silence the validator. The validator catches reach-through references; deprecation governance catches reach-back references.
 
-**Carry**: PCRV Gate 3 disposes L-doc public/private classification policy (3 options); PCRV Gate 4 remediates v3.18.0's 268 instances against chosen policy — **open, tracked as v3.20 debt D2 (L131 no-further-slip)**. The validator itself landed same cycle as discovery (PCRV plan; private-aget-framework-AGET, 2026-05-17). **Sibling**: R-REL-019 authoring-discipline amendment (gh#1448 proposes upstream prevention).
+**Carry**: PCRV Gate 3 disposes L-doc public/private classification policy (3 options); PCRV Gate 4 remediates v3.18.0's 268 instances against chosen policy — **open, tracked as v3.20 debt D2 (L131 no-further-slip)**. The validator itself landed same cycle as discovery (PCRV plan; aget-framework, 2026-05-17). **Sibling**: R-REL-019 authoring-discipline amendment (gh#1448 proposes upstream prevention).
 
 **Merge note (2026-05-26)**: CAP-REL-035 was declared twice — an L967-family authoring pass and this L919-family pass — producing a duplicate req-ID that scored AGET_RELEASE_SPEC `NONE` on `score_specifications.py` (declaration-uniqueness check, L0 gate). The two passes were the same capability (same ID, title, R-REL-044 family, validator); merged into this single block. The earlier pass's open PCRV Gate 3/4 carry is preserved above (it was mis-stated as "None" here pre-merge).
 
@@ -1809,7 +1809,7 @@ L944 — this clause governs releases published after v1.18.0.
 ### v1.15.0 (2026-04-26)
 
 - Added R-REL-024-03 to CAP-REL-016: fleet upgrade close-outs SHALL include rubric-scored Release_Outcome_Report using `RUBRIC_fleet_upgrade_outcome_v1.3.md`. Score ≥10 required; below 10 must be documented as gaps.
-- Closes vibe-not-measurement gap identified in FLEET-UPG-013 (#1149); validated by two-supervisor convergence (FLEET-UPG-013 = 13/15, FLEET-UPG-014 = 10/15)
+- Closes vibe-not-measurement gap identified in prior fleet upgrade case (#1149); validated by two-supervisor convergence (prior fleet upgrade case = 13/15, prior fleet upgrade case = 10/15)
 - See: `aget/rubrics/RUBRIC_fleet_upgrade_outcome_v1.3.md`, #1149, #1165
 
 ### v1.14.0 (2026-04-12)
@@ -1819,7 +1819,7 @@ L944 — this clause governs releases published after v1.18.0.
 - Added enforcement table entry: MIGRATION_COMPLETION_REPORT template (v3.13.0)
 - Added Requirements Grounding entry: REQ-REL-F-009 → CAP-REL-028
 - Closes the deployment feedback gap: release lifecycle now extends past "deployment verified" to include deployment learnings return
-- See: L825, L826, FLEET-UPG-011, #955
+- See: L825, L826, prior fleet upgrade case, #955
 
 ### v1.11.0 (2026-03-28)
 
@@ -1837,14 +1837,14 @@ L944 — this clause governs releases published after v1.18.0.
 - Added enforcement table entry: deployment_monitor.py (v3.9.0)
 - 5 EARS requirements for deployment status tracking, release discovery, and VERSION_SCOPE blocking
 - Design principles: deployable signal (not just existence), ADR-004 three-tier, C-WU-002 non-blocking
-- See: L656, L604, PROJECT_PLAN_structural_deployment_verification_v1.0.md
+- See: L656, L604, prior internal authoring plan
 
 ### v1.9.0 (2026-02-22)
 
 - Added R-REL-019-07: Public handoff publication requirement (L612)
 - Added sanitization requirements for public handoffs (no private names, paths, fleet size)
 - Added V-tests for public handoff existence and sanitization
-- See: L612, PROJECT_PLAN_public_release_handoff_remediation_v1.0.md
+- See: L612, prior internal authoring plan
 
 ### v1.8.0 (2026-02-20)
 
@@ -1876,14 +1876,14 @@ L944 — this clause governs releases published after v1.18.0.
 - R-REL-019-05: Archetype feature mapping requirement
 - R-REL-019-06: WHY and WHICH, not just WHAT
 - Addresses "curse of knowledge" gap (L587)
-- See: L511, L587, PROJECT_PLAN_release_handoff_spec_enhancement_v1.0
+- See: L511, L587, prior internal authoring plan
 
 ### v1.5.0 (2026-02-15)
 
 - Added CAP-REL-019: Feature-Descriptive Content Review (R-REL-042)
 - Added vocabulary: Feature_Descriptive_Artifact, Version_Indicator_Artifact, Feature_Drift
 - Distinguishes version-indicator (L584) from feature-descriptive (L585) artifact classes
-- See: L585, PROJECT_PLAN_feature_descriptive_artifact_alignment_v1.0
+- See: L585, prior internal authoring plan
 
 ### v1.4.0 (2026-01-17)
 
@@ -1895,7 +1895,7 @@ L944 — this clause governs releases published after v1.18.0.
 - Added CAP-REL-017: VERSION_SCOPE Template Compliance
 - Added CAP-REL-018: Historical VERSION_SCOPE Reconstruction
 - Added vocabulary terms: Version_Scope, MVP_Scope, Release_Phase, Release_Retrospective, Rollback_Plan
-- See: PROJECT_PLAN_version_scope_standardization_v1.0
+- See: prior internal authoring plan
 
 ### v1.2.0 (2026-01-12)
 
@@ -1903,7 +1903,7 @@ L944 — this clause governs releases published after v1.18.0.
 - Added Version-Bearing File Enumeration table
 - Added R-REL-VER-001-01 through R-REL-VER-001-05 requirements
 - Added references to L444, L521
-- See: PROJECT_PLAN_version_bearing_file_remediation_v1.0
+- See: prior internal authoring plan
 
 ### v1.1.0 (2026-01-11)
 

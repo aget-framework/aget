@@ -8,7 +8,7 @@
 **Updated**: 2026-01-04
 **Author**: aget-framework
 **Location**: `aget/specs/AGET_5D_COMPONENTS_SPEC.md`
-**Change Origin**: PROJECT_PLAN_v3.2.0 Gate 3.2
+**Change Origin**: prior internal authoring plan Gate 3.2
 **Related Specs**: AGET_5D_ARCHITECTURE_SPEC, AGET_VOCABULARY_SPEC
 **Consolidates**: AGET_PERSONA_SPEC, AGET_MEMORY_SPEC, AGET_REASONING_SPEC, AGET_SKILLS_SPEC, AGET_CONTEXT_SPEC
 

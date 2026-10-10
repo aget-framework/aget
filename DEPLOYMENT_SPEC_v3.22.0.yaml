@@ -7,7 +7,7 @@
 # Created: 2026-06-27 (RETROSPECTIVE BACK-FILL — authored after the fact per principal
 #   /aget-ask Q2:B 2026-06-27: R-REL-038 STANDS, resume DEPLOYMENT_SPEC authoring.
 #   v3.22-v3.24 shipped WITHOUT a DEPLOYMENT_SPEC — this back-fills the obligation.
-#   PROJECT_PLAN_v3.24_fleet_completion_consumer_gate_v1.0 Gate 1.)
+#   prior internal authoring plan Gate 1.)
 # Origin: DEPLOYMENT_SPEC_v3.21.0.yaml
 # Release: Skill-Support Delivery + Verify-at-Point-of-Use + Hygiene
 
@@ -87,5 +87,5 @@ completion_response:
 
 references:
   changelog: "aget/CHANGELOG.md (v3.22.0 entry, 2026-06-13)"
-  backfill_authority: "principal /aget-ask Q2:B 2026-06-27; PROJECT_PLAN_v3.24_fleet_completion_consumer_gate_v1.0 Gate 1"
+  backfill_authority: "principal /aget-ask Q2:B 2026-06-27; prior internal authoring plan Gate 1"
   defect: "gh#1660 (operational-axis propagation gap)"

@@ -12,9 +12,13 @@ This document records selected AGET Framework releases and historical repository
 
 ## Current Version
 
-**v3.35.1** (2026-10-04 candidate) — Release candidate; publication unverified
+**v3.36.0** (2026-10-10 candidate) — Release candidate; publication unverified
 
-Weekly-train patch: the public decision log and refreshed requirements, the grounded term display form (vocabulary specification v1.18.0, CAP-VOC-006), the `study_topic` zero-result fix, the Antigravity CLI re-measure, a partial referent-registry fix, the 3.35.0 corrections record, and the Apache 2.0 licence file in six templates. See `release-notes/v3.35.1.md`. This entry records the candidate; it does not assert a public tag, Release object or receiver confirmation.
+A migration kit for supervisors: the tools and the batch procedure a supervisor runs to migrate its fleet, with typed authority for each act and permission rules that last one session; the kit is not a template payload. The grounded-term display form already shipped in the previous release, v3.35.1.
+
+**v3.35.1** (published 2026-10-04 UTC) — Published
+
+Weekly-train patch: the public decision log and refreshed requirements, the grounded term display form (vocabulary specification v1.18.0, CAP-VOC-006), the `study_topic` zero-result fix, the Antigravity CLI re-measure, a partial referent-registry fix, the 3.35.0 corrections record, and the Apache 2.0 licence file in six templates. See `release-notes/v3.35.1.md`. The v3.35.1 GitHub Release was published on 2026-10-04 UTC. Publication does not establish downstream deployment or receiver acceptance.
 
 **v3.35.0** (2026-09-26 candidate; published 2026-09-25) — Published
 
@@ -654,5 +658,5 @@ We acknowledge historical gaps transparently and focus on complete releases goin
 ---
 
 *VERSION_HISTORY.md - Selected release history for AGET Framework*
-*Last Updated: 2026-10-04 (v3.35.1 candidate)*
+*Last Updated: 2026-10-10 (v3.36.0 candidate)*
 *Maintained by: aget-framework*

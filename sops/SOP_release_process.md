@@ -3,7 +3,7 @@
 **Version**: 1.35
 **Created**: 2025-11-30
 **Updated**: 2026-10-05
-**Owner**: private-aget-framework-AGET
+**Owner**: aget-framework
 
 **Changelog**: **v1.35** R-REL-035 and Phases 5.5, 5.5.1, 5.5.2, 5.5.3, 6.4.5.3, 6.5, 6.5.1 and 6.5.4 point to CAP-REL-006-02-10 (release-body register) and its inspection V-CAP-REL-006-02-10; 6.5.1 and 6.5.4 now block Phase 7 on a missing or non-conforming V-CAP-REL-006-02-10 result. 2026-10-05. **v1.33** V-G7.x slice canonical sync from private SOP — V-G7.5 added (Org Homepage Badge, was private-only since v1.41) + V-G7.1..V-G7.4 broadened (multi-condition correctness per AUDIT_validator_synecdoche_2026-05-08; closes Synecdoche-HIGH on V-G7.1/V-G7.2 and Synecdoche-MEDIUM on V-G7.3/V-G7.4) + repo enumeration drift fix (explicit RELEASE_REPOS array — case-sensitive bash glob `template-*-aget` silently skipped `template-document-processor-AGET`). v3.17 G1.T1.6 (homepage sub-plan G4 V-test slice; closes L910 V-test sub-slice; full L910 canonical sync remains OUT OF SCOPE per homepage sub-plan G4.2 deferral). Both pin-sites updated atomically (table + script) per L935 multi-site discipline. Canonical now at parity with private V-G7.x section as of private SOP v1.45. 2026-05-09.
 
@@ -26,7 +26,7 @@
 - R-REL-017: Branch Protection Verification - All repos must have branch protection enabled (L508)
 - R-REL-018: Template Visibility Verification - All templates have consistent visibility or documented exception (L509)
 - R-REL-019: Release-to-Fleet Handoff - Create handoff artifact with governance checklist and notify supervisor (L511, L562)
-- R-REL-020: VERSION_SCOPE Required - VERSION_SCOPE document required for minor/major releases (PROJECT_PLAN_version_scope_standardization)
+- R-REL-020: VERSION_SCOPE Required - VERSION_SCOPE document required for minor/major releases (prior internal authoring plan)
 - R-REL-024: Self-Upgrade Validation - Managing agent operationally validates upgrade before public release (L560)
 - R-REL-027: Template Deep Conformance - ALL templates must pass deep conformance check before release
 - R-REL-030: Dogfood Validation - Pilot validation on template/instance before public release (L576)
@@ -117,10 +117,10 @@ See: `.aget/evolution/L553_definition_of_done_release.md`
 ### Lesson Learned (L465)
 
 v3.3.0 planning revealed scope fragmentation across 5 documents:
-- PROJECT_PLAN_v3.3.0_shell_integration.md (Shell only)
-- PROJECT_PLAN_executable_knowledge_ontology_v1.0.md (EKO foundation)
-- PROJECT_PLAN_directory_semantics_reconciliation_v1.0.md (Directory semantics)
-- PROJECT_PLAN_core_entity_vocabulary_v1.0.md (Identified dependencies)
+- prior internal authoring plan (Shell only)
+- prior internal authoring plan (EKO foundation)
+- prior internal authoring plan (Directory semantics)
+- prior internal authoring plan (Identified dependencies)
 - ROADMAP_v3.3.0_specification_maturity.md (Lightweight L-doc list)
 
 **Root Cause**: No SOP requirement for pre-release scope consolidation. Each work stream created independent plans without coordination.
@@ -334,7 +334,7 @@ For historical releases without VERSION_SCOPE, reconstructed documents MAY be cr
 - `planning/TEMPLATE_VERSION_SCOPE.md` — VERSION_SCOPE template
 - `planning/PROPOSAL_version_scope_vocabulary.md` — Vocabulary terms
 - `planning/PROPOSAL_version_scope_spec_requirements.md` — Spec requirements (R-REL-020 through R-REL-028)
-- `PROJECT_PLAN_version_scope_standardization_v1.0.md` — Standardization project
+- `prior internal authoring plan` — Standardization project
 
 ---
 
@@ -1852,7 +1852,7 @@ python3 .aget/patterns/session/verify_session_protocols.py --protocol wake_up
 **Script**: `.aget/patterns/conformance/aget_conformance_report.py` v1.2.0+
 
 **Implements**: R-REL-027 (Template Deep Conformance)
-**Related**: Fleet Conformance Spotcheck (PROJECT_PLAN_fleet_conformance_spotcheck_v1.0.md)
+**Related**: Fleet Conformance Spotcheck (prior internal authoring plan)
 
 ### Phase 0.82: Structural-Rule Reconciliation Gate (SGR-F7)
 
@@ -1874,7 +1874,7 @@ python3 .aget/patterns/session/verify_session_protocols.py --protocol wake_up
 **Why structural, not behavioral** (L490/L563): this is a gate check, not a "remember to look" reminder — the collision survived precisely because nothing forced the instance-organic and framework-structural tracks to be diffed when the rule landed.
 
 **Implements**: SGR-F7 (candidate requirement R-REL-043 — pending AGET_RELEASE_SPEC amendment; ADR-008 ordering: SOP step lands now, spec requirement follows)
-**Related**: gmelli/aget-aget#1489; PROJECT_PLAN_structural_skill_governance_remediation_v1.0
+**Related**: gmelli/aget-aget#1489; prior internal authoring plan
 
 ### Phase 0.85: Deliverable Conformance Check (D40, L652)
 
@@ -2014,7 +2014,7 @@ python3 .aget/patterns/session/verify_session_protocols.py --protocol wake_up
 4. **Re-verify** - Run pilot and regression again
 
 **Implements**: R-REL-030 through R-REL-034 (Release Quality Validation)
-**Related**: L576 (Release Quality Validation Gap), PROJECT_PLAN_archetype_customization_v3.5_v1.0.md Gate 5.75
+**Related**: L576 (Release Quality Validation Gap), prior internal authoring plan Gate 5.75
 
 ### Phase 0.95: Skill Dependency Validation *(spec-anchor RETIRED 2026-07-04 — prior "(R-REL-042)" citation collided with spec v1.17.1 CAP-REL-019 (Feature-Descriptive Content Review); spec is authority (L672); re-anchoring tracked #1766)*
 
@@ -2788,7 +2788,7 @@ git show "v${VERSION}:aget/DEPLOYMENT_SPEC_v${VERSION}.yaml" >/dev/null 2>&1 || 
   { echo "⚠️ DEPLOYMENT_SPEC not tag-resolvable (verify path)"; }
 ```
 
-**Implements**: #1154 (tag-vs-HEAD fleet artifact gap), root-caused from a downstream fleet #1152 (FLEET-UPG-014). v3.15 was the last release with the deprecated ordering; v3.16 is the first release exercising the corrected ordering.
+**Implements**: #1154 (tag-vs-HEAD fleet artifact gap), root-caused from a downstream fleet #1152 (prior fleet upgrade case). v3.15 was the last release with the deprecated ordering; v3.16 is the first release exercising the corrected ordering.
 
 **Rationale**: Tags are immutable references. Remote fleet supervisors checking out vX.Y.Z must be able to read the handoff/spec from the tagged commit, not from a moving HEAD that may have advanced. Cutting tag AFTER Phase 6.4 ensures all handoff state is captured in the tag commit.
 

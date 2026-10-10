@@ -444,7 +444,7 @@ graduation:
 - SOP_sop_creation.md v1.0.0 (creation procedure)
 - SOP_specification_consolidation.md (CONSOLIDATE category subset)
 - SOP_pre_release_research.md (classification taxonomy)
-- PROJECT_PLAN_aget_enhance_spec_skill_v1.0.md (parent project)
+- prior internal authoring plan (parent project)
 
 ---
 

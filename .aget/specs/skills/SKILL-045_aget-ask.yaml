@@ -2,7 +2,7 @@
 # Purpose: Generate clarifying questions that maximally reduce agent entropy on the principal's next-action intent.
 # Created: 2026-04-18
 # Based on: SP-018 (PROPOSAL_aget-ask.md), SKILL_SPEC_TEMPLATE.yaml
-# Status: production (v1.0.0 — graduated 2026-07-03, PROJECT_PLAN_aget_ask_formalization Gate 1)
+# Status: production (v1.0.0 — graduated 2026-07-03, prior internal authoring plan Gate 1)
 
 spec:
   id: SKILL-045

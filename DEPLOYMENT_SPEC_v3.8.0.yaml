@@ -370,7 +370,7 @@ traceability:
     - "L643: Meta-Principle Codification"
     - "L644: Template-Spec Drift & Anti-Patterns"
     - "L649: Closure-Time Structural Gap"
-  project: "PROJECT_PLAN_v3.8.0_release_v1.0.md"
+  project: "prior internal authoring plan"
   supersedes: "DEPLOYMENT_SPEC_v3.7.0.yaml"
   requirements:
     - "R-DEP-001: Canonical Source Requirement"

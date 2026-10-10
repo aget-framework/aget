@@ -1,6 +1,6 @@
 """Red fixtures for /aget-propose-actions outcome gating (gh#2703; proposed REQ-PA-022 / V-PA-022).
 
-Written at Gate 0 of planning/PROJECT_PLAN_v3.35.0_value_row_propose_actions_repairs_v1.0.md,
+Written at Gate 0 of prior internal authoring plan,
 BEFORE the implementation existed: every test ran red (strict xfail) on 2026-09-24 at 09:40, and
 went green at Gate 1 when check_outcome_gating and close_summary landed and the markers were removed.
 

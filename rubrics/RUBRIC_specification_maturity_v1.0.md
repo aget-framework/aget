@@ -2,10 +2,10 @@
 
 **Version**: 1.0
 **Created**: 2026-03-16
-**Author**: private-aget-framework-AGET
+**Author**: aget-framework
 **Domain**: Specification maturity assessment — how close a spec is to verified fabric
 **Status**: Active
-**Cross-Agent Source**: F159 (private-professional-core-aget), L682
+**Cross-Agent Source**: F159 (aget-framework), L682
 
 ## Purpose
 
@@ -165,5 +165,5 @@ Each level must trigger different actions:
 ---
 
 *RUBRIC_specification_maturity_v1.0.md*
-*Adapted from F159 (private-professional-core-aget) for framework spec portfolio*
+*Adapted from F159 (aget-framework) for framework spec portfolio*
 *Per L671: each level triggers different downstream actions*

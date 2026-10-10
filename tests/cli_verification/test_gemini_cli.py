@@ -7,7 +7,7 @@ Second non-Claude validation target.
 Version: 1.0.0
 CLI: Gemini CLI
 Minimum Version: 0.20.0
-Implements: PROJECT_PLAN_cli_independence_validation_v1.0
+Implements: prior internal authoring plan
 """
 
 import json
