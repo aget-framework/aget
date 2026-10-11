@@ -1,0 +1,2086 @@
+{
+  "status": "Publication draft; meanings adopted locally, public publication pending",
+  "ontology_style": "SKOS-aligned meanings with explicit scoped constraints; not a complete logical axiomatization",
+  "definition_display": "HTML replaces underscores with spaces and trims field-edge whitespace for display. JSON preserves the complete adopted definition fields, including their original whitespace.",
+  "definitions": [
+    {
+      "uri": "aget:concept/Principal",
+      "ontology_id": "C001",
+      "preferred_label": "Principal",
+      "definition": "A Principal is a Cognitive_Entity that AI agents serve and that retains ultimate authority over their system.\n",
+      "parent_uri": "aget:concept/CognitiveEntity",
+      "meaning_state": "adopted for this architectural model",
+      "public_support": [
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_VOCABULARY_SPEC.md#L255-L255",
+          "role": "meaning",
+          "proves": "The Principal is the human operator with ultimate authority.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "bf96e1d6f1f4d806bddc244a4f5f8d2b94ea4d774ed45e241e443d1812cfe324"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_SESSION_SPEC.md#L226-L236",
+          "role": "obligation",
+          "proves": "Work is classified by scope; execution beyond the session mandate requires approval.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "c4e9e6fe6ecdf6b3df44ee3fbd4ccf8c91f7fd36eb6bfce7b21a7ad536fcbfa6"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_PROJECT_PLAN_SPEC.md#L677-L677",
+          "role": "obligation",
+          "proves": "A passed gate presents a decision point for Principal approval. The governing plan determines the required approval.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "7536ce512390c7a4a7ade6732fadcf56c789648d1a8c5e05444ff42a4fd99009"
+        }
+      ],
+      "properties": [
+        {
+          "name": "ultimate_authority",
+          "domain_uri": "aget:concept/Principal",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "served_by",
+          "domain_uri": "aget:concept/Principal",
+          "range": "aget:concept/Agent",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        }
+      ],
+      "view_key": "principal",
+      "display_label": "Principal",
+      "diagram_summary": "Directs work within the relevant authority relationship.",
+      "evidence_limit": "No actual approval event or blanket requirement for a new approval at every action is established."
+    },
+    {
+      "uri": "aget:concept/AgetInstance",
+      "ontology_id": "C2033",
+      "preferred_label": "Aget_Instance",
+      "definition": "An Aget_Instance is an Agent created from a reusable template and configured as a persistent identity distinct from its working copies and the AI system it uses.\n",
+      "parent_uri": "aget:concept/Agent",
+      "meaning_state": "adopted for this architectural model",
+      "public_support": [
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_VOCABULARY_SPEC.md#L1174-L1180",
+          "role": "meaning",
+          "proves": "An Aget is a concrete agent identity, distinct from a host working copy and the AI system it uses.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "991f908e78d4b52a4b555bba8925edba7d3c8988e2f6760334e45bcb79944a03"
+        }
+      ],
+      "properties": [
+        {
+          "name": "identity_name",
+          "domain_uri": "aget:concept/AgetInstance",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "template_origin",
+          "domain_uri": "aget:concept/AgetInstance",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "instruction_artifacts",
+          "domain_uri": "aget:concept/AgetInstance",
+          "range": "aget:concept/Artifact",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        }
+      ],
+      "view_key": "aget",
+      "display_label": "Aget identity",
+      "diagram_summary": "Persistent identity, distinct from its working copies and runtime.",
+      "evidence_limit": "No live identity reconciliation, uninterrupted memory or successful handoff is proved."
+    },
+    {
+      "uri": "aget:concept/AgetClone",
+      "ontology_id": "C2034",
+      "preferred_label": "Aget_Clone",
+      "definition": "An Aget_Clone is an Artifact that materializes one Aget_Instance as an on-disk working copy with its own working tree, records and hooks.\n",
+      "parent_uri": "aget:concept/Artifact",
+      "meaning_state": "adopted for this architectural model",
+      "public_support": [
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_VOCABULARY_SPEC.md#L1174-L1180",
+          "role": "meaning",
+          "proves": "An Aget is a concrete agent identity, distinct from a host working copy and the AI system it uses.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "991f908e78d4b52a4b555bba8925edba7d3c8988e2f6760334e45bcb79944a03"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_5D_ARCHITECTURE_SPEC.md#L462-L466",
+          "role": "design-mapping",
+          "proves": "The composition spec maps identity, memory, reasoning, skill and context characteristics to repository artifacts.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "f10e6bf58d2761cdf90adb61ece109ab57ca9940c2b205f8d0b17fbce93c48d9"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_INSTANCE_SPEC.md#L155-L167",
+          "role": "obligation",
+          "proves": "Instances must maintain archetype-standard directories, including governance, sessions, planning and knowledge.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "6d15b8a0da490b577117644c7348407b7b6ff62d6514106008885e1d83547e9a"
+        }
+      ],
+      "properties": [
+        {
+          "name": "materialized_identity",
+          "domain_uri": "aget:concept/AgetClone",
+          "range": "aget:concept/AgetInstance",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "working_tree",
+          "domain_uri": "aget:concept/AgetClone",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "identifier_allocation_scope",
+          "domain_uri": "aget:concept/AgetClone",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        }
+      ],
+      "view_key": "copy",
+      "display_label": "Working copy",
+      "diagram_summary": "On-disk materialization of one Aget identity, with its own records and hooks.",
+      "evidence_limit": "No specific installed checkout, clone inventory or required artifact inventory is observed."
+    },
+    {
+      "uri": "aget:concept/GovernedRecordSet",
+      "ontology_id": "C2151",
+      "preferred_label": "Governed Record Set",
+      "definition": "A Governed_Record_Set is an Artifact that groups selected repository records carrying identity, memory, instructions or governance responsibilities.\n",
+      "parent_uri": "aget:concept/Artifact",
+      "meaning_state": "adopted for this architectural model",
+      "public_support": [
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_5D_ARCHITECTURE_SPEC.md#L462-L466",
+          "role": "design-mapping",
+          "proves": "The composition spec maps identity, memory, reasoning, skill and context characteristics to repository artifacts.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "f10e6bf58d2761cdf90adb61ece109ab57ca9940c2b205f8d0b17fbce93c48d9"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_INSTANCE_SPEC.md#L155-L167",
+          "role": "obligation",
+          "proves": "Instances must maintain archetype-standard directories, including governance, sessions, planning and knowledge.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "6d15b8a0da490b577117644c7348407b7b6ff62d6514106008885e1d83547e9a"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_UNATTENDED_AUTONOMY_SPEC.md#L72-L76",
+          "role": "obligation",
+          "proves": "An unattended run must leave an audit record; the captured source marks that verification runtime-pending.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "ab51ff2141da5628d8047afe47a4a33ad4747c6244aa97a9c0c86c91c62f869b"
+        }
+      ],
+      "properties": [
+        {
+          "name": "members",
+          "domain_uri": "aget:concept/GovernedRecordSet",
+          "range": "aget:concept/Artifact",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "record_roles",
+          "domain_uri": "aget:concept/GovernedRecordSet",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "selection_scope",
+          "domain_uri": "aget:concept/GovernedRecordSet",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        }
+      ],
+      "view_key": "records",
+      "display_label": "Governed records",
+      "diagram_summary": "Selected identity, memory, instruction and governance records.",
+      "evidence_limit": "Presence of a file is not proof its instruction was followed or its claim is true."
+    },
+    {
+      "uri": "aget:concept/CollaborationSession",
+      "ontology_id": "C783",
+      "preferred_label": "Collaboration Session",
+      "definition": "A Collaboration_Session is a Channel_Interaction that forms a bounded principal-agent or pairing work episode.\n",
+      "parent_uri": "aget:concept/ChannelInteraction",
+      "meaning_state": "adopted for this architectural model",
+      "public_support": [
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_SESSION_SPEC.md#L16-L18",
+          "role": "meaning",
+          "proves": "A session is a bounded collaboration period with initialization, operation and finalization.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "81988f81026bb3376673d3fd84ec8f47ea5b323bb3daaeabadd5859da2f18449"
+        }
+      ],
+      "properties": [
+        {
+          "name": "episode_identity",
+          "domain_uri": "aget:concept/CollaborationSession",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "participants",
+          "domain_uri": "aget:concept/CollaborationSession",
+          "range": "aget:concept/Entity",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "episode_boundaries",
+          "domain_uri": "aget:concept/CollaborationSession",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        }
+      ],
+      "view_key": "session",
+      "display_label": "Collaboration session",
+      "diagram_summary": "Bounded work episode, distinct from identity and process lifetime.",
+      "evidence_limit": "The definition does not show that a particular episode completed or recovered context correctly."
+    },
+    {
+      "uri": "aget:concept/AgentRuntime",
+      "ontology_id": "C2152",
+      "preferred_label": "Agent Runtime",
+      "definition": "An Agent_Runtime is a Software_System that supplies an execution mechanism for agent-assisted work through configured tool interfaces.\n",
+      "parent_uri": "aget:concept/SoftwareSystem",
+      "meaning_state": "adopted for this architectural model",
+      "public_support": [
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_FRAMEWORK_SPEC.md#L40-L43",
+          "role": "scope-boundary",
+          "proves": "The framework specifies governance artifacts and protocols; it excludes CLI internals, model behavior and code execution semantics.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "baf297403f65aed84ec3f5fe9bb722aa1a146fb00c4247808af8898dd0250a49"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/docs/AGET_CLI_SUPPORT_MATRIX.md#L36-L51",
+          "role": "evidence-standard",
+          "proves": "Runtime support is graded and dated; installation and instructability do not establish a governed invocation.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "72fd2dc23cea2ba41cab9d58cec27f3d638795955ad1b0cba58493b5b2052c88"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/scripts/wake_up.py#L350-L366",
+          "role": "implementation-design",
+          "proves": "The captured wake-up function loads version and identity JSON files. This is code inspection, not proof every CLI reads every record.",
+          "limit": "Function body inspected; not executed as a conformance trial in this batch.",
+          "excerpt_sha256": "50dba79e8bb7eed4c87915ab00a385f5ac85a6df32c20cd2d2c473e0d776bf58"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/overview",
+          "role": "vendor-example",
+          "proves": "The vendor describes a coding tool that can use codebase files and execute commands, including through a terminal interface.",
+          "limit": "Example for this vendor only; no universal runtime mechanism or execution occurrence.",
+          "excerpt_sha256": "3ddf63060a005380bdf6c079cbdfb19e9bc8c254eeee39465960c933d2ddae9d"
+        }
+      ],
+      "properties": [
+        {
+          "name": "runtime_identity",
+          "domain_uri": "aget:concept/AgentRuntime",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "tool_interfaces",
+          "domain_uri": "aget:concept/AgentRuntime",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "integration_route",
+          "domain_uri": "aget:concept/AgentRuntime",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        }
+      ],
+      "view_key": "runtime",
+      "display_label": "Agent runtime",
+      "diagram_summary": "Software system supplying execution through configured tool interfaces.",
+      "evidence_limit": "Vendor documentation and code inspection do not prove this installation ran a governed AGET invocation."
+    },
+    {
+      "uri": "aget:concept/ExecutionPermissionControl",
+      "ontology_id": "C2153",
+      "preferred_label": "Execution Permission Control",
+      "definition": "An Execution_Permission_Control is an Entity that implements a mechanism for evaluating or enforcing whether a specified runtime operation is permitted under an applicable access rule.",
+      "parent_uri": "aget:concept/Entity",
+      "meaning_state": "adopted for this architectural model",
+      "public_support": [
+        {
+          "url": "https://code.claude.com/docs/en/permissions#permission-system",
+          "role": "vendor-example",
+          "proves": "In this vendor example, the runtime enforces tool permission rules; prompt instructions do not themselves grant access.",
+          "limit": "Example for this vendor only; no universal runtime mechanism or execution occurrence.",
+          "excerpt_sha256": "11ab7d38dfd2197b25287e84b0e4a60cb3c1881bb8ce417c01d7b0a9df6cf1e6"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/sandboxing#how-sandboxing-relates-to-permissions-and-permission-modes",
+          "role": "vendor-example",
+          "proves": "This vendor documents tool permissions separately from operating-system filesystem and network isolation.",
+          "limit": "Example for this vendor only; no universal runtime mechanism or execution occurrence.",
+          "excerpt_sha256": "539a329fa7ad93bfa3204a15924a9610ff62db26e2bb78cb524bb03fb1807ca7"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_SESSION_SPEC.md#L226-L236",
+          "role": "obligation",
+          "proves": "Work is classified by scope; execution beyond the session mandate requires approval.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "c4e9e6fe6ecdf6b3df44ee3fbd4ccf8c91f7fd36eb6bfce7b21a7ad536fcbfa6"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_PROJECT_PLAN_SPEC.md#L677-L677",
+          "role": "obligation",
+          "proves": "A passed gate presents a decision point for Principal approval. The governing plan determines the required approval.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "7536ce512390c7a4a7ade6732fadcf56c789648d1a8c5e05444ff42a4fd99009"
+        }
+      ],
+      "properties": [
+        {
+          "name": "protected_operation",
+          "domain_uri": "aget:concept/ExecutionPermissionControl",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "applicable_access_rule",
+          "domain_uri": "aget:concept/ExecutionPermissionControl",
+          "range": "aget:concept/Artifact",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "enforcing_component",
+          "domain_uri": "aget:concept/ExecutionPermissionControl",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "decision_scope",
+          "domain_uri": "aget:concept/ExecutionPermissionControl",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        }
+      ],
+      "view_key": "permission",
+      "display_label": "Permission control",
+      "diagram_summary": "Evaluates or enforces access for a specified runtime operation.",
+      "evidence_limit": "No specific permission grant, expiry, host configuration or vendor-independent enforcement is observed."
+    },
+    {
+      "uri": "aget:concept/ExecutionHost",
+      "ontology_id": "C2154",
+      "preferred_label": "Execution Host",
+      "definition": "An Execution_Host is a System that provides infrastructure resources in which an execution mechanism can operate.\n",
+      "parent_uri": "aget:concept/System",
+      "meaning_state": "adopted for this architectural model",
+      "public_support": [
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_HOST_RUNTIME_SPEC.md#L12-L18",
+          "role": "scope-boundary",
+          "proves": "The host-layout spec governs always-on filesystem classes; it is not a general host permission contract.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "563682f3cbaa2a14e8cbcc6dd6742a680eaaa147d11db565695f0ee327938724"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/sandboxing#how-sandboxing-relates-to-permissions-and-permission-modes",
+          "role": "vendor-example",
+          "proves": "This vendor documents tool permissions separately from operating-system filesystem and network isolation.",
+          "limit": "Example for this vendor only; no universal runtime mechanism or execution occurrence.",
+          "excerpt_sha256": "539a329fa7ad93bfa3204a15924a9610ff62db26e2bb78cb524bb03fb1807ca7"
+        }
+      ],
+      "properties": [
+        {
+          "name": "environment_identity",
+          "domain_uri": "aget:concept/ExecutionHost",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "operating_system",
+          "domain_uri": "aget:concept/ExecutionHost",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "execution_resources",
+          "domain_uri": "aget:concept/ExecutionHost",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        }
+      ],
+      "view_key": "host",
+      "display_label": "Execution host",
+      "diagram_summary": "Infrastructure resources. No deployment connection is established here.",
+      "evidence_limit": "No deployed-on relation, machine inventory, network topology or security conformance is proved."
+    },
+    {
+      "uri": "aget:concept/ExecutionEvidenceRecord",
+      "ontology_id": "C2155",
+      "preferred_label": "Execution Evidence Record",
+      "definition": "An Execution_Evidence_Record is an Artifact that records claims or observations about an identified execution occurrence together with provenance and the scope of the supported claim.\n",
+      "parent_uri": "aget:concept/Artifact",
+      "meaning_state": "adopted for this architectural model",
+      "public_support": [
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_UNATTENDED_AUTONOMY_SPEC.md#L72-L76",
+          "role": "obligation",
+          "proves": "An unattended run must leave an audit record; the captured source marks that verification runtime-pending.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "ab51ff2141da5628d8047afe47a4a33ad4747c6244aa97a9c0c86c91c62f869b"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/docs/AGET_CLI_SUPPORT_MATRIX.md#L36-L51",
+          "role": "evidence-standard",
+          "proves": "Runtime support is graded and dated; installation and instructability do not establish a governed invocation.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "72fd2dc23cea2ba41cab9d58cec27f3d638795955ad1b0cba58493b5b2052c88"
+        }
+      ],
+      "properties": [
+        {
+          "name": "evidence_subject",
+          "domain_uri": "aget:concept/ExecutionEvidenceRecord",
+          "range": "aget:concept/Entity",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "occurrence_identity",
+          "domain_uri": "aget:concept/ExecutionEvidenceRecord",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "provenance",
+          "domain_uri": "aget:concept/ExecutionEvidenceRecord",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "claim_scope",
+          "domain_uri": "aget:concept/ExecutionEvidenceRecord",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        }
+      ],
+      "view_key": "receipt",
+      "display_label": "Execution evidence",
+      "diagram_summary": "A record supports specified claims when subject and occurrence match.",
+      "evidence_limit": "An obligation to create evidence is not evidence that execution occurred; one receipt is not universal conformance."
+    },
+    {
+      "uri": "aget:concept/OntologyTerm",
+      "ontology_id": "C2156",
+      "preferred_label": "Ontology Term",
+      "definition": "An Ontology_Term is an Artifact that serves as a deliberately registered lexical designation of a concept through a preferred label or an explicitly registered alias.\n",
+      "parent_uri": "aget:concept/Artifact",
+      "meaning_state": "adopted for this architectural model",
+      "public_support": [],
+      "properties": [
+        {
+          "name": "designation",
+          "domain_uri": "aget:concept/OntologyTerm",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "referent_uri",
+          "domain_uri": "aget:concept/OntologyTerm",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "register_revision",
+          "domain_uri": "aget:concept/OntologyTerm",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        }
+      ]
+    },
+    {
+      "uri": "aget:concept/FormallyGroundedTerm",
+      "ontology_id": "C2157",
+      "preferred_label": "Formally Grounded Term",
+      "definition": "A Formally_Grounded_Term is an Ontology_Term whose referent, genus, distinguishing properties and applicable relationships are explicitly represented and traceably supported by identified artifacts, with applicable grounding constraints checked.\n",
+      "parent_uri": "aget:concept/OntologyTerm",
+      "meaning_state": "adopted for this architectural model",
+      "public_support": [],
+      "properties": [
+        {
+          "name": "resolved_referent",
+          "domain_uri": "aget:concept/FormallyGroundedTerm",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "resolved_genus",
+          "domain_uri": "aget:concept/FormallyGroundedTerm",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "artifact_bindings",
+          "domain_uri": "aget:concept/FormallyGroundedTerm",
+          "range": "aget:concept/Artifact",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "constraint_results",
+          "domain_uri": "aget:concept/FormallyGroundedTerm",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        }
+      ]
+    },
+    {
+      "uri": "aget:concept/GovernedRelation",
+      "ontology_id": "C1220",
+      "preferred_label": "Governed Relation",
+      "definition": "A Governed_Relation is an Entity that represents a named, directed predicate between governed entities and specifies its inverse.\n",
+      "parent_uri": "aget:concept/Entity",
+      "meaning_state": "adopted for this architectural model",
+      "public_support": [],
+      "properties": [
+        {
+          "name": "domain",
+          "domain_uri": "aget:concept/GovernedRelation",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "range",
+          "domain_uri": "aget:concept/GovernedRelation",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "inverse",
+          "domain_uri": "aget:concept/GovernedRelation",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        }
+      ]
+    },
+    {
+      "uri": "aget:concept/DirectsAgetWork",
+      "ontology_id": "C2158",
+      "preferred_label": "Directs Aget Work",
+      "definition": "A Directs_Aget_Work is a Governed_Relation asserting that a Principal directs work undertaken by an Aget_Instance within the applicable authority relationship.\n",
+      "parent_uri": "aget:concept/GovernedRelation",
+      "meaning_state": "adopted for this architectural model",
+      "public_support": [
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_VOCABULARY_SPEC.md#L255-L255",
+          "role": "meaning",
+          "proves": "The Principal is the human operator with ultimate authority.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "bf96e1d6f1f4d806bddc244a4f5f8d2b94ea4d774ed45e241e443d1812cfe324"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_SESSION_SPEC.md#L226-L236",
+          "role": "obligation",
+          "proves": "Work is classified by scope; execution beyond the session mandate requires approval.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "c4e9e6fe6ecdf6b3df44ee3fbd4ccf8c91f7fd36eb6bfce7b21a7ad536fcbfa6"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_PROJECT_PLAN_SPEC.md#L677-L677",
+          "role": "obligation",
+          "proves": "A passed gate presents a decision point for Principal approval. The governing plan determines the required approval.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "7536ce512390c7a4a7ade6732fadcf56c789648d1a8c5e05444ff42a4fd99009"
+        }
+      ],
+      "properties": [
+        {
+          "name": "domain",
+          "domain_uri": "aget:concept/DirectsAgetWork",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "range",
+          "domain_uri": "aget:concept/DirectsAgetWork",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "inverse",
+          "domain_uri": "aget:concept/DirectsAgetWork",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "conditions",
+          "domain_uri": "aget:concept/DirectsAgetWork",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        }
+      ]
+    },
+    {
+      "uri": "aget:concept/MaterializesAgetIdentity",
+      "ontology_id": "C2159",
+      "preferred_label": "Materializes Aget Identity",
+      "definition": "A Materializes_Aget_Identity is a Governed_Relation asserting that an Aget_Clone materializes the persistent identity of an Aget_Instance.\n",
+      "parent_uri": "aget:concept/GovernedRelation",
+      "meaning_state": "adopted for this architectural model",
+      "public_support": [
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_VOCABULARY_SPEC.md#L1174-L1180",
+          "role": "meaning",
+          "proves": "An Aget is a concrete agent identity, distinct from a host working copy and the AI system it uses.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "991f908e78d4b52a4b555bba8925edba7d3c8988e2f6760334e45bcb79944a03"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_5D_ARCHITECTURE_SPEC.md#L462-L466",
+          "role": "design-mapping",
+          "proves": "The composition spec maps identity, memory, reasoning, skill and context characteristics to repository artifacts.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "f10e6bf58d2761cdf90adb61ece109ab57ca9940c2b205f8d0b17fbce93c48d9"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_INSTANCE_SPEC.md#L155-L167",
+          "role": "obligation",
+          "proves": "Instances must maintain archetype-standard directories, including governance, sessions, planning and knowledge.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "6d15b8a0da490b577117644c7348407b7b6ff62d6514106008885e1d83547e9a"
+        }
+      ],
+      "properties": [
+        {
+          "name": "domain",
+          "domain_uri": "aget:concept/MaterializesAgetIdentity",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "range",
+          "domain_uri": "aget:concept/MaterializesAgetIdentity",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "inverse",
+          "domain_uri": "aget:concept/MaterializesAgetIdentity",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "conditions",
+          "domain_uri": "aget:concept/MaterializesAgetIdentity",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        }
+      ]
+    },
+    {
+      "uri": "aget:concept/StoresGovernedRecords",
+      "ontology_id": "C2160",
+      "preferred_label": "Stores Governed Records",
+      "definition": "A Stores_Governed_Records is a Governed_Relation asserting that an Aget_Clone stores the selected artifacts of a Governed_Record_Set.\n",
+      "parent_uri": "aget:concept/GovernedRelation",
+      "meaning_state": "adopted for this architectural model",
+      "public_support": [
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_5D_ARCHITECTURE_SPEC.md#L462-L466",
+          "role": "design-mapping",
+          "proves": "The composition spec maps identity, memory, reasoning, skill and context characteristics to repository artifacts.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "f10e6bf58d2761cdf90adb61ece109ab57ca9940c2b205f8d0b17fbce93c48d9"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_INSTANCE_SPEC.md#L155-L167",
+          "role": "obligation",
+          "proves": "Instances must maintain archetype-standard directories, including governance, sessions, planning and knowledge.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "6d15b8a0da490b577117644c7348407b7b6ff62d6514106008885e1d83547e9a"
+        }
+      ],
+      "properties": [
+        {
+          "name": "domain",
+          "domain_uri": "aget:concept/StoresGovernedRecords",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "range",
+          "domain_uri": "aget:concept/StoresGovernedRecords",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "inverse",
+          "domain_uri": "aget:concept/StoresGovernedRecords",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "conditions",
+          "domain_uri": "aget:concept/StoresGovernedRecords",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        }
+      ]
+    },
+    {
+      "uri": "aget:concept/UsesAgetWorkingCopy",
+      "ontology_id": "C2161",
+      "preferred_label": "Uses Aget Working Copy",
+      "definition": "A Uses_Aget_Working_Copy is a Governed_Relation asserting that an Agent_Runtime accesses relevant artifacts of an Aget_Clone through a documented integration route.\n",
+      "parent_uri": "aget:concept/GovernedRelation",
+      "meaning_state": "adopted for this architectural model",
+      "public_support": [
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_VOCABULARY_SPEC.md#L1174-L1180",
+          "role": "meaning",
+          "proves": "An Aget is a concrete agent identity, distinct from a host working copy and the AI system it uses.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "991f908e78d4b52a4b555bba8925edba7d3c8988e2f6760334e45bcb79944a03"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_FRAMEWORK_SPEC.md#L40-L43",
+          "role": "scope-boundary",
+          "proves": "The framework specifies governance artifacts and protocols; it excludes CLI internals, model behavior and code execution semantics.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "baf297403f65aed84ec3f5fe9bb722aa1a146fb00c4247808af8898dd0250a49"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/docs/AGET_CLI_SUPPORT_MATRIX.md#L36-L51",
+          "role": "evidence-standard",
+          "proves": "Runtime support is graded and dated; installation and instructability do not establish a governed invocation.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "72fd2dc23cea2ba41cab9d58cec27f3d638795955ad1b0cba58493b5b2052c88"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/scripts/wake_up.py#L350-L366",
+          "role": "implementation-design",
+          "proves": "The captured wake-up function loads version and identity JSON files. This is code inspection, not proof every CLI reads every record.",
+          "limit": "Function body inspected; not executed as a conformance trial in this batch.",
+          "excerpt_sha256": "50dba79e8bb7eed4c87915ab00a385f5ac85a6df32c20cd2d2c473e0d776bf58"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/overview",
+          "role": "vendor-example",
+          "proves": "The vendor describes a coding tool that can use codebase files and execute commands, including through a terminal interface.",
+          "limit": "Example for this vendor only; no universal runtime mechanism or execution occurrence.",
+          "excerpt_sha256": "3ddf63060a005380bdf6c079cbdfb19e9bc8c254eeee39465960c933d2ddae9d"
+        }
+      ],
+      "properties": [
+        {
+          "name": "domain",
+          "domain_uri": "aget:concept/UsesAgetWorkingCopy",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "range",
+          "domain_uri": "aget:concept/UsesAgetWorkingCopy",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "inverse",
+          "domain_uri": "aget:concept/UsesAgetWorkingCopy",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "conditions",
+          "domain_uri": "aget:concept/UsesAgetWorkingCopy",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        }
+      ]
+    },
+    {
+      "uri": "aget:concept/SupportsCollaborationSession",
+      "ontology_id": "C2162",
+      "preferred_label": "Supports Collaboration Session",
+      "definition": "A Supports_Collaboration_Session is a Governed_Relation asserting that an Agent_Runtime supplies execution support during a Collaboration_Session.\n",
+      "parent_uri": "aget:concept/GovernedRelation",
+      "meaning_state": "adopted for this architectural model",
+      "public_support": [
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_SESSION_SPEC.md#L16-L18",
+          "role": "meaning",
+          "proves": "A session is a bounded collaboration period with initialization, operation and finalization.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "81988f81026bb3376673d3fd84ec8f47ea5b323bb3daaeabadd5859da2f18449"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_FRAMEWORK_SPEC.md#L40-L43",
+          "role": "scope-boundary",
+          "proves": "The framework specifies governance artifacts and protocols; it excludes CLI internals, model behavior and code execution semantics.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "baf297403f65aed84ec3f5fe9bb722aa1a146fb00c4247808af8898dd0250a49"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/docs/AGET_CLI_SUPPORT_MATRIX.md#L36-L51",
+          "role": "evidence-standard",
+          "proves": "Runtime support is graded and dated; installation and instructability do not establish a governed invocation.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "72fd2dc23cea2ba41cab9d58cec27f3d638795955ad1b0cba58493b5b2052c88"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/overview",
+          "role": "vendor-example",
+          "proves": "The vendor describes a coding tool that can use codebase files and execute commands, including through a terminal interface.",
+          "limit": "Example for this vendor only; no universal runtime mechanism or execution occurrence.",
+          "excerpt_sha256": "3ddf63060a005380bdf6c079cbdfb19e9bc8c254eeee39465960c933d2ddae9d"
+        }
+      ],
+      "properties": [
+        {
+          "name": "domain",
+          "domain_uri": "aget:concept/SupportsCollaborationSession",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "range",
+          "domain_uri": "aget:concept/SupportsCollaborationSession",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "inverse",
+          "domain_uri": "aget:concept/SupportsCollaborationSession",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "conditions",
+          "domain_uri": "aget:concept/SupportsCollaborationSession",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        }
+      ]
+    },
+    {
+      "uri": "aget:concept/ParticipatesInCollaborationSession",
+      "ontology_id": "C2163",
+      "preferred_label": "Participates In Collaboration Session",
+      "definition": "A Participates_In_Collaboration_Session is a Governed_Relation asserting that an Aget_Instance participates in a Collaboration_Session while remaining distinct from that episode.\n",
+      "parent_uri": "aget:concept/GovernedRelation",
+      "meaning_state": "adopted for this architectural model",
+      "public_support": [
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_VOCABULARY_SPEC.md#L1174-L1180",
+          "role": "meaning",
+          "proves": "An Aget is a concrete agent identity, distinct from a host working copy and the AI system it uses.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "991f908e78d4b52a4b555bba8925edba7d3c8988e2f6760334e45bcb79944a03"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_SESSION_SPEC.md#L16-L18",
+          "role": "meaning",
+          "proves": "A session is a bounded collaboration period with initialization, operation and finalization.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "81988f81026bb3376673d3fd84ec8f47ea5b323bb3daaeabadd5859da2f18449"
+        }
+      ],
+      "properties": [
+        {
+          "name": "domain",
+          "domain_uri": "aget:concept/ParticipatesInCollaborationSession",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "range",
+          "domain_uri": "aget:concept/ParticipatesInCollaborationSession",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "inverse",
+          "domain_uri": "aget:concept/ParticipatesInCollaborationSession",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "conditions",
+          "domain_uri": "aget:concept/ParticipatesInCollaborationSession",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        }
+      ]
+    },
+    {
+      "uri": "aget:concept/SubjectToExecutionPermissionControl",
+      "ontology_id": "C2164",
+      "preferred_label": "Subject To Execution Permission Control",
+      "definition": "A Subject_To_Execution_Permission_Control is a Governed_Relation asserting that an operation of an Agent_Runtime is evaluated or constrained by an applicable Execution_Permission_Control.\n",
+      "parent_uri": "aget:concept/GovernedRelation",
+      "meaning_state": "adopted for this architectural model",
+      "public_support": [
+        {
+          "url": "https://code.claude.com/docs/en/permissions#permission-system",
+          "role": "vendor-example",
+          "proves": "In this vendor example, the runtime enforces tool permission rules; prompt instructions do not themselves grant access.",
+          "limit": "Example for this vendor only; no universal runtime mechanism or execution occurrence.",
+          "excerpt_sha256": "11ab7d38dfd2197b25287e84b0e4a60cb3c1881bb8ce417c01d7b0a9df6cf1e6"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/sandboxing#how-sandboxing-relates-to-permissions-and-permission-modes",
+          "role": "vendor-example",
+          "proves": "This vendor documents tool permissions separately from operating-system filesystem and network isolation.",
+          "limit": "Example for this vendor only; no universal runtime mechanism or execution occurrence.",
+          "excerpt_sha256": "539a329fa7ad93bfa3204a15924a9610ff62db26e2bb78cb524bb03fb1807ca7"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_SESSION_SPEC.md#L226-L236",
+          "role": "obligation",
+          "proves": "Work is classified by scope; execution beyond the session mandate requires approval.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "c4e9e6fe6ecdf6b3df44ee3fbd4ccf8c91f7fd36eb6bfce7b21a7ad536fcbfa6"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_PROJECT_PLAN_SPEC.md#L677-L677",
+          "role": "obligation",
+          "proves": "A passed gate presents a decision point for Principal approval. The governing plan determines the required approval.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "7536ce512390c7a4a7ade6732fadcf56c789648d1a8c5e05444ff42a4fd99009"
+        }
+      ],
+      "properties": [
+        {
+          "name": "domain",
+          "domain_uri": "aget:concept/SubjectToExecutionPermissionControl",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "range",
+          "domain_uri": "aget:concept/SubjectToExecutionPermissionControl",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "inverse",
+          "domain_uri": "aget:concept/SubjectToExecutionPermissionControl",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "conditions",
+          "domain_uri": "aget:concept/SubjectToExecutionPermissionControl",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        }
+      ]
+    },
+    {
+      "uri": "aget:concept/SupportsSessionExecutionClaim",
+      "ontology_id": "C2165",
+      "preferred_label": "Supports Session Execution Claim",
+      "definition": "A Supports_Session_Execution_Claim is a Governed_Relation asserting that an Execution_Evidence_Record supports specified execution claims about a Collaboration_Session when its evidence subject and occurrence mapping match.\n",
+      "parent_uri": "aget:concept/GovernedRelation",
+      "meaning_state": "adopted for this architectural model",
+      "public_support": [
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_UNATTENDED_AUTONOMY_SPEC.md#L72-L76",
+          "role": "obligation",
+          "proves": "An unattended run must leave an audit record; the captured source marks that verification runtime-pending.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "ab51ff2141da5628d8047afe47a4a33ad4747c6244aa97a9c0c86c91c62f869b"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/docs/AGET_CLI_SUPPORT_MATRIX.md#L36-L51",
+          "role": "evidence-standard",
+          "proves": "Runtime support is graded and dated; installation and instructability do not establish a governed invocation.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "72fd2dc23cea2ba41cab9d58cec27f3d638795955ad1b0cba58493b5b2052c88"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_SESSION_SPEC.md#L16-L18",
+          "role": "meaning",
+          "proves": "A session is a bounded collaboration period with initialization, operation and finalization.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "81988f81026bb3376673d3fd84ec8f47ea5b323bb3daaeabadd5859da2f18449"
+        }
+      ],
+      "properties": [
+        {
+          "name": "domain",
+          "domain_uri": "aget:concept/SupportsSessionExecutionClaim",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "range",
+          "domain_uri": "aget:concept/SupportsSessionExecutionClaim",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "inverse",
+          "domain_uri": "aget:concept/SupportsSessionExecutionClaim",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        },
+        {
+          "name": "conditions",
+          "domain_uri": "aget:concept/SupportsSessionExecutionClaim",
+          "range": "string",
+          "min_count": null,
+          "max_count": null,
+          "cardinality_status": "unspecified unless a separately sourced constraint applies",
+          "representation": "model-local typed attribute slot; not a newly minted global property"
+        }
+      ]
+    }
+  ],
+  "parent_definitions": [
+    {
+      "uri": "aget:concept/Agent",
+      "id": "C2032",
+      "prefLabel": "Agent",
+      "definition": "An entity that perceives some part of its environment and acts on it in pursuit of goals — its own, or those of another party on whose behalf it acts. The genus is neutral about substrate: people, organizations, software and collectives can all be agents. What sets an agent apart from other entities is directed action, not what it is made of.\n",
+      "broader": "aget:concept/Entity"
+    },
+    {
+      "uri": "aget:concept/Artifact",
+      "id": "C294",
+      "prefLabel": "Artifact",
+      "definition": "An entity intentionally produced by an agent to serve a purpose, whose identity depends on its author's productive intention and intended function rather than on natural-kind membership. Artifacts are evaluated against the purposes they were designed to fulfill.\n",
+      "broader": "aget:concept/Entity"
+    },
+    {
+      "uri": "aget:concept/ChannelInteraction",
+      "id": "C778",
+      "prefLabel": "Channel Interaction",
+      "definition": "An event that is a bounded communicative exchange among participants over a communication channel — e.g., a meeting, thread, pairing session, DM exchange, or review. The perdurant unit at which collaboration episodes are scored.\n",
+      "broader": "aget:concept/Event"
+    },
+    {
+      "uri": "aget:concept/CognitiveEntity",
+      "id": "C2150",
+      "prefLabel": "Cognitive Entity",
+      "definition": "A Cognitive_Entity is an Entity capable of performing cognitive processes, such as perception, memory, reasoning, learning, or decision-making.\n",
+      "broader": "aget:concept/Entity"
+    },
+    {
+      "uri": "aget:concept/Entity",
+      "id": "C293",
+      "prefLabel": "Entity",
+      "definition": "An Entity is a Thing whose existence the describing ontology assumes, whether concrete or abstract and individual or collective, and that can bear properties and stand in relations to other entities.\n",
+      "broader": "aget:concept/Thing"
+    },
+    {
+      "uri": "aget:concept/Event",
+      "id": "C777",
+      "prefLabel": "Event",
+      "definition": "Something that happens at a specific time, with a beginning and an end; a bounded occurrent that may involve persons, be hosted by an organization, and produce documents or result in decisions. (L459 core entity, here promoted from vision YAML to instantiated concept.)\n",
+      "broader": "aget:concept/Occurrent"
+    },
+    {
+      "uri": "aget:concept/Occurrent",
+      "id": "C776",
+      "prefLabel": "Occurrent",
+      "definition": "An entity that unfolds through time, having temporal parts and a beginning and end — as opposed to a continuant, which is wholly present at every moment of its existence. The top category under which events, processes, sessions, and activities fall.\n",
+      "broader": "aget:concept/Entity"
+    },
+    {
+      "uri": "aget:concept/SoftwareSystem",
+      "id": "C297",
+      "prefLabel": "Software System",
+      "definition": "A system for which software is of primary importance to the stakeholders — a combination of interacting elements (software, hardware, data, human procedures) organized to achieve one or more stated purposes, where software is the principal locus of functionality. The unit of process governance under ISO/IEC/IEEE 12207:2017.\n",
+      "broader": "aget:concept/System"
+    },
+    {
+      "uri": "aget:concept/System",
+      "id": "C295",
+      "prefLabel": "System",
+      "definition": "A combination of interacting elements organized to achieve one or more stated purposes, where the whole exhibits properties not reducible to its components considered in isolation. A system is bounded, structured, and goal-directed.\n",
+      "broader": "aget:concept/Entity"
+    },
+    {
+      "uri": "aget:concept/Thing",
+      "id": "C292",
+      "prefLabel": "Thing",
+      "definition": "A Thing is anything that can be referred to, named, or made the subject of discourse, whether concrete or abstract.\n",
+      "broader": null
+    }
+  ],
+  "relationships": [
+    {
+      "id": "directs",
+      "uri": "aget:concept/DirectsAgetWork",
+      "from": "principal",
+      "to": "aget",
+      "domain_uri": "aget:concept/Principal",
+      "range_uri": "aget:concept/AgetInstance",
+      "verb": "directs",
+      "inverse": {
+        "label": "is directed by",
+        "domain_uri": "aget:concept/AgetInstance",
+        "range_uri": "aget:concept/Principal",
+        "status": "named inverse of this predicate, not an independently minted concept"
+      },
+      "condition": "The entity is acting as the Principal for the relevant work; additional approval conditions come from its governing plan and mandate.",
+      "multiplicity": {
+        "value": null,
+        "status": "unspecified",
+        "source_limit": "Unspecified; no one-principal/one-Aget restriction is inferred."
+      },
+      "qualifiers": [
+        "subject_identity",
+        "scope",
+        "as_of",
+        "evidence_role"
+      ],
+      "not_established": "Ownership, a particular instruction, permission to every tool or mandatory per-action approval.",
+      "definition": "A Directs_Aget_Work is a Governed_Relation asserting that a Principal directs work undertaken by an Aget_Instance within the applicable authority relationship.\n",
+      "ontology_id": "C2158",
+      "meaning_state": "adopted for this architectural model",
+      "assertion_state": "conditional reference relationship; no universal observed occurrence claim",
+      "public_support": [
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_VOCABULARY_SPEC.md#L255-L255",
+          "role": "meaning",
+          "proves": "The Principal is the human operator with ultimate authority.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "bf96e1d6f1f4d806bddc244a4f5f8d2b94ea4d774ed45e241e443d1812cfe324"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_SESSION_SPEC.md#L226-L236",
+          "role": "obligation",
+          "proves": "Work is classified by scope; execution beyond the session mandate requires approval.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "c4e9e6fe6ecdf6b3df44ee3fbd4ccf8c91f7fd36eb6bfce7b21a7ad536fcbfa6"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_PROJECT_PLAN_SPEC.md#L677-L677",
+          "role": "obligation",
+          "proves": "A passed gate presents a decision point for Principal approval. The governing plan determines the required approval.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "7536ce512390c7a4a7ade6732fadcf56c789648d1a8c5e05444ff42a4fd99009"
+        }
+      ]
+    },
+    {
+      "id": "realizes",
+      "uri": "aget:concept/MaterializesAgetIdentity",
+      "from": "copy",
+      "to": "aget",
+      "domain_uri": "aget:concept/AgetClone",
+      "range_uri": "aget:concept/AgetInstance",
+      "verb": "materializes",
+      "inverse": {
+        "label": "is materialized by",
+        "domain_uri": "aget:concept/AgetInstance",
+        "range_uri": "aget:concept/AgetClone",
+        "status": "named inverse of this predicate, not an independently minted concept"
+      },
+      "condition": "The checkout maps to the declared identity; its actual configuration must establish that mapping in a worked case.",
+      "multiplicity": {
+        "clone_to_identity": "exactly one by C2034 definition",
+        "identity_to_clones": "multiple permitted; actual number unknown",
+        "status": "conceptual constraint, not observed inventory"
+      },
+      "qualifiers": [
+        "subject_identity",
+        "scope",
+        "as_of",
+        "evidence_role"
+      ],
+      "not_established": "Another agent identity, ownership of the runtime or verified copy lineage.",
+      "definition": "A Materializes_Aget_Identity is a Governed_Relation asserting that an Aget_Clone materializes the persistent identity of an Aget_Instance.\n",
+      "ontology_id": "C2159",
+      "meaning_state": "adopted for this architectural model",
+      "assertion_state": "conditional reference relationship; no universal observed occurrence claim",
+      "public_support": [
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_VOCABULARY_SPEC.md#L1174-L1180",
+          "role": "meaning",
+          "proves": "An Aget is a concrete agent identity, distinct from a host working copy and the AI system it uses.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "991f908e78d4b52a4b555bba8925edba7d3c8988e2f6760334e45bcb79944a03"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_5D_ARCHITECTURE_SPEC.md#L462-L466",
+          "role": "design-mapping",
+          "proves": "The composition spec maps identity, memory, reasoning, skill and context characteristics to repository artifacts.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "f10e6bf58d2761cdf90adb61ece109ab57ca9940c2b205f8d0b17fbce93c48d9"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_INSTANCE_SPEC.md#L155-L167",
+          "role": "obligation",
+          "proves": "Instances must maintain archetype-standard directories, including governance, sessions, planning and knowledge.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "6d15b8a0da490b577117644c7348407b7b6ff62d6514106008885e1d83547e9a"
+        }
+      ]
+    },
+    {
+      "id": "holds",
+      "uri": "aget:concept/StoresGovernedRecords",
+      "from": "copy",
+      "to": "records",
+      "domain_uri": "aget:concept/AgetClone",
+      "range_uri": "aget:concept/GovernedRecordSet",
+      "verb": "stores",
+      "inverse": {
+        "label": "is stored in",
+        "domain_uri": "aget:concept/GovernedRecordSet",
+        "range_uri": "aget:concept/AgetClone",
+        "status": "named inverse of this predicate, not an independently minted concept"
+      },
+      "condition": "Applicable artifacts are stored within this repository/copy; an external store is not silently assumed to be inside it.",
+      "multiplicity": {
+        "value": null,
+        "status": "unspecified",
+        "source_limit": "Multiple records can be selected by the mapping; completeness and replication cardinality are unspecified."
+      },
+      "qualifiers": [
+        "subject_identity",
+        "scope",
+        "as_of",
+        "evidence_role"
+      ],
+      "not_established": "Ownership, retention, truth of file contents or an observed complete installation.",
+      "definition": "A Stores_Governed_Records is a Governed_Relation asserting that an Aget_Clone stores the selected artifacts of a Governed_Record_Set.\n",
+      "ontology_id": "C2160",
+      "meaning_state": "adopted for this architectural model",
+      "assertion_state": "conditional reference relationship; no universal observed occurrence claim",
+      "public_support": [
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_5D_ARCHITECTURE_SPEC.md#L462-L466",
+          "role": "design-mapping",
+          "proves": "The composition spec maps identity, memory, reasoning, skill and context characteristics to repository artifacts.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "f10e6bf58d2761cdf90adb61ece109ab57ca9940c2b205f8d0b17fbce93c48d9"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_INSTANCE_SPEC.md#L155-L167",
+          "role": "obligation",
+          "proves": "Instances must maintain archetype-standard directories, including governance, sessions, planning and knowledge.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "6d15b8a0da490b577117644c7348407b7b6ff62d6514106008885e1d83547e9a"
+        }
+      ]
+    },
+    {
+      "id": "uses",
+      "uri": "aget:concept/UsesAgetWorkingCopy",
+      "from": "runtime",
+      "to": "copy",
+      "domain_uri": "aget:concept/AgentRuntime",
+      "range_uri": "aget:concept/AgetClone",
+      "verb": "uses",
+      "inverse": {
+        "label": "is used by",
+        "domain_uri": "aget:concept/AgetClone",
+        "range_uri": "aget:concept/AgentRuntime",
+        "status": "named inverse of this predicate, not an independently minted concept"
+      },
+      "condition": "The selected runtime is connected to this copy by a documented integration route.",
+      "multiplicity": {
+        "value": null,
+        "status": "unspecified",
+        "source_limit": "Unspecified; one runtime/one copy is not inferred."
+      },
+      "qualifiers": [
+        "subject_identity",
+        "scope",
+        "as_of",
+        "evidence_role"
+      ],
+      "not_established": "Complete instruction consumption, successful governance or actual execution.",
+      "definition": "A Uses_Aget_Working_Copy is a Governed_Relation asserting that an Agent_Runtime accesses relevant artifacts of an Aget_Clone through a documented integration route.\n",
+      "ontology_id": "C2161",
+      "meaning_state": "adopted for this architectural model",
+      "assertion_state": "conditional reference relationship; no universal observed occurrence claim",
+      "public_support": [
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_VOCABULARY_SPEC.md#L1174-L1180",
+          "role": "meaning",
+          "proves": "An Aget is a concrete agent identity, distinct from a host working copy and the AI system it uses.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "991f908e78d4b52a4b555bba8925edba7d3c8988e2f6760334e45bcb79944a03"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_FRAMEWORK_SPEC.md#L40-L43",
+          "role": "scope-boundary",
+          "proves": "The framework specifies governance artifacts and protocols; it excludes CLI internals, model behavior and code execution semantics.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "baf297403f65aed84ec3f5fe9bb722aa1a146fb00c4247808af8898dd0250a49"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/docs/AGET_CLI_SUPPORT_MATRIX.md#L36-L51",
+          "role": "evidence-standard",
+          "proves": "Runtime support is graded and dated; installation and instructability do not establish a governed invocation.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "72fd2dc23cea2ba41cab9d58cec27f3d638795955ad1b0cba58493b5b2052c88"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/scripts/wake_up.py#L350-L366",
+          "role": "implementation-design",
+          "proves": "The captured wake-up function loads version and identity JSON files. This is code inspection, not proof every CLI reads every record.",
+          "limit": "Function body inspected; not executed as a conformance trial in this batch.",
+          "excerpt_sha256": "50dba79e8bb7eed4c87915ab00a385f5ac85a6df32c20cd2d2c473e0d776bf58"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/overview",
+          "role": "vendor-example",
+          "proves": "The vendor describes a coding tool that can use codebase files and execute commands, including through a terminal interface.",
+          "limit": "Example for this vendor only; no universal runtime mechanism or execution occurrence.",
+          "excerpt_sha256": "3ddf63060a005380bdf6c079cbdfb19e9bc8c254eeee39465960c933d2ddae9d"
+        }
+      ]
+    },
+    {
+      "id": "runs",
+      "uri": "aget:concept/SupportsCollaborationSession",
+      "from": "runtime",
+      "to": "session",
+      "domain_uri": "aget:concept/AgentRuntime",
+      "range_uri": "aget:concept/CollaborationSession",
+      "verb": "supports",
+      "inverse": {
+        "label": "is supported by",
+        "domain_uri": "aget:concept/CollaborationSession",
+        "range_uri": "aget:concept/AgentRuntime",
+        "status": "named inverse of this predicate, not an independently minted concept"
+      },
+      "condition": "The session uses that runtime; this connection is not established for a specific event here.",
+      "multiplicity": {
+        "value": null,
+        "status": "unspecified",
+        "source_limit": "Unspecified; session and runtime process boundaries are not equated."
+      },
+      "qualifiers": [
+        "subject_identity",
+        "scope",
+        "as_of",
+        "evidence_role"
+      ],
+      "not_established": "Runtime ownership, an uninterrupted process or observed session completion.",
+      "definition": "A Supports_Collaboration_Session is a Governed_Relation asserting that an Agent_Runtime supplies execution support during a Collaboration_Session.\n",
+      "ontology_id": "C2162",
+      "meaning_state": "adopted for this architectural model",
+      "assertion_state": "conditional reference relationship; no universal observed occurrence claim",
+      "public_support": [
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_SESSION_SPEC.md#L16-L18",
+          "role": "meaning",
+          "proves": "A session is a bounded collaboration period with initialization, operation and finalization.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "81988f81026bb3376673d3fd84ec8f47ea5b323bb3daaeabadd5859da2f18449"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_FRAMEWORK_SPEC.md#L40-L43",
+          "role": "scope-boundary",
+          "proves": "The framework specifies governance artifacts and protocols; it excludes CLI internals, model behavior and code execution semantics.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "baf297403f65aed84ec3f5fe9bb722aa1a146fb00c4247808af8898dd0250a49"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/docs/AGET_CLI_SUPPORT_MATRIX.md#L36-L51",
+          "role": "evidence-standard",
+          "proves": "Runtime support is graded and dated; installation and instructability do not establish a governed invocation.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "72fd2dc23cea2ba41cab9d58cec27f3d638795955ad1b0cba58493b5b2052c88"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/overview",
+          "role": "vendor-example",
+          "proves": "The vendor describes a coding tool that can use codebase files and execute commands, including through a terminal interface.",
+          "limit": "Example for this vendor only; no universal runtime mechanism or execution occurrence.",
+          "excerpt_sha256": "3ddf63060a005380bdf6c079cbdfb19e9bc8c254eeee39465960c933d2ddae9d"
+        }
+      ]
+    },
+    {
+      "id": "participates",
+      "uri": "aget:concept/ParticipatesInCollaborationSession",
+      "from": "aget",
+      "to": "session",
+      "domain_uri": "aget:concept/AgetInstance",
+      "range_uri": "aget:concept/CollaborationSession",
+      "verb": "participates in",
+      "inverse": {
+        "label": "has participant",
+        "domain_uri": "aget:concept/CollaborationSession",
+        "range_uri": "aget:concept/AgetInstance",
+        "status": "named inverse of this predicate, not an independently minted concept"
+      },
+      "condition": "That identity is involved in the relevant collaboration episode.",
+      "multiplicity": {
+        "value": null,
+        "status": "unspecified",
+        "source_limit": "Unspecified; no single-agent session or mandatory cross-session count is asserted."
+      },
+      "qualifiers": [
+        "subject_identity",
+        "scope",
+        "as_of",
+        "evidence_role"
+      ],
+      "not_established": "Successful recovery, continuity of cognition, task completion or one task per session.",
+      "definition": "A Participates_In_Collaboration_Session is a Governed_Relation asserting that an Aget_Instance participates in a Collaboration_Session while remaining distinct from that episode.\n",
+      "ontology_id": "C2163",
+      "meaning_state": "adopted for this architectural model",
+      "assertion_state": "conditional reference relationship; no universal observed occurrence claim",
+      "public_support": [
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_VOCABULARY_SPEC.md#L1174-L1180",
+          "role": "meaning",
+          "proves": "An Aget is a concrete agent identity, distinct from a host working copy and the AI system it uses.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "991f908e78d4b52a4b555bba8925edba7d3c8988e2f6760334e45bcb79944a03"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_SESSION_SPEC.md#L16-L18",
+          "role": "meaning",
+          "proves": "A session is a bounded collaboration period with initialization, operation and finalization.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "81988f81026bb3376673d3fd84ec8f47ea5b323bb3daaeabadd5859da2f18449"
+        }
+      ]
+    },
+    {
+      "id": "requires-permission",
+      "uri": "aget:concept/SubjectToExecutionPermissionControl",
+      "from": "runtime",
+      "to": "permission",
+      "domain_uri": "aget:concept/AgentRuntime",
+      "range_uri": "aget:concept/ExecutionPermissionControl",
+      "verb": "is subject to",
+      "inverse": {
+        "label": "evaluates or constrains operations of",
+        "domain_uri": "aget:concept/ExecutionPermissionControl",
+        "range_uri": "aget:concept/AgentRuntime",
+        "status": "named inverse of this predicate, not an independently minted concept"
+      },
+      "condition": "The applicable runtime or environment policy evaluates or constrains that operation; a prompt may be unnecessary when a valid policy already permits it. The operation qualifier is required when this is instantiated; runtime-to-control alone does not mean every operation requires a fresh prompt.",
+      "multiplicity": {
+        "value": null,
+        "status": "unspecified",
+        "source_limit": "Per-operation and policy scope are implementation-specific and unspecified here."
+      },
+      "qualifiers": [
+        "subject_identity",
+        "scope",
+        "as_of",
+        "evidence_role",
+        "operation",
+        "effective_access_rule",
+        "decision",
+        "grant_scope",
+        "expiry_if_defined"
+      ],
+      "not_established": "Operating-system enforcement of every permission, a new grant per session or a specific allowed operation.",
+      "definition": "A Subject_To_Execution_Permission_Control is a Governed_Relation asserting that an operation of an Agent_Runtime is evaluated or constrained by an applicable Execution_Permission_Control.\n",
+      "ontology_id": "C2164",
+      "meaning_state": "adopted for this architectural model",
+      "assertion_state": "conditional reference relationship; no universal observed occurrence claim",
+      "public_support": [
+        {
+          "url": "https://code.claude.com/docs/en/permissions#permission-system",
+          "role": "vendor-example",
+          "proves": "In this vendor example, the runtime enforces tool permission rules; prompt instructions do not themselves grant access.",
+          "limit": "Example for this vendor only; no universal runtime mechanism or execution occurrence.",
+          "excerpt_sha256": "11ab7d38dfd2197b25287e84b0e4a60cb3c1881bb8ce417c01d7b0a9df6cf1e6"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/sandboxing#how-sandboxing-relates-to-permissions-and-permission-modes",
+          "role": "vendor-example",
+          "proves": "This vendor documents tool permissions separately from operating-system filesystem and network isolation.",
+          "limit": "Example for this vendor only; no universal runtime mechanism or execution occurrence.",
+          "excerpt_sha256": "539a329fa7ad93bfa3204a15924a9610ff62db26e2bb78cb524bb03fb1807ca7"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_SESSION_SPEC.md#L226-L236",
+          "role": "obligation",
+          "proves": "Work is classified by scope; execution beyond the session mandate requires approval.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "c4e9e6fe6ecdf6b3df44ee3fbd4ccf8c91f7fd36eb6bfce7b21a7ad536fcbfa6"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_PROJECT_PLAN_SPEC.md#L677-L677",
+          "role": "obligation",
+          "proves": "A passed gate presents a decision point for Principal approval. The governing plan determines the required approval.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "7536ce512390c7a4a7ade6732fadcf56c789648d1a8c5e05444ff42a4fd99009"
+        }
+      ]
+    },
+    {
+      "id": "records-evidence",
+      "uri": "aget:concept/SupportsSessionExecutionClaim",
+      "from": "receipt",
+      "to": "session",
+      "domain_uri": "aget:concept/ExecutionEvidenceRecord",
+      "range_uri": "aget:concept/CollaborationSession",
+      "verb": "supports claims about",
+      "inverse": {
+        "label": "has execution claims supported by",
+        "domain_uri": "aget:concept/CollaborationSession",
+        "range_uri": "aget:concept/ExecutionEvidenceRecord",
+        "status": "named inverse of this predicate, not an independently minted concept"
+      },
+      "condition": "Evidence refers to the relevant occurrence. The cited audit obligation applies WHEN an unattended run completes, not to every session unconditionally.",
+      "multiplicity": {
+        "value": null,
+        "status": "unspecified",
+        "source_limit": "Unspecified; a session may encompass several events, and no one-record/one-session rule is inferred."
+      },
+      "qualifiers": [
+        "subject_identity",
+        "scope",
+        "as_of",
+        "evidence_role",
+        "occurrence_id",
+        "evidence_subject_id",
+        "recording_actor",
+        "verifying_actor"
+      ],
+      "not_established": "Event occurrence merely from a requirement, an unconditional session-wide audit duty or universal conformance.",
+      "definition": "A Supports_Session_Execution_Claim is a Governed_Relation asserting that an Execution_Evidence_Record supports specified execution claims about a Collaboration_Session when its evidence subject and occurrence mapping match.\n",
+      "ontology_id": "C2165",
+      "meaning_state": "adopted for this architectural model",
+      "assertion_state": "conditional reference relationship; no universal observed occurrence claim",
+      "public_support": [
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_UNATTENDED_AUTONOMY_SPEC.md#L72-L76",
+          "role": "obligation",
+          "proves": "An unattended run must leave an audit record; the captured source marks that verification runtime-pending.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "ab51ff2141da5628d8047afe47a4a33ad4747c6244aa97a9c0c86c91c62f869b"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/docs/AGET_CLI_SUPPORT_MATRIX.md#L36-L51",
+          "role": "evidence-standard",
+          "proves": "Runtime support is graded and dated; installation and instructability do not establish a governed invocation.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "72fd2dc23cea2ba41cab9d58cec27f3d638795955ad1b0cba58493b5b2052c88"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_SESSION_SPEC.md#L16-L18",
+          "role": "meaning",
+          "proves": "A session is a bounded collaboration period with initialization, operation and finalization.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "81988f81026bb3376673d3fd84ec8f47ea5b323bb3daaeabadd5859da2f18449"
+        }
+      ]
+    }
+  ],
+  "constraints": [
+    {
+      "id": "definition-parent",
+      "subject": "selected term definitions",
+      "scope": "selected architecture model or named worked case",
+      "formal_predicate": "definition names exactly its resolved broader label in underscore display form",
+      "applicability": "Every selected definition",
+      "positive_case": "registered parent matches sentence",
+      "negative_case": "sentence names an undefined or different parent",
+      "public_support": [
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_VOCABULARY_SPEC.md",
+          "role": "obligation",
+          "proves": "Required labels and definitions; hierarchy acyclicity.",
+          "limit": "No current-run conformance claim.",
+          "excerpt_sha256": "4e6bbd4b25acdd218f41ce31fddb6bfe499a99c2639f35dc0a7bab6b04c59b7c"
+        }
+      ],
+      "test_result": "PASS",
+      "positive_case_count": 20,
+      "negative_case_count": 2,
+      "verification_scope": "Exact staged model and declared fixture behavior; no deployed enforcement claim",
+      "enforcement_status": "Exact-candidate model and fixture checks passed; production runtime enforcement is not certified."
+    },
+    {
+      "id": "type-separation",
+      "subject": "Aget identity, copy and episode",
+      "scope": "selected architecture model or named worked case",
+      "formal_predicate": "distinct concept URIs; copy is Artifact, Aget is Agent, episode is Channel Interaction",
+      "applicability": "Selected core model",
+      "positive_case": "three separate typed referents",
+      "negative_case": "working copy bound to actor or session protocol",
+      "public_support": [],
+      "test_result": "PASS",
+      "positive_case_count": 1,
+      "negative_case_count": 1,
+      "verification_scope": "Exact staged model and declared fixture behavior; no deployed enforcement claim",
+      "enforcement_status": "Exact-candidate model and fixture checks passed; production runtime enforcement is not certified."
+    },
+    {
+      "id": "relationship-types",
+      "subject": "selected directed relationships",
+      "scope": "selected architecture model or named worked case",
+      "formal_predicate": "from type equals declared domain; to type equals range; inverse swaps endpoints",
+      "applicability": "Every selected edge",
+      "positive_case": "copy-to-Aget materialization",
+      "negative_case": "Goal-to-Requirement Realizes used for copy-to-Aget",
+      "public_support": [],
+      "test_result": "PASS",
+      "positive_case_count": 2,
+      "negative_case_count": 1,
+      "verification_scope": "Exact staged model and declared fixture behavior; no deployed enforcement claim",
+      "enforcement_status": "Exact-candidate model and fixture checks passed; production runtime enforcement is not certified."
+    },
+    {
+      "id": "artifact-support",
+      "subject": "artifact bindings",
+      "scope": "selected architecture model or named worked case",
+      "formal_predicate": "source revision/hash and exact passage or field are resolvable; role and limitation are stated",
+      "applicability": "Every selected meaning, assertion and constraint",
+      "positive_case": "pinned identity or session passage",
+      "negative_case": "missing passage or mismatching digest",
+      "public_support": [],
+      "test_result": "PASS",
+      "positive_case_count": 1,
+      "negative_case_count": 2,
+      "verification_scope": "Exact staged model and declared fixture behavior; no deployed enforcement claim",
+      "enforcement_status": "Exact-candidate model and fixture checks passed; production runtime enforcement is not certified.",
+      "adoption_boundary": "Actual exact approved adoption separately verified; current source bytes and full findings match the reviewed transaction."
+    },
+    {
+      "id": "no-evidence-promotion",
+      "subject": "occurrence claims",
+      "scope": "selected architecture model or named worked case",
+      "formal_predicate": "asserting observed execution requires occurrence support; obligation/definition alone is insufficient",
+      "applicability": "Any claim of execution or compliance",
+      "positive_case": "scoped dated receipt supports its stated event",
+      "negative_case": "audit requirement cited as proof that a run occurred",
+      "public_support": [
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/docs/AGET_CLI_SUPPORT_MATRIX.md#L36-L51",
+          "role": "evidence-standard",
+          "proves": "Runtime support is graded and dated; installation and instructability do not establish a governed invocation.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "72fd2dc23cea2ba41cab9d58cec27f3d638795955ad1b0cba58493b5b2052c88"
+        },
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_UNATTENDED_AUTONOMY_SPEC.md#L72-L76",
+          "role": "obligation",
+          "proves": "An unattended run must leave an audit record; the captured source marks that verification runtime-pending.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "ab51ff2141da5628d8047afe47a4a33ad4747c6244aa97a9c0c86c91c62f869b"
+        }
+      ],
+      "test_result": "PASS",
+      "positive_case_count": 1,
+      "negative_case_count": 2,
+      "verification_scope": "Exact staged model and declared fixture behavior; no deployed enforcement claim",
+      "enforcement_status": "Exact-candidate model and fixture checks passed; production runtime enforcement is not certified."
+    },
+    {
+      "id": "session-evidence-subject",
+      "subject": "session evidence or closure claim",
+      "scope": "selected architecture model or named worked case",
+      "formal_predicate": "record.session_id equals claimed session_id and record.owner_invocation equals claimed owner when invocation-specific",
+      "applicability": "Invocation-specific session evidence; not every aggregate report",
+      "positive_case": "matching record accepted",
+      "negative_case": "another session recent record rejected",
+      "public_support": [],
+      "test_result": "PASS",
+      "positive_case_count": 1,
+      "negative_case_count": 2,
+      "verification_scope": "Exact staged model and declared fixture behavior; no deployed enforcement claim",
+      "enforcement_status": "Checked model rejects mismatched sessions; the inspected recent-file guard does not enforce this test. No production repair claimed."
+    },
+    {
+      "id": "append-eligibility",
+      "subject": "observation capture record",
+      "scope": "selected architecture model or named worked case",
+      "formal_predicate": "status in {open, active}; no closed_by; owner matches current invocation",
+      "applicability": "Observation append through record-observation",
+      "positive_case": "own active record accepted",
+      "negative_case": "own completed or foreign open record rejected",
+      "public_support": [],
+      "test_result": "PASS",
+      "positive_case_count": 1,
+      "negative_case_count": 1,
+      "verification_scope": "Exact staged model and declared fixture behavior; no deployed enforcement claim",
+      "enforcement_status": "Exact-candidate model and fixture checks passed; production runtime enforcement is not certified."
+    },
+    {
+      "id": "authority-vs-permission",
+      "subject": "execution decision",
+      "scope": "selected architecture model or named worked case",
+      "formal_predicate": "principal work authority and effective operation permission are separate predicates; neither implies the other",
+      "applicability": "Operation subject to an access control",
+      "positive_case": "authorized operation plus matching permit",
+      "negative_case": "work GO with denied operation",
+      "public_support": [
+        {
+          "url": "https://code.claude.com/docs/en/permissions#permission-system",
+          "role": "vendor-example",
+          "proves": "In this vendor example, the runtime enforces tool permission rules; prompt instructions do not themselves grant access.",
+          "limit": "Example for this vendor only; no universal runtime mechanism or execution occurrence.",
+          "excerpt_sha256": "11ab7d38dfd2197b25287e84b0e4a60cb3c1881bb8ce417c01d7b0a9df6cf1e6"
+        },
+        {
+          "url": "https://code.claude.com/docs/en/sandboxing#how-sandboxing-relates-to-permissions-and-permission-modes",
+          "role": "vendor-example",
+          "proves": "This vendor documents tool permissions separately from operating-system filesystem and network isolation.",
+          "limit": "Example for this vendor only; no universal runtime mechanism or execution occurrence.",
+          "excerpt_sha256": "539a329fa7ad93bfa3204a15924a9610ff62db26e2bb78cb524bb03fb1807ca7"
+        }
+      ],
+      "test_result": "PASS",
+      "positive_case_count": 1,
+      "negative_case_count": 3,
+      "verification_scope": "Exact staged model and declared fixture behavior; no deployed enforcement claim",
+      "enforcement_status": "Exact-candidate model and fixture checks passed; production runtime enforcement is not certified."
+    },
+    {
+      "id": "approval-version",
+      "subject": "semantic adoption packet",
+      "scope": "selected architecture model or named worked case",
+      "formal_predicate": "principal approval binds the adopted semantic digest and applicable scope; changed candidate requires re-review",
+      "applicability": "Live ontology adoption under this plan",
+      "positive_case": "approved current digest",
+      "negative_case": "approval for earlier digest",
+      "public_support": [
+        {
+          "url": "https://github.com/aget-framework/aget/blob/06a9f453d0d676ea068a23ee2167a4a17f29dc78/specs/AGET_PROJECT_PLAN_SPEC.md#L677-L677",
+          "role": "obligation",
+          "proves": "A passed gate presents a decision point for Principal approval. The governing plan determines the required approval.",
+          "limit": "This published definition or rule does not prove that a particular runtime conforms.",
+          "excerpt_sha256": "7536ce512390c7a4a7ade6732fadcf56c789648d1a8c5e05444ff42a4fd99009"
+        }
+      ],
+      "test_result": "PASS",
+      "positive_case_count": 1,
+      "negative_case_count": 3,
+      "verification_scope": "Exact staged model and declared fixture behavior; no deployed enforcement claim",
+      "enforcement_status": "Exact-candidate model and fixture checks passed; production runtime enforcement is not certified.",
+      "adoption_boundary": "Actual exact approved adoption separately verified; current source bytes and full findings match the reviewed transaction."
+    },
+    {
+      "id": "cardinality-honesty",
+      "subject": "relationship cardinalities",
+      "scope": "selected architecture model or named worked case",
+      "formal_predicate": "do not introduce a numeric bound without an exact source and scope",
+      "applicability": "Selected relationship model",
+      "positive_case": "unspecified multiplicity retained",
+      "negative_case": "unsupported one-runtime-per-session bound",
+      "public_support": [],
+      "test_result": "PASS",
+      "positive_case_count": 1,
+      "negative_case_count": 2,
+      "verification_scope": "Exact staged model and declared fixture behavior; no deployed enforcement claim",
+      "enforcement_status": "Exact-candidate model and fixture checks passed; production runtime enforcement is not certified."
+    },
+    {
+      "id": "frozen-artifact-preservation",
+      "subject": "locked reader and completed catalog",
+      "scope": "selected architecture model or named worked case",
+      "formal_predicate": "locked hashes unchanged; successor has separate identity",
+      "applicability": "Any later projection",
+      "positive_case": "separate successor with intact lock",
+      "negative_case": "overwrite frozen reader",
+      "public_support": [],
+      "test_result": "PASS",
+      "positive_case_count": 2,
+      "negative_case_count": 1,
+      "verification_scope": "Exact staged model and declared fixture behavior; no deployed enforcement claim",
+      "enforcement_status": "Frozen artifact integrity checked separately; these diagrams are new descendants."
+    },
+    {
+      "id": "formal-term-adoption",
+      "subject": "term grounding status",
+      "scope": "selected architecture model or named worked case",
+      "formal_predicate": "candidate is not presented as adopted/formally grounded; accepted status requires compatible ontology adoption and successful scoped checks",
+      "applicability": "Every selected term and relationship",
+      "positive_case": "candidate visibly qualified",
+      "negative_case": "new URI presented as live ontology definition",
+      "public_support": [],
+      "test_result": "PASS",
+      "positive_case_count": 1,
+      "negative_case_count": 1,
+      "verification_scope": "Exact staged model and declared fixture behavior; no deployed enforcement claim",
+      "enforcement_status": "Exact-candidate model and fixture checks passed; production runtime enforcement is not certified.",
+      "adoption_boundary": "Actual exact approved adoption separately verified; current source bytes and full findings match the reviewed transaction."
+    }
+  ],
+  "views": [
+    {
+      "id": "overview",
+      "entities": [
+        "principal",
+        "aget",
+        "copy",
+        "records",
+        "runtime",
+        "session"
+      ],
+      "relations": [
+        "directs",
+        "realizes",
+        "holds",
+        "uses",
+        "runs",
+        "participates"
+      ],
+      "title": "AGET architecture overview",
+      "limit": "Identity, working copy, runtime and episode are separate. Arrows are conditional meanings, not deployment evidence."
+    },
+    {
+      "id": "technology",
+      "entities": [
+        "host",
+        "runtime",
+        "permission",
+        "receipt",
+        "session"
+      ],
+      "relations": [
+        "requires-permission",
+        "runs",
+        "records-evidence"
+      ],
+      "title": "AGET technology architecture",
+      "limit": "Permission applies to operations; evidence must match its occurrence. Host deployment is not established."
+    }
+  ],
+  "method_sources": [
+    {
+      "url": "https://www.gabormelli.com/RKB/index.php?title=GM-RKB_Concept_Definition_Sentence&oldid=942936",
+      "role": "definition-sentence pattern"
+    },
+    {
+      "url": "https://www.w3.org/TR/2009/REC-skos-reference-20090818/",
+      "role": "SKOS concept/label separation and hierarchical/associative relations"
+    },
+    {
+      "url": "https://www.w3.org/TR/2013/REC-prov-o-20130430/",
+      "role": "entity/activity/agent distinctions and provenance model; no declaration of complete PROV-O conformance"
+    }
+  ],
+  "evidence_summary": {
+    "adoption_result": "PASS_WITH_LIMITS",
+    "full_register_result": "FAIL",
+    "full_register_findings": {
+      "warning": 1136,
+      "blocking": 1510
+    },
+    "candidate_checks_passed": 507,
+    "constraint_profiles_checked": 12,
+    "limit": "Scoped vocabulary/model verification. No deployed runtime, inventory or universal execution assurance."
+  }
+}
