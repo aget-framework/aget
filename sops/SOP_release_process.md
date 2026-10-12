@@ -2087,58 +2087,447 @@ python3 scripts/public_surface_audit.py --version X.Y.Z
 for repo in aget template-supervisor-aget template-worker-aget \
             template-advisor-aget template-consultant-aget \
             template-developer-aget template-spec-engineer-aget; do
-  cd $AGET_FRAMEWORK_DIR/$repo
+  cd ~/github/aget-framework/$repo
   git add . && git commit -m "Release vX.Y.Z: description"
 done
 
 # 2. Verify version consistency
-grep '"aget_version"' $AGET_FRAMEWORK_DIR/*/.aget/version.json
+grep '"aget_version"' ~/github/aget-framework/*/.aget/version.json
 
 # 3. Run contract tests
-cd $AGET_FRAMEWORK_DIR/private-aget-framework-AGET
+cd "$AGET_HOME"   # this agent's own repository root
 python3 -m pytest tests/ -v
 ```
 
 **Checkpoint**: All repos committed locally, versions match, tests pass.
 
+### Phase 1.4: Pre-Push Claim-Verification Gate (L1046 — BLOCKING; "grep before you assert")
+
+**Purpose**: Before any irreversible/outward step, run the **cheap mechanical control** that does not depend on the releaser's judgment of "what matters" — so it cannot inherit the releaser's blind spots. A self-framed audit that confirms everything you already believe is the *least* informative outcome, not a pass.
+
+**When**: AFTER Phase 1 (Commit), BEFORE Phase 1.5/2. Runs FIRST — before any delegated or headless audit (those mop up what the cheap control leaves).
+
+**Check (all must pass)**:
+```bash
+# 1. FULL suite — not a named subset (a self-chosen subset reproduces your blind spots)
+python3 -m pytest tests/ -q   # classify every failure: regression | by-design | pre-existing. A skip is NOT a pass.
+# 2. Grep the release PLAN's own falsifiable claims against primary sources
+grep -oE "[0-9]+/[0-9]+|[0-9]+ V-tests" planning/PROJECT_PLAN_v<VERSION>_release_v*.md   # re-derive each X/Y vs reality
+# 3. For every "root cause is X" / "confirmed at source" claim in the plan or audit:
+#    grep the NAMED source artifact itself (a root-cause claim is a claim-under-test — L1046/L960).
+# 4. STRUCTURAL claim-path gate (v3.23.1 Gate 1; L667-supervisor existence-not-substance) —
+#    every advertised release-surface bullet (release-notes/CHANGELOG/handoff "What's New")
+#    naming a skill/spec/script MUST resolve to a present-at-source canonical artifact; dates coherent.
+python3 scripts/release_claim_path_gate.py --version <VERSION>   # exit 0 = PASS; non-zero = TAG BLOCKED
+#    Re-run pre-tag (Phase 3.0) and post-release on the LIVE surfaces (belt-and-suspenders).
+```
+
+**Failure mode**: any unclassified test failure, any plan numeric claim that disagrees with reality, any "root is X" asserted without grepping X, **or any unresolved claim-path finding (step 4)** = BLOCK until corrected. Override: L178 with recorded reason (the claim-path gate's `--override --reason`, logged as a finding).
+
+**Rationale**: L1046 (a prose concession of verify-before-assert does NOT install the reflex — only the executed grep does; an overclaim was committed one paragraph after conceding the discipline) + ADR-007 (a skip counted as a pass is test-theater). Empirical: v3.21 "4/4" (was 3 pass/1 skip) and the F-2 "not single-sourced" misdiagnosis both survived eloquent self-audit; one grep each falsified them.
+
+**⚠ Canonical-sync obligation (L910 — applying F-2's own lesson to this gate)**: this Phase 1.4 currently lives in the **private** SOP only. To avoid the exact private↔canonical drift that F-2 exposed, it MUST be promoted to canonical `../aget/sops/SOP_release_process.md`. Tracked with the canonical-SOP backfill (gh#1595 sibling). Until promoted, a fleet agent deriving from canonical will not see this gate.
+
+**Tag-membership gate (v1.65 — BLOCKING; principal directive 2026-08-20)**
+
+Every repo-relative path a receiver-facing package advertises SHALL be present **in the tag tree the
+package names**, not merely present on disk.
+
+```bash
+python3 scripts/check_tag_membership_ext.py --repo ../aget --tag v<VERSION> \
+    --package <the receiver-facing files at the tag>
+# exit 0 = all advertised paths in tag · 1 = at least one is not · 2 = UNAVAILABLE (unresolvable tag, or 0 paths found)
+```
+
+**Why this is not covered by step 4's claim-path gate.** `release_claim_path_gate.py` resolves advertised
+surfaces with `Path(...).exists()` against a canonical **root** — the working tree. *"Exists at source"*
+and *"reachable at the tag"* diverge precisely when a file sits on a branch but outside the tag. That
+gate would have **passed** v3.31.1, because `handoffs/SUPERVISOR_PROMPT_v3.31.1.md` genuinely exists —
+on `main`, at `d7ba8d31`, which is not an ancestor of the tag. The package told receivers to use only the
+tag and not to trust a mutable main commit, and then pointed them at a file only that commit held.
+
+**Failure mode**: any `NOT-IN-TAG` row, or a `VACUOUS`/`UNAVAILABLE` result = **BLOCK**. Override: L178
+with recorded reason. A zero-path pass is explicitly NOT a clean bill — the check returns 2 for it,
+because a clean result over an empty population reads as assurance.
+
+**Known red on install**: run against the v3.31.1 package this gate reports the defect above. That is
+correct behaviour and is a **recorded disposition, not a surprise** — principal ruling 2026-08-20 elected
+to document that instance rather than correct it (`handoffs/RELEASE_HANDOFF_v3.31.1.md` §Known issue,
+`gh#2293`). The gate prevents recurrence; it does not retroactively repair the shipped package.
+
+**Implements**: principal directive 2026-08-20 ; L656 (published ≠ reachable) ; `gh#2293`
+
+**Inbound-receipt gate (v1.64 — BLOCKING; principal directive 2026-08-20)**
+
+A release SHALL NOT be pushed while an artifact addressed to this seat is unread, or while a recorded
+inbound obligation is open.
+
+```bash
+python3 scripts/check_inbound_ext.py --json   # then reconcile against data/cross_fleet/INBOUND_RECEIPTS.md
+```
+
+**Failure mode**: any inbound artifact with no receipt row, or a receipt row whose Obligation is open =
+**BLOCK** until read and dispositioned. Override: L178 with recorded reason.
+
+**Why here and not only at wake-up.** Both peer seats carrying this ledger
+(a supervisor seat and a peer specialist seat) surface inbound at wake-up only. That makes a
+peer's result discoverable, but nothing prevents a release shipping over it — which is how the v3.31
+NOGO checkpoint was authored, delivered, and remotely verified while this seat shipped and planned
+around it for two days. The principal's directive is explicit: *"before the next release, not after
+it."* Wake-up makes it visible; **this gate makes it binding.**
+
+**Measured at installation (2026-08-20)**: 17 artifacts addressed to this seat over 365 days — 14 from
+a supervisor seat, 2 from a second supervisor, 1 from a peer seat, oldest 30 days — against
+**zero** receiving surface. The seat's `inbox/` held 136 outbound artifacts and no inbound path.
+
+**Instrument caution**: `check_inbound_ext.py` declares `register_used` and `self_aliases_matched` in
+its output. Read them. Copied unmodified from the peer it resolved 0 seats (register is not local) and
+then matched 10/10 artifacts addressed to the *supervisor* as inbound here. A clean result over the
+wrong population is worse than no result.
+
+**Implements**: principal directive 2026-08-20 ; L480 (read boundary — siblings stage at source) ; L464 (fail-soft) ; L656 (Loading Dock: discoverable ≠ consumed)
+
+**Distinct-seat delegated review (v1.63 — BLOCKING; `deleg-verify:R1`/`R3`; POLICY_mandatory_independent_verification P-3.2)**
+
+The mechanical control above is necessary and not sufficient. A release-readiness claim is a
+**closed-loop-vulnerable claim** under POLICY P-2 (*"release complete", "gate green"*), so per **P-1** it
+SHALL NOT be settled on the releaser's own verification alone. Before the push, one **distinct-seat**
+review MUST run in a **fresh context with no access to the producing session's reasoning, diagnosis, or
+transcript**, and it MUST satisfy all three conditions below. They fail in three different ways, so a
+single combined check is not permitted — two can pass on the strength of the third.
+
+| # | Condition | Why it is separate |
+|---|---|---|
+| R3.1 | **Sealed instructions and immutable target.** The reviewer's prompt and packet MUST be recorded with a content **digest** (hash/fingerprint) so what was actually asked is reconstructible. The release record MUST name the exact reviewed candidate by **full commit SHA** (or equivalent immutable target fingerprint), and the reviewer MUST resolve the reviewed artifacts from that fingerprint rather than a mutable worktree. | Guards a review *claimed* but never run, run against a different question, or run against different bytes than the recorded candidate. |
+| R3.2 | **Durable findings.** The reviewer's findings text MUST be **persisted** as an artifact, not reduced to a verdict. | Guards findings collapsed to "PASS", which discards exactly the content that has review value. |
+| R3.3 | **Source re-verification.** Every **load-bearing finding**, including one accepted, rejected, or deferred, MUST be **verified at its original source** and carry the source, observed result, and recorded disposition — reviewer findings are **claims under test**, not conclusions. | Guards findings acted on without verification, findings silently omitted without verification, and reviewer overreach adopted because it arrived from outside. |
+
+**Reviewer instrument (2.4 decision — generalize, do not build new)**: generalize the existing committed
+read-only dispatcher around this exact isolation contract:
+`codex exec --ephemeral --ignore-user-config --ignore-rules --skip-git-repo-check -s read-only -C /private/tmp -`,
+fed a response contract plus a frozen packet on stdin. The guarantees are separate:
+`--ephemeral` does not persist a Codex session; `--ignore-user-config` skips `$CODEX_HOME/config.toml`;
+`--ignore-rules` skips user/project execpolicy `.rules`; `-s read-only` denies reviewer writes; and the
+isolated `/private/tmp` working root keeps the producing repository outside project-context discovery so
+the sealed packet, not its skills or AGENTS.md, supplies the subject. `scripts/dispatch_irpe_reviewer_ext.py`
+implements this command array but still hard-codes a `fresh-consumer-*` slot and six-item IRPE contract.
+It proves the generalization path; it is **not** the generalized release instrument. A committed wrapper
+implementing this contract and capturing the full findings is required before a release may satisfy the
+gate; absence of that wrapper blocks rather than authorizing an ad-hoc fourth harness.
+
+**Failure mode**: no distinct-seat fresh-context review, exposure to producing-session reasoning, an
+unsealed packet or mutable target, a verdict without persisted findings, or any load-bearing finding
+without source re-verification and disposition = **BLOCK** until corrected. Override: L178 with recorded
+reason.
+
+**Empirical basis (2026-08-20, this seat)**: across two gates of one remediation plan, same-lane
+self-scoring (Triad Checkpoint, `[x] Builder [x] Auditor [x] Critic`) surfaced **zero** defects, while
+two distinct-seat dispatches surfaced two — a publication guard whose polarity was **inverted**
+(unpushed → FAIL, pushed → PASS), and a red-proof oracle that stamped its intended reason onto any
+`AssertionError`, making wrong-reason failures indistinguishable from genuine red proofs. R3.3 earned
+its place in the same pass: of six findings in the second review, two were real, **one was a
+demonstrable overreach** (it asserted no check pinned the validator blob; the runner does, at line 204),
+and two were honest `unresolvable-from-packet`. See L1421, `gh#2292`.
+
+**Implements**: L1046 (root-cause-claims-are-claims-under-test) ; ADR-007 (no test theater) ; L910 (private↔canonical propagation) ; `deleg-verify:R1`/`R2`/`R3` ; POLICY_mandatory_independent_verification P-1/P-2/P-3.2 ; L1047 (producer-pilot is not downstream-verify)
+
+### Phase 0.98: Fresh-Context Default for Release Execution (REQ-PRIN-2026-001 — v1.59)
+
+**Rule (principal-ruled 2026-07-18, Option 2 / B-soft)**: release execution (Phases -1→3, the Gate-4 arc) runs in a **FRESH session/context by DEFAULT** — a cold context reading only rendered artifacts is the cheapest consumer-instantiation that exists, and it targets the rate layer (production elastic, consumption fixed; v3.27.0's ~10 post-tag defects were same-session compression cost). **Same-session lock→build→ship requires a RECORDED principal ship-today override** (one line in the release plan's authorization log — the L178 shape; the A5/v3.26 precedent becomes the priced exception, not the ambient default). The p90 `{AGET-Release_time}` SLO (`scripts/release_time_slo.py`) prices what the soak spends — deliberate over-investment stays available per D-27-K.
+
+Ledger: `governance/REQUIREMENTS_LEDGER.md` REQ-PRIN-2026-001.
+
+### Phase 0.99: Prior-Version Closure Ratchet (v1.62 — BLOCKING)
+
+Before a new release cycle advances beyond research/preparation into execution, read the immediately prior release's closure-state artifact. `prior_version_closure.status` MUST be `complete` or `not_applicable`, and both `blocks_release_close` and `blocks_next_cycle` MUST remain `true`. A missing artifact, missing field, `pending` state, or unreadable evidence blocks cycle execution; it is not converted to CI success, a deferral note, or a new-cycle checklist item.
+
+**V-test**: `python3 scripts/public_ci_release_gate_ext.py verify-release-consumer --plan planning/PROJECT_PLAN_public_ci_release_gate_v1.0.md` must report `prior_closure=blocking`. The current v3.31.1 closure-state receipt intentionally reports the unresolved v3.30.0 closure as pending, demonstrating the hold rather than laundering it.
+
+### Phase 1.5: Push Window Gate (L735 — BLOCKING)
+
+> **SCOPE — read before applying.** This gate governs pushes to **public `aget-framework/*` repositories
+> only.** It does **not** bind a private repository. Most agents reading this procedure operate in a
+> private repo, where this phase is not applicable: confirm with `git remote -v` before treating it as a
+> blocker. Applying it where it does not bind will stall work for no safety gain.
+
+
+**Purpose**: Verify that all public pushes occur within the approved weekend window. Prevents weekday contributions graph activity.
+
+**When**: AFTER Phase 1 (Commit), BEFORE Phase 2 (Push). This gate BLOCKS Phase 2.
+
+**Check**:
+```bash
+# Verify today is Saturday or Sunday
+DAY=$(date +%A)
+if [ "$DAY" = "Saturday" ]; then
+  echo "PASS: Today is Saturday — proceed to Phase 2 (Push)"
+elif [ "$DAY" = "Sunday" ]; then
+  echo "CONDITIONAL: Today is Sunday. Principal approval required to push."
+  echo "Options:"
+  echo "  1. Obtain principal approval and proceed to Phase 2"
+  echo "  2. Wait until next Saturday"
+  exit 1
+else
+  echo "BLOCKED: Today is $DAY. Public pushes to aget-framework repos are weekend-only (L735)."
+  echo "Options:"
+  echo "  1. Wait until Saturday to proceed to Phase 2"
+  echo "  2. Request principal override for emergency hotfix"
+  exit 1
+fi
+```
+
+**Override**: Principal may authorize a Sunday push or a weekday push for emergency hotfixes. Document the override reason in the session file.
+
+**Rulings pre-check (L1562 — third recurrence 2026-09-08, all at this seat)**: BEFORE citing L735 as the block, read the cycle's rulings surface — `docs/V<cycle>_DECISIONS_*.md` and `planning/RULINGS_*.md` — for a window-opening ruling (R7-class). A principal ruling can open a weekday; the day-of-week check above encodes the *default*, not the *standing state*. Three times a default quoted as an invariant cost an authorized window while the ruling that opened it sat in a loaded file. Record in the session file: the rulings file read, the ruling found or `none`, and only then the day check. A `BLOCKED` verdict without a named rulings read is not a Phase 1.5 result.
+
+**Rationale**: GitHub contributions graph is public. Every `git push` to any aget-framework repo creates a visible contribution square for that day. Concentrating pushes to the weekend keeps the graph clean and avoids Mon-Fri activity that could be misinterpreted.
+
+**Checkpoint**: Day = Saturday (autonomous), Sunday (principal-approved), or weekday principal override documented.
+
+**Implements**: L735 (Push Window Discipline Gap)
+
 ### Phase 2: Push (Deployment)
 
 ```bash
 # 1. Push aget/ core first (dependency root)
-cd $AGET_FRAMEWORK_DIR/aget
+cd ~/github/aget-framework/aget
 git push origin main
 
 # 2. Push templates alphabetically
 for repo in template-advisor-aget template-consultant-aget \
             template-developer-aget template-spec-engineer-aget \
             template-supervisor-aget template-worker-aget; do
-  cd $AGET_FRAMEWORK_DIR/$repo
+  cd ~/github/aget-framework/$repo
   git push origin main
 done
 
 # 3. Verify all pushes succeeded
 for repo in aget template-*-aget; do
   echo "=== $repo ==="
-  cd $AGET_FRAMEWORK_DIR/$repo
+  cd ~/github/aget-framework/$repo
   git status
 done
 ```
 
-**Checkpoint**: All 7 repos pushed, no failures.
+**Checkpoint**: All 14 repos pushed, no failures.
 
-### Phase 3: Tag & Release (HISTORICAL — v3.15 and earlier only)
+### Phase 2.5: Deployment Artifact Sync (L656 Prevention — v3.13+)
 
-> **⚠️ For v3.16+ releases**: Tag-cut and GitHub Release creation execute at **[Phase 6.4.5](#645-tag--release-authoritative-position-for-v316)** (after handoff artifacts are present in the working tree). Phase 3 is retained ONLY as historical context for v3.15 and earlier releases.
->
-> **Why moved (#1154 Option A)**: Tagging at this phase produced tags whose `git show vX.Y.Z:handoffs/RELEASE_HANDOFF_vX.Y.Z.md` returned "not found" because handoff artifacts did not yet exist in the working tree (created later at Phase 6.2). Remote fleet supervisors fetching the tag could not access tag-pinned handoff/DEPLOYMENT_SPEC/BREAKING_CHANGES — confirmed root cause for a downstream fleet supervisor #1152 incident.
->
-> **For v3.16+ canonical execution order**: Phase 1 → Phase 2 → Phase 4 (commit-level validation; tag-resolvable checks deferred) → Phase 5 → Phase 6.1 → Phase 6.2 → Phase 6.3 → Phase 6.3.1 → Phase 6.4 → **Phase 6.4.5 (tag + GitHub Release)** → Phase 6.5 → Phase 7.
->
-> **DO NOT execute commands here for v3.16+ releases.** The canonical commands now live at Phase 6.4.5 (sub-sections 6.4.5.1 through 6.4.5.4).
->
-> **For v3.15 and earlier audits**: Tags were cut at this phase per the prior procedure. Do NOT retroactively re-tag historical releases.
+**Purpose**: Ensure all release artifacts are deployed where downstream consumers can find them. Prevents Loading Dock anti-pattern (L656) — artifacts created in private repo but not propagated to public repos.
 
-This phase is intentionally empty of executable commands — see Phase 6.4.5 below for v3.16+ canonical commands.
+**When**: AFTER Phase 2 (Push), BEFORE Phase 3 (Tag & Release)
+
+**Rationale**: v3.13.0 post-release found 5 Loading Dock instances: DEPLOYMENT_SPEC missing from public repo, skills not propagated to template-worker-aget, handoff missing spec reference, org profile stale, DEPLOYMENT_SPEC claims not matching template reality.
+
+**Checklist**:
+
+- [ ] **DEPLOYMENT_SPEC created**: `specs/DEPLOYMENT_SPEC_vX.Y.Z.yaml` exists locally AND in public `aget/specs/`
+- [ ] **Skills propagated**: All new/upgraded skills deployed to `template-worker-aget/.claude/skills/` and pushed
+- [ ] **Parity check**: `python3 scripts/check_deployment_parity.py --version X.Y.Z` — exit code 0
+- [ ] **Handoff references DEPLOYMENT_SPEC**: `aget/handoffs/RELEASE_HANDOFF_vX.Y.Z.md` includes DEPLOYMENT_SPEC path
+- [ ] **Org profile current**: `.github/profile/README.md` version badge, roadmap, Quick Start reflect new version
+
+**V-Test**:
+```bash
+# Parity check (all claims in DEPLOYMENT_SPEC match template reality)
+python3 scripts/check_deployment_parity.py --version X.Y.Z
+# Expected: exit code 0
+```
+
+**Red Flags**:
+
+| Red Flag | Consequence | Fix |
+|----------|-------------|-----|
+| "Tags first, sync later" | Consumers find mismatched state | Sync BEFORE tagging |
+| DEPLOYMENT_SPEC claims skill version X but template has Y | D15-class divergence | Run parity check |
+| "Skills are in my .claude/ so they're deployed" | Private ≠ public | Propagate to template-worker-aget |
+
+---
+
+### Phase 3: Tag & Release
+
+**Purpose**: Create git tags and GitHub Releases for all repos
+
+**Preferred Method** (v3.12.0+): Use `tag_release.py` for automated tag, push, and release across all 14 repos:
+```bash
+python3 scripts/tag_release.py --version X.Y.Z --description "Brief description"
+# Add --dry-run first to verify
+```
+The script dynamically discovers all repos (no hardcoded list) and implements ADR-004 three-tier degradation.
+
+**Manual Fallback**: If `tag_release.py` is unavailable, use the manual steps below.
+
+**Important**: Tags ≠ Releases on GitHub. Tags are git objects; Releases are GitHub UI features created separately.
+
+#### 3.0. Pre-Tag Release-Artifact Inventory (**BLOCKING** — gh#1274 F-V317-SUP-R2-B)
+
+**Rationale**: Once `vX.Y.Z` tag is cut, the GitHub URL `aget-framework/aget/blob/vX.Y.Z/<path>` is FROZEN. Any vX.Y.Z-keyed artifact (handoff, DEPLOYMENT_SPEC, CHANGELOG entry) committed to canonical `aget/` AFTER the tag will 404 at that tag URL — discoverable only via `main`/HEAD URLs. v3.17.0 caught this empirically: handoff committed at `147818c` 2026-05-09 23:43 PDT (post-tag); spec-debt closure committed at `cdde067` (post-tag); both produced tag-vs-HEAD ambiguity surfaced in gh#1274.
+
+**This BLOCKING gate MUST run before 3.1 (tag creation) for every release.**
+
+**Procedure**:
+
+1. Inventory expected vX.Y.Z artifacts in canonical `aget/` against the to-be-tagged ref (NOT working-directory state — F1 mitigation per `workspace/PHASE_3_0_PREMORTEM_2026-05-10.md`):
+
+   **Preferred** (V-test wiring — checks `git ls-tree <ref>:<path>` against the to-be-tagged commit):
+   ```bash
+   python3 scripts/check_tag_payload_coherence.py --version X.Y.Z --pre-tag
+   # add --repo ../aget to name the canonical tree explicitly
+   # Exit 0 = PASS; Exit 1 = BLOCK; Exit 2 = FAIL/config error
+   ```
+
+   > **Changed 2026-08-21.** This block invoked `scripts/check_pretag_inventory.sh` until that script was
+   > removed under `DEP-PRETAG-SH-001` (scheduled v3.28.0, actuated at 3.31.1). The successor is
+   > `check_tag_payload_coherence.py --pre-tag`, verified executing before the removal landed.
+   > **The dangling reference is why this note exists**: the removal's own pre-checks searched for *executable
+   > callers* and found none — correctly — but an SOP that **instructs a human to run a command** is a caller
+   > the search's shape could not see. A deprecation's blast radius includes prose that tells someone to run
+   > the thing. Caught the same session, but only because the search output was re-read rather than trusted.
+
+   **Manual fallback** (if script unavailable — note: bare `test -f` checks working-dir state, not tagged tree; less rigorous):
+   ```bash
+   cd ~/github/aget-framework/aget
+   echo "=== CHANGELOG entry ===" && grep -c "## \[X.Y.Z\]\|## \[vX.Y.Z\]" CHANGELOG.md
+   echo "=== Public handoff ===" && git ls-tree HEAD:handoffs/RELEASE_HANDOFF_vX.Y.Z.md >/dev/null 2>&1 && echo PRESENT || echo ABSENT
+   echo "=== DEPLOYMENT_SPEC ===" && git ls-tree HEAD:DEPLOYMENT_SPEC_vX.Y.Z.yaml >/dev/null 2>&1 && echo PRESENT || echo ABSENT
+   echo "=== Delta spec ===" && git ls-tree HEAD:specs/deltas/AGET_DELTA_vX.Y.md >/dev/null 2>&1 && echo PRESENT || echo ABSENT
+   ```
+
+2. For each ABSENT artifact, classify and remediate:
+
+   | Artifact | If ABSENT — required action |
+   |----------|----------------------------|
+   | CHANGELOG entry | **Commit BEFORE tag** (no exceptions; CHANGELOG must be in tagged tree) |
+   | Public handoff | Choose one: (a) commit BEFORE tag (preferred), OR (b) commit principal-approved deferral note in `release-notes/vX.Y.Z.md` with patch-tag commitment per Phase 3.0(d) below, OR (c) MOVE tag forward post-handoff (destructive — principal Decide) |
+   | DEPLOYMENT_SPEC | Choose one: (a) commit BEFORE tag (Option A default), OR (b) commit explicit Option B no-DEPLOYMENT_SPEC disclosure in handoff §DEPLOYMENT_SPEC Note (per RELEASE_HANDOFF_TEMPLATE.md) |
+   | Delta spec | **Commit BEFORE tag** (release notes reference this URL) |
+   | Migration guide + REMOTE_MIGRATION_MESSAGE (#1786, v3.25) | **Commit BEFORE tag** — the v3.24.0 guide existed only post-tag on HEAD, so tag-pinned consumers (remote fleets checking out `vX.Y.Z`) could not reach it. Reachability-at-tag is the contract, not merely existence |
+   | Deep release notes `release-notes/vX.Y.Z.md` (#1786, v3.25) | **Commit BEFORE tag** (canonical tree) — same reachability-at-tag contract |
+
+2.5. **M-row payload-substance verification (BLOCKING — v1.60, gh#1871 + gh#1945)**: for every `blocking: true` M-row in DEPLOYMENT_SPEC_vX.Y.Z.yaml, execute its `detection:` clause **against the payload surfaces the fleet pulls from** — canonical `aget/` at the tag-candidate tree AND ≥1 template repo at its tag-candidate tree (full 13-template sweep at G4 or first post-tag session) — NOT against this seat's instance `scripts/`. A clause that fires only on the framework seat's working copy is unshipped substance (L640 structural-PASS at the propagation leg). Any blocking-row FAIL at a payload surface = tag BLOCKED until the substance is promoted (precedent `6f8b9dd`) or the row is corrected/descoped with disclosure.
+   - **Why**: two consecutive releases shipped M-rows without payload substance — v3.26 M-3.26-6 (#1871, canonical-only delta) and v3.27 M-3.27-3/-5 absent from canonical AND all templates + M-3.27-6 absent from templates (#1945; features built v3.27 G1.1/G1.3/G3.5.2 on the seat, promote-to-canonical step had no gate; caught by supervisor Gate -1, fleet wave NOGO'd, fixed post-tag as CORRECTIONS rows 4–5). #1871's "compute M-row conformance at G4" recommendation, now enacted pre-tag.
+   - **V-test**: per blocking M-row: `(cd ../aget && bash -c '<detection>')` exit 0 AND `(cd ../template-worker-aget && bash -c '<detection>')` exit 0 (seat-conditional rows: skip-if-absent form per CORRECTIONS row-1 pattern). Emit `DELIVERED_FILES_vX.Y.Z.yaml` (#1870 emit-half) in the same step — `ABSENT-AT-REF` rows must reconcile to a seat-conditional or a disclosed deferral.
+
+3. **Patch-tag commitment** (Phase 3.0(d)) — if any artifact is intentionally deferred per (b), the deferral comes with structural commitment to patch-tag:
+   - Author MUST file gh issue at deferral time committing to `vX.Y.Z+1` patch tag within N days post-handoff publication
+   - Patch tag SHALL include all post-tag commits to canonical `aget/` (handoff, spec-debt closures, etc.)
+   - Patch tag is NOT optional once filed — it is the structural recovery from deferral
+
+4. **Verification before 3.1**:
+   ```bash
+   # All ABSENT artifacts have a documented disposition
+   grep -q "Phase 3.0 deferral\|patch-tag commitment\|Option B" release-notes/vX.Y.Z.md && echo PASS || echo FAIL
+   # FAIL = blocked. Either commit artifact OR document deferral before proceeding.
+   ```
+
+5. **Failure mode** (advisory hard-block per ADR-008 Strict pattern): If verification FAILs and principal proceeds anyway, log decision in `release-notes/vX.Y.Z.md` Decisions section with rationale; downstream PIR D6 may cap at L1 per L671 prevention.
+
+**Detection at retro**: Cross-check tag URL `https://github.com/aget-framework/aget/blob/vX.Y.Z/handoffs/RELEASE_HANDOFF_vX.Y.Z.md` against canonical artifact set; any 404 against expected artifact = Phase 3.0 deferral was either undocumented OR patch-tag was not cut.
+
+**Closes**: gh#1274 F-V317-SUP-R2-B (tag-vs-HEAD ambiguity recommendation (a)).
+
+---
+
+#### 3.1. Create Tags (All Repos)
+
+```bash
+cd ~/github/aget-framework
+
+# Tag ALL repos (core + 13 templates = 14 total) — L727: must enumerate all, not subset
+for repo in aget template-advisor-aget template-analyst-aget template-architect-aget template-consultant-aget template-developer-aget template-document-processor-AGET template-executive-aget template-operator-aget template-researcher-aget template-reviewer-aget template-spec-engineer-aget template-supervisor-aget template-worker-aget; do
+  echo "=== Tagging $repo ==="
+  cd "$repo"
+  git tag -a vX.Y.Z -m "Release vX.Y.Z: Brief description
+
+Full release notes at:
+https://github.com/aget-framework/aget/blob/main/specs/deltas/AGET_DELTA_vX.Y.md"
+  cd ..
+done
+```
+
+#### 3.2. Push Tags
+
+```bash
+# Push tags to remote (ALL 14 repos)
+for repo in aget template-advisor-aget template-analyst-aget template-architect-aget template-consultant-aget template-developer-aget template-document-processor-AGET template-executive-aget template-operator-aget template-researcher-aget template-reviewer-aget template-spec-engineer-aget template-supervisor-aget template-worker-aget; do
+  echo "=== Pushing tag for $repo ==="
+  cd "$repo"
+  git push origin vX.Y.Z
+  cd ..
+done
+```
+
+#### 3.3. Create GitHub Releases
+
+**Note**: Pushing tags does NOT create GitHub Releases. Use `gh` CLI:
+
+```bash
+# Create releases for ALL 14 repos (L727: 12 templates were missed in v3.10.0)
+for repo in aget template-advisor-aget template-analyst-aget template-architect-aget template-consultant-aget template-developer-aget template-document-processor-AGET template-executive-aget template-operator-aget template-researcher-aget template-reviewer-aget template-spec-engineer-aget template-supervisor-aget template-worker-aget; do
+  echo "=== Creating release for $repo ==="
+  cd "$repo"
+  gh release create vX.Y.Z \
+    --title "vX.Y.Z - Brief Title" \
+    --notes "Release notes content here
+
+See https://github.com/aget-framework/aget/blob/main/specs/deltas/AGET_DELTA_vX.Y.md for complete changes."
+  cd ..
+done
+```
+
+**Release Notes Template**: Use standard release notes (see section below)
+
+#### 3.4. Verify Releases
+
+```bash
+# Check releases are visible
+for repo in aget template-supervisor-aget template-worker-aget template-advisor-aget template-consultant-aget template-developer-aget template-spec-engineer-aget; do
+  echo "=== $repo ==="
+  open "https://github.com/aget-framework/$repo/releases"
+done
+```
+
+**Verification Checklist**:
+- [ ] All 7 repos show new release on GitHub Releases page
+- [ ] Release marked as "Latest" (green badge)
+- [ ] Release notes display correctly
+- [ ] Delta spec link works
+
+**Checkpoint**: All 7 GitHub Releases visible and marked "Latest".
+
+#### 3.5. Initialize Deployment Monitor (**BLOCKING** — L772)
+
+**⚠️ CRITICAL: This step is BLOCKING. You MUST NOT proceed to Phase 4 until deployment_monitor JSONL is initialized for this version.**
+
+```bash
+cd "$AGET_HOME"   # this agent's own repository root
+
+# Initialize JSONL for this release version
+python3 scripts/deployment_monitor.py --init --version X.Y.Z
+```
+
+**V-test**:
+```bash
+# Verify JSONL has entry for this version
+python3 scripts/deployment_monitor.py --check --version X.Y.Z 2>&1 | grep -c "YELLOW\|GREEN"
+# Expected: 1 (YELLOW = initialized, GREEN = confirmed)
+```
+
+**Why BLOCKING**: deployment_monitor --init was missed in 2 of 3 releases (v3.9.0, v3.11.0), causing wake_up.py to display stale deployment status for 7+ days each time. A checklist item without BLOCKING enforcement is decorative metadata (L671). The 2/3 miss rate confirms the failure mode is the norm, not the exception.
+
+**Checkpoint**: `deployment_monitor.py --check --version X.Y.Z` returns YELLOW or GREEN.
+
+---
+
+### Phase 3.6: Tag-Payload Coherence Gate (v3.26 C-26-03, gh#1834 — STANDING)
+
+Closes the verified 3-instance class from v3.25.0: post-tag repairs on main leaving the tag payload silently divergent while migrating fleets fetch AT THE TAG.
+
+**Rule 1 — Prevention (ordering)**: computed close-DoD full-green (including metadata-coherence + DEPLOYMENT_SPEC rows) is a precondition of **TAG CREATION**, not merely of release-close. Run `check_release_completion.sh` (or the DoD gate) BEFORE Phase 3.1 tag-cut; a red row means the tag waits. (v3.25.0 sequence tag → DoD-red → fix-on-main showed the gate firing too late.)
+
+**Rule 2 — Disclosure (standing, post-tag; SINGLE-SURFACE from v1.57 — C-27-10/gh#1882)**: WHEN any commit touches a release-coupled artifact (codemeta.json, CITATION.cff, `DEPLOYMENT_SPEC_v{V}.yaml`, `handoffs/RELEASE_HANDOFF_v{V}.md`, `handoffs/REMOTE_MIGRATION_MESSAGE_v{V}.md`, CHANGELOG.md) after the version tag, the fix is recorded **FIRST and ONCE** in `handoffs/CORRECTIONS_v{V}.md` (canonical; template `handoffs/TEMPLATE_CORRECTIONS.md` — row = SHA · date · artifact · what · why-tag-copy-insufficient · consumer action) **same-day**. The other guidance surfaces (release body, handoff, migration message, supervisor prompt) carry a **static pointer** to the corrections surface instead of duplicated enumerations — one write per fix ends the v3.26 fan-out class (8 post-tag commits × 4 surfaces; the surface remote fleets EXECUTE was the one missed — L1159/L1164). The release body still gains its post-tag-repairs section at first divergence, but as pointer + summary line, not a full enumeration. Coverage check: `python3 scripts/check_corrections_surface.py --version X.Y.Z` (warn-level; pairs the Phase 3.6 coherence check).
+
+**Check**: `python3 scripts/check_tag_payload_coherence.py --version X.Y.Z` — three-state output; **PLUS (v1.58, gh#1871/C-27-32) the 3-axis sweep `--three-axis` at G4 pre-push AND post-tag**: repo axis (all 14 origins' tags, not canonical-only) × payload-path axis (M-row referenced paths present at each origin's TAGGED tree) × executed-surface axis (dual-basename `scripts/` targets must declare `executed_surface:` in the DEPLOYMENT_SPEC — gh#1881 ask 3). First live run (v3.26.0 retro-check) found the known RO-8 record-lesson gap at 2 tagged trees — the gate sees what the canonical-only form was blind to. Original three-state output per `docs/CONVENTION_check_three_state_contract.md`: PASS (no divergence, or diverged-and-disclosed) / FAIL exit 2 (diverged undisclosed — fix the release body, or patch-tag per Phase 3.0(d)) / UNREACHABLE (non-gating, ADR-004). Run at Phase 4 entry AND after any post-release repair commit.
 
 ---
 
