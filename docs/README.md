@@ -17,6 +17,7 @@ Guide to the `docs/` tree. Start with **[GETTING_STARTED.md](GETTING_STARTED.md)
 | [ONTOLOGY_DESIGN.md](ONTOLOGY_DESIGN.md) | Vocabulary-first agent customization |
 | [AGET_CORE_VOCABULARY.md](AGET_CORE_VOCABULARY.md) | Core terms and their meanings |
 | [ARCHETYPE_ECOSYSTEM.md](ARCHETYPE_ECOSYSTEM.md) | The 12 archetypes and how they relate |
+| [architecture/grounded-views-2026-10-08/](architecture/grounded-views-2026-10-08/) | Grounded architectural models (overview, technology views, companion) |
 
 ## Building & authoring
 | Doc | What it covers |
