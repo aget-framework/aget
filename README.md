@@ -106,6 +106,7 @@ All templates include the 29 required universal skills listed in [the template s
 - [Strategic Context](docs/STRATEGIC_CONTEXT.md): The governed agent paradigm
 - [Ontology-Driven Design](docs/ONTOLOGY_DESIGN.md): Vocabulary-first agent customization
 - [Philosophy](docs/COMPOSITION_GUIDE.md): Human-AI collaboration quality over autonomous speed
+- [Architecture](docs/architecture/grounded-views-2026-10-08/): Grounded architectural models and views
 
 ## Contributing
 
