@@ -16,7 +16,7 @@ The overview and technology diagrams share adopted concepts and directed relatio
 
 ## Definitions and arrows
 
-[Download the complete guide and diagrams](grounded-architecture.zip?raw=true), extract the archive, and open `companion.html` for the definitions, parent meanings, arrow directions and conditions, source support, constraints and tested limits. Open `index.html` to view both diagrams together. No account, private ontology or private evidence record is needed to read the downloaded package.
+[Download the complete guide and diagrams](https://raw.githubusercontent.com/aget-framework/aget/main/docs/architecture/grounded-views-2026-10-08/grounded-architecture.zip) ([repository file](grounded-architecture.zip)), extract the archive, and open `companion.html` for the definitions, parent meanings, arrow directions and conditions, source support, constraints and tested limits. Open `index.html` to view both diagrams together. No account, private ontology or private evidence record is needed to read the downloaded package.
 
 [Exact public model](accepted-draft/public-model.json) preserves the adopted definition fields. [Companion HTML source](accepted-draft/companion.html) is available separately. GitHub shows the HTML source; the portable guide is viewed after download, not as a hosted website.
 
