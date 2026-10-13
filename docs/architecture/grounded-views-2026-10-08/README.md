@@ -8,10 +8,10 @@ This guide is for readers learning the framework, builders interpreting its rela
 
 | Field | Disposition |
 |---|---|
-| Publication edition | Landing-page correction dated October 12, 2026. The diagrams, companion and model remain the accepted draft edition of October 8, 2026; their original bytes and review-time labels are retained. |
+| Publication edition | Landing-page evidence follow-up dated October 12, 2026. The diagrams, companion and model remain the accepted draft edition of October 8, 2026; their original bytes and review-time labels are retained. |
 | Framework source basis | The model's framework citations use [source revision 06a9f453d0d676ea068a23ee2167a4a17f29dc78](https://github.com/aget-framework/aget/tree/06a9f453d0d676ea068a23ee2167a4a17f29dc78). This is the framework source basis, not the publication's commit. |
 | Intended and assessed applicability | Intended for interpreting the selected model and cited framework passages. Applicability to a numbered product release is **not established**; no runtime compatibility test is claimed. The framework maintainer owns assessment before the next substantive revision or any release-applicability claim, whichever occurs first. |
-| Release membership | **Not established** for a numbered release. Publication between releases and a source revision do not prove inclusion in a release. The framework maintainer will check tagged contents before a membership claim or the next substantive revision. |
+| Release membership | This architecture package is **not included in the [v3.36.0 tagged source tree](https://github.com/aget-framework/aget/tree/24de1eb0104962ef7aab39f05ccc740876d5e5f2)**. It was [added after that tag](https://github.com/aget-framework/aget/commit/a2d285fa4fe13c594bddf846ddf48b5c203218b7). This is a statement about tagged file contents, not product compatibility or inclusion in other releases. |
 | Evidence strength | The model reports scoped definition, relationship and constraint checks. Its evidence summary is a report of the October 8 review, not a rerun or a runtime certificate. Whole-register and citation-access limits are stated below. |
 
 ## Overview
@@ -45,4 +45,8 @@ The enclosing repository's license applies to this original architecture package
 
 The framework Aget is the accountable maintainer of this publication. Report unclear meanings, broken links or contradictory claims through the [public issue tracker](https://github.com/aget-framework/aget/issues). Review is triggered by a substantive publication change, a changed supporting source or definition, a reported discrepancy, or a release that affects an applicability claim; it need not wait for a release.
 
-The exact model supplies each directed relationship's conditions and public support, and each constraint's predicate and positive/negative cases. Those cases explain the check; they are not evidence that a deployed runtime enforces it. The maintainer owns unresolved numbered-release applicability, membership and public reproducibility of the historical audit/access reports, to be reviewed before the next substantive revision or reuse of those claims. Historical report disclosure does not establish the underlying facts independently.
+The exact model supplies each directed relationship's conditions and public support, and each constraint's predicate and positive/negative cases. Those cases explain the check; they are not evidence that a deployed runtime enforces it. The maintainer owns unresolved numbered-release applicability, membership in other releases and public reproducibility of the historical audit/access reports, to be reviewed before the next substantive revision or reuse of those claims. Historical report disclosure does not establish the underlying facts independently.
+
+## Constraint source map
+
+[Constraint sources and limits](constraint-traceability.md) explains the twelve declared model conditions, the public support available for them, and where exact governing-source traceability remains incomplete. It is an explanatory addition; the accepted-draft package is unchanged.
