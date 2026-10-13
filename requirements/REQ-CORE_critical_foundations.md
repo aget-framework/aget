@@ -1,6 +1,6 @@
 # REQ-CORE: Critical Foundational Requirements
 
-**Version**: 0.2.1
+**Version**: 0.2.2
 **Date**: 2026-10-12 (editorial correction; requirement statements retain their 2026-09-26 source edition)
 **Status**: proposed (all requirement blocks; this correction does not adopt them)
 **Domain**: CORE (cross-cutting, foundational)
@@ -33,10 +33,10 @@ Each [requirement](REQUIREMENTS_FORMAT.md#purpose) below carries a [fit criterio
 
 | Field | Disposition |
 |---|---|
-| Publication edition | 0.2.1, October 12, 2026. Editorial correction of the 0.2.0 requirement set; all sixteen YAML requirement blocks retain their original text and proposed status. |
+| Publication edition | 0.2.2, October 12, 2026. Editorial correction of the 0.2.0 requirement set; all sixteen YAML requirement blocks retain their original text and proposed status. |
 | Framework source basis | [Public source revision da2b6f725c72ef4b2a8ca258786e9a74dc596f03](https://github.com/aget-framework/aget/blob/da2b6f725c72ef4b2a8ca258786e9a74dc596f03/requirements/REQ-CORE_critical_foundations.md), read for this correction. This identifies documentary evidence, not tested software. |
 | Intended applicability | These proposed needs address framework collaboration and publication governance across domains. Their intended scope is not limited to one release; their adoption and assessed applicability to any numbered release are **not established** by this page. |
-| Release membership | Inclusion of this corrected edition in a numbered release is **not established**. The framework maintainer owns a tagged-content check before any membership claim or the next substantive revision. |
+| Release membership | The [v3.36.0 tagged document](https://github.com/aget-framework/aget/blob/24de1eb0104962ef7aab39f05ccc740876d5e5f2/requirements/REQ-CORE_critical_foundations.md) is the earlier 0.2.0 edition. This corrected edition is a later documentation revision, **not the file included in that tag**. All sixteen proposed YAML requirement blocks are unchanged from the tagged document. Tagged inclusion does not adopt them or establish satisfaction or runtime compatibility. |
 | Evidence strength | Editorial population, metadata and summary checks only. Existing verification labels and source reports are historical; this revision runs no implementation acceptance tests and makes no runtime compatibility claim. |
 
 The framework Aget is the accountable publication maintainer. The human [Principal](https://github.com/aget-framework/aget/blob/da2b6f725c72ef4b2a8ca258786e9a74dc596f03/specs/AGET_VOCABULARY_SPEC.md#organizational-terms) retains authority over adopting the needs. Historical principal directions explain the proposals' origins; publication or this edit does not change `status: proposed`. Proposed “shall” statements and the constraints below describe the intended contract, not newly adopted obligations.
@@ -707,11 +707,11 @@ The map includes every YAML requirement block once. Some concerns interact; this
 
 The framework Aget owns this publication's accuracy and its traceability/verification backlog. Use the [public issue tracker](https://github.com/aget-framework/aget/issues) to report a discrepancy or request an accessible source. Reviews occur on a changed supporting source, definition, requirement or implementation, a reported discrepancy, and before a substantive publication update. Release-triggered review is required only where a relevant source or applicability claim changes; publication maintenance also occurs between releases.
 
-Open items include the disclosed forward-contract gaps and mismatches, public evidence for inherited historical source/verification claims, the document-versus-clause meaning distinction, and numbered-release applicability and membership. The maintainer owns each item. Resolve or explicitly redisposition it before the next substantive revision or earlier reuse of the affected claim; verify compatibility or membership before asserting either. Unknown applicability is disclosure, not compatibility evidence.
+Open items include the disclosed forward-contract gaps and mismatches, public evidence for inherited historical source/verification claims, the document-versus-clause meaning distinction, and numbered-release applicability and membership in other releases. The maintainer owns each item. Resolve or explicitly redisposition it before the next substantive revision or earlier reuse of the affected claim; verify compatibility or membership before asserting either. Unknown applicability is disclosure, not compatibility evidence.
 
 This revision preserves the sixteen proposed requirement blocks verbatim. It updates presentation, public meaning links and evidence limits; it does not approve new obligations, promote private records, or claim the proposed needs have been fulfilled.
 
 ---
 
-*REQ-CORE: Critical Foundational Requirements v0.2.1*
+*REQ-CORE: Critical Foundational Requirements v0.2.2*
 *"What the principal wants from the framework itself — published, traceable, assessable."*
