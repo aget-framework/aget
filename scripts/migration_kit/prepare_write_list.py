@@ -70,7 +70,7 @@ def gate_scope(doc, packet_path, list_path):
         row = rows.get(e["aget"], {"exit": 2, "out": "not checked"})
         e["scope_check"] = {"exit": row["exit"], "detail": row.get("out", "")[-300:]}
         ov = overrides.get(e["aget"]) or {}
-        covered = str(doc.get("batch")) in [str(b) for b in ov.get("batches", [])]   # an override names its batches
+        covered = str(doc.get("batch")).casefold() in [str(b).casefold() for b in ov.get("batches", [])]
         if row["exit"] != 0 and not covered and not e.get("blocked"):
             e["blocked"] = (f"receiver bounds: check_receiver_write_scope exit {row['exit']}; needs a principal "
                             f"override naming {e['aget']} (records.json scope_overrides)")

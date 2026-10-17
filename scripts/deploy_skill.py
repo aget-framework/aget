@@ -35,6 +35,8 @@ import shutil
 import sys
 from pathlib import Path
 
+from migration_kit.template_payload import is_compiled_cache
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 FLEET_ROOT = REPO_ROOT.parent  # siblings: template-*-aget live here
 DEFAULT_SOURCE = FLEET_ROOT / "template-worker-aget" / ".claude" / "skills"  # conformant reference
@@ -77,7 +79,7 @@ def is_weekend(today: datetime.date) -> bool:
 def plan(skill: str, source: Path, target: Path) -> dict:
     src = source / skill
     dst = target / ".claude" / "skills" / skill
-    companions = sorted(p.name for p in src.glob("*")) if src.exists() else []
+    companions = sorted(p.name for p in src.glob("*") if not is_compiled_cache(p.name)) if src.exists() else []
     return {
         "skill": skill, "source": str(src), "target": str(dst),
         "source_exists": src.exists(), "already_present": dst.exists(),
@@ -107,7 +109,8 @@ def deploy(skill: str, source: Path, target: Path, apply: bool, today: datetime.
         return {**p, "action": "REFUSED", "reason": f"L735: public template write is weekend-only (today={today:%A})"}
     dst = target / ".claude" / "skills" / skill
     dst.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copytree(source / skill, dst, dirs_exist_ok=True)
+    shutil.copytree(source / skill, dst, dirs_exist_ok=True,
+                    ignore=lambda folder, names: [name for name in names if is_compiled_cache(name)])
     ok = verify(target, skill)  # independent verify
     entry = {"ts": today.isoformat(), "skill": skill, "source": p["source"],
              "target": p["target"], "verified": ok}

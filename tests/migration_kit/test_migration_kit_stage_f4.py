@@ -209,10 +209,12 @@ UT = ("import unittest\n\n\nclass TestX(unittest.TestCase):\n{dec}    def test_x
 @requires_monitoring
 def test_f4_a_static_unittest_skip_is_a_proven_disposition(tmp_path):
     """FWK-OVSR11's F4 WIP pre-read codex 5: `@unittest.skip` (and `skipIf`/`skipUnless`) is decided at import, like a
-    mark; the census evaluates it, so the run reads complete. Control: a skip raised at run time (`self.skipTest`) is
-    still not proven."""
+    mark; the census evaluates it, so the run reads complete.
+    Changed at C29 (rxrun:R4/R7, receiver F-17; labelled): a skip raised at run time by the test's OWN body
+    (`self.skipTest` in the call phase, after the witness saw the census's function start) is the body's skip and is
+    no longer refused; skips from setup stay not proven (test_c29_a_skip_from_setup_is_still_not_proven)."""
     r = kit(tmp_path / "rt", {"test_x.py": UT.format(dec="", body="        self.skipTest('at run time')")})
-    assert refused(r, "not produced by the census"), r
+    assert complete(r), r
     r = kit(tmp_path / "case", {"test_x.py": UT.format(dec="    @unittest.skip('known')\n", body="        assert False")})
     assert complete(r), r
 

@@ -17,10 +17,17 @@ Usage:
     python3 validate_release_gate.py <version> [--manager-path PATH]
     python3 validate_release_gate.py 3.2.0
     python3 validate_release_gate.py 3.2.0 --manager-path ../framework-manager
+    python3 verification/validate_release_gate.py 3.37.0 --payload-only --framework-path /path/to/aget-framework
+
+Payload-only mode is local/offline: inspect all 13 template tags v<version>,
+including unchanged files. Wire it immediately before tag push; proceed only
+on exit 0. Missing repos/tags or unreadable trees fail closed. See
+docs/RELEASE_PAYLOAD_GATE.md for the producer integration contract.
 
 Exit Codes:
     0 - All validations passed
     1 - Validation failures detected
+    2 - Payload-only refusal (or invalid CLI arguments)
 
 Author: aget-framework
 Version: 1.1.0
@@ -37,6 +44,9 @@ import subprocess
 import sys
 from pathlib import Path
 from typing import List, Dict, Tuple, Optional
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
+from migration_kit.template_payload import compiled_caches_at, PayloadInspectionError
 
 
 # Template repositories to check (all 13 - updated v3.13.0)
@@ -299,6 +309,28 @@ def validate_structural_skill_frontmatter(
     return passed, failed, errors
 
 
+def validate_template_payloads(version, framework_path):
+    """Block publication when any template's release tag delivers compiled caches.
+
+    Inspect every path at the tag, including files unchanged since older releases.
+    Missing tags or repositories are failures, never an empty/clean payload.
+    """
+    passed, failed, errors = 0, 0, []
+    for template in TEMPLATE_REPOS:
+        try:
+            caches = compiled_caches_at(framework_path / template, f'v{version}')
+        except PayloadInspectionError as exc:
+            failed += 1
+            errors.append(str(exc))
+            continue
+        if caches:
+            failed += 1
+            errors.append(f'{template}@v{version}: release payload contains compiled cache: {", ".join(caches)}')
+        else:
+            passed += 1
+    return passed, failed, errors
+
+
 def validate_release(
     version: str,
     aget_path: Path,
@@ -405,6 +437,18 @@ def validate_release(
         for e in errors:
             print(f"    - {e}")
 
+    # Producer gate, run before publication; the migration-kit guard is defense
+    # for existing tags and must not be the first place a dirty release is found.
+    passed, failed, errors = validate_template_payloads(version, framework_path)
+    total_passed += passed
+    total_failed += failed
+    if errors:
+        issues['template_payloads'] = errors
+    if verbose:
+        print(f"  [{'PASS' if failed == 0 else 'FAIL'}] Template payloads at v{version}: {passed}/{passed + failed}")
+        for error in errors:
+            print(f'    - {error}')
+
     return total_passed, total_failed, issues
 
 
@@ -440,6 +484,11 @@ def main():
         help="Show detailed output"
     )
     parser.add_argument(
+        "--payload-only",
+        action="store_true",
+        help="Offline template tag payload check only; exit 0 clean, 2 refused"
+    )
+    parser.add_argument(
         "--skip-manager",
         action="store_true",
         help="Skip manager version check (not recommended)"
@@ -451,6 +500,14 @@ def main():
     aget_path = args.aget_path.resolve()
     framework_path = args.framework_path or aget_path.parent
     manager_path = args.manager_path
+
+    if args.payload_only:
+        passed, failed, errors = validate_template_payloads(args.version, framework_path)
+        print(f'Template payloads v{args.version}: {"FAIL" if failed else "PASS"} '
+              f'({passed}/{passed + failed})')
+        for error in errors:
+            print(f'  - {error}')
+        sys.exit(2 if failed else 0)
 
     if not aget_path.exists():
         print(f"Error: aget path does not exist: {aget_path}")

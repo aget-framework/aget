@@ -5,6 +5,7 @@ import importlib.util
 import json
 import subprocess
 import sys
+from functools import partial
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -530,12 +531,12 @@ def test_the_clone_folder_may_not_be_or_hold_the_member(tmp_path):
 
 
 @requires_monitoring
-def test_main_writes_the_record_the_push_gate_reads(tmp_path):
+def test_main_writes_the_record_the_push_gate_reads(tmp_path, monkeypatch):
     loc, g = repo(tmp_path, "def test_a():\n    assert True\n")
     pk = tmp_path / "packet.json"
     pk.write_text(json.dumps({"receivers": [{"aget": "seat", "location": str(loc), "suite_cmd": PYTEST,
                                              "head": g("rev-parse", "HEAD")}]}))   # C2a (R2-T13): a packet names its head
-    S.WORK = tmp_path / "w"
+    monkeypatch.setattr(S, "run", partial(S.run, work=tmp_path / "w"))
     assert S.main(["--packet", str(pk), "--aget", "seat", "--evidence", str(tmp_path / "ev")]) == 0
     rec = json.loads((tmp_path / "ev" / "seat" / "suite_at_commit.json").read_text())
     assert rec["sha"] == g("rev-parse", "HEAD") and rec["verdict"] == "PASS"
@@ -700,13 +701,13 @@ def _migration_world(tmp_path, how):
 
 
 @pytest.mark.parametrize("how,code,verdict", [("workflow", 1, "FAIL"), ("declared", 3, "INCONCLUSIVE")])
-def test_r2_t13_a_migration_commit_cannot_exclude_its_own_new_failure(tmp_path, how, code, verdict):
+def test_r2_t13_a_migration_commit_cannot_exclude_its_own_new_failure(tmp_path, monkeypatch, how, code, verdict):
     """R2-T13 (S-181). The migration commit adds a failing test and excludes it: a `--deselect` in a root workflow is
     not applied (the exclusions are read at the packet's head), so the record reads FAIL; a new entry in the declared
     deselect file, which pytest reads from the tested commit itself, makes it INCONCLUSIVE. Before C2a both read
     PASS: the exclusions were read at the tested commit."""
     pk, ev = _migration_world(tmp_path, how)
-    S.WORK = tmp_path / "w"
+    monkeypatch.setattr(S, "run", partial(S.run, work=tmp_path / "w"))
     assert S.main(["--packet", str(pk), "--aget", "seat", "--evidence", str(ev)]) == code
     rec = json.loads((ev / "seat" / "suite_at_commit.json").read_text())
     assert rec["verdict"] == verdict, rec

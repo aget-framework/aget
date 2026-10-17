@@ -41,6 +41,12 @@ When user says "wind down":
 | healthy | Confirm clean close |
 | warning | Display warnings, allow close |
 | error | WARN user, require acknowledgment |
+| timeout | Report TIMEOUT (incomplete observation), allow close without claiming health passed |
+
+`AGET_WIND_DOWN_HEALTH_TIMEOUT` sets integer seconds from 1 through 3600;
+the default is 120. Invalid values use 120 and print a note on stderr.
+On macOS/Linux, timeout kills the health check's process group. A crashed check
+without a JSON report is ERROR with its exit code, and wind-down exits 2.
 
 ### R-WIND-003: Session Notes Capture
 

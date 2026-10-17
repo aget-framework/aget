@@ -258,7 +258,10 @@ def plan_receiver(name, loc, repair=False, merged=()):
         raise TemplateUnmet(f"{name}: template unresolved ({route}); no packet entry is made")
     fw = Path(L.W.V.framework_root())
     tpl_repo, core = fw / tpl, fw / "aget"
-    exp = L.payload_expectations(tpl)
+    try:
+        exp = L.payload_expectations(tpl)
+    except L.Unavailable as e:
+        raise TemplateUnmet(f"{name}: release payload refused: {e}") from None
     items = []
     for path, want in sorted(exp.items()):
         if P.protected(path) or path in L.CARRIERS:
@@ -313,7 +316,7 @@ def override_note(aget, batch):
     """The principal's recorded write-scope override for this Aget and batch, quoted for the receiver, or None."""
     rec = Path(REPO / "data" / f"{R.SLUG}_ledger" / "records.json")
     ov = ((json.loads(rec.read_text()).get("scope_overrides") or {}) if rec.is_file() else {}).get(aget) or {}
-    if str(batch) not in [str(b) for b in ov.get("batches", [])]:
+    if str(batch).casefold() not in [str(b).casefold() for b in ov.get("batches", [])]:
         return None
     return (f"Your .aget/version.json write_scope does not cover every path of this migration. The principal has "
             f"overridden it for this batch only; the record reads: \"{ov.get('source', '')}\". The override covers the "
@@ -397,9 +400,22 @@ def pre_dirty(loc):
 
 
 def untracked_protected(loc, paths):
-    """Return those of the given paths that git does not track at the location. B183 finding 1 (FWK-OVSR5's E2i10
-    advisory (7)): a failed read raises InspectionFailed (preparation stops), never reports a path untracked."""
-    return [p for p in paths if not CI.git_tracked(loc, p)]
+    """Return those of the given paths that git does not track at the location AND ignores: the protected writes a
+    push cannot carry. B183 finding 1 (FWK-OVSR5's E2i10 advisory (7)): a failed read raises InspectionFailed
+    (preparation stops), never reports a path untracked.
+    gh#2971 (F-28): a NEW protected file git does not ignore (a skill the release adds) is not one of these: it goes
+    to `commit_protected` and the session stages it. Classed here as "untracked", the prompt told 6 of 7 live
+    sessions that a push would not carry it, they left it out, and the push gate refused the member."""
+    out = []
+    for p in paths:
+        if CI.git_tracked(loc, p):
+            continue
+        r = CI.read_git(loc, "check-ignore", "-q", "--no-index", "--", p)
+        if r.returncode == 0:
+            out.append(p)
+        elif r.returncode != 1:
+            raise CI.InspectionFailed(f"whether git ignores {p!r} in {loc} cannot be read (exit {r.returncode})")
+    return out
 
 
 def _rules_block(r):
@@ -766,7 +782,7 @@ def main():
             ap.error(f"--receipt {a.receipt}: {RBND.apply_entry(receipt, None)[1]}")
         # C2d (FWK-OVSR8's C2d pre-read 1): this batch's receipt, each entry applied at the member's own location
         this_batch = a.batch or ("1-repair" if a.repair else "1")
-        if str(receipt.get("batch")) != str(this_batch):
+        if str(receipt.get("batch")).casefold() != str(this_batch).casefold():
             ap.error(f"--receipt {a.receipt}: {RBND.apply_entry(receipt, None, batch=this_batch)[1]}; no packet is made")
         for x in receipt.get("agets") or []:
             name = x.get("aget") if isinstance(x, dict) else None
@@ -790,6 +806,10 @@ def main():
             tpl, route = L.usable_template(os.path.expanduser(loc), n)
             if not tpl:
                 ap.error(f"{n}: template unresolved ({route}); no packet is made")
+            try:
+                L.payload_expectations(tpl)
+            except L.Unavailable as e:
+                ap.error(f"{n}: release payload refused: {e}; no packet is made")
     global PACKET_ROOT, STAGE
     base = packet_base(a.out)
     why = CI.work_refusal(base, avoid=[os.path.expanduser(loc) for _, loc in L.members()]
@@ -835,7 +855,10 @@ def main():
            "receivers": []}
     for n in a.names:
         merged = {i["path"] for i in prev.get(n, {}).get("items", []) if i["op"] == "hold"}
-        r = plan_receiver(n, os.path.expanduser(locs[n]), repair=a.repair, merged=merged)
+        try:
+            r = plan_receiver(n, os.path.expanduser(locs[n]), repair=a.repair, merged=merged)
+        except TemplateUnmet as e:
+            ap.error(str(e))
         for spec in a.own_row_amendment:
             aget, path, row, artifact, ruling = spec.split(":")
             if aget == n:

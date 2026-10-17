@@ -1113,7 +1113,7 @@ def apply_entry(receipt, aget, list_sha256=None, batch=None, location=None):
         return None, (f"the apply receipt names list {str(receipt.get('list_sha256'))[:12]}, not the reviewed list "
                       f"{str(list_sha256)[:12]}")
     # C2d (FWK-OVSR8's C2d pre-read 1): the receipt is this batch's, where the caller knows the batch
-    if batch is not None and str(receipt.get("batch")) != str(batch):
+    if batch is not None and str(receipt.get("batch")).casefold() != str(batch).casefold():
         return None, f"the apply receipt is batch {str(receipt.get('batch'))[:20]!r}'s, not batch {str(batch)[:20]!r}'s"
     rows = [x for x in receipt.get("agets") or [] if isinstance(x, dict) and x.get("aget") == aget]
     if len(rows) != 1:

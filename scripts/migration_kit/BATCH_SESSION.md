@@ -8,6 +8,14 @@ The migration kit's test-body witness requires Python 3.12+ (`sys.monitoring`); 
 claude --settings scripts/migration_kit/batch_rules.json
 ```
 
+Before running a batch, complete the SOP's **Set up once per release**, its batch-folder paragraph and **The migration's record** under **Kit Batch Procedure**, and **Part A — per-release inputs**. Before Wave-1 pilots, follow the SOP's **Wave Sequencing / Wave-0 Supervisor Self-Upgrade**, steps 1–3. The supervisor is not a member of the Part B batch it orchestrates. Create the absolute batch folder `B` before B0; B0 and B12 write the ledger report to `B/FLEET_LEDGER.json`, never to the authority and receipt records at `data/<slug>_ledger/records.json`.
+
+Run ordinary receiver wake-up/wind-down smoke checks only after B8's `launch_batch.py` returns, in a separate receiver session under the SOP's **Receiver sittings**, before B8a. The headless B8 prompt and allowlist forbid these scripts; `head_after` is already recorded when the launcher returns. Inspect the receiver's `scripts/wind_down_ext.py` and git hooks for commit or push behavior first. Start that separate session with `GIT_ALLOW_PROTOCOL=''` in its environment and retain it in script subprocesses: the empty protocol whitelist prevents git transport, including pushes to explicit URLs and local paths. An ordinary receiver session does not inherit the B8 launcher's no-push protection. If pushing cannot be disabled, skip the smoke for that receiver and record why and the unverified health in B13; never report the skipped smoke as PASS.
+
+If wind-down writes `sessions/<file>`, follow the SOP's **Part B — the fixed procedure** smoke routes: either make exactly one receiver commit directly above B8's recorded HEAD, touching only named session paths and no packet item, run B8a with `--sha <extra-sha>`, obtain the B9 push line naming that commit, then pass `--only <member> --extra-commit <extra-sha> --extra-paths sessions/<file>` at B10; or leave the session record uncommitted, run B8a at B8's recorded HEAD, record the principal's allowance for each dirty path and pass `--allow-dirty sessions/<file>=<reason>` at B10. Name every affected path. After B8a keep HEAD and the tree unchanged; rerun B8a on any new commit before B9. B10 checks HEAD and dirty paths, and its separate push act needs the recorded B9 authority. Keep pushing disabled in the smoke session.
+
+When B9's push line names any commit, run B10 once per member with `--only <member>` (dry run, then `--push`). A member with its own extra commit passes `--extra-commit <extra-sha>` and its `--extra-paths` values. Every other member passes `--extra-commit <named-sha> --extra-paths <path>`, using one of the commits the push line names and a nonempty path value. The gate permits that member's checked commit because its HEAD still equals B8's `head_after`; the supplied extra commit does not change it. A plain B10 push without `--extra-commit` is refused with exit 6 when the push line names a commit. Keep any required `--allow-dirty` allowances for each member too. See the SOP's **Part B — the fixed procedure** smoke routes.
+
 Why (carriage rows 62, 70, 72; v3.35 migration, 2026-09-30):
 
 - In auto mode, the permission classifier refused two acts the principal had already authorized, and handed them
@@ -15,9 +23,9 @@ Why (carriage rows 62, 70, 72; v3.35 migration, 2026-09-30):
   narrow rule is resolved before the classifier.
 - Rules added through `/permissions` persist, and removing them took four dialog passes. Rules passed with
   `--settings` last for that one session: nothing persists and nothing needs removing.
-- Each rule takes a command out of the classifier's check, with any arguments. `push_batch.py --push`, and
-  `launch_batch.py --launch` without `--copy-root`, check the principal's typed line themselves (`batch_authority.py`;
-  exit 6 without it). `launch_batch.py --launch --copy-root <dir>` makes no authority check. It refuses the folder
+- Each rule takes a command out of the classifier's check, with any arguments. `python3 scripts/migration_kit/push_batch.py --push`, and
+  `python3 scripts/migration_kit/launch_batch.py --launch` without `--copy-root`, check the principal's typed line themselves (`batch_authority.py`;
+  exit 6 without it). `python3 scripts/migration_kit/launch_batch.py --launch --copy-root <dir>` makes no authority check. It refuses the folder
   (exit 2, reason printed) unless `git remote` prints nothing there, the folder is apart from the member's own folder
   (not the same folder, not inside it, not containing it, not sharing its `.git` through a link), git run in the
   folder names the folder as its working tree and the folder's own `.git` as its git folder and common folder, its
@@ -40,13 +48,130 @@ Why (carriage rows 62, 70, 72; v3.35 migration, 2026-09-30):
 - The check is per act. `launch_batch.py` asks for the launch and `push_batch.py` for the push. A launch line need not
   name the launch. In addition to the provenance, prefix, length and batch checks, the recorded line must not match
   the tool's recognized launch-exclusion pattern. A push reads only a line recorded for the push (key `<batch>:push`,
-  written by `record_authority.py --act push`): the batch's launch line is never push authority, whatever it says, and
-  `push_batch.py --push` exits 6 when no push line is recorded. A push line must have the one fixed form below.
+  written by `python3 scripts/migration_kit/record_authority.py --act push`): the batch's launch line is never push authority, whatever it says, and
+  `python3 scripts/migration_kit/push_batch.py --push` exits 6 when no push line is recorded. A push line must have the one fixed form below.
+- Scope evidence never authorizes launch for any batch. Every prompt containing a recorded scope quote is tainted,
+  including older and newer matches, and copies in resumed or forked transcripts. Identity is timestamp plus normalized
+  full text, never the filename; scope history is searched across all readable transcripts for this project. Record
+  every scope instruction, then type launch in a separate prompt containing no recorded scope quote and record it with
+  `python3 scripts/migration_kit/record_authority.py --key N --act launch --line "..." --session <id>`. Recorder and gate share the scope predicate;
+  a refused launch record leaves the ledger unchanged (observed scope evidence may be archived). Any old-format entry anywhere in the active records file blocks every
+  authority-checked launch for every batch, regardless of its Aget, batch list, wording, quotes or storage key.
+  Rehearsal launches with `python3 scripts/migration_kit/launch_batch.py --launch --copy-root` make no authority check, as before.
+  Current format requires a dict with a `batches` list and a non-empty `history` list whose EVERY item is a dict
+  with a non-empty string `line`. Every entry batch must be named in at least one history item's `batches_added`
+  list (batch names are case-insensitive). An entry with any batch lacking this per-line coverage is old-format too.
+  The recorder refuses `--scope-override` onto an existing old-format entry without writing.
+  The refusal names every offending entry key. Ask the principal to confirm the old scope override no longer applies
+  in a whole typed prompt naming that Aget, for example `GO supervisor - the old scope override for example-core-aget no longer applies`.
+  Run `python3 scripts/migration_kit/record_authority.py --session <id> --retire-scope <aget-key> --principal-line "<typed confirmation>"`.
+  The recorder verifies that whole prompt in the session, archives the full raw entry, and only then removes it.
+  If fresh scope is needed, record it from the principal's typed line under an unused batch key (existing batch
+  authority is never replaced). Retired scope quotes remain tainted permanently; use a separate launch prompt.
+  The recorder refuses `--act launch` in the same state with the same reason. Push authority (`--act push`, fixed push form) is unaffected.
+  With an all-current ledger, unverifiable history fails closed for the batches it governs and the reason identifies
+  the history to restore or repair; unrelated unverifiable history with a valid batch list does not block a first
+  launch. A missing or invalid batch list cannot establish which batches are governed and refuses all launches.
+  Scope quote matches are case-sensitive after collapsing whitespace, with word boundaries at word-bearing edges:
+  `batch 1` does not match `batch 12`.
+  Scope taint also lives in permanent `scope_archive.jsonl`, by default `../scope_archive.jsonl`
+  relative to the records file's directory, beside the ledger directories. Commit `scope_archive.jsonl`
+  and the records file together after every recorder operation. Never delete or edit the archive.
+  The records file carries `scope_archive_anchor = {"path": "../scope_archive.jsonl", "rows": N, "chain": HEX}`.
+  The path is relative to that records file, never the CWD. Genesis chain is the empty string; for each row,
+  `chain_n = sha256((chain_previous + row.sha256).encode("ascii")).hexdigest()`.
+  `AGET_MIGRATION_SCOPE_ARCHIVE` is honored only with `AGET_MIGRATION_TEST_MODE=1`; tests resolve even a relative
+  override from the records directory and refuse a path different from an existing anchor. Production always uses
+  `<supervisor-root>/data/scope_archive.jsonl`, with the root taken lexically from the kit's configured location. Active records
+  must be `<supervisor-root>/data/<name>_ledger/records.json`, without `..`. Test mode uses the passed records path lexically.
+  A symlink at the active records file, ledger directory, root or archive (including archive directory components),
+  or a disagreement between the lexical and resolved path, refuses launches and recorder scope/launch writes.
+  Replace the symlink with the real file/directory; the ledger and archive must live in the kit's data directory.
+  An anchor path resolving elsewhere refuses every launch and archive
+  mutation with "anchor path is not the ledger root's archive; restore the anchor". The recorder writes only the
+  fixed relative path in production. The archive must be a regular file separate from records.json; `/dev/null` refuses.
+  Each JSONL row retains `recorded_at`, absolute source `ledger` for provenance, root-relative `ledger_relative`,
+  `aget`, `batches`, complete raw `entry`,
+  `fields` mapping JSON pointers to every raw string, `content_sha256` for deduplication, and `sha256` over the
+  canonical sorted compact row excluding `sha256` itself. The recorder locks, validates, appends and fsyncs the
+  archive first, then atomically replaces and fsyncs the records file and its directory while holding the lock.
+  It captures complete old and new scope entries in that transaction. The gate only reads; it never appends,
+  creates a missing archive, or writes an anchor. Every dry run writes nothing, including to the archive.
+  Before seeding, verify the release's annotated tag and peeled commit, physically copy the whole
+  `scripts/migration_kit/` into the supervisor, ensure the supervisor session's `python3` imports PyYAML and pytest (the kit runs both), checked with `python3 -c "import yaml, pytest"`, and configure
+  `.aget/migration_target.json` with `to` set to `<target>` (e.g. `3.37.0`). Run
+  the SOP's release-age adoption check after reviewing or declaring `.aget/adoption_policy.json` (skew limits, minimum release age and Wave-1 soak), then run
+  `python3 scripts/migration_kit/check_fleet_skew.py --json` before ledger creation or permanent archive seeding;
+  stop on BLOCKED or UNAVAILABLE. Then create `data/<slug>_ledger/records.json` containing `{}` if absent,
+  preserving existing history. `<slug>` is `v` plus the target's major and minor digits (e.g. `v337` for `3.37.0`).
+  The release's migration message gives the complete setup, target configuration and seeding block; follow the SOP's declared Wave-1 soak before Wave 2.
+  All commands below run from the supervisor root; the kit resolves that root from its physical installation,
+  not an arbitrary data-root CLI flag. If the active ledger is missing, the refusal ends
+  `repair or move it out of the data folder`; create the active `{}` ledger first, then repeat seeding.
+  Before launching from a fresh ledger, run `python3 scripts/migration_kit/record_authority.py --archive-ledger <previous-ledger>/records.json`
+  for each earlier ledger that exists and has scope history AND run
+  `python3 scripts/migration_kit/record_authority.py --archive-ledger data/<slug>_ledger/records.json`
+  for the active ledger, before any launch and before moving a ledger or removing entries. This seeds the ACTIVE archive and
+  updates the ACTIVE anchor, leaving a different source
+  ledger unchanged. The output names the archive and reports the count actually appended (zero on a repeat).
+  A source outside the active ledger root (the records directory's parent) requires `--allow-foreign-ledger`;
+  its absolute source path is retained in each row. Use `--retire-scope` for removal. Its whole typed confirmation
+  has exactly the form `<prefix>the old scope override for <aget-key> no longer applies`.
+
+  Every checked launch scans the lexical `<root>/*_ledger/records.json`, plus the active ledger. Only folders named
+  `*_ledger` are ledgers; seed every previous ledger before renaming anything. Symlinked sibling ledger directories
+  and records files refuse, including aliases to another ledger inside the root and dangling links.
+  Every raw scope entry, in any format, must have its exact content hash in the archive, using the ledger path
+  relative to the root and the Aget key. Moving or cloning the data folder with the same relative layout keeps new
+  seeded entries seeded. Absolute source provenance is excluded from the content hash. Older archive rows remain
+  readable, tainted and seeded at their original root; seed again with `--archive-ledger` before moving the data
+  folder to append portable content hashes for those entries without rewriting history.
+  Unseeded ledgers are named with a separate
+  `python3 scripts/migration_kit/record_authority.py --archive-ledger <that records.json>` remedy for each. A missing archive refuses whenever
+  any scanned ledger has scope history or an anchor. Every ledger's anchor must match the archive prefix of its
+  declared length. A shorter archive or changed prefix refuses launch, seeding and `--anchor-archive`, including
+  from a fresh ledger. Seeding can proceed one ledger at a time; launches remain blocked until all are seeded.
+
+  The process caches ledger documents/content hashes and validated archive rows/content hashes/prefix chains by
+  `(lexical absolute path, mtime_ns, size)`. Each check validates path components, enumerates the root and stats
+  files again. The archive cache also includes the lexical root for legacy content membership. Cold scan cost is linear
+  in directory entries, ledger/archive bytes and scope entries. Warm scan cost is directory enumeration plus
+  O(L + E) metadata and hash-membership work for L ledgers and E scope entries; each anchor prefix check is O(1).
+  Transcript matching and archived quote matching have their existing additional costs.
+
+  Every checked launch, for every batch, refuses the conditions below. Run remedies against the active ledger
+  unless the refusal names an unseeded source ledger to pass to `--archive-ledger`.
+
+  | Refusal | Exact remedy |
+  |---|---|
+  | Scope history without an anchor, no archive yet | Run `python3 scripts/migration_kit/record_authority.py --archive-ledger <active records.json>` to seed and anchor it. |
+  | Any root ledger has unarchived raw scope entries | Run the named `python3 scripts/migration_kit/record_authority.py --archive-ledger <that records.json>` command for each unseeded ledger. |
+  | Existing previous-round archive without an anchor | Verify the complete archive, then run `python3 scripts/migration_kit/record_authority.py --anchor-archive`. |
+  | Missing archive, fewer rows, or anchored chain mismatch | Restore archive and records file together from the last intact committed pair; re-anchoring cannot bless loss or a changed prefix. |
+  | Extra valid rows after the anchor (interrupted ledger save or another ledger's append) | Verify the entire archive, then re-anchor with `python3 scripts/migration_kit/record_authority.py --anchor-archive`; commit both files together. |
+  | Invalid/torn row or unreadable archive | Preserve the damaged file separately; restore the complete archive and records pair from committed copies and source ledgers, restoring read permissions if needed, then `--anchor-archive`. Never discard evidence or trim the tail. |
+  | Invalid anchor or archive equal to ledger/non-regular file | Restore the committed anchor and separate regular archive together; remove any invalid test override. |
+  | Production anchor path differs from the ledger root's archive | Restore the anchor to `../scope_archive.jsonl`; do not redirect the archive. |
+  | Symlinked root, ledger directory, records file, archive or sibling ledger; lexical/resolved paths disagree | Replace the symlink with the real file/directory; the ledger and archive must live in the kit's data directory. |
+  | Corrupt/unreadable records.json in a `*_ledger` folder | Repair the named file or move it out of the data folder. |
+  | Test override resolves to a different anchored path | Remove the test override or set it to the anchored path. |
+  | Source ledger outside active ledger root | Explicitly pass `--allow-foreign-ledger` to seed it into the active archive. |
+
+  Archive taint refuses launch for **every batch** if any archived history `line` occurs in the full prompt, or if
+  the normalized full prompt occurs inside any archived raw string field. This reverse containment catches old
+  `source`, `source_7t`, `reason` and other embedded quotes. It requires at least **24 characters after whitespace
+  normalization**, so trivial prompts do not match incidental metadata everywhere. Both rules are case-sensitive;
+  the minimum applies only to reverse containment. Removing an entry or starting a new ledger never erases archived taint.
+  Selected launch transcripts with invalid UTF-8 refuse with the file and line to repair. The all-project scope scan
+  decodes each row separately and retains valid rows before and after damage. Recognized affirmative scope wording
+  also refuses (including `write_scope`, plural scopes, widening and extensions), while incidental denials such as
+  "scope overrides: none", "no need for a scope override", and "outside the scope of this batch" pass. Wording
+  detection cannot infer neutral scope instructions that were never recorded, or their unrecorded edited retypes.
 - The launch check binds the batch's name, not the packet. `launch_batch.py` passes it the packet's `batch` value
   and nothing else of the packet, so another packet file with the same `batch` value passes the launch check on
   the same recorded line, whatever receivers it lists. Operator rule, not enforced by the tool: launch with the
   packet that was rehearsed and approved for that batch. The push is bound to its packet: the push line is
-  recorded with `--packet`, and `push_batch.py --push` refuses a push from any other packet file, even one with
+  recorded with `--packet`, and `python3 scripts/migration_kit/push_batch.py --push` refuses a push from any other packet file, even one with
   the same `batch` value.
 - A push line is accepted in one fixed form only (`PUSH_FORM` in `batch_authority.py`): the prefix, then
   `push the commits of batch N`, optionally more batches (`batches 10t and 10`), optionally ` with commit SHA` (or
@@ -69,10 +194,10 @@ Why (carriage rows 62, 70, 72; v3.35 migration, 2026-09-30):
   rule for a push, not enforced by the tool: you record nothing if the principal withholds or conditions the push
   where the tool does not read it (a paste typed beside the line, a later prompt that does not repeat the line).
   Record the
-  push line on its own: `record_authority.py --key N --act push --line "..." --session <id> --packet <packet>`. The recorder refuses `--act push` without `--packet` and keeps the packet file's digest with the line, so `push_batch.py --push` refuses a push from any other packet file. The recorder runs the
+  push line on its own: `python3 scripts/migration_kit/record_authority.py --key N --act push --line "..." --session <id> --packet <packet>`. The recorder refuses `--act push` without `--packet` and keeps the packet file's digest with the line, so `python3 scripts/migration_kit/push_batch.py --push` refuses a push from any other packet file. The recorder runs the
   same line check as the push tool (`batch_authority.verify` with the push act) before writing and writes nothing when
   it refuses; the push tool runs the check again at the push.
-- `prepare_write_list.py --drop` marks a member blocked in the write list only. The apply step skips it. The
+- `python3 scripts/migration_kit/prepare_write_list.py --drop` marks a member blocked in the write list only. The apply step skips it. The
   launcher reads the packet and never the list, so it still launches a dropped member unless the packet is rebuilt
   without it or every launch names the remaining members with `--only`. Select the remaining members explicitly
   for apply and push too.
@@ -116,7 +241,7 @@ Why (carriage rows 62, 70, 72; v3.35 migration, 2026-09-30):
   not pass it until the written paths are named with `--allow-path` and the check is run again. The run leaves out
   what the tool finds excluded in the member's CI workflows (a `--deselect` test id, an `--ignore` path, an id in a
   `tests/...known...txt` file the workflows name) and lists it in `suite_at_commit.json`. When the principal rules a
-  failure baseline-equal, record the typed ruling with `record_authority.py --session <id> --baseline-equal
+  failure baseline-equal, record the typed ruling with `python3 scripts/migration_kit/record_authority.py --session <id> --baseline-equal
   AGET=<commit> --ruling-line "..." --evidence <batch>/evidence`; never write the ruling file by hand (operator rule,
   not enforced by the tool: the push tool reads the file as found). The push tool checks that the ruling's line is
   found typed, has the one fixed form (the prefix, then `the failures at SHA are baseline-equal`, SHA being 7 to 40
@@ -155,7 +280,7 @@ Why (carriage rows 62, 70, 72; v3.35 migration, 2026-09-30):
   makes, the session rehearsal's verdict from its own run only, the confirmation
   run's push URL, the changed-clone test at the suite check, the ledger's reading of workflow checks that were not
   compared, the protected-write classification and the refusal to write through a symbolic link); those eight have unit-test coverage and the later second outcome run exercised the worker path, returning FAIL accepted as R59 named limits.
-- The trial run of the protected write is `plan_protected.py --list <list>`, which contains no write.
+- The trial run of the protected write is `python3 scripts/migration_kit/plan_protected.py --list <list>`, which contains no write.
   `apply_protected.py` is run only to write.
 - If the supervisor Aget is not named `supervisor`, set `AGET_MIGRATION_LINE_PREFIX` (for example `GO overseer - `),
   and the principal types batch lines with that prefix.

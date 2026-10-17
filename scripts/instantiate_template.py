@@ -22,10 +22,13 @@ import argparse
 import json
 import os
 import shutil
+import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, Optional, List
+
+from migration_kit.template_payload import is_compiled_cache
 
 # C-34-01 / gh#2445 — the scaffold's skill-description gate. Imported, never re-implemented:
 # the audit and the gate must share one predicate or they drift, which is the gap that let
@@ -161,7 +164,7 @@ class TemplateInstantiator:
             "type": "copy_template",
             "source": str(self.template_path),
             "target": str(self.agent_path),
-            "exclude": [".aget/archive/", ".git/", "__pycache__/"]
+            "exclude": ["archive", ".aget/archive/", ".git/", "__pycache__/"]
         }
         self.actions.append(action)
 
@@ -174,26 +177,60 @@ class TemplateInstantiator:
             )
 
     def _copy_with_exclusions(self, src: Path, dst: Path, exclude_dirs: set):
-        """Copy directory tree with exclusions."""
+        """Copy tracked working-tree files, or a filtered walk for a non-git template.
+
+        Caches are filtered at every depth; archive exclusion retains its original
+        case-sensitive scope (top level and .aget/archive). Preserve symlinks.
+        Preflight tracked inputs before creating any part of the destination.
+        """
+        excluded = {name.lower() for name in exclude_dirs if name != 'archive'} | {'.git'}
+
+        def deliverable(path):
+            if 'archive' in exclude_dirs and (path.parts[0] == 'archive' or path.parts[:2] == ('.aget', 'archive')):
+                return False
+            return not is_compiled_cache(path) and not any(p.lower() in excluded for p in path.parts)
+
+        def copy_file(relative):
+            target = dst / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src / relative, target, follow_symlinks=False)
+
+        if (src / '.git').exists():  # directory or linked-worktree .git file
+            result = subprocess.run(['git', '--no-optional-locks', '--no-lazy-fetch',
+                                     '-C', str(src), 'ls-files', '--cached', '--stage', '-z'],
+                                    capture_output=True, check=True, stdin=subprocess.DEVNULL)
+            paths = []
+            for raw in result.stdout.split(b'\0'):
+                if raw:
+                    metadata, _, name = raw.partition(b'\t')
+                    relative = Path(os.fsdecode(name))
+                    if not deliverable(relative):
+                        continue
+                    if metadata.split()[0] == b'160000':
+                        raise ValueError(f'unsupported submodule: {relative}')
+                    source = src / relative
+                    if not source.is_symlink() and not source.is_file():
+                        raise ValueError(f'tracked file unavailable: {relative}')
+                    paths.append(relative)
+            dst.mkdir(parents=True, exist_ok=True)
+            for relative in paths:
+                copy_file(relative)
+            return
+
         dst.mkdir(parents=True, exist_ok=True)
-
-        for item in src.iterdir():
-            if item.name in exclude_dirs:
-                continue
-            if item.name.startswith('.') and item.name in {'.git'}:
-                continue
-
-            dst_item = dst / item.name
-
-            if item.is_dir():
-                # Check for nested exclusions
-                if item.name == ".aget":
-                    # Special handling for .aget - copy but exclude archive
-                    self._copy_with_exclusions(item, dst_item, {"archive"})
-                else:
-                    shutil.copytree(item, dst_item, dirs_exist_ok=True)
-            else:
-                shutil.copy2(item, dst_item)
+        for root, dirs, files in os.walk(src, followlinks=False):
+            relative_root = Path(root).relative_to(src)
+            dirs[:] = [d for d in dirs if deliverable(relative_root / d)]
+            (dst / relative_root).mkdir(parents=True, exist_ok=True)
+            for name in dirs[:]:
+                relative = relative_root / name
+                if (src / relative).is_symlink():
+                    copy_file(relative)
+                    dirs.remove(name)
+            for name in files:
+                relative = relative_root / name
+                if deliverable(relative):
+                    copy_file(relative)
 
     def _update_version_json(self, dry_run: bool):
         """Update version.json for agent instance."""

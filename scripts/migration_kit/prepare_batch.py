@@ -139,7 +139,11 @@ def prepare(name, loc):
         entry["blocked"] = f"template unresolved: {route}"
         return entry
     fw = Path(L.W.V.framework_root()) / tpl
-    exp = L.payload_expectations(tpl)
+    try:
+        exp = L.payload_expectations(tpl)
+    except L.Unavailable as e:
+        entry["blocked"] = f"release payload refused: {e}"
+        return entry
     for path, want in sorted(exp.items()):
         if not protected(path) or want != "present" or path == "AGENTS.md" or path == "CLAUDE.md":
             continue
@@ -191,12 +195,15 @@ def main():
     ap.add_argument("names", nargs="+")
     a = ap.parse_args()
     locs = dict(L.members())
+    entries = [prepare(n, os.path.expanduser(locs[n])) for n in a.names]
+    # Refusal belongs to the member: downstream tools skip blocked entries.
+    # A bad template must not prevent review/apply for unrelated templates.
     doc = {"schema": "v335_protected_list/1", "batch": a.batch, "target": NEW,
            "prepared_at": dt.datetime.now().astimezone().isoformat(timespec="seconds"),
            "prepared_by": f"{R.SUPERVISOR} (read-only)",
            "apply_script_sha256": sha_bytes((HERE / "apply_protected.py").read_bytes()), "claude_version":
                subprocess.run(["claude", "--version"], capture_output=True, text=True).stdout.strip(),
-           "agets": [prepare(n, os.path.expanduser(locs[n])) for n in a.names]}
+           "agets": entries}
     a.out.write_text(json.dumps(doc, indent=2) + "\n")
     for e in doc["agets"]:
         ops = [o["op"] for o in e["ops"]]

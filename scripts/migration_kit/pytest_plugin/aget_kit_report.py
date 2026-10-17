@@ -25,6 +25,7 @@ import shlex
 import stat
 import threading
 import types
+import unittest
 import uuid
 
 import pytest
@@ -172,6 +173,12 @@ def _on_end(how):
             w["end"] = how
             if how == "raised":           # F5 (B203 finding 1): kept, never overwritten by a later return
                 w["raised"] = True
+                # C29: PY_UNWIND supplies the actual exception leaving this paired body frame. A wrapper's
+                # replacement skip is a different object, even when its message is identical.
+                if isinstance(value, (pytest.skip.Exception, unittest.SkipTest)):
+                    w["skip_exc"] = value
+                else:
+                    w["non_skip_raised"] = True
     return cb
 
 
@@ -229,7 +236,8 @@ def _witness_collect(item):
         f = None
     code = getattr(f, "__code__", None)
     _witness[item.nodeid] = {"code": code, "start": 0, "end": None, "raised": False, "open": {}, "unfinished": 0,
-                             "thread": False, "unpaired": False}
+                             "thread": False, "unpaired": False, "skip_exc": None, "non_skip_raised": False,
+                             "body_skip": False}
     t = _witness_tool()
     if code is not None and isinstance(t, int):
         import sys
@@ -654,6 +662,42 @@ _run_skips = {}
 
 
 @pytest.hookimpl(hookwrapper=True, tryfirst=True)
+def pytest_runtest_makereport(item, call):
+    """Bind a reported skip to the exception witnessed unwinding the declared body, not merely its activation.
+
+    unittest consumes SkipTest and pytest's addSkip creates a new skip while handling it. Only that exact
+    conversion (its code frame and exception context) may bridge the two exception identities.
+    """
+    excinfo = call.excinfo
+    if call.when == "call":
+        pending = getattr(item, "_excinfo", None)
+        if pending:
+            excinfo = pending[0]
+    exc = excinfo.value if excinfo is not None else None
+    outcome = yield
+    report = outcome.get_result()
+    w = _witness.get(item.nodeid)
+    if w is not None and call.when == "call":
+        same_skip = exc is not None and exc is w["skip_exc"]
+        if not same_skip and exc is not None and isinstance(w["skip_exc"], unittest.SkipTest):
+            from _pytest.unittest import TestCaseFunction
+            # addSkip raises directly on some pytest versions, in its nested add_skip on others. Requiring its
+            # exact interpreter frame prevents a wrapper's `raise skip from body_skip` from claiming conversion.
+            add_skip = TestCaseFunction.addSkip.__code__
+            conversion_codes = [add_skip] + [c for c in add_skip.co_consts if isinstance(c, types.CodeType)]
+            tb = exc.__traceback__
+            converted = False
+            while tb is not None:
+                converted |= any(tb.tb_frame.f_code is code for code in conversion_codes)
+                tb = tb.tb_next
+            same_skip = (isinstance(item, TestCaseFunction) and isinstance(exc, pytest.skip.Exception)
+                         and exc.__context__ is w["skip_exc"] and converted)
+        w["body_skip"] = (report.skipped and not hasattr(report, "wasxfail")
+                          and same_skip)
+        w["skip_exc"] = None  # release the exception's traceback and body frame
+
+
+@pytest.hookimpl(hookwrapper=True, tryfirst=True)
 def pytest_runtest_call(item):
     """C2a14 (FWK-OVSR7's C2a14 pre-read 1): the identity of what is about to run, compared at the end with the
     census's item of that id (a conftest that swapped the function, or the item, is caught)."""
@@ -716,8 +760,8 @@ def pytest_runtest_call(item):
 def _late_unproven():
     """C2a14 (pre-read 1-5; weekly-train:R15), at the end of the run: a test that ran a function other than the one
     the census collected, and a test skipped or xfailed in any phase whose outcome and reason the census's own static
-    evaluation of its marks does not give (a conftest's skip, helper or importorskip, a changed condition, a late
-    marker) is not proven."""
+    evaluation of its marks does not give is not proven, except for a witnessed body-origin runtime skip (C29).
+    A conftest's skip, a changed condition or a late marker remains unproven."""
     ident, disp = _census_items.get("ident") or {}, _census_items.get("disp") or {}
     # C2a15 (B198 finding 1): pytest's collection or run code changed in this process after the kit loaded
     changed = []
@@ -785,7 +829,17 @@ def _late_unproven():
     out += [f"{n[:100]}: the function that ran is not the one the census collected"
             for n, got in _run_ident.items() if n in ident and ident[n] != got
             and not (unreadable(got) or unreadable(ident[n]))]
-    for n, (kind, reason) in _run_skips.items():
+    for n, (kind, reason, when) in _run_skips.items():
+        # C29: the reported exception must be the same skip that unwound a paired activation of the declared body
+        # (including a helper's skip propagated through it). Starting the body then skipping in its wrapper proves
+        # no skip provenance. Setup, lifecycle, runtime xfail and incomplete/lost witnesses stay under R15.
+        w = _witness.get(n) or {}
+        if (kind == "skip" and when == "call" and w.get("body_skip") and w.get("code") is not None
+                and w.get("start") and w.get("end") == "raised" and not w.get("non_skip_raised")
+                and not w.get("unfinished") and not w["code"].co_flags & (0x20 | 0x80 | 0x100 | 0x200)
+                and n not in _lost and not w.get("thread") and not w.get("unpaired")
+                and n in ident and not unreadable(ident[n]) and ident[n] == _run_ident.get(n)):
+            continue
         d = disp.get(n) or {}
         want = d.get("skip") if kind == "skip" else d.get("xfail")
         ok = want is not None and reason in (want, f"Skipped: {want}", f"reason: {want}", f"[NOTRUN] {want}")
@@ -894,10 +948,11 @@ def pytest_runtest_logreport(report):
         _called[report.nodeid] = report.outcome
     if report.skipped and report.nodeid not in _run_skips:     # C2a14 (pre-read 2-5): every skip and xfail, any phase
         if hasattr(report, "wasxfail"):
-            _run_skips[report.nodeid] = ("xfail", report.wasxfail)
+            _run_skips[report.nodeid] = ("xfail", report.wasxfail, report.when)
         else:
             lr = report.longrepr
-            _run_skips[report.nodeid] = ("skip", lr[2] if isinstance(lr, tuple) and len(lr) == 3 else str(lr))
+            _run_skips[report.nodeid] = ("skip", lr[2] if isinstance(lr, tuple) and len(lr) == 3 else str(lr),
+                                         report.when)
 
 
 _session = None
