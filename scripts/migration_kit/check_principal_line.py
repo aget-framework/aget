@@ -9,6 +9,7 @@ reads (see prompts()) that contains the given text.
 
 Exit 0: the newest match is typed. Exit 1: not typed (e.g. an accepted suggestion). Exit 2: no match or no transcript.
 Exit 4: a human-origin mid-turn entry, whose promptSource this tool does not read (accept only with that disclosed).
+Exit 6: a selected transcript is unreadable or has an invalid UTF-8 row; repair it before using its authority.
 Exit 5: the newest match is the session's FIRST prompt (R-F1, rehearsal 2026-09-30). A prompt passed at launch
 (`claude "..."`) is recorded exactly like a typed one; only its position differs (turnPosition.promptIndex 1, or the
 first user prompt read from the file when that field is absent). Whoever launches the session writes it, so it is never
@@ -37,35 +38,44 @@ DEFAULT_DIR = Path(os.environ.get("AGET_MIGRATION_PROJECTS_DIR") or
 PASTED = re.compile(r"<pasted_content[^>]*>.*?</pasted_content[^>]*>", re.S)
 QUEUED_HUMAN = "queued-human"   # a mid-turn entry: origin.kind human, no promptSource recorded (2026-09-29)
 LAUNCH_POSITION = "launch-position"   # R-F1: the session's first prompt, which a launch argument also produces
+UNREADABLE = 6
 
 
-def prompts(path):
+def prompts(path, *, errors_out=None):
     """(timestamp, source, text) for each principal entry that is read: non-meta user records whose content is a plain
     string (source = promptSource, or LAUNCH_POSITION for a typed first prompt; a record whose content is not a string
     is skipped) and mid-turn queued commands whose origin is human and whose prompt is a string (source =
     QUEUED_HUMAN). Text inside a <pasted_content> block is removed when the entry has other text (see own_text):
     a paste that QUOTES a proposed line (batch 8: the framework Aget's suggested ruling, pasted for review at 10:07) is
-    not the principal's line (a false TYPED, 2026-09-29)."""
+    not the principal's line (a false TYPED, 2026-09-29). Decode UTF-8 strictly per row: a damaged row is skipped,
+    its diagnostic appended to errors_out when supplied, and all other rows remain available to the scope scan."""
     out = []
     seen_user = False
-    for line in path.open():
-        try:
-            r = json.loads(line)
-        except ValueError:
-            continue
-        if r.get("type") == "user" and not r.get("isMeta"):
-            c = r.get("message", {}).get("content")
-            if isinstance(c, str):
-                index = (r.get("turnPosition") or {}).get("promptIndex")
-                first = index == 1 if index is not None else not seen_user
-                seen_user = True
-                source = LAUNCH_POSITION if first and r.get("promptSource") == "typed" else r.get("promptSource")
-                out.append((r.get("timestamp", ""), source, own_text(c)))
-        elif r.get("type") == "attachment" and isinstance(r.get("attachment"), dict):
-            at = r["attachment"]
-            if (at.get("type") == "queued_command" and (at.get("origin") or {}).get("kind") == "human"
-                    and isinstance(at.get("prompt"), str)):
-                out.append((at.get("timestamp") or r.get("timestamp", ""), QUEUED_HUMAN, own_text(at["prompt"])))
+    with path.open("rb") as stream:
+        for number, raw in enumerate(stream, 1):
+            try:
+                line = raw.decode("utf-8")
+            except UnicodeDecodeError:
+                if errors_out is not None:
+                    errors_out.append(f"invalid UTF-8 in {path.name} at line {number}; repair the transcript")
+                continue
+            try:
+                r = json.loads(line)
+            except ValueError:
+                continue
+            if r.get("type") == "user" and not r.get("isMeta"):
+                c = r.get("message", {}).get("content")
+                if isinstance(c, str):
+                    index = (r.get("turnPosition") or {}).get("promptIndex")
+                    first = index == 1 if index is not None else not seen_user
+                    seen_user = True
+                    source = LAUNCH_POSITION if first and r.get("promptSource") == "typed" else r.get("promptSource")
+                    out.append((r.get("timestamp", ""), source, own_text(c)))
+            elif r.get("type") == "attachment" and isinstance(r.get("attachment"), dict):
+                at = r["attachment"]
+                if (at.get("type") == "queued_command" and (at.get("origin") or {}).get("kind") == "human"
+                        and isinstance(at.get("prompt"), str)):
+                    out.append((at.get("timestamp") or r.get("timestamp", ""), QUEUED_HUMAN, own_text(at["prompt"])))
     return out
 
 
@@ -84,12 +94,28 @@ def normalize(s):
     return " ".join(s.split())
 
 
-def check(files, needle):
+def prompt_identity(path, prompt):
+    """Identify a principal act across resumed/forked copies; the file is never part of its identity."""
+    return {"timestamp": prompt[0], "text": normalize(prompt[2])}
+
+
+def check(files, needle, *, identity_out=None, errors_out=None):
     """Return (code, hit) for the newest matching prompt: 0 verified typed, 2 no match, other codes lack verified typed provenance."""
-    hits = [p for f in files for p in prompts(f) if normalize(needle) in normalize(p[2])]
+    errors, hits = [], []
+    for f in files:
+        try:
+            hits.extend((f, p) for p in prompts(f, errors_out=errors) if normalize(needle) in normalize(p[2]))
+        except OSError as err:
+            errors.append(f"unreadable transcript {f.name}: {err}")
+    if errors_out is not None:
+        errors_out.extend(errors)
+    if errors:
+        return UNREADABLE, None
     if not hits:
         return 2, None
-    newest = max(hits, key=lambda p: p[0])
+    path, newest = max(hits, key=lambda hit: hit[1][0])
+    if identity_out is not None:
+        identity_out.append(prompt_identity(path, newest))
     return {"typed": 0, QUEUED_HUMAN: 4, LAUNCH_POSITION: 5}.get(newest[1], 1), newest
 
 
@@ -104,8 +130,11 @@ def main(argv=None):
     if len(files) != 1:
         print(f"NO TRANSCRIPT: {len(files)} file(s) match {a.session!r} in {a.projects_dir}")
         return 2
-    code, hit = check(files, a.contains)
-    if hit is None:
+    errors = []
+    code, hit = check(files, a.contains, errors_out=errors)
+    if errors:
+        print(f"UNREADABLE TRANSCRIPT: {'; '.join(errors)}")
+    elif hit is None:
         print(f"NO MATCH: no principal prompt contains {a.contains!r}")
     else:
         verdict = {0: "TYPED", 4: "HUMAN (MID-TURN; SOURCE NOT RECORDED)",

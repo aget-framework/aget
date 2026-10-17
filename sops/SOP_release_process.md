@@ -2682,6 +2682,28 @@ done
 
 ##### 6.4.5.2. Push Tags
 
+**Blocking payload gate, before publication**: run the release validator after
+creating local tags and before pushing any tag or creating any GitHub Release:
+
+```bash
+cd "$AGET_FRAMEWORK_DIR"
+python3 aget/verification/validate_release_gate.py X.Y.Z \
+  --payload-only --framework-path . || exit 1
+```
+
+The `template_payloads` check reads every template's complete tree at `vX.Y.Z`
+with `git ls-tree -r`, including files unchanged since previous releases. Any
+`__pycache__` path or `.pyc`/`.pyo` suffix (case-insensitive) blocks publication.
+A missing/unreadable tag also blocks. Removing old bytecode is allowed when the
+target tree is clean. Repair and recreate local tags before retrying; the
+post-publication migration-kit guard is an additional refusal, not this gate.
+The pre-tag `scripts/check_tag_payload_coherence.py --pre-tag` check also rejects
+compiled caches in the committed `HEAD` candidate before cutting a tag.
+For that payload check alone, add `--payload-only` (exit 0 clean, 2 refused).
+The fleet gate above uses the same exit codes. See
+[Producer payload gate CLI](../docs/RELEASE_PAYLOAD_GATE.md) for the standalone
+integration contract to install in the producer's release script.
+
 ```bash
 # Push tags to remote
 for repo in aget template-supervisor-aget template-worker-aget template-advisor-aget template-consultant-aget template-developer-aget template-spec-engineer-aget; do

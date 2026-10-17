@@ -11,11 +11,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Items confirmed in-flight for a future release (latest released: **3.36.0**). Per Keep a Changelog 1.1.0 forward-work convention.
+Items confirmed in-flight for a future release (latest released: **3.37.0**). Per Keep a Changelog 1.1.0 forward-work convention.
 
 - Issue-governance spec delta for the `/aget-file-issue` pre-filing probes (skill layer shipped in 3.26.0; formal requirement rides the next spec pass).
 - Template `/aget-file-issue` structural refresh (routing + probe steps to all templates; fleet routing propagation staged per the 3.26.0 rollout decision).
 - **Traceability ratchet**: the test-requirement floor rises +5pp per minor release from the v3.29 measured floor.
+
+## [3.37.0] - 2026-10-17
+
+Receiver migration fixes and the runner pin, with the receiver adoption kit and template payload containment and wind-down health reporting. Previous release: v3.36.0. Prepared files do not establish publication or receiver acceptance. Publication is evidenced by the annotated tag `v3.37.0` and its GitHub Release object. Read the tag's peeled commit with `git rev-parse 'v3.37.0^{commit}'`; a file inside the tagged commit cannot name it.
+
+### Added
+
+- **Receiver adoption kit.** `scripts/migration_kit/adoption_policy.py`, `check_fleet_skew.py` and `halt_check.py` add receiver policy, the pre-upgrade skew check and the post-apply halt check (Part B step B7a of `sops/SOP_fleet_migration.md` v1.11.0). The halt check uses a whole-line change allowlist, ordered identity lines and a size limit, compares root CLAUDE.md mirrors and file/link transitions, and bounds regex evaluation. The supervisor's patterns in its own `.aget/adoption_policy.json` extend the defaults, which accept the templates' long canonical-specification reliance form, for every member it checks. HALT and UNAVAILABLE both stop the batch.
+- **Complete template payload gate.** Template instantiation copies tracked inputs after preflight, skill deployment filters compiled caches, and migration preparation refuses affected members individually. The fleet gate reads each template's complete tree at the tag; the pre-tag gate reads the committed tree under its working directory or `--cwd`. Within those trees, both reject case-insensitive `__pycache__` components and `.pyc`/`.pyo` suffixes, including unchanged tracked caches. Standalone offline publication commands and exit codes are in `docs/RELEASE_PAYLOAD_GATE.md`.
+
+### Fixed
+
+- **Inherited git location.** In core and templates, `tests/conftest.py` clears inherited git repository-location variables, including `GIT_CONFIG`, before collection and stops upward repository discovery at the temporary root. Tests operating on scratch repositories no longer write through a caller's inherited git location. Template deployment item M-3.37-6 includes the isolation step and `tests/test_conftest_git_env_isolation.py`.
+- **Scope and launch.** Scope-only principal approvals are refused as launch authority, whether recorded in the active ledger or preserved in the permanent, append-only `data/scope_archive.jsonl` beside the ledgers. Old-format scope records block launches until retired with `python3 scripts/migration_kit/record_authority.py --session <id> --retire-scope <aget> --principal-line "GO supervisor - the old scope override for <aget> no longer applies"`. The principal must type that whole fixed confirmation form (using the configured prefix if it differs from `GO supervisor - `); the tool archives the full entry before removing it. Retired scope quotes still cannot authorize launch. Before launches resume, run `python3 scripts/migration_kit/record_authority.py --archive-ledger data/<ledger>/records.json` once for every previous ledger in the data folder with scope history, and seed active scope history too. The gate names unseeded ledgers and refuses launches until all are seeded. Use exact-case paths on case-insensitive disks.
+- **Runtime body skips.** A skip raised by the declared test body is reported as a skip. Wrapper and fixture skips do not establish body execution; the provenance check retains that distinction.
+- **Protected-file staging.** `scripts/migration_kit/prepare_launch.py` checks whether git ignores new protected files and tells the receiver session to stage those it does not ignore, without editing them.
+- **Runner pin and action majors.** Core CI uses `ubuntu-24.04`, checkout v7 and setup-python v7. Template delivery and hosted CI results require verification in their own repositories.
+- **Wind-down health.** In core and templates, `scripts/wind_down.py` reports TIMEOUT separately from ERROR, accepts `AGET_WIND_DOWN_HEALTH_TIMEOUT` from 1 through 3600 seconds (default 120, with visible fallback for invalid values), terminates the health process group on macOS/Linux, and bounds pipe draining to five further seconds. Observation-free results report UNKNOWN with exit 0 and `clean_close` true; only health status `error` makes wind-down exit 2. JSON cannot mask a nonzero health-process exit. TIMEOUT is incomplete observation and does not by itself fail session close.
+- **Historical citations.** The v3.35.0 release notes now resolve or explicitly annotate their script citations.
+
+### Limitations
+
+Not in this release: propagation of the repaired close-authorization guard to the templates is deferred again to the next release, owned by the framework's release manager; until a template tag carries the repair, follow the consumer action in `handoffs/CORRECTIONS_v3.35.0.md` rows 4 and 5.
+
+- The pre-tag payload gate reads only the committed subtree under its working directory or `--cwd`; run it from the repository root or pass that root as `--cwd`. The producer payload gate has no automatic caller in the release path; run it by hand as the runbook says in `docs/RELEASE_PAYLOAD_GATE.md`. An observation-free health check exits 0 with `clean_close` true; read the Health Gate line, which reports UNKNOWN. One test checks only the screen text, without checking the exit code or `clean_close`.
+- The test-body witness can report a body as complete when a skip is injected into the test body's own frame (for example by a conftest trace hook or an alarm signal), and when a decorator implemented as a plain closure converts a body failure into a skip. Conversely, skips inside `subTest` bodies are reported as not complete even though the body ran. These cases can misclassify completion; a complete result does not establish that skipped behavior passed.
+- The kit changes only root `@aget-version`; `@aget-canonical-specs` stays unchanged inside the kit batch. Update the specification pin in a separate reviewed commit outside the batch and after-run window; editing it inside that window fails protected-file checks.
+- The kit halt_check checks only root AGENTS.md/CLAUDE.md; a near-match-all receiver declaration can pass validation; pins are not bound to the target release. Nested instructions, local overrides and `.claude/rules` need separate review.
+- Scope evidence survives retirement in the permanent, append-only `data/scope_archive.jsonl`, beside the ledgers. The gate checks every ledger in the data folder and its archive anchor (row count and rolling hash). It refuses a missing, shortened or mismatched archive, a moved anchor, and symlinked ledger or archive paths. Commit the archive and ledgers together; never delete or edit the archive.
+- A scope instruction that was never recorded cannot be recognised — type launches as separate prompts. The ledgers and archive are one trust domain: consistent edits of both, or rolling back the whole data folder, can remove the evidence. The kit locates its code directory by resolving symlinks; a replaced code directory pointing at another kit's data is outside the protection. On case-insensitive disks, seed with the exact-case path.
+- Template symlink containment: a tracked symlink pointing outside a template is kept. Cache filtering does not establish retained-link containment.
+- Ubuntu 26.04 qualification not yet done. Hosted CI with the new action majors, public template tags, live receiver acceptance and fleet close-out are not established by this offline release-files build.
+- The migration kit's test-body witness requires Python 3.12+; runs needing it on Python 3.10/3.11 remain INCONCLUSIVE. Wind-down descendants that escape the health process group may survive. Earlier kit limitations remain unless explicitly repaired here; see `release-notes/v3.36.0.md` and the v3.37.0 release notes.
 
 ## [3.36.0] - 2026-10-10 — Fleet migration kit for supervisors
 

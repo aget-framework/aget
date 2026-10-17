@@ -62,7 +62,7 @@ def preauthorized(preauth: Path | None, key: str, batch: str | None, now: dt.dat
     except (OSError, ValueError) as e:
         return False, f"pre-authorization unreadable: {e}"
     for e in entries:
-        if e.get("key") != key or e.get("batch") != batch:
+        if e.get("key") != key or str(e.get("batch")).casefold() != str(batch).casefold():
             continue
         if e.get("authorized_by") != "principal" or not str(e.get("typed_line", "")).strip():
             return False, f"entry for {key}/{batch} is not a principal's typed authorization"

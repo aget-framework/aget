@@ -1,0 +1,189 @@
+version: 3.37.0
+spec_version: 1.0.0
+created: '2026-10-17'
+status: released
+supersedes: DEPLOYMENT_SPEC_v3.36.0.yaml
+breaking_release: false
+source_ref: v3.37.0
+rollback_ref: v3.36.0
+release_notes: release-notes/v3.37.0.md
+release_handoff: handoffs/RELEASE_HANDOFF_v3.37.0.md
+remote_migration: handoffs/REMOTE_MIGRATION_MESSAGE_v3.37.0.md
+corrections: handoffs/CORRECTIONS_v3.37.0.md
+payload_manifest: none
+publication_boundary: Prepared content is not publication, installation or acceptance
+  evidence. Record the annotated tag and peeled commit before consuming.
+publication_state_note: 'Publication is evidenced by the annotated tag v3.37.0 and the GitHub Release object, and this field agrees with them. Planned publication date 2026-10-17. Read the peeled commit of the tag with: git rev-parse v3.37.0^{commit} (a file inside the tagged commit cannot name it). The corrections record named in the corrections field is not in this tagged commit; it is opened on main only if a correction is needed, so read it from main if it exists.'
+mandatory_changes:
+  - id: M-3.37-1
+    description: >-
+      Receiver blockers: suite isolation from inherited git location; scope-only principal approvals
+      are refused as launch authority; old-format scope records block launches until retired;
+      a declared body's runtime skip is reported as a skip; the launch prompt tells the receiver
+      session to stage new protected files that git does not ignore, without editing them.
+    surfaces: [core]
+    blocking: true
+    paths:
+      - tests/conftest.py
+      - scripts/migration_kit/batch_authority.py
+      - scripts/migration_kit/record_authority.py
+      - scripts/migration_kit/BATCH_SESSION.md
+      - scripts/migration_kit/pytest_plugin/aget_kit_report.py
+      - scripts/migration_kit/prepare_launch.py
+    source_tests:
+      - tests/test_conftest_git_env_isolation.py
+      - tests/migration_kit/test_migration_kit_batch_authority.py
+      - tests/migration_kit/test_migration_kit_scope_archive.py
+      - tests/migration_kit/test_migration_kit_scope_archive_anchor.py
+      - tests/migration_kit/test_migration_kit_scope_archive_root.py
+      - tests/migration_kit/test_migration_kit_scope_archive_symlink.py
+      - tests/migration_kit/test_migration_kit_result_source.py
+      - tests/migration_kit/test_migration_kit_launch_packet.py
+    seeding: >-
+      Verify the annotated v3.37.0 tag and peeled commit; copy the whole scripts/migration_kit/
+      into the supervisor and make PyYAML importable by the python3 the supervisor's session uses in each fresh shell (use a prepared virtual environment for externally managed Python).
+      Configure .aget/migration_target.json with actual from, to 3.37.0, register_pin, pinned_members, framework_root, optional pilots and producer (local fleets only).
+      Run python3 scripts/migration_kit/check_fleet_skew.py --json before ledger creation or permanent archive seeding;
+      stop on BLOCKED or UNAVAILABLE. Then create data/v337_ledger/records.json containing {} if absent, preserving an existing ledger.
+      From the supervisor root run python3 scripts/migration_kit/record_authority.py --archive-ledger data/<ledger>/records.json
+      once per earlier ledger with scope history AND the active ledger, before any launch.
+      Seeding updates the active anchor and leaves a different source ledger unchanged; commit ledgers and archive together.
+      Retire old-format scope only with python3 scripts/migration_kit/record_authority.py --session <id> --retire-scope <aget>
+      --principal-line "GO supervisor - the old scope override for <aget> no longer applies";
+      the principal types that fixed whole form (with the configured prefix); the full entry is archived before removal.
+    detection: python3 -m pytest -p no:cacheprovider tests/test_conftest_git_env_isolation.py tests/migration_kit -q
+    detection_scope: >-
+      Source regression tests in core; not a live receiver outcome. The permanent, append-only
+      data/scope_archive.jsonl exists beside the ledgers. The gate checks every ledger and its
+      archive anchor (row count and rolling hash); seed before any launch. Ledgers and archive
+      are one trust domain: consistent edits of both or rollback of the whole data folder can remove evidence.
+  - id: M-3.37-2
+    description: >-
+      Pin core CI to ubuntu-24.04 with checkout v7 and setup-python v7.
+      Template workflow delivery and hosted runs must be verified at their own published commits.
+    surfaces: [core]
+    blocking: true
+    paths:
+      - .github/workflows/
+    source_tests:
+      - tests/test_ci_host_independence.py
+    detection: python3 -m pytest -p no:cacheprovider tests/test_ci_host_independence.py -q
+    detection_scope: Local workflow contract only; a successful hosted run on the final commit is separate evidence.
+  - id: M-3.37-3
+    description: >-
+      Install the receiver adoption kit at supervisors; run the fleet-skew check before ledger creation and the supervisor upgrade, and the halt check
+      at Part B step B7a of sops/SOP_fleet_migration.md. The supervisor's policy extends the default pin allowlist for every member it checks.
+    surfaces: [core]
+    blocking: true
+    paths:
+      - scripts/migration_kit/
+      - sops/SOP_fleet_migration.md
+    source_tests:
+      - tests/migration_kit/test_migration_kit_adoption_policy.py
+      - tests/migration_kit/test_migration_kit_check_fleet_skew.py
+      - tests/migration_kit/test_migration_kit_halt_check.py
+    detection: python3 -m pytest -p no:cacheprovider tests/migration_kit -q
+    detection_scope: Source policy, skew and halt regression tests; no final-commit live receiver migration is asserted.
+  - id: M-3.37-4
+    description: >-
+      Template payload containment: filter compiled caches from template copies and skill deployment and refuse affected
+      migration members individually. The fleet gate reads each template's complete tree at the tag; the pre-tag gate
+      reads the committed tree under its working directory or --cwd. Producer wiring is a separate obligation.
+    surfaces: [core]
+    blocking: true
+    paths:
+      - scripts/instantiate_template.py
+      - scripts/deploy_skill.py
+      - scripts/migration_kit/template_payload.py
+      - scripts/check_tag_payload_coherence.py
+      - verification/validate_release_gate.py
+      - docs/RELEASE_PAYLOAD_GATE.md
+    source_tests:
+      - tests/test_c9_template_payload.py
+      - tests/test_c16_payload_cli.py
+    detection: python3 -m pytest -p no:cacheprovider tests/test_c9_template_payload.py tests/test_c16_payload_cli.py -q
+    detection_scope: >-
+      Local regression tests only. Run the documented full-tree gates on each actual release tag before publication.
+  - id: M-3.37-5
+    description: >-
+      Configurable wind-down health timeout, distinct TIMEOUT/ERROR results, bounded pipe drain,
+      nonzero health-process exit preservation; observation-free results report UNKNOWN with
+      exit 0 and clean_close true. Only health status error makes wind-down exit 2.
+    surfaces: [core, templates]
+    blocking: true
+    paths:
+      - scripts/wind_down.py
+      - docs/protocols/WIND_DOWN_PROTOCOL.md
+    source_tests:
+      - tests/test_wind_down_health_timeout.py
+    detection: python3 -m pytest -p no:cacheprovider tests/test_wind_down_health_timeout.py -q
+    detection_scope: >-
+      Source regression tests in core or a template checkout; protocol documentation is core-only.
+      Receiver health observations and timeout configuration still need smoke checks.
+  - id: M-3.37-6
+    description: >-
+      Suite isolation from inherited git location in each template's tests: clear repository-location
+      variables before collection and stop upward repository discovery at the temporary root.
+    surfaces: [templates]
+    blocking: true
+    paths:
+      - tests/conftest.py
+    source_tests:
+      - tests/test_conftest_git_env_isolation.py
+    detection: python3 -m pytest -p no:cacheprovider tests/test_conftest_git_env_isolation.py -q
+    detection_scope: >-
+      Template source regression tests only; not migration-kit behavior, hosted CI,
+      published template tag verification or live receiver acceptance.
+hygiene_changes:
+  - path: release-notes/v3.35.0.md
+    change: Historical script citations resolve or carry an explicit instance-only annotation.
+removals: []
+receiver_acceptance:
+  ownership: Receiver-authored and receiver-revision verified; commissioning owned by receiving manager.
+  returned: Acknowledged transmission plus verification at receiver source revision.
+  behaviour_verified: Credited capability and exercised rejection path pass; no blocking delivery defect.
+  producer_written: Never counts as receiver acceptance.
+  terminals: [ACCEPTED, BEHAVIOUR_VERIFIED, REJECTED, CANNOT-RUN]
+deployment_requirements:
+  python: '3.10+; migration kit test-body witness requires 3.12+'
+  kit_dependencies: scripts/migration_kit/requirements.txt
+  kit_installation: Copy from pinned core tree into supervisor; not a template payload.
+  local_extensions: Preserve receiver-owned instructions and merge approved changes.
+  migration_target: Set actual source version and target 3.37.0; no default release is supplied.
+known_limitations:
+  - >-
+    The pre-tag payload gate reads only the committed subtree under its working directory or --cwd.
+    Run it from the repository root or pass that root as --cwd to cover the whole repository.
+  - >-
+    The kit changes only root @aget-version; @aget-canonical-specs stays unchanged inside the kit batch.
+    Update the specification pin in a separate reviewed commit outside the batch and after-run window;
+    editing it inside that window fails protected-file checks.
+  - >-
+    Kit halt_check checks only root AGENTS.md/CLAUDE.md; a near-match-all receiver declaration can pass
+    validation; pins are not bound to the target release.
+  - >-
+    A scope approval is recognised only while its record exists in the active ledger or the scope archive;
+    a scope instruction never recorded cannot be recognised. Type launches as separate prompts.
+    The permanent, append-only data/scope_archive.jsonl beside the ledgers preserves retired entries.
+    Seed every earlier ledger with scope history AND the active ledger before any launch; archive anchors
+    detect a missing, shortened or changed prefix, a moved anchor and symlinked ledger/archive paths.
+    Commit ledgers and archive together. They are one trust domain: consistent edits of both or rollback
+    of the whole data folder can remove the evidence. Never delete or edit the archive.
+  - 'Template symlink containment: a tracked symlink pointing outside a template is kept.'
+  - Ubuntu 26.04 qualification not yet done.
+  - Timeout descendants outside the process group may survive; TIMEOUT does not by itself fail session close.
+verification:
+  core_inventory: python3 scripts/check_tag_payload_coherence.py --version 3.37.0 --pre-tag
+  citations: python3 scripts/validate_release_citation_resolution.py release-notes/v3.37.0.md --public-root .
+  suite: python3 -m pytest -p no:cacheprovider tests -q
+  public_surface: python3 -m pytest -p no:cacheprovider tests/migration_kit/test_migration_kit_public_surface.py -q
+  template_payloads: >-
+    python3 verification/validate_release_gate.py 3.37.0 --payload-only --framework-path <framework-root>
+  evidence: Record actual command output separately; no final-commit test result is asserted by this file.
+to_confirm:
+  - Public annotated tag and peeled commit, Release object, template tags and hosted CI.
+  - Prior-release closure and receiver receipt or explicit release exception.
+  - Live receiver acceptance and fleet close-out.
+rollback: >-
+  Use each receiver's recorded baseline. Revert committed migration changes without rewriting shared history;
+  restore only recorded migration paths before commit. Re-run baseline tests and wake-up; record ROLLED_BACK or HOLD.

@@ -22,6 +22,11 @@ UNREACHABLE (no tag, no git, gh absent) is distinct and non-gating.
 Usage:
   python3 scripts/check_tag_payload_coherence.py --version 3.25.0
   python3 scripts/check_tag_payload_coherence.py --version 3.26.0 --cwd /path/to/repo
+  python3 scripts/check_tag_payload_coherence.py --version 3.37.0 --cwd /path/to/template --pre-tag --payload-only
+
+--pre-tag --payload-only inspects only the committed HEAD tree, offline.
+It skips artifact inventory and release-body checks; exit 0 = clean, 2 = refused
+(including missing repo/HEAD). See docs/RELEASE_PAYLOAD_GATE.md.
 
 Exit codes: 0 = PASS (or UNREACHABLE per ADR-004 non-gating) · 2 = FAIL
 """
@@ -29,6 +34,20 @@ Exit codes: 0 = PASS (or UNREACHABLE per ADR-004 non-gating) · 2 = FAIL
 import argparse
 import subprocess
 import sys
+
+from migration_kit.template_payload import compiled_caches_at, PayloadInspectionError
+
+
+def cache_gate(cwd, revision):
+    """A cache in a release tree blocks publication; failed inspection also blocks."""
+    try:
+        caches = compiled_caches_at(cwd or '.', revision)
+    except PayloadInspectionError as exc:
+        return ('FAIL', str(exc), [])
+    if caches:
+        return ('FAIL', f'release payload at {revision} contains compiled cache: {", ".join(caches)}',
+                [(path, []) for path in caches])
+    return None
 
 
 def _run(cmd, cwd=None, timeout=30):
@@ -54,6 +73,10 @@ def check(version: str, cwd: str = None, repo: str = 'aget-framework/aget'):
     r = _run(['git', 'rev-parse', '--verify', f'refs/tags/{tag}'], cwd=cwd)
     if r.returncode != 0:
         return ('UNREACHABLE', f'tag {tag} not found in this clone — cannot compare', [])
+
+    refused = cache_gate(cwd, tag)
+    if refused:
+        return refused
 
     divergent = []
     for path in release_coupled_paths(version):
@@ -92,6 +115,9 @@ def check_pretag(version: str, cwd: str = None):
     successor — verify release-coupled artifacts are PRESENT AT HEAD before the
     tag is cut (Phase 3.0), so the tag never needs post-tag back-fills. Uses
     committed-tree state (git cat-file), not working-dir (the v1.46.1 F1 fix)."""
+    refused = cache_gate(cwd, 'HEAD')
+    if refused:
+        return refused
     missing = []
     for path in release_coupled_paths(version):
         r = _run(['git', 'cat-file', '-e', f'HEAD:{path}'], cwd=cwd)
@@ -109,9 +135,16 @@ def main(argv=None):
     p.add_argument('--repo', default='aget-framework/aget', help='GitHub repo for release-body disclosure check')
     p.add_argument('--pre-tag', action='store_true',
                    help='pre-tag presence inventory (check_pretag_inventory.sh successor; DEP-PRETAG-SH-001)')
+    p.add_argument('--payload-only', action='store_true',
+                   help='with --pre-tag: offline HEAD payload check only; exit 0 clean, 2 refused')
     args = p.parse_args(argv)
 
-    if args.pre_tag:
+    if args.payload_only:
+        if not args.pre_tag:
+            p.error('--payload-only requires --pre-tag')
+        state, msg, divergent = cache_gate(args.cwd, 'HEAD') or (
+            'PASS', 'release payload at HEAD contains no compiled caches', [])
+    elif args.pre_tag:
         state, msg, divergent = check_pretag(args.version, cwd=args.cwd)
     else:
         state, msg, divergent = check(args.version, cwd=args.cwd, repo=args.repo)

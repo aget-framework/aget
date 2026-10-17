@@ -118,7 +118,9 @@
     {
       "path": "scripts/instantiate_template.py",
       "sha256": "c68d06fd5c3eeb5771de52303e7a56fb7e4f520abb37d47211b43464bd2d1362",
-      "mode": "0o644"
+      "mode": "0o644",
+      "sha256_current": "f9725e87aa8e6444b70f3cef319853af0d501cc4db2f7050ed294136400b64df",
+      "amended_post_tag": "2026-10-16: v3.37 C9 row 22 filters compiled caches at every depth and copies tracked template files with a filtered filesystem fallback. C16 preflights missing tracked inputs and unsupported submodules before copying, and restores the original archive exclusion scope. Post-v3.34 edit; sha256 stays the record of what v3.34 shipped."
     },
     {
       "path": "scripts/study_topic.py",

@@ -109,6 +109,7 @@ def _load(name, path):
 
 
 W = _load("v335_wave_readiness", HERE / "wave_readiness.py")
+TP = _load("template_payload", HERE / "template_payload.py")
 
 TARGET = R.TO
 PIN = R.REGISTER_PIN
@@ -345,8 +346,18 @@ def resolve_template(loc, name=None, records=None):
 
 
 def payload_expectations(template):
-    """{path: 'present' | 'absent'} for one template's payload at the release target."""
+    """{path: 'present' | 'absent'} from tracked release-tag changes, never the working tree.
+
+    Guard the full TO-tag tree: unchanged tracked caches must not be delivered.
+    An 'absent' entry may still remove bytecode from an older release.
+    """
     fw = W.V.framework_root()
+    try:
+        caches = TP.compiled_caches_at(os.path.join(fw, template), R.TO_TAG)
+    except TP.PayloadInspectionError as e:
+        raise Unavailable(str(e)) from None
+    if caches:
+        raise Unavailable(f"release payload contains compiled cache: {', '.join(caches)}")
     try:                                  # B159 finding 1: NUL-separated, byte for byte
         records = CI.git_name_status(os.path.join(fw, template), "-M", R.FROM_TAG, R.TO_TAG)
     except CI.InspectionFailed as e:
@@ -362,6 +373,9 @@ def payload_expectations(template):
             exp[paths[-1]] = "present"
     for p in W.SPEC_PATHS + W.CORRECTION_ROW_4:
         exp[p] = "present"
+    caches = sorted(p for p, want in exp.items() if want == "present" and TP.is_compiled_cache(p))
+    if caches:
+        raise Unavailable(f"release payload contains compiled cache: {', '.join(caches)}")
     return exp
 
 

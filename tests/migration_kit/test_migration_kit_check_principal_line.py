@@ -91,3 +91,13 @@ def test_a_mid_turn_human_entry_is_found_and_reported_distinctly(tmp_path):
                          queued("2026-09-29T17:14:00Z", "approve list batch-9 abc", kind="task-notification")])
     assert run(d, "predicatefix; approve push batch-8 of 76f19247 plus x") == 4
     assert run(d, "approve list batch-9 abc") == 2
+
+
+def test_invalid_utf8_cli_refuses_with_file_and_line_without_a_traceback(tmp_path, capsys):
+    d = write(tmp_path, [prompt("t1", "typed", "approve list batch-8 c69fe0cf")])
+    path = d / "abc123-session.jsonl"
+    path.write_bytes(path.read_bytes() + b"\xff\n")
+    assert run(d, "approve list batch-8 c69fe0cf") == 6
+    output = capsys.readouterr()
+    assert "invalid UTF-8" in output.out and "abc123-session.jsonl at line 3" in output.out
+    assert "Traceback" not in output.out + output.err

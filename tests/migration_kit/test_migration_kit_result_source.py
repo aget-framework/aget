@@ -1945,3 +1945,132 @@ def test_without_sys_monitoring_a_native_pass_is_inconclusive(tmp_path):
     assert ids == [] and why and "this Python has no sys.monitoring" in why, (ids, why)
     parsed = LB.parse_baseline(stream(text, PYTEST), PYTEST, report, token)
     assert parsed["complete"] is False and "this Python has no sys.monitoring" in parsed["failures_unknown"], parsed
+
+
+# --- C29 (rxrun:R4/R7; receiver F-17, 2026-10-11): a skip raised by the test's OWN body is not "never ran" ------------
+
+_PORTABLE = ("import pytest\nimport os\ndef test_a():\n    pass\n"
+             "def test_live():\n    if not os.environ.get('NO_SUCH_ROOT_C29'):\n"
+             "        pytest.skip('no canonical checkout is declared; portability skip')\n    assert False\n")
+
+
+@requires_monitoring
+def test_c29_a_skip_raised_by_the_tests_own_body_is_reported_as_a_skip_not_unproven(tmp_path):
+    """Receiver F-17 (every pilot of the v3.36.0 run): a member test whose own body calls `pytest.skip()` when no
+    canonical checkout is declared was reported `census unavailable (<id>: …)`, so the run read INCONCLUSIVE. The
+    census collected that item and the witness saw its own code start; the skip came from inside its call. That is a
+    test that ran and skipped, not one that never ran. weekly-train:R15 still holds for skips the census cannot
+    reproduce that come from OUTSIDE the body (a conftest fixture, a hook, a late marker: see C2a14r above)."""
+    _, report, token, text = _run_member(tmp_path, {"test_s.py": _PORTABLE})
+    ids, why, _ = RB.report_failures(report, token, text)
+    assert ids == [] and why is None, (why, text[-300:])
+
+
+@requires_monitoring
+def test_c29_a_skip_raised_by_a_helper_the_body_calls_is_a_skip_too(tmp_path):
+    """The pilots' shape (canonical_root.py): the test body calls a helper module that raises the skip. The call phase
+    began in the census's own function, so the skip is the body's."""
+    helper = "import pytest\ndef canonical_root():\n    pytest.skip('no canonical checkout is declared; portability skip')\n"
+    body = "import croot\ndef test_a():\n    pass\ndef test_live():\n    croot.canonical_root()\n    assert False\n"
+    _, report, token, text = _run_member(tmp_path, {"test_s.py": body, "croot.py": helper},
+                                         env_extra={"PYTHONPATH": str(tmp_path / "member" / "tests")})
+    ids, why, _ = RB.report_failures(report, token, text)
+    assert ids == [] and not why, (why, text[-300:])
+
+
+@requires_monitoring
+def test_c29_a_skip_from_setup_is_still_not_proven(tmp_path):
+    """weekly-train:R15 kept: the same skip raised from a conftest fixture (setup phase) is still not proven."""
+    conf = ("import pytest\n@pytest.fixture(autouse=True)\ndef _s(request):\n"
+            "    if 'live' in request.node.name:\n        pytest.skip('portability skip')\n")
+    body = "def test_a():\n    pass\ndef test_live():\n    assert False\n"
+    _, report, token, text = _run_member(tmp_path, {"test_s.py": body, "conftest.py": conf})
+    ids, why, _ = RB.report_failures(report, token, text)
+    assert ids == [] and why and "test_live" in why, (why, text[-300:])
+
+
+@requires_monitoring
+@pytest.mark.parametrize("wrapper,body", [
+    ("        pytest.skip('wrapper skip')\n        f()\n", "    assert False\n"),
+    ("        f()\n        pytest.skip('wrapper skip')\n", "    pass\n"),
+    ("        try:\n            f()\n        except AssertionError:\n            pytest.skip('wrapper skip')\n",
+     "    assert False, 'must not disappear'\n"),
+    ("        try:\n            f()\n        except pytest.skip.Exception:\n            pytest.skip('same reason')\n",
+     "    pytest.skip('same reason')\n"),
+])
+def test_c29_a_wrappers_skip_is_not_a_body_skip(tmp_path, wrapper, body):
+    src = ("import functools, pytest\ndef dec(f):\n    @functools.wraps(f)\n    def wrapped():\n"
+           + wrapper + "    return wrapped\n@dec\ndef test_live():\n" + body)
+    _, report, token, text = _run_member(tmp_path, {"test_s.py": src})
+    ids, why, _ = RB.report_failures(report, token, text)
+    assert ids == [] and why and "test_live" in why and "skip (" in why, (why, text)
+
+
+@requires_monitoring
+@pytest.mark.parametrize("method", ["setUp", "tearDown"])
+def test_c29_unittest_lifecycle_skips_stay_unproven(tmp_path, method):
+    src = ("import unittest\nclass TestLive(unittest.TestCase):\n"
+           f"    def {method}(self):\n        self.skipTest('lifecycle skip')\n"
+           "    def test_live(self):\n        pass\n")
+    _, report, token, text = _run_member(tmp_path, {"test_s.py": src})
+    ids, why, _ = RB.report_failures(report, token, text)
+    assert ids == [] and why and "test_live" in why and "skip (" in why, (why, text)
+
+
+@requires_monitoring
+def test_c29_runtime_xfail_is_not_accepted_as_a_body_skip(tmp_path):
+    src = "import pytest\ndef test_live():\n    pytest.xfail('runtime xfail')\n"
+    _, report, token, text = _run_member(tmp_path, {"test_s.py": src})
+    ids, why, _ = RB.report_failures(report, token, text)
+    assert ids == [] and why and "xfail" in why, (why, text)
+
+
+@requires_monitoring
+def test_c29_lost_monitoring_cannot_prove_a_body_skip(tmp_path):
+    src = ("import sys, pytest\ndef test_live():\n    m = sys.monitoring\n"
+           "    for t in (3, 4):\n        if m.get_tool(t) == 'aget-kit-witness':\n"
+           "            m.free_tool_id(t)\n    pytest.skip('unwitnessed skip')\n")
+    _, report, token, text = _run_member(tmp_path, {"test_s.py": src})
+    ids, why, _ = RB.report_failures(report, token, text)
+    assert ids == [] and why and "tool was taken or changed" in why, (why, text)
+
+
+@requires_monitoring
+def test_c29_a_declared_generator_cannot_conceal_failure_as_a_wrapper_skip(tmp_path):
+    src = ("import functools, pytest\nheld = []\ndef dec(f):\n    @functools.wraps(f)\n"
+           "    def wrapped():\n        g = f()\n        next(g)\n        held.append(g)\n"
+           "        pytest.skip('unfinished body')\n    return wrapped\n@dec\ndef test_live():\n"
+           "    yield\n    assert False\n")
+    _, report, token, text = _run_member(tmp_path, {"test_s.py": src})
+    ids, why, _ = RB.report_failures(report, token, text)
+    # pytest versions that reject generator tests during collection report a native failure; versions that
+    # collect the wrapper must refuse its unfinished generator witness. Neither may read complete.
+    assert ids or why, (why, text)
+
+
+@requires_monitoring
+@pytest.mark.parametrize("wrapped", [False, True])
+def test_c29_a_body_skip_through_a_transparent_wrapper_is_complete(tmp_path, wrapped):
+    dec = ("import functools\ndef dec(f):\n    @functools.wraps(f)\n    def wrapped():\n"
+           "        return f()\n    return wrapped\n")
+    src = "import pytest\n" + (dec + "@dec\n" if wrapped else "")
+    src += "def test_live():\n    pytest.skip('body skip')\n"
+    _, report, token, text = _run_member(tmp_path, {"test_s.py": src})
+    assert RB.report_failures(report, token, text)[:2] == ([], None), text
+
+
+@requires_monitoring
+@pytest.mark.parametrize("caught,body,replacement", [
+    ("AssertionError", "assert False", "pytest.skip('converted failure')"),
+    ("unittest.SkipTest", "self.skipTest('body skip')", "self.skipTest('wrapper skip')"),
+    ("unittest.SkipTest", "self.skipTest('body skip')", "pytest.skip('wrapper skip')"),
+])
+def test_c29_unittest_wrappers_cannot_claim_pytests_skip_conversion(tmp_path, caught, body, replacement):
+    src = ("import functools, pytest, unittest\ndef dec(f):\n    @functools.wraps(f)\n"
+           "    def wrapped(self):\n        try:\n            f(self)\n"
+           f"        except {caught}:\n            {replacement}\n    return wrapped\n"
+           "class TestLive(unittest.TestCase):\n    @dec\n    def test_live(self):\n"
+           f"        {body}\n")
+    _, report, token, text = _run_member(tmp_path, {"test_s.py": src})
+    ids, why, _ = RB.report_failures(report, token, text)
+    assert ids == [] and why and "test_live" in why and "skip (" in why, (why, text)

@@ -376,6 +376,97 @@ def test_payload_expectations_from_the_template_diff(framework):
                    "scripts/core_only.py": "present"}
 
 
+def test_row_22_untracked_template_cache_is_not_payload(framework):
+    """Release-tag enumeration must ignore working-tree compiler artifacts."""
+    template = framework / "template-x-aget"
+    cache = template / "tests/__pycache__/x.pyc"
+    cache.parent.mkdir(parents=True)
+    cache.write_bytes(b"compiled cache")
+    assert "tests/__pycache__/x.pyc" not in sh(template, "ls-files").splitlines()
+    exp = L.payload_expectations(template.name)
+    assert exp["scripts/new.py"] == "present"
+    assert not any(path.endswith((".pyc", ".pyo")) for path in exp)
+
+
+@pytest.mark.parametrize("path", ["tests/__pycache__/x.pyc", "scripts/x.pyc",
+                                  "scripts/x.pyo", "tests/__pycache__/cache.dat"])
+def test_row_22_release_payload_rejects_compiled_cache(framework, path):
+    """A bad release must fail preparation, even if bytecode was tracked."""
+    template = framework / "template-x-aget"
+    sh(template, "tag", "-d", "v3.35.0")
+    commit(template, {path: "compiled cache"}, "bad release", tag="v3.35.0")
+    with pytest.raises(L.Unavailable, match="compiled cache.*" + path):
+        L.payload_expectations(template.name)
+
+
+def test_row_22_release_can_remove_old_bytecode(framework):
+    template = framework / "template-x-aget"
+    path = "tests/__pycache__/x.pyc"
+    sh(template, "tag", "-d", "v3.34.0", "v3.35.0")
+    commit(template, {path: "old cache"}, "old release", tag="v3.34.0")
+    commit(template, {path: None}, "remove cache", tag="v3.35.0")
+    assert L.payload_expectations(template.name)[path] == "absent"
+
+
+@pytest.mark.parametrize('path', ['tests/__pycache__/unchanged.pyc', 'scripts/X.PYC',
+                                  'scripts/X.PYO', 'tests/__PYCACHE__/cache.dat'])
+def test_c9_unchanged_cache_in_release_tree_refuses_migration(framework, path):
+    tpl = framework / 'template-x-aget'
+    sh(tpl, 'tag', '-d', 'v3.34.0', 'v3.35.0')
+    commit(tpl, {path: 'unchanged cache'}, 'old dirty release', tag='v3.34.0')
+    commit(tpl, {'scripts/new.py': 'unrelated change'}, 'new dirty release', tag='v3.35.0')
+    with pytest.raises(L.Unavailable, match='compiled cache'):
+        L.payload_expectations(tpl.name)
+
+
+@pytest.mark.parametrize('tool', ['prepare_batch', 'prepare_launch'])
+def test_c9_b1_refuses_bad_release_with_reason(framework, tmp_path, monkeypatch, capsys, tool):
+    spec = importlib.util.spec_from_file_location('c9_' + tool, ROOT / 'scripts/migration_kit' / (tool + '.py'))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    monkeypatch.setattr(mod.L, 'members', lambda: [('receiver', str(tmp_path / 'receiver'))])
+    monkeypatch.setattr(mod.L, 'usable_template', lambda *a: ('template-x-aget', 'fixture'))
+    monkeypatch.setattr(mod.CI, 'head_of', lambda *a: 'a' * 40)
+
+    def unavailable(*args):
+        raise mod.L.Unavailable('release payload contains compiled cache: tests/__pycache__/x.pyc')
+
+    monkeypatch.setattr(mod.L, 'payload_expectations', unavailable)
+    real_run = subprocess.run
+
+    def run(command, **kwargs):
+        if command == ['claude', '--version']:
+            return subprocess.CompletedProcess(command, 0, 'fixture', '')
+        return real_run(command, **kwargs)
+
+    monkeypatch.setattr(subprocess, 'run', run)
+    # Let the baseline reach plan_receiver; the fixed tool must refuse BEFORE staging.
+    if tool == 'prepare_launch':
+        monkeypatch.setattr(mod, 'stage', lambda *a: None)
+    out = tmp_path / 'packet.json'
+    args = [tool, '--batch', '1', '--out', str(out)]
+    if tool == 'prepare_launch':
+        protected = tmp_path / 'protected.json'
+        protected.write_text('{"agets": []}')
+        args += ['--protected-list', str(protected)]
+    monkeypatch.setattr(__import__('sys'), 'argv', args + ['receiver'])
+    try:
+        code = mod.main()
+    except SystemExit as exc:
+        code = exc.code
+    output = capsys.readouterr()
+    assert 'compiled cache' in output.out + output.err
+    if tool == 'prepare_batch':
+        assert code == 0
+        entry = json.loads(out.read_text())['agets'][0]
+        assert entry['blocked'].startswith('release payload refused: ')
+        assert entry['ops'] == []
+    else:
+        assert code != 0
+        assert not out.exists()
+    assert not (tmp_path / mod.R.SLUG / 'packets').exists()
+
+
 def test_payload_conforming_revision_has_no_findings(framework, tmp_path):
     repo = init(tmp_path / "ok")
     commit(repo, {"scripts/a.py": "a = 2\n", "scripts/new.py": "n\n", "scripts/core_only.py": "c\n"}, "m")

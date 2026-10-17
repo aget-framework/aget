@@ -23,6 +23,14 @@ Usage:
     python3 wind_down.py --force            # Bypass re-entrancy guard (L468)
     python3 wind_down.py --verify           # Migration verification (L491)
 
+Configuration:
+    AGET_WIND_DOWN_HEALTH_TIMEOUT: integer seconds, 1 through 3600 (default 120).
+    Invalid values fall back to 120 with a visible note on stderr.
+    TIMEOUT means the health observation is incomplete; it does not fail close.
+    On macOS/Linux, timeout kills the health check's entire process group.
+    Pipe draining is limited to 5 additional seconds; descendants that leave
+    the process group may survive, but cannot keep wind-down waiting on pipes.
+
 Exit codes:
     0: Clean close (health check passed)
     1: Close with warnings
@@ -46,6 +54,7 @@ import argparse
 import importlib.util
 import json
 import os
+import signal
 import subprocess
 import sys
 import time
@@ -172,6 +181,56 @@ def load_json_file(path: Path, default: Any = None) -> Any:
         return default
 
 
+HEALTH_TIMEOUT_DEFAULT = 120
+HEALTH_TIMEOUT_MAX = 3600
+HEALTH_DRAIN_TIMEOUT = 5
+
+
+def health_timeout():
+    """Bound configuration before handing a timeout to the platform's poll API."""
+    raw = os.environ.get('AGET_WIND_DOWN_HEALTH_TIMEOUT')
+    if raw is None:
+        return HEALTH_TIMEOUT_DEFAULT
+    try:
+        value = int(raw)
+        if 1 <= value <= HEALTH_TIMEOUT_MAX:
+            return value
+    except ValueError:
+        pass
+    print(f'Note: invalid AGET_WIND_DOWN_HEALTH_TIMEOUT={raw!r}; '
+          f'expected integer seconds 1..{HEALTH_TIMEOUT_MAX}; '
+          f'using default {HEALTH_TIMEOUT_DEFAULT} seconds.', file=sys.stderr)
+    return HEALTH_TIMEOUT_DEFAULT
+
+
+def run_health_process(command, agent_path, timeout):
+    """Run an isolated health process; kill its POSIX group and bound pipe drain."""
+    with subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                          stdin=subprocess.DEVNULL, text=True, cwd=str(agent_path),
+                          start_new_session=(os.name == 'posix')) as process:
+        try:
+            stdout, stderr = process.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            if os.name == 'posix':
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except (ProcessLookupError, PermissionError):
+                    # macOS can return EPERM for a zombie-only group, including
+                    # when the leader exits between the deadline and kill.
+                    pass
+            else:
+                process.kill()
+            try:
+                process.communicate(timeout=HEALTH_DRAIN_TIMEOUT)
+            except subprocess.TimeoutExpired:
+                # A descendant can leave the group while retaining these pipes.
+                # Abandon its output; the original health deadline still applies.
+                process.stdout.close()
+                process.stderr.close()
+            raise
+        return subprocess.CompletedProcess(command, process.returncode, stdout, stderr)
+
+
 def run_health_check(agent_path: Path, verbose: bool = False) -> Dict[str, Any]:
     """CAP-SESSION-012: Run housekeeping health check before wind-down."""
     script_locations = [
@@ -196,39 +255,80 @@ def run_health_check(agent_path: Path, verbose: bool = False) -> Dict[str, Any]:
             'message': 'No health check script found',
         }
 
+    timeout = health_timeout()
+
     try:
-        result = subprocess.run(
+        result = run_health_process(
             [sys.executable, str(script_path), '--json'],
-            capture_output=True, text=True, timeout=30,
-            cwd=str(agent_path),
+            agent_path, timeout,
         )
 
         if result.stdout:
             try:
                 data = json.loads(result.stdout)
+                status = data.get('status', 'unknown')
+                summary = data.get('summary', {})
+                # Canonical warning/error reports use exits 1/2. A crash or
+                # disagreement after printing JSON must not become a clean close.
+                if result.returncode != 0 and result.returncode != {'warning': 1, 'error': 2}.get(status):
+                    return {
+                        'status': 'error',
+                        'checks_passed': summary.get('passed', 0),
+                        'checks_total': summary.get('total', 0),
+                        'warnings': summary.get('warnings', 0),
+                        'errors': max(1, summary.get('errors', 0)),
+                        'message': f'Health check failed with exit code {result.returncode} '
+                                   f'(JSON status: {status})',
+                    }
+                no_observations = summary.get('total', 0) <= 0
                 return {
-                    'status': data.get('status', 'unknown'),
-                    'checks_passed': data.get('summary', {}).get('passed', 0),
-                    'checks_total': data.get('summary', {}).get('total', 0),
-                    'warnings': data.get('summary', {}).get('warnings', 0),
-                    'errors': data.get('summary', {}).get('errors', 0),
-                    'message': '',
+                    'status': 'unknown' if status == 'healthy' and no_observations else status,
+                    'checks_passed': summary.get('passed', 0),
+                    'checks_total': summary.get('total', 0),
+                    'warnings': summary.get('warnings', 0),
+                    'errors': summary.get('errors', 0),
+                    'message': 'Health check produced no observations' if no_observations else '',
                 }
             except json.JSONDecodeError:
                 pass
+
+        if result.returncode != 0:
+            return {
+                'status': 'error',
+                'checks_passed': 0,
+                'checks_total': 0,
+                'warnings': 0,
+                'errors': 1,
+                'message': f'Health check failed with exit code {result.returncode} '
+                           'without a JSON report' +
+                           (f': {result.stderr.strip()}' if result.stderr.strip() else ''),
+            }
 
         # Parse text output as fallback
         passed = result.stdout.count('[+]') + result.stdout.count('PASS')
         failed = result.stdout.count('[-]') + result.stdout.count('FAIL')
         return {
-            'status': 'healthy' if failed == 0 else 'warning',
+            'status': 'warning' if failed else 'healthy' if passed else 'unknown',
             'checks_passed': passed,
             'checks_total': passed + failed,
             'warnings': failed,
             'errors': 0,
-            'message': f'Health check passed ({passed}/{passed + failed})',
+            'message': (f'Health check passed ({passed}/{passed + failed})' if passed + failed else
+                        'Health check produced no observations'),
         }
-    except (subprocess.TimeoutExpired, Exception) as e:
+    except subprocess.TimeoutExpired as e:
+        message = f'Health check timeout after {e.timeout:g} seconds'
+        if verbose:
+            log_diagnostic(message)
+        return {
+            'status': 'timeout',
+            'checks_passed': 0,
+            'checks_total': 0,
+            'warnings': 0,
+            'errors': 0,
+            'message': message,
+        }
+    except Exception as e:
         if verbose:
             log_diagnostic(f"Sanity check error: {e}")
         return {
@@ -563,7 +663,12 @@ def format_human_output(data: Dict[str, Any]) -> str:
     elif status == 'warning':
         lines.append(f"Health Gate: WARNING ({passed}/{total} passed)")
     elif status == 'error':
-        lines.append(f"Health Gate: ERROR ({passed}/{total} passed)")
+        if health.get('message'):
+            lines.append(f"Health Gate: ERROR ({health['message']})")
+        else:
+            lines.append(f"Health Gate: ERROR ({passed}/{total} passed)")
+    elif status == 'timeout':
+        lines.append(f"Health Gate: TIMEOUT ({health.get('message', 'Health check timed out')})")
     elif status == 'skipped':
         lines.append("Health Gate: SKIPPED")
     else:
@@ -658,6 +763,14 @@ Exit codes:
   2 - Close with errors
   3 - Configuration error
   4 - Re-entrancy guard active
+
+Health timeout:
+  AGET_WIND_DOWN_HEALTH_TIMEOUT sets integer seconds, 1..3600 (default 120).
+  Invalid values use 120 with a note on stderr. TIMEOUT is an incomplete health
+  observation and does not fail close (exit 0). Execution failures report ERROR
+  (exit 2). On macOS/Linux, timeout kills the entire health-check process group.
+  Pipe draining takes at most 5 additional seconds. Descendants that leave the
+  process group may survive; their inherited pipes cannot delay close further.
         """
     )
     parser.add_argument(
@@ -783,6 +896,7 @@ Exit codes:
 
         # Exit code based on health check status
         # Only errors (broken state) produce non-zero exit codes.
+        # A timeout is an incomplete observation, not a failed health check.
         # Warnings are informational and already printed in output —
         # returning exit 1 for persistent warnings (e.g., skill drift)
         # trains users to ignore exit codes, defeating their purpose.

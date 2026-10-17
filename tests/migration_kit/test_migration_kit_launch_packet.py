@@ -1831,6 +1831,8 @@ def r55_sop_packet(tmp_path, monkeypatch, packet_override=True):
     monkeypatch.setattr(pl.L, "usable_template", lambda *a: ("template-worker-aget", "test fixture"))
     monkeypatch.setattr(pl.L.W.V, "framework_root", lambda: str(tmp_path / "framework"))
     # Only payload discovery is stubbed. The B1 CLI builds prompts, rules, settings and sealed stage itself.
+    # C9 checks the release tree before staging as well as in plan_receiver.
+    monkeypatch.setattr(pl.L, "payload_expectations", lambda *a: {})
     monkeypatch.setattr(pl, "CORE_DOCS", [])
     monkeypatch.setattr(pl, "plan_receiver", lambda n, loc, **kw: {
         "aget": n, "location": loc, "template": "template-worker-aget", "head": g("rev-parse", "HEAD"),
@@ -1949,3 +1951,45 @@ def test_r62_repair_prompt_uses_the_declared_cache_free_default_or_explicit_over
     assert f"3. Run: {default}" in PL.repair_prompt(R, "r62-repair", "prior")
     override = "python3 /fixture/run_suite_parallel.py"
     assert f"3. Run: {override}" in PL.repair_prompt(dict(R, suite_cmd=override), "r62-repair", "prior")
+
+
+# gh#2971 (F-28; carry rxrun:R7): a protected file the principal's apply writes and the member did not track before
+# was classed "untracked" and the prompt told the session a push would not carry it, so 6 of 7 live sessions left it
+# out of the commit and the push gate refused the member. Only a file git IGNORES is one a push cannot carry; a new
+# file git does not ignore is staged with the other protected writes.
+def _repo(tmp_path):
+    import subprocess
+    import os
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    subprocess.run(["git", "init", "-q", str(tmp_path)], check=True, env=env)
+    (tmp_path / ".gitignore").write_text("ignored/\n")
+    for rel in [".claude/skills/new/SKILL.md", "ignored/x.md", "AGENTS.md"]:
+        (tmp_path / rel).parent.mkdir(parents=True, exist_ok=True)
+        (tmp_path / rel).write_text("x\n")
+    subprocess.run(["git", "-C", str(tmp_path), "add", ".gitignore", "AGENTS.md"], check=True, env=env)
+    subprocess.run(["git", "-C", str(tmp_path), "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-qm", "base"],
+                   check=True, env=env)
+    return tmp_path
+
+
+def test_a_new_protected_file_git_does_not_ignore_is_staged(tmp_path):
+    repo = _repo(tmp_path)
+    paths = [".claude/skills/new/SKILL.md", "ignored/x.md", "AGENTS.md"]
+    untracked = PL.untracked_protected(str(repo), paths)
+    assert untracked == ["ignored/x.md"]
+    carried = [p for p in paths if p not in untracked]
+    receiver = dict(R, untracked_protected=untracked, commit_protected=carried)
+    commit_step = next(line for line in PL.prompt(receiver, "f28-control", paths).splitlines()
+                       if line.startswith("7. Commit."))
+    assert ".claude/skills/new/SKILL.md" in commit_step
+    assert "ignored/x.md" not in commit_step
+    import os
+    import subprocess
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    for path in carried:
+        subprocess.run(["git", "-C", str(repo), "add", "--", path], check=True, env=env)
+    subprocess.run(["git", "-C", str(repo), "-c", "user.name=t", "-c", "user.email=t@t",
+                    "commit", "-qm", "carry new protected skill"], check=True, env=env)
+    tree = subprocess.run(["git", "-C", str(repo), "ls-tree", "-r", "--name-only", "HEAD"],
+                          check=True, env=env, capture_output=True, text=True).stdout.splitlines()
+    assert ".claude/skills/new/SKILL.md" in tree and "ignored/x.md" not in tree
