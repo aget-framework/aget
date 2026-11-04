@@ -1,6 +1,6 @@
 # Release Handoff — AGET v3.37.1
 
-**Release type**: patch on v3.37.0 · **Planned date**: 2026-11-05 · **Previous release**: v3.37.0
+**Release type**: patch on v3.37.0 · **Planned date**: 2026-11-04 · **Previous release**: v3.37.0
 
 ## Release Summary
 

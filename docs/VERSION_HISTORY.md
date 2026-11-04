@@ -12,7 +12,7 @@ This document records selected AGET Framework releases and historical repository
 
 ## Current Version
 
-**v3.37.1** (2026-11-05) — Release record; verify publication via the annotated tag and GitHub Release object
+**v3.37.1** (2026-11-04) — Release record; verify publication via the annotated tag and GitHub Release object
 
 Patch on v3.37.0: the migration kit's release-age default is 0, the ruled value, so a supervisor with no policy file can adopt a release on the day it is published. See `release-notes/v3.37.1.md`. This entry does not establish publication or receiver acceptance.
 
@@ -666,5 +666,5 @@ We acknowledge historical gaps transparently and focus on complete releases goin
 ---
 
 *VERSION_HISTORY.md - Selected release history for AGET Framework*
-*Last Updated: 2026-11-05 (v3.37.1 release record)*
+*Last Updated: 2026-11-04 (v3.37.1 release record)*
 *Maintained by: aget-framework*

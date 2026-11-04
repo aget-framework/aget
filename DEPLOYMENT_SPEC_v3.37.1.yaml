@@ -1,6 +1,6 @@
 version: 3.37.1
 spec_version: 1.0.0
-created: '2026-11-05'
+created: '2026-11-04'
 status: candidate
 supersedes: DEPLOYMENT_SPEC_v3.37.0.yaml
 breaking_release: false
@@ -13,7 +13,7 @@ corrections: handoffs/CORRECTIONS_v3.37.0.md
 payload_manifest: none
 publication_boundary: Prepared content is not publication, installation or acceptance
   evidence. Record the annotated tag and peeled commit before consuming.
-publication_state_note: 'Candidate. Planned publication date 2026-11-05. Publication is evidenced only by the annotated tag v3.37.1 and the GitHub Release object. Read the peeled commit of the tag with: git rev-parse v3.37.1^{commit}.'
+publication_state_note: 'Candidate. Planned publication date 2026-11-04. Publication is evidenced only by the annotated tag v3.37.1 and the GitHub Release object. Read the peeled commit of the tag with: git rev-parse v3.37.1^{commit}.'
 mandatory_changes:
   - id: M-3.37.1-1
     description: >-

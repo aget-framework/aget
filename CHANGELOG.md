@@ -17,7 +17,7 @@ Items confirmed in-flight for a future release (latest released: **3.37.1**). Pe
 - Template `/aget-file-issue` structural refresh (routing + probe steps to all templates; fleet routing propagation staged per the 3.26.0 rollout decision).
 - **Traceability ratchet**: the test-requirement floor rises +5pp per minor release from the v3.29 measured floor.
 
-## [3.37.1] - 2026-11-05
+## [3.37.1] - 2026-11-04
 
 Patch on v3.37.0. Previous release: v3.37.0. Prepared files do not establish publication or receiver acceptance.
 

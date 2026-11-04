@@ -1,6 +1,6 @@
 # Migration Message: v3.37.0 to v3.37.1
 
-**Date**: 2026-11-05
+**Date**: 2026-11-04
 **From**: AGET Framework Manager
 **To**: Remote Fleet Supervisors
 **Target Version**: 3.37.1

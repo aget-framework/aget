@@ -1,7 +1,7 @@
 {
   "aget_version": "3.37.1",
   "created": "2025-09-21",
-  "updated": "2026-11-05",
+  "updated": "2026-11-04",
   "component": "core",
   "description": "AGET Framework Core - Specifications, templates, and validation",
   "repository": "aget-framework/aget",
@@ -59,7 +59,7 @@
     "v3.35.0 -> v3.35.1: 2026-10-04 (weekly-train patch: public commits since v3.35.0)",
     "v3.35.1 -> v3.36.0: 2026-10-10 (a migration kit for supervisors)",
     "v3.36.0 -> v3.37.0: 2026-10-17 (receiver fixes, adoption kit, runner pin and rows 22/33)",
-    "v3.37.0 -> v3.37.1: 2026-11-05 (patch: migration kit release-age default 0, the ruled value)"
+    "v3.37.0 -> v3.37.1: 2026-11-04 (patch: migration kit release-age default 0, the ruled value)"
   ],
   "contents": {
     "specs/": "Canonical specifications (AGET_VERSIONING_CONVENTIONS, etc.)",
