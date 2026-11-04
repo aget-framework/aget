@@ -61,7 +61,7 @@ Fleet migration proceeds in three sequential waves. Each wave SHALL complete bef
 
 ### Wave-0 Supervisor Self-Upgrade
 
-After seeding and before starting the pilots, complete these steps from the supervisor's own repository. Wave 0 runs after publication: the `v3.37.0` tags must exist in the core framework and supervisor-template clones. Keep those clones at their verified `v3.37.0` tag commits. **Phase 0.5: Remote Supervisor Pre-Flight** establishes framework clone freshness only; **V0.5.3: Framework Version Verification** reads the framework clone, not the supervisor.
+After seeding and before starting the pilots, complete these steps from the supervisor's own repository. Wave 0 runs after publication: the `v3.37.1` tags must exist in the core framework and supervisor-template clones. Keep those clones at their verified `v3.37.1` tag commits. **Phase 0.5: Remote Supervisor Pre-Flight** establishes framework clone freshness only; **V0.5.3: Framework Version Verification** reads the framework clone, not the supervisor.
 
 1. **Apply the release payload, preserving local script changes.** Before changing `aget_version`, read the supervisor's current value as `<from-version>`. For each of `scripts/wake_up.py`, `scripts/wind_down.py` and `scripts/health_check.py`, compare its current copy with the supervisor template's copy at `v<from-version>`, not with the new release. Use the verified supervisor-template tags; a missing from-version tag requires a merge review without a baseline. From the supervisor root, adjust `SUPERVISOR_TEMPLATE` to the local clone and run:
 
@@ -69,17 +69,17 @@ After seeding and before starting the pilots, complete these steps from the supe
    SUPERVISOR_TEMPLATE=~/github/aget-framework/template-supervisor-aget
    FROM_VERSION=$(python3 -c "import json;print(json.load(open('.aget/version.json'))['aget_version'])") || exit 1
    # FROM_VERSION is <from-version>, captured before updating the version carriers.
-   UPGRADE_REVIEW=$(mktemp -d "${TMPDIR:-/tmp}/wave0-v3.37.0.XXXXXX") || exit 1
+   UPGRADE_REVIEW=$(mktemp -d "${TMPDIR:-/tmp}/wave0-v3.37.1.XXXXXX") || exit 1
    mkdir -p scripts
    for name in wake_up wind_down health_check; do
-     git -C "$SUPERVISOR_TEMPLATE" show "v3.37.0:scripts/${name}.py" \
+     git -C "$SUPERVISOR_TEMPLATE" show "v3.37.1:scripts/${name}.py" \
        > "$UPGRADE_REVIEW/${name}.new.py" || exit 1
      if git -C "$SUPERVISOR_TEMPLATE" rev-parse --verify "refs/tags/v${FROM_VERSION}^{commit}" >/dev/null 2>&1; then
        git -C "$SUPERVISOR_TEMPLATE" show "v${FROM_VERSION}:scripts/${name}.py" \
          > "$UPGRADE_REVIEW/${name}.from.py" || exit 1
      else
-       cp "$UPGRADE_REVIEW/${name}.new.py" "scripts/${name}.py.v3.37.0" || exit 1
-       printf 'MERGE REQUIRED: scripts/%s.py; no from-version tag v%s; new release beside it as .py.v3.37.0\n' "$name" "$FROM_VERSION"
+       cp "$UPGRADE_REVIEW/${name}.new.py" "scripts/${name}.py.v3.37.1" || exit 1
+       printf 'MERGE REQUIRED: scripts/%s.py; no from-version tag v%s; new release beside it as .py.v3.37.1\n' "$name" "$FROM_VERSION"
        continue
      fi
      if [ ! -e "scripts/${name}.py" ]; then
@@ -90,23 +90,23 @@ After seeding and before starting the pilots, complete these steps from the supe
        diff_status=$?
        [ "$diff_status" -eq 1 ] || exit "$diff_status"
        cat "$UPGRADE_REVIEW/${name}.diff" || exit 1
-       cp "$UPGRADE_REVIEW/${name}.new.py" "scripts/${name}.py.v3.37.0" || exit 1
-       printf 'MERGE REQUIRED: scripts/%s.py; new release beside it as .py.v3.37.0\n' "$name"
+       cp "$UPGRADE_REVIEW/${name}.new.py" "scripts/${name}.py.v3.37.1" || exit 1
+       printf 'MERGE REQUIRED: scripts/%s.py; new release beside it as .py.v3.37.1\n' "$name"
      fi
    done
    ```
 
-   With a from-version tag available, a missing script or one identical to its from-version template copy is replaced with the new release's copy. A changed script is kept in place with the new copy beside it as `scripts/<name>.py.v3.37.0`. If the from-version tag is absent, keep each local script, write the new copy as the sidecar and print `MERGE REQUIRED`: there is no baseline to compare against. A failed payload `git show` or comparison error stops the procedure; it is not evidence that a script is unchanged. Retain each comparison's output in `UPGRADE_REVIEW/<name>.diff` and the available from-version files in `UPGRADE_REVIEW` until the upgrade is verified.
+   With a from-version tag available, a missing script or one identical to its from-version template copy is replaced with the new release's copy. A changed script is kept in place with the new copy beside it as `scripts/<name>.py.v3.37.1`. If the from-version tag is absent, keep each local script, write the new copy as the sidecar and print `MERGE REQUIRED`: there is no baseline to compare against. A failed payload `git show` or comparison error stops the procedure; it is not evidence that a script is unchanged. Retain each comparison's output in `UPGRADE_REVIEW/<name>.diff` and the available from-version files in `UPGRADE_REVIEW` until the upgrade is verified.
 
-   For every `MERGE REQUIRED` script, merge the new release's changes into the retained local copy, preserving its local behavior. Alternatively, move local changes that fit the hook's additive contract into the matching `scripts/<name>_ext.py` and then adopt the new base script. At reviewed supervisor-template commit `a985a62dec3990eaedbc6ebac4b096c7d0014613`, all three hooks are supported: `scripts/wake_up_ext.py:post_wake(data)`, `scripts/wind_down_ext.py:post_wind_down(data)` and `scripts/health_check_ext.py:post_health(data)`. The template ships `wake_up_ext.py` and `wind_down_ext.py`; it supports but does not ship `health_check_ext.py`. Preserve existing hook contents; create the health hook only when moving suitable local changes there. Keep changes that do not fit the hook contract in the merged base script. Review each merge against the new copy and the saved from-version copy when available, then remove the `.py.v3.37.0` sidecar after resolving it.
+   For every `MERGE REQUIRED` script, merge the new release's changes into the retained local copy, preserving its local behavior. Alternatively, move local changes that fit the hook's additive contract into the matching `scripts/<name>_ext.py` and then adopt the new base script. At reviewed supervisor-template commit `a985a62dec3990eaedbc6ebac4b096c7d0014613`, all three hooks are supported: `scripts/wake_up_ext.py:post_wake(data)`, `scripts/wind_down_ext.py:post_wind_down(data)` and `scripts/health_check_ext.py:post_health(data)`. The template ships `wake_up_ext.py` and `wind_down_ext.py`; it supports but does not ship `health_check_ext.py`. Preserve existing hook contents; create the health hook only when moving suitable local changes there. Keep changes that do not fit the hook contract in the merged base script. Review each merge against the new copy and the saved from-version copy when available, then remove the `.py.v3.37.1` sidecar after resolving it.
 
    The shipped `wind_down_ext.py` defines `get_extension_data(agent_path)` and a standalone `main()`. To use it as `wind_down.py`'s hook, define `post_wind_down(data)` in that file and return the augmented data dictionary: `wind_down.py` uses a dictionary return as its data for subsequent output; a non-dictionary return is ignored. Set `data['extension_output']` to a string to append human-readable wind-down output.
 
    `health_check.py` calls `post_health(data)` after `run_housekeeping()` has tallied `data['summary']` (`total`, `passed`, `warnings`, `errors`, `fixable`) and set `data['status']`. Return the augmented data dictionary. A hook adding check dictionaries to `data['checks']` must also update the summary and status: human output renders those fields and the checks' names, pass/severity indicators and messages, while the exit code follows status. Human health output does not render `extension_output`; JSON output includes the returned data. Changes to built-in checks, such as `check_sessions_directory` or `check_config_size`, stay in the merged base `scripts/health_check.py`.
 
-   Set `aget_version` in the supervisor's `.aget/version.json` to `3.37.0` and its `AGENTS.md` `@aget-version` to `3.37.0`. Update the release version in `manifest.yaml` where the file carries one, and any carrier the receiver's own hooks demand, to `3.37.0`. Run the supervisor's own full suite from its root (`python3 -m pytest tests/ -q` if that is its declared suite), including checks of the preserved local behavior. Resolve all merges and suite failures before step 2. In the self-upgrade commit message or migration record, name the scripts merged and any hooks used (or explicitly record that none needed merging), and record the actual suite command and result. A version-only change or step 3's version check is not proof that extensions were preserved.
+   Set `aget_version` in the supervisor's `.aget/version.json` to `3.37.1` and its `AGENTS.md` `@aget-version` to `3.37.1`. Update the release version in `manifest.yaml` where the file carries one, and any carrier the receiver's own hooks demand, to `3.37.1`. Run the supervisor's own full suite from its root (`python3 -m pytest tests/ -q` if that is its declared suite), including checks of the preserved local behavior. Resolve all merges and suite failures before step 2. In the self-upgrade commit message or migration record, name the scripts merged and any hooks used (or explicitly record that none needed merging), and record the actual suite command and result. A version-only change or step 3's version check is not proof that extensions were preserved.
 2. **Commit the self-upgrade.** Review and commit the applied release payload and version-carrier changes in the supervisor's own repository.
-3. **Verify the supervisor version.** From the supervisor root, run `python3 -c "import json;print(json.load(open('.aget/version.json'))['aget_version'])"`; it must print `3.37.0`. Record this result with the supervisor's self-upgrade commit.
+3. **Verify the supervisor version.** From the supervisor root, run `python3 -c "import json;print(json.load(open('.aget/version.json'))['aget_version'])"`; it must print `3.37.1`. Record this result with the supervisor's self-upgrade commit.
 
 The supervisor does not go through Part B as a member of the batch it orchestrates; Part B begins with Wave-1 pilots only after **Wave-0 Supervisor Self-Upgrade**, steps 1–3, pass.
 
@@ -842,7 +842,7 @@ Post-rollout, remember: **version-pass ≠ health-pass** — run the *full* `hea
 
 For each pilot agent:
 
-The kit route (Part B) is the supported path for v3.37.0 batches. When migrating a pilot by hand, step 2's copies apply only to a script that is absent or unchanged from the template copy at the member's from-version. Set `MEMBER_TEMPLATE` to the member's own template clone; its `v3.37.0` tag must exist after publication. For a changed script or a missing from-version tag, follow the same compare / keep / merge / suite procedure as **Wave-0 Supervisor Self-Upgrade**, step 1.
+The kit route (Part B) is the supported path for v3.37.1 batches. When migrating a pilot by hand, step 2's copies apply only to a script that is absent or unchanged from the template copy at the member's from-version. Set `MEMBER_TEMPLATE` to the member's own template clone; its `v3.37.1` tag must exist after publication. For a changed script or a missing from-version tag, follow the same compare / keep / merge / suite procedure as **Wave-0 Supervisor Self-Upgrade**, step 1.
 
 ```bash
 AGENT_PATH=~/github/{agent-name}
@@ -853,16 +853,16 @@ mkdir -p $AGENT_PATH/scripts
 # 2. Copy only scripts absent or unchanged from the member's from-version template; otherwise follow Wave-0 Supervisor Self-Upgrade step 1 (compare / keep / merge / suite).
 MEMBER_TEMPLATE=~/github/aget-framework/template-{archetype}-aget
 FROM_VERSION=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['aget_version'])" "$AGENT_PATH/.aget/version.json") || exit 1
-UPGRADE_REVIEW=$(mktemp -d "${TMPDIR:-/tmp}/pilot-v3.37.0.XXXXXX") || exit 1
+UPGRADE_REVIEW=$(mktemp -d "${TMPDIR:-/tmp}/pilot-v3.37.1.XXXXXX") || exit 1
 for name in wake_up wind_down health_check; do
-  git -C "$MEMBER_TEMPLATE" show "v3.37.0:scripts/${name}.py" \
+  git -C "$MEMBER_TEMPLATE" show "v3.37.1:scripts/${name}.py" \
     > "$UPGRADE_REVIEW/${name}.new.py" || exit 1
   if git -C "$MEMBER_TEMPLATE" rev-parse --verify "refs/tags/v${FROM_VERSION}^{commit}" >/dev/null 2>&1; then
     git -C "$MEMBER_TEMPLATE" show "v${FROM_VERSION}:scripts/${name}.py" \
       > "$UPGRADE_REVIEW/${name}.from.py" || exit 1
   else
-    cp "$UPGRADE_REVIEW/${name}.new.py" "$AGENT_PATH/scripts/${name}.py.v3.37.0" || exit 1
-    printf 'MERGE REQUIRED: %s/scripts/%s.py; no from-version tag v%s; new release beside it as .py.v3.37.0\n' "$AGENT_PATH" "$name" "$FROM_VERSION"
+    cp "$UPGRADE_REVIEW/${name}.new.py" "$AGENT_PATH/scripts/${name}.py.v3.37.1" || exit 1
+    printf 'MERGE REQUIRED: %s/scripts/%s.py; no from-version tag v%s; new release beside it as .py.v3.37.1\n' "$AGENT_PATH" "$name" "$FROM_VERSION"
     continue
   fi
   if [ ! -e "$AGENT_PATH/scripts/${name}.py" ]; then
@@ -873,8 +873,8 @@ for name in wake_up wind_down health_check; do
     diff_status=$?
     [ "$diff_status" -eq 1 ] || exit "$diff_status"
     cat "$UPGRADE_REVIEW/${name}.diff" || exit 1
-    cp "$UPGRADE_REVIEW/${name}.new.py" "$AGENT_PATH/scripts/${name}.py.v3.37.0" || exit 1
-    printf 'MERGE REQUIRED: %s/scripts/%s.py; new release beside it as .py.v3.37.0\n' "$AGENT_PATH" "$name"
+    cp "$UPGRADE_REVIEW/${name}.new.py" "$AGENT_PATH/scripts/${name}.py.v3.37.1" || exit 1
+    printf 'MERGE REQUIRED: %s/scripts/%s.py; new release beside it as .py.v3.37.1\n' "$AGENT_PATH" "$name"
   fi
 done
 
@@ -885,7 +885,7 @@ sed -i '' 's/"aget_version": "[^"]*"/"aget_version": "X.Y.Z"/' $AGENT_PATH/.aget
 sed -i '' 's/@aget-version: .*/@aget-version: X.Y.Z/' $AGENT_PATH/AGENTS.md
 ```
 
-For this release, set `X.Y.Z` in the version edits to `3.37.0`. Also update the release version in `$AGENT_PATH/manifest.yaml` where the file carries one, and any carrier the receiver's own hooks demand, to `3.37.0`. Retain each comparison's output in `UPGRADE_REVIEW/<name>.diff` and the available from-version files in `UPGRADE_REVIEW` until the upgrade is verified. Resolve sidecars and run the member's own full suite as in Wave-0 step 1 before committing.
+For this release, set `X.Y.Z` in the version edits to `3.37.1`. Also update the release version in `$AGENT_PATH/manifest.yaml` where the file carries one, and any carrier the receiver's own hooks demand, to `3.37.1`. Retain each comparison's output in `UPGRADE_REVIEW/<name>.diff` and the available from-version files in `UPGRADE_REVIEW` until the upgrade is verified. Resolve sidecars and run the member's own full suite as in Wave-0 step 1 before committing.
 
 #### Gate 1.2: Skill Content Sync (Conservative Protocol)
 
