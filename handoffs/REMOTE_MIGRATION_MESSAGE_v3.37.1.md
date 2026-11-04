@@ -5,14 +5,14 @@
 **To**: Remote Fleet Supervisors
 **Target Version**: 3.37.1
 **Previous Release**: v3.37.0
-**Migration Path**: v3.37.0 to v3.37.1. From earlier versions, follow `handoffs/REMOTE_MIGRATION_MESSAGE_v3.37.0.md` with target 3.37.1; this patch adds no steps.
+**Migration Path**: v3.37.0 to v3.37.1. From earlier versions, follow `handoffs/REMOTE_MIGRATION_MESSAGE_v3.37.0.md` with `from` set to your current version and target 3.37.1, substituting the v3.37.1 tag, date and version as in step 4 below.
 **Breaking Changes**: None.
 **Release identity**: Publication is evidenced by the annotated tag `v3.37.1` and its GitHub Release object. Read the tag's peeled commit with `git rev-parse 'v3.37.1^{commit}'`.
 **Currency note**: Read this message and any corrections from the producer's main branch. Check release availability and the tag's peeled commit before acting.
 
 ## Migration Target
 
-Set `to` in `.aget/migration_target.json` to `3.37.1`.
+In `.aget/migration_target.json`, set `from` to the version your fleet runs now (`3.37.0` if you migrated to v3.37.0) and `to` to `3.37.1`. A `from` left at an earlier release makes the kit hold every member's version line (`hold-line`). Clear any `AGET_MIGRATION_*` environment overrides left from the previous migration.
 
 ## What's New in v3.37.1
 
@@ -23,7 +23,7 @@ Set `to` in `.aget/migration_target.json` to `3.37.1`.
 1. Re-copy `scripts/migration_kit/` from a core clone at `v3.37.1` into your supervisor repository and commit it, naming the clone's commit.
 2. Run `python3 scripts/migration_kit/adoption_policy.py --show` and confirm `"min_release_age_days": 0` (or your own declared value).
 3. Run `python3 scripts/migration_kit/adoption_policy.py --check-age --published <release date> --release 3.37.1 --fixes-me` only if this fix applies to your fleet: it applies if you use the kit with no declared release-age wait.
-4. Continue as in the v3.37.0 message; nothing else changes.
+4. Continue as in the v3.37.0 message, substituting `v3.37.1` for its tag, `2026-11-04` for its publication date and `3.37.1` for every target-version check. Nothing else changes.
 
 ## Known Gaps
 

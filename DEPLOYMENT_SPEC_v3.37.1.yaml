@@ -33,11 +33,12 @@ mandatory_changes:
       Verify the annotated v3.37.1 tag and peeled commit; copy the whole scripts/migration_kit/ from a core clone
       at v3.37.1 into the supervisor, replacing the v3.37.0 copy. A min_release_age_days 0 workaround set under
       v3.37.0 may stay or go; the result is the same.
-    detection: python3 -m pytest -p no:cacheprovider tests/migration_kit/test_fwk_r132_release_age.py tests/migration_kit/test_fwk_r132_release_age_text.py tests/migration_kit/test_migration_kit_adoption_policy.py -q
+    detection: python3 scripts/migration_kit/adoption_policy.py --check-age --published 2026-11-04 --today 2026-11-04 --release 3.37.1 --fixes-me
     detection_scope: >-
-      Source regression tests in core, plus the receiver-side reading
-      python3 scripts/migration_kit/adoption_policy.py --show (prints min_release_age_days 0 with no policy file).
-      Not a live receiver outcome.
+      Runs at the supervisor, from its root, against the kit copied there. Exit 0 (ADOPT NOW) when no wait is
+      declared in AGET_ADOPTION_MIN_RELEASE_AGE_DAYS or .aget/adoption_policy.json; a declared wait still holds, by design.
+      python3 scripts/migration_kit/adoption_policy.py --show prints the value and its source. Not a live receiver outcome.
+    producer_verification: python3 -m pytest -p no:cacheprovider tests/migration_kit/test_fwk_r132_release_age.py tests/migration_kit/test_fwk_r132_release_age_text.py tests/migration_kit/test_migration_kit_adoption_policy.py -q
 hygiene_changes: []
 removals: []
 receiver_acceptance:

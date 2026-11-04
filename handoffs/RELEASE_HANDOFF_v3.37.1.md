@@ -30,11 +30,12 @@ Unchanged from v3.37.0 (`DEPLOYMENT_SPEC_v3.37.1.yaml`).
 
 1. Verify the annotated tag `v3.37.1` and its peeled commit: `git rev-parse 'v3.37.1^{commit}'`.
 2. Re-copy the kit as above. A `min_release_age_days: 0` workaround set under v3.37.0 may stay or go; the result is the same.
-3. Check: `python3 scripts/migration_kit/adoption_policy.py --show` prints `"min_release_age_days": 0` when nothing else sets it.
+3. Set `from` to your current version and `to` to `3.37.1` in `.aget/migration_target.json` (see the migration message).
+4. Check: `python3 scripts/migration_kit/adoption_policy.py --show` prints `"min_release_age_days": 0` when nothing else sets it.
 
 ## What was shown and what was not
 
-Shown before release: an automated clean install of the supervisor template plus the kit, with no policy file, reported `ADOPT NOW` for a release published that day (v3.37.0 reported `DO NOT ADOPT YET`); a patch without `--fixes-me` was still held; a release 8 days old was adopted either way; the core suite showed no new failures against v3.37.0. Not shown: a person following the steps, a receiver fleet's migration with this kit, hosted CI on the published commit (recorded at publication).
+Shipped: regression tests that fail if the seven-day default returns (`tests/migration_kit/test_fwk_r132_release_age*.py`). Not shown here: a receiver fleet's migration with this kit, or a person following the steps.
 
 ## Known Items
 

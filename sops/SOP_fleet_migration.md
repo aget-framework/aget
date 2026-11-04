@@ -3,7 +3,7 @@
 **Version**: 1.11.0
 **Status**: Active
 **Created**: 2026-01-05
-**Updated**: 2026-10-16
+**Updated**: 2026-11-04
 **Owner**: aget-framework
 **Implements**: CAP-MIG-017 (Remote Supervisor Upgrade), SD-3 wave-sequencing (v1.6.0)
 **Related**: L455 (AGENTS.md Invocation Verification), L457 (Cross-Machine Pre-Flight), AGET_RELEASE_SPEC, prior internal authoring plan
