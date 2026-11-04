@@ -24,7 +24,7 @@ def test_no_declaration_applies_defaults_and_says_so(tmp_path):
     assert set(res["sources"].values()) == {"default"}
     assert res["policy"]["halt"]["allowed_change_patterns"] == ["^@aget-version: \\d+\\.\\d+\\.\\d+$", "^@aget-canonical-specs: https://github\\.com/aget-framework/aget/tree/v\\d+\\.\\d+\\.\\d+/specs(?: — reliance-only conformance(?: \\(D-1, 2026-07-04\\): this template runs the version's features; specs are canonical-referenced, not copied locally)?)?$"]
     assert res["sources"]["halt.allowed_change_patterns"] == "default"
-    assert "skew.blocked_at" in res["defaults_ruled"] and "min_release_age_days" in res["defaults_proposed"]
+    assert "skew.blocked_at" in res["defaults_ruled"] and "min_release_age_days" in res["defaults_ruled"]
 
 
 def test_file_declaration_overrides_default_per_key(tmp_path):
@@ -88,6 +88,7 @@ def test_check_age_both_ways():
 
 
 def test_cli_check_age_exit_codes(tmp_path):
+    _write(tmp_path, {"min_release_age_days": 7})
     assert AP.main(["--root", str(tmp_path), "--check-age", "--published", "2026-10-01", "--today", "2026-10-15"]) == 0
     assert AP.main(["--root", str(tmp_path), "--check-age", "--published", "2026-10-14", "--today", "2026-10-15"]) == 1
     assert AP.main(["--root", str(tmp_path), "--check-age"]) == 2

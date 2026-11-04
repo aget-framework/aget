@@ -13,7 +13,7 @@ RESOLUTION (first found wins, per key — the same order as release_target.py; a
        AGET_ADOPTION_PATCH_POLICY, AGET_ADOPTION_WAVE1_SOAK_HOURS, AGET_ADOPTION_WAVE1_SOAK_SESSIONS,
        AGET_ADOPTION_HALT_MAX_AGENTS_MD_LINES
     2. <root>/.aget/adoption_policy.json, for example:
-       {"skew": {"blocked_at": 3, "flagged_at": 2}, "min_release_age_days": 7, "patch_policy": "adopt-if-fixes-me",
+       {"skew": {"blocked_at": 3, "flagged_at": 2}, "min_release_age_days": 0, "patch_policy": "adopt-if-fixes-me",
         "wave1_soak": {"min_hours": 24, "min_sessions": 1},
         "halt": {"max_agents_md_changed_lines": 10, "identity_patterns": ["^# ", "^\\*\\*Name\\*\\*:"],
                  "allowed_change_patterns": ["^@aget-version: \\d+\\.\\d+\\.\\d+$", "^@aget-canonical-specs: https://github\\.com/aget-framework/aget/tree/v\\d+\\.\\d+\\.\\d+/specs(?: — reliance-only conformance(?: \\(D-1, 2026-07-04\\): this template runs the version's features; specs are canonical-referenced, not copied locally)?)?$"]}}
@@ -23,11 +23,12 @@ RESOLUTION (first found wins, per key — the same order as release_target.py; a
 DEFAULTS AND THEIR STANDING
     skew 3 / 2       the producer's own bounds (block the next upgrade at three published minors behind; flag at two).
                      Ruled as the receiver default.
+    release age 0    the ruled default; see handoffs/CORRECTIONS_v3.37.0.md, disclosure 2.
+        min_release_age_days 0: a published release is already public; no extra release-age wait is imposed.
+                     The seven-day producer proposal was never approved. A receiver may still declare its own wait
+                     in the environment or policy file; the separate Wave-1 soak remains in effect.
     the others       producer proposals, each derived from the 2026-07-26..10-14 fleet history. They are open to change at
                      the next scope lock; a receiver may override any of them today.
-        min_release_age_days 7: in the two migrations that were rolled back, the defect surfaced within six days of
-                     publication. A receiver that waits a week adopts after the producer's own fleet has acted as its
-                     canary.
         patch_policy "adopt-if-fixes-me": four of twelve releases in that period were never taken up by any wave; a
                      patch is worth a migration only when it repairs something the receiver has.
         wave1_soak 24 h and 1 session: the procedure's "at least one session", made measurable.
@@ -79,7 +80,7 @@ MATCH_SECONDS = 0.05
 
 DEFAULTS = {
     "skew": {"blocked_at": 3, "flagged_at": 2},
-    "min_release_age_days": 7,
+    "min_release_age_days": 0,
     "patch_policy": "adopt-if-fixes-me",
     "wave1_soak": {"min_hours": 24, "min_sessions": 1},
     "halt": {
@@ -93,7 +94,7 @@ DEFAULTS = {
         ],
     },
 }
-RULED = {"skew.blocked_at", "skew.flagged_at"}       # default ruled by the principal; every other default is a proposal
+RULED = {"skew.blocked_at", "skew.flagged_at", "min_release_age_days"}       # default ruled by the principal; every other default is a proposal
 
 _ENV = {
     "skew.blocked_at": ("AGET_ADOPTION_SKEW_BLOCKED_AT", int),

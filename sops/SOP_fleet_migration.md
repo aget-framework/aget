@@ -133,7 +133,7 @@ supplies defaults and says when it used them.
 **Declare the policy** in `.aget/adoption_policy.json` at the supervisor's repository root, for example:
 
 ```json
-{"skew": {"blocked_at": 3, "flagged_at": 2}, "min_release_age_days": 7, "patch_policy": "adopt-if-fixes-me",
+{"skew": {"blocked_at": 3, "flagged_at": 2}, "min_release_age_days": 0, "patch_policy": "adopt-if-fixes-me",
  "wave1_soak": {"min_hours": 24, "min_sessions": 1},
  "halt": {"max_agents_md_changed_lines": 10, "identity_patterns": ["^# ", "^\\*\\*Agent\\*\\*:"],
           "allowed_change_patterns": ["^@aget-version: \\d+\\.\\d+\\.\\d+$", "^@aget-canonical-specs: https://github\\.com/aget-framework/aget/tree/v\\d+\\.\\d+\\.\\d+/specs(?: — reliance-only conformance(?: \\(D-1, 2026-07-04\\): this template runs the version's features; specs are canonical-referenced, not copied locally)?)?$"]}}
@@ -158,7 +158,7 @@ error, never a silent default. Anything left undeclared takes the default, and
 | Setting | Default | Standing of the default |
 |---|---|---|
 | `skew.blocked_at` / `skew.flagged_at` | 3 / 2 published minor releases | the producer's own bounds for its fleet, used as the default |
-| `min_release_age_days` | 7 | proposal: in the two migrations that were rolled back in July–October 2026, the defect surfaced within six days of publication, so a week's wait lets the producer's own fleet act as the canary |
+| `min_release_age_days` | 0 | ruled: a published release is already public; the seven-day producer proposal was never approved. Receiver overrides and the separate Wave-1 soak still apply |
 | `patch_policy` | `adopt-if-fixes-me` | proposal: migrate for a patch only when it repairs something this fleet has (`always` and `never-alone` are the alternatives) |
 | `wave1_soak.min_hours` / `wave1_soak.min_sessions` | 24 / 1 | proposal: "soak ≥ 1 session" above, made measurable |
 | `halt.max_agents_md_changed_lines` | 10 | proposal: lines added plus removed (a changed line counts twice); a correct payload changes AGENTS.md by its pin lines, 2 to 4 in the migrations replayed below |
