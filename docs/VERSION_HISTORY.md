@@ -12,6 +12,10 @@ This document records selected AGET Framework releases and historical repository
 
 ## Current Version
 
+**v3.37.1** (2026-11-05) — Release record; verify publication via the annotated tag and GitHub Release object
+
+Patch on v3.37.0: the migration kit's release-age default is 0, the ruled value, so a supervisor with no policy file can adopt a release on the day it is published. See `release-notes/v3.37.1.md`. This entry does not establish publication or receiver acceptance.
+
 **v3.37.0** (2026-10-17) — Release record; verify publication via the annotated tag and GitHub Release object
 
 Receiver migration fixes (inherited git location, scope versus launch authority, runtime body skips and protected-file staging), the receiver adoption kit, the Ubuntu 24.04 runner pin and action majors, complete template payload cache gates, and distinct wind-down health timeout reporting. See `release-notes/v3.37.0.md` for upgrade steps and limitations, including the shipped permanent, append-only `data/scope_archive.jsonl` beside the ledgers. Seed each earlier ledger with scope history AND the active ledger before any launch. The gate checks ledger anchors (row count and rolling hash); fixed-form retirement archives the full entry before removal. Commit ledgers and archive together: they are one trust domain, and consistent edits of both or rollback of the whole data folder can remove evidence. This entry does not establish publication or receiver acceptance.
@@ -662,5 +666,5 @@ We acknowledge historical gaps transparently and focus on complete releases goin
 ---
 
 *VERSION_HISTORY.md - Selected release history for AGET Framework*
-*Last Updated: 2026-10-17 (v3.37.0 release record)*
+*Last Updated: 2026-11-05 (v3.37.1 release record)*
 *Maintained by: aget-framework*

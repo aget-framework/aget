@@ -11,11 +11,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Items confirmed in-flight for a future release (latest released: **3.37.0**). Per Keep a Changelog 1.1.0 forward-work convention.
+Items confirmed in-flight for a future release (latest released: **3.37.1**). Per Keep a Changelog 1.1.0 forward-work convention.
 
 - Issue-governance spec delta for the `/aget-file-issue` pre-filing probes (skill layer shipped in 3.26.0; formal requirement rides the next spec pass).
 - Template `/aget-file-issue` structural refresh (routing + probe steps to all templates; fleet routing propagation staged per the 3.26.0 rollout decision).
 - **Traceability ratchet**: the test-requirement floor rises +5pp per minor release from the v3.29 measured floor.
+
+## [3.37.1] - 2026-11-05
+
+Patch on v3.37.0. Previous release: v3.37.0. Prepared files do not establish publication or receiver acceptance.
+
+### Fixed
+
+- **Migration kit release-age default is 0** (`scripts/migration_kit/adoption_policy.py`, `sops/SOP_fleet_migration.md`): with no adoption policy file, a supervisor was told `DO NOT ADOPT YET` for the first 7 days after a release. The ruled default is 0; the 7-day value was a proposal, never approved (disclosed in `handoffs/CORRECTIONS_v3.37.0.md`, row 2). A wait you declare in the environment or policy file still applies, as do the patch rule and the Wave-1 soak. Failing-first controls added under `tests/migration_kit/`.
 
 ## [3.37.0] - 2026-10-17
 
